@@ -11,7 +11,7 @@
 -----------------------------------------------
 -- Initialization
 
-local LIBRARY_VERSION = 5.0004;
+local LIBRARY_VERSION = 5.0002;
 local LIBRARY_NAME = "CT_Library";
 
 local _G = getfenv(0);
@@ -751,7 +751,7 @@ end
 local charKey;
 local function getCharKey()
 	if ( not charKey ) then
-		charKey = "CHAR-"..(UnitName("player")or"Unknown").."-"..(GetRealmName()or"Unknown");
+		charKey = "CHAR-"..(UnitName("player")or"Unknown").."-"..(GetCVar("realmName")or"Unknown");
 	end
 	return charKey;
 end
@@ -1430,6 +1430,8 @@ local function updateSliderText(slider, value)
 end
 
 local function updateSliderValue(self, value)
+	local valueStep = self:GetValueStep()
+	value = floor(value / valueStep  + 0.5) * valueStep
 	updateSliderText(self, value);
 	
 	local option = self.option;
@@ -1451,6 +1453,7 @@ objectHandlers.slider = function(self, parent, name, virtual, option, text, valu
 	
 	slider:SetMinMaxValues(minValue, maxValue);
 	slider:SetValueStep(step);
+
 	slider:SetValue(self:getOption(option) or (maxValue-minValue)/2);
 	slider:SetScript("OnValueChanged", updateSliderValue);
 	

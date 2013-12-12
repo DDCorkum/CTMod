@@ -1,5 +1,5 @@
-## Interface: 50300
-## Version: 5.3
+## Interface: 50400
+## Version: 5.4
 ## Title: CT_MailMod
 ## Notes: Heavily improves the in-game mail functionality.
 ## SavedVariables: CT_MailModOptions

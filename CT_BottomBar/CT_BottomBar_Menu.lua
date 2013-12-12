@@ -25,8 +25,8 @@
 -- LFDMicroButton
 -- CompanionsMicroButton
 -- EJMicroButton
+-- StoreMicroButton
 -- MainMenuMicroButton
--- HelpMicroButton
 --
 -- MainMenuBarArtFrame
 -- OverrideActionBarLeaveFrame:
@@ -457,8 +457,9 @@ local function addon_Register()
 		LFDMicroButton, -- 9
 		CompanionsMicroButton, -- 10
 		EJMicroButton, -- 11
-		MainMenuMicroButton, -- 12
-		HelpMicroButton -- 13
+		StoreMicroButton, -- 12
+		MainMenuMicroButton -- 13
+		--HelpMicroButton -- 14
 	);
 end
 

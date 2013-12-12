@@ -942,9 +942,9 @@ function useButton:updateCooldown()
 	local actionCooldown, controlCooldown;
 	local cooldown = self.button.cooldown;
 	-- Action cooldown
-	local start, duration, enable, charges, maxCharges = GetActionCooldown(self.actionId);
-	if ( start and start > 0 and duration > 0 and enable > 0 ) then
-		cooldown:SetCooldown(start, duration, charges, maxCharges);
+	local start, duration, enable = GetActionCooldown(self.actionId);
+	if ( start > 0 and duration > 0 and enable > 0 ) then
+		cooldown:SetCooldown(start, duration);
 		actionCooldown = true;
 		if ( displayCount ) then
 			startCooldown(cooldown, start, duration);
@@ -958,7 +958,7 @@ function useButton:updateCooldown()
 	-- Loss of control cooldown
 	local start, duration = GetActionLossOfControlCooldown(self.actionId);
 	cooldown:SetLossOfControlCooldown(start, duration);
-	if (start and start > 0 and duration > 0) then
+	if (start > 0 and duration > 0) then
 		controlCooldown = true;
 	else
 		controlCooldown = false;
@@ -1875,8 +1875,8 @@ module.useEnable = function(self)
 	self:regEvent("UNIT_INVENTORY_CHANGED", eventHandler_UpdateAll);
 	self:regEvent("PET_STABLE_UPDATE", eventHandler_UpdateAll);
 	self:regEvent("PET_STABLE_SHOW", eventHandler_UpdateAll);
---	self:regEvent("ACTIONBAR_HIDEGRID", eventHandler_HideGrid);
---	self:regEvent("ACTIONBAR_SHOWGRID", eventHandler_ShowGrid);
+	--self:regEvent("ACTIONBAR_HIDEGRID", eventHandler_HideGrid);
+	--self:regEvent("ACTIONBAR_SHOWGRID", eventHandler_ShowGrid);
 	self:regEvent("ACTIONBAR_UPDATE_STATE", eventHandler_UpdateState);
 	self:regEvent("ACTIONBAR_UPDATE_COOLDOWN", eventHandler_UpdateCooldown);
 	self:regEvent("ACTIONBAR_UPDATE_USABLE", eventHandler_UpdateUsable);
@@ -1900,7 +1900,6 @@ module.useEnable = function(self)
 	self:regEvent("SPELL_ACTIVATION_OVERLAY_GLOW_SHOW", eventHandler_ShowOverlayGlow);
 	self:regEvent("SPELL_ACTIVATION_OVERLAY_GLOW_HIDE", eventHandler_HideOverlayGlow);
 	self:regEvent("SPELL_UPDATE_CHARGES", eventHandler_updateCount);
-	self:regEvent("UPDATE_SHAPESHIFT_FORM", eventHandler_updateAll);
 	self:regEvent("UPDATE_VEHICLE_ACTIONBAR", eventHandler_updateAll);
 	self:regEvent("UPDATE_OVERRIDE_ACTIONBAR", eventHandler_updateAll);
 	self:regEvent("UPDATE_POSSESS_BAR", eventHandler_updateAll);
@@ -1941,7 +1940,6 @@ module.useDisable = function(self)
 	self:unregEvent("SPELL_ACTIVATION_OVERLAY_GLOW_SHOW", eventHandler_ShowOverlayGlow);
 	self:unregEvent("SPELL_ACTIVATION_OVERLAY_GLOW_HIDE", eventHandler_HideOverlayGlow);
 	self:unregEvent("SPELL_UPDATE_CHARGES", eventHandler_updateCount);
-	self:unregEvent("UPDATE_SHAPESHIFT_FORM", eventHandler_updateAll);
 	self:unregEvent("UPDATE_VEHICLE_ACTIONBAR", eventHandler_updateAll);
 	self:unregEvent("UPDATE_OVERRIDE_ACTIONBAR", eventHandler_updateAll);
 	self:unregEvent("UPDATE_POSSESS_BAR", eventHandler_updateAll);

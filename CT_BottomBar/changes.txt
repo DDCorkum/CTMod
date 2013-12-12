@@ -1,3 +1,7 @@
+CT_BottomBar (5.4) 2013-12-12
+- Updated for the WoW 5.4 patch.
+- Updated microbuttons.
+
 CT_BottomBar (5.3) 2013-05-24
 - Updated for the WoW 5.3 patch.
 
