@@ -1,0 +1,13 @@
+## Interface: 50300
+## Version: 5.3
+## Title: CT_UnitFrames
+## Notes: Changes display of hp/mana values and adds a percentage
+## SavedVariables: CT_UnitFramesOptions
+CT_Library.lua
+CT_UnitFrames.lua
+CT_PlayerFrame.xml
+CT_TargetFrame.xml
+CT_AssistFrame.xml
+CT_FocusFrame.xml
+CT_PartyFrame.xml
+CT_UnitFrameOptions.xml

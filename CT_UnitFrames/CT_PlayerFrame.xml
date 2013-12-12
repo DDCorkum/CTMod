@@ -1,0 +1,38 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+	<Script file="localization.lua"/>
+	<Script file="localization.ge.lua"/>
+	<Script file="localization.fr.lua"/>
+	<Script file="CT_PlayerFrame.lua"/>
+	<Frame name="CT_PlayerFrame" parent="PlayerFrame">
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="CT_PlayerHealthRight" inherits="GameFontNormalSmall" text="">
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="PlayerFrame" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="-3.4" y="-46"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CT_PlayerManaRight" inherits="GameFontNormalSmall" text="">
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="PlayerFrame" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="-5" y="-57"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				self:SetParent(PlayerFrameTexture:GetParent());
+				TargetFrame:ClearAllPoints();
+				TargetFrame:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 265, -4);
+			</OnLoad>
+		</Scripts>
+	</Frame>
+</Ui>

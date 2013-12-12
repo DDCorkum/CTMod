@@ -1,0 +1,7 @@
+## Interface: 50300
+## Version: 5.3
+## Title: CT_Timer
+## Notes: Shows a timer that counts both up and down.
+## SavedVariables: CT_TimerOptions
+CT_Library.lua
+CT_Timer.xml

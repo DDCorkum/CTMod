@@ -1,0 +1,17 @@
+## Interface: 50300
+## Version: 5.3
+## Title: CT_BarMod
+## Notes: Intuitive yet powerful action bar addon.
+## SavedVariables: CT_BarModOptions
+## OptionalDeps: Masque
+CT_Library.lua
+CT_BarMod.lua
+CT_BarMod_ActionButton.lua
+CT_BarMod_Groups.lua
+CT_BarMod_KeyBindings.lua
+CT_BarMod_Masque.lua
+CT_BarMod_Skins.lua
+CT_BarMod_Use.lua
+CT_BarMod_Shift.lua
+CT_BarMod_Options.lua
+Bindings.xml

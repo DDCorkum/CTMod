@@ -1,0 +1,21 @@
+## Interface: 50300
+## Version: 5.3
+## Title: CT_MailMod
+## Notes: Heavily improves the in-game mail functionality.
+## SavedVariables: CT_MailModOptions
+CT_Library.lua
+CT_MailMod.lua
+localization.lua
+Bindings.xml
+
+CT_MailMod_Utility.lua
+CT_MailMod_MailLog.lua
+CT_MailMod_MailStructure_Incoming.lua
+CT_MailMod_MailStructure_Outgoing.lua
+CT_MailMod_MailActions.lua
+CT_MailMod_MassOpening.lua
+CT_MailMod_OpenMail.lua
+CT_MailMod_SendMail.lua
+CT_MailMod_StockUI.lua
+CT_MailMod_Options.lua
+CT_MailMod_Alts.lua

@@ -1,0 +1,62 @@
+<Bindings>
+	<Binding name="CT_RA_MTPLAYERS_MTPLAYER1" header="CT_RA_MTPLAYERS" runOnUp="true">
+		-- Dummy binding
+	</Binding>
+	<Binding name="CT_RA_MTPLAYERS_MTPLAYER2"  runOnUp="true">
+		-- Dummy binding
+	</Binding>
+	<Binding name="CT_RA_MTPLAYERS_MTPLAYER3"  runOnUp="true">
+		-- Dummy binding
+	</Binding>
+	<Binding name="CT_RA_MTPLAYERS_MTPLAYER4"  runOnUp="true">
+		-- Dummy binding
+	</Binding>
+	<Binding name="CT_RA_MTPLAYERS_MTPLAYER5"  runOnUp="true">
+		-- Dummy binding
+	</Binding>
+	<Binding name="CT_RA_MTPLAYERS_MTPLAYER6"  runOnUp="true">
+		-- Dummy binding
+	</Binding>
+	<Binding name="CT_RA_MTPLAYERS_MTPLAYER7"  runOnUp="true">
+		-- Dummy binding
+	</Binding>
+	<Binding name="CT_RA_MTPLAYERS_MTPLAYER8"  runOnUp="true">
+		-- Dummy binding
+	</Binding>
+	<Binding name="CT_RA_MTPLAYERS_MTPLAYER9"  runOnUp="true">
+		-- Dummy binding
+	</Binding>
+	<Binding name="CT_RA_MTPLAYERS_MTPLAYER10"  runOnUp="true">
+		-- Dummy binding
+	</Binding>
+	<Binding name="CT_RA_MTPLAYERS_MTPET1"  runOnUp="true">
+		-- Dummy binding
+	</Binding>
+	<Binding name="CT_RA_MTPLAYERS_MTPET2"  runOnUp="true">
+		-- Dummy binding
+	</Binding>
+	<Binding name="CT_RA_MTPLAYERS_MTPET3"  runOnUp="true">
+		-- Dummy binding
+	</Binding>
+	<Binding name="CT_RA_MTPLAYERS_MTPET4"  runOnUp="true">
+		-- Dummy binding
+	</Binding>
+	<Binding name="CT_RA_MTPLAYERS_MTPET5"  runOnUp="true">
+		-- Dummy binding
+	</Binding>
+	<Binding name="CT_RA_MTPLAYERS_MTPET6"  runOnUp="true">
+		-- Dummy binding
+	</Binding>
+	<Binding name="CT_RA_MTPLAYERS_MTPET7"  runOnUp="true">
+		-- Dummy binding
+	</Binding>
+	<Binding name="CT_RA_MTPLAYERS_MTPET8"  runOnUp="true">
+		-- Dummy binding
+	</Binding>
+	<Binding name="CT_RA_MTPLAYERS_MTPET9"  runOnUp="true">
+		-- Dummy binding
+	</Binding>
+	<Binding name="CT_RA_MTPLAYERS_MTPET10"  runOnUp="true">
+		-- Dummy binding
+	</Binding>
+</Bindings>

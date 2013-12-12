@@ -1,0 +1,12 @@
+## Interface: 50300
+## Version: 5.3
+## Title: CT_BuffMod
+## Notes: Customizable buff display
+## SavedVariables: CT_BuffModOptions
+CT_Library.lua
+CT_BuffMod.xml
+CT_BuffMod.lua
+CT_BuffMod_Parsing.lua
+CT_BuffMod_Options.lua
+localization.lua
+Bindings.xml

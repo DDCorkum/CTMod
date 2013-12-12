@@ -1,0 +1,9 @@
+## Interface: 50300
+## Version: 5.3
+## Title: CT_RaidAssist_MTPlayers
+## Author: Dargen (Guild: Eternal Keggers, Server: Terenas)
+## Notes: Adds a Main Tank Players group and a Main Tank Pets group to CT_RaidAssist's Main Tank Targets group. Right click the title of the Main Tank Targets group to configure the settings.
+## DefaultState: enabled
+## RequiredDeps: CT_RaidAssist
+## SavedVariables: CT_RA_MTPlayers_Status
+CT_RaidAssist_MTPlayers.xml

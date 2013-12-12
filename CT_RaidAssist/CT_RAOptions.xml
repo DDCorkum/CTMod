@@ -1,0 +1,882 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+	<Script file="CT_RAOptions.lua"/>
+	<Button name="CT_RAOptionsFrameTabTemplate" inherits="CharacterFrameTabButtonTemplate" virtual="true">
+		<Scripts>
+			<OnClick>
+				CT_RATabFrame_Tab_OnClick(self);
+			</OnClick>
+		</Scripts>
+	</Button>
+	<Frame name="CT_RATabFrame" toplevel="true" parent="UIParent" movable="true" enableMouse="true" hidden="true">
+		<Size>
+			<AbsDimension x="384" y="512"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="-104"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<HitRectInsets>
+			<AbsInset left="0" right="30" top="0" bottom="45"/>
+		</HitRectInsets>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture file="Interface\FriendsFrame\FriendsFrameScrollIcon">
+					<Size>
+						<AbsDimension x="60" y="60"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="7" y="-6"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture name="CT_RATabFrameTopLeft" file="Interface\PaperDollInfoFrame\UI-Character-General-TopLeft">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture name="CT_RATabFrameTopRight" file="Interface\PaperDollInfoFrame\UI-Character-General-TopRight">
+					<Size>
+						<AbsDimension x="128" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture name="CT_RATabFrameBottomLeft" file="Interface\FriendsFrame\UI-FriendsFrame-BotLeft">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture name="CT_RATabFrameBottomRight" file="Interface\FriendsFrame\UI-FriendsFrame-BotRight">
+					<Size>
+						<AbsDimension x="128" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY">
+				<FontString name="CT_RATabFrameTitleText" inherits="GameFontNormal" text="CT_RaidAssist">
+					<Size>
+						<AbsDimension x="250" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="3" y="-16"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				CT_RATabFrame_OnLoad(self);
+			</OnLoad>
+			<OnShow>
+				CT_RATabFrame_OnShow(self);
+			</OnShow>
+			<OnHide>
+				CT_RATabFrame_OnHide(self);
+			</OnHide>
+		</Scripts>
+		<Frames>
+			<Button name="CT_RATabFrameCloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-30" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentTab1" inherits="CT_RAOptionsFrameTabTemplate" id="1" text="Players">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="11" y="46"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentTab2" inherits="CT_RAOptionsFrameTabTemplate" id="2" text="Show">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentTab1" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-15" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+		</Frames>
+	</Frame>
+
+	<CheckButton name="CT_RACheckButtonGroupTemplate" virtual="true" hidden="false" inherits="OptionsCheckButtonTemplate">
+		<HitRectInsets>
+			<AbsInset left="0" right="0" top="0" bottom="0"/>
+		</HitRectInsets>
+		<Size>
+			<AbsDimension x="16" y="16"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="$parentLabel" inherits="GameFontHighlightSmall" text="">
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent">
+							<Offset>
+								<AbsDimension x="2" y="1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnClick>
+				CT_RA_GroupCB_OnClick(self);
+			</OnClick>
+			<OnLoad>
+				self.id = self:GetID();
+			</OnLoad>
+		</Scripts>
+	</CheckButton>
+
+	<CheckButton name="CT_RACheckButtonClassTemplate" virtual="true" hidden="false" inherits="OptionsCheckButtonTemplate">
+		<HitRectInsets>
+			<AbsInset left="0" right="0" top="0" bottom="0"/>
+		</HitRectInsets>
+		<Size>
+			<AbsDimension x="16" y="16"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="$parentLabel" inherits="GameFontHighlightSmall" text="">
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent">
+							<Offset>
+								<AbsDimension x="2" y="1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnClick>
+				CT_RA_ClassCB_OnClick(self);
+			</OnClick>
+			<OnLoad>
+				self.id = self:GetID();
+			</OnLoad>
+		</Scripts>
+	</CheckButton>
+
+	<Button name="CT_RAOptionsGroupButtonTemplate" movable="true" virtual="true">
+		<Size>
+			<AbsDimension x="156" y="14"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentRank" inherits="GameFontNormalSmall" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="18" y="8"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="1" y="1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentName" inherits="GameFontNormalSmall" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="60" y="8"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentRank" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="2" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentLevel" inherits="GameFontNormalSmall" justifyH="CENTER">
+					<Size>
+						<AbsDimension x="22" y="8"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentName" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="5" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentClass" inherits="GameFontNormalSmall" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="50" y="8"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="110" y="1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="$parentDropDown" inherits="UIDropDownMenuTemplate" id="1" hidden="false">
+				<Size>
+					<AbsDimension x="10" y="10"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="70" y="10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						CT_RAMemberDropDown_OnLoad(self);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				self:SetFrameLevel(self:GetFrameLevel() + 2);
+				self:RegisterForClicks("RightButtonUp");
+			</OnLoad>
+			<OnMouseDown>
+				CT_RAOptionsGroupButton_OnMouseDown(self, button);
+			</OnMouseDown>
+		</Scripts>
+		<NormalTexture name="$parentTexture" file="Interface\RaidFrame\UI-RaidFrame-GroupButton">
+			<TexCoords left="0" right="0.640625" top="0" bottom="0.4375"/>
+		</NormalTexture>
+		<HighlightTexture file="Interface\RaidFrame\UI-RaidFrame-GroupButton" alphaMode="ADD">
+			<TexCoords left="0" right="0.640625" top="0.46875" bottom="0.90625"/>
+		</HighlightTexture>
+	</Button>
+	<Button name="CT_RAOptionsGroupSlotTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="156" y="14"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString inherits="GameFontDarkGraySmall" text="EMPTY">
+					<Anchors>
+						<Anchor point="CENTER">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<HighlightTexture file="Interface\RaidFrame\UI-RaidFrame-GroupButton" alphaMode="ADD">
+			<TexCoords left="0" right="0.640625" top="0.46875" bottom="0.90625"/>
+		</HighlightTexture>
+	</Button>
+	<Frame name="CT_RAOptionsGroupTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="162" y="80"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="$parentLabel" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<Texture file="Interface\RaidFrame\UI-RaidFrame-GroupOutline">
+					<Size>
+						<AbsDimension x="162" y="80"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+					<TexCoords left="0" right="0.6640625" top="0" bottom="0.625"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentSlot1" id="1" inherits="CT_RAOptionsGroupSlotTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="3" y="-3"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentSlot2" id="2" inherits="CT_RAOptionsGroupSlotTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentSlot1" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentSlot3" id="3" inherits="CT_RAOptionsGroupSlotTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentSlot2" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentSlot4" id="4" inherits="CT_RAOptionsGroupSlotTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentSlot3" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentSlot5" id="5" inherits="CT_RAOptionsGroupSlotTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentSlot4" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				_G[self:GetName().."Label"]:SetText(GROUP.." "..self:GetID());
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+	<Frame name="CT_RAOptionsFrame" setAllPoints="true" parent="CT_RATabFrame">
+		<Frames>
+			<Frame name="CT_RAOptionsGroup1" inherits="CT_RAOptionsGroupTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="16" y="-70"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="CT_RAOptionsGroup2" inherits="CT_RAOptionsGroupTemplate" id="2">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="CT_RAOptionsGroup1" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="3" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="CT_RAOptionsGroup3" inherits="CT_RAOptionsGroupTemplate" id="3">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="CT_RAOptionsGroup1" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-14"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="CT_RAOptionsGroup4" inherits="CT_RAOptionsGroupTemplate" id="4">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="CT_RAOptionsGroup3" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="3" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="CT_RAOptionsGroup5" inherits="CT_RAOptionsGroupTemplate" id="5">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="CT_RAOptionsGroup3" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-14"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="CT_RAOptionsGroup6" inherits="CT_RAOptionsGroupTemplate" id="6">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="CT_RAOptionsGroup5" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="3" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="CT_RAOptionsGroup7" inherits="CT_RAOptionsGroupTemplate" id="7">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="CT_RAOptionsGroup5" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-14"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="CT_RAOptionsGroup8" inherits="CT_RAOptionsGroupTemplate" id="8">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="CT_RAOptionsGroup7" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="3" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Button name="CT_RAOptionsGroupButton1" inherits="CT_RAOptionsGroupButtonTemplate" id="1"/>
+			<Button name="CT_RAOptionsGroupButton2" inherits="CT_RAOptionsGroupButtonTemplate" id="2"/>
+			<Button name="CT_RAOptionsGroupButton3" inherits="CT_RAOptionsGroupButtonTemplate" id="3"/>
+			<Button name="CT_RAOptionsGroupButton4" inherits="CT_RAOptionsGroupButtonTemplate" id="4"/>
+			<Button name="CT_RAOptionsGroupButton5" inherits="CT_RAOptionsGroupButtonTemplate" id="5"/>
+			<Button name="CT_RAOptionsGroupButton6" inherits="CT_RAOptionsGroupButtonTemplate" id="6"/>
+			<Button name="CT_RAOptionsGroupButton7" inherits="CT_RAOptionsGroupButtonTemplate" id="7"/>
+			<Button name="CT_RAOptionsGroupButton8" inherits="CT_RAOptionsGroupButtonTemplate" id="8"/>
+			<Button name="CT_RAOptionsGroupButton9" inherits="CT_RAOptionsGroupButtonTemplate" id="9"/>
+			<Button name="CT_RAOptionsGroupButton10" inherits="CT_RAOptionsGroupButtonTemplate" id="10"/>
+			<Button name="CT_RAOptionsGroupButton11" inherits="CT_RAOptionsGroupButtonTemplate" id="11"/>
+			<Button name="CT_RAOptionsGroupButton12" inherits="CT_RAOptionsGroupButtonTemplate" id="12"/>
+			<Button name="CT_RAOptionsGroupButton13" inherits="CT_RAOptionsGroupButtonTemplate" id="13"/>
+			<Button name="CT_RAOptionsGroupButton14" inherits="CT_RAOptionsGroupButtonTemplate" id="14"/>
+			<Button name="CT_RAOptionsGroupButton15" inherits="CT_RAOptionsGroupButtonTemplate" id="15"/>
+			<Button name="CT_RAOptionsGroupButton16" inherits="CT_RAOptionsGroupButtonTemplate" id="16"/>
+			<Button name="CT_RAOptionsGroupButton17" inherits="CT_RAOptionsGroupButtonTemplate" id="17"/>
+			<Button name="CT_RAOptionsGroupButton18" inherits="CT_RAOptionsGroupButtonTemplate" id="18"/>
+			<Button name="CT_RAOptionsGroupButton19" inherits="CT_RAOptionsGroupButtonTemplate" id="19"/>
+			<Button name="CT_RAOptionsGroupButton20" inherits="CT_RAOptionsGroupButtonTemplate" id="20"/>
+			<Button name="CT_RAOptionsGroupButton21" inherits="CT_RAOptionsGroupButtonTemplate" id="21"/>
+			<Button name="CT_RAOptionsGroupButton22" inherits="CT_RAOptionsGroupButtonTemplate" id="22"/>
+			<Button name="CT_RAOptionsGroupButton23" inherits="CT_RAOptionsGroupButtonTemplate" id="23"/>
+			<Button name="CT_RAOptionsGroupButton24" inherits="CT_RAOptionsGroupButtonTemplate" id="24"/>
+			<Button name="CT_RAOptionsGroupButton25" inherits="CT_RAOptionsGroupButtonTemplate" id="25"/>
+			<Button name="CT_RAOptionsGroupButton26" inherits="CT_RAOptionsGroupButtonTemplate" id="26"/>
+			<Button name="CT_RAOptionsGroupButton27" inherits="CT_RAOptionsGroupButtonTemplate" id="27"/>
+			<Button name="CT_RAOptionsGroupButton28" inherits="CT_RAOptionsGroupButtonTemplate" id="28"/>
+			<Button name="CT_RAOptionsGroupButton29" inherits="CT_RAOptionsGroupButtonTemplate" id="29"/>
+			<Button name="CT_RAOptionsGroupButton30" inherits="CT_RAOptionsGroupButtonTemplate" id="30"/>
+			<Button name="CT_RAOptionsGroupButton31" inherits="CT_RAOptionsGroupButtonTemplate" id="31"/>
+			<Button name="CT_RAOptionsGroupButton32" inherits="CT_RAOptionsGroupButtonTemplate" id="32"/>
+			<Button name="CT_RAOptionsGroupButton33" inherits="CT_RAOptionsGroupButtonTemplate" id="33"/>
+			<Button name="CT_RAOptionsGroupButton34" inherits="CT_RAOptionsGroupButtonTemplate" id="34"/>
+			<Button name="CT_RAOptionsGroupButton35" inherits="CT_RAOptionsGroupButtonTemplate" id="35"/>
+			<Button name="CT_RAOptionsGroupButton36" inherits="CT_RAOptionsGroupButtonTemplate" id="36"/>
+			<Button name="CT_RAOptionsGroupButton37" inherits="CT_RAOptionsGroupButtonTemplate" id="37"/>
+			<Button name="CT_RAOptionsGroupButton38" inherits="CT_RAOptionsGroupButtonTemplate" id="38"/>
+			<Button name="CT_RAOptionsGroupButton39" inherits="CT_RAOptionsGroupButtonTemplate" id="39"/>
+			<Button name="CT_RAOptionsGroupButton40" inherits="CT_RAOptionsGroupButtonTemplate" id="40"/>
+
+			<Button name="CT_RAOptionsButton" inherits="UIPanelButtonTemplate" text="Options">
+				<Size>
+					<AbsDimension x="110" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="70" y="-37"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CT_RAMenuFrame:Show();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnUpdate>
+				CT_RAOptionsGroupFrame_OnUpdate(self, elapsed);
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+	<Frame name="CT_RAOptions2Frame" setAllPoints="true" parent="CT_RATabFrame">
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentGroupsText" text="Groups to show when sorting by group" inherits="GameFontNormal">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="25" y="-100"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentClassesText" text="Classes to show when sorting by class" inherits="GameFontNormal">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent">
+							<Offset>
+								<AbsDimension x="25" y="-200"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentOptionsText" text="Options" inherits="GameFontNormal">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent">
+							<Offset>
+								<AbsDimension x="25" y="-340"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<CheckButton name="CT_RAOptions2GroupCB1" inherits="CT_RaCheckButtonGroupTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parentGroupsText">
+						<Offset>
+							<AbsDimension x="-3" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_RAOptions2GroupCB2" inherits="CT_RaCheckButtonGroupTemplate" id="2">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CT_RAOptions2GroupCB1">
+						<Offset>
+							<AbsDimension x="135" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_RAOptions2GroupCB3" inherits="CT_RaCheckButtonGroupTemplate" id="3">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="CT_RAOptions2GroupCB1">
+						<Offset>
+							<AbsDimension x="0" y="-3"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_RAOptions2GroupCB4" inherits="CT_RaCheckButtonGroupTemplate" id="4">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CT_RAOptions2GroupCB3">
+						<Offset>
+							<AbsDimension x="135" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_RAOptions2GroupCB5" inherits="CT_RaCheckButtonGroupTemplate" id="5">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="CT_RAOptions2GroupCB3">
+						<Offset>
+							<AbsDimension x="0" y="-3"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_RAOptions2GroupCB6" inherits="CT_RaCheckButtonGroupTemplate" id="6">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CT_RAOptions2GroupCB5">
+						<Offset>
+							<AbsDimension x="135" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_RAOptions2GroupCB7" inherits="CT_RaCheckButtonGroupTemplate" id="7">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="CT_RAOptions2GroupCB5">
+						<Offset>
+							<AbsDimension x="0" y="-3"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_RAOptions2GroupCB8" inherits="CT_RaCheckButtonGroupTemplate" id="8">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CT_RAOptions2GroupCB7">
+						<Offset>
+							<AbsDimension x="135" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_RAOptions2ClassCB1" inherits="CT_RaCheckButtonClassTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parentClassesText">
+						<Offset>
+							<AbsDimension x="-3" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_RAOptions2ClassCB2" inherits="CT_RaCheckButtonClassTemplate" id="2">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CT_RAOptions2ClassCB1">
+						<Offset>
+							<AbsDimension x="135" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_RAOptions2ClassCB3" inherits="CT_RaCheckButtonClassTemplate" id="3">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="CT_RAOptions2ClassCB1">
+						<Offset>
+							<AbsDimension x="0" y="-3"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_RAOptions2ClassCB4" inherits="CT_RaCheckButtonClassTemplate" id="4">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CT_RAOptions2ClassCB3">
+						<Offset>
+							<AbsDimension x="135" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_RAOptions2ClassCB5" inherits="CT_RaCheckButtonClassTemplate" id="5">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="CT_RAOptions2ClassCB3">
+						<Offset>
+							<AbsDimension x="0" y="-3"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_RAOptions2ClassCB6" inherits="CT_RaCheckButtonClassTemplate" id="6">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CT_RAOptions2ClassCB5">
+						<Offset>
+							<AbsDimension x="135" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_RAOptions2ClassCB7" inherits="CT_RaCheckButtonClassTemplate" id="7">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="CT_RAOptions2ClassCB5">
+						<Offset>
+							<AbsDimension x="0" y="-3"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_RAOptions2ClassCB8" inherits="CT_RaCheckButtonClassTemplate" id="8">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CT_RAOptions2ClassCB7">
+						<Offset>
+							<AbsDimension x="135" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_RAOptions2ClassCB9" inherits="CT_RaCheckButtonClassTemplate" id="9">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="CT_RAOptions2ClassCB7">
+						<Offset>
+							<AbsDimension x="0" y="-3"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_RAOptions2ClassCB10" inherits="CT_RaCheckButtonClassTemplate" id="10">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CT_RAOptions2ClassCB9">
+						<Offset>
+							<AbsDimension x="135" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_RAOptions2ClassCB11" inherits="CT_RaCheckButtonClassTemplate" id="11">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="CT_RAOptions2ClassCB9">
+						<Offset>
+							<AbsDimension x="0" y="-3"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_RASortWindowPositions" hidden="false" inherits="OptionsCheckButtonTemplate">
+				<HitRectInsets>
+					<AbsInset left="0" right="0" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Size>
+					<AbsDimension x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parentOptionsText">
+						<Offset>
+							<AbsDimension x="-3" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CT_RA_SortWindowPositions(self:GetChecked());
+					</OnClick>
+				</Scripts>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentText" text="Allow different frame positions per sort type" inherits="GameFontHighlightSmall">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="2" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</CheckButton>
+			<CheckButton name="CT_RACheckAllGroupsAndClasses" hidden="false" inherits="OptionsCheckButtonTemplate">
+				<HitRectInsets>
+					<AbsInset left="0" right="0" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="75" y="-35"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CT_RA_CheckAllGroupsAndClasses(self:GetChecked());
+					</OnClick>
+				</Scripts>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentText" text="Check all groups and classes" inherits="GameFontNormalSmall">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="2" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</CheckButton>
+			<CheckButton name="CT_RACheckAllGroups" hidden="false" inherits="OptionsCheckButtonTemplate">
+				<HitRectInsets>
+					<AbsInset left="0" right="0" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="75" y="-53"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CT_RA_CheckAllGroups(self:GetChecked());
+					</OnClick>
+				</Scripts>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentText" text="Check all groups" inherits="GameFontNormalSmall">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="2" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</CheckButton>
+			<CheckButton name="CT_RACheckAllClasses" hidden="false" inherits="OptionsCheckButtonTemplate">
+				<HitRectInsets>
+					<AbsInset left="0" right="0" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="75" y="-71"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CT_RA_CheckAllClasses(self:GetChecked());
+					</OnClick>
+				</Scripts>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentText" text="Check all classes" inherits="GameFontNormalSmall">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="2" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</CheckButton>
+		</Frames>
+
+		<Scripts>
+			<OnShow>
+				CT_RAOptions2Frame_OnShow(self);
+			</OnShow>
+		</Scripts>
+	</Frame>
+</Ui>

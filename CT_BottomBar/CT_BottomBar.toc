@@ -1,0 +1,23 @@
+## Interface: 50300
+## Version: 5.3
+## Title: CT_BottomBar
+## Notes: Breaks up the main menu bar into movable pieces.
+## SavedVariables: CT_BottomBarOptions
+CT_Library.lua
+CT_BottomBar.lua
+CT_BottomBar_MainMenu.lua
+CT_BottomBar_Override.lua
+CT_BottomBar_PetBattle.lua
+CT_BottomBar_Options.lua
+CT_BottomBar_Addons.lua
+CT_BottomBar_Arrows.lua
+CT_BottomBar_Bags.lua
+CT_BottomBar_Class.lua
+CT_BottomBar_Exp.lua
+CT_BottomBar_Extra.lua
+CT_BottomBar_Menu.lua
+CT_BottomBar_MultiCast.lua
+CT_BottomBar_Pet.lua
+CT_BottomBar_Possess.lua
+CT_BottomBar_Rep.lua
+CT_BottomBar_Vehicle.lua

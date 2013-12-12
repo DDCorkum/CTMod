@@ -1,0 +1,11 @@
+## Interface: 50300
+## Version: 5.3
+## Title: CT_Core
+## Notes: General nifty features for CTMod.
+## SavedVariables: CT_CoreOptions
+CT_Library.lua
+CT_Core.lua
+CT_Core_Chat.lua
+CT_Core_Other.lua
+localization.lua
+Bindings.xml

@@ -1,0 +1,146 @@
+<Bindings>
+	<Binding name="CLICK CT_BarModActionButton1:LeftButton" header="CT_BarMod_Bar1" />
+	<Binding name="CLICK CT_BarModActionButton2:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton3:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton4:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton5:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton6:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton7:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton8:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton9:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton10:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton11:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton12:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton13:LeftButton" header="CT_BarMod_Bar2" />
+	<Binding name="CLICK CT_BarModActionButton14:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton15:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton16:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton17:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton18:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton19:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton20:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton21:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton22:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton23:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton24:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton25:LeftButton" header="CT_BarMod_Bar3" />
+	<Binding name="CLICK CT_BarModActionButton26:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton27:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton28:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton29:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton30:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton31:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton32:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton33:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton34:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton35:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton36:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton37:LeftButton" header="CT_BarMod_Bar4" />
+	<Binding name="CLICK CT_BarModActionButton38:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton39:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton40:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton41:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton42:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton43:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton44:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton45:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton46:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton47:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton48:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton49:LeftButton" header="CT_BarMod_Bar5" />
+	<Binding name="CLICK CT_BarModActionButton50:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton51:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton52:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton53:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton54:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton55:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton56:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton57:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton58:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton59:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton60:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton61:LeftButton" header="CT_BarMod_Bar6" />
+	<Binding name="CLICK CT_BarModActionButton62:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton63:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton64:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton65:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton66:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton67:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton68:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton69:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton70:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton71:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton72:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton73:LeftButton" header="CT_BarMod_Bar7" />
+	<Binding name="CLICK CT_BarModActionButton74:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton75:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton76:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton77:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton78:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton79:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton80:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton81:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton82:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton83:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton84:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton85:LeftButton" header="CT_BarMod_Bar8" />
+	<Binding name="CLICK CT_BarModActionButton86:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton87:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton88:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton89:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton90:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton91:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton92:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton93:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton94:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton95:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton96:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton97:LeftButton" header="CT_BarMod_Bar9" />
+	<Binding name="CLICK CT_BarModActionButton98:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton99:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton100:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton101:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton102:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton103:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton104:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton105:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton106:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton107:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton108:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton109:LeftButton" header="CT_BarMod_Bar10" />
+	<Binding name="CLICK CT_BarModActionButton110:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton111:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton112:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton113:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton114:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton115:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton116:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton117:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton118:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton119:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton120:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton121:LeftButton" header="CT_BarMod_Bar11" />
+	<Binding name="CLICK CT_BarModActionButton122:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton123:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton124:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton125:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton126:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton127:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton128:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton129:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton130:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton131:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton132:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton133:LeftButton" header="CT_BarMod_Bar12" />
+	<Binding name="CLICK CT_BarModActionButton134:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton135:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton136:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton137:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton138:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton139:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton140:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton141:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton142:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton143:LeftButton" />
+	<Binding name="CLICK CT_BarModActionButton144:LeftButton" />
+</Bindings>

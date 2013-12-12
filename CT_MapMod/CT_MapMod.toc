@@ -1,0 +1,9 @@
+## Interface: 50300
+## Version: 5.3
+## Title: CT_MapMod
+## Notes: Adds the ability to write notes on the worldmap and send/receive to/from other players.
+## SavedVariables: CT_UserMap_Notes, CT_MapMod_Options
+CT_Library.lua
+CT_MapMod.xml
+CT_UserNoteMap.xml
+CT_MapModCoords.xml

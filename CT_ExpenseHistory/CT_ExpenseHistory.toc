@@ -1,0 +1,7 @@
+## Interface: 50300
+## Version: 5.3
+## Title: CT_ExpenseHistory
+## Notes: Detailed log of character expenses
+## SavedVariables: CT_EH_History
+CT_Library.lua
+CT_ExpenseHistory.xml
