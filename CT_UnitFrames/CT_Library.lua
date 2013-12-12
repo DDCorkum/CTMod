@@ -751,7 +751,7 @@ end
 local charKey;
 local function getCharKey()
 	if ( not charKey ) then
-		charKey = "CHAR-"..(UnitName("player")or"Unknown").."-"..(GetCVar("realmName")or"Unknown");
+		charKey = "CHAR-"..(UnitName("player") or "Unknown").."-"..(GetCVar("realmName") or "Unknown");
 	end
 	return charKey;
 end
