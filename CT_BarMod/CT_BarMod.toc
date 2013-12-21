@@ -1,5 +1,5 @@
 ## Interface: 50400
-## Version: 5.4
+## Version: 5.4.2
 ## Title: CT_BarMod
 ## Notes: Intuitive yet powerful action bar addon.
 ## SavedVariables: CT_BarModOptions

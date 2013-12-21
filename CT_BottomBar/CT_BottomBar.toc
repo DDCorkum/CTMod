@@ -1,5 +1,5 @@
 ## Interface: 50400
-## Version: 5.4
+## Version: 5.4.2
 ## Title: CT_BottomBar
 ## Notes: Breaks up the main menu bar into movable pieces.
 ## SavedVariables: CT_BottomBarOptions

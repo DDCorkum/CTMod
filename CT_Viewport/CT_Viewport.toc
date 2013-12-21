@@ -1,5 +1,5 @@
 ## Interface: 50400
-## Version: 5.4
+## Version: 5.4.2
 ## Title: CT_Viewport
 ## Notes: Allows you to change the rendered world's size
 ## SavedVariablesPerCharacter: CT_Viewport_Saved

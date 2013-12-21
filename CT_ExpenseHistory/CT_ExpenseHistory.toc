@@ -1,5 +1,5 @@
 ## Interface: 50400
-## Version: 5.4
+## Version: 5.4.2
 ## Title: CT_ExpenseHistory
 ## Notes: Detailed log of character expenses
 ## SavedVariables: CT_EH_History
