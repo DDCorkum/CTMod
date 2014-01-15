@@ -1,9 +1,10 @@
 ## Interface: 50400
-## Version: 5.4.2
+## Version: 5.4.2.1
 ## Title: CT_BottomBar
 ## Notes: Breaks up the main menu bar into movable pieces.
 ## SavedVariables: CT_BottomBarOptions
-CT_Library.lua
+## Dependencies: CT_Library
+
 CT_BottomBar.lua
 CT_BottomBar_MainMenu.lua
 CT_BottomBar_Override.lua

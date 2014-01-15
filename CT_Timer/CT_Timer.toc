@@ -1,7 +1,8 @@
 ## Interface: 50400
-## Version: 5.4.2
+## Version: 5.4.2.1
 ## Title: CT_Timer
 ## Notes: Shows a timer that counts both up and down.
 ## SavedVariables: CT_TimerOptions
-CT_Library.lua
+## Dependencies: CT_Library
+
 CT_Timer.xml

@@ -1,9 +1,10 @@
 ## Interface: 50400
-## Version: 5.4.2
+## Version: 5.4.2.1
 ## Title: CT_MailMod
 ## Notes: Heavily improves the in-game mail functionality.
 ## SavedVariables: CT_MailModOptions
-CT_Library.lua
+## Dependencies: CT_Library
+
 CT_MailMod.lua
 localization.lua
 Bindings.xml

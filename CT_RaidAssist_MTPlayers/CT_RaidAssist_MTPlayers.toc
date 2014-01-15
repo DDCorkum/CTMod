@@ -6,4 +6,5 @@
 ## DefaultState: enabled
 ## RequiredDeps: CT_RaidAssist
 ## SavedVariables: CT_RA_MTPlayers_Status
+
 CT_RaidAssist_MTPlayers.xml

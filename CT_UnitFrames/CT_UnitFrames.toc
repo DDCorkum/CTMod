@@ -1,9 +1,10 @@
 ## Interface: 50400
-## Version: 5.4.2
+## Version: 5.4.2.1
 ## Title: CT_UnitFrames
-## Notes: Changes display of hp/mana values and adds a percentage
+## Notes: Changes display of hp/mana values and adds a percentage.
 ## SavedVariables: CT_UnitFramesOptions
-CT_Library.lua
+## Dependencies: CT_Library
+
 CT_UnitFrames.lua
 CT_PlayerFrame.xml
 CT_TargetFrame.xml

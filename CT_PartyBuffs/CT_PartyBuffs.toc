@@ -1,7 +1,8 @@
 ## Interface: 50400
-## Version: 5.4.2
+## Version: 5.4.2.1
 ## Title: CT_PartyBuffs
-## Notes: Shows buffs at party member frames
+## Notes: Shows buffs at party member frames.
 ## SavedVariables: CT_PartyBuffsOptions
-CT_Library.lua
+## Dependencies: CT_Library
+
 CT_PartyBuffs.xml

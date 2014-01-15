@@ -24,6 +24,7 @@
 ## SavedVariables: CT_RATab_AutoPromotions
 ## SavedVariables: CT_RATab_DefaultLootMethod
 ## SavedVariables: CT_RATarget
+
 CT_RACache.lua
 CT_RASlashCmds.xml
 CT_RASets.xml

@@ -1,7 +1,8 @@
 ## Interface: 50400
-## Version: 5.4.2
+## Version: 5.4.2.1
 ## Title: CT_ExpenseHistory
-## Notes: Detailed log of character expenses
+## Notes: Detailed log of character expenses.
 ## SavedVariables: CT_EH_History
-CT_Library.lua
+## Dependencies: CT_Library
+
 CT_ExpenseHistory.xml

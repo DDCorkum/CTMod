@@ -1,10 +1,11 @@
 ## Interface: 50400
-## Version: 5.4.2
+## Version: 5.4.2.1
 ## Title: CT_BarMod
 ## Notes: Intuitive yet powerful action bar addon.
 ## SavedVariables: CT_BarModOptions
+## Dependencies: CT_Library
 ## OptionalDeps: Masque
-CT_Library.lua
+
 CT_BarMod.lua
 CT_BarMod_ActionButton.lua
 CT_BarMod_Groups.lua

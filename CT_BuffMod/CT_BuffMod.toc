@@ -1,9 +1,10 @@
 ## Interface: 50400
-## Version: 5.4.2
+## Version: 5.4.2.1
 ## Title: CT_BuffMod
-## Notes: Customizable buff display
+## Notes: Customizable buff display.
 ## SavedVariables: CT_BuffModOptions
-CT_Library.lua
+## Dependencies: CT_Library
+
 CT_BuffMod.xml
 CT_BuffMod.lua
 CT_BuffMod_Parsing.lua
