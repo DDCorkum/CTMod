@@ -2,5 +2,6 @@
 ## Version: 5.4.2
 ## Title: CT_Library
 ## Notes: Library features for CTMod.
+## DefaultState: Enabled
 
 CT_Library.lua

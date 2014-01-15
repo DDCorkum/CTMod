@@ -2,6 +2,7 @@
 ## Version: 5.4.2.1
 ## Title: CT_UnitFrames
 ## Notes: Changes display of hp/mana values and adds a percentage.
+## DefaultState: Enabled
 ## SavedVariables: CT_UnitFramesOptions
 ## Dependencies: CT_Library
 

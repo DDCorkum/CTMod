@@ -2,6 +2,7 @@
 ## Version: 5.4.2.1
 ## Title: CT_ExpenseHistory
 ## Notes: Detailed log of character expenses.
+## DefaultState: Enabled
 ## SavedVariables: CT_EH_History
 ## Dependencies: CT_Library
 

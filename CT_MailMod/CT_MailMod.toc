@@ -2,6 +2,7 @@
 ## Version: 5.4.2.1
 ## Title: CT_MailMod
 ## Notes: Heavily improves the in-game mail functionality.
+## DefaultState: Enabled
 ## SavedVariables: CT_MailModOptions
 ## Dependencies: CT_Library
 

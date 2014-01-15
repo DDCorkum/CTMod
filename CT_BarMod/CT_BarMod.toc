@@ -2,6 +2,7 @@
 ## Version: 5.4.2.1
 ## Title: CT_BarMod
 ## Notes: Intuitive yet powerful action bar addon.
+## DefaultState: Enabled
 ## SavedVariables: CT_BarModOptions
 ## Dependencies: CT_Library
 ## OptionalDeps: Masque

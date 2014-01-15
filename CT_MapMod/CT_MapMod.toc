@@ -2,6 +2,7 @@
 ## Version: 5.4.2.1
 ## Title: CT_MapMod
 ## Notes: Adds the ability to write notes on the worldmap and send/receive to/from other players.
+## DefaultState: Enabled
 ## SavedVariables: CT_UserMap_Notes, CT_MapMod_Options
 ## Dependencies: CT_Library
 
