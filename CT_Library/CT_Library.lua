@@ -11,7 +11,7 @@
 -----------------------------------------------
 -- Initialization
 
-local LIBRARY_VERSION = 5.0402;
+local LIBRARY_VERSION = 5.04022;
 local LIBRARY_NAME = "CT_Library";
 
 local _G = getfenv(0);
@@ -32,7 +32,7 @@ if ( lib ) then
 	-- Get the data to preserve from the earlier version of CT_Library.
 	-- Note: Previous versions of CT_Library may not have handled all of these values,
 	-- so they will be nil after the call to the earlier CT_Library's lib:getData().
-	modules, movables, eventTable, timerRepeatedTimes, timerRepeatedFuncs,
+		modules, movables, eventTable, timerRepeatedTimes, timerRepeatedFuncs,
 		timerRepeatedStarts, timerTimes, timerFuncs, frame,
 		-- Added handling of the following in 5.0002
 		numSlashCmds, localizations, tableList, defaultValues, frameCache = lib:getData();
@@ -55,14 +55,32 @@ lib.version = LIBRARY_VERSION;
 -- Local Copies
 
 local ChatFrame1 = ChatFrame1;
-local match = string.match;
-local maxn = table.maxn;
-local tonumber = tonumber;
-local tremove = tremove;
-local tinsert = tinsert;
-local type = type;
+
+local floor = floor;
+local format = format;
+local gsub = gsub;
 local ipairs = ipairs;
+local match = string.match;
+local math = math;
+local maxn = table.maxn;
+local min = min;
 local pairs = pairs;
+local print = print;
+local select = select;
+local setmetatable = setmetatable;
+local sort = sort;
+local string = string;
+local strlen = strlen;
+local strlower = strlower;
+local strmatch = strmatch;
+local strsub = strsub;
+local strupper = strupper;
+local tinsert = tinsert;
+local tonumber = tonumber;
+local tostring = tostring;
+local tremove = tremove;
+local type = type;
+local unpack = unpack;
 
 -- For spell database
 local getNumSpellTabs = GetNumSpellTabs;
@@ -1161,13 +1179,13 @@ local points = {
 -- Object Handlers
 local objectHandlers = { };
 
-	-- Frame
+-- Frame
 objectHandlers.frame = function(self, parent, name, virtual, option)
 	local frame = CreateFrame("Frame", name, parent, virtual);
 	return frame;
 end
 
-	-- Button
+-- Button
 objectHandlers.button = function(self, parent, name, virtual, option, text)
 	local button = CreateFrame("Button", name, parent, virtual);
 	if ( text ) then
@@ -1180,7 +1198,7 @@ objectHandlers.button = function(self, parent, name, virtual, option, text)
 	return button;
 end
 
-	-- CheckButton
+-- CheckButton
 local function checkbuttonOnClick(self)
 	local checked = self:GetChecked() or false;
 	local option = self.option;
@@ -1224,15 +1242,19 @@ objectHandlers.checkbutton = function(self, parent, name, virtual, option, text,
 	return checkbutton;
 end
 
-	-- Backdrop
-local dialogBackdrop = { bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background", 
-				edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border", 
-				tile = true, tileSize = 32, edgeSize = 32, 
-				insets = { left = 11, right = 12, top = 12, bottom = 11 }};
-local tooltipBackdrop = { bgFile="Interface\\Tooltips\\UI-Tooltip-Background",
-				edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border", 
-				tile = true, tileSize = 16, edgeSize = 16, 
-				insets = { left = 5, right = 5, top = 5, bottom = 5 }};
+-- Backdrop
+local dialogBackdrop = {
+	bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+	edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+	tile = true, tileSize = 32, edgeSize = 32,
+	insets = { left = 11, right = 12, top = 12, bottom = 11 }
+};
+local tooltipBackdrop = {
+	bgFile="Interface\\Tooltips\\UI-Tooltip-Background",
+	edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+	tile = true, tileSize = 16, edgeSize = 16,
+	insets = { left = 4, right = 4, top = 4, bottom = 4 }
+};
 objectHandlers.backdrop = function(self, parent, name, virtual, option, backdropType, bgColor, borderColor)
 	-- Convert short-notation names to the appropriate tables
 	if ( backdropType == "dialog" ) then
@@ -1255,7 +1277,7 @@ objectHandlers.backdrop = function(self, parent, name, virtual, option, backdrop
 	end
 end
 
-	-- FontString
+-- FontString
 objectHandlers.font = function(self, parent, name, virtual, option, text, data, layer)
 	-- Data
 	local r, g, b, justify;
@@ -1302,7 +1324,7 @@ objectHandlers.font = function(self, parent, name, virtual, option, text, data, 
 	return fontString;
 end
 
-	-- Texture
+-- Texture
 objectHandlers.texture = function(self, parent, name, virtual, option, texture, layer)
 	-- Texture & Layer
 	local r, g, b, a = splitString(texture, colonSeparator);
@@ -1318,7 +1340,7 @@ objectHandlers.texture = function(self, parent, name, virtual, option, texture, 
 	return tex;
 end
 
-	-- Option Frame
+-- Option Frame
 local optionFrameOnMouseUp = function(self) self:GetParent():StopMovingOrSizing(); end
 local optionFrameOnEnter = function(self) lib:displayPredefinedTooltip(self, "DRAG"); end
 local optionFrameOnLeave = function(self) lib:hideTooltip(); end
@@ -1363,7 +1385,7 @@ objectHandlers.optionframe = function(self, parent, name, virtual, option, heade
 	return frame;
 end
 
-	-- DropDown
+-- DropDown
 local function dropdownSetWidth(self, width)
 	-- Ugly, ugly hack.
 	self.SetWidth = self.oldSetWidth;
@@ -1610,13 +1632,13 @@ end
 -- Sets a few predefined attributes; abstracted for easier caching
 local function setAttributes(self, parent, frame, identifier, option, global, strata, width, height, movable, clamped, hidden, anch1, anch2, anch3, anch4)
 
-		-- Object
+	-- Object
 	frame.object = self;
 	
-		-- Parent
+	-- Parent
 	frame.parent = parent;
 	
-		-- Identifier
+	-- Identifier
 	if ( identifier ) then
 	
 		if ( parent ) then
@@ -1631,37 +1653,37 @@ local function setAttributes(self, parent, frame, identifier, option, global, st
 		end
 	end
 	
-		-- Option
+	-- Option
 	frame.option = option;
 	frame.global = global;
 	
-		-- Strata
+	-- Strata
 	if ( strata ) then
 		frame:SetFrameStrata(strata);
 	end
 	
-		-- Width & Height
+	-- Width & Height
 	if ( width ) then
 		frame:SetWidth(width);
 		frame:SetHeight(height);
 	end
 	
-		-- Movable
+	-- Movable
 	if ( movable ) then
 		frame:SetMovable(true);
 	end
 	
-		-- Clamped
+	-- Clamped
 	if ( clamped ) then
 		frame:SetClampedToScreen(true);
 	end
 	
-		-- Hidden
+	-- Hidden
 	if ( hidden ) then
 		frame:Hide();
 	end
 	
-		-- Anchors
+	-- Anchors
 	if ( anch1 ) then
 		frame:ClearAllPoints();
 		setAnchor(frame, anch1);
@@ -1732,19 +1754,15 @@ local function generalObjectHandler(self, specializedHandler, str, parent, initi
 		-- Movable
 		if ( value == "movable" ) then
 			movable = true;
-		
 		-- Clamped
 		elseif ( value == "clamped" ) then
 			clamped = true;
-			
 		-- Hidden
 		elseif ( value == "hidden" ) then
 			hidden = true;
-			
 		-- Cache
 		elseif ( value == "cache" ) then
 			cache = true;
-			
 		else
 			-- Identifier
 			if ( not found and not identifier ) then
@@ -2157,14 +2175,14 @@ local function resizer(self, elapsed)
 	local width = self.width;
 	if ( width < 630 ) then
 		-- Set Width
-		local newWidth = min(width + 705*elapsed, 635); -- Resize to 620 over ~0.9 sec
+		local newWidth = min(width + 705 * elapsed, 635); -- Resize to 620 over ~0.9 sec
 		self:SetWidth(newWidth);
 		self.width = newWidth;
 	else
 		-- Set Alpha
 		local alpha = self.alpha;
 		if ( alpha < 1 ) then
-			local newAlpha = min(alpha + 1.25*elapsed, 1); -- Set to 100% opacity over 0.8 sec
+			local newAlpha = min(alpha + 1.25 * elapsed, 1); -- Set to 100% opacity over 0.8 sec
 						
 			self.options:SetAlpha(newAlpha);
 			self.alpha = newAlpha;

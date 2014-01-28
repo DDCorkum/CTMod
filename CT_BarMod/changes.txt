@@ -1,3 +1,11 @@
+CT_BarMod (5.4.2.2) 2014-01-28
+- Drastically reduced CPU usage, when the player has no target.
+- Reduced range check's update internal to 0.5 sec.
+- Changing target now going to update range check instantly.
+- Fixed an issue with some event's function handler.
+- Added more upvalues.
+- Some other minor fixes.
+
 CT_BarMod (5.4.2.1) 2013-12-30
 - Changed library to a standalone module.
 

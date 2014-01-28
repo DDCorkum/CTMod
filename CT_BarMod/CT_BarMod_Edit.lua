@@ -17,14 +17,23 @@
 local _G = getfenv(0);
 local module = _G.CT_BarMod;
 
+-- End Initialization
+--------------------------------------------
+
 --------------------------------------------
 -- Local Copies
 
+local pairs = pairs;
+local select = select;
 local GetCursorPosition = GetCursorPosition;
 local IsControlKeyDown = IsControlKeyDown;
 local IsShiftKeyDown = IsShiftKeyDown;
+
 local actionButtonList = module.actionButtonList;
 local ATTRIBUTE_NOOP = ATTRIBUTE_NOOP;
+
+-- End Local Copies
+--------------------------------------------
 
 --------------------------------------------
 -- Selection Handler
@@ -181,8 +190,8 @@ end
 local selectorMode;
 local function isInside(left, right, top, bottom, button)
 	local scale = button:GetScale();
-	local bLeft, bRight, bTop, bBottom = button:GetLeft()*scale, 
-		button:GetRight()*scale, button:GetTop()*scale, button:GetBottom()*scale;
+	local bLeft, bRight, bTop, bBottom = button:GetLeft() * scale, 
+		button:GetRight() * scale, button:GetTop() * scale, button:GetBottom() * scale;
 
 	return not (
 			bLeft > right or
@@ -282,24 +291,24 @@ local function selectorUpdate(self, elapsed)
 			if ( height < 0 ) then
 				selectFrame:SetPoint("BOTTOMLEFT", nil, initialX, initialY);
 				selectFrame:SetPoint("TOPRIGHT", nil, "BOTTOMLEFT", scaledX, scaledY);
-				initialY, newY = newY, initialY*scale;
+				initialY, newY = newY, initialY * scale;
 			else
 				selectFrame:SetPoint("BOTTOMLEFT", nil, initialX, scaledY);
 				selectFrame:SetPoint("TOPRIGHT", nil, "BOTTOMLEFT", scaledX, initialY);
-				initialY = initialY*scale;
+				initialY = initialY * scale;
 			end
-			initialX, newX = newX, initialX*scale;
+			initialX, newX = newX, initialX * scale;
 		else
 			if ( height < 0 ) then
 				selectFrame:SetPoint("BOTTOMLEFT", nil, scaledX, initialY);
 				selectFrame:SetPoint("TOPRIGHT", nil, "BOTTOMLEFT", initialX, scaledY);
-				initialY, newY = newY, initialY*scale;
+				initialY, newY = newY, initialY * scale;
 			else
 				selectFrame:SetPoint("BOTTOMLEFT", nil, scaledX, scaledY);
 				selectFrame:SetPoint("TOPRIGHT", nil, "BOTTOMLEFT", initialX, initialY);
-				initialY = initialY*scale;
+				initialY = initialY * scale;
 			end
-			initialX = initialX*scale;
+			initialX = initialX * scale;
 		end
 		
 		-- Find buttons inside the area

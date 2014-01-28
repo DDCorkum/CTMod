@@ -17,6 +17,18 @@
 local _G = getfenv(0);
 local module = _G.CT_BarMod;
 
+-- End Initialization
+--------------------------------------------
+
+--------------------------------------------
+-- Local Copies
+
+local tinsert = tinsert;
+local select = select;
+
+-- End Local Copies
+--------------------------------------------
+
 --------------------------------------------
 -- Button skins
 
@@ -27,7 +39,7 @@ local module = _G.CT_BarMod;
 module.skins = {};
 module.skinsList = {};
 
-local scale = 66/66;
+local scale = 66 / 66;
 local xoff = 0;
 local yoff = 0;
 module.skins.standard = {
@@ -214,7 +226,7 @@ module.skins.standard = {
 	},
 };
 
-local scale = 62/56;
+local scale = 62 / 56;
 local xoff = -0.5;
 local yoff = -0.5;
 module.skins.alternate = {

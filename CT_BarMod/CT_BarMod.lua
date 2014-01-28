@@ -1,5 +1,5 @@
 ------------------------------------------------
---                 CT_BarMod                  --
+--               CT_BarMod                    --
 --                                            --
 -- Intuitive yet powerful action bar addon,   --
 -- featuring per-button positioning as well   --
@@ -10,7 +10,6 @@
 -- redistribute this without the consent of   --
 -- the CTMod Team. Thank you.                 --
 ------------------------------------------------
-
 
 --------------------------------------------
 -- Initialization
@@ -27,8 +26,23 @@ module.version = MODULE_VERSION;
 _G[MODULE_NAME] = module;
 CT_Library:registerModule(module);
 
+-- End Initialization
 --------------------------------------------
--- Slash command.
+
+--------------------------------------------
+-- Local Copies
+
+local floor = floor;
+local hooksecurefunc = hooksecurefunc;
+local string = string;
+local tonumber = tonumber;
+local InCombatLockdown = InCombatLockdown;
+
+-- End Local Copies
+--------------------------------------------
+
+--------------------------------------------
+-- Slash command
 
 local function slashCommand(msg)
 	local val1, val2;

@@ -23,6 +23,22 @@
 local _G = getfenv(0);
 local module = _G.CT_BarMod;
 
+-- End Initialization
+--------------------------------------------
+
+--------------------------------------------
+-- Local Copies
+
+local next = next;
+local hooksecurefunc = hooksecurefunc;
+local GetNumShapeshiftForms = GetNumShapeshiftForms;
+local GetPossessInfo = GetPossessInfo;
+local HasMultiCastActionBar = HasMultiCastActionBar;
+local InCombatLockdown = InCombatLockdown;
+local IsSpellKnown = IsSpellKnown;
+
+-- End Local Copies
+--------------------------------------------
 
 local frameSetPoint;
 local frameClearAllPoints;

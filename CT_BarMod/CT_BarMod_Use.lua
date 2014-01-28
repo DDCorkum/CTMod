@@ -45,30 +45,54 @@ local defbarShowBindings = true;
 local defbarShowActionText = true;
 local defbarHideTooltip = true;
 
--- In combat flag
 local inCombat = false;
+
+-- End Initialization
+--------------------------------------------
 
 --------------------------------------------
 -- Local Copies
 
-local rangeIndicator = RANGE_INDICATOR;
-local GetTime = GetTime;
+local ipairs = ipairs;
+local max = max;
+local pairs = pairs;
+local tinsert = tinsert;
+local tremove = tremove;
+local unpack = unpack;
 local ceil = ceil;
 local next = next;
-
-local HasAction = HasAction;
+local ActionButton_GetPagedID = ActionButton_GetPagedID;
 local ActionHasRange = ActionHasRange;
-
-local GetActionRange = GetActionRange;
-local GetActionTexture = GetActionTexture;
+local CanExitVehicle = CanExitVehicle;
+local GetActionCharges = GetActionCharges;
 local GetActionCooldown = GetActionCooldown;
-
-local IsUsableAction = IsUsableAction;
+local GetActionCount = GetActionCount;
+local GetActionInfo = GetActionInfo;
+local GetActionLossOfControlCooldown = GetActionLossOfControlCooldown;
+local GetActionRange = GetActionRange;
+local GetActionText = GetActionText;
+local GetActionTexture = GetActionTexture;
+local GetBindingAction = GetBindingAction;
+local GetBindingKey = GetBindingKey;
+local GetMacroSpell = GetMacroSpell;
+local GetPossessInfo = GetPossessInfo;
+local GetTime = GetTime;
+local HasAction = HasAction;
+local IsActionInRange = IsActionInRange;
 local IsAttackAction = IsAttackAction;
-local IsCurrentAction = IsCurrentAction;
-local IsConsumableAction = IsConsumableAction;
-local IsStackableAction = IsStackableAction;
 local IsAutoRepeatAction = IsAutoRepeatAction;
+local IsConsumableAction = IsConsumableAction;
+local IsCurrentAction = IsCurrentAction;
+local IsEquippedAction = IsEquippedAction;
+local IsItemAction = IsItemAction;
+local IsSpellOverlayed = IsSpellOverlayed;
+local IsStackableAction = IsStackableAction;
+local IsUsableAction = IsUsableAction;
+local rangeIndicator = RANGE_INDICATOR;
+local UnitExists = UnitExists;
+
+-- End Local Copies
+--------------------------------------------
 
 --------------------------------------------
 -- Cooldown Handler
@@ -991,9 +1015,17 @@ end
 -- Update Binding
 function useButton:updateBinding()
 	local actionId = self.actionId;
+	if ( IsActionInRange(self.actionId) == 0 ) then
+		local button = self.button;
+		self.outOfRange = true;
+		button.hotkey:SetVertexColor(1.0, 0.1, 0.1);
+	else
+		self.outOfRange = nil;
+		self.button.hotkey:SetVertexColor(0.6, 0.6, 0.6);
+	end
 	if ( displayBindings ) then
 		local text = self:getBinding();
-		if ( text == "" or text == nil ) then
+		if ( text == "" or not text ) then
 			if ( not self.hasAction or not IsActionInRange(actionId) ) then
 				self.button.hotkey:SetText("");
 				self.hasRange = nil;
@@ -1029,14 +1061,6 @@ end
 
 -- Update Range
 function useButton:updateRange()
-	if ( IsActionInRange(self.actionId) == 0 ) then
-		local button = self.button;
-		self.outOfRange = true;
-		button.hotkey:SetVertexColor(1.0, 0.1, 0.1);
-	else
-		self.outOfRange = nil;
-		self.button.hotkey:SetVertexColor(0.6, 0.6, 0.6);
-	end
 	self:updateBinding();
 	if ( colorLack ) then
 		self:updateUsable();
@@ -1534,9 +1558,20 @@ local function eventHandler_updateSummonPets()
 	actionButtonList:updateSummonPets();
 end
 
+-- Target changed range hider
+local function rangeTargetUpdater()
+	actionButtonList:updateBinding();
+	if ( colorLack ) then
+		actionButtonList:updateUsable();
+	end
+end
+
 -- Range checker
 local function rangeUpdater()
-	actionButtonList:updateRange();
+	local exists = UnitExists("target");
+	if exists then
+		actionButtonList:updateRange();
+	end
 end
 
 --------------------------------------------
@@ -1891,7 +1926,7 @@ module.useEnable = function(self)
 	self:regEvent("PLAYER_LEAVE_COMBAT", eventHandler_CheckRepeat);
 	self:regEvent("STOP_AUTOREPEAT_SPELL", eventHandler_CheckRepeat);
 	self:regEvent("START_AUTOREPEAT_SPELL", eventHandler_CheckRepeat);
-	self:regEvent("PLAYER_TARGET_CHANGED", rangeUpdater);
+	self:regEvent("PLAYER_TARGET_CHANGED", rangeTargetUpdater);
 	self:regEvent("PLAYER_REGEN_ENABLED", combatFlagger);
 	self:regEvent("PLAYER_REGEN_DISABLED", combatFlagger);
 	self:regEvent("UNIT_ENTERED_VEHICLE", eventHandler_UpdateStateVehicle);
@@ -1899,24 +1934,24 @@ module.useEnable = function(self)
 	self:regEvent("COMPANION_UPDATE", eventHandler_UpdateStateCompanion);
 	self:regEvent("SPELL_ACTIVATION_OVERLAY_GLOW_SHOW", eventHandler_ShowOverlayGlow);
 	self:regEvent("SPELL_ACTIVATION_OVERLAY_GLOW_HIDE", eventHandler_HideOverlayGlow);
-	self:regEvent("SPELL_UPDATE_CHARGES", eventHandler_updateCount);
-	self:regEvent("UPDATE_VEHICLE_ACTIONBAR", eventHandler_updateAll);
-	self:regEvent("UPDATE_OVERRIDE_ACTIONBAR", eventHandler_updateAll);
-	self:regEvent("UPDATE_POSSESS_BAR", eventHandler_updateAll);
-	self:regEvent("UPDATE_MULTI_CAST_ACTIONBAR", eventHandler_updateAll);
+	self:regEvent("SPELL_UPDATE_CHARGES", eventHandler_UpdateCount);
+	self:regEvent("UPDATE_VEHICLE_ACTIONBAR", eventHandler_UpdateAll);
+	self:regEvent("UPDATE_OVERRIDE_ACTIONBAR", eventHandler_UpdateAll);
+	self:regEvent("UPDATE_POSSESS_BAR", eventHandler_UpdateAll);
+	self:regEvent("UPDATE_MULTI_CAST_ACTIONBAR", eventHandler_UpdateAll);
 	self:regEvent("UPDATE_SUMMONPETS_ACTION", eventHandler_updateSummonPets);
 	self:regEvent("LOSS_OF_CONTROL_UPDATE", eventHandler_UpdateCooldown);
-	self:schedule(0.3, true, rangeUpdater);
+	self:schedule(0.5, true, rangeUpdater);
 end
-module.useDisable = function(self)
 
+module.useDisable = function(self)
 	self:unregEvent("PLAYER_ENTERING_WORLD", eventHandler_UpdateAll);
 	self:unregEvent("UPDATE_SHAPESHIFT_FORM", eventHandler_UpdateAll);
 	self:unregEvent("UNIT_INVENTORY_CHANGED", eventHandler_UpdateAll);
 	self:unregEvent("PET_STABLE_UPDATE", eventHandler_UpdateAll);
 	self:unregEvent("PET_STABLE_SHOW", eventHandler_UpdateAll);
---	self:unregEvent("ACTIONBAR_HIDEGRID", eventHandler_HideGrid);
---	self:unregEvent("ACTIONBAR_SHOWGRID", eventHandler_ShowGrid);
+	--self:unregEvent("ACTIONBAR_HIDEGRID", eventHandler_HideGrid);
+	--self:unregEvent("ACTIONBAR_SHOWGRID", eventHandler_ShowGrid);
 	self:unregEvent("ACTIONBAR_UPDATE_COOLDOWN", eventHandler_UpdateCooldown);
 	self:unregEvent("ACTIONBAR_UPDATE_STATE", eventHandler_UpdateState);
 	self:unregEvent("ACTIONBAR_UPDATE_USABLE", eventHandler_UpdateUsable);
@@ -1931,7 +1966,7 @@ module.useDisable = function(self)
 	self:unregEvent("PLAYER_LEAVE_COMBAT", eventHandler_CheckRepeat);
 	self:unregEvent("STOP_AUTOREPEAT_SPELL", eventHandler_CheckRepeat);
 	self:unregEvent("START_AUTOREPEAT_SPELL", eventHandler_CheckRepeat);
-	self:unregEvent("PLAYER_TARGET_CHANGED", rangeUpdater);
+	self:unregEvent("PLAYER_TARGET_CHANGED", rangeTargetUpdater);
 	self:unregEvent("PLAYER_REGEN_ENABLED", combatFlagger);
 	self:unregEvent("PLAYER_REGEN_DISABLED", combatFlagger);
 	self:unregEvent("UNIT_ENTERED_VEHICLE", eventHandler_UpdateStateVehicle);
@@ -1939,11 +1974,11 @@ module.useDisable = function(self)
 	self:unregEvent("COMPANION_UPDATE", eventHandler_UpdateStateCompanion);
 	self:unregEvent("SPELL_ACTIVATION_OVERLAY_GLOW_SHOW", eventHandler_ShowOverlayGlow);
 	self:unregEvent("SPELL_ACTIVATION_OVERLAY_GLOW_HIDE", eventHandler_HideOverlayGlow);
-	self:unregEvent("SPELL_UPDATE_CHARGES", eventHandler_updateCount);
-	self:unregEvent("UPDATE_VEHICLE_ACTIONBAR", eventHandler_updateAll);
-	self:unregEvent("UPDATE_OVERRIDE_ACTIONBAR", eventHandler_updateAll);
-	self:unregEvent("UPDATE_POSSESS_BAR", eventHandler_updateAll);
-	self:unregEvent("UPDATE_MULTI_CAST_ACTIONBAR", eventHandler_updateAll);
+	self:unregEvent("SPELL_UPDATE_CHARGES", eventHandler_UpdateCount);
+	self:unregEvent("UPDATE_VEHICLE_ACTIONBAR", eventHandler_UpdateAll);
+	self:unregEvent("UPDATE_OVERRIDE_ACTIONBAR", eventHandler_UpdateAll);
+	self:unregEvent("UPDATE_POSSESS_BAR", eventHandler_UpdateAll);
+	self:unregEvent("UPDATE_MULTI_CAST_ACTIONBAR", eventHandler_UpdateAll);
 	self:unregEvent("UPDATE_SUMMONPETS_ACTION", eventHandler_updateSummonPets);
 	self:unregEvent("LOSS_OF_CONTROL_UPDATE", eventHandler_UpdateCooldown);
 	self:unschedule(rangeUpdater, true);

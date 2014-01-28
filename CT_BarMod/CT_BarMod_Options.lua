@@ -17,12 +17,32 @@
 local _G = getfenv(0);
 local module = _G.CT_BarMod;
 
+-- End Initialization
+--------------------------------------------
+
+--------------------------------------------
 -- Local Copies
-local InCombatLockdown = InCombatLockdown;
+
 local format = format;
+local gsub = gsub;
+local ipairs = ipairs;
+local pairs = pairs;
+local print = print;
+local select = select;
+local strfind = strfind;
+local strsub = strsub;
+local tonumber = tonumber;
 local tostring = tostring;
+local type = type;
+local unpack = unpack;
+local InCombatLockdown = InCombatLockdown;
+local IsShiftKeyDown = IsShiftKeyDown;
+local UnitClass = UnitClass;
 
 local groupList = module.groupList;
+
+-- End Local Copies
+--------------------------------------------
 
 local theOptionsFrame;
 
@@ -82,7 +102,6 @@ local function updateGroups()
 --		group:update("barPaging", module:getOption("barPaging" .. groupId) or 1);
 	end
 end
-
 
 ----------
 -- Reset group positions
@@ -1243,16 +1262,16 @@ module.frame = function()
 	-- Bar options
 	----------
 
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#r");
-		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Bar Options");
+		optionsBeginFrame(-20,    0, "frame#tl:0:%y#r");
+		optionsAddObject(   0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Bar Options");
 
 		----------
 		-- Select bar
 		----------
 
-		optionsAddObject(-15,   14, "font#tl:15:%y#v:ChatFontNormal#Select bar:");
+		optionsAddObject(-15, 14, "font#tl:15:%y#v:ChatFontNormal#Select bar:");
 
-		optionsBeginFrame(  19,   24, "button#tl:80:%y#s:24:%s");
+		optionsBeginFrame(19, 24, "button#tl:80:%y#s:24:%s");
 			optionsAddScript("onclick",
 				function(self)
 					module:setOption("prvsGroup", 1, true);  -- Actual value assigned to option is not important.
@@ -1268,7 +1287,7 @@ module.frame = function()
 			);
 		optionsEndFrame();
 
-		optionsBeginFrame(  25,   24, "button#tl:100:%y#s:24:%s");
+		optionsBeginFrame(24, 24, "button#tl:100:%y#s:24:%s");
 			optionsAddScript("onclick",
 				function(self)
 					module:setOption("nextGroup", 1, true);  -- Actual value assigned to option is not important.
@@ -1304,7 +1323,7 @@ module.frame = function()
 		optionsAddObject(  3,   26, "checkbutton#tl:40:%y#i:barFlipVertical#o:barFlipVertical:false#Flip the bar vertically");
 
 		optionsAddFrame( -18,   17, "slider#tl:42:%y#s:100:%s#o:barNumToShow:12#i:barNumToShow#Buttons = <value>#1:12:1");
-		optionsBeginFrame(  17,   17, "slider#tl:180:%y#s:100:%s#o:barColumns:12#i:columns#Columns = <value>#1:12:1");
+		optionsBeginFrame(17,   17, "slider#tl:180:%y#s:100:%s#o:barColumns:12#i:columns#Columns = <value>#1:12:1");
 			optionsAddScript("onload", function()
 				updateGroupWidgets_Columns(currentEditGroup);
 			end);
@@ -1343,7 +1362,7 @@ module.frame = function()
 
 		optionsAddObject( -6,   20, "checkbutton#tl:15:%y#s:%s:%s#i:visAdvanced#o:visAdvanced#Use advanced conditions");
 
-		optionsBeginFrame(  20,   20, "button#tl:194:%y#s:20:%s#i:visHelp0#v:UIPanelButtonTemplate#?");
+		optionsBeginFrame(20,   20, "button#tl:194:%y#s:20:%s#i:visHelp0#v:UIPanelButtonTemplate#?");
 			optionsAddScript("onenter",
 				function(self)
 					advancedVisTooltip0(self, currentEditGroup);

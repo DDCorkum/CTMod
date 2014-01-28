@@ -17,6 +17,40 @@
 local _G = getfenv(0);
 local module = _G.CT_BarMod;
 
+-- End Initialization
+--------------------------------------------
+
+--------------------------------------------
+-- Local Copies
+
+local format = format;
+local ipairs = ipairs;
+local pairs = pairs;
+local tinsert = tinsert;
+local tonumber = tonumber;
+local tostring = tostring;
+local ClearOverrideBindings = ClearOverrideBindings;
+local GetActionInfo = GetActionInfo;
+local GetActionText = GetActionText;
+local GetBindingAction = GetBindingAction;
+local GetBindingKey = GetBindingKey;
+local GetBindingText = GetBindingText;
+local GetCurrentBindingSet = GetCurrentBindingSet;
+local GetMacroInfo = GetMacroInfo;
+local GetMouseFocus = GetMouseFocus;
+local GetSpellInfo = GetSpellInfo;
+local HasAction = HasAction;
+local InCombatLockdown = InCombatLockdown;
+local IsAltKeyDown = IsAltKeyDown;
+local IsControlKeyDown = IsControlKeyDown;
+local IsShiftKeyDown = IsShiftKeyDown;
+local SaveBindings = SaveBindings;
+local SetOverrideBinding = SetOverrideBinding;
+local SetOverrideBindingClick = SetOverrideBindingClick;
+
+-- End Local Copies
+--------------------------------------------
+
 local actionButtonList = module.actionButtonList;
 local groupList = module.groupList;
 
@@ -25,7 +59,7 @@ local TOOLTIP = CreateFrame("GameTooltip", "CT_BarModTooltip", nil, "GameTooltip
 local TOOLTIP_TITLELEFT = _G.CT_BarModTooltipTextLeft1;
 local TOOLTIP_TITLERIGHT = _G.CT_BarModTooltipTextRight1;
 
--------------------------
+--------------------------------------------
 -- Global variables for use with the game's key binding window.
 
 do
@@ -48,9 +82,8 @@ module.getBindingKey = function(buttonId)
 	return GetBindingKey("CLICK CT_BarModActionButton" .. buttonId .. ":LeftButton");
 end
 
---[[
 -- Key Bindings Purger
-module:regEvent("UPDATE_BINDINGS", function()
+--[[module:regEvent("UPDATE_BINDINGS", function()
 	local GetBindingAction = GetBindingAction;
 	local strmatch = strmatch;
 	local key, action;
@@ -63,8 +96,7 @@ module:regEvent("UPDATE_BINDINGS", function()
 			end
 		end
 	end
-end);
---]]
+end);]]
 
 --------------------------------------------
 -- Buttons handler
@@ -877,10 +909,13 @@ local function flyoutModeStart()
 end
 
 local function flyoutModeEnd()
+
 end
 
 ---------------------------------------------
 -- Key Bindings options frame related
+
+local mouseoverButton
 
 local keyBindingTemplate = {
 	"font#r:l:-2:0#v:GameFontNormalLarge#i:header#1:0.82:0:l",
@@ -1089,7 +1124,7 @@ local function setActionBindings()
 			if (showBar) then
 				local buttonObjs = groupObj.objects;
 				local action;
-				local baseNum = (groupNum -1 ) * 12;
+				local baseNum = (groupNum - 1) * 12;
 				for buttonNum = 1, 12 do
 					local buttonObj = buttonObjs[buttonNum];
 					-- Get the action name associated with this button (eg. "ACTIONBUTTON1")

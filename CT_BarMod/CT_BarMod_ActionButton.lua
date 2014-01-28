@@ -17,13 +17,30 @@
 local _G = getfenv(0);
 local module = _G.CT_BarMod;
 
+-- End Initialization
 --------------------------------------------
--- Variables
 
+--------------------------------------------
 -- Local Copies
+
+local ceil = ceil;
+local max = max;
+local min = min;
+local pairs = pairs;
+local select = select;
+local setmetatable = setmetatable;
+local tinsert = tinsert;
 local tremove = tremove;
 local type = type;
+local CanExitVehicle = CanExitVehicle;
 local GetActionTexture = GetActionTexture;
+local GetPossessInfo = GetPossessInfo;
+local InCombatLockdown = InCombatLockdown;
+local SetBinding = SetBinding;
+local SetBindingClick = SetBindingClick;
+
+-- End Local Copies
+--------------------------------------------
 
 -- Referenced at multiple locations
 local newButtonMeta;
@@ -39,7 +56,7 @@ module.maxBarNum = 12;  -- Maximum number of bars allowed
 module.controlBarId = 11;  -- id number of the Control Bar
 module.actionBarId = 12;  -- id number of the Action Bar
 
---------------------------------------------
+-------------------------------------------
 -- Helpers
 
 local currentHover;
@@ -404,7 +421,7 @@ end
 -- Save position for this session
 function actionButton:savePosition()
 	local scale, xPos, yPos = self.scale, self.button:GetCenter();
-	self.xPos, self.yPos = xPos*scale, yPos*scale;
+	self.xPos, self.yPos = xPos * scale, yPos * scale;
 	self:updatePosition();
 end
 
@@ -472,7 +489,6 @@ setmetatable(actionButtonList, { __index =
 		end
 	end
 });
-
 
 --------------------------------------------
 -- Event Handlers

@@ -17,6 +17,27 @@
 local _G = getfenv(0);
 local module = _G.CT_BarMod;
 
+-- End Initialization
+--------------------------------------------
+
+--------------------------------------------
+-- Local Copies
+
+local floor = floor;
+local ipairs = ipairs;
+local pairs = pairs;
+local setmetatable = setmetatable;
+local tinsert = tinsert;
+local tonumber = tonumber;
+local type = type;
+local GetOverrideBarIndex = GetOverrideBarIndex;
+local GetVehicleBarIndex = GetVehicleBarIndex;
+local InCombatLockdown = InCombatLockdown;
+local IsShiftKeyDown = IsShiftKeyDown;
+
+-- End Local Copies
+--------------------------------------------
+
 --------------------------------------------
 -- Group Management
 
@@ -36,7 +57,7 @@ local overlayEdgeSize = 0;
 local overlayLevelAdjust = 1;
 local dragLevelAdjust = overlayLevelAdjust + 1;
 local buttonLevelAdjust = dragLevelAdjust + 1;
-local dragOnTopLevelAdjust = buttonLevelAdjust + 2;  -- +2 since cooldown is between button and top dragframe
+local dragOnTopLevelAdjust = buttonLevelAdjust + 2;  -- + 2 since cooldown is between button and top dragframe
 
 local backdrop1 = {
 	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
@@ -795,7 +816,7 @@ defaultPositions[2] = {
 --
 -- Secondary index is the bar (group) id.
 defaultPositions[3] = {
-	[12] = {"BOTTOMLEFT",  "BOTTOM",      -516,  43, "ACROSS", "AB"},  -- Bar 12, Action Bar position
+	[12] = {"BOTTOMLEFT", "BOTTOM", -516, 43, "ACROSS", "AB"},  -- Bar 12, Action Bar position
 };
 
 function group:position(orientation, stdPositions)

@@ -17,6 +17,20 @@
 local _G = getfenv(0);
 local module = _G.CT_BarMod;
 
+-- End Initialization
+--------------------------------------------
+
+--------------------------------------------
+-- Local Copies
+
+local ipairs = ipairs;
+local pairs = pairs;
+local strsub = strsub;
+local tostring = tostring;
+
+-- End Local Copies
+--------------------------------------------
+
 --------------------------------------------
 -- Masque support.
 

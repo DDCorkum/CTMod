@@ -17,16 +17,27 @@
 local _G = getfenv(0);
 local module = _G.CT_BarMod;
 
----------------------------------------------
+-- End Initialization
+--------------------------------------------
+
+--------------------------------------------
 -- Local Copies
 
-local tinsert = tinsert;
+local ceil = ceil;
 local format = format;
+local pairs = pairs;
+local tinsert = tinsert;
 local tostring = tostring;
+local tremove = tremove;
 local GetCursorPosition = GetCursorPosition;
+local IsShiftKeyDown = IsShiftKeyDown;
+
 local editButton = module.editButtonClass;
 
----------------------------------------------
+-- End Local Copies
+--------------------------------------------
+
+--------------------------------------------
 -- Options
 
 local editFrame;
@@ -253,7 +264,7 @@ local function editFrameSkeleton()
 				local parent, obj = self.parent;
 				for x = 1, 12, 1 do
 					for y = 1, 12, 1 do
-						obj = parent[tostring((y-1)*12+x)];
+						obj = parent[tostring((y - 1) * 12 + x)];
 						if ( x >= dX and x <= oX and y >= dY and y <= oY ) then
 							toggleSelected(obj, not originalSelection[obj]);
 							obj.over = 2;
@@ -335,14 +346,14 @@ local function editFrameSkeleton()
 	for x = 1, 12, 1 do
 		for y = 1, 12, 1 do
 			data[format("button#i:%d#tl:%d:%d#s:27:27#li:buttonTemplate",
-				(y-1)*12+x, 21+27*x, -26-27*y)] = buttonTemplate;
+				(y - 1) * 12 + x, 21 + 27 * x, -26 - 27 * y)] = buttonTemplate;
 		end
 	end
 	
 	return "optionframe#s:700:550#n:CT_BarModEditFrame#CT_BarMod Edit", data;
 end
 
--- if ( not editFrame ) then
--- 	editFrame = module:getFrame(editFrameSkeleton);
--- end
--- editFrame:Show();
+--[[if ( not editFrame ) then
+	editFrame = module:getFrame(editFrameSkeleton);
+end
+editFrame:Show();]]
