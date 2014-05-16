@@ -128,12 +128,13 @@ local function updateClickDirection()
 	end
 
 	local down = not not module:getOption("clickDirection");
+	local click = not not module:getOption("clickIncluded");
 
 	for gkey, group in pairs(groupList) do
 		local objects = group.objects;
 		if ( objects ) then
 			for bkey, object in ipairs(objects) do
-				object:setClickDirection(down);
+				object:setClickDirection(down, click);
 			end
 		end
 	end
@@ -983,7 +984,8 @@ module.frame = function()
 		optionsAddObject(  0,   14, "font#tl:50:%y#v:ChatFontNormal#Move buttons key:");
 		optionsAddObject( 14,   20, "dropdown#tl:140:%y#n:CT_BarModDropdown_buttonLockKey#o:buttonLockKey:3#Alt#Ctrl#Shift");
 
-		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:clickDirection#Activate button on key or mouse down");
+		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:clickDirection#Activate button on key down only");
+		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:clickIncluded#Activate button on key or mouse down");
 	optionsEndFrame();
 
 	----------
@@ -2245,6 +2247,9 @@ module.optionUpdate = function(self, optName, value)
 		end
 
 	elseif ( optName == "clickDirection" ) then
+		updateClickDirection();
+
+	elseif ( optName == "clickIncluded" ) then
 		updateClickDirection();
 
 	elseif ( optName == "buttonLock" ) then

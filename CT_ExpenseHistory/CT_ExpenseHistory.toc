@@ -1,5 +1,5 @@
 ## Interface: 50400
-## Version: 5.4.2.1
+## Version: 5.4.7.0
 ## Title: CT_ExpenseHistory
 ## Notes: Detailed log of character expenses.
 ## DefaultState: Enabled

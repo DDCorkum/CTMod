@@ -1,3 +1,7 @@
+CT_MailMod (5.4.7.0) 2014-05-16
+- Updated to 5.4.7.
+- Library updates.
+
 CT_MailMod (5.4.2.1) 2013-12-30
 - Changed library to a standalone module.
 
@@ -184,8 +188,6 @@ General
 - The message at the top of the CTMod Control panel now mentions the slash commands that can be used to open it.
 - Some variables and functions which were global are now correctly declared as local.
 
------
-
 CT_MailMod (3.200)
 - Updated for the WoW 3.2 patch.
 
@@ -227,4 +229,4 @@ CT_MailMod (3.001)
 - Alt-Left click on an inventory item should now initiate a trade with the targeted person.
 
 CT_MailMod (3.000)
-- Updated for the WoW 3.0 patch
+- Updated for the WoW 3.0 patch.

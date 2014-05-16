@@ -337,7 +337,7 @@ function actionButton:constructor(buttonId, actionId, groupId, count, noInherit,
 	self:setMode(currentMode);
 	self:setBinding();
 
-	self:setClickDirection( not not module:getOption("clickDirection") );
+	self:setClickDirection( not not module:getOption("clickDirection"), not not module:getOption("clickIncluded") );
 	button:RegisterForDrag("LeftButton", "RightButton");
 	button:SetAttribute("type", "action");
 end
@@ -385,11 +385,19 @@ function actionButton:setMode(newMode)
 end
 
 -- Set if action is triggered on click up or click down.
-function actionButton:setClickDirection(down)
+function actionButton:setClickDirection(down, clicks)
 	if (down) then
-		self.button:RegisterForClicks("AnyDown");
+		if (clicks) then
+			self.button:RegisterForClicks("AnyDown");
+		else
+			self.button:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp", "Button4Down", "Button5Down");
+		end
 	else
-		self.button:RegisterForClicks("AnyUp");
+		if (clicks) then
+			self.button:RegisterForClicks("AnyDown");
+		else
+			self.button:RegisterForClicks("AnyUp");
+		end
 	end
 end
 

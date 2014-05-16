@@ -11,7 +11,7 @@
 -----------------------------------------------
 -- Initialization
 
-local LIBRARY_VERSION = 5.04022;
+local LIBRARY_VERSION = 5.04070;
 local LIBRARY_NAME = "CT_Library";
 
 local _G = getfenv(0);
@@ -915,7 +915,7 @@ function lib:registerMovable(id, frame, clamped)
 		local scale = option[6];
 		if ( scale ) then
 			frame:SetScale(scale);
-			frame:SetPoint(option[1], option[2], option[3], option[4]/scale, option[5]/scale);
+			frame:SetPoint(option[1], option[2], option[3], option[4] / scale, option[5] / scale);
 		else
 			frame:SetPoint(option[1], option[2], option[3], option[4], option[5]);
 		end
@@ -938,13 +938,20 @@ function lib:stopMovable(id)
 		
 		local a, b, c, d, e = frame:GetPoint(1);
 		local scale = frame:GetScale();
-		
-		d, e = d*scale, e*scale;
+		if string.upper(a) == "BOTTOMLEFT" or string.upper(a) == "BOTTOMRIGHT" then
+			a = "BOTTOM";
+			c = "BOTTOM";
+			d = math.floor(frame:GetLeft() + (frame:GetWidth() - UIParent:GetWidth()) / 2 + 0.5) * scale;
+			e = math.floor(frame:GetTop() - frame:GetHeight() + 0.5) * scale;
+		end
+
 		pos[1], pos[2], pos[3], pos[4], pos[5], pos[6] = a, b, c, d, e, scale;
+		frame:ClearAllPoints();
+		frame:SetPoint(a, b, c, d, e);
 	else
 		local a, b, c, d, e = frame:GetPoint(1);
 		local scale = frame:GetScale();
-		d, e = d*scale, e*scale;
+		d, e = d * scale, e * scale;
 		
 		pos = { a, b, c, d, e, scale };
 		self:setOption(id, pos, true);

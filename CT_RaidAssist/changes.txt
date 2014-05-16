@@ -1,3 +1,7 @@
+CT_RaidAssist (5.4.7.0) 2014-05-16
+- Updated to 5.4.7.
+- Library updates.
+
 CT_RaidAssist (5.4.2) 2013-12-21
 - Library fix.
 
@@ -195,4 +199,3 @@ CT_RaidAssist_MTPlayers (3.0) (Bundled with CT_RaidAssist)
 - The MT Pets group shows the health and mana of the Main Tanks' pets (if any).
 - Each group can be enabled or disabled.
 - Each group can be joined to the MT Targets group (they line up horizontally), or they can be positioned independently of each other.
-

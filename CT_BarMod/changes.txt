@@ -1,3 +1,10 @@
+CT_BarMod (5.4.7.0) 2014-05-16
+- Updated to 5.4.7.
+- Library updates.
+- Rescaling the UI Scale or the game itself in windowed mode now won't cause the bars to move randomly.
+- "Activate button on key or mouse down" is renamed to "Activate button on key down only" and it's going to ignore mouse button downs.
+- Added an option to "Activate button on key or mouse down" which will registed both button and mouse downs.
+
 CT_BarMod (5.4.2.2) 2014-01-28
 - Drastically reduced CPU usage, when the player has no target.
 - Reduced range check's update internal to 0.5 sec.
