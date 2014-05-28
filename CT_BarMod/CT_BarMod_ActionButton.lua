@@ -394,7 +394,7 @@ function actionButton:setClickDirection(down, clicks)
 		end
 	else
 		if (clicks) then
-			self.button:RegisterForClicks("AnyDown");
+			self.button:RegisterForClicks("LeftButtonDown");
 		else
 			self.button:RegisterForClicks("AnyUp");
 		end
