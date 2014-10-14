@@ -981,7 +981,7 @@ function useButton:updateCooldown()
 	end
 	-- Loss of control cooldown
 	local start, duration = GetActionLossOfControlCooldown(self.actionId);
-	cooldown:SetLossOfControlCooldown(start, duration);
+	--cooldown:SetLossOfControlCooldown(start, duration);
 	if (start > 0 and duration > 0) then
 		controlCooldown = true;
 	else

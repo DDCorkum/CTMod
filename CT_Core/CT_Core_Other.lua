@@ -11,7 +11,7 @@
 local _G = getfenv(0);
 local module = _G.CT_Core;
 local NUM_CHAT_WINDOWS = NUM_CHAT_WINDOWS;
-
+local WatchFrame = ObjectiveTrackerFrame
 --------------------------------------------
 -- Quest Levels
 
@@ -2088,7 +2088,7 @@ do
 
 	-- Size of our frame when collapsed
 	local collapsedHeight = 27;
-	local collapsedWidth = WATCHFRAME_COLLAPSEDWIDTH + 7;
+	local collapsedWidth = 0 + 7;
 
 	-- Local copies of option values
 	local opt_watchframeEnabled;

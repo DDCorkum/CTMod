@@ -313,7 +313,7 @@ local function CT_MapMod_GetMapName()
 		return nil;
 	end
 	-- Return the name currently assigned to the zone drop down menu.
-	return WorldMapZoneDropDownText:GetText();
+	--return WorldMapZoneDropDownText:GetText();
 end
 
 local function CT_MapMod_IsDialogShown()
@@ -2124,7 +2124,7 @@ end
 hooksecurefunc("WorldMap_ToggleSizeDown", CT_MapMod_WorldMap_ToggleSizeDown);
 
 
-hooksecurefunc("WorldMapFrame_SetOpacity",
+--[[hooksecurefunc("WorldMapFrame_SetOpacity",
 	function(opacity)
 		local alpha;
 		alpha = 0.5 + (1.0 - opacity) * 0.50;
@@ -2135,13 +2135,13 @@ hooksecurefunc("WorldMapFrame_SetOpacity",
 --		WorldMapQuestShowObjectives:SetAlpha(alpha);
 		WorldMapShowDropDown:SetAlpha(alpha);
 	end
-);
+);]]
 
-hooksecurefunc("WorldMap_OpenToQuest",
+--[[hooksecurefunc("WorldMap_OpenToQuest",
 	function(...)
 		CT_MapMod_UpdateMap();
 	end
-);
+);]]
 
 hooksecurefunc("WorldMapFrame_ToggleWindowSize",
 	function(...)
