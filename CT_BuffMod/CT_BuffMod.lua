@@ -48,7 +48,7 @@ for auraType, colorTable in pairs(defaultBackgroundColors) do
 	backgroundColors[auraType] = colorTable;
 end
 
-local defaultClassColors = { r=0.82, g=1, b=0 };
+local defaultClassColors = { r = 0.82, g = 1, b = 0 };
 
 local defaultWindowColor = { 0, 0, 0, 0.25};
 local defaultConsolidatedColor = { 0, 0, 0, 0.8};
@@ -399,7 +399,7 @@ local function configureAuras(self, auraTable, consolidateTable, weaponPosition)
 	end
 
 	local left, right, top, bottom = math.huge, -math.huge, -math.huge, math.huge;
-	for index=1,display do
+	for index = 1,display do
 		local button = buttons[index];
 		local wrapAfter = wrapAfter or index
 		local tick, cycle = floor((index - 1) % wrapAfter), floor((index - 1) / wrapAfter);
@@ -582,12 +582,12 @@ for i, key in ipairs{"index", "name", "expires"} do
 	local label = key:upper();
 	sorters[label] = {};
 	for bool in pairs{[true] = true, [false] = false} do
-		sorters[label][bool] = {}
-		for sep=-1,1 do
+		sorters[label][bool] = {};
+		for sep = -1, 1 do
 			-- BeginMod
 			--sorters[label][bool][sep] = sortFactory(key, sep, bool);
 			sorters[label][bool][sep] = {};
-			for zero=-1,1 do
+			for zero = -1, 1 do
 				sorters[label][bool][sep][zero] = sortFactory(key, sep, bool, zero);
 			end
 			-- EndMod
