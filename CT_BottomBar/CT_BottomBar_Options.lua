@@ -613,7 +613,7 @@ module.frame = function()
 	optionsEndFrame();
 
 	-- Options window
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#r");
+	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Options window");
 		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:dragHideTooltip#Hide drag frame tooltips");
 		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:clampFrames#Cannot drag bars completely off screen");
@@ -623,7 +623,7 @@ module.frame = function()
 	optionsEndFrame();
 
 	-- Artwork Options
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#r#i:general");
+	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b#i:general");
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Artwork");
 
 		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#i:showLions#o:showLions#Show lions instead of gryphons");
@@ -633,7 +633,7 @@ module.frame = function()
 	optionsEndFrame();
 
 	-- Override Frame
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#r");
+	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Override/Vehicle Frame");
 		optionsAddObject( -5, 4*14, "font#t:0:%y#s:0:%s#l:20:0#r#This is a large frame used for vehicle and override bars. If you hide the frame you will need to use an alternate bar that can show vehicle and override buttons.#" .. textColor2 .. ":l");
 		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:vehicleHideFrame#Hide the override/vehicle frame.");
@@ -641,13 +641,13 @@ module.frame = function()
 	optionsEndFrame();
 
 	-- Pet Battle Frame
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#r");
+	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Pet Battle Frame");
 		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:petbattleHideEnabledBars:true#Hide the activated CT_BottomBar bars.");
 	optionsEndFrame();
 
 	-- Bars
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#r#i:bar");
+	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b#i:bar");
 		optionsAddObject(  0,    1, "texture#tl:5:%y#br:tr:0:%b#1:1:1");
 		optionsAddObject(-15,   17, "font#tl:5:%y#v:GameFontNormalLarge#Bars");
 
@@ -702,7 +702,7 @@ module.frame = function()
 	optionsEndFrame();
 
 	-- Action bar options
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#r#i:actionbar");
+	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b#i:actionbar");
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Action Bar");
 
 		optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:20:0#r#CT_BottomBar does not include support for manipulating the default main action bar.#" .. textColor2 .. ":l");
@@ -723,7 +723,7 @@ module.frame = function()
 
 	-- Bags Bar
 	if (module.ctBagsBar) then
-		optionsBeginFrame(-20, 0, "frame#tl:0:%y#r");
+		optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
 			optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Bags Bar");
 
 			optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:20:0#r#These options will have no effect if the Bags Bar is not activated.#" .. textColor3 .. ":l");
@@ -736,7 +736,7 @@ module.frame = function()
 
 	-- Experience & Reputation Bar
 	if (module.ctExpBar and module.ctRepBar) then
-		optionsBeginFrame(-25, 0, "frame#tl:0:%y#i:exprep#r");
+		optionsBeginFrame(-25, 0, "frame#tl:0:%y#br:tr:0:%b#i:exprep#r");
 			optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Experience & Reputation Bars");
 
 			optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:20:0#r#These options will have no effect if the Experience Bar is not activated.#" .. textColor3 .. ":l");
@@ -889,7 +889,7 @@ module.frame = function()
 
 	-- Extra Bar
 	if (module.ctExtraBar) then
-		optionsBeginFrame(-20, 0, "frame#tl:0:%y#r");
+		optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
 			optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Extra Bar");
 
 			optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:20:0#r#The following options will have no effect if the Extra Bar is not activated.#" .. textColor3 .. ":l");
@@ -903,7 +903,7 @@ module.frame = function()
 
 	-- Pet Bar
 	if (module.ctPetBar) then
-		optionsBeginFrame(-30, 0, "frame#tl:0:%y#r");
+		optionsBeginFrame(-30, 0, "frame#tl:0:%y#br:tr:0:%b");
 			optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Pet Bar");
 
 			optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:20:0#r#These options will have no effect if the Pet Bar is not activated.#" .. textColor3 .. ":l");
@@ -916,7 +916,7 @@ module.frame = function()
 
 	-- Vehicle Tools Bar
 	if (module.ctVehicleBar) then
-		optionsBeginFrame(-30, 0, "frame#tl:0:%y#r");
+		optionsBeginFrame(-30, 0, "frame#tl:0:%y#br:tr:0:%b");
 			optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Vehicle Tools Bar");
 
 			optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:20:0#r#These options will have no effect if the Vehicle Tools Bar is not activated.#" .. textColor3 .. ":l");
@@ -928,7 +928,7 @@ module.frame = function()
 	end
 
 	-- Reset Options
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#r");
+	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
 		optionsAddObject(  0,    1, "texture#tl:5:%y#br:tr:0:%b#1:1:1");
 
 		optionsAddObject(-15,   17, "font#tl:5:%y#v:GameFontNormalLarge#Reset CT_BottomBar Options");

@@ -313,7 +313,7 @@ local function CT_MapMod_GetMapName()
 		return nil;
 	end
 	-- Return the name currently assigned to the zone drop down menu.
-	--return WorldMapZoneDropDownText:GetText();
+	--return GetCurrentMapZone();
 end
 
 local function CT_MapMod_IsDialogShown()
@@ -778,6 +778,7 @@ end
 
 local notewindowDropDownInitialized;
 function CT_MapMod_NoteWindow_Show()
+	CT_MapMod_NoteWindow:SetFrameStrata("TOOLTIP")
 	if (not notewindowDropDownInitialized) then
 		-- We're delaying the initialization of the dropdown menus until as late as possible
 		-- to make sure that Blizzard has had time to create CompactRaidFrame1.
@@ -1341,11 +1342,11 @@ local function CT_MapMod_Coord_ResetPosition(clearSaved)
 	if ( WORLDMAP_SETTINGS.size == WORLDMAP_WINDOWED_SIZE ) then
 		-- Small size world map
 		CT_MapMod_Coord:ClearAllPoints();
-		CT_MapMod_Coord:SetPoint("TOPLEFT", WorldMapDetailFrame, "TOPLEFT", 0, 20);
+		CT_MapMod_Coord:SetPoint("TOPLEFT", WorldMapFrame, "TOPLEFT", 95, -5);
 	else
 		-- Full screen size world map
 		CT_MapMod_Coord:ClearAllPoints();
-		CT_MapMod_Coord:SetPoint("TOPLEFT", WorldMapPositioningGuide, "TOPLEFT", 10, -5);
+		CT_MapMod_Coord:SetPoint("BOTTOMRIGHT", WorldMapFrame, "BOTTOMRIGHT", -170, 10);
 	end
 	if (clearSaved) then
 		local optName = CT_MapMod_Coord_GetPositionOptionName();
@@ -1586,11 +1587,11 @@ local function CT_MapMod_MainButton_ResetPosition(clearSaved)
 	if ( WORLDMAP_SETTINGS.size == WORLDMAP_WINDOWED_SIZE ) then
 		-- Small size world map
 		CT_MapMod_MainButton:ClearAllPoints();
-		CT_MapMod_MainButton:SetPoint("TOPRIGHT", WorldMapDetailFrame, "TOPRIGHT", -40, 23);
+		CT_MapMod_MainButton:SetPoint("RIGHT", WorldMapFrameSizeUpButton, "LEFT", 3, 0);
 	else
 		-- Full screen size world map
 		CT_MapMod_MainButton:ClearAllPoints();
-		CT_MapMod_MainButton:SetPoint("TOPRIGHT", WorldMapPositioningGuide, "TOPRIGHT", -43, -2);
+		CT_MapMod_MainButton:SetPoint("RIGHT", WorldMapFrameSizeUpButton, "LEFT", 3, 0);
 	end
 	if (clearSaved) then
 		local optName = CT_MapMod_MainButton_GetPositionOptionName();

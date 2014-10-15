@@ -950,7 +950,7 @@ module.frame = function()
 	-- Options window
 	----------
 
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#r");
+	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Options window");
 
 		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:dragHideTooltip#Hide drag frame tooltip");
@@ -966,7 +966,7 @@ module.frame = function()
 	-- General Options
 	----------
 
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#r");
+	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#General");
 
 		optionsAddObject(-10,   14, "font#tl:20:%y#v:ChatFontNormal#Out of Range:");
@@ -992,7 +992,7 @@ module.frame = function()
 	-- Shifting options
 	----------
 
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#r");
+	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Shifting");
 
 		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:shiftParty:true#Shift default party frames to the right");
@@ -1011,7 +1011,7 @@ module.frame = function()
 	-- Button skins options
 	----------
 
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#r");
+	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Skinning Buttons");
 
 		optionsAddObject( -2, 4*14, "font#t:0:%y#s:0:%s#l:22:0#r#Buttons can be skinned using the skins included with CT_BarMod, or using an addon called Masque and some downloaded skins.#" .. textColor2 .. ":l");
@@ -1040,7 +1040,7 @@ module.frame = function()
 	-- Cooldown Options
 	----------
 
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#r");
+	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
 		local fonts = "";
 		for i, value in ipairs(fontTypeListSorted) do
 			fonts = fonts .. "#" .. value;
@@ -1071,7 +1071,7 @@ module.frame = function()
 	-- Blizzard Action Buttons
 	----------
 
-	optionsBeginFrame(-30, 0, "frame#tl:0:%y#r");
+	optionsBeginFrame(-30, 0, "frame#tl:0:%y#br:tr:0:%b");
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Blizzard Action Buttons");
 
 		optionsAddObject( -2, 3*14, "font#t:0:%y#s:0:%s#l:20:0#r#Select which of the following CT_BarMod options to also apply to the buttons on Blizzard's action bars.#" .. textColor2 .. ":l");
@@ -1086,7 +1086,7 @@ module.frame = function()
 	-- Default Bar Positions
 	----------
 
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#r");
+	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Default Bar Positions");
 
 		optionsAddObject( -2, 3*14, "font#t:0:%y#s:0:%s#l:20:0#r#There are two sets of default positions for CT_BarMod bars: the original CT_BarMod positions and the standard UI positions.#" .. textColor2 .. ":l");
@@ -1106,7 +1106,7 @@ module.frame = function()
 	-- Enable bars
 	----------
 
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#r#i:enablebars");
+	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b#i:enablebars");
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Enable Bars");
 
 		-- Although the default for all showGroup options is true,
@@ -1213,7 +1213,7 @@ module.frame = function()
 	----------
 	-- Default key bindings options
 	----------
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#r#i:defkeyoptions");
+	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b#i:defkeyoptions");
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Use Default Bars' Key Bindings");
 
 		optionsAddObject(-10, 3*14, "font#t:0:%y#s:0:%s#l:20:0#r#These options allow you to use the key bindings that are assigned to buttons on the game's default bars.#" .. textColor2 .. ":l");
@@ -1232,7 +1232,7 @@ module.frame = function()
 	-- Bar 12 options
 	----------
 
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#r#i:bar12options");
+	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b#i:bar12options");
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Bar 12 Options");
 
 		optionsAddObject(-10,   14, "font#tl:15:%y#Previous/Next Action Bar commands");
@@ -1264,7 +1264,7 @@ module.frame = function()
 	-- Bar options
 	----------
 
-		optionsBeginFrame(-20,    0, "frame#tl:0:%y#r");
+		optionsBeginFrame(-20,    0, "frame#tl:0:%y#br:tr:0:%b");
 		optionsAddObject(   0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Bar Options");
 
 		----------
@@ -1426,7 +1426,7 @@ module.frame = function()
 			);
 		optionsEndFrame();
 
-		optionsBeginFrame(   0,  90, "frame#tl:40:%y#r");
+		optionsBeginFrame(   0,  90, "frame#tl:40:%y#br:tr:0:%b");
 			optionsAddScript("onload",
 				function(self)
 					local width = 260;
@@ -1660,7 +1660,7 @@ module.frame = function()
 			);
 		optionsEndFrame();
 
-		optionsBeginFrame(   0,  90, "frame#tl:40:%y#r");
+		optionsBeginFrame(   0,  90, "frame#tl:40:%y#br:tr:0:%b");
 			optionsAddScript("onload",
 				function(self)
 					local width = 260;
@@ -1830,7 +1830,7 @@ module.frame = function()
 	-- Reset Options
 	----------
 
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#r");
+	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
 		optionsAddObject(  0,    1, "texture#tl:5:%y#br:tr:0:%b#1:1:1");
 
 		optionsAddObject(-15,   17, "font#tl:5:%y#v:GameFontNormalLarge#Reset CT_BarMod Options");

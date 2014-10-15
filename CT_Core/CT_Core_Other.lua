@@ -2246,16 +2246,16 @@ do
 			if ( WatchFrame.collapsed and not WatchFrame.userCollapsed ) then
 				-- WatchFrame is collapsed, but not because user clicked the collapse button.
 				-- There was not enough room to show objectives, so Blizzard collapsed the frame.
-				WatchFrameCollapseExpandButton:Disable();
+				--WatchFrameCollapseExpandButton:Disable();
 			else
-				WatchFrameCollapseExpandButton:Enable();
+				--WatchFrameCollapseExpandButton:Enable();
 			end
 
 			-- Show our watchFrame if there is at least one thing being tracked (which is the case
 			-- when the WatchFrameHeader is shown.
 			-- Also show our watchFrame if at least one auto quest pop up frame is shown, even if
 			-- there are no objectives being tracked. These pop up frames have a height of 82.
-			if (WatchFrameHeader:IsShown() or (GetNumAutoQuestPopUps() or 0) > 0) then
+			if (ObjectiveTrackerFrame:IsShown() or (GetNumAutoQuestPopUps() or 0) > 0) then
 				watchFrame:Show();
 			else
 				-- Blizzard hid their WatchFrame, so hide ours also.
@@ -2416,25 +2416,25 @@ do
 			end
 		end);
 
-		hooksecurefunc("WatchFrame_Update", function()
+		--[[hooksecurefunc("WatchFrame_Update", function()
 			if (opt_watchframeEnabled) then
 				watchFrame_Update();
 			end
-		end);
+		end);]]
 
-		hooksecurefunc("WatchFrame_SetWidth", function()
+		--[[hooksecurefunc("WatchFrame_SetWidth", function()
 			if (opt_watchframeEnabled) then
 				watchFrame_Update();
 			end
-		end);
+		end);]]
 
-		hooksecurefunc("WatchFrame_Expand", function()
+		--[[hooksecurefunc("WatchFrame_Expand", function()
 			module:setOption("watchframeIsCollapsed", WatchFrame.collapsed, true);
-		end);
+		end);]]
 
-		hooksecurefunc("WatchFrame_Collapse", function()
+		--[[hooksecurefunc("WatchFrame_Collapse", function()
 			module:setOption("watchframeIsCollapsed", WatchFrame.collapsed, true);
-		end);
+		end);]]
 
 		hookedFunctions = true;
 	end

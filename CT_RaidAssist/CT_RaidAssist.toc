@@ -1,5 +1,5 @@
-## Interface: 50400
-## Version: 5.4.7.0
+## Interface: 60000
+## Version: 6.0.2.0
 ## Title: CT_RaidAssist
 ## Notes: Allows you to monitor Raid HP.
 ## DefaultState: Enabled

@@ -561,7 +561,7 @@ module.frame = function()
 	optionsEndFrame();
 
 	-- Reset Options
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#r");
+	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Reset Options");
 		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:resetAll#Reset options for all of your characters");
 		optionsBeginFrame(   0,   30, "button#t:0:%y#s:120:%s#v:UIPanelButtonTemplate#Reset options");

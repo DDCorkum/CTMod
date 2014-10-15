@@ -9573,7 +9573,7 @@ module.frame = function()
 	optionsEndFrame();
 
 	-- General Options
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#r");
+	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#General");
 
 		optionsAddObject(-10,   26, "checkbutton#tl:10:%y#o:showWindowTitles:true#Show window titles when options are shown");
@@ -9645,7 +9645,7 @@ module.frame = function()
 	optionsEndFrame();
 
 	-- Expiration options
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#r");
+	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
 		optionsAddObject(-10,   17, "font#tl:5:%y#v:GameFontNormalLarge#Expiration");
 		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:flashIcons:true#Flash icon before expiring");
 
@@ -9678,7 +9678,7 @@ module.frame = function()
 		optionsEndFrame();
 	optionsEndFrame();
 
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#r#i:frameOptions");
+	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b#i:frameOptions");
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Windows");
 
 		optionsBeginFrame( -10,   30, "button#tl:15:%y#s:80:%s#v:UIPanelButtonTemplate#Add");
@@ -9917,7 +9917,7 @@ module.frame = function()
 			);
 		optionsEndFrame();
 
-		optionsBeginFrame(   0,  120, "frame#tl:40:%y#r");
+		optionsBeginFrame(   0,  120, "frame#tl:40:%y#br:tr:0:%b");
 			optionsAddScript("onload",
 				function(self)
 					local width = 260;
@@ -10344,7 +10344,7 @@ module.frame = function()
 		);
 	optionsEndFrame();
 
-	optionsBeginFrame(-25, 0, "frame#tl:0:%y#r");
+	optionsBeginFrame(-25, 0, "frame#tl:0:%y#br:tr:0:%b");
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Reset Options");
 		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:resetAll#Reset options for all of your characters");
 		optionsBeginFrame(  -5,   30, "button#t:0:%y#s:120:%s#v:UIPanelButtonTemplate#Reset options");

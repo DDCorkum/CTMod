@@ -505,7 +505,7 @@ module.frame = function()
 		optionsAddObject( -5, 2*13, "font#t:0:%y#s:0:%s#l#r#This will place the window at\nthe center of the screen.#" .. textColor2);
 	optionsEndFrame();
 
-	optionsBeginFrame(-25, 0, "frame#tl:0:%y#r");
+	optionsBeginFrame(-25, 0, "frame#tl:0:%y#br:tr:0:%b");
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Reset Options");
 		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:resetAll#Reset options for all of your characters");
 		optionsBeginFrame(  -5,   30, "button#t:0:%y#s:120:%s#v:UIPanelButtonTemplate#Reset options");
@@ -526,7 +526,7 @@ module.frame = function()
 	optionsEndFrame();
 
 	-- Slash command details
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#r");
+	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Commands");
 		for i, text in ipairs(CT_TIMER_HELP) do
 			optionsAddObject( -2, 3*14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. text .. "#" .. textColor2 .. ":l");
