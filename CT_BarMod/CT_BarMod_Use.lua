@@ -675,7 +675,7 @@ function useButton:update()
 	end
 	
 	-- Action text
-	if ( displayActionText and not IsConsumableAction(actionId) and not IsStackableAction(actionId) and (IsItemAction(actionId) or GetActionCount(actionId) == 0) ) then
+	if ( displayActionText and not IsConsumableAction(actionId) and not IsStackableAction(actionId) and (IsItemAction(actionId) or GetActionCount(actionId) == false) ) then
 		button.name:SetText(GetActionText(actionId));
 	else
 		button.name:SetText("");
@@ -1015,7 +1015,7 @@ end
 -- Update Binding
 function useButton:updateBinding()
 	local actionId = self.actionId;
-	if ( IsActionInRange(self.actionId) == 0 ) then
+	if ( IsActionInRange(self.actionId) == false ) then
 		local button = self.button;
 		self.outOfRange = true;
 		button.hotkey:SetVertexColor(1.0, 0.1, 0.1);
@@ -1629,7 +1629,7 @@ do
 		end
 		local rangeTimer = self.rangeTimer;
 		if ( rangeTimer and rangeTimer == TOOLTIP_UPDATE_TIME ) then
-			if ( colorLack and IsActionInRange(ActionButton_GetPagedID(self)) == 0 ) then
+			if ( colorLack and IsActionInRange(ActionButton_GetPagedID(self)) == false ) then
 				local icon = _G[self:GetName().."Icon"];
 				if ( colorLack == 2 ) then
 					icon:SetVertexColor(0.5, 0.5, 0.5);
@@ -1649,7 +1649,7 @@ do
 		if (not defbarShowRange) then
 			return;
 		end
-		if ( colorLack and IsActionInRange(ActionButton_GetPagedID(self)) == 0 ) then
+		if ( colorLack and IsActionInRange(ActionButton_GetPagedID(self)) == false ) then
 			local icon = _G[self:GetName().."Icon"];
 			if ( colorLack == 2 ) then
 				icon:SetVertexColor(0.5, 0.5, 0.5);

@@ -304,6 +304,24 @@ local function CT_MapMod_GetCharKey()
 	return UnitName("player") .. "@" .. GetRealmName();
 end
 
+local function CT_MapMod_GetWorldMapZoneName()
+    local mapName, _, _, isMicroDungeon, microDungeonMapName = GetMapInfo()
+    local name = WORLD_MAP
+    if GetCurrentMapZone() > 0 then
+        name = GetMapNameByID(GetCurrentMapAreaID())
+        local floorNum = DungeonUsesTerrainMap() and GetCurrentMapDungeonLevel() - 1 or GetCurrentMapDungeonLevel()
+        if floorNum > 0 then
+            name = name .. ': ' .. _G["DUNGEON_FLOOR_" .. strupper(mapName or '') .. floorNum]
+        end
+    else
+        local currentContinent = GetCurrentMapContinent()
+        if currentContinent ~= WORLDMAP_WORLD_ID and currentContinent ~= WORLDMAP_COSMIC_ID then
+            name = select(currentContinent, GetMapContinents())
+        end
+    end
+    return name or (isMicroDungeon and microDungeonMapName or mapName)
+end
+
 local function CT_MapMod_GetMapName()
 	-- Get the name of the current map.
 	-- This is for use when the player is looking at the map.
@@ -313,7 +331,7 @@ local function CT_MapMod_GetMapName()
 		return nil;
 	end
 	-- Return the name currently assigned to the zone drop down menu.
-	--return GetCurrentMapZone();
+	return CT_MapMod_GetWorldMapZoneName();
 end
 
 local function CT_MapMod_IsDialogShown()
@@ -778,7 +796,7 @@ end
 
 local notewindowDropDownInitialized;
 function CT_MapMod_NoteWindow_Show()
-	CT_MapMod_NoteWindow:SetFrameStrata("TOOLTIP")
+	CT_MapMod_NoteWindow:SetFrameStrata("DIALOG")
 	if (not notewindowDropDownInitialized) then
 		-- We're delaying the initialization of the dropdown menus until as late as possible
 		-- to make sure that Blizzard has had time to create CompactRaidFrame1.

@@ -1,5 +1,5 @@
 ## Interface: 60000
-## Version: 6.0.2.0
+## Version: 6.0.2.1
 ## Title: CT_BarMod
 ## Notes: Intuitive yet powerful action bar addon.
 ## DefaultState: Enabled

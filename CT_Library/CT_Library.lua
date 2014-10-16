@@ -2911,7 +2911,7 @@ module.frame = function()
 	for key, value in ipairs(modules) do
 		if ( value ~= module and value.options ) then
 			num = num + 1;
-			tinsert(addonsTable, "checkbutton#i:"..num.."#tl:20:-"..(num*20));
+			tinsert(addonsTable, "checkbutton#i:"..num.."#tl:20:-"..(num * 20));
 		end
 	end
 	
