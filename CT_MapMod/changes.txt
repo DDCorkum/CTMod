@@ -1,5 +1,8 @@
+CT_MapMod (6.0.2.2) 2014-10-17
+- Filtering frame strata fix.
+
 CT_MapMod (6.0.2.1) 2014-10-16
-- Note creating should properly work again.
+- Note creation should properly work again.
 
 CT_MapMod (6.0.2.0) 2014-10-15
 - Updated to 6.0.2.

@@ -939,6 +939,8 @@ function CT_MapMod_FilterWindow_OnShow(self)
 	CT_MapMod_MapButtonFrame:Hide();
 	CT_MapMod_MainButton:Disable();
 
+	self:SetFrameStrata("DIALOG")
+
 	local eb = CT_MapMod_FilterWindowFilterEB;
 	eb:SetText(CT_MapMod_Filter or "");
 	eb:HighlightText();

@@ -1,5 +1,5 @@
 ## Interface: 60000
-## Version: 6.0.2.1
+## Version: 6.0.2.2
 ## Title: CT_MapMod
 ## Notes: Adds the ability to write notes on the worldmap and send/receive to/from other players.
 ## DefaultState: Enabled

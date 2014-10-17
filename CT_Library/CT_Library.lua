@@ -11,7 +11,7 @@
 -----------------------------------------------
 -- Initialization
 
-local LIBRARY_VERSION = 6.02000;
+local LIBRARY_VERSION = 6.02002;
 local LIBRARY_NAME = "CT_Library";
 
 local _G = getfenv(0);
@@ -2550,7 +2550,9 @@ local function populateAddonsList(char)
 	obj = optionsFrame.actions;
 	obj:ClearAllPoints();
 	obj:SetPoint("TOPLEFT", optionsFrame, "TOPLEFT", 0, -105 + (-20 * num));
-	obj:SetPoint("RIGHT", optionsFrame);
+	obj:SetWidth(300)
+	obj:SetHeight(150)
+	--obj:SetPoint("RIGHT", optionsFrame);
 	obj:Show()
 
 	-- Hide unused addon objects
