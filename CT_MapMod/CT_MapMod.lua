@@ -24,6 +24,44 @@ _G[MODULE_NAME] = module;
 CT_Library:registerModule(module);
 
 --------------------------------------------
+-- Upvalues
+
+local abs = abs
+local ipairs = ipairs
+local math = math
+local pairs = pairs
+local select = select
+local string = string
+local strlen = strlen
+local strlower = strlower
+local strsub = strsub
+local strupper = strupper
+local tinsert = tinsert
+local tonumber = tonumber
+local tremove = tremove
+local type = type
+
+local CreateFrame = CreateFrame
+
+local DungeonUsesTerrainMap = DungeonUsesTerrainMap
+local GetCurrentMapAreaID = GetCurrentMapAreaID
+local GetCurrentMapContinent = GetCurrentMapContinent
+local GetCurrentMapDungeonLevel = GetCurrentMapDungeonLevel
+local GetCurrentMapZone = GetCurrentMapZone
+local GetCursorPosition = GetCursorPosition
+local GetMapContinents = GetMapContinents
+local GetMapInfo = GetMapInfo
+local GetMapNameByID = GetMapNameByID
+local GetMapZones = GetMapZones
+local GetPlayerMapPosition = GetPlayerMapPosition
+local GetRealmName = GetRealmName
+local IsControlKeyDown = IsControlKeyDown
+local PlaySound = PlaySound
+local SetMapToCurrentZone = SetMapToCurrentZone
+local SetMapZoom = SetMapZoom
+local UnitName = UnitName
+
+--------------------------------------------
 -- General Mod Code (recode imminent!)
 
 CT_UserMap_Notes = {};
@@ -305,21 +343,25 @@ local function CT_MapMod_GetCharKey()
 end
 
 local function CT_MapMod_GetWorldMapZoneName()
-    local mapName, _, _, isMicroDungeon, microDungeonMapName = GetMapInfo()
-    local name = WORLD_MAP
-    if GetCurrentMapZone() > 0 then
-        name = GetMapNameByID(GetCurrentMapAreaID())
-        local floorNum = DungeonUsesTerrainMap() and GetCurrentMapDungeonLevel() - 1 or GetCurrentMapDungeonLevel()
-        if floorNum > 0 then
-            name = name .. ': ' .. _G["DUNGEON_FLOOR_" .. strupper(mapName or '') .. floorNum]
-        end
-    else
-        local currentContinent = GetCurrentMapContinent()
-        if currentContinent ~= WORLDMAP_WORLD_ID and currentContinent ~= WORLDMAP_COSMIC_ID then
-            name = select(currentContinent, GetMapContinents())
-        end
-    end
-    return name or (isMicroDungeon and microDungeonMapName or mapName)
+	local mapName, _, _, isMicroDungeon, microDungeonMapName = GetMapInfo()
+	local name = WORLD_MAP
+	if GetCurrentMapZone() > 0 then
+		name = GetMapNameByID(GetCurrentMapAreaID())
+		local floorNum = DungeonUsesTerrainMap() and GetCurrentMapDungeonLevel() - 1 or GetCurrentMapDungeonLevel()
+		if floorNum > 0 then
+			if not _G["DUNGEON_FLOOR_" .. strupper(mapName or "") .. floorNum] then
+				name = name .. ': ' .. strupper(mapName or "") .. floorNum
+			else
+				name = name .. ': ' .. _G["DUNGEON_FLOOR_" .. strupper(mapName or "") .. floorNum]
+			end
+		end
+	else
+		local currentContinent = GetCurrentMapContinent()
+		if currentContinent ~= WORLDMAP_WORLD_ID and currentContinent ~= WORLDMAP_COSMIC_ID then
+			name = select(currentContinent, GetMapContinents())
+		end
+	end
+	return name or (isMicroDungeon and microDungeonMapName or mapName)
 end
 
 local function CT_MapMod_GetMapName()
@@ -366,7 +408,7 @@ local function CT_MapMod_anchorFrame(ancFrame)
 		relFrame = WorldMapDetailFrame;
 	else
 		-- Full screen size world map
-		relFrame = WorldMapPositioningGuide;
+		relFrame = WorldMapDetailFrame;
 	end
 
 	local ancFrameScale, ancFrameBottom, ancFrameLeft;
@@ -1394,8 +1436,12 @@ function CT_MapMod_Coord_RestorePosition()
 	local pos = CT_MapMod_Options[characterKey][optName];
 	if (pos) then
 		-- Restore to the saved position.
-		button:ClearAllPoints();
-		button:SetPoint(pos[1], pos[2], pos[3], pos[4], pos[5]);
+		if pos[2] == "WorldMapPositioningGuide" then
+			CT_MapMod_Coord_ResetPositions()
+		else
+			button:ClearAllPoints();
+			button:SetPoint(pos[1], pos[2], pos[3], pos[4], pos[5]);
+		end
 	else
 		-- Restore to default position.
 		CT_MapMod_Coord_ResetPosition(false)
@@ -1639,8 +1685,12 @@ function CT_MapMod_MainButton_RestorePosition()
 	local pos = CT_MapMod_Options[characterKey][optName];
 	if (pos) then
 		-- Restore to the saved position.
-		button:ClearAllPoints();
-		button:SetPoint(pos[1], pos[2], pos[3], pos[4], pos[5]);
+		if pos[2] == "WorldMapPositioningGuide" then
+			CT_MapMod_MainButton_ResetPositions()
+		else
+			button:ClearAllPoints();
+			button:SetPoint(pos[1], pos[2], pos[3], pos[4], pos[5]);
+		end
 	else
 		-- Restore to default position.
 		CT_MapMod_MainButton_ResetPosition(false)
@@ -1683,7 +1733,7 @@ local function CT_MapMod_MainButton_ToggleCountPosition()
 	-- Change the position of the note count text on the current map size
 	local characterKey = CT_MapMod_GetCharKey();
 	local optName = CT_MapMod_MainButton_GetCountPositionOptionName();
-	pos = CT_MapMod_Options[characterKey][optName] or 1;
+	local pos = CT_MapMod_Options[characterKey][optName] or 1;
 	pos = pos + 1;
 	if (pos > 4) then
 		pos = 1;

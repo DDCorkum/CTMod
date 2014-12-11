@@ -1,3 +1,7 @@
+CT_BarMod (6.0.3.0) 2014-12-11
+- Fixed the issue which caused macro names not to show up.
+- Fixed the "Fade when mouse is not over the bar" condition.
+
 CT_BarMod (6.0.2.1) 2014-10-16
 - Fixed out of range coloring issues.
 

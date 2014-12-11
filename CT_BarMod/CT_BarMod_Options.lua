@@ -81,7 +81,7 @@ local function updateGroups()
 
 		group:update("barScale", module:getOption("barScale" .. groupId) or 1);
 
-		group:update("barMouseover", module:getOption("barMouseover" .. groupId) == 1);  -- do before "barOpacity"
+		group:update("barMouseover", module:getOption("barMouseover" .. groupId) == true);  -- do before "barOpacity"
 		group:update("barFaded", module:getOption("barFaded" .. groupId) or 0);  -- do before "barOpacity"
 		group:update("barOpacity", module:getOption("barOpacity" .. groupId) or 1);
 

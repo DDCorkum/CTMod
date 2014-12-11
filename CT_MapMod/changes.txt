@@ -1,3 +1,8 @@
+CT_MapMod (6.0.3.0) 2014-12-11
+- Coordinates and Note button fixes from older configs.
+- Zone name fixes for POI creation.
+- Added upvalues.
+
 CT_MapMod (6.0.2.2) 2014-10-17
 - Note filtering frame strata fix.
 

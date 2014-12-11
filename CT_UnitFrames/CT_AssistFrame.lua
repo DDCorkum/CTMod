@@ -561,6 +561,7 @@ function CT_AssistFrame_UpdateAuras(self)
 
 			-- Handle cooldowns
 			frameCooldown = _G[frameName.."Cooldown"];
+			frameCooldown:SetHideCountdownNumbers(true)
 			if ( duration > 0 ) then
 				frameCooldown:Show();
 				CooldownFrame_SetTimer(frameCooldown, expirationTime - duration, duration, 1);
@@ -634,6 +635,7 @@ function CT_AssistFrame_UpdateAuras(self)
 
 					-- Handle cooldowns
 					frameCooldown = _G[frameName.."Cooldown"];
+					frameCooldown:SetHideCountdownNumbers(true)
 					if ( duration > 0 ) then
 						frameCooldown:Show();
 						CooldownFrame_SetTimer(frameCooldown, expirationTime - duration, duration, 1);

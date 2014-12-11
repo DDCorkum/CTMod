@@ -1,9 +1,13 @@
+local _G = _G
+local tonumber = tonumber
+
 function CT_PartyFrameSlider_OnLoad(self)
 	_G[self:GetName().."Text"]:SetText(CT_UFO_PARTYTEXTSIZE);
 	_G[self:GetName().."High"]:SetText(CT_UFO_PARTYTEXTSIZE_LARGE);
 	_G[self:GetName().."Low"]:SetText(CT_UFO_PARTYTEXTSIZE_SMALL);
 	self:SetMinMaxValues(1, 5);
 	self:SetValueStep(1);
+	self:SetObeyStepOnDrag(true)
 	self.tooltipText = "Allows you to change the text size of the party health & mana texts.";
 end
 

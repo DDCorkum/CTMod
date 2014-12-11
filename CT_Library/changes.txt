@@ -1,3 +1,6 @@
+CT_Library (6.0.3.0) 2014-12-11
+- Version and toc bump.
+
 CT_Library (6.0.2.2) 2014-10-17
 - Fixed the import issues.
 

@@ -675,7 +675,7 @@ function useButton:update()
 	end
 	
 	-- Action text
-	if ( displayActionText and not IsConsumableAction(actionId) and not IsStackableAction(actionId) and (IsItemAction(actionId) or GetActionCount(actionId) == false) ) then
+	if ( displayActionText and not IsConsumableAction(actionId) and not IsStackableAction(actionId) and (IsItemAction(actionId) or GetActionCount(actionId) == 0) ) then
 		button.name:SetText(GetActionText(actionId));
 	else
 		button.name:SetText("");
