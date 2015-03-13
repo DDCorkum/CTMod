@@ -1,5 +1,5 @@
-## Interface: 60000
-## Version: 6.0.3.0
+## Interface: 60100
+## Version: 6.1.0.0
 ## Title: CT_Library
 ## Notes: Library features for CTMod.
 ## DefaultState: Enabled

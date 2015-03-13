@@ -1,3 +1,6 @@
+CT_UnitFrames (6.1.0.0) 2015-03-13
+- Updated to 6.1.0.
+
 CT_UnitFrames (6.0.3.0) 2014-12-11
 - Removed Blizzard cooldown text from Assist Frame's buffs and debuffs.
 - Fixed party text slider ondrag value setp issues.

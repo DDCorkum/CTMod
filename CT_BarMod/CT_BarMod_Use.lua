@@ -128,11 +128,13 @@ cooldownUpdater = function()
 		local currTime = GetTime();
 		local start, duration, enable;
 		for button, fsCount in pairs(cooldownList) do
-			start, duration, enable = GetActionCooldown(button.actionId);
-			if ( start > 0 and duration > 0 and enable > 0 ) then
-				updateCooldown(fsCount, duration - (currTime - start));
-			else
-				dropCooldownFromQueue(button);
+			if button.actionId then
+				start, duration, enable = GetActionCooldown(button.actionId);
+				if ( start > 0 and duration > 0 and enable > 0 ) then
+					updateCooldown(fsCount, duration - (currTime - start));
+				else
+					dropCooldownFromQueue(button);
+				end
 			end
 		end
 	end
@@ -1708,14 +1710,32 @@ do
 		cooldown.object = self;
 		self.actionId = actionId;
 
-		local start, duration, enable = GetActionCooldown(actionId);
-		if ( start > 0 and duration > 0 and enable > 0 ) then
-			startCooldown(cooldown, start, duration);
-			if (not displayCount) then
+		if actionId then
+			local start, duration, enable = GetActionCooldown(actionId);
+			if ( start > 0 and duration > 0 and enable > 0 ) then
+				startCooldown(cooldown, start, duration);
+				if (not displayCount) then
+					hideCooldown(cooldown);
+				end
+			else
 				hideCooldown(cooldown);
 			end
 		else
-			hideCooldown(cooldown);
+			local i = 1;
+	 		local button = _G["SpellFlyoutButton"..i];
+	 		while (button and button:IsShown()) do
+	 			local start, duration, enable = GetSpellCooldown(button.spellID);
+				if ( start > 0 and duration > 0 and enable > 0 ) then
+					startCooldown(cooldown, start, duration);
+					if (not displayCount) then
+						hideCooldown(cooldown);
+					end
+				else
+					hideCooldown(cooldown);
+				end
+	 			i = i + 1;
+	 			button = _G["SpellFlyoutButton"..i];
+	 		end
 		end
 	end
 	hooksecurefunc("ActionButton_UpdateCooldown", CT_BarMod_ActionButton_UpdateCooldown);

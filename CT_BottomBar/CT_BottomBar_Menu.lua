@@ -23,7 +23,7 @@
 -- GuildMicroButton
 -- PVPMicroButton
 -- LFDMicroButton
--- CompanionsMicroButton
+-- CollectionsMicroButton
 -- EJMicroButton
 -- StoreMicroButton
 -- MainMenuMicroButton
@@ -455,7 +455,7 @@ local function addon_Register()
 		GuildMicroButton, -- 7
 		PVPMicroButton, -- 8
 		LFDMicroButton, -- 9
-		CompanionsMicroButton, -- 10
+		CollectionsMicroButton, -- 10
 		EJMicroButton, -- 11
 		StoreMicroButton, -- 12
 		MainMenuMicroButton -- 13

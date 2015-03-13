@@ -751,6 +751,20 @@ local function CT_MapMod_EditNote(id)
 	end
 end
 
+function CT_MapMod_CreateNote(x, y, note)
+	local mapName = CT_MapMod_GetMapName();
+	if (mapName and x and y and x > 0 and x < 100 and y > 0 and y < 100) then
+		if not note then
+			note = "New note"
+		end
+		local id = CT_MapMod_AddNote(x / 100, y / 100, mapName, note, "", 1, 1);
+		CT_MapMod_NoteWindow.note = id;
+		CT_MapMod_NoteWindow.zone = mapName;
+		CT_MapMod_NoteWindow_Show();
+		CT_MapMod_NoteWindow_Accept()
+	end
+end
+
 local function CT_MapMod_CreateNoteOnCursor()
 	-- Create a new note at the cursor position.
 	local mapName = CT_MapMod_GetMapName();

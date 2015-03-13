@@ -1,3 +1,8 @@
+CT_BarMod (6.1.0.0) 2015-03-13
+- Updated to 6.1.0.
+- Cooldown swipe edge is disabled for action buttons.
+- Spell flyout menu cooldown fix.
+
 CT_BarMod (6.0.3.0) 2014-12-11
 - Fixed the issue which caused macro names not to show up.
 - Fixed the "Fade when mouse is not over the bar" condition.

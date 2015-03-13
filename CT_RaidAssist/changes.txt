@@ -1,3 +1,6 @@
+CT_RaidAssist (6.1.0.0) 2015-03-13
+- Updated to 6.1.0.
+
 CT_RaidAssist (6.0.2.0) 2014-10-15
 - Updated to 6.0.2.
 

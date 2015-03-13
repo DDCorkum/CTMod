@@ -210,6 +210,7 @@ local function getActionButton(buttonId)
 		button.name = parent:CreateFontString();
 
 		button.cooldown = CreateFrame("Cooldown", nil, parent, "CooldownFrameTemplate");
+		button.cooldown:SetDrawEdge(false);
 
 		button.FlyoutArrow = parent:CreateTexture(nil, "ARTWORK", "ActionBarFlyoutButton-ArrowUp");
 		button.FlyoutArrow:SetDrawLayer("ARTWORK", 2);

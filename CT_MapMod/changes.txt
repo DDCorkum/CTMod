@@ -1,3 +1,7 @@
+CT_MapMod (6.1.0.0) 2015-03-13
+- Updated to 6.1.0.
+- Added a function to auto create notes.
+
 CT_MapMod (6.0.3.0) 2014-12-11
 - Coordinates and Note button fixes from older configs.
 - Zone name fixes for POI creation.
