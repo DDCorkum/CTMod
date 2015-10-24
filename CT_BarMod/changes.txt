@@ -1,3 +1,7 @@
+CT_BarMod (6.2.3.0) 2015-10-24
+- Updated to 6.2.3.
+- Binding fixes.
+
 CT_BarMod (6.1.0.0) 2015-03-13
 - Updated to 6.1.0.
 - Cooldown swipe edge is disabled for action buttons.

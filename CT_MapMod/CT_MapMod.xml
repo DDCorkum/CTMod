@@ -686,9 +686,9 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 					<AbsDimension x="200" y="14"/>
 				</Size>
 				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="WorldMapPositioningGuide" relativePoint="TOPLEFT">
+					<Anchor point="TOPLEFT" relativeTo="WorldMapFrame" relativePoint="TOPLEFT">
 						<Offset>
-							<AbsDimension x="0" y="0"/>
+							<AbsDimension x="95" y="-5"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -739,9 +739,9 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 					<AbsDimension x="70" y="19"/>
 				</Size>
 				<Anchors>
-					<Anchor point="TOPRIGHT" relativeTo="WorldMapPositioningGuide" relativePoint="TOPRIGHT">
+					<Anchor point="RIGHT" relativeTo="WorldMapFrameSizeUpButton" relativePoint="LEFT">
 						<Offset>
-							<AbsDimension x="0" y="0"/>
+							<AbsDimension x="3" y="0"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
