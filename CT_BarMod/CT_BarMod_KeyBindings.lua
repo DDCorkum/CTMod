@@ -990,7 +990,7 @@ local function keyBindingOnLoad(self)
 	scrollFrame:SetPoint("BOTTOMRIGHT", self, -19, 0);
 
 	local tex = scrollFrame:CreateTexture(scrollFrame:GetName() .. "Track", "BACKGROUND");
-	tex:SetTexture(0, 0, 0, 0.3);
+	tex:SetColorTexture(0, 0, 0, 0.3);
 	tex:ClearAllPoints();
 	tex:SetPoint("TOPLEFT", _G[scrollFrame:GetName().."ScrollBar"], -1, 17);
 	tex:SetPoint("BOTTOMRIGHT", _G[scrollFrame:GetName().."ScrollBar"], 5, -17);

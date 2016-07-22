@@ -867,7 +867,7 @@ end
 
 local function castingtimer_configure(castBarFrame)
 
-	local castingBarText = castBarFrame.text;
+	local castingBarText = castBarFrame.Text;
 	local countDownText = castBarFrame.countDownText;
 
 	if (not countDownText) then

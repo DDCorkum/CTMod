@@ -7979,12 +7979,12 @@ function globalClass:applyGlobalOptions(initFlag)
 
 	-- Hide Blizzard's buffs, consolidated buffs, enchants
 	self.hideBlizzardBuffs = module:getOption("hideBlizzardBuffs") ~= false;
-	self.hideBlizzardConsolidated = module:getOption("hideBlizzardConsolidated") ~= false;
+	--self.hideBlizzardConsolidated = module:getOption("hideBlizzardConsolidated") ~= false;
 	self.hideBlizzardEnchants = module:getOption("hideBlizzardEnchants") ~= false;
 
 	globalObject:hideBlizzardEnchantsFrame(self.hideBlizzardEnchants);
 	globalObject:hideBlizzardBuffsFrame(self.hideBlizzardBuffs);
-	globalObject:hideBlizzardConsolidatedFrame(self.hideBlizzardConsolidated);
+	--globalObject:hideBlizzardConsolidatedFrame(self.hideBlizzardConsolidated);
 
 	-- Aura tooltip
 	self.showCasterName = module:getOption("showCasterName") ~= false;
@@ -8137,7 +8137,7 @@ BuffFrame:HookScript("OnShow",
 );
 
 -- Blizzard shows/hides the ConsolidatedBuffs frame as needed.
-local hidConsolidated;
+--[[local hidConsolidated;
 local consolidatedOption;
 
 function globalClass:hideBlizzardConsolidatedFrame(value)
@@ -8170,7 +8170,7 @@ ConsolidatedBuffs:HookScript("OnShow",
 			frame_Hide(self);
 		end
 	end
-);
+);]]
 
 
 --------------------------------------------

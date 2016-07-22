@@ -361,7 +361,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 			<OnLoad>
 				local scroll = _G[self:GetName() .. "ScrollFrame"];
 				local tex = scroll:CreateTexture(scroll:GetName() .. "Track", "BACKGROUND");
-				tex:SetTexture(0, 0, 0, 0.3);
+				tex:SetColorTexture(0, 0, 0, 0.3);
 				tex:ClearAllPoints();
 				tex:SetPoint("TOPLEFT", _G[scroll:GetName().."ScrollBar"], -1, 17);
 				tex:SetPoint("BOTTOMRIGHT", _G[scroll:GetName().."ScrollBar"], 0, -17);

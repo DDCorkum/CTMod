@@ -688,7 +688,7 @@ function group:new(groupId)
 	overlay:SetHitRectInsets(0, 0, 0, 0);  -- was 10's
 	overlay.background = overlay:CreateTexture(nil, "BACKGROUND");
 	overlay.background:SetAllPoints();
-	overlay.background:SetTexture(1, 1, 1, 0);
+	overlay.background:SetColorTexture(1, 1, 1, 0);
 	overlay.background:SetVertexColor(1, 1, 1, 1);
 	overlay.background:Show();
 	overlay:Show();

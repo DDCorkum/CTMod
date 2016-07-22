@@ -11,7 +11,7 @@
 -----------------------------------------------
 -- Initialization
 
-local LIBRARY_VERSION = 6.02030;
+local LIBRARY_VERSION = 7.03000;
 local LIBRARY_NAME = "CT_Library";
 
 local _G = getfenv(0);
@@ -1339,7 +1339,7 @@ objectHandlers.texture = function(self, parent, name, virtual, option, texture, 
 	
 	-- Color
 	if ( r and g and b ) then
-		tex:SetTexture(tonumber(r) or 1, tonumber(g) or 1, tonumber(b) or 1, tonumber(a) or 1);
+		tex:SetColorTexture(tonumber(r) or 1, tonumber(g) or 1, tonumber(b) or 1, tonumber(a) or 1);
 	else
 		tex:SetTexture(texture);
 	end
@@ -1567,7 +1567,7 @@ objectHandlers.colorswatch = function(self, parent, name, virtual, option, alpha
 	normalTexture:SetTexture("Interface\\ChatFrame\\ChatFrameColorSwatch");
 	normalTexture:SetAllPoints(swatch);
 	swatch:SetNormalTexture(normalTexture);
-	bg:SetTexture(1, 1, 1);
+	bg:SetColorTexture(1, 1, 1);
 	bg:SetPoint("TOPLEFT", swatch, 1, -1);
 	bg:SetPoint("BOTTOMRIGHT", swatch, 0, 1);
 	
@@ -2434,7 +2434,7 @@ local function controlPanelSkeleton()
 				self.scroll = scroll;
 
 				local tex = scroll:CreateTexture(scroll:GetName() .. "Track", "BACKGROUND");
-				tex:SetTexture(0, 0, 0, 0.3);
+				tex:SetColorTexture(0, 0, 0, 0.3);
 				tex:ClearAllPoints();
 				tex:SetPoint("TOPLEFT", _G[scroll:GetName().."ScrollBar"], -1, 17);
 				tex:SetPoint("BOTTOMRIGHT", _G[scroll:GetName().."ScrollBar"], 0, -17);

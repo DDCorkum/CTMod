@@ -454,7 +454,7 @@ function CT_ViewportFrame_OnLoad(self)
 	
 	if (not CT_ViewportOverlay) then
 		CT_ViewportOverlay = WorldFrame:CreateTexture("CT_ViewportOverlay", "BACKGROUND");
-		CT_ViewportOverlay:SetTexture(1, 1, 1, 1);
+		CT_ViewportOverlay:SetColorTexture(1, 1, 1, 0);
 		CT_ViewportOverlay:SetPoint("TOPLEFT", "UIParent", "TOPLEFT", -1, 1);
 		CT_ViewportOverlay:SetPoint("BOTTOMRIGHT", "UIParent", "BOTTOMRIGHT", 1, -1);
 	end

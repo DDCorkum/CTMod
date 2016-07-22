@@ -359,7 +359,7 @@ end
 
 function CT_FocusFrame_CheckFaction(self)
 	-- self == The main unit frame
-	if ( not UnitPlayerControlled(self.unit) and UnitIsTapped(self.unit) and not UnitIsTappedByPlayer(self.unit) and not UnitIsTappedByAllThreatList(self.unit) ) then
+	if ( not UnitPlayerControlled(self.unit) and UnitIsTapDenied(self.unit) ) then
 		self.nameBackground:SetVertexColor(0.5, 0.5, 0.5);
 		if ( self.portrait ) then
 			self.portrait:SetVertexColor(0.5, 0.5, 0.5);
@@ -563,7 +563,7 @@ function CT_FocusFrame_UpdateAuras(self)
 			frameCooldown = _G[frameName.."Cooldown"];
 			if ( duration > 0 ) then
 				frameCooldown:Show();
-				CooldownFrame_SetTimer(frameCooldown, expirationTime - duration, duration, 1);
+				CooldownFrame_Set(frameCooldown, expirationTime - duration, duration, 1);
 			else
 				frameCooldown:Hide();
 			end
@@ -636,7 +636,7 @@ function CT_FocusFrame_UpdateAuras(self)
 					frameCooldown = _G[frameName.."Cooldown"];
 					if ( duration > 0 ) then
 						frameCooldown:Show();
-						CooldownFrame_SetTimer(frameCooldown, expirationTime - duration, duration, 1);
+						CooldownFrame_Set(frameCooldown, expirationTime - duration, duration, 1);
 					else
 						frameCooldown:Hide();
 					end
@@ -1127,15 +1127,13 @@ function CT_Focus_Spellbar_OnLoad(self)
 	
 	CastingBarFrame_OnLoad(self, self.unit, false, true);
 
-	local name = self:GetName();
-
-	local barIcon =_G[name.."Icon"];
+	local barIcon = self.Icon;
 	barIcon:Show();
 
 --	CT_SetFocusSpellbarAspect(self);
 	
 	--The focus casting bar has less room for text than most, so shorten it
-	_G[name.."Text"]:SetWidth(150)
+	self.Text:SetWidth(150);
 
 	-- check to see if the castbar should be shown
 --	if ( GetCVar("showTargetCastbar") == "0") then

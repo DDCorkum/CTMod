@@ -82,7 +82,7 @@ local function encodeLogEntry(success, type, mail, message)
 			end
 		end
 		money = money or 0;
-		entry = ("1#%s#%s#%s#%d#%d#%d#%s"):format(type, receiver, sender, money, time(), numItems, mail.subject) .. items;
+		entry = ("1#%s#%s#%s#%s#%d#%d#%s"):format(type, receiver, sender, money, time(), numItems, mail.subject) .. items;
 
 	elseif ( not success and message ) then
 		if (not mail) then

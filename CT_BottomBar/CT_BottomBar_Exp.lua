@@ -500,7 +500,7 @@ local function CT_BottomBar_MainMenuExpBar_CreateFrames()
 	tx:SetHeight(10);
 	tx:SetWidth(0);
 	tx:SetPoint("TOPLEFT", experBar, "TOPLEFT", 0, 0);
-	tx:SetTexture(1, 1, 1, 1);
+	tx:SetColorTexture(1, 1, 1, 1);
 
 	-- Border texture with a sublevel of -1 (below division textures which are at sublevel 0).
 	tx = experBar:CreateTexture("CT_BottomBar_MainMenuExpBarTextureLeftCap1",  "OVERLAY", nil, -1);
@@ -513,7 +513,7 @@ local function CT_BottomBar_MainMenuExpBar_CreateFrames()
 	tx = experBar:CreateTexture("CT_BottomBar_MainMenuExpBarTextureMid2",      "OVERLAY", nil,  1);
 
 	tx = experBar:CreateTexture("CT_BottomBar_MainMenuExpBarTextureBack", "BACKGROUND");
-	tx:SetTexture(0, 0, 0, 0.5);
+	tx:SetColorTexture(0, 0, 0, 0.5);
 	tx:SetAllPoints();
 
 	overlayFrame = CreateFrame("Frame", "CT_BottomBar_MainMenuExpBarOverlayFrame", experBar);
@@ -1006,10 +1006,10 @@ local function addon_OnDelayedUpdate(self, value)
 	-- Returns: true if delayed update was completed.
 	--          false, nil == the delayed update was not completed.
 	
-	-- Call Blizzard's ReputationWatchBar_Update() function.
+	-- Call Blizzard's ReputationWatchBar_UpdateMaxLevel() function.
 	-- Since we have this hooked (in CT_BottomBar_Rep.lua),
 	-- our exp and rep bars will also get updated.
-	ReputationWatchBar_Update();
+	ReputationWatchBar_UpdateMaxLevel();
 
 	return true;
 end
@@ -1017,7 +1017,7 @@ end
 local function addon_updateVisibility()
 	-- This will get called at the end of addon:updateVisibility().
 	-- Call Blizzard's function that updates the reputation and exp bars.
-	ReputationWatchBar_Update();
+	ReputationWatchBar_UpdateMaxLevel();
 end
 
 local function addon_Hooked_SpecialUI_OnShow(self)

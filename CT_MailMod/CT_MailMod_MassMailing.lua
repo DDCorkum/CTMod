@@ -184,13 +184,13 @@ do
 		
 		local function itemBoxOnEnter(self)
 			if ( not CursorHasItem() ) then
-				self.background:SetTexture(0.3, 0.3, 0.3, 0.25);
+				self.background:SetColorTexture(0.3, 0.3, 0.3, 0.25);
 				module:displayTooltip(self, module:getText("MASS_MAILING_CLICK_REMOVE"));
 			end
 		end
 		
 		local function itemBoxOnLeave(self)
-			self.background:SetTexture(0, 0, 0, 0.25);
+			self.background:SetColorTexture(0, 0, 0, 0.25);
 			module:hideTooltip();
 		end
 		
@@ -215,7 +215,7 @@ do
 
 			local background = button:CreateTexture(nil, "BACKGROUND");
 			background:SetAllPoints(button);
-			background:SetTexture(0, 0, 0, 0.25);
+			background:SetColorTexture(0, 0, 0, 0.25);
 			button.background = background;
 
 			local icon = CreateFrame("Button", nil, button);
@@ -362,7 +362,7 @@ do
 				self.dropButton = dropButton;
 				dropButton:SetPoint("TOPLEFT", self, "TOPLEFT", 25, -170);
 				dropButton.name:SetText(module:getText("MASS_MAILING_DROP_ITEMS"));
-				dropButton.background:SetTexture(0, 0.4, 0, 0.35);
+				dropButton.background:SetColorTexture(0, 0.4, 0, 0.35);
 				dropButton:SetScript("OnClick", function(self)
 					local container, slot = getCurrentItem();
 					if ( container and slot ) then
@@ -374,12 +374,12 @@ do
 				dropButton:SetScript("OnReceiveDrag", dropButton:GetScript("OnClick"));
 				dropButton:SetScript("OnEnter", function(self)
 					if ( CursorHasItem() ) then
-						self.background:SetTexture(0.5, 0.82, 0, 0.45);
+						self.background:SetColorTexture(0.5, 0.82, 0, 0.45);
 						module:displayTooltip(self, module:getText("MASS_MAILING_DROP_HERE"));
 					end
 				end);
 				dropButton:SetScript("OnLeave", function(self)
-					self.background:SetTexture(0, 0.4, 0, 0.35);
+					self.background:SetColorTexture(0, 0.4, 0, 0.35);
 					module:hideTooltip();
 				end);
 
