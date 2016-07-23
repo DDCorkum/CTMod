@@ -1,6 +1,10 @@
+CT_MailMod (7.0.3.1) 2016-07-23
+- Editbox fixes.
+- Mail tooltip and mail log fixes.
+
 CT_MailMod (7.0.3.0) 2016-07-22
 - Updated to 7.0.3.
-- Should handle big strings now without issue.
+- Should handle big strings now without an issue.
 
 CT_MailMod (6.2.3.0) 2015-10-24
 - Updated to 6.2.3.

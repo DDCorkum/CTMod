@@ -220,7 +220,7 @@ end
 function CT_BuffMod_UnsecureAuraHeader_OnUpdate(self)
 	-- Bugfix
 	local hasMainHandEnchant, hasOffHandEnchant, _;
-	hasMainHandEnchant, _, _, hasOffHandEnchant, _, _ = GetWeaponEnchantInfo();
+	hasMainHandEnchant, _, _, _, hasOffHandEnchant = GetWeaponEnchantInfo();
 -- rng	local hasMainHandEnchant, hasOffHandEnchant, hasRangedEnchant, _;
 -- rng	hasMainHandEnchant, _, _, hasOffHandEnchant, _, _, hasRangedEnchant, _, _ = GetWeaponEnchantInfo();
 	-- EndBugfix
@@ -358,7 +358,7 @@ local function configureAuras(self, auraTable, consolidateTable, weaponPosition)
 	if ( weaponPosition ) then
 		local hasMainHandEnchant, hasOffHandEnchant, _;
 -- rng		local hasMainHandEnchant, hasOffHandEnchant, hasRangedEnchant, _;
-		hasMainHandEnchant, _, _, hasOffHandEnchant, _, _ = GetWeaponEnchantInfo();
+		hasMainHandEnchant, _, _, _, hasOffHandEnchant = GetWeaponEnchantInfo();
 -- rng		hasMainHandEnchant, _, _, hasOffHandEnchant, _, _, hasRangedEnchant, _, _ = GetWeaponEnchantInfo();
 
 		for weapon=2,1,-1 do
@@ -1651,8 +1651,8 @@ local function getTemporaryEnchantInfo(index, slot, unit)
 	-- slot == inventory slot number (16 == main hand, 17 = off hand, 18 = ranged) -- rng
 	-- unit == unit ID (should be "player")
 
-	local numValues = 3;  -- Number of return values from GetWeaponEnchantInfo() per weapon
-	local hasEnchant, timeRemaining, count = select(numValues * (index - 1) + 1, GetWeaponEnchantInfo());
+	local numValues = 4;  -- Number of return values from GetWeaponEnchantInfo() per weapon
+	local hasEnchant, timeRemaining, count, id = select(numValues * (index - 1) + 1, GetWeaponEnchantInfo());
 	if (not hasEnchant) then
 		return false;
 	end
@@ -2408,6 +2408,7 @@ local function auraButton_updateAppearance(button)
 	) then
 		if ( not fsTimeleft ) then
 			fsTimeleft = frameDetails:CreateFontString(nil, "ARTWORK", "ChatFontNormal");
+			fsTimeleft:SetWordWrap(false)
 			button.fsTimeleft = fsTimeleft;
 			fsTimeleft:SetText("test");
 			button.fsTimeleftHeight = fsTimeleft:GetStringHeight();
@@ -2489,6 +2490,7 @@ local function auraButton_updateAppearance(button)
 		if ( frameObject.showNames1 ) then
 			if ( not fsName ) then
 				fsName = frameDetails:CreateFontString(nil, "ARTWORK", "GameFontNormal");
+				fsName:SetWordWrap(false)
 				button.fsName = fsName;
 			end
 		elseif ( fsName ) then
@@ -2843,6 +2845,7 @@ local function auraButton_updateAppearance(button)
 	if (auraObject.count and auraObject.count > 1) then
 		if (not fsCount) then
 			fsCount = button:CreateFontString(nil, "OVERLAY", "NumberFontNormalSmall");
+			fsCount:SetWordWrap(false)
 			fsCount:SetPoint("BOTTOMRIGHT", button, 5, 0);
 			fsCount:SetFont("ARIALN.TTF", 12, ""); -- "MONOCHROME");
 		end
@@ -4330,6 +4333,7 @@ function frameClass:createAltFrame()
 
 	-- Create window title
 	altFrame.fsWindowTitle = altFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+	altFrame.fsWindowTitle:SetWordWrap(false)
 	altFrame.fsWindowTitle:SetText("Window " .. self:getWindowId());
 	altFrame.fsWindowTitle:SetPoint("BOTTOM", altFrame, "TOP");
 	altFrame.fsWindowTitle:Hide();
@@ -9727,7 +9731,7 @@ module.frame = function()
 
 		optionsAddObject(-20,   14, "font#tl:15:%y#v:ChatFontNormal#Select window:");
 
-		optionsBeginFrame(  19,   24, "button#tl:105:%y#s:24:%s");
+		optionsBeginFrame( 19,   24, "button#tl:105:%y#s:24:%s");
 			optionsAddScript("onclick",
 				function(self)
 					options_prvsWindow();
@@ -9743,7 +9747,7 @@ module.frame = function()
 			);
 		optionsEndFrame();
 
-		optionsBeginFrame(  25,   24, "button#tl:125:%y#s:24:%s");
+		optionsBeginFrame( 24,   24, "button#tl:125:%y#s:24:%s");
 			optionsAddScript("onclick",
 				function(self)
 					options_nextWindow();

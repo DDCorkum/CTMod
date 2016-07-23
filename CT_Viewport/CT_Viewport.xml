@@ -203,22 +203,22 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							<Anchors>
 								<Anchor point="TOPLEFT">
 									<Offset>
-										<AbsDimension x="-2" y="3"/>
+										<AbsDimension x="0" y="0"/>
 									</Offset>
 								</Anchor>
 								<Anchor point="TOPRIGHT">
 									<Offset>
-										<AbsDimension x="2" y="3"/>
+										<AbsDimension x="0" y="0"/>
 									</Offset>
 								</Anchor>
 								<Anchor point="BOTTOMLEFT">
 									<Offset>
-										<AbsDimension x="-2" y="-6"/>
+										<AbsDimension x="0" y="0"/>
 									</Offset>
 								</Anchor>
 								<Anchor point="BOTTOMRIGHT">
 									<Offset>
-										<AbsDimension x="3" y="-6"/>
+										<AbsDimension x="0" y="0"/>
 									</Offset>
 								</Anchor>
 							</Anchors>
@@ -248,7 +248,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeTo="$parentBackground">
 								<Offset>
-									<AbsDimension x="-2" y="2"/>
+									<AbsDimension x="0" y="0"/>
 								</Offset>
 							</Anchor>
 						</Anchors>
@@ -271,7 +271,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 						<Anchors>
 							<Anchor point="TOPRIGHT" relativeTo="$parentBackground">
 								<Offset>
-									<AbsDimension x="2" y="2"/>
+									<AbsDimension x="0" y="0"/>
 								</Offset>
 							</Anchor>
 						</Anchors>
@@ -294,7 +294,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 						<Anchors>
 							<Anchor point="BOTTOMLEFT" relativeTo="$parentBackground">
 								<Offset>
-									<AbsDimension x="-2" y="-3"/>
+									<AbsDimension x="0" y="0"/>
 								</Offset>
 							</Anchor>
 						</Anchors>
@@ -317,7 +317,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 						<Anchors>
 							<Anchor point="BOTTOMRIGHT" relativeTo="$parentBackground">
 								<Offset>
-									<AbsDimension x="2" y="-3"/>
+									<AbsDimension x="0" y="0"/>
 								</Offset>
 							</Anchor>
 						</Anchors>

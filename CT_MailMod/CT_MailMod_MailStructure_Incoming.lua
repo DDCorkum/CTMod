@@ -140,10 +140,10 @@ end
 function incMail:getFirstItem()
 	-- Get information about the first item in the message.
 	local itemIndex = 1;
-	local name, itemTexture, count, quality, canUse = GetInboxItem(self.id, itemIndex);
+	local name, itemID, itemTexture, count, quality, canUse = GetInboxItem(self.id, itemIndex);
 	while (not name and itemIndex < ATTACHMENTS_MAX_RECEIVE) do
 		itemIndex = itemIndex + 1;
-		name, itemTexture, count, quality, canUse = GetInboxItem(self.id, itemIndex);
+		name, itemID, itemTexture, count, quality, canUse = GetInboxItem(self.id, itemIndex);
 	end
 	return name, itemTexture, count, quality, canUse;
 end
@@ -153,7 +153,7 @@ function incMail:getItemInfo(itemIndex)
 	local link = GetInboxItemLink(self.id, itemIndex);
 	if (link) then
 		-- Return item link, and quantity
-		return link:match("|H(item:[^|]+)|h"), (select(3, GetInboxItem(self.id, itemIndex)));
+		return link:match("|H(item:[^|]+)|h"), (select(4, GetInboxItem(self.id, itemIndex)));
 	end
 	-- Link is nil if the item has already been removed from the mail.
 	return nil, nil;

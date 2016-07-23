@@ -11,7 +11,7 @@
 -----------------------------------------------
 -- Initialization
 
-local LIBRARY_VERSION = 7.03000;
+local LIBRARY_VERSION = 7.03001;
 local LIBRARY_NAME = "CT_Library";
 
 local _G = getfenv(0);
@@ -1409,6 +1409,12 @@ local function dropdownClick(self)
 		-- As of the 3.0.8 patch UIDROPDOWNMEN_OPEN_MENU is an object.
 		dropdown = UIDROPDOWNMENU_OPEN_MENU;
 	end
+
+	-- 7.0.3
+	if not dropdown then
+		dropdown = UIDROPDOWNMENU_INIT_MENU
+	end
+
 	if ( dropdown ) then
 		local value = self.value;
 		local option = dropdown.option;
