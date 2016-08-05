@@ -1,3 +1,6 @@
+CT_UnitFrames (7.0.3.2) 2016-08-05
+- Assist and focus frame castbar fixes.
+
 CT_UnitFrames (7.0.3.1) 2016-07-23
 - Editbox fixes.
 

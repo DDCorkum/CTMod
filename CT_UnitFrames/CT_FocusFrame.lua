@@ -1119,13 +1119,13 @@ function CT_Focus_Spellbar_OnLoad(self)
 	parent.spellbar = self;
 	parent.auraRows = 0;
 
-	self.unit = unit1;
+	--self.unit = unit1;
 
 	self:RegisterEvent("PLAYER_FOCUS_CHANGED");
 	self:RegisterEvent("CVAR_UPDATE");
 	self:RegisterEvent("VARIABLES_LOADED");
 	
-	CastingBarFrame_OnLoad(self, self.unit, false, true);
+	CastingBarFrame_OnLoad(self, unit1, false, true);
 
 	local barIcon = self.Icon;
 	barIcon:Show();

@@ -11,7 +11,7 @@
 -----------------------------------------------
 -- Initialization
 
-local LIBRARY_VERSION = 7.03001;
+local LIBRARY_VERSION = 7.03002;
 local LIBRARY_NAME = "CT_Library";
 
 local _G = getfenv(0);
@@ -655,7 +655,7 @@ local function updateSpellTab(tabIndex)
 
 		-- print("tab=", tabIndex, "off=", offset, "idx=", spellIndex, "name=", spellName, "rname=", rankName, "rold=", oldRank, "rnk=", rank, "sid=", spellId)
 
-		if ( not oldRank or ( rank and rank > oldRank ) ) then
+		if ( ( not oldRank or ( rank and rank > oldRank ) ) and spellName ) then
 			-- Need to update our listing
 			spellRanks[spellName] = rank;
 			spellIds[spellName] = spellId;

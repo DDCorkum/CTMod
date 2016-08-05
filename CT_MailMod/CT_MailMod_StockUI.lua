@@ -788,7 +788,7 @@ do
 			for i = 1, ATTACHMENTS_MAX_RECEIVE do
 				local name, itemID, itemTexture, count, quality, canUse = GetInboxItem(mailIndex, i);
 				if (name) then
-					--local itemLink = GetInboxItemLink(mailIndex, i);
+					local itemLink = GetInboxItemLink(mailIndex, i);
 					if (not itemLink) then
 						itemLink = "[" .. name .. "]";
 					end

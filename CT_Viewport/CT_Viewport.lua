@@ -275,7 +275,7 @@ function CT_Viewport_ApplyViewport(left, right, top, bottom, r, g, b)
 		frameSetPoint(WorldFrame, "BOTTOMRIGHT", -xoffset, yoffset);
 	end
 
-	CT_ViewportOverlay:SetVertexColor(r, g, b, 1);
+	--CT_ViewportOverlay:SetVertexColor(r, g, b, 1);
 end
 
 function CT_Viewport_ApplySavedViewport()
@@ -357,7 +357,7 @@ function CT_Viewport_ApplyInnerViewport(left, right, top, bottom, r, g, b)
 		iframe:SetHeight(frameTop - frameBottom);
 		iframe:SetWidth(frameRight - frameLeft);
 	else
-		CT_ViewportFrame.awaitingValues = 1;
+		CT_ViewportFrame.awaitingValues = true;
 	end
 end
 
@@ -412,7 +412,7 @@ function CT_ViewportFrame_Init(width, height)
 		end
 		CT_Viewport.screenRes = { x, y };
 		CT_ViewportFrame:SetHeight(210 + CT_ViewportFrameBorderFrame:GetHeight());
-		CT_Viewport.awaitingValues = 1;
+		CT_Viewport.awaitingValues = true;
 	end
 end
 
@@ -452,12 +452,12 @@ function CT_ViewportFrame_OnLoad(self)
 	CT_ViewportFrameBorderFrame:SetBackdropBorderColor(1, 0, 0, 1);
 	CT_ViewportFrameInnerFrameBackground:SetVertexColor(1, 1, 0, 0.1);
 	
-	if (not CT_ViewportOverlay) then
+	--[[if (not CT_ViewportOverlay) then
 		CT_ViewportOverlay = WorldFrame:CreateTexture("CT_ViewportOverlay", "BACKGROUND");
 		CT_ViewportOverlay:SetColorTexture(1, 1, 1, 0);
 		CT_ViewportOverlay:SetPoint("TOPLEFT", "UIParent", "TOPLEFT", -1, 1);
 		CT_ViewportOverlay:SetPoint("BOTTOMRIGHT", "UIParent", "BOTTOMRIGHT", 1, -1);
-	end
+	end]]
 end
 
 	-- OnUpdate
@@ -582,7 +582,7 @@ function CT_ViewportFrame_OnShow(self)
 			CT_Viewport_Saved[7]
 		);
 	else
-			CT_ViewportFrame.hasAppliedViewport = nil;
+		CT_ViewportFrame.hasAppliedViewport = nil;
 	end
 end
 
