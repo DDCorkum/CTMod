@@ -1493,6 +1493,11 @@ end
 function CT_MapMod_MapFrame_OnUpdate()
 	local cX, cY = CT_MapMod_GetCursorMapPosition();
 	local pX, pY = GetPlayerMapPosition("player");
+
+	if not pX or not pY then
+		return
+	end
+
 	local dec = 1;
 
 	cX = round(cX * 100, dec);

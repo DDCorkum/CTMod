@@ -94,6 +94,17 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 		<FontString inherits="ChatFontNormal"/>
 	</EditBox>
 	<Button name="CT_MapMod_NoteTemplate" inherits="WorldMapUnitTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="16" y="16"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentIcon" file="Interface\Minimap\PartyRaidBlips" setAllPoints="true" parentKey="icon"/>
+			</Layer>
+		</Layers>
 		<Scripts>
 			<OnLoad>
 				self.unit = "player";

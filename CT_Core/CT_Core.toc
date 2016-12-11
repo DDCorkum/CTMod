@@ -1,5 +1,5 @@
-## Interface: 70000
-## Version: 7.0.3.1
+## Interface: 70100
+## Version: 7.1.0.0
 ## Title: CT_Core
 ## Notes: General nifty features for CTMod.
 ## DefaultState: Enabled

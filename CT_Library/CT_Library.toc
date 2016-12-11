@@ -1,5 +1,5 @@
-## Interface: 70000
-## Version: 7.0.3.2
+## Interface: 70100
+## Version: 7.1.0.0
 ## Title: CT_Library
 ## Notes: Library features for CTMod.
 ## DefaultState: Enabled

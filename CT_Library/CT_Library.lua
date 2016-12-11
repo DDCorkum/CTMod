@@ -11,7 +11,7 @@
 -----------------------------------------------
 -- Initialization
 
-local LIBRARY_VERSION = 7.03002;
+local LIBRARY_VERSION = 7.10000;
 local LIBRARY_NAME = "CT_Library";
 
 local _G = getfenv(0);
@@ -1414,6 +1414,7 @@ local function dropdownClick(self)
 	if not dropdown then
 		dropdown = UIDROPDOWNMENU_INIT_MENU
 	end
+	print(dropdown:GetName())
 
 	if ( dropdown ) then
 		local value = self.value;

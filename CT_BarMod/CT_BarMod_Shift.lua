@@ -65,7 +65,7 @@ local function CT_BarMod_Shift_Party_Move2(shift)
 		return;
 	end
 	local point, rel, relpoint, x, y = PartyMemberFrame1:GetPoint(1);
-	if ( shift ) then
+	if ( shift and point and rel and relpoint and x and y ) then
 		if (not partyShifted) then
 			local offset = module:getOption("shiftPartyOffset") or 37;
 			x = x + offset;

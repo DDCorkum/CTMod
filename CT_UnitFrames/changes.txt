@@ -1,3 +1,6 @@
+CT_UnitFrames (7.1.0.0) 2016-12-11
+- Updated for 7.1.0.
+
 CT_UnitFrames (7.0.3.2) 2016-08-05
 - Assist and focus frame castbar fixes.
 

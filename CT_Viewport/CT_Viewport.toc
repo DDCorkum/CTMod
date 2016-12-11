@@ -1,5 +1,5 @@
-## Interface: 70000
-## Version: 7.0.3.2
+## Interface: 70100
+## Version: 7.1.0.0
 ## Title: CT_Viewport
 ## Notes: Allows you to change the rendered world's size.
 ## DefaultState: Enabled

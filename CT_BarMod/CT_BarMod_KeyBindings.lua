@@ -1017,6 +1017,10 @@ local function keyBindingOnLoad(self)
 	do
 		local function buttonsOptionDropdownClick(self)
 			local dropdown = UIDROPDOWNMENU_OPEN_MENU;
+			-- 7.0.3
+			if not dropdown then
+				dropdown = UIDROPDOWNMENU_INIT_MENU
+			end
 			if ( dropdown ) then
 				local value = self.value;
 				local option = dropdown.option;
