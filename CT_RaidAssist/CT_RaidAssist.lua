@@ -1248,6 +1248,9 @@ function CT_RA_OnEvent(self, event, arg1, arg2, ...)
 			CT_RA_RaidParticipant = playerName;
 		end
 	elseif ( event == "UNIT_HEALTH" or event == "UNIT_MAXHEALTH" ) then
+		if not arg1 then
+			return
+		end
 		local _, _, id = string.find(arg1, "^raid(%d+)$");
 		if ( id ) then
 			local frame = CT_RA_UnitIDFrameMap["raid"..id];

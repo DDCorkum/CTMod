@@ -1,5 +1,5 @@
-## Interface: 70100
-## Version: 7.1.0.0
+## Interface: 70200
+## Version: 7.2.0.0
 ## Title: CT_MailMod
 ## Notes: Heavily improves the in-game mail functionality.
 ## DefaultState: Enabled

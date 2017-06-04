@@ -17,7 +17,7 @@ local module = _G.CT_Core;
 local chgFriendsButtonHide;
 
 local function setFriendsButton(showButton)
-	local button = FriendsMicroButton;
+	local button = QuickJoinToastButton;
 	if (showButton) then
 		button:Show();
 	else
