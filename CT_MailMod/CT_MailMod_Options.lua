@@ -84,7 +84,7 @@ module.frame = function()
 		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:inboxShowMailbox:true#Show number of messages not in the inbox");
 		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:toolMultipleItems:true#Show all attachments in message tooltips");
 		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:toolSelectMsg:true#Show tooltip for message checkboxes");
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:hideLogButton#Hide the 'Mail Log' button");
+		--optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:hideLogButton#Hide the 'Mail Log' button");
 		optionsAddObject(-10, 1*13, "font#t:0:%y#s:0:%s#l:13:0#r#Tips#" .. textColor3 .. ":l");
 		optionsAddObject(-10, 2*13, "font#t:0:%y#s:0:%s#l:13:0#r#Right-click the Prev/Next buttons to jump to the first/last page of the inbox.#" .. textColor1 .. ":l");
 
@@ -206,7 +206,7 @@ module.update = function(self, optName, value)
 		opt.logWindowScale = getoption("logWindowScale", 1);
 		opt.logColor = getoption("logColor", defaultLogColor);
 		opt.hideLogButton = getoption("hideLogButton", false);
-		module:updateMailLogButton();
+		--module:updateMailLogButton();
 
 		module:setOption("resetLog", nil, true);
 
@@ -234,8 +234,8 @@ module.update = function(self, optName, value)
 		elseif (optName == "logColor") then
 			module:updateMailLogColor();
 
-		elseif (optName == "hideLogButton") then
-			module:updateMailLogButton();
+		--[[elseif (optName == "hideLogButton") then
+			module:updateMailLogButton();]]
 
 		elseif (optName == "resetLog") then
 			if (optionsFrame) then

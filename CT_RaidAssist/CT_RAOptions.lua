@@ -29,14 +29,14 @@ function CT_RATabFrame_ShowSubFrame(frameName)
 			_G[value]:Show()
 		else
 			_G[value]:Hide();
-		end	
-	end 
+		end
+	end
 end
 
 function CT_RATabFrame_OnShow()
 	CT_RATabFrameTitleText:SetText("CT_RaidAssist  " .. CT_RA_Version);
 	CT_RATabFrame_Update();
-	PlaySound("igCharacterInfoTab");
+	PlaySound(841);
 end
 
 function CT_RATabFrame_Update()
@@ -56,7 +56,7 @@ function CT_RATabFrame_Update()
 end
 
 function CT_RATabFrame_OnHide()
-	PlaySound("igMainMenuClose");
+	PlaySound(851);
 end
 
 function CT_RATabFrame_Tab_OnClick(self)
@@ -107,17 +107,17 @@ function CT_RAOptions_Update()
 					buttonClass = _G["CT_RAOptionsGroupButton"..i.."Class"];
 					buttonRank = _G["CT_RAOptionsGroupButton"..i.."Rank"];
 					button.id = i;
-					
+
 					button.name = name;
-					
+
 					if ( level == 0 ) then
 						level = "";
 					end
-					
+
 					if ( not name ) then
 						name = UNKNOWN;
 					end
-					
+
 					buttonName:SetText(name);
 					buttonLevel:SetText(level);
 					buttonClass:SetText(class);
@@ -138,7 +138,7 @@ function CT_RAOptions_Update()
 						buttonClass:SetVertexColor(GRAYr, GRAYg, GRAYb);
 						buttonLevel:SetVertexColor(GRAYr, GRAYg, GRAYb);
 					end
-					
+
 					buttonRank:SetText("");
 					for k, v in pairs(CT_RA_MainTanks) do
 						if ( v == name ) then
@@ -146,13 +146,13 @@ function CT_RAOptions_Update()
 							break;
 						end
 					end
-					
+
 					-- Anchor button to slot
 					local slot = raidGroup.nextIndex;
 					if ( not CT_RA_MOVINGMEMBER or CT_RA_MOVINGMEMBER ~= button  ) then
 						button:SetPoint("TOPLEFT", "CT_RAOptionsGroup"..subgroup.."Slot"..slot, "TOPLEFT", 0, 0);
 					end
-					
+
 					-- Save slot for future use
 					button.slot = "CT_RAOptionsGroup"..subgroup.."Slot"..slot;
 					-- Save the button's subgroup too
@@ -208,7 +208,7 @@ function CT_RAOptions_UpdateMTs()
 		name = GetRaidRosterInfo(i);
 		rank = _G["CT_RAOptionsGroupButton"..i.."Rank"];
 		rank:SetText("");
-		
+
 		for k, v in pairs(CT_RA_MainTanks) do
 			if ( v == name ) then
 				rank:SetText(k);
@@ -344,7 +344,7 @@ function CT_RAMemberDropDown_Initialize(self)
 	info.hasArrow = 1;
 	info.notCheckable = 1;
 	UIDropDownMenu_AddButton(info);
-	
+
 	info = { };
 	info.text = "Auto-Promote";
 	info.tooltipTitle = "Auto-Promote";
@@ -388,7 +388,7 @@ function CT_RAMemberDropDownRemove_Initialize(self)
 		info.isTitle = 1;
 		info.notCheckable = 1;
 		UIDropDownMenu_AddButton(info);
-	
+
 		info = {};
 		info.text = "Remove MT";
 		info.value = self:GetParent().name;

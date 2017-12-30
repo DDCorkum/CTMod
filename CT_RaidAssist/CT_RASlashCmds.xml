@@ -57,7 +57,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 					DEFAULT_CHAT_FRAME.editBox:Show();
 					DEFAULT_CHAT_FRAME.editBox.setText = 1;
 					DEFAULT_CHAT_FRAME.editBox.text = self.slashCommand;
-				
+
 					if ( (DEFAULT_CHAT_FRAME.editBox.stickyType == "PARTY") and (CT_RA_GetNumPartyMembers() == 0) ) then
 						DEFAULT_CHAT_FRAME.editBox.chatType = "SAY";
 						ChatEdit_UpdateHeader(DEFAULT_CHAT_FRAME.editBox);
@@ -222,7 +222,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 						HideUIPanel(self:GetParent());
 					</OnClick>
 					<OnHide>
-						PlaySound("UChatScrollButton");
+						PlaySound(1115);
 					</OnHide>
 				</Scripts>
 			</Button>

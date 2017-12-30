@@ -56,7 +56,7 @@ module:setText("MONEY_DECREASED", "Your money decreased by: %s");
 module:setText("MAIL_DOWNLOAD_BEGIN", "Waiting for mail to download into the inbox.");
 module:setText("MAIL_DOWNLOAD_END", "Mail has downloaded into the inbox.");
 
-module:setText("MAILBOX_OPTIONS_TIP1", "To access CT_MailMod options and tips, click this button or type /ctmail.");
+module:setText("MAILBOX_OPTIONS_TIP1", "To access CT_MailMod options and tips, click this button or type /ctmail.\nRight click to toggle the mail log window or type /maillog.");
 
 -- Send Mail
 module:setText("SEND_MAIL_MONEY_SUBJECT_GOLD", "%d gold %d silver %d copper");

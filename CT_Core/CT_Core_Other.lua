@@ -252,7 +252,7 @@ local function tooltipIsDefault(self)
 		-- Tooltip is not being shown in the default location.
 		return false;
 	end
-	
+
 	-- Check for special cases.
 	local owner = self:GetOwner();
 	if (owner and owner == mainMenuMicroButton) then
@@ -322,7 +322,7 @@ end
 
 local function createTooltipAnchorFrame()
 	-- Create our anchor frame for the tooltip.
-	local movable = "TOOLTIPANCHOR";	
+	local movable = "TOOLTIPANCHOR";
 	tooltipAnchorFrame = module:getFrame(anchorFrameSkeleton);
 	updateTooltipText(tooltipAnchorFrame);
 	updateTooltipAnchorVisibility();
@@ -376,7 +376,7 @@ local function createTooltipAnchorFrame()
 
 			-- Display tooltip & play sound
 			self:GetScript("OnEnter")(self);
-			PlaySound("UChatScrollButton");
+			PlaySound(1115);
 		end
 	end);
 end
@@ -658,7 +658,7 @@ end
 
 local function toggleTooltipAnchorVisibility(show)
 	tooltipAnchorDisplay = show;
-	
+
 	if ( not tooltipAnchorFrame and show ) then
 		createTooltipAnchorFrame();
 	else
@@ -739,11 +739,11 @@ local function updateTickDisplay(key, diff)
 	obj:SetText(format(obj.strFormat, diff));
 	obj:SetAlpha(1);
 	obj.alpha = 1;
-	
+
 	if ( tickFrameWidth ) then
 		tickFrame:SetWidth(tickFrameWidth);
 	end
-	
+
 	counter = 0.05;
 	tickFrame:SetScript("OnUpdate", fadeTicks);
 end
@@ -803,7 +803,7 @@ local function updateTickFrameOptions()
 	if ( not tickFrame ) then
 		return;
 	end
-	
+
 	-- Height
 	local _, class = UnitClass("player");
 	if ( UnitPowerType("player") == 0 or class == "DRUID" ) then
@@ -811,7 +811,7 @@ local function updateTickFrameOptions()
 	else
 		tickFrame:SetHeight(30);
 	end
-	
+
 	-- Width & Format
 	if ( not tickDisplayType or tickDisplayType == 1 ) then
 		tickFrameWidth = 90;
@@ -904,7 +904,7 @@ local function castingtimer_configure(castBarFrame)
 		countDownText:Show();
 	else
 		countDownText:Hide();
-		
+
 		-- See CastingBarFrame_SetLook() in CastingBarFrame.lua.
 		if ((castBarFrame:GetWidth() or 0) > 190) then
 			-- CLASSIC look
@@ -1048,18 +1048,18 @@ local function editNote(playerName, noteType)
 	if ( not StaticPopupDialogs["CTMOD_PLAYERNOTE_EDIT"] ) then
 		StaticPopupDialogs["CTMOD_PLAYERNOTE_EDIT"] = getNoteDialogTable();
 	end
-	
+
 	local coloredName;
 	if ( noteType == ignoreNotes ) then
 		coloredName = "|c00FF0000"..playerName.."|r";
 	else
 		coloredName = "|c0000FF00"..playerName.."|r";
 	end
-	
+
 	local dialog = StaticPopup_Show("CTMOD_PLAYERNOTE_EDIT", coloredName);
 	local staticPopupName = StaticPopup_Visible("CTMOD_PLAYERNOTE_EDIT");
 	local editBox = _G[staticPopupName.."EditBox"];
-	
+
 	currentNoteType = noteType;
 	dialog.data = playerName;
 	editBox:SetText(noteType[playerName] or "");
@@ -1074,7 +1074,7 @@ local function playerNoteSkeleton()
 			normalTexture:SetAllPoints(self);
 			highlightTexture:SetAllPoints(self);
 			highlightTexture:SetBlendMode("ADD");
-			
+
 			self.normalTexture = normalTexture;
 			self:SetNormalTexture(normalTexture);
 			self:SetHighlightTexture(highlightTexture);
@@ -1138,7 +1138,7 @@ local function updateFriendsDisplay(framePrefix, frameOffset, tbl, enabled)
 
 			if ( not name ) then
 				btn:Hide();
-			else			
+			else
 				local note = tbl[name];
 				if ( note ) then
 					btn.note = note;
@@ -1150,7 +1150,7 @@ local function updateFriendsDisplay(framePrefix, frameOffset, tbl, enabled)
 
 				btn.type = tbl;
 				btn.name = name;
-			
+
 				btn:SetParent(frame);
 				btn:ClearAllPoints();
 				btn:SetPoint("LEFT", frame, "RIGHT", -16, 0);
@@ -1215,7 +1215,7 @@ local function updateIgnoreDisplay(framePrefix, frameOffset, tbl, enabled)
 
 			if ( not name ) then
 				btn:Hide();
-			else			
+			else
 				local note = tbl[name];
 				if ( note ) then
 					btn.note = note;
@@ -1292,7 +1292,7 @@ local function updateGuildDisplay(framePrefix, tbl, enabled)
 		else
 			index = frame.guildIndex or 1;
 			name = GetGuildRosterInfo(index);
-			
+
 			local note = tbl[name];
 			if ( note ) then
 				btn.note = note;
@@ -1304,7 +1304,7 @@ local function updateGuildDisplay(framePrefix, tbl, enabled)
 
 			btn.type = tbl;
 			btn.name = name;
-			
+
 			btn:SetParent(frame);
 			btn:ClearAllPoints();
 			btn:SetPoint("LEFT", frame, "RIGHT", -16, 0);
@@ -1333,7 +1333,7 @@ do
 		if (arg1 and arg1 == "Blizzard_GuildUI") then
 			hooksecurefunc("GuildRoster_Update", CTCore_GuildRoster_Update);
 			GuildRosterContainer:HookScript("OnVerticalScroll", CTCore_GuildRoster_Update);
-			hooksecurefunc("GuildRoster_SetView", 
+			hooksecurefunc("GuildRoster_SetView",
 				function(view)
 					guildView = view;
 					CTCore_GuildRoster_Update();
@@ -1363,7 +1363,7 @@ local function CT_Core_MerchantItemButton_OnModifiedClick(self, ...)
 		local maxStack = GetMerchantItemMaxStack(id);
 		local money = GetMoney();
 		local _, _, price, quantity = GetMerchantItemInfo(id);
-		
+
 		if ( maxStack == 1 and quantity > 1 ) then
 			-- We need to check max stack count
 			local _, _, _, _, _, _, _, stackCount = GetItemInfo(GetMerchantItemLink(id));
@@ -1375,7 +1375,7 @@ local function CT_Core_MerchantItemButton_OnModifiedClick(self, ...)
 				end
 			end
 		end
-	
+
 		if ( maxStack*price > money ) then
 			if (price == 0) then
 				maxStack = 0;
@@ -1430,7 +1430,7 @@ do
 		local function clearTrade()
 			prepBag, prepItem, prepPlayer = nil;
 		end
-		
+
 		prepareTrade = function(bag, item, player) -- Local
 			prepBag, prepItem, prepPlayer = bag, item, player;
 			module:schedule(3, clearTrade);
@@ -1458,7 +1458,7 @@ do
 				if (not TradeFrame:IsShown()) then
 					local tradeAltClickOpen = module:getOption("tradeAltClickOpen");
 					if (tradeAltClickOpen and
-						not CursorHasItem() and 
+						not CursorHasItem() and
 						UnitExists("target") and
 						CheckInteractDistance("target", 2) and
 						UnitIsFriend("player", "target") and
@@ -1637,9 +1637,9 @@ local function castingbar_AlwaysVisibility(self)
 end
 
 local function castingbar_CreateAnchorFrame()
-	local movable = "CASTINGBARANCHOR2";	
+	local movable = "CASTINGBARANCHOR2";
 	castingbarAnchorFrame = module:getFrame(castingbar_FrameSkeleton, UIParent, "CT_Core_CastingBarAnchorFrame");
-	
+
 	module:registerMovable(movable, castingbarAnchorFrame, true);
 	castingbarAnchorFrame.movable = movable;
 	castingbarAnchorFrame:SetScript("OnEnter", function(self)
@@ -1784,7 +1784,7 @@ do
 	-- NUM_CONTAINER_FRAMES   13
 	-- NUM_BAG_SLOTS           4
 	-- NUM_BANKBAGSLOTS        7
-	-- 
+	--
 	-- 0 == Backpack
 	-- 1 == Bag 1 (1st bag to the left of backpack)
 	-- 2 == Bag 2 (2nd bag to the left of backpack)
@@ -1797,7 +1797,7 @@ do
 	-- 9 == Bank bag 5
 	-- 10 == Bank bag 6
 	-- 11 == Bank bag 7
-	-- 
+	--
 	-- FrameXML/ContainerFrame.lua
 	--	OpenAllBags(frame)
 	--		- If at least one of first 5 bags (bag 0 == backpack, bags 1 to 4) is open, then do nothing. return.
@@ -2056,7 +2056,7 @@ do
 	-- Toggling that option while in combat may also result in the error.
 	--
 	-- This addon's options which require changing Blizzard's variable, or calling
-	-- their functions, are disabled by default. The user is told in the options 
+	-- their functions, are disabled by default. The user is told in the options
 	-- window that enabling the options may result in an action blocked error under
 	-- the described conditions.
 
@@ -2952,7 +2952,7 @@ local function powerbaralt_createAnchorFrame()
 	tex:Show();
 	tex:SetTexture("Interface\\Tooltips\\UI-Tooltip-Background");
 	tex:SetVertexColor(0.7, 0.7, 0.7, 0.8);
-	
+
 	self:SetScript("OnEnter", powerbaralt_onEnter);
 	self:SetScript("OnLeave", module.hideTooltip);
 	self:SetScript("OnMouseDown", powerbaralt_onMouseDown);

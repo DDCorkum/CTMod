@@ -1,3 +1,6 @@
+CT_BuffMod (7.3.0.0) 2017-09-03
+- Updated for 7.3.0.
+
 CT_BuffMod (7.2.0.0) 2017-04-18
 - Updated for 7.2.0.
 
@@ -80,7 +83,7 @@ b) Group the buffs as "All buffs". Don't use "Canceleable buffs" or "Uncancelabl
 c) Set the "Buffs that you cast" option to "With other players".
 d) Set the "Non-expiring buffs" option to "After other buffs".
 
-- Blizzard finally fixed some of the bugs in their Secure Aura routines. As a result the following items are now implemented in CT_BuffMod: 
+- Blizzard finally fixed some of the bugs in their Secure Aura routines. As a result the following items are now implemented in CT_BuffMod:
 
 a) The off hand weapon enchant button should now display and cancel properly.
 b) The ranged weapon enchant button should now display and cancel properly.

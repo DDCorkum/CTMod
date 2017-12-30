@@ -27,7 +27,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 						<AbsDimension x="20" y="0"/>
 					</Offset>
 				</Anchor>
-			</Anchors> 
+			</Anchors>
 		</NormalText>
 		<HighlightText name="$parentHighlightText" inherits="GameFontHighlight" justifyH="LEFT" nonspacewrap="true">
 			<Size>
@@ -452,11 +452,11 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 		<Scripts>
 			<OnShow>
 				self:SetFrameLevel(self:GetParent():GetFrameLevel() + 2);
-				PlaySound("UChatScrollButton");
+				PlaySound(1115);
 				CT_MapMod_GroupWindow_Update();
 			</OnShow>
 			<OnHide>
-				PlaySound("UChatScrollButton");
+				PlaySound(1115);
 			</OnHide>
 		</Scripts>
 		<Frames>

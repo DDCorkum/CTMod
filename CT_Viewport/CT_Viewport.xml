@@ -261,7 +261,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</OnMouseDown>
 							<OnMouseUp>
 								CT_Viewport_StopResize(self);
-							</OnMouseUp> 
+							</OnMouseUp>
 						</Scripts>
 					</Button>
 					<Button name="$parentResizeTopRight">
@@ -284,7 +284,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</OnMouseDown>
 							<OnMouseUp>
 								CT_Viewport_StopResize(self);
-							</OnMouseUp> 
+							</OnMouseUp>
 						</Scripts>
 					</Button>
 					<Button name="$parentResizeBottomLeft">
@@ -307,7 +307,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</OnMouseDown>
 							<OnMouseUp>
 								CT_Viewport_StopResize(self);
-							</OnMouseUp> 
+							</OnMouseUp>
 						</Scripts>
 					</Button>
 					<Button name="$parentResizeBottomRight">
@@ -330,7 +330,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</OnMouseDown>
 							<OnMouseUp>
 								CT_Viewport_StopResize(self);
-							</OnMouseUp> 
+							</OnMouseUp>
 						</Scripts>
 					</Button>
 					<Button name="$parentResizeTop">
@@ -358,7 +358,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</OnMouseDown>
 							<OnMouseUp>
 								CT_Viewport_StopResize(self);
-							</OnMouseUp> 
+							</OnMouseUp>
 						</Scripts>
 					</Button>
 					<Button name="$parentResizeBottom">
@@ -386,7 +386,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</OnMouseDown>
 							<OnMouseUp>
 								CT_Viewport_StopResize(self);
-							</OnMouseUp> 
+							</OnMouseUp>
 						</Scripts>
 					</Button>
 					<Button name="$parentResizeLeft">
@@ -414,7 +414,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</OnMouseDown>
 							<OnMouseUp>
 								CT_Viewport_StopResize(self);
-							</OnMouseUp> 
+							</OnMouseUp>
 						</Scripts>
 					</Button>
 					<Button name="$parentResizeRight">
@@ -442,7 +442,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</OnMouseDown>
 							<OnMouseUp>
 								CT_Viewport_StopResize(self);
-							</OnMouseUp> 
+							</OnMouseUp>
 						</Scripts>
 					</Button>
 				</Frames>
@@ -584,7 +584,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 			<OnHide>
 				self.isResizing = nil;
 				_G[self:GetName() .. "InnerFrame"]:StopMovingOrSizing();
-				PlaySound("UChatScrollButton");
+				PlaySound(1115);
 			</OnHide>
 			<OnLoad>
 				CT_ViewportFrame_OnLoad(self);
@@ -594,7 +594,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 			</OnUpdate>
 			<OnShow>
 				CT_ViewportFrame_OnShow(self);
-				PlaySound("UChatScrollButton");
+				PlaySound(1115);
 			</OnShow>
 			<OnEvent>
 				CT_ViewportFrame_OnEvent(self, event, ...);

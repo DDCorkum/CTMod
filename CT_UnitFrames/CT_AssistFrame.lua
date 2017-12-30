@@ -45,7 +45,7 @@ function CT_AssistFrame_OnLoad(self)
 
 	local thisName = self:GetName();
 	self.borderTexture = _G[thisName.."TextureFrameTexture"];
-	self.highLevelTexture = _G[thisName.."TextureFrameHighLevelTexture"];	
+	self.highLevelTexture = _G[thisName.."TextureFrameHighLevelTexture"];
 	self.pvpIcon = _G[thisName.."TextureFramePVPIcon"];
 	self.leaderIcon = _G[thisName.."TextureFrameLeaderIcon"];
 	self.raidTargetIcon = _G[thisName.."TextureFrameRaidTargetIcon"];
@@ -78,19 +78,19 @@ function CT_AssistFrame_OnLoad(self)
 		_G[thisName.."TextureFrameHealthBarText"],
 		_G[thisName.."ManaBar"],
 		_G[thisName.."TextureFrameManaBarText"],
-		nil, -- threatFrame, 
+		nil, -- threatFrame,
 		nil, -- "player",
 		nil, -- _G[thisName.."NumericalThreat"],
 		_G[thisName.."MyHealPredictionBar"],
 		_G[thisName.."OtherHealPredictionBar"],
-		_G[thisName.."TotalAbsorbBar"], 
-		_G[thisName.."TotalAbsorbBarOverlay"], 
+		_G[thisName.."TotalAbsorbBar"],
+		_G[thisName.."TotalAbsorbBarOverlay"],
 		_G[thisName.."TextureFrameOverAbsorbGlow"]
 	);
 
 	self.noTextPrefix = true;
 	CT_AssistFrame_Update(self);
-	
+
 	self:RegisterEvent("PLAYER_ENTERING_WORLD");
 	self:RegisterEvent("PLAYER_TARGET_CHANGED");
 	self:RegisterEvent("UNIT_HEALTH");
@@ -234,11 +234,11 @@ function CT_AssistFrame_OnEvent(self, event, ...)
 
 --		if ( UnitExists(self.unit) ) then
 --			if ( UnitIsEnemy(self.unit, "player") ) then
---				PlaySound("igCreatureAggroSelect");
+--				PlaySound(873);
 --			elseif ( UnitIsFriend("player", self.unit) ) then
---				PlaySound("igCharacterNPCSelect");
+--				PlaySound(867);
 --			else
---				PlaySound("igCreatureNeutralSelect");
+--				PlaySound(871);
 --			end
 --		end
 
@@ -326,14 +326,14 @@ end
 function CT_AssistFrame_OnHide(self)
 	-- self == The main unit frame
 
---	PlaySound("INTERFACESOUND_LOSTTARGETUNIT");
+--	PlaySound(684);
 --	CloseDropDownMenus();
 end
 
 function CT_AssistFrame_CheckLevel(self)
 	-- self == The main unit frame
 	local assistLevel = UnitLevel(self.unit);
-	
+
 	if ( UnitIsCorpse(self.unit) ) then
 		self.levelText:Hide();
 		self.highLevelTexture:Show();
@@ -427,7 +427,7 @@ function CT_AssistFrame_CheckClassification(self, forceNormalTexture)
 		self.borderTexture:SetTexture("Interface\\TargetingFrame\\UI-TargetingFrame");
 		forceNormalTexture = true;
 	end
-		
+
 	if ( forceNormalTexture ) then
 		self.haveElite = nil;
 		if ( classification == "minus" ) then
@@ -450,7 +450,7 @@ function CT_AssistFrame_CheckClassification(self, forceNormalTexture)
 --				self.threatIndicator:SetHeight(93);
 --				self.threatIndicator:SetPoint("TOPLEFT", self, "TOPLEFT", -24, 0);
 --			end
---		end	
+--		end
 	else
 		self.haveElite = true;
 		--TargetFrameBackground:SetSize(119,41);
@@ -461,9 +461,9 @@ function CT_AssistFrame_CheckClassification(self, forceNormalTexture)
 --			self.threatIndicator:SetWidth(242);
 --			self.threatIndicator:SetHeight(112);
 --			self.threatIndicator:SetPoint("TOPLEFT", self, "TOPLEFT", -22, 9);
---		end		
+--		end
 	end
-	
+
 	if (self.questIcon) then
 		if (UnitIsQuestBoss(self.unit)) then
 			self.questIcon:Show();
@@ -495,7 +495,7 @@ function CT_AssistFrame_OnUpdate(self, elapsed)
 --	if ( self.totFrame:IsShown() ~= (UnitExists("target") and UnitExists(unit1) and UnitExists(unit2)) ) then
 --		CT_TargetofAssist_Update(self.totFrame);
 --	end
-	
+
 	self.ctUpdate = self.ctUpdate + elapsed;
 	if ( self.ctUpdate > 0.1 ) then
 		self.ctUpdate = 0;
@@ -602,10 +602,10 @@ function CT_AssistFrame_UpdateAuras(self)
 	else
 		filter = nil;
 	end
-	
+
 	local frameNum = 1;
 	local index = 1;
-	
+
 	while ( frameNum <= (self.maxDebuffs or MAX_TARGET_DEBUFFS) ) do
 		local debuffName = UnitDebuff(self.unit, index, filter);
 		if ( debuffName ) then
@@ -659,7 +659,7 @@ function CT_AssistFrame_UpdateAuras(self)
 
 					frame:ClearAllPoints();
 					frame:Show();
-					
+
 					frameNum = frameNum + 1;
 				end
 			end
@@ -792,7 +792,7 @@ function CT_AssistFrame_UpdateBuffAnchor(self, buffName, index, numDebuffs, anch
 	if ( index == 1 ) then
 		if ( UnitIsFriend("player", self.unit) or numDebuffs == 0 ) then
 			-- unit is friendly or there are no debuffs...buffs start on top
-			buff:SetPoint(point.."LEFT", self, relativePoint.."LEFT", AURA_START_X, startY);			
+			buff:SetPoint(point.."LEFT", self, relativePoint.."LEFT", AURA_START_X, startY);
 		else
 			-- unit is not friendly and we have debuffs...buffs start on bottom
 			buff:SetPoint(point.."LEFT", self.debuffs, relativePoint.."LEFT", 0, -offsetY);
@@ -879,14 +879,14 @@ function CT_AssistFrame_HealthUpdate(self, elapsed, unit)
 			local alpha = 255;
 			local counter = self.statusCounter + elapsed;
 			local sign    = self.statusSign;
-	
+
 			if ( counter > 0.5 ) then
 				sign = -sign;
 				self.statusSign = sign;
 			end
 			counter = mod(counter, 0.5);
 			self.statusCounter = counter;
-	
+
 			if ( sign == 1 ) then
 				alpha = (127  + (counter * 256)) / 255;
 			else
@@ -1126,20 +1126,20 @@ function CT_Assist_Spellbar_OnLoad(self)
 	self:RegisterEvent("PLAYER_TARGET_CHANGED");
 	self:RegisterEvent("CVAR_UPDATE");
 	self:RegisterEvent("VARIABLES_LOADED");
-	
+
 	CastingBarFrame_OnLoad(self, unit1, false, true);
 
 	local barIcon = self.Icon;
 	barIcon:Show();
 
 --	CT_SetAssistSpellbarAspect(self);
-	
+
 	--The target casting bar has less room for text than most, so shorten it
 	self.Text:SetWidth(150);
 
 	-- check to see if the castbar should be shown
 --	if ( GetCVar("showTargetCastbar") == "0") then
---		self.showCastbar = false;	
+--		self.showCastbar = false;
 --	end
 	CT_Assist_ToggleSpellbar(self);
 end

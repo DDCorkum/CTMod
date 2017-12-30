@@ -11,7 +11,7 @@
 -----------------------------------------------
 -- Initialization
 
-local LIBRARY_VERSION = 7.20000;
+local LIBRARY_VERSION = 7.30000;
 local LIBRARY_NAME = "CT_Library";
 
 local _G = getfenv(0);
@@ -114,7 +114,7 @@ function lib:clearTable(tbl, clearMeta)
 	for key, value in pairs(tbl) do
 		tbl[key] = nil;
 	end
-	
+
 	if ( clearMeta ) then
 		setmetatable(tbl, emptyMeta);
 	end
@@ -264,15 +264,15 @@ end
 -- Add localizations for a given text string
 local num_locales = 3; -- EN, DE, FR
 function lib:setText(key, ...)
-	local count = select('#', ...);	
+	local count = select('#', ...);
 	if ( count == 0 ) then
 		return;
 	end
-	
+
 	if ( not localizations ) then
 		localizations = { };
 	end
-	
+
 	local retVal = maxn(localizations)+1;
 	for i = 1, min(count, num_locales), 1 do
 		tinsert(localizations, (select(i, ...)));
@@ -284,12 +284,12 @@ end
 function lib:getText(key)
 	local localeOffset;
 	if ( localizations ) then
-	
+
 		key = self[key];
 		if ( not key ) then
 			return;
 		end
-		
+
 		if ( not localeOffset ) then
 			local locale = strsub(GetLocale(), 1, 2);
 			if ( locale == "en" ) then
@@ -302,7 +302,7 @@ function lib:getText(key)
 				localeOffset = 0;
 			end
 		end
-		
+
 		local value = localizations[key+localeOffset];
 		if ( not value and localeOffset > 0 ) then
 			value = localizations[key];
@@ -367,7 +367,7 @@ function lib:abbreviateLargeNumbers(value, breakup)
 		negative = "-";
 		value = -value;
 	end
-	
+
 	local retString = value;
 	local strLen = strlen(value);
 	if ( strLen > 8 ) then
@@ -389,7 +389,7 @@ end
 function lib:breakUpLargeNumbers(value, breakup)
 	-- Break up large numbers using separators, and if the number contains
 	-- decimals then the returned string will have two decimals.
-	-- 
+	--
 	-- This is a modified version of BreakUpLargeNumbers() from UIParent.lua
 	-- as of WoW 5.0.4.
 	-- This modified version handles negative numbers, adds the breakup parameter,
@@ -409,7 +409,7 @@ function lib:breakUpLargeNumbers(value, breakup)
 	end
 
 	local retString = "";
-	
+
 	if ( value < 1000 ) then
 		if ( (value - math.floor(value)) == 0) then
 			-- Return a string with no decimals.
@@ -453,7 +453,7 @@ local function loadAddon(self, event, addon)
 			if ( value.name == addon ) then
 				-- Initialize options
 				value.options = _G[addon.."Options"];
-				
+
 				-- Run any update function we might have
 				updateFunc = value.update;
 				if ( updateFunc ) then
@@ -476,11 +476,11 @@ end
 function lib:regEvent(event, func)
 	event = strupper(event);
 	frame:RegisterEvent(event);
-	
+
 	if ( not eventTable ) then
 		eventTable = { };
 	end
-	
+
 	local oldFunc = eventTable[event];
 	if ( not oldFunc ) then
 		eventTable[event] = func;
@@ -495,13 +495,13 @@ function lib:unregEvent(event, func)
 	if ( not eventTable ) then
 		return;
 	end
-	
+
 	event = strupper(event);
 	local eventFuncs = eventTable[event];
 	if ( not eventFuncs ) then
 		return;
 	end
-	
+
 	if ( type(eventFuncs) == "table" ) then
 		for key, value in ipairs(eventFuncs) do
 			if ( value == func ) then
@@ -522,7 +522,7 @@ local function eventHandler(self, event, ...)
 	if ( event == "ADDON_LOADED" ) then
 		loadAddon(self, event, ...);
 	end
-	
+
 	local eventFuncs = eventTable[event];
 	if ( type(eventFuncs) == "table" ) then
 		for key, value in ipairs(eventFuncs) do
@@ -543,7 +543,7 @@ function lib:schedule(time, func, repeatFunc)
 	if ( not time or not func or ( type(func) ~= "function" and not repeatFunc ) ) then
 		return;
 	end
-	
+
 	if ( repeatFunc ) then
 		if ( not timerRepeatedTimes ) then
 			timerRepeatedTimes, timerRepeatedFuncs, timerRepeatedStarts = { }, { }, { };
@@ -565,7 +565,7 @@ function lib:unschedule(func, isRepeat)
 	if ( not func ) then
 		return;
 	end
-	
+
 	if ( isRepeat ) then
 		if ( timerRepeatedFuncs ) then
 			for key, value in ipairs(timerRepeatedFuncs) do
@@ -595,7 +595,7 @@ frame:SetScript("OnUpdate", function(self, elapsed)
 	-- Normal times
 	local found = false;
 	local val;
-	
+
 	if ( timerTimes ) then
 		for i = #timerTimes, 1, -1 do
 			val = timerTimes[i] - elapsed;
@@ -608,7 +608,7 @@ frame:SetScript("OnUpdate", function(self, elapsed)
 			end
 		end
 	end
-	
+
 	if ( timerRepeatedTimes ) then
 		for key, value in ipairs(timerRepeatedTimes) do
 			found = true;
@@ -621,7 +621,7 @@ frame:SetScript("OnUpdate", function(self, elapsed)
 			end
 		end
 	end
-	
+
 	if ( not found ) then
 		frame:Hide();
 	end
@@ -687,7 +687,7 @@ function lib:getSpell(name)
 	if ( not spellRanks ) then
 		updateSpellDatabase();
 	end
-	
+
 	return spellIds[name], spellRanks[name];
 end
 
@@ -824,7 +824,7 @@ end
 -- are hard coded at various points in the addon, as well as being
 -- specified in the widget strings that make up the addon's options
 -- frame.
--- 
+--
 -- Note that if CT_Library is ever changed to populate the defaultValues
 -- table earlier in an addon's life, this may cause problems with addons
 -- that explicitly test an option's value for nil to test if it has ever been
@@ -850,9 +850,9 @@ function lib:getOption(option, useDefault)
 		end
 		return;
 	end
-	
+
 	local key = getCharKey();
-	
+
 	local charOptions = options[key];
 	local val;
 	if ( charOptions ) then
@@ -901,17 +901,17 @@ function lib:registerMovable(id, frame, clamped)
 	if ( not movables ) then
 		movables = { };
 	end
-	
+
 	id = "MOVABLE-"..id;
 	movables[id] = frame;
 	frame:SetMovable(true);
 	frame:SetClampedToScreen(clamped);
-	
+
 	-- See if we have a saved position already...
 	local option = self:getOption(id);
 	if ( option ) then
 		frame:ClearAllPoints();
-		
+
 		local scale = option[6];
 		if ( scale ) then
 			frame:SetScale(scale);
@@ -931,11 +931,11 @@ function lib:stopMovable(id)
 	local frame = movables[id];
 	frame:StopMovingOrSizing();
 	frame:SetUserPlaced(false); -- Since we're storing the position manually, don't save it in layout-cache
-	
+
 	local pos = self:getOption(id);
 	if ( pos ) then
 		self:clearTable(pos);
-		
+
 		local a, b, c, d, e = frame:GetPoint(1);
 		local scale = frame:GetScale();
 		if string.upper(a) == "BOTTOMLEFT" or string.upper(a) == "BOTTOMRIGHT" then
@@ -952,11 +952,11 @@ function lib:stopMovable(id)
 		local a, b, c, d, e = frame:GetPoint(1);
 		local scale = frame:GetScale();
 		d, e = d * scale, e * scale;
-		
+
 		pos = { a, b, c, d, e, scale };
 		self:setOption(id, pos, true);
 	end
-	
+
 	local rel = pos[2];
 	if ( rel ) then
 		pos[2] = rel:GetName();
@@ -1139,7 +1139,7 @@ end
 	local colonSeparator = ":";
 	local commaSeparator = ",";
 	local pipeSeparator = "|";
-	
+
 	local numberMatch = "^(.-)"..numberSeparator.."(.*)$";
 	local colonMatch = "^(.-)"..colonSeparator.."(.*)$";
 	local commaMatch = "^(.-)"..commaSeparator.."(.*)$";
@@ -1209,14 +1209,14 @@ end
 local function checkbuttonOnClick(self)
 	local checked = self:GetChecked() or false;
 	local option = self.option;
-	
+
 	if ( option ) then
 		self.object:setOption(option, checked, not self.global);
 	end
 	if ( checked ) then
-		PlaySound("igMainMenuOptionCheckBoxOn");
+		PlaySound(856);
 	else
-		PlaySound("igMainMenuOptionCheckBoxOff");
+		PlaySound(857);
 	end
 end
 
@@ -1225,13 +1225,13 @@ objectHandlers.checkbutton = function(self, parent, name, virtual, option, text,
 	local textObj = checkbutton:CreateFontString(nil, "ARTWORK", "ChatFontNormal");
 	textObj:SetPoint("LEFT", checkbutton, "RIGHT", 4, 0);
 	checkbutton.text = textObj;
-	
+
 	-- Text Color
 	local r, g, b = splitString(textColor, colonSeparator);
 	if ( r ) then
 		textObj:SetTextColor(tonumber(r) or 1, tonumber(g) or 1, tonumber(b) or 1);
 	end
-	
+
 	-- Text
 	if ( text ) then
 		local str = _G[text];
@@ -1240,12 +1240,12 @@ objectHandlers.checkbutton = function(self, parent, name, virtual, option, text,
 		end
 		textObj:SetText(str);
 	end
-	
+
 	if ( not virtual or not checkbutton:GetScript("OnClick") ) then
 		checkbutton:SetScript("OnClick", checkbuttonOnClick);
 	end
 	checkbutton:SetChecked(self:getOption(option) or false);
-	
+
 	return checkbutton;
 end
 
@@ -1269,14 +1269,14 @@ objectHandlers.backdrop = function(self, parent, name, virtual, option, backdrop
 	elseif ( backdropType == "tooltip" ) then
 		parent:SetBackdrop(tooltipBackdrop);
 	end
-	
+
 	-- BG Color
 	local r, g, b, a;
 	if ( bgColor ) then
 		r, g, b, a = splitString(bgColor, colonSeparator);
 	end
 	parent:SetBackdropColor(tonumber(r) or 0, tonumber(g) or 0, tonumber(b) or 0, tonumber(a) or 0.25);
-	
+
 	-- BG Color
 	if ( borderColor ) then
 		r, g, b, a = splitString(borderColor, colonSeparator);
@@ -1289,7 +1289,7 @@ objectHandlers.font = function(self, parent, name, virtual, option, text, data, 
 	-- Data
 	local r, g, b, justify;
 	local a, b, c, d = splitString(data, colonSeparator);
-	
+
 	-- Parse our attributes
 	r = tonumber(a);
 	if ( r ) then
@@ -1298,36 +1298,36 @@ objectHandlers.font = function(self, parent, name, virtual, option, text, data, 
 	else
 		justify = a;
 	end
-	
+
 	-- Create FontString
 	local fontString = parent:CreateFontString(name, layer or "ARTWORK", virtual or "GameFontNormal");
-	
+
 	-- Justify
 	if ( justify ) then
 		local h = match(justify, "[lLrR]");
 		local v = match(justify, "[tTbB]");
-		
+
 		if ( h == "l" ) then
 			fontString:SetJustifyH("LEFT");
 		elseif ( h == "r" ) then
 			fontString:SetJustifyH("RIGHT");
 		end
-		
+
 		if ( v == "t" ) then
 			fontString:SetJustifyV("TOP");
 		elseif ( v == "b" ) then
 			fontString:SetJustifyV("BOTTOM");
 		end
 	end
-	
+
 	-- Color
 	if ( r and g and b ) then
 		fontString:SetTextColor(tonumber(r) or 1, tonumber(g) or 1, tonumber(b) or 1);
 	end
-	
+
 	-- Text
 	fontString:SetText(self:getText(text) or _G[text] or text);
-	
+
 	return fontString;
 end
 
@@ -1336,14 +1336,14 @@ objectHandlers.texture = function(self, parent, name, virtual, option, texture, 
 	-- Texture & Layer
 	local r, g, b, a = splitString(texture, colonSeparator);
 	local tex = parent:CreateTexture(name, layer or "ARTWORK", virtual);
-	
+
 	-- Color
 	if ( r and g and b ) then
 		tex:SetColorTexture(tonumber(r) or 1, tonumber(g) or 1, tonumber(b) or 1, tonumber(a) or 1);
 	else
 		tex:SetTexture(texture);
 	end
-	
+
 	return tex;
 end
 
@@ -1368,7 +1368,7 @@ objectHandlers.optionframe = function(self, parent, name, virtual, option, heade
 	frame:SetMovable(true);
 	frame:SetToplevel(true);
 	frame:SetFrameStrata("DIALOG");
-	
+
 	-- DragFrame
 	local dragFrame = CreateFrame("Button", nil, frame);
 	dragFrame:SetWidth(150); dragFrame:SetHeight(32);
@@ -1377,18 +1377,18 @@ objectHandlers.optionframe = function(self, parent, name, virtual, option, heade
 	dragFrame:SetScript("OnMouseUp", optionFrameOnMouseUp);
 	dragFrame:SetScript("OnEnter", optionFrameOnEnter);
 	dragFrame:SetScript("OnLeave", optionFrameOnLeave);
-	
+
 	-- HeaderTexture
 	local headerTexture = frame:CreateTexture(nil, "ARTWORK");
 	headerTexture:SetTexture("Interface\\DialogFrame\\UI-DialogBox-Header");
 	headerTexture:SetWidth(256); headerTexture:SetHeight(64);
 	headerTexture:SetPoint("TOP", 0, 12);
-	
+
 	-- HeaderText
 	local headerText = frame:CreateFontString(nil, "ARTWORK", "GameFontNormal");
 	headerText:SetText(headerName);
 	headerText:SetPoint("TOP", headerTexture, 0, -14);
-	
+
 	return frame;
 end
 
@@ -1419,7 +1419,7 @@ local function dropdownClick(self)
 	if ( dropdown ) then
 		local value = self.value;
 		local option = dropdown.option;
-		
+
 		UIDropDownMenu_SetSelectedValue(dropdown, value);
 		if ( option ) then
 			dropdown.object:setOption(option, value, not dropdown.global);
@@ -1433,18 +1433,18 @@ objectHandlers.dropdown = function(self, parent, name, virtual, option, ...)
 	frame.oldSetWidth = frame.SetWidth;
 	frame.SetWidth = dropdownSetWidth;
 	frame.ctDropdownClick = dropdownClick;
-	
+
 	-- Make the slider smaller
 	local left, right, mid, btn = _G[name.."Left"], _G[name.."Middle"], _G[name.."Right"], _G[name.."Button"];
 	local setHeight = left.SetHeight;
-	
+
 	btn:SetPoint("TOPRIGHT", right, "TOPRIGHT", 12, -12);
 	setHeight(left, 50);
 	setHeight(right, 50);
 	setHeight(mid, 50);
-	
+
 	local entries = { ... };
-	
+
 	UIDropDownMenu_Initialize(frame, function()
 		for i = 1, #entries, 1 do
 			dropdownEntry.text = entries[i];
@@ -1454,7 +1454,7 @@ objectHandlers.dropdown = function(self, parent, name, virtual, option, ...)
 			UIDropDownMenu_AddButton(dropdownEntry);
 		end
 	end);
-	
+
 	UIDropDownMenu_SetSelectedValue(frame, self:getOption(option) or 1);
 	UIDropDownMenu_JustifyText(frame, "LEFT");
 	return frame;
@@ -1469,7 +1469,7 @@ local function updateSliderValue(self, value)
 	local valueStep = self:GetValueStep()
 	value = floor(value / valueStep  + 0.5) * valueStep
 	updateSliderText(self, value);
-	
+
 	local option = self.option;
 	if ( option ) then
 		self.object:setOption(option, value, not self.global);
@@ -1481,18 +1481,18 @@ objectHandlers.slider = function(self, parent, name, virtual, option, text, valu
 	local title, low, high = select(10, slider:GetRegions()); -- Hack to allow for unnamed sliders
 	local titleText, lowText, highText = splitString(text, colonSeparator);
 	local minValue, maxValue, step = splitString(values, colonSeparator);
-	
+
 	minValue, maxValue, step = tonumber(minValue), tonumber(maxValue), tonumber(step);
 	slider.title, slider.titleText, slider.object, slider.option = title, titleText, self, option;
 	low:SetText(lowText or minValue);
 	high:SetText(highText or maxValue);
-	
+
 	slider:SetMinMaxValues(minValue, maxValue);
 	slider:SetValueStep(step);
 
 	slider:SetValue(self:getOption(option) or (maxValue-minValue)/2);
 	slider:SetScript("OnValueChanged", updateSliderValue);
-	
+
 	updateSliderText(slider);
 	return slider;
 end
@@ -1503,7 +1503,7 @@ local function colorSwatchCancel()
 	local r, g, b = self.r or 1, self.g or 1, self.b or 1;
 	local a = self.opacity or 1;
 	local object, option = self.object, self.option;
-	
+
 	local colors = object:getOption(option);
 	colors[1], colors[2], colors[3] = r, g, b;
 	colors[4] = a;
@@ -1515,7 +1515,7 @@ local function colorSwatchColor()
 	local self = ColorPickerFrame.object;
 	local r, g, b = ColorPickerFrame:GetColorRGB();
 	local object, option = self.object, self.option;
-	
+
 	local colors = object:getOption(option);
 	colors[1], colors[2], colors[3] = r, g, b;
 	object:setOption(option, colors, not self.global);
@@ -1526,7 +1526,7 @@ local function colorSwatchOpacity()
 	local self = ColorPickerFrame.object;
 	local a = OpacitySliderFrame:GetValue();
 	local object, option = self.object, self.option;
-	
+
 	local colors = object:getOption(option);
 	colors[4] = a;
 	object:setOption(option, colors, not self.global);
@@ -1540,13 +1540,13 @@ local function colorSwatchShow(self)
 	else
 		r, g, b, a = 1, 1, 1, 1;
 	end
-	
+
 	self.r, self.g, self.b, self.opacity = r, g, b, a;
 	self.opacityFunc = colorSwatchOpacity;
 	self.swatchFunc = colorSwatchColor;
 	self.cancelFunc = colorSwatchCancel;
 	self.hasOpacity = self.hasAlpha;
-	
+
 	ColorPickerFrame.object = self;
 	UIDropDownMenuButton_OpenColorPicker(self);
 	ColorPickerFrame:SetFrameStrata("TOOLTIP");
@@ -1570,22 +1570,22 @@ objectHandlers.colorswatch = function(self, parent, name, virtual, option, alpha
 	local swatch = CreateFrame("Button", name, parent, virtual);
 	local bg = swatch:CreateTexture(nil, "BACKGROUND");
 	local normalTexture = swatch:CreateTexture(nil, "ARTWORK");
-	
+
 	normalTexture:SetTexture("Interface\\ChatFrame\\ChatFrameColorSwatch");
 	normalTexture:SetAllPoints(swatch);
 	swatch:SetNormalTexture(normalTexture);
 	bg:SetColorTexture(1, 1, 1);
 	bg:SetPoint("TOPLEFT", swatch, 1, -1);
 	bg:SetPoint("BOTTOMRIGHT", swatch, 0, 1);
-	
+
 	local color = self:getOption(option);
 	if ( color ) then
 		normalTexture:SetVertexColor(color[1], color[2], color[3]);
 	end
-	
+
 	swatch.bg, swatch.normalTexture = bg, normalTexture;
 	swatch.object, swatch.option, swatch.hasAlpha = self, option, alpha;
-	
+
 	swatch:SetScript("OnLeave", colorSwatchOnLeave);
 	swatch:SetScript("OnEnter", colorSwatchOnEnter);
 	swatch:SetScript("OnClick", colorSwatchOnClick);
@@ -1596,7 +1596,7 @@ end
 local function setAnchor(frame, str)
 	local rel, pt, xoff, yoff, relpt = "";
 	local tmpVal, found;
-	
+
 	for key, value in iterator(str, colonMatch) do
 		-- Offsets
 		if ( not yoff ) then
@@ -1610,7 +1610,7 @@ local function setAnchor(frame, str)
 				found = true;
 			end
 		end
-		
+
 		-- Points
 		if ( not found and not relpt ) then
 			tmpVal = points[value];
@@ -1623,18 +1623,18 @@ local function setAnchor(frame, str)
 				found = true;
 			end
 		end
-		
+
 		-- Relative object
 		if ( not found ) then
 			rel = value;
 		end
 		found = nil;
 	end
-	
+
 	if ( not relpt ) then
 		relpt = pt;
 	end
-	
+
 	local parent = frame:GetParent();
 	if ( pt == "all" ) then
 		frame:SetAllPoints( ( parent and parent[rel] ) or _G[rel] or parent);
@@ -1648,17 +1648,17 @@ local function setAttributes(self, parent, frame, identifier, option, global, st
 
 	-- Object
 	frame.object = self;
-	
+
 	-- Parent
 	frame.parent = parent;
-	
+
 	-- Identifier
 	if ( identifier ) then
-	
+
 		if ( parent ) then
 			parent[identifier] = frame;
 		end
-		
+
 		if ( tonumber(identifier) ) then
 			local setID = frame.SetID;
 			if ( setID ) then
@@ -1666,37 +1666,37 @@ local function setAttributes(self, parent, frame, identifier, option, global, st
 			end
 		end
 	end
-	
+
 	-- Option
 	frame.option = option;
 	frame.global = global;
-	
+
 	-- Strata
 	if ( strata ) then
 		frame:SetFrameStrata(strata);
 	end
-	
+
 	-- Width & Height
 	if ( width ) then
 		frame:SetWidth(width);
 		frame:SetHeight(height);
 	end
-	
+
 	-- Movable
 	if ( movable ) then
 		frame:SetMovable(true);
 	end
-	
+
 	-- Clamped
 	if ( clamped ) then
 		frame:SetClampedToScreen(true);
 	end
-	
+
 	-- Hidden
 	if ( hidden ) then
 		frame:Hide();
 	end
-	
+
 	-- Anchors
 	if ( anch1 ) then
 		frame:ClearAllPoints();
@@ -1753,18 +1753,18 @@ local function generalObjectHandler(self, specializedHandler, str, parent, initi
 	if ( frameCache[str] ) then
 		return frameCache[str]();
 	end
-	
+
 	-- Make sure we don't have any saved attributes from before
 	lib:clearTable(specialAttributes);
-	
+
 	-- Parse the things we want first of all
 	-- Any object handler can have up to 6 special, object-specific attributes
-	local identifier, name, explicitParent, option, defaultValue, global, strata, width, 
+	local identifier, name, explicitParent, option, defaultValue, global, strata, width,
 		height, movable, clamped, hidden, cache, virtual, localInherit;
 	local anch1, anch2, anch3, anch4, specFound;
 	local found;
 	for key, value in iterator(str, numberMatch) do
-	
+
 		-- Movable
 		if ( value == "movable" ) then
 			movable = true;
@@ -1786,7 +1786,7 @@ local function generalObjectHandler(self, specializedHandler, str, parent, initi
 					found = true;
 				end
 			end
-			
+
 			-- Option
 			if ( not found and not option ) then
 				local o, opt, def, glb = splitString(value, colonSeparator);
@@ -1801,7 +1801,7 @@ local function generalObjectHandler(self, specializedHandler, str, parent, initi
 					found = true;
 				end
 			end
-			
+
 			-- Strata
 			if ( not found and not strata ) then
 				local st, strta = splitString(value, colonSeparator);
@@ -1810,7 +1810,7 @@ local function generalObjectHandler(self, specializedHandler, str, parent, initi
 					found = true;
 				end
 			end
-			
+
 			-- Virtual (inherit)
 			if ( not found and not virtual ) then
 				local v, inherit = splitString(value, colonSeparator);
@@ -1819,7 +1819,7 @@ local function generalObjectHandler(self, specializedHandler, str, parent, initi
 					found = true;
 				end
 			end
-			
+
 			-- Local Virtual (inherit from table)
 			if ( not found and not localInherit ) then
 				local li, inherit = splitString(value, colonSeparator);
@@ -1828,7 +1828,7 @@ local function generalObjectHandler(self, specializedHandler, str, parent, initi
 					found = true;
 				end
 			end
-			
+
 			-- Name
 			if ( not found and not name ) then
 				local n, frameName = splitString(value, colonSeparator);
@@ -1837,7 +1837,7 @@ local function generalObjectHandler(self, specializedHandler, str, parent, initi
 					found = true;
 				end
 			end
-			
+
 			-- Parent
 			if ( not found and not explicitParent ) then
 				local p, parentName = splitString(value, colonSeparator);
@@ -1850,7 +1850,7 @@ local function generalObjectHandler(self, specializedHandler, str, parent, initi
 					found = true;
 				end
 			end
-			
+
 			-- Width & Height
 			if ( not found and not width ) then
 				local s, w, h = splitString(value, colonSeparator);
@@ -1860,7 +1860,7 @@ local function generalObjectHandler(self, specializedHandler, str, parent, initi
 					found = true;
 				end
 			end
-			
+
 			-- Anchors
 			if ( not found and not anch4 and not specFound ) then
 				local a = splitString(value, colonSeparator) or value;
@@ -1877,7 +1877,7 @@ local function generalObjectHandler(self, specializedHandler, str, parent, initi
 					found = true;
 				end
 			end
-			
+
 			-- Special attributes
 			if ( not found ) then
 				tinsert(specialAttributes, value);
@@ -1886,36 +1886,36 @@ local function generalObjectHandler(self, specializedHandler, str, parent, initi
 		end
 		found = nil;
 	end
-	
+
 	-- Make sure we have valid values
 	if ( explicitParent == "nil" ) then
 		parent = nil;
 	else
 		parent = explicitParent or parent or UIParent;
 	end
-	
+
 	-- Check override name
 	name = overrideName or name;
-	
+
 	anch1 = anch1 or "mid";
-	
+
 	-- Set default value
 	if ( option and defaultValue ) then
 		defaultValues[self.name.."-"..option] = defaultValue;
 	end
-	
+
 	-- Create our frame
 	local frame = specializedHandler(self, parent, name, virtual, option, unpack(specialAttributes));
-	
+
 	-- Grab any local inherits
 	if ( localInherit ) then
 		lib:getFrame(initialValue[localInherit], frame);
 	end
-	
+
 	if ( not frame ) then
 		-- Return if we don't have a frame - useful for backdrops etc.
 		return;
-		
+
 	elseif ( cache ) then
 		-- Cache if requested
 		local cacheAttributes = {};
@@ -1932,12 +1932,12 @@ local function generalObjectHandler(self, specializedHandler, str, parent, initi
 		end
 		frameCache[str] = cacheFunc;
 	end
-	
+
 	-- Apply our attributes
 	setAttributes(self, parent, frame, identifier, option, global, strata, width, height, movable, clamped, hidden, anch1, anch2, anch3, anch4);
-	
+
 	return frame;
-	
+
 end
 
 -- Parse attributes from a string
@@ -1994,7 +1994,7 @@ local function getFrame(self, value, origParent, initialValue, overrideName)
 		end
 		return parent;
 	end
-	
+
 	-- Call any OnLoad/OnShow we might have after having recursed through all parents
 	if ( parent ) then
 		local getScript = parent.GetScript;
@@ -2005,7 +2005,7 @@ local function getFrame(self, value, origParent, initialValue, overrideName)
 			if ( parent.execOnLoad and type(onLoad) == "function" ) then
 				onLoad(parent);
 			end
-			
+
 			if ( parent:IsVisible() ) then
 				local onShow = getScript(parent, "OnShow");
 				if ( type(onShow) == "function" ) then
@@ -2197,7 +2197,7 @@ local function resizer(self, elapsed)
 		local alpha = self.alpha;
 		if ( alpha < 1 ) then
 			local newAlpha = min(alpha + 1.25 * elapsed, 1); -- Set to 100% opacity over 0.8 sec
-						
+
 			self.options:SetAlpha(newAlpha);
 			self.alpha = newAlpha;
 		else
@@ -2210,16 +2210,16 @@ end
 local function selectControlPanelModule(self)
 	local parent = self.parent;
 	local newModule = self:GetID();
-	PlaySound("UChatScrollButton");
-	
+	PlaySound(1115);
+
 	local module = modules[newModule];
 	local optionsFrame = module.frame;
 	local isExternal = module.external;
-	
+
 	if ( not module or not optionsFrame ) then
 		return;
 	end
-	
+
 	if ( not isExternal ) then
 		-- Highlight the correct bullet
 		self.bullet:SetVertexColor(1, 0, 0);
@@ -2239,10 +2239,10 @@ local function selectControlPanelModule(self)
 			end
 		end
 	end
-	
+
 	local frameType = type(optionsFrame);
 	local options = controlPanelFrame.options;
-	
+
 	-- Check if this is a function. If so, parse it.
 	if ( frameType == "function" ) then
 		if ( not isExternal ) then
@@ -2282,7 +2282,7 @@ local function selectControlPanelModule(self)
 			frame:Hide();
 		end
 	end
-	
+
 	optionsFrame:Show();
 	if ( not isExternal ) then
 		parent.selectedModuleFrame = optionsFrame;
@@ -2324,15 +2324,15 @@ local function controlPanelSkeleton()
 		"backdrop#tooltip#0:0:0:0.75",
 		["onshow"] = function(self)
 			local module, obj;
-			
+
 			-- Prepare the frame
 			local selectedModuleFrame = self.selectedModuleFrame;
 			selectedModule = nil;
-			
+
 			self:SetWidth(300);
 			self.options:Hide();
 			self.selectedModuleFrame = nil;
-			
+
 			-- Show/Hide our bullets
 			local listing = self.listing;
 			local num = 0;
@@ -2346,7 +2346,7 @@ local function controlPanelSkeleton()
 					obj:SetID(i);
 					obj:Show();
 					obj:SetText(module.name);
-					
+
 					if ( version and version ~= "" ) then
 						obj.version:SetText("|c007F7F7Fv|r"..module.version);
 					end
@@ -2355,7 +2355,7 @@ local function controlPanelSkeleton()
 					else
 						obj.bullet:SetVertexColor(1, 0.82, 0);
 					end
-					
+
 					if ( num == 14 ) then
 						break;
 					end
@@ -2364,11 +2364,11 @@ local function controlPanelSkeleton()
 			for i = num + 1, 14, 1 do
 				listing[tostring(i)]:Hide();
 			end
-			PlaySound("UChatScrollButton");
+			PlaySound(1115);
 			eventHandler(lib, "CONTROL_PANEL_VISIBILITY", true);
 		end,
 		["onhide"] = function(self)
-			PlaySound("UChatScrollButton");
+			PlaySound(1115);
 			local selectedModuleFrame = self.selectedModuleFrame;
 			if ( selectedModuleFrame ) then
 				selectedModuleFrame:Hide();
@@ -2433,7 +2433,7 @@ local function controlPanelSkeleton()
 				child:SetWidth(300);
 				child:SetHeight(450);
 				self.scrollchild = child;
-				
+
 				local scroll = CreateFrame("ScrollFrame", "CT_LibraryOptionsScrollFrame", self, "UIPanelScrollFrameTemplate");
 				scroll:SetPoint("TOPLEFT", self, 0, 4);
 				scroll:SetPoint("BOTTOMRIGHT", self, -12, -10);
@@ -2466,7 +2466,7 @@ function lib:showControlPanel(show)
 			show = false;
 		end
 	end
-	
+
 	if ( show ~= false ) then
 		displayControlPanel();
 	elseif ( controlPanelFrame ) then
@@ -2568,7 +2568,7 @@ local function populateAddonsList(char)
 		if ( not obj ) then
 			break;
 		end
-		
+
 		obj:Hide();
 		num = num + 1;
 	end
@@ -2590,7 +2590,7 @@ local function populateCharDropdownInit()
 		lib:clearTable(dropdownEntry);
 		lib:clearTable(flaggedCharacters);
 	end
-	
+
 	-- Prevent ourself from being added
 	flaggedCharacters[getCharKey()] = true;
 
@@ -2658,7 +2658,7 @@ local function populateServerDropdownInit()
 		lib:clearTable(dropdownEntry);
 		lib:clearTable(flaggedCharacters);
 	end
-	
+
 	-- Prevent ourself from being added
 	flaggedCharacters[getCharKey()] = true;
 
@@ -2730,7 +2730,7 @@ local function hideAddonsList()
 		if ( not obj ) then
 			break;
 		end
-		
+
 		obj:Hide();
 		num = num + 1;
 	end
@@ -2745,7 +2745,7 @@ local function addonIsChecked(name)
 		if ( not obj or not obj:IsVisible() ) then
 			return false;
 		end
-		
+
 		if ( obj.text:GetText() == name ) then
 			return obj:GetChecked();
 		end
@@ -2768,7 +2768,7 @@ local function import()
 		local charKey = getCharKey();
 		local options, success;
 		local fromOptions;
-		
+
 		for modnum, addon in ipairs(modules) do
 			options = addon.options;
 			if ( options and addon ~= module ) then
@@ -2780,7 +2780,7 @@ local function import()
 				end
 			end
 		end
-		
+
 		module:setOption("canImport", nil, true);
 
 		if ( success ) then
@@ -2799,7 +2799,7 @@ local function delete()
 		local charKey = getCharKey();
 		local options, success;
 		local fromOptions;
-		
+
 		for modnum, addon in ipairs(modules) do
 			options = addon.options;
 			if ( options and addon ~= module ) then
@@ -2810,7 +2810,7 @@ local function delete()
 				end
 			end
 		end
-		
+
 		module:setOption("canDelete", nil, true);
 
 		if ( success ) then
@@ -2880,20 +2880,20 @@ module.frame = function()
 
 		"font#tl:20:-30#n:CT_LibraryDropdown0Label#v:ChatFontNormal#Server:",
 		"dropdown#s:175:20#tl:80:-31#o:char#n:CT_LibraryDropdown0#i:serverDropdown",
-		
+
 		"font#tl:20:-55#n:CT_LibraryDropdown1Label#v:ChatFontNormal#Character:",
 		"dropdown#s:175:20#tl:80:-56#o:char#n:CT_LibraryDropdown1#i:charDropdown",
-		
+
 		["onload"] = function(self)
 			optionsFrame, addonsFrame = self, self.addons;
 
 			populateServerDropdown();
 			populateCharDropdown();
-			
+
 			module:setOption("canImport", nil, true);
 			module:setOption("canDelete", nil, true);
 		end,
-		
+
 		["frame#tl:0:-85#r#i:addons#hidden"] = addonsTable,
 
 		["frame#i:actions#hidden"] = {
@@ -2911,10 +2911,10 @@ module.frame = function()
 			},
 		},
 	};
-	
+
 	-- Fill in our addons table
 	tinsert(addonsTable, "font#tl:5:0#v:GameFontNormalLarge#Import Settings For");
-	
+
 	-- Populate with addons
 	local num = 0;
 	for key, value in ipairs(modules) do
@@ -2923,6 +2923,6 @@ module.frame = function()
 			tinsert(addonsTable, "checkbutton#i:"..num.."#tl:20:-"..(num * 20));
 		end
 	end
-	
+
 	return "frame#all", optionsTable;
 end

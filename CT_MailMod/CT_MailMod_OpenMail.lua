@@ -89,7 +89,7 @@ function OpenMailFrame_OnHide()
 	StaticPopup_Hide("DELETE_MAIL");
 	if ( not InboxFrame.openMailID ) then
 		InboxFrame_Update();
-		PlaySound("igSpellBookClose");
+		PlaySound(830);
 		return;
 	end
 
@@ -102,7 +102,7 @@ function OpenMailFrame_OnHide()
 			isAuctionTempInvoice = true;
 		end
 	end
-	
+
 	-- If mail contains no items, then delete it on close
 	local packageIcon, stationeryIcon, sender, subject, money, CODAmount, daysLeft, itemCount, wasRead, wasReturned, textCreated  = GetInboxHeaderInfo(InboxFrame.openMailID);
 	if ( money == 0 and not itemCount and textCreated and not isAuctionTempInvoice ) then
@@ -141,12 +141,12 @@ function OpenMailFrame_OnHide()
 	end
 	InboxFrame.openMailID = 0;
 	InboxFrame_Update();
-	PlaySound("igSpellBookClose");
+	PlaySound(830);
 end
 
 -- Replace the OnHide script for the OpenMailFrame with our own.
 --
-OpenMailFrame:SetScript("OnHide", 
+OpenMailFrame:SetScript("OnHide",
 	function(...)
 		-- Call our modified replacement function.
 		OpenMailFrame_OnHide();
@@ -210,7 +210,7 @@ function OpenMailAttachment_OnClick(self, itemIndex)
 		-- Clicking an already clicked attachment will remove it from the queue
 		-- as long as it is not the one currently being processed.
 		local removed = module:removeMailAction(self.ctData);
-		if (removed) then			
+		if (removed) then
 			SetItemButtonDesaturated(self, false, 0.5, 0.5, 0.5)
 			self.ctClicked = nil;
 			self.ctData = nil;

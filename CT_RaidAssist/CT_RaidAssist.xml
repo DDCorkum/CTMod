@@ -324,7 +324,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				self.update = 1;
 				self.HPBar:EnableMouse(false);
 				self.MPBar:EnableMouse(false);
-				
+
 				--self:SetAttribute("type", "target");
 				ClickCastFrames = ClickCastFrames or { };
 				ClickCastFrames[self] = true;
@@ -1211,13 +1211,13 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 		</Frames>
 		<Scripts>
 			<OnShow>
-				PlaySound("UChatScrollButton");
+				PlaySound(1115);
 				self.hide = 30;
 				_G[self:GetName() .. "Info"]:SetText("'|c00FFFFFF" .. CT_RA_CheckReady_Person .. "|r' has requested a ready check.\nPress ready if you are ready.");
 			</OnShow>
 			<OnHide>
 				self.hide = nil;
-				PlaySound("UChatScrollButton");
+				PlaySound(1115);
 			</OnHide>
 			<OnUpdate>
 				CT_RA_ReadyFrame_OnUpdate(self, elapsed);
@@ -1319,13 +1319,13 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 		</Frames>
 		<Scripts>
 			<OnShow>
-				PlaySound("UChatScrollButton");
+				PlaySound(1115);
 				self.hide = 30;
 				_G[self:GetName() .. "Info"]:SetText(self.question);
 			</OnShow>
 			<OnHide>
 				self.hide = nil;
-				PlaySound("UChatScrollButton");
+				PlaySound(1115);
 			</OnHide>
 			<OnUpdate>
 				CT_RA_ReadyFrame_OnUpdate(self, elapsed);
@@ -1406,13 +1406,13 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 		</Frames>
 		<Scripts>
 			<OnShow>
-				PlaySound("UChatScrollButton");
+				PlaySound(1115);
 				self.hide = 30;
 				_G[self:GetName() .. "Info"]:SetText("O RLY?");
 			</OnShow>
 			<OnHide>
 				self.hide = nil;
-				PlaySound("UChatScrollButton");
+				PlaySound(1115);
 			</OnHide>
 			<OnUpdate>
 				CT_RA_ReadyFrame_OnUpdate(self, elapsed);
@@ -1598,7 +1598,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				<Scripts>
 					<OnClick>
 						CT_RADurability_Sort(3);
-						PlaySound("igMainMenuOptionCheckBoxOn");
+						PlaySound(856);
 					</OnClick>
 				</Scripts>
 				<Layers>
@@ -1644,7 +1644,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				<Scripts>
 					<OnClick>
 						CT_RADurability_Sort(4);
-						PlaySound("igMainMenuOptionCheckBoxOn");
+						PlaySound(856);
 					</OnClick>
 				</Scripts>
 				<Layers>
@@ -1690,7 +1690,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				<Scripts>
 					<OnClick>
 						CT_RADurability_Sort(4);
-						PlaySound("igMainMenuOptionCheckBoxOn");
+						PlaySound(856);
 					</OnClick>
 				</Scripts>
 				<Layers>
@@ -1733,7 +1733,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				<Scripts>
 					<OnClick>
 						CT_RADurability_Sort(5);
-						PlaySound("igMainMenuOptionCheckBoxOn");
+						PlaySound(856);
 					</OnClick>
 				</Scripts>
 				<Layers>
@@ -1776,7 +1776,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				<Scripts>
 					<OnClick>
 						CT_RADurability_Sort(6);
-						PlaySound("igMainMenuOptionCheckBoxOn");
+						PlaySound(856);
 					</OnClick>
 				</Scripts>
 				<Layers>
@@ -1819,7 +1819,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				<Scripts>
 					<OnClick>
 						CT_RADurability_Sort(7);
-						PlaySound("igMainMenuOptionCheckBoxOn");
+						PlaySound(856);
 					</OnClick>
 				</Scripts>
 				<Layers>
@@ -1862,7 +1862,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				<Scripts>
 					<OnClick>
 						CT_RADurability_Sort(8);
-						PlaySound("igMainMenuOptionCheckBoxOn");
+						PlaySound(856);
 					</OnClick>
 				</Scripts>
 				<Layers>

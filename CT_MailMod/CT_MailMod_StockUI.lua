@@ -196,10 +196,10 @@ do
 			["onclick"] = function(self, arg1)
 				if (self:GetChecked()) then
 					module:inboxSelectAll();
-					PlaySound("igMainMenuOptionCheckBoxOn");
+					PlaySound(856);
 				else
 					module:inboxUnselectAll();
-					PlaySound("igMainMenuOptionCheckBoxOff");
+					PlaySound(857);
 				end
 				module:inboxUpdateSelection();
 			end,
@@ -382,9 +382,9 @@ do
 		end
 
 		if (status) then
-			PlaySound("igMainMenuOptionCheckBoxOn");
+			PlaySound(856);
 		else
-			PlaySound("igMainMenuOptionCheckBoxOff");
+			PlaySound(857);
 			module.selectAllMail = false;
 		end
 
@@ -557,7 +557,7 @@ do
 				end
 			};
 		end
-		
+
 		return "button#s:28:28#tr:br:0:0", quickActionTbl;
 	end
 
@@ -585,7 +585,7 @@ do
 			quick = quickAction[key];
 			if (mailIndex > mailCount) then
 				-- Hide the line
-				quick:Hide();				
+				quick:Hide();
 			else
 				-- Show the line
 				local mailItem = _G["MailItem" .. key .. "Subject"];
@@ -612,7 +612,7 @@ do
 						quick:SetHighlightTexture("Interface\\Buttons\\UI-Common-MouseHilight");
 						quick:Show();
 						quick.ctmailmodAction = 1; -- return
-					end				
+					end
 				else
 					-- Don't show a quick action button below the expiry time
 					mailItem:SetWidth(248);
@@ -727,7 +727,7 @@ do
 end
 
 -- Add the mail log button
-do
+--[[do
 	local btn = CreateFrame("Button", nil, InboxFrame, "UIPanelButtonTemplate");
 
 	btn:SetWidth(120);
@@ -745,7 +745,7 @@ do
 			btn:Show();
 		end
 	end
-end
+end]]
 
 -- Mail icon buttons
 do
@@ -794,10 +794,10 @@ do
 					end
 					if (count == 1) then
 --						GameTooltip:AddLine(itemLink);
-						GameTooltip:AddLine("|T" .. itemTexture .. ":0|t" .. itemLink) 
+						GameTooltip:AddLine("|T" .. itemTexture .. ":0|t" .. itemLink)
 					else
 --						GameTooltip:AddLine(itemLink .. " x " .. count);
-						GameTooltip:AddLine("|T" .. itemTexture .. ":0|t" .. itemLink .. " x " .. count) 
+						GameTooltip:AddLine("|T" .. itemTexture .. ":0|t" .. itemLink .. " x " .. count)
 					end
 --					-- Note: GameTooltip:AddTexture() only supports 10 textures, so
 --					-- if there are more than 10 items attached to the message
@@ -882,7 +882,7 @@ do
 
 	InboxNextPageButton:ClearAllPoints();
 	InboxNextPageButton:SetPoint("CENTER", InboxFrame, "BOTTOMLEFT", 305, 110);
-	
+
 	InboxNextPageButton:RegisterForClicks("LeftButtonUp", "RightButtonUp");
 	InboxPrevPageButton:RegisterForClicks("LeftButtonUp", "RightButtonUp");
 
@@ -914,8 +914,13 @@ do
 	frame:SetWidth(58);
 	frame:SetPoint("TOPLEFT", MailFrame, "TOPLEFT", -7, 6);
 	frame:Show();
+	frame:RegisterForClicks("AnyUp")
 	frame:SetScript("OnClick", function(self, button, ...)
-		module:showModuleOptions(module.name);
+		if button == "RightButton" then
+			module.toggleMailLog();
+		else
+			module:showModuleOptions(module.name);
+		end
 	end);
 	frame:SetScript("OnEnter", function(self, ...)
 		GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 0, 5);
@@ -959,11 +964,11 @@ function InboxFrame_OnClick(self, index)
 		OpenMail_Update();
 		--OpenMailFrame:Show();
 		ShowUIPanel(OpenMailFrame);
-		PlaySound("igSpellBookOpen");
+		PlaySound(829);
 		module:initOpenMail(); -- *new*
 	else
 		InboxFrame.openMailID = 0;
-		HideUIPanel(OpenMailFrame);		
+		HideUIPanel(OpenMailFrame);
 	end
 	InboxFrame_Update();
 end

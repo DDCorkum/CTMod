@@ -5,7 +5,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 		<Size>
 			<AbsDimension x="220" y="15"/>
 		</Size>
-		
+
 		<Layers>
 			<Layer level="ARTWORK">
 				<FontString name="$parentText" text="MT #1:" inherits="GameFontNormal" justifyH="LEFT" justifyV="TOP">
@@ -28,7 +28,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				</Texture>
 			</Layer>
 		</Layers>
-		
+
 		<Scripts>
 			<PreClick>
 				self:SetAttribute("unit", "");
@@ -60,7 +60,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 		<Size>
 			<AbsDimension x="220" y="15"/>
 		</Size>
-		
+
 		<Layers>
 			<Layer level="OVERLAY">
 				<FontString name="$parentText" text="Target #5:" inherits="GameFontNormal" justifyH="LEFT" justifyV="TOP">
@@ -92,7 +92,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				</Texture>
 			</Layer>
 		</Layers>
-		
+
 		<Scripts>
 			<OnEnter>
 				self.isOver = 1;
@@ -113,16 +113,16 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 			</PreClick>
 		</Scripts>
 	</Frame>
-	
+
 	<Frame name="CT_RATargetFrame" hidden="true" movable="true" parent="UIParent">
 		<Size>
 			<AbsDimension x="450" y="275"/>
 		</Size>
-		
+
 		<Anchors>
 			<Anchor point="CENTER"/>
 		</Anchors>
-		
+
 		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
 			<EdgeSize>
 				<AbsValue val="16"/>
@@ -134,7 +134,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				<AbsInset left="5" right="5" top="5" bottom="5"/>
 			</BackgroundInsets>
 		</Backdrop>
-		
+
 		<Layers>
 			<Layer level="ARTWORK">
 				<FontString name="$parentTitle" text="Target Management" inherits="GameFontNormal">
@@ -157,7 +157,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				</FontString>
 			</Layer>
 		</Layers>
-		
+
 		<Frames>
 			<Button name="$parentCloseButton" hidden="false">
 				<Size>
@@ -283,7 +283,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentTarget9"/>
 				</Anchors>
 			</Button>
-			
+
 			<Button name="$parentInfoBox">
 				<Size>
 					<AbsDimension x="440" y="45"/>
@@ -332,7 +332,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				</Scripts>
 			</Button>
 		</Frames>
-		
+
 		<Scripts>
 			<OnMouseDown>
 				if ( button == "LeftButton" ) then
@@ -345,11 +345,11 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				end
 			</OnMouseUp>
 			<OnHide>
-				PlaySound("UChatScrollButton");
+				PlaySound(1115);
 				self:StopMovingOrSizing();
 			</OnHide>
 			<OnShow>
-				PlaySound("UChatScrollButton");
+				PlaySound(1115);
 			</OnShow>
 			<OnLoad>
 				CT_RATarget_OnLoad(self);
@@ -438,7 +438,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 		</Frames>
 		<Scripts>
 			<OnShow>
-				PlaySound("TellMessage");
+				PlaySound(3081);
 				_G[self:GetName() .. "Info"]:SetText("'|c00FFFFFF" .. CT_RATarget.assistPerson[1] .. "|r' wants you to assist him/her.\nPress Assist to assist.");
 			</OnShow>
 		</Scripts>

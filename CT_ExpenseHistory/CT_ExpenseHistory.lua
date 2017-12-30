@@ -84,7 +84,7 @@ function CT_EH_UpdateSummary()
 	CT_ExpenseHistoryFrameDropDownText:SetText(( currPlayer or CT_EH_ALLCHARACTERS ));
 
 	CT_ExpenseHistoryFrameRecordingText:SetText(format(CT_EH_RECORDINGFROM, date("%m/%d/%Y", CT_EH_History["startUsage"])));
-	
+
 	local classCoords = CLASS_ICON_TCOORDS;  -- Table index is non-localized class name (eg: "WARRIOR")
 
 	local costsTable, totalRepair, numRepairs, totalFlight, totalReagent, totalAmmo, totalMail, totalCost, highCost = CT_EH_GetStats(CT_ExpenseHistoryFrame.currPlayer, CT_ExpenseHistoryFrame.currServer);
@@ -97,7 +97,7 @@ function CT_EH_UpdateSummary()
 			end
 		end
 	);
-	
+
 	-- Summaries
 	local dailyCost, dailyFlight, dailyRepair, dailyReagent, dailyAmmo, dailyMail;
 	local avgRepair;
@@ -125,19 +125,19 @@ function CT_EH_UpdateSummary()
 	MoneyFrame_Update("CT_ExpenseHistoryFrameSummaryAverageRepairMoney", avgRepair);
 	MoneyFrame_Update("CT_ExpenseHistoryFrameSummaryAvgExpensesPerDayMoney", dailyCost );
 	MoneyFrame_Update("CT_ExpenseHistoryFrameSummaryTotalCostMoney", floor(totalCost + 0.5));
-	
+
 	MoneyFrame_Update("CT_ExpenseHistoryFrameSummaryAvgExpensesFlightsMoney", dailyFlight);
 	MoneyFrame_Update("CT_ExpenseHistoryFrameSummaryAvgExpensesRepairsMoney", dailyRepair);
 	MoneyFrame_Update("CT_ExpenseHistoryFrameSummaryAvgExpensesReagentsMoney", dailyReagent);
 	MoneyFrame_Update("CT_ExpenseHistoryFrameSummaryAvgExpensesAmmoMoney", dailyAmmo);
 	MoneyFrame_Update("CT_ExpenseHistoryFrameSummaryAvgExpensesMailMoney", dailyMail);
-	
+
 	MoneyFrame_Update("CT_ExpenseHistoryFrameSummaryTotalCostFlightsMoney", floor(totalFlight+0.5));
 	MoneyFrame_Update("CT_ExpenseHistoryFrameSummaryTotalCostRepairsMoney", floor(totalRepair+0.5));
 	MoneyFrame_Update("CT_ExpenseHistoryFrameSummaryTotalCostReagentsMoney", floor(totalReagent+0.5));
 	MoneyFrame_Update("CT_ExpenseHistoryFrameSummaryTotalCostAmmoMoney", floor(totalAmmo+0.5));
 	MoneyFrame_Update("CT_ExpenseHistoryFrameSummaryTotalCostMailMoney", floor(totalMail+0.5));
-	
+
 	local i = 0;
 	CT_ExpenseHistoryFrame.numPiles = 0;
 	for playerIndex, val in pairs(allCostsTable) do
@@ -239,7 +239,7 @@ function CT_EH_UpdateLog()
 		local typeText = _G["CT_ExpenseHistoryFrameLogLine" .. i .. "Type"];
 		local costFrameName = "CT_ExpenseHistoryFrameLogLine" .. i .. "Cost";
 
-		local index = i + FauxScrollFrame_GetOffset(CT_ExpenseHistoryFrameLogScrollFrame); 
+		local index = i + FauxScrollFrame_GetOffset(CT_ExpenseHistoryFrameLogScrollFrame);
 		if ( index <= numEntries ) then
 			local iStart, iEnd, charName, serverName = string.find(entries[index][2], "^(.+)@(.+)$");
 			if ( strlen(charName)+strlen(serverName) > 16 ) then
@@ -375,7 +375,7 @@ function CT_EH_GetMoney(name)
 end
 
 function CT_EH_OnShow()
-	PlaySound("UChatScrollButton");
+	PlaySound(1115);
 	PanelTemplates_SetTab(CT_ExpenseHistoryFrame, 1);
 	CT_ExpenseHistoryFrameSummary:Show();
 	CT_ExpenseHistoryFrameLog:Hide();
@@ -395,7 +395,7 @@ function CT_EH_OnEvent(event)
 		end
 		CT_EH_History["version"] = CT_EH_Version;
 		if ( not CT_EH_History[player] ) then
-			CT_EH_History[player] = { 
+			CT_EH_History[player] = {
 				["class"] = UnitClass("player"),
 				["key"] = player
 			};
@@ -403,7 +403,7 @@ function CT_EH_OnEvent(event)
 		-- Save the non-localized class name so we don't need to translate
 		-- the localized class to a non-localized one. This value is new
 		-- as of version 1.3 (Sep 30 2008, while preparing for WotLK).
-		-- 
+		--
 		-- Keep in mind that there may still be old players in the table
 		-- that do not have this non-localized class value, so they will
 		-- still need to have their class translated into a non-localized
@@ -550,7 +550,7 @@ function CT_EH_ServerDropDown_OnClick(self)
 	else
 		CT_ExpenseHistoryFrame.currServer = self.value;
 	end
-	-- Reset character pull down to "All characters" 
+	-- Reset character pull down to "All characters"
 	CT_ExpenseHistoryFrame.currPlayer = nil
 	-- Re initialize character pull down so it only has players from selected server.
 	CT_EH_DropDown_Initialize();
@@ -569,7 +569,7 @@ function CT_EH_Tab_OnClick(self)
 		CT_EH_SortLog();
 		CT_EH_UpdateLog();
 	end
-	PlaySound("igCharacterInfoTab");
+	PlaySound(841);
 	PanelTemplates_SetTab(CT_ExpenseHistoryFrame, self:GetID());
 end
 

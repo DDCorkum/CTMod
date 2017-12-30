@@ -2,7 +2,7 @@ local UnitName = CT_RA_UnitName;
 local GetNumRaidMembers = CT_RA_GetNumRaidMembers;
 
 -- Variables
-CT_RATarget = { 
+CT_RATarget = {
 	["MainTanks"] = { }
 };
 
@@ -144,7 +144,7 @@ function CT_RATarget_UpdateInfoBox()
 				CT_RATargetFrameInfoBox.lock = 1;
 				CT_RATargetFrameInfoBoxMouseOver:Hide();
 			elseif ( hasMainTankWithoutTarget ) then
-				text:SetText("Click a target ID to set that MT's target to |c00FFFFFF" .. UnitName("target") .. "|r.\nClick here to set |c00FFFFFF" .. hasMainTankWithoutTarget[2] .. "|r's target to |c00FFFFFF" .. UnitName("target") .. "|r.");		
+				text:SetText("Click a target ID to set that MT's target to |c00FFFFFF" .. UnitName("target") .. "|r.\nClick here to set |c00FFFFFF" .. hasMainTankWithoutTarget[2] .. "|r's target to |c00FFFFFF" .. UnitName("target") .. "|r.");
 				CT_RATargetFrameInfoBox.clickFunction = "CT_RATarget_MTAssist";
 				CT_RATargetFrameInfoBox.functionArg = hasMainTankWithoutTarget[1];
 				CT_RATargetFrameInfoBox.lock = nil;
@@ -328,7 +328,7 @@ function CT_RATarget_SetMT(id, frame)
 		if ( id ~= 1 and not CT_RATarget.MainTanks[id-1] ) then
 			return;
 		end
-		
+
 		CT_RA_MainTanks[id] = UnitName("target");
 		for i = 1, GetNumRaidMembers(), 1 do
 			if ( UnitIsUnit("target", "raid" .. i) ) then
@@ -418,7 +418,7 @@ function CT_RATarget_AssistButton_OnClick(self)
 	end
 	CT_RATarget.assistPerson = nil;
 	self:GetParent():Hide();
-	PlaySound("UChatScrollButton");
+	PlaySound(1115);
 end
 
 -- Slash command

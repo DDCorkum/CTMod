@@ -322,7 +322,7 @@ local function CT_MapMod_GetCharKey()
 	-- hideMainTooltip == Hide the Notes button tooltip.
 
 	if ( not CT_MapMod_Options[characterKey] ) then
-		CT_MapMod_Options[characterKey] = { 
+		CT_MapMod_Options[characterKey] = {
 			autoHerbs = true,
 			autoMinerals = true,
 			hideGroups = {},
@@ -599,10 +599,10 @@ local function CT_MapMod_UpdateMap()
 	for i, var in pairs(notes) do
 		if (
 			-- If not hiding this set of notes, and
-			not CT_MapMod_Options[characterKey].hideGroups[(CT_MAPMOD_SETS[(var.set or 1)])] and 
+			not CT_MapMod_Options[characterKey].hideGroups[(CT_MAPMOD_SETS[(var.set or 1)])] and
 			(
 				-- not filtering the notes, or
-				not CT_MapMod_Filter or 
+				not CT_MapMod_Filter or
 
 				-- we are filtering the notes and the note's name matches the filter pattern, or
 				string.find(strlower(var.name), strlower(CT_MapMod_Filter)) or
@@ -620,7 +620,7 @@ local function CT_MapMod_UpdateMap()
 
 			note = _G["CT_UserMap_Note" .. count];
 			IconTexture = _G["CT_UserMap_Note" .. count .."Icon"];
-			
+
 			if ( var.set == 7 ) then
 				-- Herbalism notes.
 				-- If icon is 1 and the name is not what the default was, then try correcting the icon.
@@ -646,9 +646,9 @@ local function CT_MapMod_UpdateMap()
 			else
 				IconTexture:SetTexture("Interface\\AddOns\\CT_MapMod\\Skin\\" .. CT_UserMap_Icons[var.set]);
 			end
-			note:SetPoint("CENTER", "WorldMapDetailFrame", "TOPLEFT", var.x * WorldMapButton:GetWidth(), -var.y * WorldMapButton:GetHeight());			
+			note:SetPoint("CENTER", "WorldMapDetailFrame", "TOPLEFT", var.x * WorldMapButton:GetWidth(), -var.y * WorldMapButton:GetHeight());
 			note:Show();
-			
+
 			if ( not var.name ) then
 				var.name = "";
 			end
@@ -658,7 +658,7 @@ local function CT_MapMod_UpdateMap()
 			if ( not var.descript ) then
 				var.descript = "";
 			end
-	
+
 			note.name = var.name;
 			note.set = CT_MAPMOD_SETS[var.set];
 			note.descript = var.descript;
@@ -881,7 +881,7 @@ function CT_MapMod_NoteWindow_OnShow(self)
 	CT_MapMod_NoteWindowSendEB.lastsend = "";
 	CT_MapMod_NoteWindowSendEB:SetText("");
 
-	PlaySound("UChatScrollButton");
+	PlaySound(1115);
 end
 
 function CT_MapMod_NoteWindow_OnHide(self)
@@ -889,7 +889,7 @@ function CT_MapMod_NoteWindow_OnHide(self)
 	CT_MapMod_MapButtonFrame:Show();
 	CT_MapMod_MainButton:Enable();
 
-	PlaySound("UChatScrollButton");
+	PlaySound(1115);
 end
 
 function CT_MapMod_NoteWindow_Accept()
@@ -920,7 +920,7 @@ function CT_MapMod_NoteWindow_Accept()
 	note.descript = descript;
 	note.set = set;
 	note.icon = icon;
-	
+
 	CT_MapMod_NoteWindow:Hide();
 	CT_MapMod_UpdateMap();
 end
@@ -1001,7 +1001,7 @@ function CT_MapMod_FilterWindow_OnShow(self)
 	eb:SetText(CT_MapMod_Filter or "");
 	eb:HighlightText();
 
-	PlaySound("UChatScrollButton");
+	PlaySound(1115);
 end
 
 function CT_MapMod_FilterWindow_OnHide(self)
@@ -1009,7 +1009,7 @@ function CT_MapMod_FilterWindow_OnHide(self)
 	CT_MapMod_MapButtonFrame:Show();
 	CT_MapMod_MainButton:Enable();
 
-	PlaySound("UChatScrollButton");
+	PlaySound(1115);
 end
 
 function CT_MapMod_FilterWindow_Accept()
@@ -1158,7 +1158,7 @@ function CT_MapMod_SendNote()
 	descript = CT_MapMod_NoteWindowDescriptEB:GetText();
 	zone = CT_MapMod_NoteWindow.zone;
 	player = CT_MapMod_NoteWindowSendEB:GetText();
-	
+
 	note = CT_UserMap_Notes[zone][CT_MapMod_NoteWindow.note];
 
 	if ( not CT_MapMod_NoteWindow:IsVisible() or strlen(player) == 0 or not CT_UserMap_Zone[zone] ) then
@@ -1436,7 +1436,7 @@ local function CT_MapMod_Coord_ResetPositions()
 	for i = 1, CT_MapMod_GetMapSizeNumber("max") do
 		local optName = CT_MapMod_Coord_GetPositionOptionName(i);
 		CT_MapMod_Options[characterKey][optName] = nil;
-	end		
+	end
 	CT_MapMod_Coord_ResetPosition(false);
 end
 
@@ -1662,7 +1662,7 @@ function CT_MapMod_MainButton_OnClick(self, button)
 		dropdown.xOffset = 0;
 		dropdown.yOffset = 0;
 		ToggleDropDownMenu(1, nil, dropdown);
-		PlaySound("igMainMenuOptionCheckBoxOn");
+		PlaySound(856);
 	end
 end
 
@@ -1672,11 +1672,11 @@ local function CT_MapMod_MainButton_ResetPosition(clearSaved)
 	if ( WORLDMAP_SETTINGS.size == WORLDMAP_WINDOWED_SIZE ) then
 		-- Small size world map
 		CT_MapMod_MainButton:ClearAllPoints();
-		CT_MapMod_MainButton:SetPoint("RIGHT", WorldMapFrameSizeUpButton, "LEFT", 3, 0);
+		CT_MapMod_MainButton:SetPoint("RIGHT", WorldMapFrame.BorderFrame.MaximizeMinimizeFrame, "LEFT", 3, 0);
 	else
 		-- Full screen size world map
 		CT_MapMod_MainButton:ClearAllPoints();
-		CT_MapMod_MainButton:SetPoint("RIGHT", WorldMapFrameSizeUpButton, "LEFT", 3, 0);
+		CT_MapMod_MainButton:SetPoint("RIGHT", WorldMapFrame.BorderFrame.MaximizeMinimizeFrame, "LEFT", 3, 0);
 	end
 	if (clearSaved) then
 		local optName = CT_MapMod_MainButton_GetPositionOptionName();
@@ -1690,7 +1690,7 @@ local function CT_MapMod_MainButton_ResetPositions()
 	for i = 1, CT_MapMod_GetMapSizeNumber("max") do
 		local optName = CT_MapMod_MainButton_GetPositionOptionName(i);
 		CT_MapMod_Options[characterKey][optName] = nil;
-	end		
+	end
 	CT_MapMod_MainButton_ResetPosition(false);
 end
 
@@ -2090,7 +2090,7 @@ local function CT_MapMod_UpdateOldNotes()
 	for key, val in pairs(CT_UserMap_Notes) do
 		if ( type(key) == "number" and type(val) == "table" ) then
 			update = true;
-			-- Old notes 
+			-- Old notes
 			local tempvar = {
 				name = val.desc,
 				x = val.x,

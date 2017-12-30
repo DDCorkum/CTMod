@@ -151,7 +151,7 @@ function CT_Timer_UpdateTime(self, elapsed)
 
 		if ( CT_TimerData.time == 0 ) then
 			DEFAULT_CHAT_FRAME:AddMessage(format(CT_TIMER_FINISHCOUNT, CT_TimerData.countfrom), 1, 0.5, 0);
-			PlaySound("TellMessage");
+			PlaySound(3081);
 			CT_Timer_Reset();
 		else
 			CT_Timer_SetTime(CT_TimerData.time, CT_TimerFrame);

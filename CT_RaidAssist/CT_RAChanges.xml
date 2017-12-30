@@ -352,7 +352,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 						HideUIPanel(self:GetParent());
 					</OnClick>
 					<OnHide>
-						PlaySound("UChatScrollButton");
+						PlaySound(1115);
 					</OnHide>
 				</Scripts>
 			</Button>

@@ -112,7 +112,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 			</OnEnter>
 			<OnLeave>
 				_G[self:GetName() .. "Text"]:SetTextColor(1, 0.82, 0);
-				GameTooltip:Hide();						
+				GameTooltip:Hide();
 			</OnLeave>
 			<OnLoad>
 				self.text = "";
@@ -145,7 +145,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 			</OnEnter>
 			<OnLeave>
 				_G[self:GetName() .. "Text"]:SetTextColor(1, 1, 1);
-				GameTooltip:Hide();						
+				GameTooltip:Hide();
 			</OnLeave>
 			<OnLoad>
 				self.text = "";
@@ -178,7 +178,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 			</OnEnter>
 			<OnLeave>
 				_G[self:GetName() .. "Text"]:SetTextColor(1, 0.82, 0);
-				GameTooltip:Hide();						
+				GameTooltip:Hide();
 			</OnLeave>
 			<OnLoad>
 				self.text = "";
@@ -211,7 +211,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 			</OnEnter>
 			<OnLeave>
 				_G[self:GetName() .. "Text"]:SetTextColor(1, 1, 1);
-				GameTooltip:Hide();						
+				GameTooltip:Hide();
 			</OnLeave>
 			<OnLoad>
 				self.text = "";
@@ -3814,10 +3814,10 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				else
 					_G[self:GetName() .. "NameEB"]:SetText("");
 				end
-				PlaySound("UChatScrollButton");
+				PlaySound(1115);
 			</OnShow>
 			<OnHide>
-				PlaySound("UChatScrollButton");
+				PlaySound(1115);
 			</OnHide>
 		</Scripts>
 	</Frame>
@@ -3913,10 +3913,10 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 		<Scripts>
 			<OnShow>
 				_G[self:GetName() .. "Delete"]:SetText("Are you sure you want to delete\n'|c00FFFFFF" .. self.name .. "|r'?");
-				PlaySound("UChatScrollButton");
+				PlaySound(1115);
 			</OnShow>
 			<OnHide>
-				PlaySound("UChatScrollButton");
+				PlaySound(1115);
 			</OnHide>
 		</Scripts>
 	</Frame>

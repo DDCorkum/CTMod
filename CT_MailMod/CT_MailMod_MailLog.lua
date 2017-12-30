@@ -318,21 +318,21 @@ do
 			-- Having a moneyframe "here", but creating it dynamically later
 			-- Having several icons "here", but creating them dynamically later
 		}
-		
+
 		return "frame#n:CT_MailMod_MailLog#s:" .. defaultLogWidth .. ":500", {
 			"backdrop#tooltip#0:0:0:0.75",
 			"font#t:0:-10#v:GameFontNormalHuge#MAIL_LOG#1:1:1",
-			
+
 			"font#tl:60:-47#i:receiverHeading#v:GameFontNormalLarge#Receiver#1:1:1",
 			"font#tl:165:-47#i:senderHeading#v:GameFontNormalLarge#Sender#1:1:1",
 			"font#tl:270:-47#i:subjectHeading#v:GameFontNormalLarge#Subject#1:1:1",
 			"font#tl:475:-47#i:moneyHeading#v:GameFontNormalLarge#Money#1:1:1",
 			"font#tl:553:-47#i:itemsHeading#v:GameFontNormalLarge#Items#1:1:1",
-			
+
 			--"font#tl:20:-40#v:GameFontNormalLarge#Filter:#1:1:1",
 			--"dropdown#n:CT_MAILMOD_MAILLOGDROPDOWN1#tl:80:-43#All Mail#Incoming Mail#Outgoing Mail",
 			--"dropdown#n:CT_MAILMOD_MAILLOGDROPDOWN2#tl:220:-43#i:charDropdown#All Characters",
-			
+
 			["button#s:100:25#tr:-5:-5#n:CT_MailMod_Close_Button#v:GameMenuButtonTemplate#Close"] = {
 				["onclick"] = function(self)
 					HideUIPanel(CT_MailMod_MailLog);
@@ -364,7 +364,7 @@ do
 				["frame#s:0:20#tl:0:-380#r#i:20"] = scrollChild,
 				["frame#s:0:20#tl:0:-400#r#i:21"] = scrollChild,
 			},
-			
+
 			["onload"] = function(self)
 				self:SetFrameLevel(100);
 				self:EnableMouse(true);
@@ -466,7 +466,7 @@ do
 					module:moveMovable("MAILLOG");
 				end
 			end,
-			
+
 			["onmouseup"] = function(self, button)
 				if ( button == "LeftButton" ) then
 					module:stopMovable("MAILLOG");
@@ -476,19 +476,19 @@ do
 					self:SetPoint("CENTER", UIParent);
 				end
 			end,
-			
+
 			["onenter"] = function(self)
 				module:displayPredefinedTooltip(self, "DRAG");
 			end,
-			
+
 			["onleave"] = function(self)
 				module:hideTooltip();
 			end
 		};
 	end
-	
+
 	local updateMailEntry, mailLogFrame;
-	
+
 	do
 		local createMoneyFrame;
 		do
@@ -503,11 +503,11 @@ do
 			createMoneyFrame = function(parent, id) -- Local
 				local frameName = "CT_MailMod_MailLogMoneyFrame"..id;
 				local frame = CreateFrame("Frame", frameName, parent, "SmallMoneyFrameTemplate");
-				
+
 				_G[frameName.."GoldButton"]:EnableMouse(false);
 				_G[frameName.."SilverButton"]:EnableMouse(false);
 				_G[frameName.."CopperButton"]:EnableMouse(false);
-				
+
 				local diff = mailLogFrame:GetWidth() - defaultLogWidth;
 				frame:SetPoint("LEFT", parent, "LEFT", 470 + diff, 0);
 				frame.moneyType = "STATIC";
@@ -516,7 +516,7 @@ do
 				return frame;
 			end
 		end
-		
+
 		local createItemFrame;
 		do
 			local function itemOnEnter(self, ...)
@@ -541,7 +541,7 @@ do
 				return button;
 			end
 		end
-		
+
 		local function formatPlayer(name)
 			if ( name == module:getPlayerName() ) then
 				name = "\124cff888888Me\124r";
@@ -552,19 +552,19 @@ do
 			end
 			return name;
 		end
-		
+
 		updateMailEntry = function(frame, i, success, type, message, receiver, sender, subject, money, timestamp, ...) -- Local
 			local moneyFrame = frame.moneyFrame;
 			local items = select('#', ...);
-			
+
 			frame.timestamp = timestamp;
 
 			if ( success ) then
 				-- Success
-				
+
 				receiver = formatPlayer(receiver);
 				sender = formatPlayer(sender);
-				
+
 				frame.receiver:SetText(receiver);
 				frame.sender:SetText(sender);
 				frame.subject:SetText(subject);
@@ -596,7 +596,7 @@ do
 					frame.comment:SetText("");
 				end
 			end
-			
+
 			-- Icon
 --			frame.icon:SetTexture("Interface\\AddOns\\CT_MailMod\\Images\\mail_"..type);
 			if (type == "returned") then
@@ -632,7 +632,7 @@ do
 				MoneyFrame_Update(moneyFrame:GetName(), 0);
 				moneyFrame:Hide();
 			end
-			
+
 			-- Handling items
 			if (not frame.items) then
 				frame.items = {};
@@ -696,7 +696,7 @@ do
 		FauxScrollFrame_Update(CT_MailMod_MailLog_ScrollFrame, #getLogTable(), 21, 20);
 		local offset = FauxScrollFrame_GetOffset(CT_MailMod_MailLog_ScrollFrame);
 		local tostring, children, frame = tostring, mailLogFrame.scrollChildren;
-		
+
 		for i = 1, 21, 1 do
 			frame = children[tostring(i)];
 			local entry = getLogEntry(i+offset);
@@ -714,7 +714,7 @@ do
 			updateMailLog();
 		end
 	end
-	
+
 	local function showMailLog()
 		if ( not mailLogFrame ) then
 			mailLogFrame = module:getFrame(mailLogFrameSkeleton);
@@ -737,7 +737,7 @@ do
 			end
 		end
 	end
-	
+
 	function module:scaleMailLog()
 		if (mailLogFrame) then
 			mailLogFrame:SetScale(module.opt.logWindowScale);

@@ -19,23 +19,23 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				</FontString>
 			</Layer>
 		</Layers>
-		<NormalTexture name="$parentNormalTexture" file="Interface\Buttons\UI-RadioButton"> 
-			<TexCoords left="0" right="0.25" top="0" bottom="1"/> 
-		</NormalTexture>		
-		<DisabledTexture name="$parentDisabledTexture" file="Interface\Buttons\UI-RadioButton"> 
-			<TexCoords left="0" right="0.25" top="0" bottom="1"/> 
-		</DisabledTexture>		
-		<PushedTexture name="$parentPushedTexture" file="Interface\Buttons\UI-RadioButton"> 
-			<TexCoords left="0.25" right="0.5" top="0" bottom="1"/> 
-		</PushedTexture> 
+		<NormalTexture name="$parentNormalTexture" file="Interface\Buttons\UI-RadioButton">
+			<TexCoords left="0" right="0.25" top="0" bottom="1"/>
+		</NormalTexture>
+		<DisabledTexture name="$parentDisabledTexture" file="Interface\Buttons\UI-RadioButton">
+			<TexCoords left="0" right="0.25" top="0" bottom="1"/>
+		</DisabledTexture>
+		<PushedTexture name="$parentPushedTexture" file="Interface\Buttons\UI-RadioButton">
+			<TexCoords left="0.25" right="0.5" top="0" bottom="1"/>
+		</PushedTexture>
 		<HighlightTexture name="$parentHighlightTexture" file="Interface\Buttons\UI-RadioButton" alphaMode="ADD">
-			<TexCoords left="0.51" right="0.75" top="0" bottom="1"/> 
+			<TexCoords left="0.51" right="0.75" top="0" bottom="1"/>
 		</HighlightTexture>
-		<CheckedTexture name="$parentCheckedTexture" file="Interface\Buttons\UI-RadioButton"> 
-			<TexCoords left="0.25" right="0.5" top="0" bottom="1"/> 
-		</CheckedTexture> 
-		<DisabledCheckedTexture name="$parentDisabledCheckedTexture" file="Interface\Buttons\UI-RadioButton"> 
-			<TexCoords left="0.25" right="0.5" top="0" bottom="1"/> 
+		<CheckedTexture name="$parentCheckedTexture" file="Interface\Buttons\UI-RadioButton">
+			<TexCoords left="0.25" right="0.5" top="0" bottom="1"/>
+		</CheckedTexture>
+		<DisabledCheckedTexture name="$parentDisabledCheckedTexture" file="Interface\Buttons\UI-RadioButton">
+			<TexCoords left="0.25" right="0.5" top="0" bottom="1"/>
 		</DisabledCheckedTexture>
 		<Scripts>
 			<OnClick>
@@ -240,7 +240,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				</FontString>
 			</Layer>
 		</Layers>
-		
+
 		<Frames>
 			<Button name="$parentCloseButton" hidden="false">
 				<Size>
@@ -645,7 +645,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 					</Slider>
 				</Frames>
 			</Frame>
-			
+
 			<Frame name="$parentBox3" id="3" inherits="CT_UnitFramesOptionsBoxTemplate" hidden="true">
 				<Size>
 					<AbsDimension x="460" y="275"/>
@@ -1443,11 +1443,11 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				end
 			</OnMouseUp>
 			<OnHide>
-				PlaySound("UChatScrollButton");
+				PlaySound(1115);
 				self:StopMovingOrSizing();
 			</OnHide>
 			<OnShow>
-				PlaySound("UChatScrollButton");
+				PlaySound(1115);
 			</OnShow>
 		</Scripts>
 	</Frame>

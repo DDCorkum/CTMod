@@ -273,7 +273,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 					</OnLeave>
 				</Scripts>
 			</Frame>
-			
+
 			<Frame name="$parentSummary" hidden="false">
 				<Anchors>
 					<Anchor point="TOPLEFT"/>
@@ -770,7 +770,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 						<Scripts>
 							<OnClick>
 								CT_EH_SortLogBy(1);
-								PlaySound("igMainMenuOptionCheckBoxOn");
+								PlaySound(856);
 							</OnClick>
 						</Scripts>
 						<ButtonText text="CT_EH_LOGDATE">
@@ -797,7 +797,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 						<Scripts>
 							<OnClick>
 								CT_EH_SortLogBy(2);
-								PlaySound("igMainMenuOptionCheckBoxOn");
+								PlaySound(856);
 							</OnClick>
 						</Scripts>
 						<ButtonText text="CT_EH_LOGCHAR">
@@ -824,7 +824,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 						<Scripts>
 							<OnClick>
 								CT_EH_SortLogBy(3);
-								PlaySound("igMainMenuOptionCheckBoxOn");
+								PlaySound(856);
 							</OnClick>
 						</Scripts>
 						<ButtonText text="CT_EH_LOGTYPE">
@@ -851,7 +851,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 						<Scripts>
 							<OnClick>
 								CT_EH_SortLogBy(4);
-								PlaySound("igMainMenuOptionCheckBoxOn");
+								PlaySound(856);
 							</OnClick>
 						</Scripts>
 						<ButtonText text="CT_EH_LOGCOST">
@@ -1034,7 +1034,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				CT_EH_ProcessAnimation(self, elapsed);
 			</OnUpdate>
 			<OnHide>
-				PlaySound("UChatScrollButton");
+				PlaySound(1115);
 			</OnHide>
 		</Scripts>
 	</Frame>

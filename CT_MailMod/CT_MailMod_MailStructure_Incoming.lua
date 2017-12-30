@@ -27,7 +27,7 @@ function module:loadMail(id)
 	--
 	-- .id
 	-- .serial
-	-- 
+	--
 	-- These are updated by incMail:update()
 	-- .from
 	-- .sender
@@ -42,7 +42,7 @@ function module:loadMail(id)
 	-- .canReply
 	-- .isGM
 	-- .receiver
-	-- 
+	--
 	-- These are used by all of the incoming mail actions
 	-- and the mail log routines.
 	-- .logPending
@@ -52,7 +52,7 @@ function module:loadMail(id)
 	-- .logSuccess
 	-- .logMessage
 	-- .logPrint
-	-- 
+	--
 	-- Refer to individual actions for other object members.
 	--
 	local mail = setmetatable(module:getTable(), incMail_meta);
@@ -898,7 +898,7 @@ local function retrieveOpenItem(mail)
 
 				OpenMailFrame.updateButtonPositions = false;
 			end
-			PlaySound("igMainMenuOptionCheckBoxOn");
+			PlaySound(856);
 		end
 		return true;
 	end
@@ -1349,7 +1349,7 @@ function module:beginIncomingProcessing()
 
 	-- This is usually called after a user clicks a button
 	-- and actions are added to the mail action queue.
-	-- 
+	--
 	-- The INCOMING_START event can be use to prepare the UI
 	-- for processing. Certain items may need to be enabled
 	-- or disabled, etc.

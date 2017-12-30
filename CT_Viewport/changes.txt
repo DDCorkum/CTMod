@@ -1,5 +1,5 @@
-CT_Viewport (7.2.0.0) 2017-04-18
-- Updated for 7.2.0.
+CT_Viewport (7.3.0.0) 2017-09-03
+- Updated for 7.3.0.
 
 CT_Viewport (7.1.0.0) 2016-12-11
 - Updated for 7.1.0.
