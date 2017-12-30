@@ -335,7 +335,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 					</OnEscapePressed>
 				</Scripts>
 			</EditBox>
-			<Frame name="$parentGroupDropDown" inherits="UIDropDownMenuTemplate" hidden="false">
+			<Frame name="$parentGroupDropDown" inherits="Lib_UIDropDownMenuTemplate" hidden="false">
 				<Size>
 					<AbsDimension x="128" y="16"/>
 				</Size>
@@ -676,11 +676,10 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 		<Scripts>
 			<OnLoad>
 				self:RegisterEvent("PLAYER_LOGIN");
-				self:RegisterEvent("CHAT_MSG_OPENING");
-				self:RegisterEvent("UI_ERROR_MESSAGE");
 				self:RegisterEvent("PLAYER_ENTERING_WORLD");
 				self:RegisterEvent("DISPLAY_SIZE_CHANGED");
 				self:RegisterEvent("WORLD_MAP_UPDATE");
+				self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED");
 			</OnLoad>
 			<OnEvent>
 				CT_MapMod_EventFrame_OnEvent(self, event, ...);
@@ -741,7 +740,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 					<OnLoad>
 						self:SetClampedToScreen(true);
 						self:SetMovable(true);
-						self:SetFrameLevel(CT_MapMod_MapButtonFrame:GetFrameLevel()+1);
+						self:SetFrameLevel(CT_MapMod_MapButtonFrame:GetFrameLevel() + 1);
 					</OnLoad>
 				</Scripts>
 			</Frame>
@@ -783,14 +782,14 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 						self:SetClampedToScreen(true);
 						self:SetMovable(true);
 						self:RegisterForClicks("LeftButtonUp");
-						self:SetFrameLevel(CT_MapMod_MapButtonFrame:GetFrameLevel()+1);
+						self:SetFrameLevel(CT_MapMod_MapButtonFrame:GetFrameLevel() + 1);
 					</OnLoad>
 					<OnShow>
 						CT_MapMod_MainButton_OnShow(self);
 					</OnShow>
 				</Scripts>
 			</Button>
-			<Frame name="CT_MapMod_MainMenuDropDown" inherits="UIDropDownMenuTemplate" hidden="true">
+			<Frame name="CT_MapMod_MainMenuDropDown" inherits="Lib_UIDropDownMenuTemplate" hidden="true">
 				<Size>
 					<AbsDimension x="100" y="22"/>
 				</Size>

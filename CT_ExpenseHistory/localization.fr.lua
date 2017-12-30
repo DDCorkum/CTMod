@@ -4,12 +4,12 @@ if ( GetLocale() == "frFR" ) then
 	CT_EH_REAGENT = "Composant";
 	CT_EH_AMMO = "Munitions";
 	CT_EH_MAIL = "Courrier";
-	
+
 	CT_EH_LOGDATE = "Date";
 	CT_EH_LOGTYPE = "Type";
 	CT_EH_LOGCHAR = "Personnage";
 	CT_EH_LOGCOST = "Cost";
-	
+
 	CT_EH_AVERAGEREPAIR = "R\195\169paration Moyenne:";
 	CT_EH_AVERAGEEXPENSES = "D\195\169pense Moyenne/Jour:";
 	CT_EH_FLIGHTCOSTS = "Vols:";
@@ -17,17 +17,17 @@ if ( GetLocale() == "frFR" ) then
 	CT_EH_REAGENTCOSTS = "Composants:";
 	CT_EH_AMMOCOSTS = "Munitions:";
 	CT_EH_MAILCOSTS = "Envoie de Courrier:";
-	
+
 	CT_EH_TOTALCOST = "Montant D\195\169pens\195\169 Total:";
 	CT_EH_PLAYERDISTRIBUTION = "Distribution par Joueur:";
 	CT_EH_ALLSERVERS = "All Servers";
 	CT_EH_ALLCHARACTERS = "Tous les Personnages:";
 	CT_EH_RECORDINGFROM = "Donn\195\169es Enregistr\195\169es Depuis |c00FFFFFF%s|r.";
 	CT_EH_VIEWING = "Regarder |c00FFFFFF%s|r";
-	
+
 	CT_EH_SUMMARY = "Sommaire";
 	CT_EH_LOG = "Journal";
-	
+
 	-- Classes
 	CT_EH_WARRIOR = "Guerrier";
 	CT_EH_MAGE = "Mage";
@@ -82,7 +82,7 @@ if ( GetLocale() == "frFR" ) then
 		["hache de lancer grossi\195\168re"] = true,
 		["petit couteau de lancer"] = true
 	};
-	
+
 	CT_EH_MODINFO = {
 		"Expense History",
 		"Afficher Fen\195\170tre",

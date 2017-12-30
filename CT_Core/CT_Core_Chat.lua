@@ -1085,7 +1085,7 @@ local function setChatEditFocus(showFocus)
 				focus2:SetTexture(nil);
 				focus3:SetTexture(nil);
 			end
-		end			
+		end
 	end
 end
 
@@ -1126,7 +1126,7 @@ local function setChatEditBorder(showBorder)
 				border2:SetTexture(nil);
 				border3:SetTexture(nil);
 			end
-		end			
+		end
 	end
 end
 

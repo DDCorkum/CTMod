@@ -1,7 +1,10 @@
 ## Interface: 70300
-## Version: 7.3.0.0
+## Version: 7.3.2.0
 ## Title: CT_Library
 ## Notes: Library features for CTMod.
 ## DefaultState: Enabled
+
+Libs\LibStub\LibStub.lua
+Libs\UIDropDownMenu\UIDropDownMenu.xml
 
 CT_Library.lua

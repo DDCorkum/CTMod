@@ -222,7 +222,7 @@ local function buttonsUpdateEntry(index, object, isGroup, group)
 		else
 			displayObj.header:SetText("-");
 		end
-		
+
 		local spell = displayObj.spell;
 		spell:SetFontObject(GameFontNormalLarge);
 		spell:SetText(format("|c00FFD200%s|r", object.fullName));
@@ -300,7 +300,7 @@ local function buttonsUpdateList()
 			end
 		end
 	end
-	
+
 	-- Hide all other entries
 	for i = index + 1, 13 do
 		buttonsFrame[tostring(i)]:Hide();
@@ -324,7 +324,7 @@ local function buttonsUpdateScroll()
 		scrollFrame:SetVerticalScroll(prevOffset or 0);
 		return;
 	end
-	
+
 	-- Get number of entries in the list.
 	local numEntries = 0;
 	local objects = 0;
@@ -339,12 +339,12 @@ local function buttonsUpdateScroll()
 			end
 		end
 	end
-	
+
 	-- Update the display.
 	prevOffset = scrollFrame:GetVerticalScroll();
 	FauxScrollFrame_Update(CT_BarModOptionsKeyBindingsScrollFrame, numEntries, 13, 25);
 	buttonsUpdateList();
-	
+
 --	_G[scrollFrame:GetName().."ScrollChildFrame"]:SetHeight(scrollFrame:GetHeight());
 end
 
@@ -595,7 +595,7 @@ local function bindingsKeyPressed(key)
 	) then
 		return;
 	end
-	
+
 	-- Convert the mouse button names
 	if ( key == "LeftButton" ) then
 		key = "BUTTON1";
@@ -679,7 +679,7 @@ local function bindingsKeyPressed(key)
 		bindingsCancel();
 		return;
 	end
-	
+
 	if ( key == "BUTTON1") then
 		-- Don't allow mouse button 1 to be bound.
 		return;
@@ -705,7 +705,7 @@ local function bindingsKeyPressed(key)
 		-- Nothing selected.
 		return;
 	end
-	
+
 	if ( key == "BUTTON2" ) then
 		-- Delete the key binding.
 		if (not InCombatLockdown()) then
@@ -788,7 +788,7 @@ local function bindingsModeStart()
 				GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 				GameTooltip:SetText("Bar " .. self.group.num .. " Button " .. self.buttonNum, 1, 1, 1);
 				GameTooltip:AddLine("Left-click to change the binding.\nRight-click to see binding " .. nextBinding .. ".");
-				GameTooltip:Show();	
+				GameTooltip:Show();
 			else
 				local self = selectedButton;
 				if (self.tooltip) then
@@ -899,7 +899,7 @@ local function flyoutModeStart()
 				GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 				GameTooltip:SetText("Bar " .. self.group.num .. " Button " .. self.buttonNum, 1, 1, 1);
 				GameTooltip:AddLine("Click to change the direction\nof the flyout bar.");
-				GameTooltip:Show();	
+				GameTooltip:Show();
 			else
 				GameTooltip:Hide();
 			end
@@ -1016,15 +1016,15 @@ local function keyBindingOnLoad(self)
 
 	do
 		local function buttonsOptionDropdownClick(self)
-			local dropdown = UIDROPDOWNMENU_OPEN_MENU;
+			local dropdown = LIB_UIDROPDOWNMENU_OPEN_MENU;
 			-- 7.0.3
 			if not dropdown then
-				dropdown = UIDROPDOWNMENU_INIT_MENU
+				dropdown = LIB_UIDROPDOWNMENU_INIT_MENU
 			end
 			if ( dropdown ) then
 				local value = self.value;
 				local option = dropdown.option;
-				UIDropDownMenu_SetSelectedValue(dropdown, value);
+				Lib_UIDropDownMenu_SetSelectedValue(dropdown, value);
 				if ( option ) then
 					dropdown.object:setOption(option, value, not dropdown.global);
 				end
@@ -1034,18 +1034,18 @@ local function keyBindingOnLoad(self)
 		end
 
 		local dropdownEntry = {};
-		UIDropDownMenu_Initialize(CT_BarModDropButtonOptions, function()
+		Lib_UIDropDownMenu_Initialize(CT_BarModDropButtonOptions, function()
 			for i = 1, #buttonsModes, 1 do
 				dropdownEntry.text = buttonsModes[i].name;
 				dropdownEntry.value = i;
 				dropdownEntry.checked = nil;
 				dropdownEntry.func = buttonsOptionDropdownClick;
-				UIDropDownMenu_AddButton(dropdownEntry);
+				Lib_UIDropDownMenu_AddButton(dropdownEntry);
 			end
 		end);
 	end
 
-	UIDropDownMenu_SetSelectedValue(CT_BarModDropButtonOptions, 1);
+	Lib_UIDropDownMenu_SetSelectedValue(CT_BarModDropButtonOptions, 1);
 
 	buttonsSetMode();
 end
@@ -1124,7 +1124,7 @@ local function setActionBindings()
 			elseif (groupId == 5) then
 				useDefault = module:getOption("bar6Bindings") ~= false;
 			end
-		
+
 			if (showBar) then
 				local buttonObjs = groupObj.objects;
 				local action;

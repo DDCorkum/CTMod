@@ -329,7 +329,7 @@ end
 
 function CT_RA_MTPlayers_SetValue(new, current)
 	-- ----------
-	-- General routine to set value to new value of 0 or 1, 
+	-- General routine to set value to new value of 0 or 1,
 	-- or to toggle between those two values if new value is nil.
 	-- ----------
 	local value;
@@ -1350,7 +1350,7 @@ function CT_RA_MTPlayers_EK_RA_UpdateMTPs(forceUpdate)
 					end
 					isOnline = UnitIsConnected(raidid) or false;
 
-					if ( 
+					if (
 						forceUpdate
 						or name ~= ( frame.unitName or "" )
 						or hppercent ~= ( frame.hppercent or -1 )
@@ -1432,11 +1432,11 @@ function CT_RA_MTPlayers_EK_RA_UpdateMTPs(forceUpdate)
 						isDead = false;
 					end
 					isOnline = UnitIsConnected(raidid) or false;
-					if ( 
+					if (
 						forceUpdate
 						or name ~= ( frame.unitName or "" )
 						or hppercent ~= ( frame.hppercent or -1 )
-						or mppercent ~= ( frame.mppercent or -1 ) 
+						or mppercent ~= ( frame.mppercent or -1 )
 						or isOnline ~= frame.ekisOnline  -- not UnitIsConnected(raidid)
 						or isDead ~= frame.ekisDead
 					) then
@@ -1797,11 +1797,11 @@ function CT_RA_MTPlayers_EK_RA_UpdateRaidFrames()
 
 	local tempOptions = CT_RAMenu_Options["temp"];
 	local numRaidMembers = CT_RA_NumRaidMembers;
-	
+
 	local showGroups = tempOptions["ShowGroups"];
 	local lockGroups = tempOptions["LockGroups"];
 	local hideNames = tempOptions["HideNames"];
-	
+
 
 	if (showmtplayers) then
 		-- Main Tank Players
@@ -2073,7 +2073,7 @@ local function prepareFrame(frame, dragFrame, template, initFunction, title, spl
 	local showHorizontal = splitView == nil and tempOptions["ShowHorizontal"];
 	local hideBorder = tempOptions["HideBorder"];
 	local removeSpace = hideBorder and tempOptions["HideSpace"];
-	
+
 	if ( splitView ~= 1 and not frame.init ) then
 		frame:SetAttribute("template", template);
 		frame.GroupName = frameCache[frame].GroupName;
@@ -2088,7 +2088,7 @@ local function prepareFrame(frame, dragFrame, template, initFunction, title, spl
 		end
 		frame.init = true;
 	end
-	
+
 	-- Clear all points for each of the child frames.
 	-- Not doing so causes a problem when switching between
 	-- horizontal and vertical orientation. We may end up
@@ -2649,7 +2649,7 @@ function CT_RA_MTPlayers_CT_RAMTGroupDragOnMouseDown(self, button)
 				CT_RA_MTPlayers_DropDown_OnLoad(oDrop);
 				dropdownInitialized = true;
 			end
-			ToggleDropDownMenu(1, nil, oDrop, cFrame, 47, 15);
+			Lib_ToggleDropDownMenu(1, nil, oDrop, cFrame, 47, 15);
 			return;
 		end
 	end
@@ -2857,7 +2857,7 @@ function CT_RA_MTPlayers_DropDown_OnLoad(self)
 	-- ----------
 	-- Initialize drop down menu when it is loaded.
 	-- ----------
-	UIDropDownMenu_Initialize(self, CT_RA_MTPlayers_DropDown_InitButtons, "MENU");
+	Lib_UIDropDownMenu_Initialize(self, CT_RA_MTPlayers_DropDown_InitButtons, "MENU");
 end
 
 
@@ -2970,7 +2970,7 @@ function CT_RA_MTPlayers_DropDown_InitButtons(self)
 	info.isTitle = 1;
 	info.justifyH = "CENTER";
 	info.notCheckable = 1;
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	info.text = CT_RA_MTPlayers_TEXT_Menu_Show_MTTargets;
@@ -2986,7 +2986,7 @@ function CT_RA_MTPlayers_DropDown_InitButtons(self)
 	if (InCombatLockdown()) then
 		info.disabled = 1;
 	end
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	info.text = "    " .. CT_RA_MTPlayers_TEXT_Menu_Show_MTTTargets;
@@ -3005,7 +3005,7 @@ function CT_RA_MTPlayers_DropDown_InitButtons(self)
 	if (InCombatLockdown()) then
 		info.disabled = 1;
 	end
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	info.text = CT_RA_MTPlayers_TEXT_Menu_Show_MTPlayers;
@@ -3021,7 +3021,7 @@ function CT_RA_MTPlayers_DropDown_InitButtons(self)
 	if (InCombatLockdown()) then
 		info.disabled = 1;
 	end
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	info.text = "    " .. CT_RA_MTPlayers_TEXT_Menu_Hide_MTAndPlayers;
@@ -3040,7 +3040,7 @@ function CT_RA_MTPlayers_DropDown_InitButtons(self)
 	if (InCombatLockdown()) then
 		info.disabled = 1;
 	end
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	info.text = "    " .. CT_RA_MTPlayers_TEXT_Menu_Show_PlayerBuffs;
@@ -3056,7 +3056,7 @@ function CT_RA_MTPlayers_DropDown_InitButtons(self)
 	if (tempOptions["ctmtp_MTPlayers"] ~= 1) then
 		info.disabled = 1;
 	end
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	info.text = CT_RA_MTPlayers_TEXT_Menu_Show_MTPets;
@@ -3072,7 +3072,7 @@ function CT_RA_MTPlayers_DropDown_InitButtons(self)
 	if (InCombatLockdown()) then
 		info.disabled = 1;
 	end
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	info.text = "    " .. CT_RA_MTPlayers_TEXT_Menu_Hide_MTAndPets;
@@ -3091,7 +3091,7 @@ function CT_RA_MTPlayers_DropDown_InitButtons(self)
 	if (InCombatLockdown()) then
 		info.disabled = 1;
 	end
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	if (tempOptions["ctmtp_GroupHasNoPet"] == 1) then
@@ -3110,7 +3110,7 @@ function CT_RA_MTPlayers_DropDown_InitButtons(self)
 	if (InCombatLockdown()) then
 		info.disabled = 1;
 	end
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
 --	info = { };
 --	if (tempOptions["ctmtp_PlayerHasNoPet"] == 1) then
@@ -3129,7 +3129,7 @@ function CT_RA_MTPlayers_DropDown_InitButtons(self)
 --	if (InCombatLockdown()) then
 --		info.disabled = 1;
 --	end
---	UIDropDownMenu_AddButton(info);
+--	Lib_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	if (tempOptions["ctmtp_LockJoined"] == 1) then
@@ -3145,7 +3145,7 @@ function CT_RA_MTPlayers_DropDown_InitButtons(self)
 	if (InCombatLockdown()) then
 		info.disabled = 1;
 	end
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	if (tempOptions["ctmtp_SidePlayer"] == 1) then
@@ -3164,7 +3164,7 @@ function CT_RA_MTPlayers_DropDown_InitButtons(self)
 	if (InCombatLockdown()) then
 		info.disabled = 1;
 	end
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	if (tempOptions["ctmtp_SidePet"] == 1) then
@@ -3183,7 +3183,7 @@ function CT_RA_MTPlayers_DropDown_InitButtons(self)
 	if (InCombatLockdown()) then
 		info.disabled = 1;
 	end
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	if (tempOptions["ctmtp_SidePetPlayer"] == 1) then
@@ -3202,7 +3202,7 @@ function CT_RA_MTPlayers_DropDown_InitButtons(self)
 	if (InCombatLockdown()) then
 		info.disabled = 1;
 	end
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	if (tempOptions["ctmtp_GapHide"] == 1) then
@@ -3221,7 +3221,7 @@ function CT_RA_MTPlayers_DropDown_InitButtons(self)
 	if (InCombatLockdown()) then
 		info.disabled = 1;
 	end
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	if (tempOptions["ctmtp_AlignToTitle"] == 1) then
@@ -3237,14 +3237,16 @@ function CT_RA_MTPlayers_DropDown_InitButtons(self)
 	if (tempOptions["ctmtp_LockJoined"] == 1) then
 		info.disabled = 1;
 	end
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	info.text = CT_RA_MTPlayers_TEXT_Menu_Close;
-	info.func = function() CloseDropDownMenus() end;
+	info.func = function()
+		Lib_CloseDropDownMenus()
+	end;
 	info.arg1 = 1;
 	info.notCheckable = 1;
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 end
 
 
@@ -3379,7 +3381,7 @@ function CT_RA_MTPlayers_CT_RA_UpdateRaidGroupColors()
 			local name = CT_RA_MTPlayers_UnitName(raidid);
 			if ( CT_RA_Stats[name] ) then
 				CT_RA_MTPlayers_MTP_UpdateUnitBuffs(CT_RA_Stats[name]["Buffs"], member, name);
-			end	
+			end
 		end
 		y = y + 1;
 		member = CT_RAMTGroupPlayer:GetAttribute("child".. y);
@@ -3590,7 +3592,7 @@ function CT_RA_MTPlayers_CT_RA_MemberFrame_OnEnter(self)
 	if (ctype) then
 		GameTooltip:AddLine(ctype, 1, 1, 1);
 	end
-	
+
 	if (UnitIsDead(unitid)) then
 		GameTooltip:AddLine("Dead");
 	end

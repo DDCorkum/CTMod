@@ -1,3 +1,4 @@
+
 ------------------------------------------------
 --                 CT_MapMod                  --
 --                                            --
@@ -64,117 +65,361 @@ local UnitName = UnitName
 --------------------------------------------
 -- General Mod Code (recode imminent!)
 
-CT_UserMap_Notes = {};
+CT_UserMap_Notes = {};  -- Used mapName as key before version 7.3; now uses integer mapID
 
-CT_UserMap_Zone = {};
-CT_UserMap_Zone["Alterac Mountains"] = 1;
-CT_UserMap_Zone["Arathi Highlands"] = 2;
-CT_UserMap_Zone["Badlands"] = 3;
-CT_UserMap_Zone["Blackrock Spire"] = 4;
-CT_UserMap_Zone["Blasted Lands"] = 5;
-CT_UserMap_Zone["Tirisfal Glades"] = 6;
-CT_UserMap_Zone["Silverpine Forest"] = 7;
-CT_UserMap_Zone["Western Plaguelands"] = 8;
-CT_UserMap_Zone["Eastern Plaguelands"] = 9;
-CT_UserMap_Zone["Hillsbrad Foothills"] = 10;
-CT_UserMap_Zone["The Hinterlands"] = 11;
-CT_UserMap_Zone["Dun Morogh"] = 12;
-CT_UserMap_Zone["Searing Gorge"] = 13;
-CT_UserMap_Zone["Burning Steppes"] = 14;
-CT_UserMap_Zone["Elwynn Forest"] = 15;
-CT_UserMap_Zone["Darrowmere Lake"] = 16;
-CT_UserMap_Zone["Deadwind Pass"] = 17;
-CT_UserMap_Zone["Duskwood"] = 18;
-CT_UserMap_Zone["Loch Modan"] = 19;
-CT_UserMap_Zone["Redridge Mountains"] = 20;
-CT_UserMap_Zone["Stranglethorn Vale"] = 21;
-CT_UserMap_Zone["Swamp of Sorrows"] = 22;
-CT_UserMap_Zone["Westfall"] = 23;
-CT_UserMap_Zone["Wetlands"] = 24;
-CT_UserMap_Zone["Stonetalon Mountains"] = 25;
-CT_UserMap_Zone["Dustwallow Marsh"] = 26;
-CT_UserMap_Zone["Feralas"] = 27;
-CT_UserMap_Zone["Tanaris"] = 28;
-CT_UserMap_Zone["Durotar"] = 29;
-CT_UserMap_Zone["Mulgore"] = 30;
-CT_UserMap_Zone["The Barrens"] = 31;
-CT_UserMap_Zone["Teldrassil"] = 32;
-CT_UserMap_Zone["Darkshore"] = 33;
-CT_UserMap_Zone["Ashenvale"] = 34;
-CT_UserMap_Zone["Desolace"] = 35;
-CT_UserMap_Zone["Thousand Needles"] = 36;
-CT_UserMap_Zone["Azshara"] = 37;
-CT_UserMap_Zone["Felwood"] = 38;
-CT_UserMap_Zone["Un'Goro Crater"] = 39;
-CT_UserMap_Zone["Moonglade"] = 40;
-CT_UserMap_Zone["Stormwind City"] = 41;
-CT_UserMap_Zone["Ironforge"] = 42;
-CT_UserMap_Zone["Undercity"] = 43;
-CT_UserMap_Zone["Darnassus"] = 44;
-CT_UserMap_Zone["Durotar"] = 45;
-CT_UserMap_Zone["Orgrimmar"] = 46;
-CT_UserMap_Zone["Silithus"] = 47;
-CT_UserMap_Zone["Thunder Bluff"] = 48;
-CT_UserMap_Zone["Winterspring"] = 49;
-CT_UserMap_Zone["Blade's Edge Mountains"] = 50;
-CT_UserMap_Zone["Hellfire Peninsula"] = 51;
-CT_UserMap_Zone["Nagrand"] = 52;
-CT_UserMap_Zone["Netherstorm"] = 53;
-CT_UserMap_Zone["Shadowmoon Valley"] = 54;
-CT_UserMap_Zone["Shattrah City"] = 55;
-CT_UserMap_Zone["Terokkar Forest"] = 56;
-CT_UserMap_Zone["Zangarmarsh"] = 57;
-CT_UserMap_Zone["Azuremyst Isle"] = 58;
-CT_UserMap_Zone["Bloodmyst Isle"] = 59;
-CT_UserMap_Zone["The Exodar"] = 60;
-CT_UserMap_Zone["Eversong Woods"] = 61;
-CT_UserMap_Zone["Ghostlands"] = 62;
-CT_UserMap_Zone["Silvermoon City"] = 63;
-CT_UserMap_Zone["Isle of Quel'Danas"] = 64;
-CT_UserMap_Zone["Borean Tundra"] = 65;
-CT_UserMap_Zone["Crystalsong Forest"] = 66;
-CT_UserMap_Zone["Dalaran"] = 67;
-CT_UserMap_Zone["Dragonblight"] = 68;
-CT_UserMap_Zone["Grizzly Hills"] = 69;
-CT_UserMap_Zone["Howling Fjord"] = 70;
-CT_UserMap_Zone["Icecrown"] = 71;
-CT_UserMap_Zone["Sholazar Basin"] = 72;
-CT_UserMap_Zone["The Storm Peaks"] = 73;
-CT_UserMap_Zone["Wintergrasp"] = 74;
-CT_UserMap_Zone["Zul'Drak"] = 75;
-CT_UserMap_Zone["Hrothgar's Landing"] = 76;
-CT_UserMap_Zone["Ahn'Qiraj: The Fallen Kingdom"] = 77;
-CT_UserMap_Zone["Mount Hyjal"] = 78;
-CT_UserMap_Zone["Northern Barrens"] = 79;
-CT_UserMap_Zone["Southern Barrens"] = 80;
-CT_UserMap_Zone["Uldum"] = 81;
-CT_UserMap_Zone["Abyssal Depths"] = 82;
-CT_UserMap_Zone["Kelp'thar Forest"] = 83;
-CT_UserMap_Zone["Northern Stranglethorn"] = 84;
-CT_UserMap_Zone["Ruins of Gilneas"] = 85;
-CT_UserMap_Zone["Ruins of Gilneas City"] = 86;
-CT_UserMap_Zone["Shimmering Expanse"] = 87;
-CT_UserMap_Zone["The Cape of Stranglethorn"] = 88;
-CT_UserMap_Zone["Tol Barad"] = 89;
-CT_UserMap_Zone["Tol Barad Peninsula"] = 90;
-CT_UserMap_Zone["Twilight Highlands"] = 91;
-CT_UserMap_Zone["Vashj'ir"] = 92;
-CT_UserMap_Zone["Deepholm"] = 93;
-CT_UserMap_Zone["Kezan"] = 94;
-CT_UserMap_Zone["The Lost Isles"] = 95;
-CT_UserMap_Zone["The Maelstrom"] = 96;
--- Mists of Pandaria
-CT_UserMap_Zone["Dread Wastes"] = 97;
-CT_UserMap_Zone["Krasarang Wilds"] = 98;
-CT_UserMap_Zone["Kun-Lai Summit"] = 99;
-CT_UserMap_Zone["The Jade Forest"] = 100;
-CT_UserMap_Zone["The Veiled Stair"] = 101;
-CT_UserMap_Zone["Townlong Steppes"] = 102;
-CT_UserMap_Zone["Vale of Eternal Blossoms"] = 103;
-CT_UserMap_Zone["Valley of the Four Winds"] = 104;
-CT_UserMap_Zone["Shrine of Seven Stars"] = 105;
-CT_UserMap_Zone["Shrine of Two Moons"] = 106;
-CT_UserMap_Zone["The Wandering Isle"] = 107;
+
+-- DEPRECIATED -- REQUIRED ONLY TO TRANSITION OLD NOTES TO THE NEW VERSION IN 7.3
+CT_UserMap_Zone = {};   -- Necessary only to convert notes from mapName to mapID keys
+
+-- Kalimdor
+CT_UserMap_Zone["Ahn'Qiraj: The Fallen Kingdom"] = "772:0";
+CT_UserMap_Zone["Ammen Vale"] = "894:0";
+CT_UserMap_Zone["Ashenvale"] = "43:0";
+CT_UserMap_Zone["Azshara"] = "181:0";
+CT_UserMap_Zone["Azuremyst Isle"] = "464:0";
+CT_UserMap_Zone["Bloodmyst Isle"] = "476:0";
+CT_UserMap_Zone["Camp Narache"] = "890:0";
+CT_UserMap_Zone["Darkshore"] = "42:0";
+CT_UserMap_Zone["Darnassus"] = "381:0";
+CT_UserMap_Zone["Desolace"] = "101:0";
+CT_UserMap_Zone["Durotar"] = "4:0";
+CT_UserMap_Zone["Dustwallow Marsh"] = "141:0";
+CT_UserMap_Zone["Echo Isles"] = "891:0";
+CT_UserMap_Zone["Felwood"] = "182:0";
+CT_UserMap_Zone["Feralas"] = "121:0";
+CT_UserMap_Zone["Molten Front"] = "795:0";
+CT_UserMap_Zone["Moonglade"] = "241:0";
+CT_UserMap_Zone["Mount Hyjal"] = "606:0";
+CT_UserMap_Zone["Mulgore"] = "9:0";
+CT_UserMap_Zone["Northern Barrens"] = "11:0";
+CT_UserMap_Zone["Orgrimmar"] = "321:0";
+CT_UserMap_Zone["Shadowglen"] = "888:0";
+CT_UserMap_Zone["Silithus"] = "261:0";
+CT_UserMap_Zone["Southern Barrens"] = "607:0";
+CT_UserMap_Zone["Stonetalon Mountains"] = "81:0";
+CT_UserMap_Zone["Tanaris"] = "161:0";
+CT_UserMap_Zone["Teldrassil"] = "41:0";
+CT_UserMap_Zone["The Exodar"] = "471:0";
+CT_UserMap_Zone["Thousand Needles"] = "61:0";
+CT_UserMap_Zone["Thunder Bluff"] = "362:0";
+CT_UserMap_Zone["Uldum"] = "720:0";
+CT_UserMap_Zone["Un'Goro Crater"] = "201:0";
+CT_UserMap_Zone["Valley of Trials"] = "889:0";
+CT_UserMap_Zone["Winterspring"] = "281:0";
+
+-- Eastern Kingdoms
+CT_UserMap_Zone["Abyssal Depths"] = "614:0";
+CT_UserMap_Zone["Arathi Highlands"] = "16:0";
+CT_UserMap_Zone["Badlands"] = "17:0";
+CT_UserMap_Zone["Blasted Lands"] = "19:0";
+CT_UserMap_Zone["Burning Steppes"] = "29:0";
+CT_UserMap_Zone["Coldridge Valley"] = "866:0";
+CT_UserMap_Zone["Deadwind Pass"] = "32:0";
+CT_UserMap_Zone["Deathknell"] = "892:0";
+CT_UserMap_Zone["Dun Morogh"] = "27:0";
+CT_UserMap_Zone["Duskwood"] = "34:0";
+CT_UserMap_Zone["Eastern Plaguelands"] = "23:0";
+CT_UserMap_Zone["Elwynn Forest"] = "30:0";
+CT_UserMap_Zone["Eversong Woods"] = "462:0";
+CT_UserMap_Zone["Ghostlands"] = "463:0";
+CT_UserMap_Zone["Gilneas"] = "545:0";
+CT_UserMap_Zone["Gilneas City"] = "611:0";
+CT_UserMap_Zone["Hillsbrad Foothills"] = "24:0";
+CT_UserMap_Zone["Ironforge"] = "341:0";
+CT_UserMap_Zone["Isle of Quel'Danas"] = "499:0";
+CT_UserMap_Zone["Kelp'thar Forest"] = "610:0";
+CT_UserMap_Zone["Loch Modan"] = "35:0";
+CT_UserMap_Zone["New Tinkertown"] = "895:0";
+CT_UserMap_Zone["Northern Stranglethorn"] = "37:0";
+CT_UserMap_Zone["Northshire"] = "864:0";
+CT_UserMap_Zone["Redridge Mountains"] = "36:0";
+CT_UserMap_Zone["Ruins of Gilneas"] = "684:0";
+CT_UserMap_Zone["Ruins of Gilneas City"] = "685:0";
+CT_UserMap_Zone["Searing Gorge"] = "28:0";
+CT_UserMap_Zone["Shimmering Expanse"] = "615:0";
+CT_UserMap_Zone["Silvermoon City"] = "480:0";
+CT_UserMap_Zone["Silverpine Forest"] = "21:0";
+CT_UserMap_Zone["Stormwind City"] = "301:0";
+CT_UserMap_Zone["Stranglethorn Vale"] = "689:0";
+CT_UserMap_Zone["Sunstrider Isle"] = "893:0";
+CT_UserMap_Zone["Swamp of Sorrows"] = "38:0";
+CT_UserMap_Zone["The Cape of Stranglethorn"] = "673:0";
+CT_UserMap_Zone["The Hinterlands"] = "26:0";
+CT_UserMap_Zone["The Scarlet Enclave"] = "502:0";
+CT_UserMap_Zone["Tirisfal Glades"] = "20:0";
+CT_UserMap_Zone["Tol Barad"] = "708:0";
+CT_UserMap_Zone["Tol Barad Peninsula"] = "709:0";
+CT_UserMap_Zone["Twilight Highlands"] = "700:0";
+CT_UserMap_Zone["Undercity"] = "382:0";
+CT_UserMap_Zone["Vashj'ir"] = "613:0";
+CT_UserMap_Zone["Western Plaguelands"] = "22:0";
+CT_UserMap_Zone["Westfall"] = "39:0";
+CT_UserMap_Zone["Wetlands"] = "40:0";
+
+-- Outland
+CT_UserMap_Zone["Blade's Edge Mountains"] = "475:0";
+CT_UserMap_Zone["Hellfire Peninsula"] = "465:0";
+CT_UserMap_Zone["Nagrand"] = "477:0";
+CT_UserMap_Zone["Netherstorm"] = "479:0";
+CT_UserMap_Zone["Shadowmoon Valley"] = "473:0";
+CT_UserMap_Zone["Shattrath City"] = "481:0";
+CT_UserMap_Zone["Terokkar Forest"] = "478:0";
+CT_UserMap_Zone["Zangarmarsh"] = "467:0";
+
+-- Northrend
+CT_UserMap_Zone["Borean Tundra"] = "486:0";
+CT_UserMap_Zone["Crystalsong Forest"] = "510:0";
+--CT_UserMap_Zone["Dalaran"] = "504:0";  -- will assume dal is the legion one
+CT_UserMap_Zone["Dragonblight"] = "488:0";
+CT_UserMap_Zone["Grizzly Hills"] = "490:0";
+CT_UserMap_Zone["Howling Fjord"] = "491:0";
+CT_UserMap_Zone["Hrothgar's Landing"] = "541:0";
+CT_UserMap_Zone["Icecrown"] = "492:0";
+CT_UserMap_Zone["Sholazar Basin"] = "493:0";
+CT_UserMap_Zone["The Storm Peaks"] = "495:0";
+CT_UserMap_Zone["Wintergrasp"] = "501:0";
+CT_UserMap_Zone["Zul'Drak"] = "496:0";
+
+-- The Maelstrom
+CT_UserMap_Zone["Deepholm"] = "640:0";
+CT_UserMap_Zone["Kezan"] = "605:0";
+CT_UserMap_Zone["The Lost Isles"] = "544:0";
+
+-- Pandaria
+CT_UserMap_Zone["Dread Wastes"] = "858:0";
+CT_UserMap_Zone["Isle of Giants"] = "929:0";
+CT_UserMap_Zone["Isle of Thunder"] = "928:0";
+CT_UserMap_Zone["Krasarang Wilds"] = "857:0";
+CT_UserMap_Zone["Kun-Lai Summit"] = "809:0";
+CT_UserMap_Zone["Shrine of Seven Stars"] = "905:0";
+CT_UserMap_Zone["Shrine of Two Moons"] = "903:0";
+CT_UserMap_Zone["The Jade Forest"] = "806:0";
+CT_UserMap_Zone["The Veiled Stair"] = "873:0";
+CT_UserMap_Zone["The Wandering Isle"] = "808:0";
+CT_UserMap_Zone["Timeless Isle"] = "951:0";
+CT_UserMap_Zone["Townlong Steppes"] = "810:0";
+CT_UserMap_Zone["Vale of Eternal Blossoms"] = "811:0";
+CT_UserMap_Zone["Valley of the Four Winds"] = "807:0";
+
+-- Draenor
+CT_UserMap_Zone["Ashran"] = "978:0";
+CT_UserMap_Zone["Frostfire Ridge"] = "941:0";
+CT_UserMap_Zone["Frostwall"] = "976:0";
+CT_UserMap_Zone["Gorgrond"] = "949:0";
+CT_UserMap_Zone["Lunarfall"] = "971:0";
+CT_UserMap_Zone["Nagrand"] = "950:0";
+CT_UserMap_Zone["Shadowmoon Valley"] = "947:0";
+CT_UserMap_Zone["Spires of Arak"] = "948:0";
+CT_UserMap_Zone["Stormshield"] = "1009:0";
+CT_UserMap_Zone["Talador"] = "946:0";
+CT_UserMap_Zone["Tanaan Jungle"] = "945:0";
+CT_UserMap_Zone["Tanaan Jungle - Assault on the Dark Portal"] = "970:0";
+CT_UserMap_Zone["Warspear"] = "1011:0";
+
+-- Legion
+CT_UserMap_Zone["Aszuna"] = "1015:0";
+CT_UserMap_Zone["Highmountain"] = "1024:0";
+CT_UserMap_Zone["Stormheim"] = "1017:0";
+CT_UserMap_Zone["Suramar"] = "1033:0";
+CT_UserMap_Zone["Val'sharah"] = "1018:0";
+CT_UserMap_Zone["Antoran Wastes"] = "1171:0";
+CT_UserMap_Zone["Krokuun"] = "1135:0";
+CT_UserMap_Zone["Dalaran"] = "1014-10";
+
+
+-- Battlegrounds
+CT_UserMap_Zone["Alterac Valley"] = "401:1";
+CT_UserMap_Zone["Arathi Basin"] = "461:1";
+CT_UserMap_Zone["Deepwind Gorge"] = "935:1";
+CT_UserMap_Zone["Eye of the Storm"] = "482:1";
+CT_UserMap_Zone["Isle of Conquest"] = "540:1";
+CT_UserMap_Zone["Silvershard Mines"] = "860:1";
+CT_UserMap_Zone["Strand of the Ancients"] = "512:1";
+CT_UserMap_Zone["Temple of Kotmogu"] = "856:1";
+CT_UserMap_Zone["The Battle for Gilneas"] = "736:1";
+CT_UserMap_Zone["Twin Peaks"] = "626:1";
+CT_UserMap_Zone["Warsong Gulch"] = "443:1";
+
+-- Scenarios
+CT_UserMap_Zone["A Brewing Storm"] = "878:1";
+CT_UserMap_Zone["A Little Patience"] = "912:1";
+CT_UserMap_Zone["Arena of Annihilation"] = "899:1";
+CT_UserMap_Zone["Assault on Zan'vess"] = "883:1";
+CT_UserMap_Zone["Battle on the High Seas"] = "940:1";
+CT_UserMap_Zone["Blood in the Snow"] = "939:1";
+CT_UserMap_Zone["Brewmoon Festival"] = "884:1";
+CT_UserMap_Zone["Celestial Tournament"] = "955:1";
+CT_UserMap_Zone["Crypt of Forgotten Kings"] = "900:1";
+CT_UserMap_Zone["Dagger in the Dark"] = "914:1";
+CT_UserMap_Zone["Dark Heart of Pandaria"] = "937:1";
+CT_UserMap_Zone["Domination Point (H)"] = "920:1";
+CT_UserMap_Zone["Greenstone Village"] = "880:1";
+CT_UserMap_Zone["Lion's Landing (A)"] = "911:1";
+CT_UserMap_Zone["Malorne's Nightmare"] = "1086:1";
+CT_UserMap_Zone["The Road to Fel"] = "1099:1";
+CT_UserMap_Zone["The Secrets of Ragefire"] = "938:1";
+CT_UserMap_Zone["Theramore's Fall (A)"] = "906:1";
+CT_UserMap_Zone["Theramore's Fall (H)"] = "851:1";
+CT_UserMap_Zone["Unga Ingoo"] = "882:1";
+
+-- Classic Dungeons
+CT_UserMap_Zone["Blackfathom Deeps"] = "688:1";
+CT_UserMap_Zone["Blackrock Depths"] = "704:1";
+CT_UserMap_Zone["Blackrock Spire"] = "721:1";
+CT_UserMap_Zone["Dire Maul"] = "699:1";
+CT_UserMap_Zone["Gnomeregan"] = "691:1";
+CT_UserMap_Zone["Maraudon"] = "750:1";
+CT_UserMap_Zone["Ragefire Chasm"] = "680:1";
+CT_UserMap_Zone["Razorfen Downs"] = "760:1";
+CT_UserMap_Zone["Razorfen Kraul"] = "761:1";
+CT_UserMap_Zone["Shadowfang Keep"] = "764:1";
+CT_UserMap_Zone["Stratholme"] = "765:1";
+CT_UserMap_Zone["The Deadmines"] = "756:1";
+CT_UserMap_Zone["The Stockade"] = "690:1";
+CT_UserMap_Zone["The Temple of Atal'Hakkar"] = "687:1";
+CT_UserMap_Zone["Uldaman"] = "692:1";
+CT_UserMap_Zone["Wailing Caverns"] = "749:1";
+CT_UserMap_Zone["Zul'Farrak"] = "686:1";
+
+-- Classic Raids
+CT_UserMap_Zone["Blackwing Lair"] = "755:1";
+CT_UserMap_Zone["Molten Core"] = "696:1";
+CT_UserMap_Zone["Ruins of Ahn'Qiraj"] = "717:1";
+CT_UserMap_Zone["Temple of Ahn'Qiraj"] = "766:1";
+
+-- Burning Crusade Dungeons
+CT_UserMap_Zone["Auchenai Crypts"] = "722:1";
+CT_UserMap_Zone["Hellfire Ramparts"] = "797:1";
+CT_UserMap_Zone["Magisters' Terrace"] = "798:1";
+CT_UserMap_Zone["Mana-Tombs"] = "732:1";
+CT_UserMap_Zone["Old Hillsbrad Foothills"] = "734:1";
+CT_UserMap_Zone["Sethekk Halls"] = "723:1";
+CT_UserMap_Zone["Shadow Labyrinth"] = "724:1";
+CT_UserMap_Zone["The Arcatraz"] = "731:1";
+CT_UserMap_Zone["The Black Morass"] = "733:1";
+CT_UserMap_Zone["The Blood Furnace"] = "725:1";
+CT_UserMap_Zone["The Botanica"] = "729:1";
+CT_UserMap_Zone["The Mechanar"] = "730:1";
+CT_UserMap_Zone["The Shattered Halls"] = "710:1";
+CT_UserMap_Zone["The Slave Pens"] = "728:1";
+CT_UserMap_Zone["The Steamvault"] = "727:1";
+CT_UserMap_Zone["The Underbog"] = "726:1";
+
+-- Burning Crusade Raids
+CT_UserMap_Zone["Black Temple"] = "796:1";
+CT_UserMap_Zone["Gruul's Lair"] = "776:1";
+CT_UserMap_Zone["Hyjal Summit"] = "775:1";
+CT_UserMap_Zone["Karazhan"] = "799:1";
+CT_UserMap_Zone["Magtheridon's Lair"] = "779:1";
+CT_UserMap_Zone["Serpentshrine Cavern"] = "780:1";
+CT_UserMap_Zone["Sunwell Plateau"] = "789:1";
+CT_UserMap_Zone["The Eye"] = "782:1";
+
+-- Wrath Dungeons
+CT_UserMap_Zone["Ahn'kahet: The Old Kingdom"] = "522:1";
+CT_UserMap_Zone["Azjol-Nerub"] = "533:1";
+CT_UserMap_Zone["Drak'Tharon Keep"] = "534:1";
+CT_UserMap_Zone["Gundrak"] = "530:1";
+CT_UserMap_Zone["Halls of Lightning"] = "525:1";
+CT_UserMap_Zone["Halls of Reflection"] = "603:1";
+CT_UserMap_Zone["Halls of Stone"] = "526:1";
+CT_UserMap_Zone["Pit of Saron"] = "602:1";
+CT_UserMap_Zone["The Culling of Stratholme"] = "521:1";
+CT_UserMap_Zone["The Forge of Souls"] = "601:1";
+CT_UserMap_Zone["The Nexus"] = "520:1";
+CT_UserMap_Zone["The Oculus"] = "528:1";
+CT_UserMap_Zone["The Violet Hold"] = "536:1";
+CT_UserMap_Zone["Trial of the Champion"] = "542:1";
+CT_UserMap_Zone["Utgarde Keep"] = "523:1";
+CT_UserMap_Zone["Utgarde Pinnacle"] = "524:1";
+
+-- Wrath Raids
+CT_UserMap_Zone["Icecrown Citadel"] = "604:1";
+CT_UserMap_Zone["Naxxramas"] = "535:1";
+CT_UserMap_Zone["Onyxia's Lair"] = "718:1";
+CT_UserMap_Zone["The Eye of Eternity"] = "527:1";
+CT_UserMap_Zone["The Obsidian Sanctum"] = "531:1";
+CT_UserMap_Zone["The Ruby Sanctum"] = "609:1";
+CT_UserMap_Zone["Trial of the Crusader"] = "543:1";
+CT_UserMap_Zone["Ulduar"] = "529:1";
+CT_UserMap_Zone["Vault of Archavon"] = "532:1";
+
+-- Cataclysm Dungeons
+CT_UserMap_Zone["Blackrock Caverns"] = "753:1";
+CT_UserMap_Zone["End Time"] = "820:1";
+CT_UserMap_Zone["Grim Batol"] = "757:1";
+CT_UserMap_Zone["Halls of Origination"] = "759:1";
+CT_UserMap_Zone["Hour of Twilight"] = "819:1";
+CT_UserMap_Zone["Lost City of the Tol'vir"] = "747:1";
+CT_UserMap_Zone["The Stonecore"] = "768:1";
+CT_UserMap_Zone["The Vortex Pinnacle"] = "769:1";
+CT_UserMap_Zone["Throne of the Tides"] = "767:1";
+CT_UserMap_Zone["Well of Eternity"] = "816:1";
+CT_UserMap_Zone["Zul'Aman"] = "781:1";
+CT_UserMap_Zone["Zul'Gurub"] = "793:1";
+
+-- Cataclysm Raids
+CT_UserMap_Zone["Baradin Hold"] = "752:1";
+CT_UserMap_Zone["Blackwing Descent"] = "754:1";
+CT_UserMap_Zone["Dragon Soul"] = "824:1";
+CT_UserMap_Zone["Firelands"] = "800:1";
+CT_UserMap_Zone["The Bastion of Twilight"] = "758:1";
+CT_UserMap_Zone["Throne of the Four Winds"] = "773:1";
+
+-- Pandaria Dungeons
+CT_UserMap_Zone["Gate of the Setting Sun"] = "875:1";
+CT_UserMap_Zone["Mogu'Shan Palace"] = "885:1";
+CT_UserMap_Zone["Scarlet Halls"] = "871:1";
+CT_UserMap_Zone["Scarlet Monastery"] = "874:1";
+CT_UserMap_Zone["Scholomance"] = "898:1";
+CT_UserMap_Zone["Shado-pan Monastery"] = "877:1";
+CT_UserMap_Zone["Siege of Niuzao Temple"] = "887:1";
+CT_UserMap_Zone["Stormstout Brewery"] = "876:1";
+CT_UserMap_Zone["Temple of the Jade Serpent"] = "867:1";
+
+-- Pandaria Raids
+CT_UserMap_Zone["Heart of Fear"] = "897:1";
+CT_UserMap_Zone["Mogu'shan Vaults"] = "896:1";
+CT_UserMap_Zone["Siege of Orgrimmar"] = "953:1";
+CT_UserMap_Zone["Terrace of Endless Spring"] = "886:1";
+CT_UserMap_Zone["Throne of Thunder"] = "930:1";
+
+-- Draenor Dungeons
+CT_UserMap_Zone["Auchindoun"] = "984:1";
+CT_UserMap_Zone["Bloodmaul Slag Mines"] = "964:1";
+CT_UserMap_Zone["Grimrail Depot"] = "993:1";
+CT_UserMap_Zone["Iron Docks"] = "987:1";
+CT_UserMap_Zone["Shadowmoon Burial Grounds"] = "969:1";
+CT_UserMap_Zone["Skyreach"] = "989:1";
+CT_UserMap_Zone["The Everbloom"] = "1008:1";
+CT_UserMap_Zone["Upper Blackrock Spire"] = "995:1";
+
+-- Draenor Raids
+CT_UserMap_Zone["Highmaul"] = "994:1";
+CT_UserMap_Zone["Blackrock Foundry"] = "988:1";
+CT_UserMap_Zone["Hellfire Citadel"] = "1026:1";
+
+-- Legion Dungeons
+CT_UserMap_Zone["Black Rook Hold"] = "1081:1";
+CT_UserMap_Zone["Cathedral of Eternal Night"] = "1146:1";
+CT_UserMap_Zone["Court of Stars"] = "1087:1";
+CT_UserMap_Zone["Darkheart Thicket"] = "1067:1";
+CT_UserMap_Zone["Eye of Azshara"] = "1046:1";
+CT_UserMap_Zone["Halls of Valor"] = "1041:1";
+CT_UserMap_Zone["Maw of Souls"] = "1042:1";
+CT_UserMap_Zone["Neltharion's Lair"] = "1065:1";
+CT_UserMap_Zone["Return to Karazhan"] = "1115:1";
+CT_UserMap_Zone["The Arcway"] = "1079:1";
+CT_UserMap_Zone["Vault of the Wardens"] = "1045:1";
+CT_UserMap_Zone["Violet Hold"] = "1066:1";
+
+-- Legion Raids
+CT_UserMap_Zone["The Emerald Nightmare"] = "1094:1";
+CT_UserMap_Zone["Trial of Valor"] = "1114:1";
+CT_UserMap_Zone["The Nighthold"] = "1088:1";
+CT_UserMap_Zone["Tomb of Sargeras"] = "1147:1";
+
+
 
 CT_MapMod_Options = {};
 
@@ -342,38 +587,15 @@ local function CT_MapMod_GetCharKey()
 	return UnitName("player") .. "@" .. GetRealmName();
 end
 
-local function CT_MapMod_GetWorldMapZoneName()
-	local mapName, _, _, isMicroDungeon, microDungeonMapName = GetMapInfo()
-	local name = WORLD_MAP
-	if GetCurrentMapZone() > 0 then
-		name = GetMapNameByID(GetCurrentMapAreaID())
-		local floorNum = DungeonUsesTerrainMap() and GetCurrentMapDungeonLevel() - 1 or GetCurrentMapDungeonLevel()
-		if floorNum > 0 then
-			if not _G["DUNGEON_FLOOR_" .. strupper(mapName or "") .. floorNum] then
-				name = name .. ': ' .. strupper(mapName or "") .. floorNum
-			else
-				name = name .. ': ' .. _G["DUNGEON_FLOOR_" .. strupper(mapName or "") .. floorNum]
-			end
-		end
-	else
-		local currentContinent = GetCurrentMapContinent()
-		if currentContinent ~= WORLDMAP_WORLD_ID and currentContinent ~= WORLDMAP_COSMIC_ID then
-			name = select(currentContinent, GetMapContinents())
-		end
-	end
-	return name or (isMicroDungeon and microDungeonMapName or mapName)
-end
 
+-- Completely overhauled.  Returns the mapID of an outdoor zone; or mapID:dungeonLevel of multi-level zones.
 local function CT_MapMod_GetMapName()
-	-- Get the name of the current map.
-	-- This is for use when the player is looking at the map.
-	if (GetCurrentMapZone() == 0) then
-		-- Map does not have any zones.
-		-- This applies to universe maps, continent maps, instance maps.
-		return nil;
+	local mapID, isContinent = GetCurrentMapAreaID();
+	local dungeonLevel, y2, y3, y4, y5 = GetCurrentMapDungeonLevel();
+	if (isContinent or not mapID or mapID < 0) then
+		return false;
 	end
-	-- Return the name currently assigned to the zone drop down menu.
-	return CT_MapMod_GetWorldMapZoneName();
+	return mapID .. ":" .. dungeonLevel;
 end
 
 local function CT_MapMod_IsDialogShown()
@@ -591,7 +813,6 @@ local function CT_MapMod_UpdateMap()
 		CT_NumNotes:SetText("|c00FFFFFF0|r/|c00FFFFFF0|r");
 		return;
 	end
-
 	characterKey = CT_MapMod_GetCharKey();
 
 	-- Calculate what notes to show
@@ -743,6 +964,7 @@ local function CT_MapMod_EditNote(id)
 				id = 0;
 			end
 		end
+
 		if (id > 0) then
 			CT_MapMod_NoteWindow.note = id;
 			CT_MapMod_NoteWindow.zone = mapName;
@@ -763,6 +985,7 @@ function CT_MapMod_CreateNote(x, y, note)
 		CT_MapMod_NoteWindow_Show();
 		CT_MapMod_NoteWindow_Accept()
 	end
+
 end
 
 local function CT_MapMod_CreateNoteOnCursor()
@@ -909,10 +1132,10 @@ function CT_MapMod_NoteWindow_Accept()
 
 	icon = note.icon;
 
-	if ( UIDropDownMenu_GetSelectedName(CT_MapMod_NoteWindowGroupDropDown) ) then
+	if ( Lib_UIDropDownMenu_GetSelectedName(CT_MapMod_NoteWindowGroupDropDown) ) then
 		set = note.set;
 	else
-		set = UIDropDownMenu_GetSelectedID( CT_MapMod_NoteWindowGroupDropDown );
+		set = Lib_UIDropDownMenu_GetSelectedID( CT_MapMod_NoteWindowGroupDropDown );
 	end
 
 	-- Update the note
@@ -943,7 +1166,7 @@ end
 
 function CT_MapMod_NoteWindow_GroupDropDown_OnClick(self)
 	-- User clicked on an item in the group menu.
-	UIDropDownMenu_SetSelectedID(CT_MapMod_NoteWindowGroupDropDown, self:GetID(), 1);
+	Lib_UIDropDownMenu_SetSelectedID(CT_MapMod_NoteWindowGroupDropDown, self:GetID(), 1);
 end
 
 function CT_MapMod_NoteWindow_GroupDropDown_OnShow()
@@ -954,11 +1177,11 @@ function CT_MapMod_NoteWindow_GroupDropDown_OnShow()
 		local note = CT_UserMap_Notes[zoneKey][noteKey];
 		local set = note.set;
 		if ( tonumber(set) and tonumber(set) == set ) then
-			UIDropDownMenu_SetSelectedName(CT_MapMod_NoteWindowGroupDropDown, CT_MAPMOD_SETS[set], nil);
+			Lib_UIDropDownMenu_SetSelectedName(CT_MapMod_NoteWindowGroupDropDown, CT_MAPMOD_SETS[set], nil);
 		else
-			UIDropDownMenu_SetSelectedName(CT_MapMod_NoteWindowGroupDropDown, set, nil);
+			Lib_UIDropDownMenu_SetSelectedName(CT_MapMod_NoteWindowGroupDropDown, set, nil);
 		end
-		UIDropDownMenu_SetText(CT_MapMod_NoteWindowGroupDropDown, CT_MAPMOD_SETS[set]);
+		Lib_UIDropDownMenu_SetText(CT_MapMod_NoteWindowGroupDropDown, CT_MAPMOD_SETS[set]);
 	end
 end
 
@@ -970,14 +1193,14 @@ function CT_MapMod_NoteWindow_GroupDropDown_Initialize(self)
 		info.value = val;
 		info.owner = self;
 		info.func = CT_MapMod_NoteWindow_GroupDropDown_OnClick;
-		UIDropDownMenu_AddButton(info);
+		Lib_UIDropDownMenu_AddButton(info);
 	end
 end
 
 function CT_MapMod_NoteWindow_GroupDropDown_OnLoad(self)
 	-- The group menu is being loaded.
-	UIDropDownMenu_Initialize(self, CT_MapMod_NoteWindow_GroupDropDown_Initialize);
-	UIDropDownMenu_SetWidth(self, 130);
+	Lib_UIDropDownMenu_Initialize(self, CT_MapMod_NoteWindow_GroupDropDown_Initialize);
+	Lib_UIDropDownMenu_SetWidth(self, 130);
 end
 
 ---------------------------------------------
@@ -1042,20 +1265,6 @@ local function CT_MapMod_EnableReceiveNotes(enable)
 	CT_MapMod_Options[characterKey].receiveNotes = enable;
 end
 
-local function CT_MapMod_GetZone(zoneid)
-	if ( not tonumber(zoneid) ) then
-		return "(Error: Please report zoneid " .. zoneid .. ")";
-	end
-
-	local zone = tonumber(zoneid);
-	for key, val in pairs(CT_UserMap_Zone) do
-		if ( val == zone ) then
-			return key;
-		end
-	end
-	return "(Error: Please report zone " .. zoneid .. ")";
-end
-
 local function CT_MapMod_ProcessWhisper(self, event, msg, user)
 	-- Process incoming whispers.
 	-- Return nil to allow the game to continue processing the message (should show up in chat window).
@@ -1069,16 +1278,15 @@ local function CT_MapMod_ProcessWhisper(self, event, msg, user)
 	if (strsub(msg, 1, 7) ~= "<CTMod>") then
 		return nil;
 	end
-	local pos1, pos2, xpos, ypos, zone, name, descript, group, icon = string.find(msg, "^<CTMod> New map note received: x=(.+) y=(.+) z=(.+) n=(.*) d=(.*) g=(.+) i=(.+)$");
+	local pos1, pos2, xpos, ypos, zone, name, descript, group, icon = string.find(msg, "^<CTMod> New map note received: x=(.+); y=(.+); z=(%d+:%d+); n=(.*); d=(.*); g=(.+); i=(.+);$");
+
 	if (not zone) then
-		pos1, pos2, name, xpos, ypos, zone = string.find(msg, "^<CTMod> New map note: (.*) x=(.+) y=(.+) z=(.+) v=.+$");
-		if (not zone) then
-			return nil;
-		end
-		descript = "Received from " .. user;
-		icon = 1;
-		group = 1;
+		return nil;
 	end
+	if (not descript) then
+		descript = "Received from " .. user;
+	end
+
 
 	-- If this is the same as the last incoming message we processed...
 	if (msg == CT_LastIncMessage.msg and CT_LastIncMessage.user == user) then
@@ -1091,17 +1299,16 @@ local function CT_MapMod_ProcessWhisper(self, event, msg, user)
 	CT_LastIncMessage.msg = msg;
 	CT_LastIncMessage.user = user;
 
-	-- Notify user of a received message.
-	local zonename = CT_MapMod_GetZone(zone);
+	-- Add the note and inform the user.
 	local characterKey = CT_MapMod_GetCharKey();
 
 	if ( not CT_MapMod_Options[characterKey].receiveNotes ) then
 		module:printcolor(1.0, 0.5, 0.0, "<CTMapMod> Blocked incoming map note from " .. user .. ".");
 	else
-		module:printcolor(1.0, 0.5, 0.0, "<CTMapMod> Map note received in zone '" .. zonename .. "' at " .. round(xpos * 100, 0) .. ", " .. round(ypos * 100, 0) .. " from " .. user .. ".");
+		module:printcolor(1.0, 0.5, 0.0, "<CTMapMod> Map note received from " .. user .. ".");
 		if (strsub(zonename, 1, 1) ~= "(") then
 			-- Add the note to the map
-			CT_MapMod_AddNote(xpos, ypos, zonename, name, descript, tonumber(icon), group);
+			CT_MapMod_AddNote(xpos, ypos, zone, name, descript, tonumber(icon), group);
 		end
 	end
 	return true;  -- true == don't show whisper in chat frame
@@ -1121,7 +1328,7 @@ local function CT_MapMod_ProcessOutgoingWhisper(self, event, msg, user)
 	if (strsub(msg, 1, 7) ~= "<CTMod>") then
 		return nil;
 	end
-	local pos1, pos2, xpos, ypos, zone = string.find(msg, "^<CTMod> New map note received: x=(.+) y=(.+) z=(.+) n=.* d=.* g=.+ i=.+$");
+	local pos1, pos2, xpos, ypos, zone = string.find(msg, "^<CTMod> New map note received: x=(.+); y=(.+); z=(%d+:%d+); n=.*; d=.*; g=.+; i=.+;$");
 	if (not zone) then
 		return nil;
 	end
@@ -1137,8 +1344,7 @@ local function CT_MapMod_ProcessOutgoingWhisper(self, event, msg, user)
 	CT_LastOutMessage.user = user;
 
 	-- Notify user of sent message.
-	local zonename = CT_MapMod_GetZone(zone);
-	module:printcolor(1.0, 0.5, 0.0, "<CTMapMod> Sent map note in zone '" .. zonename .. "' at " .. round(xpos * 100, 0) .. ", " .. round(ypos * 100, 0) .. " to " .. user .. ".");
+	module:printcolor(1.0, 0.5, 0.0, "<CTMapMod> Sent map note to " .. user .. ".");
 	return true;  -- true == don't show whisper in chat frame
 end
 
@@ -1161,21 +1367,21 @@ function CT_MapMod_SendNote()
 
 	note = CT_UserMap_Notes[zone][CT_MapMod_NoteWindow.note];
 
-	if ( not CT_MapMod_NoteWindow:IsVisible() or strlen(player) == 0 or not CT_UserMap_Zone[zone] ) then
+	if ( not CT_MapMod_NoteWindow:IsVisible() or strlen(player) == 0 ) then
 		return;
 	end
 
-	if ( UIDropDownMenu_GetSelectedName(CT_MapMod_NoteWindowGroupDropDown) ) then
+	if ( Lib_UIDropDownMenu_GetSelectedName(CT_MapMod_NoteWindowGroupDropDown) ) then
 		group = note.set;
 	else
-		group = UIDropDownMenu_GetSelectedID(CT_MapMod_NoteWindowGroupDropDown);
+		group = Lib_UIDropDownMenu_GetSelectedID(CT_MapMod_NoteWindowGroupDropDown);
 	end
 
 	x = note.x;
 	y = note.y;
 	icon = note.icon;
 
-	SendChatMessage("<CTMod> New map note received: x="..x.." y="..y.." z="..CT_UserMap_Zone[zone].." n="..name.." d="..descript.." g="..group .. " i=" .. icon, "WHISPER", nil, player);
+	SendChatMessage("<CTMod> New map note received: x="..x.."; y="..y.."; z="..zone.."; n="..name.."; d="..descript.."; g="..group .. "; i=" .. icon .. ";", "WHISPER", nil, player);
 
 	CT_MapMod_NoteWindowSendEB.lastsend = player;
 	CT_MapMod_NoteWindowSendEB:SetText("");
@@ -1196,24 +1402,8 @@ local function CT_MapMod_EnableAutoGatherNotes(enable, key)
 	CT_MapMod_Options[characterKey][key] = enable;
 end
 
-local function CT_MapMod_GetZoneName(id, ...)
-	if ( id >= 1 and select('#', ...) >= id ) then
-		return select(id, ...);
-	end
-end
 
-local function CT_MapMod_GetCurrentZone()
-	local x, y = GetPlayerMapPosition("player");
-	local currC, currZ = GetCurrentMapContinent(), GetCurrentMapZone();
-	SetMapToCurrentZone();
-	local name = CT_MapMod_GetZoneName(GetCurrentMapZone(), GetMapZones(GetCurrentMapContinent()));
-	if ( x == 0 and y == 0 ) then
-		SetMapZoom(currC, currZ);
-	end
-	return name;
-end
-
-local function CT_MapMod_ParseResource(event, arg1)
+local function CT_MapMod_ParseResource(event, arg1, arg2)
 	local characterKey = CT_MapMod_GetCharKey();
 	local options = CT_MapMod_Options[characterKey];
 
@@ -1229,47 +1419,32 @@ local function CT_MapMod_ParseResource(event, arg1)
 		return;
 	end
 
-	local _, name, prefix, node;
-	if ( string.find(event, "^CHAT_MSG" ) ) then
-		if ( options.autoHerbs and string.find(arg1, "^You perform Herb Gathering on") ) then
-			_,_, name = string.find(arg1, "^You perform Herb Gathering on (.+)%.$");
-			prefix = "Herb_";
-			node = 7;
+	local name, prefix, node;
 
-		elseif ( options.autoMinerals and string.find(arg1, "^You perform Mining on") ) then
-			_,_, name = string.find(arg1, "^You perform Mining on (.+)%.$");
-			prefix = "Ore_";
-			node = 8;
+	if ( options.autoHerbs and arg1 == "player" and arg2 == "Herb Gathering" ) then
+		name = "Herb";
+		prefix = "Herb_";
+		node = 7;
 
-		end
-	elseif ( string.find(event, "UI_ERROR_MESSAGE") ) then
-		name = GameTooltipTextLeft1:GetText();
-		if ( name and strlen(name) > 0 ) then
-			if ( options.autoHerbs and string.find(arg1, "Requires Herbalism") ) then
-				prefix = "Herb_";
-				node = 7;
+	elseif ( options.autoMinerals and arg1 == "player" and arg2 == "Mining" ) then
+		name = "Ore";
+		prefix = "Ore_";
+		node = 8;
 
-			elseif ( options.autoMinerals and string.find(arg1, "Requires Mining") ) then
-				prefix = "Ore_";
-				node = 8;
-			else
-				name = nil;
-			end
-		else
-			name = nil;
-		end
 	end
 
+
 	if (name) then
-		local zone = CT_MapMod_GetCurrentZone();
-		if ( not zone or not CT_UserMap_Zone[zone] ) then
+		SetMapToCurrentZone();
+		local zone = CT_MapMod_GetMapName();
+		if (not zone) then
 			return;
 		end
-		if ( not CT_UserMap_Notes[zone] ) then
-			CT_UserMap_Notes[zone] = { };
+		if (not CT_UserMap_Notes[zone]) then
+			CT_UserMap_Notes[zone] = { }
 		end
 		for k, v in pairs(CT_UserMap_Notes[zone]) do
-			if ( abs(v.x-x) <= 0.005 and abs(v.y-y) <= 0.005 ) then
+			if ( abs(v.x-x) <= 0.01 and abs(v.y-y) <= 0.01 ) then
 				-- Two very close nodes, most likely the same node, we don't want to add another note then
 				return;
 			end
@@ -1277,6 +1452,7 @@ local function CT_MapMod_ParseResource(event, arg1)
 		CT_MapMod_AddNote(x, y, zone, name, "", CT_MapMod_FindResourceIcon(name, prefix), node);
 	end
 end
+
 
 ---------------------------------------------
 -- Group window (not functional)
@@ -1661,7 +1837,7 @@ function CT_MapMod_MainButton_OnClick(self, button)
 
 		dropdown.xOffset = 0;
 		dropdown.yOffset = 0;
-		ToggleDropDownMenu(1, nil, dropdown);
+		Lib_ToggleDropDownMenu(1, nil, dropdown);
 		PlaySound(856);
 	end
 end
@@ -1847,13 +2023,14 @@ function CT_MapMod_MainMenu_DropDown_OnClick(self)
 end
 
 function CT_MapMod_MainMenu_DropDown_Initialize(self, level)
+
 	local info;
 	local characterKey = CT_MapMod_GetCharKey();
 	local optName;
 
-	if (level == 2 and UIDROPDOWNMENU_MENU_VALUE == "menu_button") then
+	if (level == 2 and LIB_UIDROPDOWNMENU_MENU_VALUE == "menu_button") then
 
-		info = UIDropDownMenu_CreateInfo();
+		info = Lib_UIDropDownMenu_CreateInfo();
 		info.text = "Reset position"
 		info.value = "resetposition";
 		info.notCheckable = 1;
@@ -1864,9 +2041,9 @@ function CT_MapMod_MainMenu_DropDown_Initialize(self, level)
 		elseif (not CT_MapMod_Options[characterKey][optName]) then
 			info.disabled = true;
 		end
-		UIDropDownMenu_AddButton(info, level);
+		Lib_UIDropDownMenu_AddButton(info, level);
 
-		info = UIDropDownMenu_CreateInfo();
+		info = Lib_UIDropDownMenu_CreateInfo();
 		info.text = "Hide tooltip"
 		info.value = "hideMainTooltip";
 		if (CT_MapMod_Options[characterKey] and CT_MapMod_Options[characterKey].hideMainTooltip) then
@@ -1874,21 +2051,21 @@ function CT_MapMod_MainMenu_DropDown_Initialize(self, level)
 		end
 		info.keepShownOnClick = 1;
 		info.func = CT_MapMod_MainMenu_DropDown_OnClick;
-		UIDropDownMenu_AddButton(info, level);
+		Lib_UIDropDownMenu_AddButton(info, level);
 
-		info = UIDropDownMenu_CreateInfo();
+		info = Lib_UIDropDownMenu_CreateInfo();
 		info.text = "Change note count position"
 		info.value = "togglecountpos";
 		info.notCheckable = 1;
 		info.func = CT_MapMod_MainMenu_DropDown_OnClick;
 		info.keepShownOnClick = 1;
-		UIDropDownMenu_AddButton(info, level);
+		Lib_UIDropDownMenu_AddButton(info, level);
 
 		return;
 
-	elseif (level == 2 and UIDROPDOWNMENU_MENU_VALUE == "menu_coord") then
+	elseif (level == 2 and LIB_UIDROPDOWNMENU_MENU_VALUE == "menu_coord") then
 
-		info = UIDropDownMenu_CreateInfo();
+		info = Lib_UIDropDownMenu_CreateInfo();
 		if (unlockCoord) then
 			info.text = "Lock"
 			info.value = "lockCoord";
@@ -1898,9 +2075,9 @@ function CT_MapMod_MainMenu_DropDown_Initialize(self, level)
 		end
 		info.notCheckable = 1;
 		info.func = CT_MapMod_MainMenu_DropDown_OnClick;
-		UIDropDownMenu_AddButton(info, level);
+		Lib_UIDropDownMenu_AddButton(info, level);
 
-		info = UIDropDownMenu_CreateInfo();
+		info = Lib_UIDropDownMenu_CreateInfo();
 		info.text = "Reset position"
 		info.value = "resetcoord";
 		info.notCheckable = 1;
@@ -1911,9 +2088,9 @@ function CT_MapMod_MainMenu_DropDown_Initialize(self, level)
 		elseif (not CT_MapMod_Options[characterKey][optName]) then
 			info.disabled = true;
 		end
-		UIDropDownMenu_AddButton(info, level);
+		Lib_UIDropDownMenu_AddButton(info, level);
 
-		info = UIDropDownMenu_CreateInfo();
+		info = Lib_UIDropDownMenu_CreateInfo();
 		info.text = "Hide"
 		info.value = "hideCoord";
 		optName = CT_MapMod_Coord_GetHideOptionName();
@@ -1922,13 +2099,13 @@ function CT_MapMod_MainMenu_DropDown_Initialize(self, level)
 		end
 		info.keepShownOnClick = 1;
 		info.func = CT_MapMod_MainMenu_DropDown_OnClick;
-		UIDropDownMenu_AddButton(info, level);
+		Lib_UIDropDownMenu_AddButton(info, level);
 
 		return;
 
-	elseif (level == 2 and UIDROPDOWNMENU_MENU_VALUE == "auto_add") then
+	elseif (level == 2 and LIB_UIDROPDOWNMENU_MENU_VALUE == "auto_add") then
 
-		info = UIDropDownMenu_CreateInfo();
+		info = Lib_UIDropDownMenu_CreateInfo();
 		info.text = "Herbs"
 		info.value = "autoHerbs";
 		if (CT_MapMod_Options[characterKey] and CT_MapMod_Options[characterKey].autoHerbs) then
@@ -1936,9 +2113,9 @@ function CT_MapMod_MainMenu_DropDown_Initialize(self, level)
 		end
 		info.keepShownOnClick = 1;
 		info.func = CT_MapMod_MainMenu_DropDown_OnClick;
-		UIDropDownMenu_AddButton(info, level);
+		Lib_UIDropDownMenu_AddButton(info, level);
 
-		info = UIDropDownMenu_CreateInfo();
+		info = Lib_UIDropDownMenu_CreateInfo();
 		info.text = "Minerals"
 		info.value = "autoMinerals";
 		if (CT_MapMod_Options[characterKey] and CT_MapMod_Options[characterKey].autoMinerals) then
@@ -1946,20 +2123,20 @@ function CT_MapMod_MainMenu_DropDown_Initialize(self, level)
 		end
 		info.keepShownOnClick = 1;
 		info.func = CT_MapMod_MainMenu_DropDown_OnClick;
-		UIDropDownMenu_AddButton(info, level);
+		Lib_UIDropDownMenu_AddButton(info, level);
 
 		return;
 
 	end
 
-	info = UIDropDownMenu_CreateInfo();
+	info = Lib_UIDropDownMenu_CreateInfo();
 	info.text = "CT_MapMod";
 	info.notCheckable = 1;
 	info.justifyH = "CENTER";
 	info.isTitle = true;
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
-	info = UIDropDownMenu_CreateInfo();
+	info = Lib_UIDropDownMenu_CreateInfo();
 	info.text = "Create note at player"
 	info.value = "playernote";
 	info.notCheckable = 1;
@@ -1967,9 +2144,9 @@ function CT_MapMod_MainMenu_DropDown_Initialize(self, level)
 	if (not CT_MapMod_CanCreateNoteOnPlayer()) then
 		info.disabled = true;
 	end
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
-	info = UIDropDownMenu_CreateInfo();
+	info = Lib_UIDropDownMenu_CreateInfo();
 	info.text = "Edit last note added to this map"
 	info.value = "editlast";
 	info.notCheckable = 1;
@@ -1989,11 +2166,11 @@ function CT_MapMod_MainMenu_DropDown_Initialize(self, level)
 			info.disabled = true;
 		end
 	end
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
 	local emptyFilter = ((CT_MapMod_Filter or "") == "");
 
-	info = UIDropDownMenu_CreateInfo();
+	info = Lib_UIDropDownMenu_CreateInfo();
 	if (emptyFilter) then
 		info.text = "Set filter text"
 	else
@@ -2002,9 +2179,9 @@ function CT_MapMod_MainMenu_DropDown_Initialize(self, level)
 	info.value = "setfilter";
 	info.notCheckable = 1;
 	info.func = CT_MapMod_MainMenu_DropDown_OnClick;
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
-	info = UIDropDownMenu_CreateInfo();
+	info = Lib_UIDropDownMenu_CreateInfo();
 	info.text = "Clear filter text"
 	info.value = "clearfilter";
 	info.notCheckable = 1;
@@ -2012,40 +2189,40 @@ function CT_MapMod_MainMenu_DropDown_Initialize(self, level)
 	if (emptyFilter) then
 		info.disabled = true;
 	end
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
-	info = UIDropDownMenu_CreateInfo();
+	info = Lib_UIDropDownMenu_CreateInfo();
 	info.text = "Options";
 	info.notCheckable = 1;
 	info.justifyH = "CENTER";
 	info.isTitle = true;
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
-	info = UIDropDownMenu_CreateInfo();
+	info = Lib_UIDropDownMenu_CreateInfo();
 	info.text = "Notes button"
 	info.value = "menu_button";
 	info.keepShownOnClick = 1;
 	info.notCheckable = 1;
 	info.hasArrow = true;
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
-	info = UIDropDownMenu_CreateInfo();
+	info = Lib_UIDropDownMenu_CreateInfo();
 	info.text = "Coordinates"
 	info.value = "menu_coord";
 	info.keepShownOnClick = 1;
 	info.notCheckable = 1;
 	info.hasArrow = true;
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
-	info = UIDropDownMenu_CreateInfo();
+	info = Lib_UIDropDownMenu_CreateInfo();
 	info.text = "Create notes when gathering"
 	info.value = "auto_add";
 	info.keepShownOnClick = 1;
 	info.notCheckable = 1;
 	info.hasArrow = true;
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
-	info = UIDropDownMenu_CreateInfo();
+	info = Lib_UIDropDownMenu_CreateInfo();
 	info.text = "Receive notes from players"
 	info.value = "receivenotes";
 	if (CT_MapMod_Options[characterKey] and CT_MapMod_Options[characterKey].receiveNotes) then
@@ -2053,17 +2230,17 @@ function CT_MapMod_MainMenu_DropDown_Initialize(self, level)
 	end
 	info.keepShownOnClick = 1;
 	info.func = CT_MapMod_MainMenu_DropDown_OnClick;
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
-	info = UIDropDownMenu_CreateInfo();
+	info = Lib_UIDropDownMenu_CreateInfo();
 	info.text = "Groups To Show";
 	info.notCheckable = 1;
 	info.justifyH = "CENTER";
 	info.isTitle = true;
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
 	for key, val in pairs(CT_MAPMOD_SETS) do
-		info = UIDropDownMenu_CreateInfo();
+		info = Lib_UIDropDownMenu_CreateInfo();
 		info.text = val;
 		info.value = val;
 		if ( CT_MapMod_Options[characterKey] and ( not CT_MapMod_Options[characterKey].hideGroups or not CT_MapMod_Options[characterKey].hideGroups[val] ) ) then
@@ -2071,68 +2248,54 @@ function CT_MapMod_MainMenu_DropDown_Initialize(self, level)
 		end
 		info.keepShownOnClick = 1;
 		info.func = CT_MapMod_MainMenu_DropDown_OnClick;
-		UIDropDownMenu_AddButton(info);
+		Lib_UIDropDownMenu_AddButton(info);
 	end
 end
 
 function CT_MapMod_MainMenu_DropDown_OnLoad(self)
-	UIDropDownMenu_Initialize(self, CT_MapMod_MainMenu_DropDown_Initialize, "MENU");
-	UIDropDownMenu_SetWidth(self, 130);
+	Lib_UIDropDownMenu_Initialize(self, CT_MapMod_MainMenu_DropDown_Initialize, "MENU");
+	Lib_UIDropDownMenu_SetWidth(self, 130);
+
+	hooksecurefunc(WorldMapFrame, "Hide", function(this)
+		if LIB_UIDROPDOWNMENU_OPEN_MENU == CT_MapMod_MainMenuDropDown then
+			Lib_ToggleDropDownMenu(1, nil, CT_MapMod_MainMenuDropDown);
+		end
+	end)
 end
 
 ---------------------------------------------
 -- Convert old notes
 
 local function CT_MapMod_UpdateOldNotes()
-	-- Convert old notes to new format.
+
+	-- TEMPORARY CODE FOR BETA TESTING
+	--for key, val in pairs(CT_UserMap_Zone) do
+	--	CT_MapMod_AddNote(0.50, 0.50, key, "BETA TEST", "BETA TEST", CT_MapMod_FindResourceIcon("Herb", "Herb_"), 7);
+	--end
+
+	-- Converts string-based mapName to integer-based mapID keys.
+	-- This was introduced in 7.3, and replaces the very old updating from 4.0
+
 	local temp = {};
-	local update = false;
 	for key, val in pairs(CT_UserMap_Notes) do
-		if ( type(key) == "number" and type(val) == "table" ) then
-			update = true;
-			-- Old notes
-			local tempvar = {
-				name = val.desc,
-				x = val.x,
-				y = val.y,
-				icon = 1,
-				set = 1,
-			};
-			local zone = val.zone;
-			if (zone) then
-				if (not temp[zone]) then
-					temp[zone] = {};
-				end
-				temp[zone][#(temp[zone])+1] = tempvar;
-			end
-			CT_UserMap_Notes[key] = nil;
-		end
-	end
-	if (update) then
-		for key, val in pairs(temp) do
-			if ( not CT_UserMap_Notes[key] ) then
-				CT_UserMap_Notes[key] = {};
-			end
-			for k, v in pairs(val) do
-				tinsert(CT_UserMap_Notes[key], v);
+		if (type(key) == "string" and type(val) == "table" and not string.find(key,"^%d+%-%d+$")) then
+			if (CT_UserMap_Zone[key]) then
+				CT_UserMap_Notes[CT_UserMap_Zone[key]] = val;
+				CT_UserMap_Notes[key] = nil;
 			end
 		end
-		CT_MapMod_Print("<CTMod> Updated old notes to new format.", 1, 0.5, 0);
 	end
+
+
 end
 
 ---------------------------------------------
 -- Event frame
 
-function CT_MapMod_EventFrame_OnEvent(self, event, arg1)
+function CT_MapMod_EventFrame_OnEvent(self, event, arg1, arg2)
 
-	if ( event == "CHAT_MSG_OPENING" ) then
-		CT_MapMod_ParseResource(event, arg1);
-
-	elseif ( event == "UI_ERROR_MESSAGE" ) then
-		if ( arg1 and ( string.find(arg1, "Requires Herbalism") or string.find(arg1, "Requires Mining") ) ) then
-			CT_MapMod_ParseResource(event, arg1);
-		end
+	if ( event == "UNIT_SPELLCAST_SUCCEEDED" ) then
+		CT_MapMod_ParseResource(event, arg1, arg2)
 
 	elseif ( event == "DISPLAY_SIZE_CHANGED" ) then
 		CT_MapMod_AdjustPositions();
@@ -2173,7 +2336,6 @@ function CT_MapMod_EventFrame_OnEvent(self, event, arg1)
 	elseif ( event == "PLAYER_ENTERING_WORLD" ) then
 		local characterKey = CT_MapMod_GetCharKey();
 		SetMapToCurrentZone();
-
 	end
 end
 

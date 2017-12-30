@@ -23,7 +23,7 @@
 						</Anchor>
 					</Anchors>
 					<TexCoords left="0.296875" right="0.5703125" top="0" bottom="0.515625"/>
-				</Texture>	
+				</Texture>
 			</Layer>
 		</Layers>
 		<Frames>
@@ -77,7 +77,7 @@
 						</Anchor>
 					</Anchors>
 					<TexCoords left="0.296875" right="0.5703125" top="0" bottom="0.515625"/>
-				</Texture>	
+				</Texture>
 				<FontString name="$parentCount" inherits="NumberFontNormalSmall" justifyH="RIGHT">
 					<Anchors>
 						<Anchor point="BOTTOMRIGHT">
@@ -444,7 +444,7 @@
 				</Scripts>
 			</Button>
 <!--
-			<Frame name="$parentDropDown" inherits="UIDropDownMenuTemplate" id="1" hidden="true">
+			<Frame name="$parentDropDown" inherits="Lib_UIDropDownMenuTemplate" id="1" hidden="true">
 				<Size>
 					<AbsDimension x="10" y="10"/>
 				</Size>
@@ -618,7 +618,7 @@
 						<AbsDimension x="46" y="15"/>
 					</Size>
 					<Anchors>
-						<Anchor point="BOTTOMLEFT">	
+						<Anchor point="BOTTOMLEFT">
 							<Offset>
 								<AbsDimension x="42" y="13"/>
 							</Offset>

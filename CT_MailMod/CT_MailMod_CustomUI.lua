@@ -21,7 +21,7 @@ local module = _G["CT_MailMod"];
 do
 	local function inboxFrameSkeleton()
 		return "frame#s:384:512#tl#p:MailFrame", {
-			
+
 		};
 	end
 	module.inboxFrame = module:getFrame(inboxFrameSkeleton);

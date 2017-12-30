@@ -37,13 +37,13 @@ end
 function CT_RAMeters_InitDropDown()
 	local meterOptions = CT_RAMeters_GetMeterOptions();
 	local info;
-	if ( UIDROPDOWNMENU_MENU_LEVEL == 2 ) then
+	if ( LIB_UIDROPDOWNMENU_MENU_LEVEL == 2 ) then
 		info = {};
-		info.text = UIDROPDOWNMENU_MENU_VALUE;
+		info.text = LIB_UIDROPDOWNMENU_MENU_VALUE;
 		info.justifyH = "CENTER";
 		info.isTitle = 1;
 		info.notCheckable = 1;
-		UIDropDownMenu_AddButton(info, UIDROPDOWNMENU_MENU_LEVEL);
+		Lib_UIDropDownMenu_AddButton(info, LIB_UIDROPDOWNMENU_MENU_LEVEL);
 
 		local nonManaUsers = {
 			[CT_RA_CLASS_ROGUE] = 1,
@@ -53,13 +53,13 @@ function CT_RAMeters_InitDropDown()
 		for j, k in ipairs(CT_RA_ClassSorted) do
 			-- local v = CT_RA_ClassPositions[k];
 			local value;
-			if ( UIDROPDOWNMENU_MENU_VALUE == "Class Health" ) then
+			if ( LIB_UIDROPDOWNMENU_MENU_VALUE == "Class Health" ) then
 				value = "Health Display";
-			elseif ( UIDROPDOWNMENU_MENU_VALUE == "Class Mana" ) then
+			elseif ( LIB_UIDROPDOWNMENU_MENU_VALUE == "Class Mana" ) then
 				value = "Mana Display";
 			else
-				-- "Raid Health" or "Raid Mana"				
-				value = UIDROPDOWNMENU_MENU_VALUE;
+				-- "Raid Health" or "Raid Mana"
+				value = LIB_UIDROPDOWNMENU_MENU_VALUE;
 			end
 			if ( ( value == "Health Display" or value == "Raid Health" ) or not nonManaUsers[k] ) then
 				info = { };
@@ -68,7 +68,7 @@ function CT_RAMeters_InitDropDown()
 				info.checked = ( meterOptions and meterOptions[value] and meterOptions[value][k] );
 				info.keepShownOnClick = 1;
 				info.func = CT_RAMeters_DropDown_OnClick;
-				UIDropDownMenu_AddButton(info, UIDROPDOWNMENU_MENU_LEVEL);
+				Lib_UIDropDownMenu_AddButton(info, LIB_UIDROPDOWNMENU_MENU_LEVEL);
 			end
 		end
 		return;
@@ -79,35 +79,35 @@ function CT_RAMeters_InitDropDown()
 	info.justifyH = "CENTER";
 	info.isTitle = 1;
 	info.notCheckable = 1;
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
 	info = {};
 	info.text = "Class Health";
 	info.hasArrow = 1;
 	info.notCheckable = 1;
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
 	info = {};
 	info.text = "Class Mana";
 	info.hasArrow = 1;
 	info.notCheckable = 1;
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
 	info = {};
 	info.text = "Raid Health";
 	info.hasArrow = 1;
 	info.notCheckable = 1;
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
 	info = {};
 	info.text = "Raid Mana";
 	info.hasArrow = 1;
 	info.notCheckable = 1;
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
 --	info = {};
 --	info.disabled = 1;
---	UIDropDownMenu_AddButton(info);
+--	Lib_UIDropDownMenu_AddButton(info);
 
 	info = {};
 	info.text = "AFK";
@@ -115,7 +115,7 @@ function CT_RAMeters_InitDropDown()
 	info.checked = ( meterOptions and meterOptions["AFK Count"] );
 	info.keepShownOnClick = 1;
 	info.func = CT_RAMeters_DropDown_OnClick;
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
 	info = {};
 	info.text = "Dead";
@@ -123,7 +123,7 @@ function CT_RAMeters_InitDropDown()
 	info.checked = ( meterOptions and meterOptions["Dead Count"] );
 	info.keepShownOnClick = 1;
 	info.func = CT_RAMeters_DropDown_OnClick;
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
 	info = {};
 	info.text = "Not In Zone";
@@ -131,7 +131,7 @@ function CT_RAMeters_InitDropDown()
 	info.checked = ( meterOptions and meterOptions["notInZone"] );
 	info.keepShownOnClick = 1;
 	info.func = CT_RAMeters_DropDown_OnClick;
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
 	info = {};
 	info.text = "Offline";
@@ -139,7 +139,7 @@ function CT_RAMeters_InitDropDown()
 	info.checked = ( meterOptions and meterOptions["Offline Count"] );
 	info.keepShownOnClick = 1;
 	info.func = CT_RAMeters_DropDown_OnClick;
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
 	info = {};
 	info.text = "PVP";
@@ -147,7 +147,7 @@ function CT_RAMeters_InitDropDown()
 	info.checked = ( meterOptions and meterOptions["PVP Count"] );
 	info.keepShownOnClick = 1;
 	info.func = CT_RAMeters_DropDown_OnClick;
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
 	info = {};
 	info.text = "Total";
@@ -155,7 +155,7 @@ function CT_RAMeters_InitDropDown()
 	info.checked = ( meterOptions and meterOptions["Total Count"] );
 	info.keepShownOnClick = 1;
 	info.func = CT_RAMeters_DropDown_OnClick;
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
 	info = {};
 	info.text = "Hide count if zero";
@@ -163,11 +163,11 @@ function CT_RAMeters_InitDropDown()
 	info.checked = ( meterOptions and meterOptions["HideZero"] );
 	info.keepShownOnClick = 1;
 	info.func = CT_RAMeters_DropDown_OnClick;
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
 --	info = {};
 --	info.disabled = 1;
---	UIDropDownMenu_AddButton(info);
+--	Lib_UIDropDownMenu_AddButton(info);
 
 	info = {};
 	if ( meterOptions and meterOptions["Lock"] ) then
@@ -178,7 +178,7 @@ function CT_RAMeters_InitDropDown()
 	info.value = "LockMeter";
 	info.notCheckable = 1;
 	info.func = CT_RAMeters_DropDown_OnClick;
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	info.text = "Background color";
@@ -200,21 +200,21 @@ function CT_RAMeters_InitDropDown()
 	info.opacityFunc = CT_RAMeters_DropDown_OpacityFunc;
 	info.cancelFunc = CT_RAMeters_DropDown_CancelFunc;
 	info.notCheckable = 1;
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
 	info = {};
 	info.text = "Hide window";  -- |c00FF8080 |r
 	info.value = "Hide";
 	info.notCheckable = 1;
 	info.func = CT_RAMeters_DropDown_OnClick;
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 
 	info = {};
 	info.text = "Close this menu";
 	info.value = "CloseMenu";
 	info.notCheckable = 1;
 	info.func = CT_RAMeters_DropDown_OnClick;
-	UIDropDownMenu_AddButton(info);
+	Lib_UIDropDownMenu_AddButton(info);
 end
 
 function CT_RAMeters_DropDown_SwatchFunc()
@@ -236,7 +236,7 @@ end
 
 function CT_RAMeters_DropDown_CancelFunc(val)
 	local meterOptions = CT_RAMeters_GetMeterOptions();
-	meterOptions["Background"] = { 
+	meterOptions["Background"] = {
 		["r"] = val.r,
 		["g"] = val.g,
 		["b"] = val.b,
@@ -251,7 +251,7 @@ function CT_RAMeters_OnLoad(self)
 end
 
 function CT_RAMeters_DropDown_OnLoad(self)
-	UIDropDownMenu_Initialize(self, CT_RAMeters_InitDropDown, "MENU");
+	Lib_UIDropDownMenu_Initialize(self, CT_RAMeters_InitDropDown, "MENU");
 end
 
 function CT_RAMeters_DropDown_OnClick(self)
@@ -273,7 +273,7 @@ function CT_RAMeters_DropDown_OnClick(self)
 		CloseDropDownMenus();
 		return;
 	end
-	
+
 	if ( type(self.value) == "table" ) then
 		-- We have either HP or Mana Display/Totals
 		meterOptions[self.value[1]][self.value[2]] = not meterOptions[self.value[1]][self.value[2]];
@@ -339,7 +339,7 @@ function CT_RAMeters_GetTables()
 			{ "pvpCount", "|c00FFD468", "|r" },
 			{ "totalCount", "|c00DDDDDD", "|r" },
 		};
-	end	
+	end
 
 	return CT_RAMeters_StatsTable, CT_RAMeters_ResultsTable, CT_RAMeters_OrderTable;
 end
@@ -379,13 +379,13 @@ function CT_RAMeters_UpdateWindow()
 			local class = UnitClass(id);
 			local health = 0;
 			local mana = 0;
-			local isDead = ( 
+			local isDead = (
 				( UnitIsDead(id) or UnitIsGhost(id) ) and
 				( not CT_RA_Stats[name] or not CT_RA_Stats[name]["FD"] )
 			);
 			local isAfk = ( CT_RA_Stats[name] and CT_RA_Stats[name]["AFK"] );
 			if ( class and statsTable[class] ) then
-				if ( 
+				if (
 					( meterOptions["Raid Health"] and meterOptions["Raid Health"][class] ) or
 					( meterOptions["Health Display"] and meterOptions["Health Display"][class] )
 				) then
@@ -395,7 +395,7 @@ function CT_RAMeters_UpdateWindow()
 						health = UnitHealth(id) / UnitHealthMax(id);
 					end
 				end
-				if ( 
+				if (
 					UnitPowerType(id) == 0 and
 					(
 						( meterOptions["Raid Mana"] and meterOptions["Raid Mana"][class] ) or
@@ -433,7 +433,7 @@ function CT_RAMeters_UpdateWindow()
 		end
 	end
 	statsTable["Generic"]["total"] = GetNumRaidMembers();
-	
+
 	-- Raid Health
 	if ( meterOptions["Raid Health"] ) then
 		local combinedHealth, numHealth = 0, 0;
@@ -454,7 +454,7 @@ function CT_RAMeters_UpdateWindow()
 			resultsTable["raidHp"][1] = "Raid Health: " .. combinedHealth .. "%";
 		end
 	end
-	
+
 	-- Raid Mana
 	if ( meterOptions["Raid Mana"] ) then
 		local combinedMana, numMana = 0, 0;
@@ -485,17 +485,17 @@ function CT_RAMeters_UpdateWindow()
 	if ( meterOptions["AFK Count"] and statsTable["Generic"]["isAfk"] >= minToShow) then
 		resultsTable["afkCount"][1] = "AFK: " .. statsTable["Generic"]["isAfk"];
 	end
-	
+
 	-- Dead Count
 	if ( meterOptions["Dead Count"] and statsTable["Generic"]["isDead"] >= minToShow) then
 		resultsTable["deadCount"][1] = "Dead: " .. statsTable["Generic"]["isDead"];
 	end
-	
+
 	-- Offline Count
 	if ( meterOptions["Offline Count"] and statsTable["Generic"]["isOffline"] >= minToShow) then
 		resultsTable["offlineCount"][1] = "Offline: " .. statsTable["Generic"]["isOffline"];
 	end
-	
+
 	-- PVP Count
 	if ( meterOptions["PVP Count"] and statsTable["Generic"]["isPVP"] >= minToShow) then
 		resultsTable["pvpCount"][1] = "PVP: " .. statsTable["Generic"]["isPVP"];
@@ -510,7 +510,7 @@ function CT_RAMeters_UpdateWindow()
 	if ( meterOptions["Total Count"] and statsTable["Generic"]["total"] >= minToShow) then
 		resultsTable["totalCount"][1] = "Total: " .. statsTable["Generic"]["total"];
 	end
-	
+
 	-- Health Display
 	resultsTable["hpDisplay"][2] = 0;
 	if ( meterOptions["Health Display"] ) then
@@ -532,7 +532,7 @@ function CT_RAMeters_UpdateWindow()
 			end
 		end
 	end
-	
+
 	-- Mana Display
 	resultsTable["mpDisplay"][2] = 0;
 	if ( meterOptions["Mana Display"]) then
@@ -554,7 +554,7 @@ function CT_RAMeters_UpdateWindow()
 			end
 		end
 	end
-	
+
 	-- Add together all the stats
 	local out, numLines = "", 0;
 	for i = 1, #orderTable, 1 do

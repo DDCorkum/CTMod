@@ -1,5 +1,5 @@
 ## Interface: 70300
-## Version: 7.3.0.0
+## Version: 7.3.2.0
 ## Title: CT_PartyBuffs
 ## Notes: Shows buffs at party member frames.
 ## DefaultState: Enabled

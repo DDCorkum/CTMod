@@ -1,6 +1,6 @@
 if ( GetLocale() == "deDE" ) then
 	-- Credits to Hjörvarör for these
-		
+
 	CT_TIMER_DRAG1 = "Klick um zu Starten/Stoppen.";
 	CT_TIMER_DRAG2 = "Rechtsklick zum Verschieben.";
 	CT_TIMER_RESET = "Reset";

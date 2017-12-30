@@ -16,7 +16,7 @@ local module = _G.CT_UnitFrames;
 -- General Mod Code (rewrite imminent!)
 
 tinsert(UISpecialFrames, "CT_UnitFramesOptionsFrame"); -- So we can close it with escape
-CT_UnitFramesOptions = { 
+CT_UnitFramesOptions = {
 	["styles"] = {
 		[1] = { -- Box (Player)
 			{1, 1, 1, 1, 1}, -- On health bar
@@ -73,7 +73,7 @@ end
 function CT_UnitFramesOptions_Selection_OnLoad(self)
 	local box = self:GetParent():GetID();
 	local id = self:GetID();
-	
+
 	if ( CT_UnitFramesOptions_NumSelections[box] == 2 ) then
 		_G[self:GetName() .. "Name"]:SetText(CT_UFO_SELECTION[id + (1-mod(id, 2))]);
 	else
@@ -148,7 +148,7 @@ function CT_UnitFrameOptions_OnEvent(self, event, ...)
 			) then
 				fixLeft = true;
 			end
-		
+
 			-- When the "Enemy Health Bar" setting was added, there were 4 rows for the target frame (box 3)
 			-- and the target of target frame (box 4).
 			--
@@ -209,7 +209,7 @@ function CT_UnitFramesOptions_Radio_Update()
 			end
 		end
 	end
-	
+
 	for boxId, box in pairs(CT_UnitFramesOptions.styles) do
 		for selectionId, selection in pairs(box) do
 -- This was the code that prevented the user from selecting the same thing for the bar and the right of the bar.
@@ -233,7 +233,7 @@ function CT_UnitFramesOptions_Radio_Update()
 			_G["CT_UnitFramesOptionsFrameBox" .. boxId .. "Selection" .. selectionId .. "Radio" .. selection[1] .. "Name"]:SetTextColor(1.0, 1.0, 1.0, 1.0);
 		end
 	end
-	
+
 	CT_UnitFramesOptionsFrameBox1PlayerTextLeftCB:SetChecked(CT_UnitFramesOptions.playerTextLeft);
 	CT_UnitFramesOptionsFrameBox3ClassFrameCB:SetChecked(CT_UnitFramesOptions.displayTargetClass);
 	CT_UnitFramesOptionsFrameBox3TargetTextRightCB:SetChecked(CT_UnitFramesOptions.targetTextRight);
@@ -289,7 +289,7 @@ function CT_UnitFrameOptions_ColorSwatch_ShowColorPicker(self, frame)
 	frame.swatchFunc = CT_UnitFrameOptions_ColorSwatch_SetColor;
 	frame.cancelFunc = CT_UnitFrameOptions_ColorSwatch_CancelColor;
 	frame.hasOpacity = 1;
-	UIDropDownMenuButton_OpenColorPicker(frame);
+	Lib_UIDropDownMenuButton_OpenColorPicker(frame);
 end
 
 function CT_UnitFrameOptions_ColorSwatch_SetColor()
@@ -298,7 +298,7 @@ function CT_UnitFrameOptions_ColorSwatch_SetColor()
 	CT_UnitFramesOptions.styles[boxId][selectionId][2] = r;
 	CT_UnitFramesOptions.styles[boxId][selectionId][3] = g;
 	CT_UnitFramesOptions.styles[boxId][selectionId][4] = b;
-	
+
 	CT_UnitFramesOptions_Radio_Update();
 end
 
@@ -308,7 +308,7 @@ function CT_UnitFrameOptions_ColorSwatch_CancelColor()
 	CT_UnitFramesOptions.styles[boxId][selectionId][3] = CT_UnitFramesOptionsFrame.g;
 	CT_UnitFramesOptions.styles[boxId][selectionId][4] = CT_UnitFramesOptionsFrame.b;
 	CT_UnitFramesOptions.styles[boxId][selectionId][5] = CT_UnitFramesOptionsFrame.opacity;
-	
+
 	CT_UnitFramesOptions_Radio_Update();
 end
 
@@ -316,7 +316,7 @@ function CT_UnitFrameOptions_ColorSwatch_SetOpacity()
 	local a = OpacitySliderFrame:GetValue();
 	local boxId, selectionId = CT_UnitFramesOptionsFrame.boxId, CT_UnitFramesOptionsFrame.selectionId;
 	CT_UnitFramesOptions.styles[boxId][selectionId][5] = a;
-	
+
 	CT_UnitFramesOptions_Radio_Update();
 end
 
@@ -457,7 +457,7 @@ function CT_UnitFramesOptions_Lock_CB_OnClick(obj, checked, id)
 
 	local lockdata = lockTable[id];
 	CT_UnitFramesOptions.unlock[id] = not checked;
-	
+
 	if ( checked ) then
 		_G[lockdata.drag]:Hide();
 	else
@@ -580,11 +580,11 @@ module.update = function(self, type, value)
 				CT_TargetofFocusFrame:Hide();
 			end
 		end
-		
+
 		if ( not CT_UnitFramesOptions.unlock ) then
 			CT_UnitFramesOptions.unlock = { };
 		end
-		
+
 		local unlock = CT_UnitFramesOptions.unlock;
 		for i, lockdata in pairs(lockTable) do
 			CT_UnitFramesOptions_Lock_CB_OnClick(_G[lockdata.cb], not unlock[i], i);
@@ -592,7 +592,7 @@ module.update = function(self, type, value)
 
 		CT_UnitFrameOptions_SetOptionsFrame("player");
 	else
-		
+
 	end
 end
 

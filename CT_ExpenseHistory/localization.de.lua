@@ -4,30 +4,30 @@ if ( GetLocale() == "deDE" ) then
 	CT_EH_REAGENT = "Zutat";
 	CT_EH_AMMO = "Munition";
 	CT_EH_MAIL = "Post";
-	
+
 	CT_EH_LOGDATE = "Datum";
 	CT_EH_LOGTYPE = "Typ";
 	CT_EH_LOGCHAR = "Charakter";
 	CT_EH_LOGCOST = "Kosten";
-	
+
 	CT_EH_AVERAGEREPAIR = "Durchschnittliche Reparaturkosten:";
 	CT_EH_AVERAGEEXPENSES = "Durchschnittliche Ausgaben/Tag:";
-	CT_EH_FLIGHTCOSTS = "Fl\195\188ge:"; 
+	CT_EH_FLIGHTCOSTS = "Fl\195\188ge:";
 	CT_EH_REPAIRCOSTS = "Reparaturen:";
 	CT_EH_REAGENTCOSTS = "Zutaten:";
 	CT_EH_AMMOCOSTS = "Munition:";
 	CT_EH_MAILCOSTS = "Portokosten:";
-	
+
 	CT_EH_TOTALCOST = "Gesamtausgaben:";
 	CT_EH_PLAYERDISTRIBUTION = "Spielerverteilung:";
 	CT_EH_ALLSERVERS = "All Servers";
 	CT_EH_ALLCHARACTERS = "Alle Charaktere";
 	CT_EH_RECORDINGFROM = "Datenaufzeichnung von |c00FFFFFF%s|r.";
 	CT_EH_VIEWING = "Besichtigung |c00FFFFFF%s|r";
-	
+
 	CT_EH_SUMMARY = "Zusammenfassung";
 	CT_EH_LOG = "Log";
-	
+
 	-- Classes
 	CT_EH_WARRIOR = "Krieger";
 	CT_EH_MAGE = "Magier";
@@ -82,7 +82,7 @@ if ( GetLocale() == "deDE" ) then
 		["kunstlose wurfaxt"] = true,
 		["kleines wurfmesser"] = true
 	};
-	
+
 	CT_EH_MODINFO = {
 		"Expense History",
 		"Zeige Dialogfenster",

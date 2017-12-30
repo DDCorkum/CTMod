@@ -28,7 +28,7 @@ CT_Library:registerModule(module);
 CT_Viewport = {
 	["initialValues"] = {
 		[1] = 563,
-		[2] = 937, 
+		[2] = 937,
 		[3] = 736,
 		[4] = 455,
 		[5] = 375,
@@ -52,7 +52,7 @@ local frameClearAllPoints, frameSetAllPoints, frameSetPoint;
 
 function CT_Viewport_GetQuotient(number)
 	number = format("%.2f", number);
-	
+
 	for a = 1, 100, 1 do
 		for b = 1, 100, 1 do
 			if ( format("%.2f", b / a) == number ) then
@@ -60,7 +60,7 @@ function CT_Viewport_GetQuotient(number)
 			elseif ( format("%.2f", a / b) == number ) then
 				return format("%.2f |r(|c00FFFFFF%d/%d|r)", number, a, b);
 			end
-		end 
+		end
 	end
 	return number;
 end
@@ -88,7 +88,7 @@ function CT_Viewport_Resize(button, anchorPoint)
 
 	button:GetParent():StartSizing(anchorPoint);
 	CT_Viewport.isResizing = anchorPoint;
-	
+
 	-- A bit hackish, but meh, it works
 	if ( anchorPoint == "LEFT" ) then
 		button:GetParent():SetMaxResize(ivalues[5] - (ivalues[2] - iframe:GetRight()), ivalues[6]);
@@ -233,11 +233,11 @@ function CT_Viewport_ApplyViewport(left, right, top, bottom, r, g, b)
 	if ( bottom < 0 ) then
 		bottom = 0;
 	end
-	
+
 	r = ( r or 0 );
 	g = ( g or 0 );
 	b = ( b or 0 );
-	
+
 	CT_Viewport_Saved = { left, right, top, bottom, r, g, b }; -- Need to reverse top and bottom because of how it works
 
 	local update = true;
@@ -451,7 +451,7 @@ function CT_ViewportFrame_OnLoad(self)
 	CT_ViewportFrameInnerFrame:SetBackdropBorderColor(1, 1, 0, 1);
 	CT_ViewportFrameBorderFrame:SetBackdropBorderColor(1, 0, 0, 1);
 	CT_ViewportFrameInnerFrameBackground:SetVertexColor(1, 1, 0, 0.1);
-	
+
 	--[[if (not CT_ViewportOverlay) then
 		CT_ViewportOverlay = WorldFrame:CreateTexture("CT_ViewportOverlay", "BACKGROUND");
 		CT_ViewportOverlay:SetColorTexture(1, 1, 1, 0);

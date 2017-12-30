@@ -32,7 +32,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 			</Layer>
 		</Layers>
 		<Frames>
-			<Frame name="$parentDropDown" inherits="UIDropDownMenuTemplate" id="1" hidden="true">
+			<Frame name="$parentDropDown" inherits="Lib_UIDropDownMenuTemplate" id="1" hidden="true">
 				<Size>
 					<AbsDimension x="10" y="10"/>
 				</Size>

@@ -15,7 +15,7 @@
 						</Anchor>
 					</Anchors>
 					<TexCoords left="0.296875" right="0.5703125" top="0" bottom="0.515625"/>
-				</Texture>	
+				</Texture>
 				<FontString parentKey="symbol" inherits="TextStatusBarText">
 					<Anchors>
 						<Anchor point="TOPLEFT">

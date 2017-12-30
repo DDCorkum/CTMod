@@ -7,26 +7,26 @@ function CT_RAChanges_DisplayDialog()
 	-- Initialize dialog
 		-- Set title
 	CT_RA_ChangelogFrameTitle:SetText(CT_RA_Changes["title"]);
-	
+
 		-- Show sections
 	local section, totalHeight = 1, 0;
 	while ( CT_RA_Changes["section" .. section] ) do
 		local objSection = _G["CT_RA_ChangelogFrameScrollFrameSection" .. section];
 		local part, partHeights = 1, 0;
-		
+
 			-- Show section
 		objSection:Show();
-		
+
 			-- Set section title
 		_G[objSection:GetName() .. "Title"]:SetText(CT_RA_Changes["section" .. section]["title"]);
-		
+
 			-- Show parts
 		while ( CT_RA_Changes["section" .. section][part] ) do
 			local objPart = _G["CT_RA_ChangelogFrameScrollFrameSection" .. section .. "Part" .. part];
-			
+
 				-- Show part
 			objPart:Show();
-			
+
 				-- Set part stuff
 			_G[objPart:GetName() .. "Text"]:SetText(CT_RA_Changes["section" .. section][part][2]);
 			_G[objPart:GetName() .. "Text"]:SetHeight(CT_RA_Changes["section" .. section][part][1]);

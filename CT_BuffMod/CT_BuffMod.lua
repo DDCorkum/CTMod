@@ -279,8 +279,8 @@ local function constructChild(kind, name, parent, template)
 end
 
 local enchantableSlots = {
-	[1] = "MainHandSlot", 
-	[2] = "SecondaryHandSlot", 
+	[1] = "MainHandSlot",
+	[2] = "SecondaryHandSlot",
 -- rng	[3] = "RangedSlot",
 }
 
@@ -312,7 +312,7 @@ local function configureAuras(self, auraTable, consolidateTable, weaponPosition)
 				button:ClearAllPoints();
 			else
 				button = constructChild(buffWidget, name and name.."AuraButton"..i, self, buffTemplate);
-				setAttributesWithoutResponse(self, childAttr, button, "frameref-"..childAttr, GetFrameHandle(button)); 
+				setAttributesWithoutResponse(self, childAttr, button, "frameref-"..childAttr, GetFrameHandle(button));
 			end
 			local buffInfo = auraTable[i];
 			button:SetID(buffInfo.index);
@@ -424,7 +424,7 @@ local function configureAuras(self, auraTable, consolidateTable, weaponPosition)
 	end
 --]]
 	-- EndBugfix
-	
+
 	if ( display >= 1 ) then
 		self:SetWidth(max(right - left, minWidth));
 		self:SetHeight(max(top - bottom, minHeight));
@@ -953,7 +953,7 @@ local function queueBuffRecast(buffName)
 	if ( not buffQueue ) then
 		buffQueue = { };
 	end
-	
+
 	-- Make sure it's not in here already
 	for key, value in ipairs(buffQueue) do
 		if ( value == buffName ) then
@@ -1031,7 +1031,7 @@ local function autoHide_OnUpdate(self, elapsed)
 			else
 				-- Continue counting down
 				data.timer = data.timer - elapsed;
-	
+
 				-- When we reach the end...
 				if (data.timer < 0) then
 					-- Hide the frame and clear the autohide.
@@ -1191,7 +1191,7 @@ function auraClass:checkExpiration()
 	if (timeRemaining <= 0) then
 		return;
 	end
-	
+
 	-- If we haven't displayed an expiration warning for this object yet...
 	if (not self.showedWarning) then
 
@@ -2293,12 +2293,12 @@ local function auraButton_updateDimensions(button)
 		local txSpark = button.txSpark;
 		local txTimerBG = button.txTimerBG;
 		local txBackground = button.txBackground;
-	
+
 		if ( txSpark ) then
 			txSpark:SetWidth(min(frameObject.detailHeight1 * 2/3, 25));
 			txSpark:SetHeight(frameObject.detailHeight1 * 1.9);
 		end
-	
+
 		frameDetails:SetHeight(frameObject.detailHeight1);
 		frameDetails:SetWidth(frameObject.detailWidth1);
 
@@ -2402,7 +2402,7 @@ local function auraButton_updateAppearance(button)
 		button.frameDetails = frameDetails;
 	end
 
-	if ( 
+	if (
 		(frameObject.buttonStyle == 1 and frameObject.showTimers1) or
 		(frameObject.buttonStyle == 2 and frameObject.showTimers2)
 	) then
@@ -3161,7 +3161,7 @@ local oldUnsecureConsolidatedFrames = {};
 
 local tooltipBackdrop = {
 	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-	edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border", 
+	edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
 	tile = true,
 	tileSize = 16,
 	edgeSize = 16,
@@ -3169,7 +3169,7 @@ local tooltipBackdrop = {
 };
 local tooltipBackdrop2 = {
 	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-	edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border", 
+	edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
 	tile = true,
 	tileSize = 16,
 	edgeSize = 16,
@@ -5443,7 +5443,7 @@ function primaryClass:applyProtectedOptions(initFlag)
 	-- Clear the flag that gets checked when leaving combat.
 	self.needApplyProtected = false;
 
-	-- Code below this point assumes that combat restrictions won't 
+	-- Code below this point assumes that combat restrictions won't
 	-- prevent it from executing.
 
 	local consolidatedObject = self.consolidatedObject;
@@ -8660,7 +8660,7 @@ local function options_updateWindowWidgets(windowId)
 		windowId = currentWindowId;
 	end
 
-	-- To stop some widgets from achieving anything when they call module:setOption() we will 
+	-- To stop some widgets from achieving anything when they call module:setOption() we will
 	-- set the "doNotUpdateFlag" variable. It gets tested for in the module.optionUpdate()
 	-- function and if it is found to be set then the function will return without doing anything.
 	-- We just want to visually update the widges, not change any options.
@@ -8677,7 +8677,7 @@ local function options_updateWindowWidgets(windowId)
 	if (not dropdown.isInitialized) then
 		dropdown.isInitialized = true;
 		-- Only need to do this one time.
-		UIDropDownMenu_Initialize(dropdown,
+		Lib_UIDropDownMenu_Initialize(dropdown,
 			function()
 				local i = 1;
 				local dropdownEntry = {};
@@ -8688,16 +8688,16 @@ local function options_updateWindowWidgets(windowId)
 					dropdownEntry.value = i;
 					dropdownEntry.checked = nil;
 					dropdownEntry.func = dropdown.ctDropdownClick;
-					UIDropDownMenu_AddButton(dropdownEntry);
+					Lib_UIDropDownMenu_AddButton(dropdownEntry);
 					i = i + 1;
 				end
 			end
 		);
 	else
-		UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+		Lib_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
 	end
-	UIDropDownMenu_SetSelectedValue( dropdown, globalObject.windowListObject:windowIdToNum(windowId) );
-	UIDropDownMenu_JustifyText(dropdown, "LEFT");
+	Lib_UIDropDownMenu_SetSelectedValue( dropdown, globalObject.windowListObject:windowIdToNum(windowId) );
+	Lib_UIDropDownMenu_JustifyText(dropdown, "LEFT");
 
 	----------
 	-- Window
@@ -8718,8 +8718,8 @@ local function options_updateWindowWidgets(windowId)
 	local playerUnsecure = not not frameOptions.playerUnsecure;
 
 	dropdown = CT_BuffModDropdown_unitType;
-	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-	UIDropDownMenu_SetSelectedValue( dropdown, unitType );
+	Lib_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	Lib_UIDropDownMenu_SetSelectedValue( dropdown, unitType );
 
 	if (CT_BuffMod_xoptUnsecure) then
 		-- Use unsecure buttons
@@ -8765,13 +8765,13 @@ local function options_updateWindowWidgets(windowId)
 	local sortMethod = frameOptions.sortMethod or constants.SORT_METHOD_NAME;
 
 	dropdown = CT_BuffModDropdown_sortMethod;
-	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-	UIDropDownMenu_SetSelectedValue( dropdown, sortMethod );
+	Lib_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	Lib_UIDropDownMenu_SetSelectedValue( dropdown, sortMethod );
 
 	if (CT_BuffMod_xoptUnsecure) then
 		dropdown = CT_BuffModDropdown_separateZero;
-		UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-		UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.separateZero or constants.SEPARATE_ZERO_WITH );
+		Lib_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+		Lib_UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.separateZero or constants.SEPARATE_ZERO_WITH );
 		if (playerUnsecure) then
 			frame.separateZeroText:Show();
 			frame.separateZero:Show();
@@ -8784,34 +8784,34 @@ local function options_updateWindowWidgets(windowId)
 	frame.sortDirection:SetChecked( not not frameOptions.sortDirection );
 
 	dropdown = CT_BuffModDropdown_separateOwn;
-	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	Lib_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
 	-- Bug: Originally due to a bug in Blizzard's code, the SEPARATE_OWN_WITH value
 	--      acted like the SEPARATE_OWN_BEFORE value.
 	--
 	--      Note: As of WoW 4.3 they hvae fixed the bug.
 	--            I am now using SEPARATE_OWN_WITH as the default instead of SEPARATE_OWN_BEFORE.
 	--
-	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.separateOwn or constants.SEPARATE_OWN_WITH );
+	Lib_UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.separateOwn or constants.SEPARATE_OWN_WITH );
 
 	dropdown = CT_BuffModDropdown_sortSeq1;
-	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.sortSeq1 or constants.FILTER_TYPE_DEBUFF );
+	Lib_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	Lib_UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.sortSeq1 or constants.FILTER_TYPE_DEBUFF );
 
 	dropdown = CT_BuffModDropdown_sortSeq2;
-	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.sortSeq2 or constants.FILTER_TYPE_WEAPON );
+	Lib_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	Lib_UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.sortSeq2 or constants.FILTER_TYPE_WEAPON );
 
 	dropdown = CT_BuffModDropdown_sortSeq3;
-	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.sortSeq3 or constants.FILTER_TYPE_BUFF_CANCELABLE );
+	Lib_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	Lib_UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.sortSeq3 or constants.FILTER_TYPE_BUFF_CANCELABLE );
 
 	dropdown = CT_BuffModDropdown_sortSeq4;
-	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.sortSeq4 or constants.FILTER_TYPE_BUFF_UNCANCELABLE );
+	Lib_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	Lib_UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.sortSeq4 or constants.FILTER_TYPE_BUFF_UNCANCELABLE );
 
 	dropdown = CT_BuffModDropdown_sortSeq5;
-	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.sortSeq5 or constants.FILTER_TYPE_NONE );
+	Lib_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	Lib_UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.sortSeq5 or constants.FILTER_TYPE_NONE );
 
 	----------
 	-- Consolidation
@@ -8886,8 +8886,8 @@ local function options_updateWindowWidgets(windowId)
 
 	-- Layout
 	dropdown = CT_BuffModDropdown_layoutType;
-	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-	UIDropDownMenu_SetSelectedValue( dropdown, layoutType );
+	Lib_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	Lib_UIDropDownMenu_SetSelectedValue( dropdown, layoutType );
 
 	if (
 		layoutType == constants.LAYOUT_GROW_DOWN_WRAP_RIGHT or
@@ -8928,8 +8928,8 @@ local function options_updateWindowWidgets(windowId)
 	-- Appearance
 	----------
 	dropdown = CT_BuffModDropdown_buttonStyle;
-	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.buttonStyle or 1 );
+	Lib_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	Lib_UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.buttonStyle or 1 );
 
 	----------
 	-- Style 1
@@ -8939,8 +8939,8 @@ local function options_updateWindowWidgets(windowId)
 	frame.detailWidth1:SetValue( frameOptions.detailWidth1 or constants.DEFAULT_DETAIL_WIDTH );
 
 	dropdown = CT_BuffModDropdown_rightAlign1;
-	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-	UIDropDownMenu_SetSelectedValue( dropdown, tonumber(frameOptions.rightAlign1) or constants.RIGHT_ALIGN_DEFAULT );
+	Lib_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	Lib_UIDropDownMenu_SetSelectedValue( dropdown, tonumber(frameOptions.rightAlign1) or constants.RIGHT_ALIGN_DEFAULT );
 
 	frame.colorBuffs1:SetChecked( frameOptions.colorBuffs1 ~= false );
 	frame.colorCodeBackground1:SetChecked( not not frameOptions.colorCodeBackground1 );
@@ -8950,26 +8950,26 @@ local function options_updateWindowWidgets(windowId)
 	frame.colorCodeDebuffs1:SetChecked( not not frameOptions.colorCodeDebuffs1 );
 
 	dropdown = CT_BuffModDropdown_nameJustifyWithTime1;
-	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.nameJustifyWithTime1 or constants.JUSTIFY_DEFAULT );
+	Lib_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	Lib_UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.nameJustifyWithTime1 or constants.JUSTIFY_DEFAULT );
 
 	dropdown = CT_BuffModDropdown_nameJustifyNoTime1;
-	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.nameJustifyNoTime1 or constants.JUSTIFY_DEFAULT );
+	Lib_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	Lib_UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.nameJustifyNoTime1 or constants.JUSTIFY_DEFAULT );
 
 	frame.showTimers1:SetChecked( frameOptions.showTimers1 ~= false );
 
 	dropdown = CT_BuffModDropdown_durationFormat1;
-	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.durationFormat1 or 1 );
+	Lib_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	Lib_UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.durationFormat1 or 1 );
 
 	dropdown = CT_BuffModDropdown_durationLocation1;
-	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.durationLocation1 or constants.DURATION_LOCATION_DEFAULT );
+	Lib_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	Lib_UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.durationLocation1 or constants.DURATION_LOCATION_DEFAULT );
 
 	dropdown = CT_BuffModDropdown_timeJustifyNoName1;
-	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.timeJustifyNoName1 or constants.JUSTIFY_DEFAULT );
+	Lib_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	Lib_UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.timeJustifyNoName1 or constants.JUSTIFY_DEFAULT );
 
 	frame.showBuffTimer1:SetChecked( frameOptions.showBuffTimer1 ~= false );
 	frame.showTimerBackground1:SetChecked( frameOptions.showTimerBackground1 ~= false );
@@ -8986,12 +8986,12 @@ local function options_updateWindowWidgets(windowId)
 	frame.showTimers2:SetChecked( frameOptions.showTimers2 ~= false );
 
 	dropdown = CT_BuffModDropdown_durationFormat2;
-	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.durationFormat2 or 1 );
+	Lib_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	Lib_UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.durationFormat2 or 1 );
 
 	dropdown = CT_BuffModDropdown_dataSide2;
-	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.dataSide2 or constants.DATA_SIDE_BOTTOM );
+	Lib_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	Lib_UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.dataSide2 or constants.DATA_SIDE_BOTTOM );
 
 	frame.spacingFromIcon2:SetValue( frameOptions.spacingFromIcon2 or 0 );
 
