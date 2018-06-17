@@ -135,17 +135,18 @@ local function showMinimap(enable)
 	end
 end
 
-module:regEvent("CONTROL_PANEL_VISIBILITY", function(event, enabled)
-	if ( minimapFrame ) then
-		if ( enabled ) then
-			minimapFrame.enabled:Show();
-			minimapFrame.disabled:Hide();
-		else
-			minimapFrame.enabled:Hide();
-			minimapFrame.disabled:Show();
-		end
-	end
-end);
+-- commented out in WoW 8.0.1; this doesn't appear to be a recognized event in the API
+--module:regEvent("CONTROL_PANEL_VISIBILITY", function(event, enabled)
+--	if ( minimapFrame ) then
+--		if ( enabled ) then
+--			minimapFrame.enabled:Show();
+--			minimapFrame.disabled:Hide();
+--		else
+--			minimapFrame.enabled:Hide();
+--			minimapFrame.disabled:Show();
+--		end
+--	end
+--end);
 
 --------------------------------------------
 -- Slash command.
