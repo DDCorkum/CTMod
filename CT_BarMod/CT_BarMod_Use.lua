@@ -1936,8 +1936,6 @@ module.useEnable = function(self)
 	self:regEvent("ACTIONBAR_UPDATE_COOLDOWN", eventHandler_UpdateCooldown);
 	self:regEvent("ACTIONBAR_UPDATE_USABLE", eventHandler_UpdateUsable);
 	self:regEvent("UPDATE_INVENTORY_ALERTS", eventHandler_UpdateUsable);
-	self:regEvent("CRAFT_SHOW", eventHandler_UpdateState);
-	self:regEvent("CRAFT_CLOSE", eventHandler_UpdateState);
 	self:regEvent("TRADE_SKILL_SHOW", eventHandler_UpdateState);
 	self:regEvent("TRADE_SKILL_CLOSE", eventHandler_UpdateState);
 	self:regEvent("ARCHAEOLOGY_CLOSED", eventHandler_UpdateState);
@@ -1976,8 +1974,6 @@ module.useDisable = function(self)
 	self:unregEvent("ACTIONBAR_UPDATE_STATE", eventHandler_UpdateState);
 	self:unregEvent("ACTIONBAR_UPDATE_USABLE", eventHandler_UpdateUsable);
 	self:unregEvent("UPDATE_INVENTORY_ALERTS", eventHandler_UpdateUsable);
-	self:unregEvent("CRAFT_SHOW", eventHandler_UpdateState);
-	self:unregEvent("CRAFT_CLOSE", eventHandler_UpdateState);
 	self:unregEvent("TRADE_SKILL_SHOW", eventHandler_UpdateState);
 	self:unregEvent("TRADE_SKILL_CLOSE", eventHandler_UpdateState);
 	self:unregEvent("ARCHAEOLOGY_CLOSED", eventHandler_UpdateState);
