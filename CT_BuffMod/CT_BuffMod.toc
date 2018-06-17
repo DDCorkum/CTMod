@@ -1,5 +1,5 @@
-## Interface: 70300
-## Version: 7.3.2.0
+## Interface: 80100
+## Version: 8.0.1.0
 ## Title: CT_BuffMod
 ## Notes: Customizable buff display.
 ## DefaultState: Enabled
