@@ -1479,6 +1479,7 @@ end
 objectHandlers.slider = function(self, parent, name, virtual, option, text, values)
 	local slider = CreateFrame("Slider", name, parent, virtual or "OptionsSliderTemplate");
 	local title, low, high = select(10, slider:GetRegions()); -- Hack to allow for unnamed sliders
+	title = _G[name .. "Text"];  -- Temporary fix for WoW 8.0.1
 	local titleText, lowText, highText = splitString(text, colonSeparator);
 	local minValue, maxValue, step = splitString(values, colonSeparator);
 
@@ -1895,7 +1896,7 @@ local function generalObjectHandler(self, specializedHandler, str, parent, initi
 	end
 
 	-- Check override name
-	name = overrideName or name;
+	name = overrideName or name or identifier or option;  -- Temporary fix for WoW 8.0.1, added "or identifier or option"
 
 	anch1 = anch1 or "mid";
 
