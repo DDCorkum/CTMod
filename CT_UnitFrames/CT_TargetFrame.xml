@@ -65,7 +65,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 					<OnLoad>
 						self:SetBackdropColor(0, 0, 1, 0.5);
 						self:RegisterEvent("UNIT_FACTION");
-						self:RegisterEvent("UNIT_DYNAMIC_FLAGS");
+						<!-- (Removed since WoW 5.3.0) self:RegisterEvent("UNIT_DYNAMIC_FLAGS"); -->
 						self:RegisterEvent("PLAYER_TARGET_CHANGED");
 						self:RegisterEvent("GROUP_ROSTER_UPDATE");
 					</OnLoad>
