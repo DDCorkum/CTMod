@@ -518,7 +518,7 @@ function CT_FocusFrame_UpdateAuras(self)
 	-- self == The main unit frame
 	local frame, frameName;
 	local frameIcon, frameCount, frameCooldown;
-	local name, rank, icon, count, debuffType, duration, expirationTime, caster, canStealOrPurge, spellId, _;
+	local name, icon, count, debuffType, duration, expirationTime, caster, canStealOrPurge, spellId, _;
 	local frameStealable;
 	local numBuffs = 0;
 	local playerIsFocus = UnitIsUnit(PlayerFrame.unit, self.unit);
@@ -531,7 +531,7 @@ function CT_FocusFrame_UpdateAuras(self)
 	end
 
 	for i=1, MAX_TARGET_BUFFS do
-		name, rank, icon, count, debuffType, duration, expirationTime, caster, canStealOrPurge, _ , spellId = UnitBuff(self.unit, i, filter);
+		name, icon, count, debuffType, duration, expirationTime, caster, canStealOrPurge, _ , spellId = UnitBuff(self.unit, i, filter);
 
 		frameName = selfName .. "Buff" .. i;
 		frame = _G[frameName];
@@ -609,7 +609,7 @@ function CT_FocusFrame_UpdateAuras(self)
 		local debuffName = UnitDebuff(self.unit, index, filter);
 		if ( debuffName ) then
 			if ( CT_FocusFrame_ShouldShowDebuff(self.unit, index, filter) ) then
-				name, rank, icon, count, debuffType, duration, expirationTime, caster = UnitDebuff(self.unit, index, filter);
+				name, icon, count, debuffType, duration, expirationTime, caster = UnitDebuff(self.unit, index, filter);
 				frameName = selfName.."Debuff"..frameNum;
 				frame = _G[frameName];
 				if ( icon ) then
@@ -705,7 +705,7 @@ function CT_FocusFrame_ShouldShowDebuff(unit, index, filter)
 	if ( SHOW_ALL_ENEMY_DEBUFFS == "1" or not UnitCanAttack("player", unit) ) then
 		return true;
 	else
-		local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, shouldConsolidate, spellId, canApplyAura, isBossDebuff, points1, points2, points3, isCastByPlayer = UnitDebuff(unit, index, filter);
+		local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, shouldConsolidate, spellId, canApplyAura, isBossDebuff, points1, points2, points3, isCastByPlayer = UnitDebuff(unit, index, filter);
 
 		local hasCustom, alwaysShowMine, showForMySpec = SpellGetVisibilityInfo(spellId, "ENEMY_TARGET");
 		if ( hasCustom ) then
