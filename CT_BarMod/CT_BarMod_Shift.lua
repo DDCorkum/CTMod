@@ -974,8 +974,8 @@ local function CT_BarMod_Shift_OnEvent(self, event, arg1, ...)
 		DurabilityFrame:HookScript("OnShow", CT_BarMod_Shift_UIParent_ManageFramePositions);
 		DurabilityFrame:HookScript("OnHide", CT_BarMod_Shift_UIParent_ManageFramePositions);
 
-		MainMenuBarMaxLevelBar:HookScript("OnShow", CT_BarMod_Shift_UIParent_ManageFramePositions);
-		MainMenuBarMaxLevelBar:HookScript("OnHide", CT_BarMod_Shift_UIParent_ManageFramePositions);
+		-- (Requires overhaul in WoW 8.0.1) MainMenuBarMaxLevelBar:HookScript("OnShow", CT_BarMod_Shift_UIParent_ManageFramePositions);
+		-- (Requires overhaul in WoW 8.0.1) MainMenuBarMaxLevelBar:HookScript("OnHide", CT_BarMod_Shift_UIParent_ManageFramePositions);
 
 		MultiCastActionBarFrame:HookScript("OnShow", CT_BarMod_Shift_UIParent_ManageFramePositions);
 		MultiCastActionBarFrame:HookScript("OnHide", CT_BarMod_Shift_UIParent_ManageFramePositions);
@@ -983,7 +983,7 @@ local function CT_BarMod_Shift_OnEvent(self, event, arg1, ...)
 		PetActionBarFrame:HookScript("OnShow", CT_BarMod_Shift_UIParent_ManageFramePositions);
 		PetActionBarFrame:HookScript("OnHide", CT_BarMod_Shift_UIParent_ManageFramePositions);
 
-		ReputationWatchBar:HookScript("OnHide", CT_BarMod_Shift_UIParent_ManageFramePositions);
+		-- (Requires overhaul in WoW 8.0.1) ReputationWatchBar:HookScript("OnHide", CT_BarMod_Shift_UIParent_ManageFramePositions);
 	end
 
 	if (event == "PLAYER_REGEN_ENABLED" or event == "PLAYER_ENTERING_WORLD") then
