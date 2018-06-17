@@ -8,7 +8,7 @@
 -- the CTMod Team. Thank you.                 --
 ------------------------------------------------
 
---------------------------------------------
+---------------------------------------------
 -- Initialization
 
 local module = { };
@@ -671,7 +671,7 @@ function CT_BuffMod_UnsecureAuraHeader_Update(self)
 		local i = 1;
 		repeat
 			local aura, _, duration = freshTable();
-			aura.name, _, _, _, _, duration, aura.expires, aura.caster, _, aura.shouldConsolidate, _ = UnitAura(unit, i, fullFilter);
+			aura.name, _, _, _, duration, aura.expires, aura.caster, _, aura.shouldConsolidate, _ = UnitAura(unit, i, fullFilter);
 			if ( aura.name ) then
 				aura.filter = fullFilter;
 				aura.index = i;
@@ -1423,7 +1423,7 @@ function unitClass:updateSpellsForFilter(filter, buffFlag)
 	local unit, index, auraObject, auraType;
 	unit = self.unitId;
 	index = 1;
-	name, rank, texture, count, debuffType, duration, expirationTime, casterUnit, canStealOrPurge, shouldConsolidate, spellId = UnitAura(unit, index, filter);
+	name, texture, count, debuffType, duration, expirationTime, casterUnit, canStealOrPurge, shouldConsolidate, spellId = UnitAura(unit, index, filter);
 	while (name) do
 		duration = duration or 0;
 		expirationTime = expirationTime or 0;
@@ -1577,7 +1577,7 @@ function unitClass:updateSpellsForFilter(filter, buffFlag)
 		auraObject.count = count;
 
 		index = index + 1;
-		name, rank, texture, count, debuffType, duration, expirationTime, casterUnit, canStealOrPurge, shouldConsolidate, spellId = UnitAura(unit, index, filter);
+		name, texture, count, debuffType, duration, expirationTime, casterUnit, canStealOrPurge, shouldConsolidate, spellId = UnitAura(unit, index, filter);
 	end
 end
 
@@ -2340,7 +2340,7 @@ local function auraButton_updateAppearance(button)
 		if (not index or not filter) then
 			return;
 		end
-		spellId = select(11, UnitAura(frameObject:getUnitId(), index, filter));
+		spellId = select(10, UnitAura(frameObject:getUnitId(), index, filter));
 		auraObject = unitObject:findSpell(spellId);
 
 	elseif (button.mode == constants.BUTTONMODE_ENCHANT) then

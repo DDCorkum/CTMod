@@ -1,3 +1,7 @@
+CT_BarMod (8.0.1.0) 2018-06-16
+- Updated for 8.0.1
+- Temporary fixes to CT_BarMod_Shift.lua
+
 CT_BarMod (7.3.2.0) 2017-12-30
 - Updated for 7.3.2.
 
