@@ -422,6 +422,7 @@ local function updateGroupWidgets_Columns(groupId)
 
 	local slider = groupFrame.columns;
 	local title, low, high = select(10, slider:GetRegions()); -- Hack to allow for unnamed sliders
+	title = _G[slider:GetName() .. "Text"];  -- Temporary fix for WoW 8.0.1
 
 	-- Save the current value of the "barColumns" option before we change the upper limit.
 	local barColumns = module:getOption("barColumns" .. groupId) or 12;
