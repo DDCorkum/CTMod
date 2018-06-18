@@ -596,8 +596,8 @@ local function hook_UIParent_ManageFramePositions()
 	DurabilityFrame:HookScript("OnHide", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
 
 	-- From MainMenuBar.xml
-	MainMenuBarMaxLevelBar:HookScript("OnShow", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
-	MainMenuBarMaxLevelBar:HookScript("OnHide", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
+	-- (Requires overhaul in WoW 8.0.1) MainMenuBarMaxLevelBar:HookScript("OnShow", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
+	-- (Requires overhaul in WoW 8.0.1) MainMenuBarMaxLevelBar:HookScript("OnHide", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
 
 	-- From MultiCastActionBarFrame.xml
 	MultiCastActionBarFrame:HookScript("OnShow", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
@@ -608,7 +608,7 @@ local function hook_UIParent_ManageFramePositions()
 	PetActionBarFrame:HookScript("OnHide", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
 
 	-- From ReputationFrame.xml
-	ReputationWatchBar:HookScript("OnHide", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
+	-- (Requires overhaul in WoW 8.0.1) ReputationWatchBar:HookScript("OnHide", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
 end
 
 local function hookFunctions()
@@ -677,12 +677,12 @@ module.update = function(self, optName, value)
 		-- "Experience Bar" needs to load before "Reputation Bar".
 		--
 		module:loadAddon("Action Bar Arrows");
-		module:loadAddon("Bags Bar");
+		-- (Requires overhaul in WoW 8.0.1) module:loadAddon("Bags Bar");
 		module:loadAddon("Class Bar");
-		module:loadAddon("Experience Bar");
-		module:loadAddon("Reputation Bar");  -- Show after exp bar in options window
+		-- (Requires overhaul in WoW 8.0.1) module:loadAddon("Experience Bar");
+		-- (Requires overhaul in WoW 8.0.1) module:loadAddon("Reputation Bar");  -- Show after exp bar in options window
 		module:loadAddon("Extra Bar");
-		module:loadAddon("Menu Bar");
+		-- (Requires overhaul in WoW 8.0.1) module:loadAddon("Menu Bar");
 		module:loadAddon("Pet Bar");
 		module:loadAddon("Possess Bar");
 		module:loadAddon("MultiCastBar");  -- Totem bar

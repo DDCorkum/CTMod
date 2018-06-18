@@ -28,7 +28,7 @@ local function addon_Update(self)
 
 	local objUp = ActionBarUpButton;
 	local objDown = ActionBarDownButton;
-	local objPage = MainMenuBarPageNumber;
+	local objPage = MainMenuBarArtFrame.PageNumber;
 
 	self.helperFrame:ClearAllPoints();
 	self.helperFrame:SetPoint("TOPLEFT", objUp, "TOPLEFT", 5, -5);
