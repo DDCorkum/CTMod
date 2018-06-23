@@ -6,6 +6,6 @@
 ## SavedVariables: CT_UserMap_Notes, CT_MapMod_Options
 ## Dependencies: CT_Library
 
-CT_MapMod.xml
-CT_UserNoteMap.xml
-CT_MapModCoords.xml
+#CT_MapMod.xml             #Needs major overhaul to work in 8.0.1
+#CT_UserNoteMap.xml
+#CT_MapModCoords.xml
