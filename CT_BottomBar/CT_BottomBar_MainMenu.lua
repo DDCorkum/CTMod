@@ -75,11 +75,11 @@ function module:toggleGryphons(hide)
 	end
 	-- Hide/Show the gryphons
 	if ( hide ) then
-		MainMenuBarLeftEndCap:Hide();
-		MainMenuBarRightEndCap:Hide();
+		MainMenuBarArtFrame.LeftEndCap:Hide();
+		MainMenuBarArtFrame.RightEndCap:Hide();
 	else
-		MainMenuBarLeftEndCap:Show();
-		MainMenuBarRightEndCap:Show();
+		MainMenuBarArtFrame.LeftEndCap:Show();
+		MainMenuBarArtFrame.RightEndCap:Show();
 	end
 	if (type(module.frame) == "table") then
 		-- Change the checkbox in CT_BottomBar
@@ -104,85 +104,50 @@ local shownLions;
 
 function module:showLions(show)
 	if (show) then
-		MainMenuBarLeftEndCap:SetTexture("Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Human");
-		MainMenuBarRightEndCap:SetTexture("Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Human");
+		MainMenuBarArtFrame.LeftEndCap:SetTexture("Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Human");
+		MainMenuBarArtFrame.RightEndCap:SetTexture("Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Human");
 		shownLions = true;
 	else
 		-- Only show the gryphons if we have previously shown the lions.
 		if (not shownLions) then
 			return;
 		end
-		MainMenuBarLeftEndCap:SetTexture("Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Dwarf");
-		MainMenuBarRightEndCap:SetTexture("Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Dwarf");
+		MainMenuBarArtFrame.LeftEndCap:SetTexture("Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Dwarf");
+		MainMenuBarArtFrame.RightEndCap:SetTexture("Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Dwarf");
 		shownLions = false;
 	end
 end
 
 --------------------------------------------
--- Hide Left Texture
+-- Hide Background Texture
 
-local hidLeft;
+local hidBackground;
 
-function module:hideTexturesLeft(hide)
-	-- Hide/Show the left textures
-
-	-- MainMenuBarTexture0
-	--	- Texture behind action buttons 1 to 6.
-	-- MainMenuBarTexture1
-	--	- Texture behind action buttons 7 to 12.
+function module:hideTexturesBackground(hide)
+	-- Hide/Show the background textures
+	
+	-- Changed in WoW 8.0.1 to now hide the "small" texture when only the left half is showing.
 
 	if (hide) then
-		MainMenuBarTexture0:Hide();
-		MainMenuBarTexture1:Hide();
-		hidLeft = true;
+		MainMenuBarArtFrameBackground:Hide();
+		
+		hidBackground = true;
 	else
 		-- Only show the textures if we previously hid them.
-		if (not hidLeft) then
+		if (not hidBackground) then
 			return;
 		end
-		MainMenuBarTexture0:Show();
-		MainMenuBarTexture1:Show();
-		hidLeft = false;
+		MainMenuBarArtFrameBackground:Show();
+		hidBackground = false;
 	end
 end
 
---------------------------------------------
--- Hide Right Texture
-
-local hidRight;
-
-function module:hideTexturesRight(hide)
-	-- Hide/Show the right textures
-
-	-- MainMenuBarTexture2
-	--	- Texture behind the action bar arrows, the action bar page number,
-	--	  and all but the last three and 1/3 micro buttons.
-	-- MainMenuBarTexture3
-	--	- Texture behind part of the encounter journal micro button,
-	--	  the raid micro button, the menu micro button, the help
-	--	  micro button, the bag buttons, and the backpack button.
-
-	if (hide) then
-		MainMenuBarTexture2:Hide();
-		MainMenuBarTexture3:Hide();
-		hidRight = true;
-	else
-		-- Only show the textures if we previously hid them.
-		if (not hidRight) then
-			return;
-		end
-		MainMenuBarTexture2:Show();
-		MainMenuBarTexture3:Show();
-		hidRight = false;
-	end
-end
 
 --------------------------------------------
 -- Configure artwork
 
 function module:configureArtwork()
-	module:hideTexturesLeft(appliedOptions.hideTexturesLeft);
-	module:hideTexturesRight(appliedOptions.hideTexturesRight);
+	module:hideTexturesBackground(appliedOptions.hideTexturesBackground);
 end
 
 --------------------------------------------

@@ -755,7 +755,7 @@ local function tickFrameSkeleton()
 		"font#i:mana#b:0:8",
 		["onload"] = function(self)
 			self:RegisterEvent("UNIT_HEALTH");
-			self:RegisterEvent("UNIT_POWER");
+			self:RegisterEvent("UNIT_POWER_UPDATE");
 			self:SetBackdropColor(0, 0, 0, 0.75);
 			module:registerMovable("TICKMOD", self, true);
 		end,
@@ -768,7 +768,7 @@ local function tickFrameSkeleton()
 						updateTickDisplay("health", diff);
 					end
 					lastTickHealth = health;
-				elseif ( event == "UNIT_POWER" and arg2 == "MANA" ) then
+				elseif ( event == "UNIT_POWER_UPDATE" and arg2 == "MANA" ) then
 					local mana = UnitMana("player");
 					local diff = mana-lastTickMana;
 					if ( diff > 0 ) then

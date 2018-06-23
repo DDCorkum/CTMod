@@ -684,7 +684,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 			<OnLoad>
 				self:RegisterEvent("UNIT_HEALTH");
 				self:RegisterEvent("UNIT_MAXHEALTH");
-				self:RegisterEvent("UNIT_POWER");
+				self:RegisterEvent("UNIT_POWER_UPDATE");
 				self:RegisterEvent("UNIT_MAXPOWER");
 				self:RegisterEvent("UNIT_AURA");
 				self:RegisterEvent("PLAYER_AURAS_CHANGED");

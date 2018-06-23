@@ -421,17 +421,12 @@ function module:updateOption(optName, value)
 			module:showLions(value);
 		end
 
-	elseif (optName == "hideTexturesLeft") then
+	elseif (optName == "hideTexturesBackground") then
 		value = value ~= false;
 		if (applyUnprotectedOption(optName, value)) then
-			module:hideTexturesLeft(value);
+			module:hideTexturesBackground(value);
 		end
 
-	elseif (optName == "hideTexturesRight") then
-		value = value ~= false;
-		if (applyUnprotectedOption(optName, value)) then
-			module:hideTexturesRight(value);
-		end
 
 	elseif (optName == "showCTBarMod") then
 		value = not not value;
@@ -628,8 +623,7 @@ module.frame = function()
 
 		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#i:showLions#o:showLions#Show lions instead of gryphons");
 		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#i:hideGryphons#o:hideGryphons:true#Hide the gryphons/lions");
-		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#i:hideTexturesLeft#o:hideTexturesLeft:true#Hide left side artwork (main action bar)");
-		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#i:hideTexturesRight#o:hideTexturesRight:true#Hide right side artwork (menu, bags)");
+		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#i:hideTexturesBackground#o:hideTexturesBackground:true#Hide the background textures");
 	optionsEndFrame();
 
 	-- Override Frame
@@ -991,8 +985,7 @@ function module:optionsInitApplied()
 
 	appliedOptions.hideGryphons = module:getOption("hideGryphons") ~= false;
 	appliedOptions.showLions = not not module:getOption("showLions");
-	appliedOptions.hideTexturesLeft = module:getOption("hideTexturesLeft") ~= false;
-	appliedOptions.hideTexturesRight = module:getOption("hideTexturesRight") ~= false;
+	appliedOptions.hideTexturesBackground = module:getOption("hideTexturesBackground") ~= false;
 
 	for key, obj in ipairs(module.addons) do
 		local settings = obj.settings;

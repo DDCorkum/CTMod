@@ -453,7 +453,7 @@ local function addon_Register()
 		AchievementMicroButton, -- 5
 		QuestLogMicroButton, -- 6
 		GuildMicroButton, -- 7
-		PVPMicroButton, -- 8
+		--PVPMicroButton, -- 8
 		LFDMicroButton, -- 9
 		CollectionsMicroButton, -- 10
 		EJMicroButton, -- 11

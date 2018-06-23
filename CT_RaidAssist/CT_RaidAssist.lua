@@ -1302,7 +1302,7 @@ function CT_RA_OnEvent(self, event, arg1, arg2, ...)
 		if ( string.find(arg1, "^raid%d+$") ) then
 			CT_RA_ScanPartyAuras(arg1);
 		end
-	elseif ( event == "UNIT_POWER" or event == "UNIT_MAXPOWER" ) then
+	elseif ( event == "UNIT_POWER_UPDATE" or event == "UNIT_MAXPOWER" ) then
 		if (arg2 == "MANA" or arg2 == "RAGE" or arg2 == "ENERGY") then
 			local _, _, id = string.find(arg1, "^raid(%d+)$");
 			if ( id ) then
