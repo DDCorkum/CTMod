@@ -687,7 +687,6 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				self:RegisterEvent("UNIT_POWER_UPDATE");
 				self:RegisterEvent("UNIT_MAXPOWER");
 				self:RegisterEvent("UNIT_AURA");
-				self:RegisterEvent("PLAYER_AURAS_CHANGED");
 
 				self:RegisterEvent("PLAYER_TARGET_CHANGED");
 				self:RegisterEvent("PLAYER_ENTERING_WORLD");
@@ -778,7 +777,6 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				self:RegisterEvent("CHAT_MSG_RAID_LEADER");
 				self:RegisterEvent("CHAT_MSG_WHISPER");
 				self:RegisterEvent("CHAT_MSG_WHISPER_INFORM");
-				self:RegisterEvent("CHAT_MSG_COMBAT_FRIENDLY_DEATH");
 				self:RegisterEvent("CHAT_MSG_SYSTEM");
 				self:RegisterEvent("CHAT_MSG_PARTY");
 				self:RegisterEvent("CHAT_MSG_ADDON");

@@ -1,7 +1,7 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 	<Script file="CT_RAMeters.lua"/>
-	<Script file="CT_RAMeters_Localization.lua"/>
+	<!-- COMMENTED OUT BECAUSE IT IS LOADING AN EMPTY FILE: Script file="CT_RAMeters_Localization.lua"/-->
 	<Frame name="CT_RAMetersFrame" hidden="true" movable="true" parent="UIParent">
 		<Anchors>
 			<Anchor point="CENTER"/>

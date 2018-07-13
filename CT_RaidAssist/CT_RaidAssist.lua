@@ -1156,7 +1156,7 @@ function CT_RA_OnEvent(self, event, arg1, arg2, ...)
 			end
 			CT_RA_CheckGroups();
 		else
-			RegisterAddonMessagePrefix("CTRA");
+			C_ChatInfo.RegisterAddonMessagePrefix("CTRA");
 			CT_RA_UpdateRaidFrameOptions();
 		end
 
