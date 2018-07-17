@@ -1,4 +1,4 @@
-CT_Core (8.0.1.0) 2018-06-16
+CT_Core (8.0.1.0) 2018-07-17
 - Updated for 8.0.1
 - Temporary fix to CT_Core_Other.lua at line 1671
 

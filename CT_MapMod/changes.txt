@@ -1,3 +1,6 @@
+CT_MapMod (8.0.1.0) 2018-07-17
+- Temporarily disabled all functionality to avoid errors, pending major rewrite for new expansion
+
 CT_MapMod (7.3.2.0) 2017-12-30
 - Updated for 7.3.2.
 

@@ -1,3 +1,6 @@
+CT_ExpenseHistory (8.0.1.0) 2018-07-17
+- Updated for 8.0.1
+
 CT_ExpenseHistory (7.3.2.0) 2017-12-30
 - Updated for 7.3.2.
 

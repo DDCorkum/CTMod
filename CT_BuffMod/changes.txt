@@ -1,4 +1,4 @@
-CT_BuffMod (8.0.1.0) 2018-06-16
+CT_BuffMod (8.0.1.0) 2018-07-17
 - Updated for 8.0.1
 
 CT_BuffMod (7.3.2.0) 2017-12-30
