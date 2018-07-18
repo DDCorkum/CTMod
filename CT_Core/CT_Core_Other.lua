@@ -769,7 +769,7 @@ local function tickFrameSkeleton()
 					end
 					lastTickHealth = health;
 				elseif ( event == "UNIT_POWER_UPDATE" and arg2 == "MANA" ) then
-					local mana = UnitMana("player");
+					local mana = UnitPower("player");
 					local diff = mana-lastTickMana;
 					if ( diff > 0 ) then
 						updateTickDisplay("mana", diff);
@@ -835,7 +835,7 @@ local function toggleTick(enable)
 		end
 		tickFrame:Show();
 		updateTickFrameOptions();
-		lastTickHealth, lastTickMana = UnitHealth("player"), UnitMana("player");
+		lastTickHealth, lastTickMana = UnitHealth("player"), UnitPower("player");
 
 	elseif ( tickFrame ) then
 		tickFrame:Hide();

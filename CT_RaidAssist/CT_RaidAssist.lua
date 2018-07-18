@@ -1632,10 +1632,10 @@ function CT_RA_UpdateUnitMana(frame)
 	local id = "raid" .. frame.id;
 	local percent;
 	if ( UnitExists(id) ) then
-		if (UnitManaMax(id) == 0) then
+		if (UnitPowerMax(id) == 0) then
 			percent = 0;
 		else
-			percent = floor(UnitMana(id) / UnitManaMax(id) * 100);
+			percent = floor(UnitPower(id) / UnitPowerMax(id) * 100);
 		end
 	end
 	frame.MPBar:SetValue(percent);
@@ -2086,7 +2086,7 @@ function CT_RA_UpdateMT(raidid, mtid, frame, val)
 		frame.Percent:SetPoint("TOP", frameName, "TOPLEFT", 47, -18);
 	end
 	if ( raidid and UnitExists(raidid) and strlen(UnitName(raidid) or "") > 0 ) then
-		local health, healthmax, mana, manamax = UnitHealth(raidid), UnitHealthMax(raidid), UnitMana(raidid), UnitManaMax(raidid);
+		local health, healthmax, mana, manamax = UnitHealth(raidid), UnitHealthMax(raidid), UnitPower(raidid), UnitPowerMax(raidid);
 		frame.Name:SetHeight(15);
 		frame.Status:Hide();
 		frame.HPBar:Show();
@@ -2220,10 +2220,10 @@ function CT_RA_UpdateMTs(forceUpdate)
 				else
 					hppercent = UnitHealth(raidid) / UnitHealthMax(raidid);
 				end
-				if (UnitManaMax(raidid) == 0) then
+				if (UnitPowerMax(raidid) == 0) then
 					mppercent = 0;
 				else
-					mppercent = UnitMana(raidid) / UnitManaMax(raidid);
+					mppercent = UnitPower(raidid) / UnitPowerMax(raidid);
 				end
 				if ( forceUpdate or name ~= ( frame.unitName or "" ) or hppercent ~= ( frame.hppercent or -1 ) or mppercent ~= ( frame.mppercent or -1 ) or not UnitIsConnected(raidid) ) then
 					if ( not UnitIsConnected(raidid) ) then
@@ -2271,7 +2271,7 @@ function CT_RA_UpdatePT(raidid, frame, val)
 		frame.Percent:SetPoint("TOP", frameName, "TOPLEFT", 47, -18);
 	end
 	if ( raidid and UnitExists(raidid) and strlen(UnitName(raidid) or "") > 0 ) then
-		local health, healthmax, mana, manamax = UnitHealth(raidid), UnitHealthMax(raidid), UnitMana(raidid), UnitManaMax(raidid);
+		local health, healthmax, mana, manamax = UnitHealth(raidid), UnitHealthMax(raidid), UnitPower(raidid), UnitPowerMax(raidid);
 		frame.Name:SetHeight(15);
 		frame.Status:Hide();
 		frame.HPBar:Show();
@@ -2387,10 +2387,10 @@ function CT_RA_UpdatePTs(forceUpdate)
 					else
 						hppercent = UnitHealth(raidid) / UnitHealthMax(raidid);
 					end
-					if (UnitManaMax(raidid) == 0) then
+					if (UnitPowerMax(raidid) == 0) then
 						mppercent = 0;
 					else
-						mppercent = UnitMana(raidid) / UnitManaMax(raidid);
+						mppercent = UnitPower(raidid) / UnitPowerMax(raidid);
 					end
 					if ( forceUpdate or name ~= ( frame.unitName or "" ) or hppercent ~= ( frame.hppercent or -1 ) or mppercent ~= ( frame.mppercent or -1 ) or not UnitIsConnected(raidid) ) then
 						if ( not UnitIsConnected(raidid) ) then
@@ -2438,7 +2438,7 @@ function CT_RA_UpdatePTT(raidid, frame, val)
 		frame.Percent:SetPoint("TOP", frameName, "TOPLEFT", 47, -18);
 	end
 	if ( raidid and UnitExists(raidid) and strlen(UnitName(raidid) or "") > 0 ) then
-		local health, healthmax, mana, manamax = UnitHealth(raidid), UnitHealthMax(raidid), UnitMana(raidid), UnitManaMax(raidid);
+		local health, healthmax, mana, manamax = UnitHealth(raidid), UnitHealthMax(raidid), UnitPower(raidid), UnitPowerMax(raidid);
 		frame.Name:SetHeight(15);
 		frame.Status:Hide();
 		frame.HPBar:Show();
@@ -2561,10 +2561,10 @@ function CT_RA_UpdatePTTs(forceUpdate)
 					else
 						hppercent = UnitHealth(raidid) / UnitHealthMax(raidid);
 					end
-					if (UnitManaMax(raidid) == 0) then
+					if (UnitPowerMax(raidid) == 0) then
 						mppercent = 0;
 					else
-						mppercent = UnitMana(raidid) / UnitManaMax(raidid);
+						mppercent = UnitPower(raidid) / UnitPowerMax(raidid);
 					end
 					if ( forceUpdate or name ~= ( frame.unitName or "" ) or hppercent ~= ( frame.hppercent or -1 ) or mppercent ~= ( frame.mppercent or -1 ) or not UnitIsConnected(raidid) ) then
 						if ( not UnitIsConnected(raidid) ) then
@@ -2617,7 +2617,7 @@ function CT_RA_UpdateMTTT(raidid, mtid, frame, val)
 		frame.Percent:SetPoint("TOP", frameName, "TOPLEFT", 47, -18);
 	end
 	if ( raidid and UnitExists(raidid) and strlen(UnitName(raidid) or "") > 0 ) then
-		local health, healthmax, mana, manamax = UnitHealth(raidid), UnitHealthMax(raidid), UnitMana(raidid), UnitManaMax(raidid);
+		local health, healthmax, mana, manamax = UnitHealth(raidid), UnitHealthMax(raidid), UnitPower(raidid), UnitPowerMax(raidid);
 		frame.Name:SetHeight(15);
 		frame.Status:Hide();
 		frame.HPBar:Show();
@@ -2744,10 +2744,10 @@ function CT_RA_UpdateMTTTs(forceUpdate)
 				else
 					hppercent = UnitHealth(raidid) / UnitHealthMax(raidid);
 				end
-				if (UnitManaMax(raidid) == 0) then
+				if (UnitPowerMax(raidid) == 0) then
 					mppercent = 0;
 				else
-					mppercent = UnitMana(raidid) / UnitManaMax(raidid);
+					mppercent = UnitPower(raidid) / UnitPowerMax(raidid);
 				end
 				if ( forceUpdate or name ~= ( frame.unitName or "" ) or hppercent ~= ( frame.hppercent or -1 ) or mppercent ~= ( frame.mppercent or -1 ) or not UnitIsConnected(raidid) ) then
 					if ( not UnitIsConnected(raidid) ) then
