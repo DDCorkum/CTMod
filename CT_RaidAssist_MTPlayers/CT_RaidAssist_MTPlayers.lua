@@ -1321,7 +1321,7 @@ function CT_RA_MTPlayers_EK_RA_UpdateMTPs(forceUpdate)
 
 					local name = (CT_RA_MTPlayers_UnitName(raidid) or "");
 					local hpmax = UnitHealthMax(raidid);
-					local mpmax = UnitManaMax(raidid);
+					local mpmax = UnitPowerMax(raidid);
 					local hppercent;
 					local mppercent;
 					if (hpmax and hpmax ~= 0) then
@@ -1330,7 +1330,7 @@ function CT_RA_MTPlayers_EK_RA_UpdateMTPs(forceUpdate)
 						hppercent = -1;
 					end
 					if (mpmax and mpmax ~= 0) then
-						mppercent = UnitMana(raidid)/mpmax;
+						mppercent = UnitPower(raidid)/mpmax;
 					else
 						mppercent = -1;
 					end
@@ -1411,7 +1411,7 @@ function CT_RA_MTPlayers_EK_RA_UpdateMTPs(forceUpdate)
 
 					local name = (CT_RA_MTPlayers_UnitName(raidid) or "");
 					local hpmax = UnitHealthMax(raidid);
-					local mpmax = UnitManaMax(raidid);
+					local mpmax = UnitPowerMax(raidid);
 					local hppercent;
 					local mppercent;
 					if (hpmax and hpmax ~= 0) then
@@ -1420,7 +1420,7 @@ function CT_RA_MTPlayers_EK_RA_UpdateMTPs(forceUpdate)
 						hppercent = -1;
 					end
 					if (mpmax and mpmax ~= 0) then
-						mppercent = UnitMana(raidid)/mpmax;
+						mppercent = UnitPower(raidid)/mpmax;
 					else
 						mppercent = -1;
 					end
@@ -1526,7 +1526,7 @@ function CT_RA_MTPlayers_EK_RA_UpdateMT(raidid, mtid, frame, val, isPet)
 		frame.Percent:SetPoint("TOP", frameName, "TOPLEFT", 47, -18);
 	end
 	if ( raidid and UnitExists(raidid) and strlen(CT_RA_MTPlayers_UnitName(raidid) or "") > 0 ) then
-		local health, healthmax, mana, manamax = UnitHealth(raidid), UnitHealthMax(raidid), UnitMana(raidid), UnitManaMax(raidid);
+		local health, healthmax, mana, manamax = UnitHealth(raidid), UnitHealthMax(raidid), UnitPower(raidid), UnitPowerMax(raidid);
 
 		frame.Name:SetHeight(15);
 		frame.Status:Hide();

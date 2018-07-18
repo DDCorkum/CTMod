@@ -403,10 +403,10 @@ function CT_RAMeters_UpdateWindow()
 					)
 				) then
 					statsTable[class]["numMana"] = statsTable[class]["numMana"] + 1;
-					if (UnitManaMax(id) == 0) then
+					if (UnitPowerMax(id) == 0) then
 						mana = 0;
 					else
-						mana = UnitMana(id) / UnitManaMax(id);
+						mana = UnitPower(id) / UnitPowerMax(id);
 					end
 				end
 				statsTable[class]["health"] = statsTable[class]["health"] + health;
