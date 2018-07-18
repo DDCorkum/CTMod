@@ -3899,7 +3899,7 @@ end
 
 function CT_RA_GetBuffIndex(buffname)
 	local i = 1;
-	local name, = UnitBuff("player", i)
+	local name = UnitBuff("player", i)
 	while ( name ) do
 		if ( buffname == name ) then
 			return i;
