@@ -56,7 +56,7 @@ function CT_PartyBuffs_RefreshBuffs(self, elapsed)
 			if ( i > numBuffs ) then
 				_G[name .. "Buff" .. i]:Hide();
 			else
-				local _, _, bufftexture = UnitBuff("party" .. self:GetID(), i);
+				local _, bufftexture = UnitBuff("party" .. self:GetID(), i);
 				if ( bufftexture ) then
 					_G[name .. "Buff" .. i .. "Icon"]:SetTexture(bufftexture);
 					_G[name .. "Buff" .. i]:Show();
@@ -71,7 +71,7 @@ function CT_PartyBuffs_RefreshBuffs(self, elapsed)
 					if ( i > numDebuffs ) then
 						_G[name .. "Debuff" .. i]:Hide();
 					else
-						local _, _, debufftexture, debuffApplications, debuffType = UnitDebuff("party" .. self:GetID(), i);
+						local _, debufftexture, debuffApplications, debuffType = UnitDebuff("party" .. self:GetID(), i);
 						if ( debufftexture ) then
 							local color;
 							if ( debuffApplications > 1 ) then
@@ -113,7 +113,7 @@ function CT_PartyBuffs_RefreshPetBuffs(self, elapsed)
 			if ( i > numPetBuffs ) then
 				_G[self:GetName() .. "Buff" .. i]:Hide();
 			else
-				_, _, bufftexture = UnitBuff("pet", i);
+				_, bufftexture = UnitBuff("pet", i);
 				if ( bufftexture ) then
 					_G[self:GetName() .. "Buff" .. i .. "Icon"]:SetTexture(bufftexture);
 					_G[self:GetName() .. "Buff" .. i]:Show();

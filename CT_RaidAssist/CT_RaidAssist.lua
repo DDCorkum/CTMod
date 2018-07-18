@@ -1632,10 +1632,10 @@ function CT_RA_UpdateUnitMana(frame)
 	local id = "raid" .. frame.id;
 	local percent;
 	if ( UnitExists(id) ) then
-		if (UnitManaMax(id) == 0) then
+		if (UnitPowerMax(id) == 0) then
 			percent = 0;
 		else
-			percent = floor(UnitMana(id) / UnitManaMax(id) * 100);
+			percent = floor(UnitPower(id) / UnitPowerMax(id) * 100);
 		end
 	end
 	frame.MPBar:SetValue(percent);
@@ -2086,7 +2086,7 @@ function CT_RA_UpdateMT(raidid, mtid, frame, val)
 		frame.Percent:SetPoint("TOP", frameName, "TOPLEFT", 47, -18);
 	end
 	if ( raidid and UnitExists(raidid) and strlen(UnitName(raidid) or "") > 0 ) then
-		local health, healthmax, mana, manamax = UnitHealth(raidid), UnitHealthMax(raidid), UnitMana(raidid), UnitManaMax(raidid);
+		local health, healthmax, mana, manamax = UnitHealth(raidid), UnitHealthMax(raidid), UnitPower(raidid), UnitPowerMax(raidid);
 		frame.Name:SetHeight(15);
 		frame.Status:Hide();
 		frame.HPBar:Show();
@@ -2220,10 +2220,10 @@ function CT_RA_UpdateMTs(forceUpdate)
 				else
 					hppercent = UnitHealth(raidid) / UnitHealthMax(raidid);
 				end
-				if (UnitManaMax(raidid) == 0) then
+				if (UnitPowerMax(raidid) == 0) then
 					mppercent = 0;
 				else
-					mppercent = UnitMana(raidid) / UnitManaMax(raidid);
+					mppercent = UnitPower(raidid) / UnitPowerMax(raidid);
 				end
 				if ( forceUpdate or name ~= ( frame.unitName or "" ) or hppercent ~= ( frame.hppercent or -1 ) or mppercent ~= ( frame.mppercent or -1 ) or not UnitIsConnected(raidid) ) then
 					if ( not UnitIsConnected(raidid) ) then
@@ -2271,7 +2271,7 @@ function CT_RA_UpdatePT(raidid, frame, val)
 		frame.Percent:SetPoint("TOP", frameName, "TOPLEFT", 47, -18);
 	end
 	if ( raidid and UnitExists(raidid) and strlen(UnitName(raidid) or "") > 0 ) then
-		local health, healthmax, mana, manamax = UnitHealth(raidid), UnitHealthMax(raidid), UnitMana(raidid), UnitManaMax(raidid);
+		local health, healthmax, mana, manamax = UnitHealth(raidid), UnitHealthMax(raidid), UnitPower(raidid), UnitPowerMax(raidid);
 		frame.Name:SetHeight(15);
 		frame.Status:Hide();
 		frame.HPBar:Show();
@@ -2387,10 +2387,10 @@ function CT_RA_UpdatePTs(forceUpdate)
 					else
 						hppercent = UnitHealth(raidid) / UnitHealthMax(raidid);
 					end
-					if (UnitManaMax(raidid) == 0) then
+					if (UnitPowerMax(raidid) == 0) then
 						mppercent = 0;
 					else
-						mppercent = UnitMana(raidid) / UnitManaMax(raidid);
+						mppercent = UnitPower(raidid) / UnitPowerMax(raidid);
 					end
 					if ( forceUpdate or name ~= ( frame.unitName or "" ) or hppercent ~= ( frame.hppercent or -1 ) or mppercent ~= ( frame.mppercent or -1 ) or not UnitIsConnected(raidid) ) then
 						if ( not UnitIsConnected(raidid) ) then
@@ -2438,7 +2438,7 @@ function CT_RA_UpdatePTT(raidid, frame, val)
 		frame.Percent:SetPoint("TOP", frameName, "TOPLEFT", 47, -18);
 	end
 	if ( raidid and UnitExists(raidid) and strlen(UnitName(raidid) or "") > 0 ) then
-		local health, healthmax, mana, manamax = UnitHealth(raidid), UnitHealthMax(raidid), UnitMana(raidid), UnitManaMax(raidid);
+		local health, healthmax, mana, manamax = UnitHealth(raidid), UnitHealthMax(raidid), UnitPower(raidid), UnitPowerMax(raidid);
 		frame.Name:SetHeight(15);
 		frame.Status:Hide();
 		frame.HPBar:Show();
@@ -2561,10 +2561,10 @@ function CT_RA_UpdatePTTs(forceUpdate)
 					else
 						hppercent = UnitHealth(raidid) / UnitHealthMax(raidid);
 					end
-					if (UnitManaMax(raidid) == 0) then
+					if (UnitPowerMax(raidid) == 0) then
 						mppercent = 0;
 					else
-						mppercent = UnitMana(raidid) / UnitManaMax(raidid);
+						mppercent = UnitPower(raidid) / UnitPowerMax(raidid);
 					end
 					if ( forceUpdate or name ~= ( frame.unitName or "" ) or hppercent ~= ( frame.hppercent or -1 ) or mppercent ~= ( frame.mppercent or -1 ) or not UnitIsConnected(raidid) ) then
 						if ( not UnitIsConnected(raidid) ) then
@@ -2617,7 +2617,7 @@ function CT_RA_UpdateMTTT(raidid, mtid, frame, val)
 		frame.Percent:SetPoint("TOP", frameName, "TOPLEFT", 47, -18);
 	end
 	if ( raidid and UnitExists(raidid) and strlen(UnitName(raidid) or "") > 0 ) then
-		local health, healthmax, mana, manamax = UnitHealth(raidid), UnitHealthMax(raidid), UnitMana(raidid), UnitManaMax(raidid);
+		local health, healthmax, mana, manamax = UnitHealth(raidid), UnitHealthMax(raidid), UnitPower(raidid), UnitPowerMax(raidid);
 		frame.Name:SetHeight(15);
 		frame.Status:Hide();
 		frame.HPBar:Show();
@@ -2744,10 +2744,10 @@ function CT_RA_UpdateMTTTs(forceUpdate)
 				else
 					hppercent = UnitHealth(raidid) / UnitHealthMax(raidid);
 				end
-				if (UnitManaMax(raidid) == 0) then
+				if (UnitPowerMax(raidid) == 0) then
 					mppercent = 0;
 				else
-					mppercent = UnitMana(raidid) / UnitManaMax(raidid);
+					mppercent = UnitPower(raidid) / UnitPowerMax(raidid);
 				end
 				if ( forceUpdate or name ~= ( frame.unitName or "" ) or hppercent ~= ( frame.hppercent or -1 ) or mppercent ~= ( frame.mppercent or -1 ) or not UnitIsConnected(raidid) ) then
 					if ( not UnitIsConnected(raidid) ) then
@@ -3899,20 +3899,20 @@ end
 
 function CT_RA_GetBuffIndex(buffname)
 	local i = 1;
-	local name, rank = UnitBuff("player", i)
+	local name, = UnitBuff("player", i)
 	while ( name ) do
 		if ( buffname == name ) then
 			return i;
 		end
 		i = i + 1;
-		name, rank = UnitAura("player", i)
+		name = UnitAura("player", i)
 	end
 	return nil;
 end
 
 function CT_RA_GetBuffTimeLeft(index)
 	local _, duration, expirationTime, timeLeft;
-	_, _, _, _, _, duration, expirationTime = UnitBuff("player", index);
+	_, _, _, _, duration, expirationTime = UnitBuff("player", index);
 	if (not expirationTime) then
 		expirationTime = GetTime();
 		duration = expirationTime;
@@ -3925,7 +3925,7 @@ function CT_RA_GetBuffTimeLeft(index)
 end
 
 function CT_RA_GetBuffTexture(index)
-	local _, _, icon = UnitBuff("player", index);
+	local _, icon = UnitBuff("player", index);
 	return icon;
 end
 
@@ -4492,7 +4492,7 @@ function CT_RA_CheckFD(name, unit)
 	end
 	local hasFD = 0;
 	local num = 0;
-	local buff, _, texture = UnitBuff(unit, 1);
+	local buff, texture = UnitBuff(unit, 1);
 	while ( buff ) do
 		if ( texture == "Interface\\Icons\\Ability_Rogue_FeignDeath" ) then
 			hasFD = 1;
@@ -4502,7 +4502,7 @@ function CT_RA_CheckFD(name, unit)
 			break;
 		end
 		num = num + 1;
-		buff, _, texture = UnitBuff(unit, num+1);
+		buff, texture = UnitBuff(unit, num+1);
 	end
 	return hasFD;
 end
@@ -4518,7 +4518,7 @@ function CT_RA_ScanUnitBuffs(unit, name, id)
 	end
 	stats.n = 0;
 	local num = 0;
-	local buffName, _, buff, _, _, dur = UnitBuff(unit, 1);
+	local buffName, buff, _, _, dur = UnitBuff(unit, 1);
 	local duplicateTextures = {
 		["Interface\\Icons\\Spell_Nature_Regeneration"] = true,
 		["Interface\\Icons\\Spell_Nature_LightningShield"] = true
@@ -4534,7 +4534,7 @@ function CT_RA_ScanUnitBuffs(unit, name, id)
 		end
 		stats.n = stats.n + 1;
 		oldAuras[buffName] = nil;
-		buffName, _, buff, _, _, dur = UnitBuff(unit, num+1);
+		buffName, buff, _, _, dur = UnitBuff(unit, num+1);
 	end
 	for k, v in pairs(oldAuras) do
 		stats[k] = nil;
@@ -4587,7 +4587,7 @@ function CT_RA_ScanUnitDebuffs(unit, name, id)
 	end
 	stats.n = 0;
 	local num = 0;
-	local debuffName, _, debuff, applications, dType = UnitDebuff(unit, 1);
+	local debuffName, debuff, applications, dType = UnitDebuff(unit, 1);
 	while ( debuff ) do
 		stats.n = stats.n + 1;
 		num = num + 1;
@@ -4622,7 +4622,7 @@ function CT_RA_ScanUnitDebuffs(unit, name, id)
 				end
 			end
 		end
-		debuffName, _, debuff, applications, dType = UnitDebuff(unit, num+1);
+		debuffName, debuff, applications, dType = UnitDebuff(unit, num+1);
 	end
 	for k, v in pairs(oldAuras) do
 		stats[k] = nil;
