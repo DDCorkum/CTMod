@@ -1,3 +1,6 @@
+CT_BottomBar (8.0.1.2) 2018-07-19
+- Restored XP/Rep bar functionality, works with Artifact/Azerite power too!
+
 CT_BottomBar (8.0.1.0) 2018-07-17
 - Partially updated for 8.0.1
 - Some addon functionality disabled, pending further updates: XP, rep, menu and bag bars
