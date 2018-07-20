@@ -687,6 +687,7 @@ module.update = function(self, optName, value)
 		module:loadAddon("Possess Bar");
 		module:loadAddon("MultiCastBar");  -- Totem bar
 		module:loadAddon("Vehicle Bar");
+		module:loadAddon("Status Bar");
 	end
 
 	-- Hook some functions.

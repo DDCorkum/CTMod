@@ -43,18 +43,14 @@ local function addon_Enable(self)
 	if (not not self.frame) then
 		StatusTrackingBarManager:SetParent(self.frame);
 		StatusTrackingBarManager:UpdateBarsShown();
-		DEFAULT_CHAT_FRAME:AddMessage("Enable1");
 	end
-	DEFAULT_CHAT_FRAME:AddMessage("Enable2");
 end
 
 local function addon_Disable(self)
 	if (not not CT_BottomBar_StatusBar_DefaultParent) then
 		StatusTrackingBarManager:SetParent(CT_BottomBar_StatusBar_DefaultParent);
 		StatusTrackingBarManager:UpdateBarsShown();
-		DEFAULT_CHAT_FRAME:AddMessage("Disable1");
 	end
-	DEFAULT_CHAT_FRAME:AddMessage("Disable2");
 end
 
 local function addon_Init(self)
