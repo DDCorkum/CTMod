@@ -88,7 +88,7 @@ local function addon_Register()
 	module:registerAddon(
 		"Status Bar",  -- option name
 		"StatusBar",  -- used in frame names
-		"Status Bar",  -- shown in options window & tooltips
+		"Status Bar (XP & rep)",  -- shown in options window & tooltips
 		"Status Bar",  -- title for horizontal orientation
 		nil,  -- title for vertical orientation
 		{ "BOTTOMLEFT", ctRelativeFrame, "BOTTOM", -512, 18 },

@@ -25,3 +25,4 @@ CT_BottomBar_Possess.lua
 # CT_BottomBar_Rep.lua	      # StatusBar
 CT_BottomBar_Vehicle.lua
 CT_BottomBar_StatusBar.lua
+CT_BottomBar_FPS.lua
