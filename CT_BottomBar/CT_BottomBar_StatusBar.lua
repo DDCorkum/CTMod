@@ -91,7 +91,7 @@ local function addon_Register()
 		"Status Bar",  -- shown in options window & tooltips
 		"Status Bar",  -- title for horizontal orientation
 		nil,  -- title for vertical orientation
-		{ "BOTTOMLEFT", ctRelativeFrame, "BOTTOM", -400, 140 },
+		{ "BOTTOMLEFT", ctRelativeFrame, "BOTTOM", -512, 18 },
 		{ -- settings
 			orientation = "ACROSS",
 		},

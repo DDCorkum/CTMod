@@ -19,6 +19,13 @@ local module = _G.CT_BottomBar;
 local ctRelativeFrame = module.ctRelativeFrame;
 local appliedOptions;
 
+CT_BottomBar_Arrows_MainMenuBarArtFrameDefaultPosition = nil;
+CT_BB_Arrows_MainMenuArtDefaultPoint = nil;
+CT_BB_Arrows_MainMenuArtDefaultRelativeTo = nil;
+CT_BB_Arrows_MainMenuArtDefaultRelativePoint = nil;
+CT_BB_Arrows_MainMenuArtDefaultX = nil;
+CT_BB_Arrows_MainMenuArtDefaultY = nil;
+
 --------------------------------------------
 -- Action bar arrows and page number
 
@@ -28,23 +35,35 @@ local function addon_Update(self)
 
 	local objUp = ActionBarUpButton;
 	local objDown = ActionBarDownButton;
-	local objPage = MainMenuBarArtFrame.PageNumber;
+
 
 	self.helperFrame:ClearAllPoints();
-	self.helperFrame:SetPoint("TOPLEFT", objUp, "TOPLEFT", 5, -5);
-	self.helperFrame:SetPoint("BOTTOMRIGHT", objDown, "BOTTOMRIGHT", 5, 5);
+	self.helperFrame:SetPoint("TOPLEFT", objUp, "TOPLEFT", -5, 5);
+	self.helperFrame:SetPoint("BOTTOMRIGHT", objDown, "BOTTOMRIGHT", 15, -5);
 
 	objDown:SetParent(self.frame);
-	objDown:ClearAllPoints();
-	objDown:SetPoint("BOTTOMLEFT", self.frame, 0, 0);
-
 	objUp:SetParent(self.frame);
+	
+	objDown:ClearAllPoints();
 	objUp:ClearAllPoints();
-	objUp:SetPoint("BOTTOMLEFT", objDown, "TOPLEFT", 0, -12);
 
-	objPage:SetParent(self.frame);
-	objPage:ClearAllPoints();
-	objPage:SetPoint("TOPLEFT", objDown, "TOPLEFT", 32.5, 0);
+	objDown:SetPoint("BOTTOMLEFT", self.frame, 0, 0);
+	objUp:SetPoint("BOTTOMLEFT", objDown, "TOPLEFT", 0, 0);
+	
+	--From WoW 8.0 forward, this moves the number next to the arrows but ONLY if the background textures are hidden
+	CT_BottomBar_Arrows_FixMainMenuBarArtFrameBackground(self)
+
+	
+end
+
+function CT_BottomBar_Arrows_FixMainMenuBarArtFrameBackground(self)
+	if (appliedOptions.hideTexturesBackground) then
+		MainMenuBarArtFrameBackground:ClearAllPoints();
+		MainMenuBarArtFrameBackground:SetPoint("BOTTOMLEFT", self.frame, "BOTTOMLEFT", -515, 0);
+	else
+		MainMenuBarArtFrameBackground:ClearAllPoints();
+		MainMenuBarArtFrameBackground:SetPoint(CT_BB_Arrows_MainMenuArtDefaultPoint, CT_BB_Arrows_MainMenuArtDefaultRelativeTo, CT_BB_Arrows_MainMenuArtDefaultRelativePoint, CT_BB_Arrows_MainMenuArtDefaultX, CT_BB_Arrows_MainMenuArtDefaultY);
+	end
 end
 
 local function addon_Enable(self)
@@ -63,6 +82,8 @@ local function addon_Init(self)
 
 	local frame = CreateFrame("Frame", "CT_BottomBar_" .. self.frameName .. "_GuideFrame");
 	self.helperFrame = frame;
+	
+	CT_BB_Arrows_MainMenuArtDefaultPoint, CT_BB_Arrows_MainMenuArtDefaultRelativeTo, CT_BB_Arrows_MainMenuArtDefaultRelativePoint, CT_BB_Arrows_MainMenuArtDefaultX, CT_BB_Arrows_MainMenuArtDefaultY = MainMenuBarArtFrameBackground:GetPoint(1);
 
 	return true;
 end
@@ -74,7 +95,7 @@ local function addon_Register()
 		"Action Bar Page",  -- shown in options window & tooltips
 		"Page",  -- title for horizontal orientation
 		nil,  -- title for vertical orientation
-		{ "BOTTOMLEFT", ctRelativeFrame, "BOTTOM", -6, -5 },
+		{ "BOTTOMLEFT", ctRelativeFrame, "BOTTOM", -6, 24 },
 		{ -- settings
 			orientation = "ACROSS",
 		},
@@ -88,7 +109,7 @@ local function addon_Register()
 		"helperFrame",
 		ActionBarUpButton,
 		ActionBarDownButton,
-		MainMenuBarPageNumber
+		MainMenuBarArtFrame.PageNumber
 	);
 end
 

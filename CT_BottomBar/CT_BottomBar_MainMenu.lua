@@ -141,6 +141,9 @@ function module:hideTexturesBackground(hide)
 		hidMainBackground = false;
 	end
 	
+	-- From WoW 8.0.1 foward, it is necessary for this frame to follow the arrows when it is hidden, but stay in place when visible
+	CT_BottomBar_Arrows_FixMainMenuBarArtFrameBackground(module.ctActionBarPage);
+	
 end
 
 --From WoW 8.0.1 forward, this hides the micro-button menu and bags artwork in the bottom right
