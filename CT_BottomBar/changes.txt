@@ -1,5 +1,7 @@
-CT_BottomBar (8.0.1.2) 2018-07-19
+CT_BottomBar (8.0.1.2) 2018-07-20
 - Restored XP/Rep bar functionality, works with Artifact/Azerite power too!
+- Restored micro-button and bag bars, added option to hide background
+- Partially resolved problem with battleground queuing.
 
 CT_BottomBar (8.0.1.0) 2018-07-17
 - Partially updated for 8.0.1

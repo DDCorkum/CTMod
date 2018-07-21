@@ -20,6 +20,8 @@ local ctRelativeFrame = module.ctRelativeFrame;
 local appliedOptions;
 
 CT_BottomBar_StatusBar_DefaultParent = nil;
+CT_BottomBar_StatusBar_Frame = nil;
+CT_BottomBar_StatusBar_HelperFrame = nil;
 
 --------------------------------------------
 -- Status Tracking Bar Manager
@@ -28,13 +30,17 @@ local function addon_Update(self)
 	-- Update the frame
 	-- self == status tracking bar manager object
 
-	self.helperFrame:ClearAllPoints();
-	self.helperFrame:SetPoint("TOPLEFT", StatusTrackingBarManager, "TOPLEFT", -5, 5);
-	self.helperFrame:SetPoint("BOTTOMRIGHT", StatusTrackingBarManager, "BOTTOMRIGHT", 5, -5);
-
-	--StatusTrackingBarManager:SetParent(self.frame);
+	CT_BottomBar_StatusBar_Frame:SetWidth(appliedOptions.customStatusBarWidth or 1024);
+		
 	StatusTrackingBarManager:ClearAllPoints();
 	StatusTrackingBarManager:SetPoint("TOPLEFT", self.frame, 0, 0);
+	StatusTrackingBarManager:UpdateBarsShown();
+	
+	CT_BottomBar_StatusBar_HelperFrame:ClearAllPoints();
+	CT_BottomBar_StatusBar_HelperFrame:SetPoint("TOPLEFT", CT_BottomBar_StatusBar_Frame, "TOPLEFT", -5, 5);
+	CT_BottomBar_StatusBar_HelperFrame:SetPoint("BOTTOMRIGHT", CT_BottomBar_StatusBar_Frame, "BOTTOMRIGHT", 5, -5);
+
+
 
 end
 
@@ -58,28 +64,25 @@ local function addon_Init(self)
 	-- self == status tracking bar manager object
 
 	appliedOptions = module.appliedOptions;
-
 	module.ctStatusBar = self;
+	module.CT_BottomBar_StatusBar_SetWidth = addon_Update;
 
-	self.frame:SetFrameLevel(MainMenuBarArtFrame:GetFrameLevel() + 1);
-	self.frame:SetWidth(StatusTrackingBarManager:GetWidth());
-	--self.frame:SetHeight(StatusTrackingBarManager:GetHeight());
-
-	local helperframe = CreateFrame("Frame", "CT_BottomBar_" .. self.frameName .. "_GuideFrame");
-	self.helperFrame = helperframe;
+	CT_BottomBar_StatusBar_Frame = self.frame;
+	CT_BottomBar_StatusBar_Frame:SetFrameLevel(MainMenuBarArtFrame:GetFrameLevel() + 1);
+	
+	CT_BottomBar_StatusBar_HelperFrame = CreateFrame("Frame", "CT_BottomBar_" .. self.frameName .. "_GuideFrame");
+	self.helperFrame = CT_BottomBar_StatusBar_HelperFrame;
 	CT_BottomBar_StatusBar_DefaultParent = StatusTrackingBarManager:GetParent();
-	
-	self.frame.OnStatusBarsUpdated = CT_BottomBar_StatusBar_OnStatusBarsUpdated;
-	
-	--StatusTrackingBarManager:SetParent(self.frame);  --better to call this during addon_Enable
-	
+		
+	CT_BottomBar_StatusBar_Frame.OnStatusBarsUpdated = CT_BottomBar_StatusBar_OnStatusBarsUpdated;
+
+	addon_Update(self);
 	return true;
 end
 
 function CT_BottomBar_StatusBar_OnStatusBarsUpdated(self)
 	--CT_BottomBar_StatusBar_DefaultParent.OnStatusBarsUpdated(self)
 end
-
 
 local function addon_Register()
 	module:registerAddon(
@@ -98,7 +101,7 @@ local function addon_Register()
 		addon_Update,
 		nil,  -- no orientation function
 		addon_Enable,
-		addon_Disable,  -- no disable function
+		addon_Disable,
 		"helperFrame",
 		StatusBarTrackingManager
 	);

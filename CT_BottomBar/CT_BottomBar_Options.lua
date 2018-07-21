@@ -310,6 +310,12 @@ function module:updateOption(optName, value)
 			end
 		end
 
+	elseif (optName == "customStatusBarWidth") then
+		value = value or EXP_DEFAULT_WIDTH or 1024;
+		if (applyUnprotectedOption(optName, value)) then
+			module:CT_BottomBar_StatusBar_SetWidth();
+		end
+
 	elseif (optName == "repBarHideNoRep" or
 		optName == "repBarCoverExpBar" or
 		optName == "expBarShowMaxLevelBar"
@@ -427,6 +433,11 @@ function module:updateOption(optName, value)
 			module:hideTexturesBackground(value);
 		end
 
+	elseif (optName == "hideMenuAndBagsBackground") then
+		value = value ~= false;
+		if (applyUnprotectedOption(optName, value)) then
+			module:hideMenuAndBagsBackground(value);
+		end
 
 	elseif (optName == "showCTBarMod") then
 		value = not not value;
@@ -624,6 +635,7 @@ module.frame = function()
 		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#i:showLions#o:showLions#Show lions instead of gryphons");
 		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#i:hideGryphons#o:hideGryphons:true#Hide the gryphons/lions");
 		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#i:hideTexturesBackground#o:hideTexturesBackground:true#Hide the background textures");
+		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#i:hideMenuAndBagsBackground#o:hideMenuAndBagsBackground:true#Hide the menu and bags textures");
 	optionsEndFrame();
 
 	-- Override Frame
@@ -728,155 +740,30 @@ module.frame = function()
 		optionsEndFrame();
 	end
 
-	-- Experience & Reputation Bar
-	if (module.ctExpBar and module.ctRepBar) then
-		optionsBeginFrame(-25, 0, "frame#tl:0:%y#br:tr:0:%b#i:exprep#r");
-			optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Experience & Reputation Bars");
+	-- Experience & Reputation Status Bar
+	if (module.ctStatusBar) then
+		optionsBeginFrame(-25, 0, "frame#tl:0:%y#br:tr:0:%b#i:status#r");
+			optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Exp/Rep/Power Status Bars");
 
-			optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:20:0#r#These options will have no effect if the Experience Bar is not activated.#" .. textColor3 .. ":l");
+			optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:20:0#r#These options will have no effect if the Status Bar is not activated.#" .. textColor3 .. ":l");
 
-			optionsAddObject( -5, 4*14, "font#t:0:%y#s:0:%s#l:20:0#r#If you are using the game's default action bars, the game will shift the action bars up or down in response to the showing or hiding of the exp and rep bars.#" .. textColor2 .. ":l");
+			optionsAddObject( -5, 4*14, "font#t:0:%y#s:0:%s#l:20:0#r#If you are using the game's default status bars, the game will shift the action bars up or down in response to the showing or hiding of the exp and rep bars.#" .. textColor2 .. ":l");
 
 			optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:20:0#r#The default width of the experience and reputation frames is 1024.#" .. textColor2 .. ":l");
-
-			optionsAddFrame( -25,   17, "slider#tl:55:%y#s:210:%s#i:repBarWidth#o:repBarWidth:1024#Rep Frame width = <value>#1:2048:1");
+	
+			optionsAddFrame( -25,   17, "slider#tl:55:%y#s:210:%s#i:customStatusBarWidth#o:customStatusBarWidth:1024#Status Frame width = <value>#1:2048:1");
 			do
-				local function updateRepSize(size)
-					local minSize, maxSize = exprepOptionsFrame.repBarWidth:GetMinMaxValues();
+				local function updateStatusBarSize(size)
+					local minSize, maxSize = statusOptionsFrame.customStatusBarWidth:GetMinMaxValues();
 					if (size < minSize) then
 						size = minSize;
 					end
 					if (size > maxSize) then
 						size = maxSize;
 					end
-					exprepOptionsFrame.repBarWidth:SetValue(size);
+					statusOptionsFrame.customStatusBarWidth:SetValue(size);
 				end
-
-				optionsBeginFrame(  17,  24, "button#tl:22:%y#s:24:%s");
-					optionsAddScript("onclick",
-						function(self, button)
-							size = module:getOption("repBarWidth") or 1024;
-							if (button == "RightButton") then
-								size = size - 5;
-							else
-								size = size - 1;
-							end
-							updateRepSize(size);
-						end
-					);
-					optionsAddScript("onload",
-						function(self)
-							exprepOptionsFrame = self.parent;
-							self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
-							self:SetNormalTexture("Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Up");
-							self:SetPushedTexture("Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Down");
-							self:SetDisabledTexture("Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Disabled");
-							self:SetHighlightTexture("Interface\\Buttons\\UI-Common-MouseHilight");
-						end
-					);
-				optionsEndFrame();
-				optionsBeginFrame(  25,  24, "button#tl:275:%y#s:24:%s");
-					optionsAddScript("onclick",
-						function(self)
-							size = module:getOption("repBarWidth") or 1024;
-							if (button == "RightButton") then
-								size = size + 5;
-							else
-								size = size + 1;
-							end
-							updateRepSize(size);
-						end
-					);
-					optionsAddScript("onload",
-						function(self)
-							self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
-							self:SetNormalTexture("Interface\\Buttons\\UI-SpellbookIcon-NextPage-Up");
-							self:SetPushedTexture("Interface\\Buttons\\UI-SpellbookIcon-NextPage-Down");
-							self:SetDisabledTexture("Interface\\Buttons\\UI-SpellbookIcon-NextPage-Disabled");
-							self:SetHighlightTexture("Interface\\Buttons\\UI-Common-MouseHilight");
-						end
-					);
-				optionsEndFrame();
 			end
-
-			optionsAddFrame( -20,   17, "slider#tl:55:%y#s:210:%s#i:expBarWidth#o:expBarWidth:1024#Exp Frame width = <value>#1:2048:1");
-			do
-				local function updateExpSize(size)
-					local minSize, maxSize = exprepOptionsFrame.expBarWidth:GetMinMaxValues();
-					if (size < minSize) then
-						size = minSize;
-					end
-					if (size > maxSize) then
-						size = maxSize;
-					end
-					exprepOptionsFrame.expBarWidth:SetValue(size);
-				end
-
-				optionsBeginFrame(  17,  24, "button#tl:22:%y#s:24:%s");
-					optionsAddScript("onclick",
-						function(self, button)
-							local size = module:getOption("expBarWidth") or 1024;
-							if (button == "RightButton") then
-								size = size - 5;
-							else
-								size = size - 1;
-							end
-							updateExpSize(size);
-						end
-					);
-					optionsAddScript("onload",
-						function(self)
-							exprepOptionsFrame = self.parent;
-							self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
-							self:SetNormalTexture("Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Up");
-							self:SetPushedTexture("Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Down");
-							self:SetDisabledTexture("Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Disabled");
-							self:SetHighlightTexture("Interface\\Buttons\\UI-Common-MouseHilight");
-						end
-					);
-				optionsEndFrame();
-				optionsBeginFrame(  25,  24, "button#tl:275:%y#s:24:%s");
-					optionsAddScript("onclick",
-						function(self, button)
-							local size = module:getOption("expBarWidth") or 1024;
-							if (button == "RightButton") then
-								size = size + 5;
-							else
-								size = size + 1;
-							end
-							updateExpSize(size);
-						end
-					);
-					optionsAddScript("onload",
-						function(self)
-							self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
-							self:SetNormalTexture("Interface\\Buttons\\UI-SpellbookIcon-NextPage-Up");
-							self:SetPushedTexture("Interface\\Buttons\\UI-SpellbookIcon-NextPage-Down");
-							self:SetDisabledTexture("Interface\\Buttons\\UI-SpellbookIcon-NextPage-Disabled");
-							self:SetHighlightTexture("Interface\\Buttons\\UI-Common-MouseHilight");
-						end
-					);
-				optionsEndFrame();
-			end
-
-			optionsAddObject(-15,   26, "checkbutton#tl:20:%y#o:repBarHideBorder#Hide reputation border.");
-			optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:repBarHideDivisions#Hide reputation divisions.");
-			optionsAddFrame( -15,   17, "slider#tl:55:%y#s:210:%s#i:repBarNumDivisions#o:repBarNumDivisions:20#Reputation divisions = <value>#1:20:1");
-
-			optionsAddObject(-15,   26, "checkbutton#tl:20:%y#o:expBarHideBorder#Hide experience border.");
-			optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:expBarHideDivisions#Hide experience divisions.");
-			optionsAddFrame( -15,   17, "slider#tl:55:%y#s:210:%s#i:expBarNumDivisions#o:expBarNumDivisions:20#Experience divisions = <value>#1:20:1");
-
-			optionsAddObject(-25,   26, "checkbutton#tl:20:%y#o:exprepAltBorder#Use reputation border in experience frame.");
-			optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:exprepAltDivisions#Display the borders on top of the divisions.");
-			optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:expBarHideAtMaxLevel#Hide exp bar if max level or exp is disabled.");
-			optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:expBarHideOnOther#Don't show exp bar on override/vehicle.");
-			optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:expBarHideOnPetBattle#Don't show exp bar on pet battle frame.");
-
-			optionsAddObject(-10, 5*14, "font#t:0:%y#s:0:%s#l:20:0#r#Enabling all three of the following options emulates the game's behavior for a maximum level character (but works at any level) as long as the exp bar and rep bar are not deliberately hidden.#" .. textColor2 .. ":l");
-			optionsAddObject(  3,   26, "checkbutton#tl:20:%y#o:repBarHideNoRep#Hide reputation when not monitoring one.");
-			optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:repBarCoverExpBar#Show rep bar in the exp frame.");
-			optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:expBarShowMaxLevelBar#Show solid exp bar if no rep and exp bars.");
 
 		optionsEndFrame();
 	end
@@ -986,6 +873,7 @@ function module:optionsInitApplied()
 	appliedOptions.hideGryphons = module:getOption("hideGryphons") ~= false;
 	appliedOptions.showLions = not not module:getOption("showLions");
 	appliedOptions.hideTexturesBackground = module:getOption("hideTexturesBackground") ~= false;
+	appliedOptions.hideMenuAndBagsBackground = module:getOption("hideMenuAndBagsBackground") ~= false;
 
 	for key, obj in ipairs(module.addons) do
 		local settings = obj.settings;
@@ -1016,6 +904,7 @@ function module:optionsInitApplied()
 		module.ctRepBar.isDisabled = module.ctExpBar.isDisabled;
 	end
 
+	appliedOptions.customStatusBarWidth = module:getOption("customStatusBarWidth");
 	appliedOptions.repBarHideNoRep = not not module:getOption("repBarHideNoRep");
 	appliedOptions.repBarCoverExpBar = not not module:getOption("repBarCoverExpBar");
 	appliedOptions.expBarShowMaxLevelBar = not not module:getOption("expBarShowMaxLevelBar");

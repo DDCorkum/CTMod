@@ -119,10 +119,11 @@ function module:showLions(show)
 end
 
 --------------------------------------------
--- Hide Background Texture
+-- Hide Background Textures
 
-local hidBackground;
+local hidMainBackground, hidMenuAndBagsBackground;
 
+--From WoW 8.0.1 forward, this only hides the main artwork in the middle but not the micro-button menu and bags artwork in the bottom right
 function module:hideTexturesBackground(hide)
 	-- Hide/Show the background textures
 	
@@ -130,16 +131,35 @@ function module:hideTexturesBackground(hide)
 
 	if (hide) then
 		MainMenuBarArtFrameBackground:Hide();
-		
-		hidBackground = true;
+		hidMainBackground = true;
 	else
 		-- Only show the textures if we previously hid them.
-		if (not hidBackground) then
+		if (not hidMainBackground) then
 			return;
 		end
 		MainMenuBarArtFrameBackground:Show();
-		hidBackground = false;
+		hidMainBackground = false;
 	end
+	
+end
+
+--From WoW 8.0.1 forward, this hides the micro-button menu and bags artwork in the bottom right
+function module:hideMenuAndBagsBackground(hide)
+	-- Hide/Show the background textures
+	
+	if (hide) then
+		MicroButtonAndBagsBar:Hide();
+		
+		hidMenuAndBagsBackground = true;
+	else
+		-- Only show the textures if we previously hid them.
+		if (not hidMenuAndBagsBackground) then
+			return;
+		end
+		MicroButtonAndBagsBar:Show();
+		hidMenuAndBagsBackground = false;
+	end
+	
 end
 
 
@@ -148,6 +168,7 @@ end
 
 function module:configureArtwork()
 	module:hideTexturesBackground(appliedOptions.hideTexturesBackground);
+	module:hideMenuAndBagsBackground(appliedOptions.hideMenuAndBagsBackground);
 end
 
 --------------------------------------------
