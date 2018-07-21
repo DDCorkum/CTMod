@@ -112,7 +112,7 @@ local function addon_Register()
 		"Bags Bar",  -- shown in options window & tooltips
 		"Bags Bar",  -- title for horizontal orientation
 		"Bags",  -- title for vertical orientation
-		{ "BOTTOMLEFT", ctRelativeFrame, "BOTTOM", 350, 6 },
+		{ "BOTTOMLEFT", ctRelativeFrame, "BOTTOM", 345, 28 },
 		{ -- settings
 			orientation = "ACROSS",
 			saveShown = true, -- save/load the shown state of frames

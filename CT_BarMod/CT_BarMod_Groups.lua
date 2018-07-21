@@ -765,8 +765,8 @@ local defaultPositions = {};
 -- Secondary index is the bar (group) id.
 defaultPositions[1] = {
 	[10] = {"BOTTOMLEFT",  "BOTTOM",      -260, 560, "ACROSS", "AC"},  -- Bar  1, Above center
-	[1]  = {"BOTTOMLEFT",  "BOTTOM",      -516,  97, "ACROSS", "BL"},  -- Bar  2, Bottom left
-	[2]  = {"BOTTOMLEFT",  "BOTTOM",        -6,  97, "ACROSS", "BR"},  -- Bar  3, Bottom right
+	[1]  = {"BOTTOMLEFT",  "BOTTOM",      -516, 102, "ACROSS", "BL"},  -- Bar  2, Bottom left
+	[2]  = {"BOTTOMLEFT",  "BOTTOM",        0,  102, "ACROSS", "BR"},  -- Bar  3, Bottom right
 	[3]  = {"BOTTOMLEFT",  "TOPLEFT",      -10, -85, "DOWN",   "LE"},  -- Bar  4, Left
 	[4]  = {"BOTTOMRIGHT", "BOTTOMRIGHT",   12, 603, "DOWN",   "OR"},  -- Bar  5, Outside right
 	[5]  = {"BOTTOMRIGHT", "BOTTOMRIGHT",  -31, 603, "DOWN",   "IR"},  -- Bar  6, Inside right
@@ -775,7 +775,7 @@ defaultPositions[1] = {
 	[8]  = {"BOTTOMLEFT",  "BOTTOM",      -260, 430, "ACROSS", "UC"},  -- Bar  9, Upper center
 	[9]  = {"BOTTOMLEFT",  "BOTTOM",      -260, 495, "ACROSS", "TC"},  -- Bar 10, Top center
 	[11] = {"BOTTOMLEFT",  "BOTTOM",      -260, 625, "ACROSS", "OC"},  -- Bar 11 (Control bar), Over center
-	[12] = {"BOTTOMLEFT",  "BOTTOM",      -260, 690, "ACROSS", "HC"},  -- Bar 12 (Action bar), High center
+	[12] = {"BOTTOMLEFT",  "BOTTOM",      -516, 65, "ACROSS", "HC"},  -- Bar 12 (Action bar), High center
 };
 
 -- The following standard (Blizzard) bar positions reorganize the groups
@@ -801,14 +801,14 @@ defaultPositions[2] = {
 	[1]  = {"BOTTOMLEFT",  "TOPLEFT",      -10, -85, "DOWN",   "LE"},  -- Bar  2, Left
 	[2]  = {"BOTTOMRIGHT", "BOTTOMRIGHT",   12, 603, "DOWN",   "OR"},  -- Bar  3, Outside right
 	[3]  = {"BOTTOMRIGHT", "BOTTOMRIGHT",  -31, 603, "DOWN",   "IR"},  -- Bar  4, Inside right
-	[4]  = {"BOTTOMLEFT",  "BOTTOM",        -6,  97, "ACROSS", "BR"},  -- Bar  5, Bottom right
-	[5]  = {"BOTTOMLEFT",  "BOTTOM",      -516,  97, "ACROSS", "BL"},  -- Bar  6, Bottom left
+	[4]  = {"BOTTOMLEFT",  "BOTTOM",        0,  102, "ACROSS", "BR"},  -- Bar  5, Bottom right
+	[5]  = {"BOTTOMLEFT",  "BOTTOM",      -516, 102, "ACROSS", "BL"},  -- Bar  6, Bottom left
 	[6]  = {"BOTTOMLEFT",  "BOTTOM",      -260, 300, "ACROSS", "BC"},  -- Bar  7, Bottom center
 	[7]  = {"BOTTOMLEFT",  "BOTTOM",      -260, 365, "ACROSS", "LC"},  -- Bar  8, Lower center
 	[8]  = {"BOTTOMLEFT",  "BOTTOM",      -260, 430, "ACROSS", "UC"},  -- Bar  9, Upper center
 	[9]  = {"BOTTOMLEFT",  "BOTTOM",      -260, 495, "ACROSS", "TC"},  -- Bar 10, Top center
 	[11] = {"BOTTOMLEFT",  "BOTTOM",      -260, 625, "ACROSS", "OC"},  -- Bar 11, Over center
-	[12] = {"BOTTOMLEFT",  "BOTTOM",      -260, 690, "ACROSS", "HC"},  -- Bar 12, High center
+	[12] = {"BOTTOMLEFT",  "BOTTOM",      -516, 65, "ACROSS", "HC"},  -- Bar 12, High center
 };
 
 -- This holds the position for the main action bar when we detect that CT_BottomBar has disabled
@@ -816,7 +816,7 @@ defaultPositions[2] = {
 --
 -- Secondary index is the bar (group) id.
 defaultPositions[3] = {
-	[12] = {"BOTTOMLEFT", "BOTTOM", -516, 43, "ACROSS", "AB"},  -- Bar 12, Action Bar position
+	[12] = {"BOTTOMLEFT", "BOTTOM", -516, 65, "ACROSS", "AB"},  -- Bar 12, Action Bar position
 };
 
 function group:position(orientation, stdPositions)

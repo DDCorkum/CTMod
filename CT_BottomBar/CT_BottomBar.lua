@@ -677,16 +677,18 @@ module.update = function(self, optName, value)
 		-- "Experience Bar" needs to load before "Reputation Bar".
 		--
 		module:loadAddon("Action Bar Arrows");
-		-- (Requires overhaul in WoW 8.0.1) module:loadAddon("Bags Bar");
+		module:loadAddon("Bags Bar");
 		module:loadAddon("Class Bar");
-		-- (Requires overhaul in WoW 8.0.1) module:loadAddon("Experience Bar");
-		-- (Requires overhaul in WoW 8.0.1) module:loadAddon("Reputation Bar");  -- Show after exp bar in options window
+		-- (Replaced by status bar) module:loadAddon("Experience Bar");
+		-- (Replaced by status bar) module:loadAddon("Reputation Bar");  -- Show after exp bar in options window
 		module:loadAddon("Extra Bar");
-		-- (Requires overhaul in WoW 8.0.1) module:loadAddon("Menu Bar");
+		module:loadAddon("Menu Bar");
 		module:loadAddon("Pet Bar");
 		module:loadAddon("Possess Bar");
 		module:loadAddon("MultiCastBar");  -- Totem bar
 		module:loadAddon("Vehicle Bar");
+		module:loadAddon("Status Bar");
+		module:loadAddon("Framerate Bar");
 	end
 
 	-- Hook some functions.
