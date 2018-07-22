@@ -289,7 +289,7 @@ function CT_UnitFrameOptions_ColorSwatch_ShowColorPicker(self, frame)
 	frame.swatchFunc = CT_UnitFrameOptions_ColorSwatch_SetColor;
 	frame.cancelFunc = CT_UnitFrameOptions_ColorSwatch_CancelColor;
 	frame.hasOpacity = 1;
-	Lib_UIDropDownMenuButton_OpenColorPicker(frame);
+	L_UIDropDownMenuButton_OpenColorPicker(frame);
 end
 
 function CT_UnitFrameOptions_ColorSwatch_SetColor()

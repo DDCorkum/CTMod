@@ -2649,7 +2649,7 @@ function CT_RA_MTPlayers_CT_RAMTGroupDragOnMouseDown(self, button)
 				CT_RA_MTPlayers_DropDown_OnLoad(oDrop);
 				dropdownInitialized = true;
 			end
-			Lib_ToggleDropDownMenu(1, nil, oDrop, cFrame, 47, 15);
+			L_ToggleDropDownMenu(1, nil, oDrop, cFrame, 47, 15);
 			return;
 		end
 	end
@@ -2857,7 +2857,7 @@ function CT_RA_MTPlayers_DropDown_OnLoad(self)
 	-- ----------
 	-- Initialize drop down menu when it is loaded.
 	-- ----------
-	Lib_UIDropDownMenu_Initialize(self, CT_RA_MTPlayers_DropDown_InitButtons, "MENU");
+	L_UIDropDownMenu_Initialize(self, CT_RA_MTPlayers_DropDown_InitButtons, "MENU");
 end
 
 
@@ -2970,7 +2970,7 @@ function CT_RA_MTPlayers_DropDown_InitButtons(self)
 	info.isTitle = 1;
 	info.justifyH = "CENTER";
 	info.notCheckable = 1;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	info.text = CT_RA_MTPlayers_TEXT_Menu_Show_MTTargets;
@@ -2986,7 +2986,7 @@ function CT_RA_MTPlayers_DropDown_InitButtons(self)
 	if (InCombatLockdown()) then
 		info.disabled = 1;
 	end
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	info.text = "    " .. CT_RA_MTPlayers_TEXT_Menu_Show_MTTTargets;
@@ -3005,7 +3005,7 @@ function CT_RA_MTPlayers_DropDown_InitButtons(self)
 	if (InCombatLockdown()) then
 		info.disabled = 1;
 	end
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	info.text = CT_RA_MTPlayers_TEXT_Menu_Show_MTPlayers;
@@ -3021,7 +3021,7 @@ function CT_RA_MTPlayers_DropDown_InitButtons(self)
 	if (InCombatLockdown()) then
 		info.disabled = 1;
 	end
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	info.text = "    " .. CT_RA_MTPlayers_TEXT_Menu_Hide_MTAndPlayers;
@@ -3040,7 +3040,7 @@ function CT_RA_MTPlayers_DropDown_InitButtons(self)
 	if (InCombatLockdown()) then
 		info.disabled = 1;
 	end
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	info.text = "    " .. CT_RA_MTPlayers_TEXT_Menu_Show_PlayerBuffs;
@@ -3056,7 +3056,7 @@ function CT_RA_MTPlayers_DropDown_InitButtons(self)
 	if (tempOptions["ctmtp_MTPlayers"] ~= 1) then
 		info.disabled = 1;
 	end
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	info.text = CT_RA_MTPlayers_TEXT_Menu_Show_MTPets;
@@ -3072,7 +3072,7 @@ function CT_RA_MTPlayers_DropDown_InitButtons(self)
 	if (InCombatLockdown()) then
 		info.disabled = 1;
 	end
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	info.text = "    " .. CT_RA_MTPlayers_TEXT_Menu_Hide_MTAndPets;
@@ -3091,7 +3091,7 @@ function CT_RA_MTPlayers_DropDown_InitButtons(self)
 	if (InCombatLockdown()) then
 		info.disabled = 1;
 	end
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	if (tempOptions["ctmtp_GroupHasNoPet"] == 1) then
@@ -3110,7 +3110,7 @@ function CT_RA_MTPlayers_DropDown_InitButtons(self)
 	if (InCombatLockdown()) then
 		info.disabled = 1;
 	end
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 --	info = { };
 --	if (tempOptions["ctmtp_PlayerHasNoPet"] == 1) then
@@ -3129,7 +3129,7 @@ function CT_RA_MTPlayers_DropDown_InitButtons(self)
 --	if (InCombatLockdown()) then
 --		info.disabled = 1;
 --	end
---	Lib_UIDropDownMenu_AddButton(info);
+--	L_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	if (tempOptions["ctmtp_LockJoined"] == 1) then
@@ -3145,7 +3145,7 @@ function CT_RA_MTPlayers_DropDown_InitButtons(self)
 	if (InCombatLockdown()) then
 		info.disabled = 1;
 	end
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	if (tempOptions["ctmtp_SidePlayer"] == 1) then
@@ -3164,7 +3164,7 @@ function CT_RA_MTPlayers_DropDown_InitButtons(self)
 	if (InCombatLockdown()) then
 		info.disabled = 1;
 	end
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	if (tempOptions["ctmtp_SidePet"] == 1) then
@@ -3183,7 +3183,7 @@ function CT_RA_MTPlayers_DropDown_InitButtons(self)
 	if (InCombatLockdown()) then
 		info.disabled = 1;
 	end
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	if (tempOptions["ctmtp_SidePetPlayer"] == 1) then
@@ -3202,7 +3202,7 @@ function CT_RA_MTPlayers_DropDown_InitButtons(self)
 	if (InCombatLockdown()) then
 		info.disabled = 1;
 	end
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	if (tempOptions["ctmtp_GapHide"] == 1) then
@@ -3221,7 +3221,7 @@ function CT_RA_MTPlayers_DropDown_InitButtons(self)
 	if (InCombatLockdown()) then
 		info.disabled = 1;
 	end
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	if (tempOptions["ctmtp_AlignToTitle"] == 1) then
@@ -3237,16 +3237,16 @@ function CT_RA_MTPlayers_DropDown_InitButtons(self)
 	if (tempOptions["ctmtp_LockJoined"] == 1) then
 		info.disabled = 1;
 	end
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	info.text = CT_RA_MTPlayers_TEXT_Menu_Close;
 	info.func = function()
-		Lib_CloseDropDownMenus()
+		L_CloseDropDownMenus()
 	end;
 	info.arg1 = 1;
 	info.notCheckable = 1;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 end
 
 

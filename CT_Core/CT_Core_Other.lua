@@ -368,10 +368,10 @@ local function createTooltipAnchorFrame()
 				local item = tooltipAnchorNumber;
 				local frame = CTCoreDropdownTooltipFrameAnchor;
 				local level = 1;
-				Lib_CloseDropDownMenus(level);
-				Lib_ToggleDropDownMenu(level, item, frame);
-				Lib_UIDropDownMenu_SetSelectedValue(frame, item);
-				Lib_CloseDropDownMenus(level);
+				L_CloseDropDownMenus(level);
+				L_ToggleDropDownMenu(level, item, frame);
+				L_UIDropDownMenu_SetSelectedValue(frame, item);
+				L_CloseDropDownMenus(level);
 			end
 
 			-- Display tooltip & play sound
@@ -1275,7 +1275,7 @@ local function updateGuildDisplay(framePrefix, tbl, enabled)
 
 	local currentView = guildView;
 	if (not currentView) then
-		currentView = Lib_UIDropDownMenu_GetSelectedValue(GuildRosterViewDropdown);
+		currentView = L_UIDropDownMenu_GetSelectedValue(GuildRosterViewDropdown);
 	end
 
 	local i = 1;
@@ -2046,7 +2046,7 @@ end
 do
 	-- Altering Blizzard's WATCHFRAME_MAXLINEWIDTH variable,
 	-- or calling WatchFrame_Update / WatchFrame_Collapse / WatchFrame_Expand / etc,
-	-- or creating a menu using Blizzard's Lib_UIDropDownMenu_AddButton system,
+	-- or creating a menu using Blizzard's L_UIDropDownMenu_AddButton system,
 	-- can cause taint.
 	--
 	-- That taint could lead to an "Action blocked by an addon" message if the user is

@@ -487,14 +487,14 @@ local function updateGroupWidgets_Orientation(groupId)
 		return;
 	end
 	local value;
-	Lib_UIDropDownMenu_Initialize(CT_BarModDropOrientation, CT_BarModDropOrientation.initialize);
+	L_UIDropDownMenu_Initialize(CT_BarModDropOrientation, CT_BarModDropOrientation.initialize);
 	value = module:getOption("orientation" .. groupId) or "ACROSS";
 	if (value == "DOWN") then
 		value = 2;
 	else
 		value = 1; -- "ACROSS"
 	end
-	Lib_UIDropDownMenu_SetSelectedValue(CT_BarModDropOrientation, value);
+	L_UIDropDownMenu_SetSelectedValue(CT_BarModDropOrientation, value);
 end
 
 local function updateGroupWidgets_ShowGroup(groupId)
@@ -529,8 +529,8 @@ local function updateGroupWidgets(groupId)
 	-- Select Bar menu
 	----------
 	dropdown = CT_BarModDropdown2;
-	Lib_UIDropDownMenu_Initialize(dropdown, dropdown.initialize);
-	Lib_UIDropDownMenu_SetSelectedValue(dropdown, module.GroupIdToNum(groupId));
+	L_UIDropDownMenu_Initialize(dropdown, dropdown.initialize);
+	L_UIDropDownMenu_SetSelectedValue(dropdown, module.GroupIdToNum(groupId));
 
 	----------
 	-- Enable bars
@@ -582,16 +582,16 @@ local function updateGroupWidgets(groupId)
 
 	-- Basic conditions
 	dropdown = CT_BarModDropdown_pageAltKey;
-	Lib_UIDropDownMenu_Initialize(dropdown, dropdown.initialize);
-	Lib_UIDropDownMenu_SetSelectedValue(dropdown, module:getOption("pageAltKey" .. groupId) or 1);
+	L_UIDropDownMenu_Initialize(dropdown, dropdown.initialize);
+	L_UIDropDownMenu_SetSelectedValue(dropdown, module:getOption("pageAltKey" .. groupId) or 1);
 
 	dropdown = CT_BarModDropdown_pageCtrlKey;
-	Lib_UIDropDownMenu_Initialize(dropdown, dropdown.initialize);
-	Lib_UIDropDownMenu_SetSelectedValue(dropdown, module:getOption("pageCtrlKey" .. groupId) or 1);
+	L_UIDropDownMenu_Initialize(dropdown, dropdown.initialize);
+	L_UIDropDownMenu_SetSelectedValue(dropdown, module:getOption("pageCtrlKey" .. groupId) or 1);
 
 	dropdown = CT_BarModDropdown_pageShiftKey;
-	Lib_UIDropDownMenu_Initialize(dropdown, dropdown.initialize);
-	Lib_UIDropDownMenu_SetSelectedValue(dropdown, module:getOption("pageShiftKey" .. groupId) or 1);
+	L_UIDropDownMenu_Initialize(dropdown, dropdown.initialize);
+	L_UIDropDownMenu_SetSelectedValue(dropdown, module:getOption("pageShiftKey" .. groupId) or 1);
 
 	-- Advanced conditions
 	groupFrame.pageEB:SetText( module:getOption("pageCondition" .. groupId) or "" );
