@@ -6,5 +6,6 @@
 
 Libs\LibStub\LibStub.lua
 Libs\LibUIDropDownMenu\LibUIDropDownMenu.xml
+Libs\DropDownFix\DropDownFix.lua
 
 CT_Library.lua
