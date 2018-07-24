@@ -523,18 +523,17 @@ function CT_RA_ParseEvent(self, event, arg1, arg2, arg3, arg4, arg5, arg6, ...)
 	end
 end
 
--- Previously tainted ChatFrame_OnEvent() but now changed to use ChatFrame_AddMessageEventFilter();
-function CT_RA_RaidChatFilter(self, event, ...)
-	local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = ...;
-	local rank = arg2;
-	if ( event and arg1 and arg2 and type(event) == "string" and type(arg1) == "string" and type(arg2) == "string" ) then
+CT_RA_oldChatFrame_OnEvent = ChatFrame_OnEvent;
+function CT_RA_newChatFrame_OnEvent(self, event, ...)
+	local arg1, arg2 = ...;
+	if ( event and arg1 and arg2 and type(event) == "string" and type(arg1) == "string" and type(arg2) == "string" and strsub(event, 1, 13) == "CHAT_MSG_RAID" ) then
 		local tempOptions = CT_RAMenu_Options["temp"];
 		local name, rank;
 		for i = 1, GetNumRaidMembers(), 1 do
 			name, rank = GetRaidRosterInfo(i);
 			if ( name == arg2 ) then
 				if ( rank and rank < 1 and CT_RA_Squelch > 0 ) then
-					return true;
+					return;
 				end
 				break;
 			end
@@ -543,18 +542,18 @@ function CT_RA_RaidChatFilter(self, event, ...)
 			rank = 0;
 		end
 		if ( rank >= 1 and ( arg1 == "<CTRaid> Quiet mode, no talking." or arg1 == "<CTRaid> Quiet mode is over." ) ) then
-			return true;
+			return;
 		end
 		local useless, useless, chan = string.find(gsub(arg1, "%%", "%%%%"), "^<CTMod> This is an automatic message sent by CT_RaidAssist. Channel changed to: (.+)$");
 		if ( chan ) then
-			return true;
+			return;
 		end
 		if ( rank == 2 and ( not tempOptions["leaderColor"] or tempOptions["leaderColor"].enabled ) ) then
 			CT_RA_oldAddMessage = self.AddMessage;
 			self.AddMessage = CT_RA_newAddMessage;
 			CT_RA_oldChatFrame_OnEvent(self, event, ...);
 			self.AddMessage = CT_RA_oldAddMessage;
-			return true;
+			return;
 		end
 	elseif ( event and arg1 and type(event) == "string" and type(arg1) == "string" and event == "CHAT_MSG_WHISPER" ) then
 		local tempOptions = CT_RAMenu_Options["temp"];
@@ -562,13 +561,12 @@ function CT_RA_RaidChatFilter(self, event, ...)
 			( tempOptions["KeyWord"] and strlower(arg1) == strlower(tempOptions["KeyWord"]) ) or
 			arg1 == "<CTRaid> Quiet mode is enabled in the raid. Please be quiet."
 		) then
-			return true;
+			return;
 		end
 	end
-	return false;
+	CT_RA_oldChatFrame_OnEvent(self, event, ...);
 end
-
-ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID", CT_RA_RaidChatFilter);
+ChatFrame_OnEvent = CT_RA_newChatFrame_OnEvent;
 
 function CT_RA_newAddMessage(obj, msg, r, g, b)
 	local tempOptions = CT_RAMenu_Options["temp"];
