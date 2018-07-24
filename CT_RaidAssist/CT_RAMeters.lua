@@ -37,13 +37,13 @@ end
 function CT_RAMeters_InitDropDown()
 	local meterOptions = CT_RAMeters_GetMeterOptions();
 	local info;
-	if ( LIB_UIDROPDOWNMENU_MENU_LEVEL == 2 ) then
+	if ( L_UIDROPDOWNMENU_MENU_LEVEL == 2 ) then
 		info = {};
-		info.text = LIB_UIDROPDOWNMENU_MENU_VALUE;
+		info.text = L_UIDROPDOWNMENU_MENU_VALUE;
 		info.justifyH = "CENTER";
 		info.isTitle = 1;
 		info.notCheckable = 1;
-		Lib_UIDropDownMenu_AddButton(info, LIB_UIDROPDOWNMENU_MENU_LEVEL);
+		L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL);
 
 		local nonManaUsers = {
 			[CT_RA_CLASS_ROGUE] = 1,
@@ -53,13 +53,13 @@ function CT_RAMeters_InitDropDown()
 		for j, k in ipairs(CT_RA_ClassSorted) do
 			-- local v = CT_RA_ClassPositions[k];
 			local value;
-			if ( LIB_UIDROPDOWNMENU_MENU_VALUE == "Class Health" ) then
+			if ( L_UIDROPDOWNMENU_MENU_VALUE == "Class Health" ) then
 				value = "Health Display";
-			elseif ( LIB_UIDROPDOWNMENU_MENU_VALUE == "Class Mana" ) then
+			elseif ( L_UIDROPDOWNMENU_MENU_VALUE == "Class Mana" ) then
 				value = "Mana Display";
 			else
 				-- "Raid Health" or "Raid Mana"
-				value = LIB_UIDROPDOWNMENU_MENU_VALUE;
+				value = L_UIDROPDOWNMENU_MENU_VALUE;
 			end
 			if ( ( value == "Health Display" or value == "Raid Health" ) or not nonManaUsers[k] ) then
 				info = { };
@@ -68,7 +68,7 @@ function CT_RAMeters_InitDropDown()
 				info.checked = ( meterOptions and meterOptions[value] and meterOptions[value][k] );
 				info.keepShownOnClick = 1;
 				info.func = CT_RAMeters_DropDown_OnClick;
-				Lib_UIDropDownMenu_AddButton(info, LIB_UIDROPDOWNMENU_MENU_LEVEL);
+				L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL);
 			end
 		end
 		return;
@@ -79,35 +79,35 @@ function CT_RAMeters_InitDropDown()
 	info.justifyH = "CENTER";
 	info.isTitle = 1;
 	info.notCheckable = 1;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = {};
 	info.text = "Class Health";
 	info.hasArrow = 1;
 	info.notCheckable = 1;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = {};
 	info.text = "Class Mana";
 	info.hasArrow = 1;
 	info.notCheckable = 1;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = {};
 	info.text = "Raid Health";
 	info.hasArrow = 1;
 	info.notCheckable = 1;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = {};
 	info.text = "Raid Mana";
 	info.hasArrow = 1;
 	info.notCheckable = 1;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 --	info = {};
 --	info.disabled = 1;
---	Lib_UIDropDownMenu_AddButton(info);
+--	L_UIDropDownMenu_AddButton(info);
 
 	info = {};
 	info.text = "AFK";
@@ -115,7 +115,7 @@ function CT_RAMeters_InitDropDown()
 	info.checked = ( meterOptions and meterOptions["AFK Count"] );
 	info.keepShownOnClick = 1;
 	info.func = CT_RAMeters_DropDown_OnClick;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = {};
 	info.text = "Dead";
@@ -123,7 +123,7 @@ function CT_RAMeters_InitDropDown()
 	info.checked = ( meterOptions and meterOptions["Dead Count"] );
 	info.keepShownOnClick = 1;
 	info.func = CT_RAMeters_DropDown_OnClick;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = {};
 	info.text = "Not In Zone";
@@ -131,7 +131,7 @@ function CT_RAMeters_InitDropDown()
 	info.checked = ( meterOptions and meterOptions["notInZone"] );
 	info.keepShownOnClick = 1;
 	info.func = CT_RAMeters_DropDown_OnClick;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = {};
 	info.text = "Offline";
@@ -139,7 +139,7 @@ function CT_RAMeters_InitDropDown()
 	info.checked = ( meterOptions and meterOptions["Offline Count"] );
 	info.keepShownOnClick = 1;
 	info.func = CT_RAMeters_DropDown_OnClick;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = {};
 	info.text = "PVP";
@@ -147,7 +147,7 @@ function CT_RAMeters_InitDropDown()
 	info.checked = ( meterOptions and meterOptions["PVP Count"] );
 	info.keepShownOnClick = 1;
 	info.func = CT_RAMeters_DropDown_OnClick;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = {};
 	info.text = "Total";
@@ -155,7 +155,7 @@ function CT_RAMeters_InitDropDown()
 	info.checked = ( meterOptions and meterOptions["Total Count"] );
 	info.keepShownOnClick = 1;
 	info.func = CT_RAMeters_DropDown_OnClick;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = {};
 	info.text = "Hide count if zero";
@@ -163,11 +163,11 @@ function CT_RAMeters_InitDropDown()
 	info.checked = ( meterOptions and meterOptions["HideZero"] );
 	info.keepShownOnClick = 1;
 	info.func = CT_RAMeters_DropDown_OnClick;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 --	info = {};
 --	info.disabled = 1;
---	Lib_UIDropDownMenu_AddButton(info);
+--	L_UIDropDownMenu_AddButton(info);
 
 	info = {};
 	if ( meterOptions and meterOptions["Lock"] ) then
@@ -178,7 +178,7 @@ function CT_RAMeters_InitDropDown()
 	info.value = "LockMeter";
 	info.notCheckable = 1;
 	info.func = CT_RAMeters_DropDown_OnClick;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	info.text = "Background color";
@@ -200,21 +200,21 @@ function CT_RAMeters_InitDropDown()
 	info.opacityFunc = CT_RAMeters_DropDown_OpacityFunc;
 	info.cancelFunc = CT_RAMeters_DropDown_CancelFunc;
 	info.notCheckable = 1;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = {};
 	info.text = "Hide window";  -- |c00FF8080 |r
 	info.value = "Hide";
 	info.notCheckable = 1;
 	info.func = CT_RAMeters_DropDown_OnClick;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = {};
 	info.text = "Close this menu";
 	info.value = "CloseMenu";
 	info.notCheckable = 1;
 	info.func = CT_RAMeters_DropDown_OnClick;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 end
 
 function CT_RAMeters_DropDown_SwatchFunc()
@@ -251,7 +251,7 @@ function CT_RAMeters_OnLoad(self)
 end
 
 function CT_RAMeters_DropDown_OnLoad(self)
-	Lib_UIDropDownMenu_Initialize(self, CT_RAMeters_InitDropDown, "MENU");
+	L_UIDropDownMenu_Initialize(self, CT_RAMeters_InitDropDown, "MENU");
 end
 
 function CT_RAMeters_DropDown_OnClick(self)

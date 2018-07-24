@@ -335,7 +335,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 					</OnEscapePressed>
 				</Scripts>
 			</EditBox>
-			<Frame name="$parentGroupDropDown" inherits="Lib_UIDropDownMenuTemplate" hidden="false">
+			<Frame name="$parentGroupDropDown" inherits="L_UIDropDownMenuTemplate" hidden="false">
 				<Size>
 					<AbsDimension x="128" y="16"/>
 				</Size>
@@ -789,7 +789,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 					</OnShow>
 				</Scripts>
 			</Button>
-			<Frame name="CT_MapMod_MainMenuDropDown" inherits="Lib_UIDropDownMenuTemplate" hidden="true">
+			<Frame name="CT_MapMod_MainMenuDropDown" inherits="L_UIDropDownMenuTemplate" hidden="true">
 				<Size>
 					<AbsDimension x="100" y="22"/>
 				</Size>

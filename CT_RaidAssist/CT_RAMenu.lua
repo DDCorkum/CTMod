@@ -88,7 +88,7 @@ function CT_UIDropDownMenu_SetSelectedID(frame, id, useValue)
 	frame.selectedID = id;
 	frame.selectedName = nil;
 	frame.selectedValue = nil;
-	-- Lib_UIDropDownMenu_Refresh(frame, useValue);
+	-- L_UIDropDownMenu_Refresh(frame, useValue);
 end
 
 function CT_RAMenu_UpdateMenu()
@@ -535,7 +535,7 @@ function CT_RAMenuDebuff_OnClick(self)
 	frame.hasOpacity = 1;
 	ColorPickerFrame.frame = frame;
 	CloseMenus();
-	Lib_UIDropDownMenuButton_OpenColorPicker(frame);
+	L_UIDropDownMenuButton_OpenColorPicker(frame);
 end
 
 function CT_RAMenuDebuff_SetColor()
@@ -744,7 +744,7 @@ function CT_RAMenuDisplay_ChangeWC(self)
 	frame.cancelFunc = CT_RAMenuDisplay_CancelColor;
 	frame.hasOpacity = 1;
 	CloseMenus();
-	Lib_UIDropDownMenuButton_OpenColorPicker(frame);
+	L_UIDropDownMenuButton_OpenColorPicker(frame);
 end
 
 function CT_RAMenuDisplay_SetColor()
@@ -777,26 +777,26 @@ function CT_RAMenuDisplay_LockGroups(self)
 end
 
 function CT_RAMenuFrameGeneralMiscDropDown_OnLoad(self)
-	Lib_UIDropDownMenu_Initialize(self, CT_RAMenuFrameGeneralMiscDropDown_Initialize);
-	Lib_UIDropDownMenu_SetWidth(self, 130);
-	Lib_UIDropDownMenu_SetSelectedID(CT_RAMenuFrameGeneralMiscDropDown, 1);
+	L_UIDropDownMenu_Initialize(self, CT_RAMenuFrameGeneralMiscDropDown_Initialize);
+	L_UIDropDownMenu_SetWidth(self, 130);
+	L_UIDropDownMenu_SetSelectedID(CT_RAMenuFrameGeneralMiscDropDown, 1);
 end
 
 function CT_RAMenuFrameGeneralMiscDropDown_Initialize(self)
 	local info = {};
 	info.text = "Group";
 	info.func = CT_RAMenuFrameGeneralMiscDropDown_OnClick;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = {};
 	info.text = "Class";
 	info.func = CT_RAMenuFrameGeneralMiscDropDown_OnClick;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 end
 
 
 function CT_RAMenuFrameGeneralMiscDropDown_OnClick(self)
-	Lib_UIDropDownMenu_SetSelectedID(CT_RAMenuFrameGeneralMiscDropDown, self:GetID());
+	L_UIDropDownMenu_SetSelectedID(CT_RAMenuFrameGeneralMiscDropDown, self:GetID());
 	if ( self:GetID() == 1 ) then
 		CT_RA_SetSortType("group");
 	elseif ( self:GetID() == 2 ) then
@@ -808,31 +808,31 @@ function CT_RAMenuFrameGeneralMiscDropDown_OnClick(self)
 end
 
 function CT_RAMenuFrameBuffsBuffsDropDown_OnLoad(self)
-	Lib_UIDropDownMenu_Initialize(self, CT_RAMenuFrameBuffsBuffsDropDown_Initialize);
-	Lib_UIDropDownMenu_SetWidth(self, 180);
-	Lib_UIDropDownMenu_SetSelectedID(CT_RAMenuFrameBuffsBuffsDropDown, 1);
+	L_UIDropDownMenu_Initialize(self, CT_RAMenuFrameBuffsBuffsDropDown_Initialize);
+	L_UIDropDownMenu_SetWidth(self, 180);
+	L_UIDropDownMenu_SetSelectedID(CT_RAMenuFrameBuffsBuffsDropDown, 1);
 end
 
 function CT_RAMenuFrameBuffsBuffsDropDown_Initialize()
 	local info = {};
 	info.text = "Show buffs";
 	info.func = CT_RAMenuFrameBuffsBuffsDropDown_OnClick;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = {};
 	info.text = "Show debuffs";
 	info.func = CT_RAMenuFrameBuffsBuffsDropDown_OnClick;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = {};
 	info.text = "Show buffs until debuffed";
 	info.func = CT_RAMenuFrameBuffsBuffsDropDown_OnClick;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 end
 
 
 function CT_RAMenuFrameBuffsBuffsDropDown_OnClick(self)
-	Lib_UIDropDownMenu_SetSelectedID(CT_RAMenuFrameBuffsBuffsDropDown, self:GetID());
+	L_UIDropDownMenu_SetSelectedID(CT_RAMenuFrameBuffsBuffsDropDown, self:GetID());
 	if ( self:GetID() == 1 ) then
 		CT_RAMenu_Options["temp"]["ShowDebuffs"] = nil;
 		CT_RAMenu_Options["temp"]["ShowBuffsDebuffed"] = nil;
@@ -848,41 +848,41 @@ function CT_RAMenuFrameBuffsBuffsDropDown_OnClick(self)
 end
 
 function CT_RAMenuFrameGeneralDisplayHealthDropDown_OnLoad(self)
-	Lib_UIDropDownMenu_Initialize(self, CT_RAMenuFrameGeneralDisplayHealthDropDown_Initialize);
-	Lib_UIDropDownMenu_SetWidth(self, 130);
-	Lib_UIDropDownMenu_SetSelectedID(CT_RAMenuFrameGeneralDisplayHealthDropDown, 1);
+	L_UIDropDownMenu_Initialize(self, CT_RAMenuFrameGeneralDisplayHealthDropDown_Initialize);
+	L_UIDropDownMenu_SetWidth(self, 130);
+	L_UIDropDownMenu_SetSelectedID(CT_RAMenuFrameGeneralDisplayHealthDropDown, 1);
 end
 
 function CT_RAMenuFrameGeneralDisplayHealthDropDown_Initialize()
 	local info = {};
 	info.text = "Show Values";
 	info.func = CT_RAMenuFrameGeneralDisplayHealthDropDown_OnClick;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = {};
 	info.text = "Show Percentages";
 	info.func = CT_RAMenuFrameGeneralDisplayHealthDropDown_OnClick;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = {};
 	info.text = "Show Deficit";
 	info.func = CT_RAMenuFrameGeneralDisplayHealthDropDown_OnClick;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = {};
 	info.text = "Show only MTT HP %";
 	info.func = CT_RAMenuFrameGeneralDisplayHealthDropDown_OnClick;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = {};
 	info.text = "Show None";
 	info.func = CT_RAMenuFrameGeneralDisplayHealthDropDown_OnClick;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 end
 
 
 function CT_RAMenuFrameGeneralDisplayHealthDropDown_OnClick(self)
-	Lib_UIDropDownMenu_SetSelectedID(CT_RAMenuFrameGeneralDisplayHealthDropDown, self:GetID());
+	L_UIDropDownMenu_SetSelectedID(CT_RAMenuFrameGeneralDisplayHealthDropDown, self:GetID());
 	if ( self:GetID() < 5 ) then
 		CT_RAMenu_Options["temp"]["ShowHP"] = self:GetID();
 	else
@@ -942,7 +942,7 @@ function CT_RAMenuDisplay_ChangeAC(self)
 	frame.swatchFunc = CT_RAMenuDisplay_SetAlertColor;
 	frame.cancelFunc = CT_RAMenuDisplay_CancelAlertColor;
 	CloseMenus();
-	Lib_UIDropDownMenuButton_OpenColorPicker(frame);
+	L_UIDropDownMenuButton_OpenColorPicker(frame);
 end
 
 function CT_RAMenuDisplay_SetAlertColor()
@@ -968,7 +968,7 @@ function CT_RAMenuDisplay_ChangeTC(self)
 	frame.swatchFunc = CT_RAMenuDisplayPercent_SetColor;
 	frame.cancelFunc = CT_RAMenuDisplayPercent_CancelColor;
 	CloseMenus();
-	Lib_UIDropDownMenuButton_OpenColorPicker(frame);
+	L_UIDropDownMenuButton_OpenColorPicker(frame);
 end
 
 function CT_RAMenuDisplayPercent_SetColor()
@@ -1568,7 +1568,7 @@ function CT_RAMenu_Misc_ColorLeader_ShowColorPicker(frame)
 	frame.b = CT_RAMenu_Options["temp"]["leaderColor"].b;
 	frame.swatchFunc = CT_RAMenu_Misc_ColorLeader_SetColor;
 	frame.cancelFunc = CT_RAMenu_Misc_ColorLeader_CancelColor;
-	Lib_UIDropDownMenuButton_OpenColorPicker(frame);
+	L_UIDropDownMenuButton_OpenColorPicker(frame);
 end
 
 function CT_RAMenu_Misc_ColorLeader_SetColor()

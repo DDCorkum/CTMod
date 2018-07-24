@@ -932,7 +932,7 @@ end
 
 --[[
 function CT_AssistFrameDropDown_OnLoad (self)
-	Lib_UIDropDownMenu_Initialize(self, CT_AssistFrameDropDown_Initialize, "MENU");
+	L_UIDropDownMenu_Initialize(self, CT_AssistFrameDropDown_Initialize, "MENU");
 end
 ]]
 

@@ -40,7 +40,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				</Layers>
 				<HighlightTexture alphaMode="ADD" file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight"/>
 			</Button>
-			<Frame name="CT_RASets_DropDown" inherits="Lib_UIDropDownMenuTemplate" hidden="true">
+			<Frame name="CT_RASets_DropDown" inherits="L_UIDropDownMenuTemplate" hidden="true">
 				<Size>
 					<AbsDimension x="10" y="10"/>
 				</Size>

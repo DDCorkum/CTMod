@@ -714,7 +714,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</Frame>
 						</Frames>
 					</Frame>
-					<Frame name="CT_ExpenseHistoryFrameServerDropDown" inherits="Lib_UIDropDownMenuTemplate" id="2">
+					<Frame name="CT_ExpenseHistoryFrameServerDropDown" inherits="L_UIDropDownMenuTemplate" id="2">
 						<Size>
 							<AbsDimension x="100" y="15"/>
 						</Size>
@@ -731,7 +731,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</OnLoad>
 						</Scripts>
 					</Frame>
-					<Frame name="CT_ExpenseHistoryFrameDropDown" inherits="Lib_UIDropDownMenuTemplate" id="1">
+					<Frame name="CT_ExpenseHistoryFrameDropDown" inherits="L_UIDropDownMenuTemplate" id="1">
 						<Size>
 							<AbsDimension x="200" y="15"/>
 						</Size>
