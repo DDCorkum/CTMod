@@ -132,7 +132,7 @@ end
 -- The "Open Selected" and "Return Selected" buttons
 do
 	module:getFrame( {
-		["button#n:CTMailModOpenSelected#s:80:25#l:tl:155:-42#v:UIPanelButtonTemplate#OPEN_SELECTED"] = {
+		["button#n:CTMailModOpenSelected#s:68:25#l:tl:143:-42#v:UIPanelButtonTemplate#OPEN_SELECTED"] = {
 			["onclick"] = function(self, arg1)
 				if ( arg1 == "LeftButton" ) then
 					if (module.isProcessing) then
@@ -147,8 +147,16 @@ do
 					end
 				end
 			end,
+			["onenter"] = function(self)
+				GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, -60);
+				GameTooltip:SetText("Open selected messages");
+				GameTooltip:Show();
+			end,
+			["onleave"] = function(self)
+				GameTooltip:Hide();
+			end
 		},
-		["button#n:CTMailModReturnSelected#s:80:25#l:tl:245:-42#v:UIPanelButtonTemplate#RETURN_SELECTED"] = {
+		["button#n:CTMailModReturnSelected#s:68:25#l:tl:212:-42#v:UIPanelButtonTemplate#RETURN_SELECTED"] = {
 			["onclick"] = function(self, arg1)
 				if ( arg1 == "LeftButton" ) then
 					if (module.isProcessing) then
@@ -163,6 +171,14 @@ do
 					end
 				end
 			end,
+			["onenter"] = function(self)
+				GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, -60);
+				GameTooltip:SetText("Return selected messages");
+				GameTooltip:Show();
+			end,
+			["onleave"] = function(self)
+				GameTooltip:Hide();
+			end
 		},
 	}, InboxFrame);
 
@@ -192,7 +208,7 @@ do
 
 	-- The Select All checkbox
 	module:getFrame( {
-		["checkbutton#n:CTMailModSelectAll#s:24:24#l:tl:60:-38#v:OptionsCheckButtonTemplate##1:0.82:0"] = {
+		["checkbutton#n:CTMailModSelectAll#s:24:24#l:tl:59:-38#v:OptionsCheckButtonTemplate##1:0.82:0"] = {
 			["onclick"] = function(self, arg1)
 				if (self:GetChecked()) then
 					module:inboxSelectAll();
@@ -205,6 +221,7 @@ do
 			end,
 			["onload"] = function(self)
 				self.text:SetText(module:getText("SELECT_ALL"));
+				self.text:SetPoint("LEFT", self, "RIGHT", 1, 0);
 				self:SetHitRectInsets(0, -55, 0, 0);
 			end,
 			["onenter"] = function(self)
@@ -727,15 +744,23 @@ do
 end
 
 -- Add the mail log button
---[[do
+do
 	local btn = CreateFrame("Button", nil, InboxFrame, "UIPanelButtonTemplate");
 
-	btn:SetWidth(120);
+	btn:SetWidth(50);
 	btn:SetHeight(25);
 	btn:SetText(module:getText("MAIL_LOG"));
-	btn:SetPoint("BOTTOMLEFT", 110, 98);
+	btn:SetPoint("TOPLEFT", 282, -30);
 	btn:SetScript("OnClick", function(...)
 		module.toggleMailLog();
+	end);
+	btn:SetScript("OnEnter", function(...)
+		GameTooltip:SetOwner(btn, "ANCHOR_TOPLEFT", 30, -60);
+		GameTooltip:SetText("Open the CT_MailMod Log");
+		GameTooltip:Show();
+	end);
+	btn:SetScript("OnLeave", function(...)
+		GameTooltip:Hide();
 	end);
 
 	function module:updateMailLogButton()
@@ -745,7 +770,7 @@ end
 			btn:Show();
 		end
 	end
-end]]
+end
 
 -- Mail icon buttons
 do
@@ -1014,7 +1039,27 @@ function CT_MailMod_UpdateFilterDropDown()
 
 end
 
-sendmailframe = module:getFrame("dropdown#s:1:40#tl:182:-32#n:CT_MailModDropdown_autoCompleteFilters#o:autoCompleteFilters:1#CT_MultipleSelections#Online or nearby toons#sendmailAutoCompleteOnline#Friends List#sendmailAutoCompleteFriends#Guild Only#sendmailAutoCompleteGuild#Current Group#sendmailAutoCompleteGroup#Recently Chatted#sendmailAutoCompleteInteracted#Own characters#sendmailAutoCompleteAccount",SendMailFrame);
-filterdropdown = select(#(sendmailframe:GetChildren())-1, sendmailframe:GetChildren());
+do
+	sendmailframe = module:getFrame("dropdown#s:1:40#tl:182:-32#n:CT_MailModDropdown_autoCompleteFilters#o:autoCompleteFilters:1#CT_MultipleSelections#Online and/or nearby toons#sendmailAutoCompleteOnline#Friends list (including offline)#sendmailAutoCompleteFriends#Guild list (including offline)#sendmailAutoCompleteGuild#Current Group#sendmailAutoCompleteGroup#Recently Interacted#sendmailAutoCompleteInteracted#Own toons on this account#sendmailAutoCompleteAccount",SendMailFrame);
+	filterdropdown = select(#(sendmailframe:GetChildren())-1, sendmailframe:GetChildren());
+	filterdropdown:SetScript("OnEnter", function(...)
+		GameTooltip:SetOwner(filterdropdown, "ANCHOR_TOPLEFT", 35, 10);
+		GameTooltip:SetText("Select down-arrow to change filters");
+		GameTooltip:Show();
+	end);
+	filterdropdown:SetScript("OnLeave", function(...)
+		GameTooltip:Hide();
+	end);
+	SendMailNameEditBox:SetScript("OnEnter", function(...)
+		if (module:getOption("sendmailAutoCompleteUse")) then
+			GameTooltip:SetOwner(filterdropdown, "ANCHOR_TOPLEFT", 35, 10);
+			GameTooltip:SetText("Select down-arrow to change filters");
+			GameTooltip:Show();
+		end
+	end);
+	SendMailNameEditBox:SetScript("OnLeave", function(...)
+		GameTooltip:Hide();
+	end);
+end
 
 

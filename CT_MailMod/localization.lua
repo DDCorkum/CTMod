@@ -24,7 +24,7 @@ module:setText("MAILBOX_COUNT", "Mailbox: %d");
 module:setText("MAILBOX_BUTTON_TIP1", "Download mail");
 
 module:setText("SELECT_ALL", "Select All");
-module:setText("MAIL_LOG", "Mail Log");
+module:setText("MAIL_LOG", "Log");
 
 module:setText("NOTHING_SELECTED", "No messages are selected.");
 module:setText("OPEN_SELECTED", "Open");
