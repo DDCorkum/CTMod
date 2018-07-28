@@ -1,5 +1,6 @@
-CT_RaidAssist (8.0.1.3) 2018-07-22
-- Updates some legacy code to avoid future taint issues.
+CT_RaidAssist (8.0.1.3) 2018-07-27
+- Changing some legacy code to avoid future taint issues.
+- Updated SendAddonMessage() for 8.0.1
 
 CT_RaidAssist (8.0.1.1) 2018-07-17
 - Further updates for 8.0.1

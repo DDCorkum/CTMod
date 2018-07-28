@@ -358,9 +358,9 @@ end
 function CT_RAMemberDropDown_OnClick(self)
 	if ( self.value[1] == "Main Tanks" ) then
 		if ( self.value[5] ) then
-			CT_RA_SendMessage("R " .. self.value[2], 1);
+			CT_RA_SendMessage("R " .. self.value[2]);
 		else
-			CT_RA_SendMessage("SET " .. self.value[3] .. " " .. self.value[2], 1);
+			CT_RA_SendMessage("SET " .. self.value[3] .. " " .. self.value[2]);
 		end
 	elseif ( self.value[1] == "Player Targets" ) then
 		if ( self.value[4] ) then
@@ -403,7 +403,7 @@ end
 function CT_RAMemberDropDownRemove_OnClick(self)
 	for k, v in pairs(CT_RA_MainTanks) do
 		if ( v == self.value ) then
-			CT_RA_SendMessage("R " .. v, 1);
+			CT_RA_SendMessage("R " .. v);
 			return;
 		end
 	end

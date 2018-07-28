@@ -1107,11 +1107,17 @@ function CT_RA_AddMessage(msg)
 	tinsert(CT_RA_Comm_MessageQueue, msg);
 end
 
-function CT_RA_SendMessage(msg)
-	if ( not (GetNumRaidMembers() > 0 )) then return; end -- Mod should be disabled if not in raid
+function CT_RA_SendMessage(msg, logged)
+	-- must be in a raid group, and not a battlegroup or arena instance
+	if ( not IsInRaid()) then return; end
 	local _, iType = IsInInstance();
-	if (iType ~= "pvp") then
-		SendAddonMessage("CTRA", msg, "RAID");
+	if ((iType == "pvp") or (iType == "arena")) then return; end
+	
+	-- logged parameter added in WoW 8.0, defaults to nil (ie: false)
+	if (logged) then
+		C_ChatInfo.SendAddonMessageLogged("CTRA", msg, "RAID");
+	else
+		C_ChatInfo.SendAddonMessage("CTRA", msg, "RAID");
 	end
 end
 
@@ -4409,7 +4415,7 @@ function CT_RA_SendMessageQueue(self)
 
 	for key, val in pairs(CT_RA_Comm_MessageQueue) do
 		if ( strlen(retstr)+strlen(val)+1 > 255 ) then
-			CT_RA_SendMessage(retstr, 1);
+			CT_RA_SendMessage(retstr);
 			self.numMessagesSent = self.numMessagesSent + 1;
 			tremove(CT_RA_Comm_MessageQueue, key);
 			if ( self.numMessagesSent == 4 ) then
@@ -4423,7 +4429,7 @@ function CT_RA_SendMessageQueue(self)
 		retstr = retstr .. val;
 	end
 	if ( retstr ~= "" ) then
-		CT_RA_SendMessage(retstr, 1);
+		CT_RA_SendMessage(retstr);
 		self.numMessagesSent = self.numMessagesSent + 1;
 	end
 	CT_RA_Comm_MessageQueue = { };
