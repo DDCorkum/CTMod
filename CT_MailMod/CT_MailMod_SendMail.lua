@@ -101,12 +101,20 @@ local function configureSendToNameAutoComplete()
 		if (module:getOption("sendmailAutoCompleteGroup")) then
 			include = bit.bor(include, AUTOCOMPLETE_FLAG_IN_GROUP);
 		end
-		SendMailNameEditBox.autoCompleteParams = {include = include, exclude = exclude};
+		if (module:getOption("sendmailAutoCompleteOnline")) then
+			include = bit.bor(include, AUTOCOMPLETE_FLAG_ONLINE);
+		end
+		if (module:getOption("sendmailAutoCompleteAccount")) then
+			include = bit.bor(include, AUTO_COMPLETE_ACCOUNT_CHARACTER);
+		end
+		AutoCompleteEditBox_SetAutoCompleteSource(SendMailNameEditBox, GetAutoCompleteResults, include, exclude);
 	else
 		if (setAutoComplete) then
-			SendMailNameEditBox.autoCompleteParams = AUTOCOMPLETE_LIST.MAIL;
+			AutoCompleteEditBox_SetAutoCompleteSource(SendMailNameEditBox, GetAutoCompleteResults, AUTOCOMPLETE_LIST.MAIL.include, AUTOCOMPLETE_LIST.MAIL.exclude);
 			setAutoComplete = nil;
 		end
 	end
+	CT_MailMod_UpdateFilterDropDown();
 end
 module.configureSendToNameAutoComplete = configureSendToNameAutoComplete;
+

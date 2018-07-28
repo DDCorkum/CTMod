@@ -999,3 +999,22 @@ function InboxGetMoreMail()
 	-- CheckInbox() from getting called at times that we would rather
 	-- it not be.
 end
+
+-- Send Mail Auto-Complete Filters
+
+local sendmailframe;
+local filterdropdown;
+
+function CT_MailMod_UpdateFilterDropDown()
+	if (module:getOption("sendmailAutoCompleteUse")) then
+		filterdropdown:Show();
+	else
+		filterdropdown:Hide();
+	end
+
+end
+
+sendmailframe = module:getFrame("dropdown#s:1:40#tl:182:-32#n:CT_MailModDropdown_autoCompleteFilters#o:autoCompleteFilters:1#CT_MultipleSelections#Online or nearby toons#sendmailAutoCompleteOnline#Friends List#sendmailAutoCompleteFriends#Guild Only#sendmailAutoCompleteGuild#Current Group#sendmailAutoCompleteGroup#Recently Chatted#sendmailAutoCompleteInteracted#Own characters#sendmailAutoCompleteAccount",SendMailFrame);
+filterdropdown = select(#(sendmailframe:GetChildren())-1, sendmailframe:GetChildren());
+
+

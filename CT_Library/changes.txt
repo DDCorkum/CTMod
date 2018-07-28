@@ -1,6 +1,7 @@
-CT_Library (8.0.1.3) 2018-07-22
+CT_Library (8.0.1.3) 2018-07-28
 - Library updates
 - Incorporates foxlit's fix for BG queuing taint
+- Supports multiple-selection dropdowns
 
 CT_Library (8.0.1.0) 2018-07-17
 - Updated for 8.0.1

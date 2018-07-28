@@ -1400,8 +1400,10 @@ local function dropdownSetWidth(self, width)
 	self.SetWidth = dropdownSetWidth;
 end
 
-local function dropdownClick(self)
+local function dropdownClick(self, arg1, arg2, checked)
 	local dropdown;
+	local value;
+	local option;
 	if ( type(L_UIDROPDOWNMENU_OPEN_MENU) == "string" ) then
 		-- Prior to the 3.0.8 patch UIDROPDOWNMEN_OPEN_MENU was a string (name of the object).
 		dropdown = _G[L_UIDROPDOWNMENU_OPEN_MENU];
@@ -1415,12 +1417,19 @@ local function dropdownClick(self)
 		dropdown = L_UIDROPDOWNMENU_INIT_MENU
 	end
 	--print(dropdown:GetName())
-
+	
 	if ( dropdown ) then
-		local value = self.value;
-		local option = dropdown.option;
-
-		L_UIDropDownMenu_SetSelectedValue(dropdown, value);
+		
+		
+		if (arg1) then
+			value = not checked;
+			option = arg1;
+		else
+			value = self.value;
+			option = dropdown.option;
+			L_UIDropDownMenu_SetSelectedValue(dropdown, value);
+		end
+		
 		if ( option ) then
 			dropdown.object:setOption(option, value, not dropdown.global);
 		end
@@ -1433,7 +1442,9 @@ objectHandlers.dropdown = function(self, parent, name, virtual, option, ...)
 	frame.oldSetWidth = frame.SetWidth;
 	frame.SetWidth = dropdownSetWidth;
 	frame.ctDropdownClick = dropdownClick;
-
+	
+	-- Handle specializ
+	
 	-- Make the slider smaller
 	local left, right, mid, btn = _G[name.."Left"], _G[name.."Middle"], _G[name.."Right"], _G[name.."Button"];
 	local setHeight = left.SetHeight;
@@ -1444,18 +1455,33 @@ objectHandlers.dropdown = function(self, parent, name, virtual, option, ...)
 	setHeight(mid, 50);
 
 	local entries = { ... };
+	
+	if (entries[1] == "CT_MultipleSelections") then
+		L_UIDropDownMenu_Initialize(frame, function()
+			for i = 2, #entries, 2 do
+				dropdownEntry.text = entries[i];
+				dropdownEntry.value = i/2;
+				dropdownEntry.isNotRadio = true;
+				dropdownEntry.checked = self:getOption(entries[i+1]);
+				dropdownEntry.func = dropdownClick;
+				dropdownEntry.arg1 = entries[i+1];
+				L_UIDropDownMenu_AddButton(dropdownEntry);
+			end
+		end);
+	else
+	
+		L_UIDropDownMenu_Initialize(frame, function()
+			for i = 1, #entries, 1 do
+				dropdownEntry.text = entries[i];
+				dropdownEntry.value = i;
+				dropdownEntry.checked = nil;
+				dropdownEntry.func = dropdownClick;
+				L_UIDropDownMenu_AddButton(dropdownEntry);
+			end
+		end);
+		L_UIDropDownMenu_SetSelectedValue(frame, self:getOption(option) or 1);
+	end
 
-	L_UIDropDownMenu_Initialize(frame, function()
-		for i = 1, #entries, 1 do
-			dropdownEntry.text = entries[i];
-			dropdownEntry.value = i;
-			dropdownEntry.checked = nil;
-			dropdownEntry.func = dropdownClick;
-			L_UIDropDownMenu_AddButton(dropdownEntry);
-		end
-	end);
-
-	L_UIDropDownMenu_SetSelectedValue(frame, self:getOption(option) or 1);
 	L_UIDropDownMenu_JustifyText(frame, "LEFT");
 	return frame;
 end
