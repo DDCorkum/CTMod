@@ -1,11 +1,14 @@
 
-CT_BottomBar (8.0.1.3) 2018-07-23
+CT_BottomBar (8.0.1.3) 2018-07-29
+- Fixed combat taint issue that was introduced in 8.0.1.2
+- Fixed action-bar paging buttons not restoring when mod disabled
+- Improved options for manipulating XP/Rep bars
 - Small tweak to micro-button bar during pet battles
 
 CT_BottomBar (8.0.1.2) 2018-07-21
 - Restored XP/Rep bar functionality, works with Artifact/Azerite power too!
 - Restored micro-button and bag bars, added option to hide background
-- Partially resolved problem with battleground queuing.
+- Resolved CT_BB portion of problem with battleground queuing.
 - The FPS indicator (pressing CTRL-R) is now movable!  No longer stuck behind custom bars.
 
 CT_BottomBar (8.0.1.0) 2018-07-17
