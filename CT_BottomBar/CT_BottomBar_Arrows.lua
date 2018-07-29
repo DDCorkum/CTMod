@@ -60,7 +60,7 @@ end
 function CT_BottomBar_Arrows_FixMainMenuBarArtFrameBackground(self)
 	if (appliedOptions.hideTexturesBackground and CT_BB_Arrows_isEnabled) then
 		MainMenuBarArtFrameBackground:ClearAllPoints();
-		MainMenuBarArtFrameBackground:SetPoint("BOTTOMLEFT", self.frame, "BOTTOMLEFT", -515, 0);
+		MainMenuBarArtFrameBackground:SetPoint("BOTTOMLEFT", self.frame, "BOTTOMLEFT", -512, 0);
 	else
 		MainMenuBarArtFrameBackground:ClearAllPoints();
 		MainMenuBarArtFrameBackground:SetPoint(CT_BB_Arrows_MainMenuArtDefaultPoint, CT_BB_Arrows_MainMenuArtDefaultRelativeTo, CT_BB_Arrows_MainMenuArtDefaultRelativePoint, CT_BB_Arrows_MainMenuArtDefaultX, CT_BB_Arrows_MainMenuArtDefaultY);
@@ -112,7 +112,7 @@ local function addon_Register()
 		addon_Update,
 		nil,  -- no orientation function
 		addon_Enable,
-		nil,  -- no disable function
+		addon_Disable,  -- no disable function
 		"helperFrame",
 		ActionBarUpButton,
 		ActionBarDownButton,
