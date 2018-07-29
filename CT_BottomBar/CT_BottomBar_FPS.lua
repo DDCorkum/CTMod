@@ -19,11 +19,11 @@ local module = _G.CT_BottomBar;
 local ctRelativeFrame = module.ctRelativeFrame;
 local appliedOptions;
 
-CT_BB_FPS_DefaultPoint = nil;
-CT_BB_FPS_DefaultRelativeTo = nil;
-CT_BB_FPS_DefaultRelativePoint = nil;
-CT_BB_FPS_DefaultX = nil;
-CT_BB_FPS_DefaultY = nil;
+local CT_BB_FPS_DefaultPoint = nil;
+local CT_BB_FPS_DefaultRelativeTo = nil;
+local CT_BB_FPS_DefaultRelativePoint = nil;
+local CT_BB_FPS_DefaultX = nil;
+local CT_BB_FPS_DefaultY = nil;
 
 --------------------------------------------
 -- Action bar arrows and page number
