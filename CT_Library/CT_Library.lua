@@ -2236,7 +2236,7 @@ end
 
 local function selectControlPanelModule(self)
 	local parent = self.parent;
-	local newModule = self:GetID();
+	local newModule = self:GetID()-700;  		 --700 is an offset to prevent taint affecting battleground queueing
 	PlaySound(1115);
 
 	local module = modules[newModule];
@@ -2251,7 +2251,7 @@ local function selectControlPanelModule(self)
 		-- Highlight the correct bullet
 		self.bullet:SetVertexColor(1, 0, 0);
 		local obj, module;
-		local num = 0;
+		local num = 700;			--700 is an offset to prevent taint affecting battleground queueing
 		for key, value in ipairs(modules) do
 			if ( value.frame ) then
 				num = num + 1;
@@ -2362,7 +2362,7 @@ local function controlPanelSkeleton()
 
 			-- Show/Hide our bullets
 			local listing = self.listing;
-			local num = 0;
+			local num = 700;		--700 is an offset to prevent taint affecting battleground queueing
 			local version;
 			for i = 1, #modules, 1 do
 				module = modules[i];
@@ -2370,7 +2370,7 @@ local function controlPanelSkeleton()
 					num = num + 1;
 					version = module.version;
 					obj = listing[tostring(num)];
-					obj:SetID(i);
+					obj:SetID(num);
 					obj:Show();
 					obj:SetText(module.name);
 
@@ -2388,7 +2388,7 @@ local function controlPanelSkeleton()
 					end
 				end
 			end
-			for i = num + 1, 14, 1 do
+			for i = num + 1, 714, 1 do
 				listing[tostring(i)]:Hide();
 			end
 			PlaySound(1115);
@@ -2438,20 +2438,21 @@ local function controlPanelSkeleton()
 			"texture#i:hover#l:5:0#s:290:25#hidden#1:1:1:0.125",
 			"texture#i:select#l:5:0#s:290:25#hidden#1:1:1:0.25",
 			"font#b:-10:-5#CTMod - www.ctmod.net#0.72:0.36:0",
-			["button#i:1#hidden#s:263:25#tl:17:-85"] = modListButtonTemplate,
-			["button#i:2#hidden#s:263:25#tl:17:-110"] = modListButtonTemplate,
-			["button#i:3#hidden#s:263:25#tl:17:-135"] = modListButtonTemplate,
-			["button#i:4#hidden#s:263:25#tl:17:-160"] = modListButtonTemplate,
-			["button#i:5#hidden#s:263:25#tl:17:-185"] = modListButtonTemplate,
-			["button#i:6#hidden#s:263:25#tl:17:-210"] = modListButtonTemplate,
-			["button#i:7#hidden#s:263:25#tl:17:-235"] = modListButtonTemplate,
-			["button#i:8#hidden#s:263:25#tl:17:-260"] = modListButtonTemplate,
-			["button#i:9#hidden#s:263:25#tl:17:-285"] = modListButtonTemplate,
-			["button#i:10#hidden#s:263:25#tl:17:-310"] = modListButtonTemplate,
-			["button#i:11#hidden#s:263:25#tl:17:-335"] = modListButtonTemplate,
-			["button#i:12#hidden#s:263:25#tl:17:-360"] = modListButtonTemplate,
-			["button#i:13#hidden#s:263:25#tl:17:-385"] = modListButtonTemplate,
-			["button#i:14#hidden#s:263:25#tl:17:-410"] = modListButtonTemplate,
+						--700 is an offset to prevent taint affecting battleground queueing
+			["button#i:701#hidden#s:263:25#tl:17:-85"] = modListButtonTemplate,	
+			["button#i:702#hidden#s:263:25#tl:17:-110"] = modListButtonTemplate,
+			["button#i:703#hidden#s:263:25#tl:17:-135"] = modListButtonTemplate,
+			["button#i:704#hidden#s:263:25#tl:17:-160"] = modListButtonTemplate,
+			["button#i:705#hidden#s:263:25#tl:17:-185"] = modListButtonTemplate,
+			["button#i:706#hidden#s:263:25#tl:17:-210"] = modListButtonTemplate,
+			["button#i:707#hidden#s:263:25#tl:17:-235"] = modListButtonTemplate,
+			["button#i:708#hidden#s:263:25#tl:17:-260"] = modListButtonTemplate,
+			["button#i:709#hidden#s:263:25#tl:17:-285"] = modListButtonTemplate,
+			["button#i:710#hidden#s:263:25#tl:17:-310"] = modListButtonTemplate,
+			["button#i:711#hidden#s:263:25#tl:17:-335"] = modListButtonTemplate,
+			["button#i:712#hidden#s:263:25#tl:17:-360"] = modListButtonTemplate,
+			["button#i:713#hidden#s:263:25#tl:17:-385"] = modListButtonTemplate,
+			["button#i:714#hidden#s:263:25#tl:17:-410"] = modListButtonTemplate,
 		},
 		["frame#s:315:0#tr:-15:-30#b:0:15#i:options#hidden"] = {
 			["onload"] = function(self)
@@ -2508,7 +2509,7 @@ function lib:showModuleOptions(modname)
 	-- Look up the addon name to deterine which button to click.
 	local listing = CTCONTROLPANEL.listing;
 	local button;
-	local num = 0;
+	local num = 700;			--700 is an offset to prevent taint affecting battleground queueing
 	for i, v in ipairs(modules) do
 		if (v.frame) then
 			num = num + 1;
