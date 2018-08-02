@@ -19,12 +19,13 @@ local module = _G.CT_BottomBar;
 local ctRelativeFrame = module.ctRelativeFrame;
 local appliedOptions;
 
-CT_BottomBar_Arrows_MainMenuBarArtFrameDefaultPosition = nil;
-CT_BB_Arrows_MainMenuArtDefaultPoint = nil;
-CT_BB_Arrows_MainMenuArtDefaultRelativeTo = nil;
-CT_BB_Arrows_MainMenuArtDefaultRelativePoint = nil;
-CT_BB_Arrows_MainMenuArtDefaultX = nil;
-CT_BB_Arrows_MainMenuArtDefaultY = nil;
+local CT_BottomBar_Arrows_MainMenuBarArtFrameDefaultPosition = nil;
+local CT_BB_Arrows_MainMenuArtDefaultPoint = nil;
+local CT_BB_Arrows_MainMenuArtDefaultRelativeTo = nil;
+local CT_BB_Arrows_MainMenuArtDefaultRelativePoint = nil;
+local CT_BB_Arrows_MainMenuArtDefaultX = nil;
+local CT_BB_Arrows_MainMenuArtDefaultY = nil;
+local CT_BB_Arrows_isEnabled = nil;
 
 --------------------------------------------
 -- Action bar arrows and page number
@@ -57,9 +58,9 @@ local function addon_Update(self)
 end
 
 function CT_BottomBar_Arrows_FixMainMenuBarArtFrameBackground(self)
-	if (appliedOptions.hideTexturesBackground) then
+	if (appliedOptions.hideTexturesBackground and CT_BB_Arrows_isEnabled) then
 		MainMenuBarArtFrameBackground:ClearAllPoints();
-		MainMenuBarArtFrameBackground:SetPoint("BOTTOMLEFT", self.frame, "BOTTOMLEFT", -515, 0);
+		MainMenuBarArtFrameBackground:SetPoint("BOTTOMLEFT", self.frame, "BOTTOMLEFT", -512, 0);
 	else
 		MainMenuBarArtFrameBackground:ClearAllPoints();
 		MainMenuBarArtFrameBackground:SetPoint(CT_BB_Arrows_MainMenuArtDefaultPoint, CT_BB_Arrows_MainMenuArtDefaultRelativeTo, CT_BB_Arrows_MainMenuArtDefaultRelativePoint, CT_BB_Arrows_MainMenuArtDefaultX, CT_BB_Arrows_MainMenuArtDefaultY);
@@ -67,7 +68,13 @@ function CT_BottomBar_Arrows_FixMainMenuBarArtFrameBackground(self)
 end
 
 local function addon_Enable(self)
+	CT_BB_Arrows_isEnabled = true;
 	self.frame:SetClampRectInsets(10, -10, 39, 10);
+end
+
+local function addon_Disable(self)
+	CT_BB_Arrows_isEnabled = false;
+	CT_BottomBar_Arrows_FixMainMenuBarArtFrameBackground(self)
 end
 
 local function addon_Init(self)
@@ -105,7 +112,7 @@ local function addon_Register()
 		addon_Update,
 		nil,  -- no orientation function
 		addon_Enable,
-		nil,  -- no disable function
+		addon_Disable,  -- no disable function
 		"helperFrame",
 		ActionBarUpButton,
 		ActionBarDownButton,

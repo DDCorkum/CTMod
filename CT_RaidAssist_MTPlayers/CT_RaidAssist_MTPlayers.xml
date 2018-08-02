@@ -13,7 +13,7 @@
 			</OnEvent>
 		</Scripts>
 	</Frame>
-	<Frame name="CT_RA_MTPlayers_DropDown" inherits="Lib_UIDropDownMenuTemplate" id="1" hidden="true">
+	<Frame name="CT_RA_MTPlayers_DropDown" inherits="L_UIDropDownMenuTemplate" id="1" hidden="true">
 		<Size>
 			<AbsDimension x="10" y="10"/>
 		</Size>

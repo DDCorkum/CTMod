@@ -245,19 +245,19 @@ function CT_RAOptionsGroupFrame_OnUpdate(self, elapsed)
 end
 
 function CT_RAMemberDropDown_OnLoad(self)
-	Lib_UIDropDownMenu_Initialize(self, CT_RAMemberDropDown_Initialize, "MENU");
+	L_UIDropDownMenu_Initialize(self, CT_RAMemberDropDown_Initialize, "MENU");
 end
 
 function CT_RAMemberDropDown_Initialize(self)
 	local info;
-	if ( type(LIB_UIDROPDOWNMENU_MENU_VALUE) == "table" and LIB_UIDROPDOWNMENU_MENU_VALUE[1] == "Main Tanks" ) then
+	if ( type(L_UIDROPDOWNMENU_MENU_VALUE) == "table" and L_UIDROPDOWNMENU_MENU_VALUE[1] == "Main Tanks" ) then
 		info = {};
 		info.text = "Main Tanks";
 		info.isTitle = 1;
-		Lib_UIDropDownMenu_AddButton(info, LIB_UIDROPDOWNMENU_MENU_LEVEL);
+		L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL);
 		local isMT;
 		for key, value in pairs(CT_RA_MainTanks) do
-			if ( value == LIB_UIDROPDOWNMENU_MENU_VALUE[2] ) then
+			if ( value == L_UIDROPDOWNMENU_MENU_VALUE[2] ) then
 				isMT = key;
 				break;
 			end
@@ -270,7 +270,7 @@ function CT_RAMemberDropDown_Initialize(self)
 					info.text = info.text .. "  (" .. CT_RA_MainTanks[i] .. ")";
 				end
 				info.text = info.text .. "|r";
-				info.value = { LIB_UIDROPDOWNMENU_MENU_VALUE[1], LIB_UIDROPDOWNMENU_MENU_VALUE[2], i, isMT, 1 };
+				info.value = { L_UIDROPDOWNMENU_MENU_VALUE[1], L_UIDROPDOWNMENU_MENU_VALUE[2], i, isMT, 1 };
 				info.tooltipTitle = "Remove Main Tank"
 				info.tooltipText = "Removes the Main Tank from the MT window.";
 			else
@@ -278,25 +278,25 @@ function CT_RAMemberDropDown_Initialize(self)
 				if (CT_RA_MainTanks[i]) then
 					info.text = info.text .. "  (" .. CT_RA_MainTanks[i] .. ")";
 				end
-				info.value = { LIB_UIDROPDOWNMENU_MENU_VALUE[1], LIB_UIDROPDOWNMENU_MENU_VALUE[2], i, isMT };
+				info.value = { L_UIDROPDOWNMENU_MENU_VALUE[1], L_UIDROPDOWNMENU_MENU_VALUE[2], i, isMT };
 				info.tooltipTitle = "Set Main Tank"
 				info.tooltipText = "Sets a main tank, which allows everyone to see the main tank(s) target info";
 			end
 			info.func = CT_RAMemberDropDown_OnClick;
-			Lib_UIDropDownMenu_AddButton(info, LIB_UIDROPDOWNMENU_MENU_LEVEL);
+			L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL);
 		end
 		return;
 	end
-	if ( type(LIB_UIDROPDOWNMENU_MENU_VALUE) == "table" and LIB_UIDROPDOWNMENU_MENU_VALUE[1] == "Player Targets" ) then
+	if ( type(L_UIDROPDOWNMENU_MENU_VALUE) == "table" and L_UIDROPDOWNMENU_MENU_VALUE[1] == "Player Targets" ) then
 		info = {};
 		info.text = "Player Targets";
 		info.isTitle = 1;
 		info.notCheckable = 1;
-		Lib_UIDropDownMenu_AddButton(info, LIB_UIDROPDOWNMENU_MENU_LEVEL);
+		L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL);
 		local isPT;
 		if ( CT_RA_PTargets ) then
 			for key, value in pairs(CT_RA_PTargets) do
-				if ( value == LIB_UIDROPDOWNMENU_MENU_VALUE[2] ) then
+				if ( value == L_UIDROPDOWNMENU_MENU_VALUE[2] ) then
 					isPT = key;
 					break;
 				end
@@ -305,45 +305,45 @@ function CT_RAMemberDropDown_Initialize(self)
 		info = {};
 		if ( isPT ) then
 			info.text = "|c00DFFFFFRemove PT|r";
-			info.value = { LIB_UIDROPDOWNMENU_MENU_VALUE[1], LIB_UIDROPDOWNMENU_MENU_VALUE[2], isPT, 1 };
+			info.value = { L_UIDROPDOWNMENU_MENU_VALUE[1], L_UIDROPDOWNMENU_MENU_VALUE[2], isPT, 1 };
 			info.tooltipTitle = "Remove Player Target"
 			info.tooltipText = "Removes the Player Target from the PT window.";
 		else
 			info.text = "Set PT"
-			info.value = { LIB_UIDROPDOWNMENU_MENU_VALUE[1], LIB_UIDROPDOWNMENU_MENU_VALUE[2], isPT };
+			info.value = { L_UIDROPDOWNMENU_MENU_VALUE[1], L_UIDROPDOWNMENU_MENU_VALUE[2], isPT };
 			info.tooltipTitle = "Set Player Target"
 			info.tooltipText = "Sets a player target, which allows you to easily see the person's health and target.";
 		end
 		info.func = CT_RAMemberDropDown_OnClick;
-		Lib_UIDropDownMenu_AddButton(info, LIB_UIDROPDOWNMENU_MENU_LEVEL);
+		L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL);
 		return;
 	end
 	info = {};
 	info.text = self:GetParent().name;
 	info.isTitle = 1;
 	info.notCheckable = 1;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 	if ( CT_RA_Level < 1 ) then
 		info = { };
 		info.text = "|c00666666Main Tanks|r";
 		info.tooltipTitle = "Promotion Required";
 		info.tooltipText = "In order to set main tanks, you need to at least be a promoted user, or raid leader.";
 		info.notCheckable = 1;
-		Lib_UIDropDownMenu_AddButton(info);
+		L_UIDropDownMenu_AddButton(info);
 	else
 		info = {};
 		info.text = "Main Tanks";
 		info.value = { "Main Tanks", self:GetParent().name };
 		info.hasArrow = 1;
 		info.notCheckable = 1;
-		Lib_UIDropDownMenu_AddButton(info);
+		L_UIDropDownMenu_AddButton(info);
 	end
 	info = {};
 	info.text = "Player Targets";
 	info.value = { "Player Targets", self:GetParent().name };
 	info.hasArrow = 1;
 	info.notCheckable = 1;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	info.text = "Auto-Promote";
@@ -352,15 +352,15 @@ function CT_RAMemberDropDown_Initialize(self)
 	info.checked = CT_RATab_AutoPromotions[self:GetParent().name];
 	info.value = self:GetParent().id;
 	info.func = CT_RATab_AutoPromote_OnClick;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 end
 
 function CT_RAMemberDropDown_OnClick(self)
 	if ( self.value[1] == "Main Tanks" ) then
 		if ( self.value[5] ) then
-			CT_RA_SendMessage("R " .. self.value[2], 1);
+			CT_RA_SendMessage("R " .. self.value[2]);
 		else
-			CT_RA_SendMessage("SET " .. self.value[3] .. " " .. self.value[2], 1);
+			CT_RA_SendMessage("SET " .. self.value[3] .. " " .. self.value[2]);
 		end
 	elseif ( self.value[1] == "Player Targets" ) then
 		if ( self.value[4] ) then
@@ -377,7 +377,7 @@ end
 -- These functions, CT_RAMemberDropDownRemove*, are not being used anywhere.
 --[[
 function CT_RAMemberDropDownRemove_OnLoad(self)
-	Lib_UIDropDownMenu_Initialize(self, CT_RAMemberDropDownRemove_Initialize, "MENU");
+	L_UIDropDownMenu_Initialize(self, CT_RAMemberDropDownRemove_Initialize, "MENU");
 end
 
 function CT_RAMemberDropDownRemove_Initialize(self)
@@ -387,7 +387,7 @@ function CT_RAMemberDropDownRemove_Initialize(self)
 		info.text = self:GetParent().name;
 		info.isTitle = 1;
 		info.notCheckable = 1;
-		Lib_UIDropDownMenu_AddButton(info);
+		L_UIDropDownMenu_AddButton(info);
 
 		info = {};
 		info.text = "Remove MT";
@@ -396,14 +396,14 @@ function CT_RAMemberDropDownRemove_Initialize(self)
 		info.notCheckable = 1;
 		info.tooltipTitle = "Remove Main Tank"
 		info.tooltipText = "Removes the main tank";
-		Lib_UIDropDownMenu_AddButton(info);
+		L_UIDropDownMenu_AddButton(info);
 	end
 end
 
 function CT_RAMemberDropDownRemove_OnClick(self)
 	for k, v in pairs(CT_RA_MainTanks) do
 		if ( v == self.value ) then
-			CT_RA_SendMessage("R " .. v, 1);
+			CT_RA_SendMessage("R " .. v);
 			return;
 		end
 	end

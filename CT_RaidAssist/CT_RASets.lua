@@ -421,8 +421,8 @@ function CT_RASets_OnEvent(self, event, ...)
 	if (event == "VARIABLES_LOADED") then
 		CT_RASets_MoveButton();
 	elseif (event == "PLAYER_REGEN_DISABLED") then
-		if (LIB_UIDROPDOWNMENU_OPEN_MENU == "CT_RASets_DropDown") then
-			Lib_CloseDropDownMenus();
+		if (L_UIDROPDOWNMENU_OPEN_MENU == "CT_RASets_DropDown") then
+			L_CloseDropDownMenus();
 		end
 	end
 end
@@ -439,7 +439,7 @@ function CT_RASets_ToggleDropDown()
 	end
 	CT_RASets_DropDown.point = "TOPRIGHT";
 	CT_RASets_DropDown.relativePoint = "BOTTOMLEFT";
-	Lib_ToggleDropDownMenu(1, nil, CT_RASets_DropDown);
+	L_ToggleDropDownMenu(1, nil, CT_RASets_DropDown);
 end
 
 function CT_RASets_DropDown_Initialize(self)
@@ -453,7 +453,7 @@ function CT_RASets_DropDown_Initialize(self)
 	info.isTitle = 1;
 	info.justifyH = "CENTER";
 	info.notCheckable = 1;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	info.text = "Open CTRA options";
@@ -461,7 +461,7 @@ function CT_RASets_DropDown_Initialize(self)
 	info.notCheckable = 1;
 	info.disabled = inCombat;
 	info.func = CT_RASets_DropDown_OnClick;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	info.text = "Open CTRA raid window";
@@ -469,7 +469,7 @@ function CT_RASets_DropDown_Initialize(self)
 	info.notCheckable = 1;
 	info.disabled = inCombat;
 	info.func = CT_RASets_DropDown_OnClick;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	if ( ( CT_RASets_OpenedLevel or 0 ) >= 1 ) then
 		info = { };
@@ -478,7 +478,7 @@ function CT_RASets_DropDown_Initialize(self)
 		info.notCheckable = 1;
 		info.disabled = inCombat;
 		info.func = CT_RASets_DropDown_OnClick;
-		Lib_UIDropDownMenu_AddButton(info);
+		L_UIDropDownMenu_AddButton(info);
 	end
 
 	info = { };
@@ -491,7 +491,7 @@ function CT_RASets_DropDown_Initialize(self)
 	info.notCheckable = 1;
 	info.disabled = inCombat;
 	info.func = CT_RASets_DropDown_OnClick;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info = { };
 	info.text = "Edit option sets";
@@ -499,7 +499,7 @@ function CT_RASets_DropDown_Initialize(self)
 	info.notCheckable = 1;
 	info.disabled = inCombat;
 	info.func = CT_RASets_DropDown_OnClick;
-	Lib_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	local numSets = 0;
 	local sets = {};
@@ -525,7 +525,7 @@ function CT_RASets_DropDown_Initialize(self)
 		info.isTitle = 1;
 		info.justifyH = "CENTER";
 		info.notCheckable = 1;
-		Lib_UIDropDownMenu_AddButton(info);
+		L_UIDropDownMenu_AddButton(info);
 
 		for i, k in ipairs(sets) do
 			info = { };
@@ -539,7 +539,7 @@ function CT_RASets_DropDown_Initialize(self)
 			info.tooltipTitle = "Change Set";
 			info.tooltipText = "Changes the current option set to this one, updating all of your settings to match the ones specified in the option set.";
 			info.func = CT_RASets_DropDown_OnClick;
-			Lib_UIDropDownMenu_AddButton(info);
+			L_UIDropDownMenu_AddButton(info);
 		end
 	end
 end
@@ -587,7 +587,7 @@ function CT_RASets_DropDown_OnClick(self)
 end
 
 function CT_RASets_DropDown_OnLoad(self)
-	Lib_UIDropDownMenu_Initialize(self, CT_RASets_DropDown_Initialize, "MENU");
+	L_UIDropDownMenu_Initialize(self, CT_RASets_DropDown_Initialize, "MENU");
 end
 
 tinsert(UISpecialFrames, "CT_RAMenu_NewSetFrame");
@@ -692,9 +692,9 @@ function CT_RASetsEdit_Delete()
 end
 
 function CT_RASetsEditNewDropDown_OnLoad(self)
-	Lib_UIDropDownMenu_Initialize(self, CT_RASetsEditNew_DropDown_Initialize);
-	Lib_UIDropDownMenu_SetWidth(self, 180);
-	Lib_UIDropDownMenu_SetSelectedName(CT_RASetsEditNew_DropDown, "Default");
+	L_UIDropDownMenu_Initialize(self, CT_RASetsEditNew_DropDown_Initialize);
+	L_UIDropDownMenu_SetWidth(self, 180);
+	L_UIDropDownMenu_SetSelectedName(CT_RASetsEditNew_DropDown, "Default");
 end
 
 function CT_RASetsEditNew_DropDown_Initialize(self)
@@ -704,7 +704,7 @@ function CT_RASetsEditNew_DropDown_Initialize(self)
 			info = { };
 			info.text = k;
 			info.func = CT_RASetsEditNew_DropDown_OnClick;
-			Lib_UIDropDownMenu_AddButton(info);
+			L_UIDropDownMenu_AddButton(info);
 		end
 	end
 end
@@ -716,13 +716,13 @@ function CT_RASetsEditNew_DropDown_OnClick(self)
 			num = num + 1;
 			if ( num == self:GetID() ) then
 				CT_RASetsEditNewFrame.set = k;
-				Lib_UIDropDownMenu_SetSelectedName(CT_RASetsEditNew_DropDown, k);
+				L_UIDropDownMenu_SetSelectedName(CT_RASetsEditNew_DropDown, k);
 				return;
 			end
 		end
 	end
 	CT_RASetsEditNewFrame.set = "Default";
-	Lib_UIDropDownMenu_SetSelectedName(CT_RASetsEditNew_DropDown, "Default");
+	L_UIDropDownMenu_SetSelectedName(CT_RASetsEditNew_DropDown, "Default");
 end
 
 function CT_RASet_New()

@@ -139,11 +139,14 @@ module.frame = function()
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Send Mail");
 		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:sendmailAltClickItem#Alt left-click adds items to the Send Mail tab");
 		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:sendmailMoneySubject:true#Replace blank subject with money amount");
-		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:sendmailAutoCompleteUse#Configure auto-completion of Send To name");
-		optionsAddObject(  6,   26, "checkbutton#tl:40:%y#o:sendmailAutoCompleteFriends#Friends list");
-		optionsAddObject(  6,   26, "checkbutton#tl:40:%y#o:sendmailAutoCompleteGuild#Guild members");
-		optionsAddObject(  6,   26, "checkbutton#tl:40:%y#o:sendmailAutoCompleteGroup#Group members (party or raid)");
-		optionsAddObject(  6,   26, "checkbutton#tl:40:%y#o:sendmailAutoCompleteInteracted#Players interacted with (whispers, etc)");
+		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:sendmailAutoCompleteUse#Filter auto-completion of Send To name");
+		optionsAddObject(  6,   40, "font#t:0:%y#s:0:%s#l:13:0#r#New: Select filters right inside the mail window!#" .. textColor1 .. ":l");
+		--optionsAddObject(  6,   26, "checkbutton#tl:40:%y#o:sendmailAutoCompleteOnline#Online and nearby toons");
+		--optionsAddObject(  6,   26, "checkbutton#tl:40:%y#o:sendmailAutoCompleteFriends#Friends list");
+		--optionsAddObject(  6,   26, "checkbutton#tl:40:%y#o:sendmailAutoCompleteGuild#Guild members");
+		--optionsAddObject(  6,   26, "checkbutton#tl:40:%y#o:sendmailAutoCompleteGroup#Group members (party or raid)");
+		--optionsAddObject(  6,   26, "checkbutton#tl:40:%y#o:sendmailAutoCompleteInteracted#Players interacted with (whispers, etc)");
+		--optionsAddObject(  6,   26, "checkbutton#tl:40:%y#o:sendmailAutoCompleteAccount#Own characters");
 
 		optionsAddScript("onload",
 			function (self)
@@ -214,6 +217,16 @@ module.update = function(self, optName, value)
 		opt.sendmailAltClickItem = getoption("sendmailAltClickItem", true);
 		opt.sendmailMoneySubject = getoption("sendmailMoneySubject", true);
 		module.configureSendToNameAutoComplete();
+		local temp = getoption("sendmailAutoCompleteUse", 5);  -- 5 is a non-sensical value, demonstrating the var was never set
+		if (temp == 5) then
+			module:setOption("sendmailAutoCompleteUse", true, false);
+			module:setOption("sendmailAutoCompleteFriends", true, false);
+			module:setOption("sendmailAutoCompleteGuild", true, false);
+			module:setOption("sendmailAutoCompleteInteracted", true, false);
+			module:setOption("sendmailAutoCompleteGroup", true, false);
+			module:setOption("sendmailAutoCompleteOnline", true, false);
+			module:setOption("sendmailAutoCompleteAccount", true, false);
+		end
 
 	-- General options
 	else
@@ -256,7 +269,9 @@ module.update = function(self, optName, value)
 			optName == "sendmailAutoCompleteFriends" or
 			optName == "sendmailAutoCompleteGuild" or
 			optName == "sendmailAutoCompleteInteracted" or
-			optName == "sendmailAutoCompleteGroup"
+			optName == "sendmailAutoCompleteGroup" or
+			optName == "sendmailAutoCompleteOnline" or
+			optName == "sendmailAutoCompleteAccount"
 		) then
 			module.configureSendToNameAutoComplete();
 

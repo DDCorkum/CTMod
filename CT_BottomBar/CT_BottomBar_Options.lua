@@ -315,6 +315,18 @@ function module:updateOption(optName, value)
 		if (applyUnprotectedOption(optName, value)) then
 			module:CT_BottomBar_StatusBar_SetWidth();
 		end
+	elseif (optName == "customStatusBarHideReputation" or
+		optName == "customStatusBarHideHonor" or
+		optName == "customStatusBarHideArtifact" or
+		optName == "customStatusBarHideExp" or
+		optName == "customStatusBarHideAzerite"
+	) then
+		value = value or false;
+			if (applyProtectedOption(optName, value)) then
+			CT_StatusTrackingBarManager:UpdateBarsShown();
+		end
+		
+		
 
 	elseif (optName == "repBarHideNoRep" or
 		optName == "repBarCoverExpBar" or
@@ -764,6 +776,13 @@ module.frame = function()
 					statusOptionsFrame.customStatusBarWidth:SetValue(size);
 				end
 			end
+			optionsAddObject(  0,   35, "font#tl:20:-206:%y#v:GameFontNormal#Make bars hidden");
+			optionsAddObject( -5, 3*14, "font#t:0:%y#s:0:%s#l:20:0#r#The game automatically hides bars that are not needed.  Use these options to hide them always.#" .. textColor2 .. ":l");
+			optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:customStatusBarHideExp#Never display experience bar");
+			optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:customStatusBarHideReputation#Never display reputation bar");
+			optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:customStatusBarHideHonor#Never display honor bar");
+			optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:customStatusBarHideArtifact#Never display Legion artifact bar");
+			optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:customStatusBarHideAzerite#Never display BFA Azerite bar");
 
 		optionsEndFrame();
 	end

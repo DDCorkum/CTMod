@@ -11,7 +11,7 @@
 -----------------------------------------------
 -- Initialization
 
-local LIBRARY_VERSION = 7.32000;
+local LIBRARY_VERSION = 8.01030;
 local LIBRARY_NAME = "CT_Library";
 
 local _G = getfenv(0);
@@ -1396,31 +1396,40 @@ end
 local function dropdownSetWidth(self, width)
 	-- Ugly, ugly hack.
 	self.SetWidth = self.oldSetWidth;
-	Lib_UIDropDownMenu_SetWidth(self, width);
+	L_UIDropDownMenu_SetWidth(self, width);
 	self.SetWidth = dropdownSetWidth;
 end
 
-local function dropdownClick(self)
+local function dropdownClick(self, arg1, arg2, checked)
 	local dropdown;
-	if ( type(LIB_UIDROPDOWNMENU_OPEN_MENU) == "string" ) then
+	local value;
+	local option;
+	if ( type(L_UIDROPDOWNMENU_OPEN_MENU) == "string" ) then
 		-- Prior to the 3.0.8 patch UIDROPDOWNMEN_OPEN_MENU was a string (name of the object).
-		dropdown = _G[LIB_UIDROPDOWNMENU_OPEN_MENU];
+		dropdown = _G[L_UIDROPDOWNMENU_OPEN_MENU];
 	else
 		-- As of the 3.0.8 patch UIDROPDOWNMEN_OPEN_MENU is an object.
-		dropdown = LIB_UIDROPDOWNMENU_OPEN_MENU;
+		dropdown = L_UIDROPDOWNMENU_OPEN_MENU;
 	end
 
 	-- 7.0.3
 	if not dropdown then
-		dropdown = LIB_UIDROPDOWNMENU_INIT_MENU
+		dropdown = L_UIDROPDOWNMENU_INIT_MENU
 	end
 	--print(dropdown:GetName())
-
+	
 	if ( dropdown ) then
-		local value = self.value;
-		local option = dropdown.option;
-
-		Lib_UIDropDownMenu_SetSelectedValue(dropdown, value);
+		
+		
+		if (arg1) then
+			value = not checked;
+			option = arg1;
+		else
+			value = self.value;
+			option = dropdown.option;
+			L_UIDropDownMenu_SetSelectedValue(dropdown, value);
+		end
+		
 		if ( option ) then
 			dropdown.object:setOption(option, value, not dropdown.global);
 		end
@@ -1429,11 +1438,13 @@ end
 
 local dropdownEntry = { };
 objectHandlers.dropdown = function(self, parent, name, virtual, option, ...)
-	local frame = CreateFrame("Frame", name, parent, virtual or "Lib_UIDropDownMenuTemplate");
+	local frame = CreateFrame("Frame", name, parent, virtual or "L_UIDropDownMenuTemplate");
 	frame.oldSetWidth = frame.SetWidth;
 	frame.SetWidth = dropdownSetWidth;
 	frame.ctDropdownClick = dropdownClick;
-
+	
+	-- Handle specializ
+	
 	-- Make the slider smaller
 	local left, right, mid, btn = _G[name.."Left"], _G[name.."Middle"], _G[name.."Right"], _G[name.."Button"];
 	local setHeight = left.SetHeight;
@@ -1444,19 +1455,34 @@ objectHandlers.dropdown = function(self, parent, name, virtual, option, ...)
 	setHeight(mid, 50);
 
 	local entries = { ... };
+	
+	if (entries[1] == "CT_MultipleSelections") then
+		L_UIDropDownMenu_Initialize(frame, function()
+			for i = 2, #entries, 2 do
+				dropdownEntry.text = entries[i];
+				dropdownEntry.value = i/2;
+				dropdownEntry.isNotRadio = true;
+				dropdownEntry.checked = self:getOption(entries[i+1]);
+				dropdownEntry.func = dropdownClick;
+				dropdownEntry.arg1 = entries[i+1];
+				L_UIDropDownMenu_AddButton(dropdownEntry);
+			end
+		end);
+	else
+	
+		L_UIDropDownMenu_Initialize(frame, function()
+			for i = 1, #entries, 1 do
+				dropdownEntry.text = entries[i];
+				dropdownEntry.value = i;
+				dropdownEntry.checked = nil;
+				dropdownEntry.func = dropdownClick;
+				L_UIDropDownMenu_AddButton(dropdownEntry);
+			end
+		end);
+		L_UIDropDownMenu_SetSelectedValue(frame, self:getOption(option) or 1);
+	end
 
-	Lib_UIDropDownMenu_Initialize(frame, function()
-		for i = 1, #entries, 1 do
-			dropdownEntry.text = entries[i];
-			dropdownEntry.value = i;
-			dropdownEntry.checked = nil;
-			dropdownEntry.func = dropdownClick;
-			Lib_UIDropDownMenu_AddButton(dropdownEntry);
-		end
-	end);
-
-	Lib_UIDropDownMenu_SetSelectedValue(frame, self:getOption(option) or 1);
-	Lib_UIDropDownMenu_JustifyText(frame, "LEFT");
+	L_UIDropDownMenu_JustifyText(frame, "LEFT");
 	return frame;
 end
 
@@ -1549,7 +1575,7 @@ local function colorSwatchShow(self)
 	self.hasOpacity = self.hasAlpha;
 
 	ColorPickerFrame.object = self;
-	Lib_UIDropDownMenuButton_OpenColorPicker(self);
+	L_UIDropDownMenuButton_OpenColorPicker(self);
 	ColorPickerFrame:SetFrameStrata("TOOLTIP");
 	ColorPickerFrame:Raise();
 end
@@ -2620,7 +2646,7 @@ local function populateCharDropdownInit()
 			dropdownEntry.value = value;
 			dropdownEntry.checked = nil;
 			dropdownEntry.func = dropdownClick;
-			Lib_UIDropDownMenu_AddButton(dropdownEntry);
+			L_UIDropDownMenu_AddButton(dropdownEntry);
 
 			importPlayerCount = importPlayerCount + 1;
 		end
@@ -2629,7 +2655,7 @@ local function populateCharDropdownInit()
 	if (importSetPlayer) then
 		if (importRealm) then
 			local value = players[1];
-			Lib_UIDropDownMenu_SetSelectedValue(CT_LibraryDropdown1, value);
+			L_UIDropDownMenu_SetSelectedValue(CT_LibraryDropdown1, value);
 			populateAddonsList(value);
 		end
 	end
@@ -2644,7 +2670,7 @@ local function populateCharDropdownInit()
 end
 
 local function populateCharDropdown()
-	Lib_UIDropDownMenu_Initialize(CT_LibraryDropdown1, populateCharDropdownInit);
+	L_UIDropDownMenu_Initialize(CT_LibraryDropdown1, populateCharDropdownInit);
 end
 
 local function populateServerDropdownInit()
@@ -2691,7 +2717,7 @@ local function populateServerDropdownInit()
 		dropdownEntry.value = value;
 		dropdownEntry.checked = nil;
 		dropdownEntry.func = dropdownClick;
-		Lib_UIDropDownMenu_AddButton(dropdownEntry);
+		L_UIDropDownMenu_AddButton(dropdownEntry);
 	end
 
 	importPlayerCount = 0;
@@ -2701,7 +2727,7 @@ local function populateServerDropdownInit()
 		if (importRealm2) then
 			value = importRealm2;
 		end
-		Lib_UIDropDownMenu_SetSelectedValue(CT_LibraryDropdown0, value);
+		L_UIDropDownMenu_SetSelectedValue(CT_LibraryDropdown0, value);
 		module:update("char", value);
 		-- CT_LibraryDropdown1Label:Hide();
 		-- CT_LibraryDropdown1:Hide();
@@ -2717,7 +2743,7 @@ local function populateServerDropdownInit()
 end
 
 local function populateServerDropdown()
-	Lib_UIDropDownMenu_Initialize(CT_LibraryDropdown0, populateServerDropdownInit);
+	L_UIDropDownMenu_Initialize(CT_LibraryDropdown0, populateServerDropdownInit);
 end
 
 local function hideAddonsList()
@@ -2820,7 +2846,7 @@ local function delete()
 			if (count == 0) then
 				-- No addons left for the character.
 				importRealm = nil;
-				importRealm2 = Lib_UIDropDownMenu_GetSelectedValue(CT_LibraryDropdown0);
+				importRealm2 = L_UIDropDownMenu_GetSelectedValue(CT_LibraryDropdown0);
 				populateServerDropdown();
 				importRealm2 = nil;
 				if (importPlayerCount == 0) then

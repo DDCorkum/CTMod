@@ -917,7 +917,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 			</Layer>
 		</Layers>
 		<Frames>
-			<Frame name="$parentDropDown" inherits="Lib_UIDropDownMenuTemplate" id="1" hidden="true">
+			<Frame name="$parentDropDown" inherits="L_UIDropDownMenuTemplate" id="1" hidden="true">
 				<Size>
 					<AbsDimension x="125" y="15"/>
 				</Size>
@@ -1075,7 +1075,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 			</BackgroundInsets>
 		</Backdrop>
 		<Frames>
-			<Frame name="$parentDropDown" inherits="Lib_UIDropDownMenuTemplate" id="1" hidden="true">
+			<Frame name="$parentDropDown" inherits="L_UIDropDownMenuTemplate" id="1" hidden="true">
 				<Size>
 					<AbsDimension x="10" y="10"/>
 				</Size>

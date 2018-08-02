@@ -150,7 +150,7 @@ local function addon_Update_OverrideUI(self)
 	setpoint(obj1, "BOTTOMLEFT", bar, "BOTTOMLEFT", anchorX, anchorY);
 
 	obj2:ClearAllPoints();
-	setpoint(obj2, "TOPLEFT", obj1, "BOTTOMLEFT", 0, 24);
+	setpoint(obj2, "TOPLEFT", obj1, "BOTTOMLEFT", 0, 0);
 end
 
 local function addon_UpdateOrientation_OverrideUI(self, orientation)
@@ -195,7 +195,7 @@ local function addon_Update_PetBattleUI(self)
 	setpoint(obj1, "BOTTOMLEFT", bar, "BOTTOMLEFT", anchorX, anchorY);
 
 	obj2:ClearAllPoints();
-	setpoint(obj2, "TOPLEFT", obj1, "BOTTOMLEFT", 0, 24);
+	setpoint(obj2, "TOPLEFT", obj1, "BOTTOMLEFT", 0, 0);
 end
 
 local function addon_UpdateOrientation_PetBattleUI(self, orientation)
