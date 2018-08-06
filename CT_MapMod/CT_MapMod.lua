@@ -30,175 +30,173 @@ CT_UserMap_Notes = {};  	-- Legacy variable holding map notes prior to 8.0.1.4
 local CT_MapMod_OldZones = { }; -- defined at bottom of script
 local CT_MapMod_OldNames = { }; -- defined at bottom of script
 
-module.update = function(self, optName, value)
-	if (optName == "init") then		
-	
-		-- configure the hardcoded variables
-		module.NoteTypes =
+local function CT_MapMod_Initialize()		-- called via module.update("init") from CT_Library
+	-- configure the hardcoded variables
+	module.NoteTypes =
+	{
+		["User"] = 
 		{
-			["User"] = 
-			{
-				["DEFAULT"] = "Interface\\RaidFrame\\UI-RaidFrame-Threat",
-				["Grey Note"] = "Interface\\AddOns\\CT_MapMod\\Skin\\GreyNote", --1
-				["Blue Shield"] = "Interface\\AddOns\\CT_MapMod\\Skin\\BlueShield", --2
-				["Red Dot"] = "Interface\\AddOns\\CT_MapMod\\Skin\\RedDot", --3
-				["White Circle"] = "Interface\\AddOns\\CT_MapMod\\Skin\\WhiteCircle", --4
-				["Green Square"] = "Interface\\AddOns\\CT_MapMod\\Skin\\GreenSquare", --5
-				["Red Cross"] = "Interface\\AddOns\\CT_MapMod\\Skin\\RedCross", --6
-				["Herb"] = "Interface\\AddOns\\CT_MapMod\\Skin\\Herb ", --7
-				["Ore"] = "Interface\\AddOns\\CT_MapMod\\Skin\\Ore", --8
-				["Diamond"] = "Interface\\RaidFrame\\UI-RaidFrame-Threat" --added in 8.0
-			},			
-			["Herb"] =
-			{
-				["DEFAULT"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",
-				["Bruiseweed"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed", -- 1
-				["Arthas Tears"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_ArthasTears", -- 2
-				["Black Lotus"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_BlackLotus", -- 3
-				["Blindweed"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Blindweed", -- 4
-				["Briarthorn"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Briarthorn", -- 5
-				["Dreamfoil"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Dreamfoil", -- 6
-				["Earthroot"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Earthroot", -- 7
-				["Fadeleaf"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Fadeleaf", -- 8
-				["Firebloom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Firebloom", -- 9
-				["Ghost Mushroom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_GhostMushroom", -- 10
-				["Golden Sansam"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_GoldenSansam", -- 11
-				["Goldthorn"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Goldthorn", -- 12
-				["Grave Moss"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_GraveMoss", -- 13
-				["Gromsblood"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Gromsblood", -- 14
-				["Icecap"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Icecap", -- 15
-				["Khadgars Whisker"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_KhadgarsWhisker", -- 16
-				["Kingsblood"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Kingsblood", -- 17
-				["Liferoot"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Liferoot", -- 18
-				["Mageroyal"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Mageroyal", -- 19
-				["Mountain Silversage"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_MountainSilversage", -- 20
-				["Peacebloom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Peacebloom", -- 21
-				["Plaguebloom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Plaguebloom", -- 22
-				["Purple Lotus"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_PurpleLotus", -- 23
-				["Silverleaf"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Silverleaf", -- 24
-				["Stranglekelp"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Stranglekelp", -- 25
-				["Sungrass"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Sungrass", -- 26
-				["Swiftthistle"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Swiftthistle", -- 27
-				["Wild Steelbloom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_WildSteelbloom", -- 28
-				["Wintersbite"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Wintersbite", -- 29
-				["Dreaming Glory"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_DreamingGlory", -- 30
-				["Felweed"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Felweed", -- 31
-				["FlameCap"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_FlameCap", -- 32
-				["Mana Thistle"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_ManaThistle", -- 33
-				["Netherbloom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Netherbloom", -- 34
-				["Netherdust Bush"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_NetherdustBush", -- 35
-				["Nightmare Vine"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_NightmareVine", -- 36
-				["Ragveil"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Ragveil", -- 37
-				["Terocone"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Terocone", -- 38
-				["Adders Tongue"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_AddersTongue", -- 39
-				["Frost Lotus"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_FrostLotus", -- 40
-				["Goldclover"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Goldclover", -- 41
-				["Icethorn"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Icethorn", -- 42
-				["Lichbloom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Lichbloom", -- 43
-				["Talandras Rose"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_TalandrasRose", -- 44
-				["Tiger Lily"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_TigerLily", -- 45
-				["Frozen Herb"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_FrozenHerb", -- 46
-				-- Cataclysm
-				["Sorrowmoss"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Sorrowmoss", -- 47 Formerly known as Plaugebloom. Same icon.
-				["Dragons Teeth"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_DragonsTeeth", -- 48 Formerly known as Wintersbite. New icon in 4.0.6.
-				["AzsharasVeil"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_AzsharasVeil", -- 49
-				["Cinderbloom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Cinderbloom", -- 50
-				["Heartblossom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Heartblossom", -- 51
-				["Stormvine"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Stormvine", -- 52
-				["Twilight Jasmine"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_TwilightJasmine", -- 53
-				["Whiptail"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Whiptail", -- 54
-				-- Mists of Pandaria
-				["Fools Cap"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_FoolsCap", -- 55
-				["Golden Lotus"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_GoldenLotus", -- 56
-				["Green Tea Leaf"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_GreenTeaLeaf", -- 57
-				["Rain Poppy"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_RainPoppy", -- 58
-				["Sha Herb"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_ShaHerb", -- 59
-				["Silkweed"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Silkweed", -- 60
-				["Snow Lily"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_SnowLily" -- 61
+			["DEFAULT"] = "Interface\\RaidFrame\\UI-RaidFrame-Threat",
+			["Grey Note"] = "Interface\\AddOns\\CT_MapMod\\Skin\\GreyNote", --1
+			["Blue Shield"] = "Interface\\AddOns\\CT_MapMod\\Skin\\BlueShield", --2
+			["Red Dot"] = "Interface\\AddOns\\CT_MapMod\\Skin\\RedDot", --3
+			["White Circle"] = "Interface\\AddOns\\CT_MapMod\\Skin\\WhiteCircle", --4
+			["Green Square"] = "Interface\\AddOns\\CT_MapMod\\Skin\\GreenSquare", --5
+			["Red Cross"] = "Interface\\AddOns\\CT_MapMod\\Skin\\RedCross", --6
+			["Herb"] = "Interface\\AddOns\\CT_MapMod\\Skin\\Herb ", --7
+			["Ore"] = "Interface\\AddOns\\CT_MapMod\\Skin\\Ore", --8
+			["Diamond"] = "Interface\\RaidFrame\\UI-RaidFrame-Threat" --added in 8.0
+		},			
+		["Herb"] =
+		{
+			["DEFAULT"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",
+			["Bruiseweed"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed", -- 1
+			["Arthas Tears"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_ArthasTears", -- 2
+			["Black Lotus"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_BlackLotus", -- 3
+			["Blindweed"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Blindweed", -- 4
+			["Briarthorn"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Briarthorn", -- 5
+			["Dreamfoil"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Dreamfoil", -- 6
+			["Earthroot"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Earthroot", -- 7
+			["Fadeleaf"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Fadeleaf", -- 8
+			["Firebloom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Firebloom", -- 9
+			["Ghost Mushroom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_GhostMushroom", -- 10
+			["Golden Sansam"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_GoldenSansam", -- 11
+			["Goldthorn"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Goldthorn", -- 12
+			["Grave Moss"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_GraveMoss", -- 13
+			["Gromsblood"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Gromsblood", -- 14
+			["Icecap"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Icecap", -- 15
+			["Khadgars Whisker"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_KhadgarsWhisker", -- 16
+			["Kingsblood"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Kingsblood", -- 17
+			["Liferoot"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Liferoot", -- 18
+			["Mageroyal"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Mageroyal", -- 19
+			["Mountain Silversage"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_MountainSilversage", -- 20
+			["Peacebloom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Peacebloom", -- 21
+			["Plaguebloom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Plaguebloom", -- 22
+			["Purple Lotus"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_PurpleLotus", -- 23
+			["Silverleaf"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Silverleaf", -- 24
+			["Stranglekelp"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Stranglekelp", -- 25
+			["Sungrass"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Sungrass", -- 26
+			["Swiftthistle"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Swiftthistle", -- 27
+			["Wild Steelbloom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_WildSteelbloom", -- 28
+			["Wintersbite"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Wintersbite", -- 29
+			["Dreaming Glory"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_DreamingGlory", -- 30
+			["Felweed"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Felweed", -- 31
+			["Flame Cap"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_FlameCap", -- 32
+			["Mana Thistle"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_ManaThistle", -- 33
+			["Netherbloom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Netherbloom", -- 34
+			["Netherdust Bush"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_NetherdustBush", -- 35
+			["Nightmare Vine"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_NightmareVine", -- 36
+			["Ragveil"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Ragveil", -- 37
+			["Terocone"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Terocone", -- 38
+			["Adders Tongue"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_AddersTongue", -- 39
+			["Frost Lotus"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_FrostLotus", -- 40
+			["Goldclover"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Goldclover", -- 41
+			["Icethorn"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Icethorn", -- 42
+			["Lichbloom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Lichbloom", -- 43
+			["Talandras Rose"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_TalandrasRose", -- 44
+			["Tiger Lily"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_TigerLily", -- 45
+			["Frozen Herb"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_FrozenHerb", -- 46
+			-- Cataclysm
+			["Sorrowmoss"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Sorrowmoss", -- 47 Formerly known as Plaugebloom. Same icon.
+			["Dragons Teeth"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_DragonsTeeth", -- 48 Formerly known as Wintersbite. New icon in 4.0.6.
+			["AzsharasVeil"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_AzsharasVeil", -- 49
+			["Cinderbloom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Cinderbloom", -- 50
+			["Heartblossom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Heartblossom", -- 51
+			["Stormvine"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Stormvine", -- 52
+			["Twilight Jasmine"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_TwilightJasmine", -- 53
+			["Whiptail"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Whiptail", -- 54
+			-- Mists of Pandaria
+			["Fools Cap"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_FoolsCap", -- 55
+			["Golden Lotus"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_GoldenLotus", -- 56
+			["Green Tea Leaf"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_GreenTeaLeaf", -- 57
+			["Rain Poppy"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_RainPoppy", -- 58
+			["Sha Herb"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_ShaHerb", -- 59
+			["Silkweed"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Silkweed", -- 60
+			["Snow Lily"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_SnowLily" -- 61
 
-			},
-			["Ore"] = 
-			{
-				["DEFAULT"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein", --1
-				["Copper"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein", --1
-				["Gold"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_GoldVein", --2
-				["Iron"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_IronVein", --3
-				["Mithril"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_MithrilVein", --4
-				["Silver"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_SilverVein", --5
-				["Thorium"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_ThoriumVein", --6
-				["Tin"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_TinVein", --7
-				["Truesilver"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_TruesilverVein", --8
-				["Adamantite"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_AdamantiteVein", --9
-				["FelIron"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_FelIronVein", --10
-				["Khorium"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_KhoriumVein", --11
-				["Cobalt"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CobaltVein", --12
-				["Saronite"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_SaroniteVein", --13
-				["Titanium"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_TitaniumVein", --14
-				-- Cataclysm
-				["Elementium"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Elementium", -- 15
-				["Obsidian"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Obsidian", -- 16
-				["Pyrite"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Pyrite", -- 17
-				-- Mists of Pandaria
-				["Ghost Iron"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_GhostIron", -- 18
-				["Kyparite"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Kyparite", -- 19
-				["Trillium"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Trillium" -- 20
-			}
-		};
+		},
+		["Ore"] = 
+		{
+			["DEFAULT"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein", --1
+			["Copper"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein", --1
+			["Gold"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_GoldVein", --2
+			["Iron"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_IronVein", --3
+			["Mithril"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_MithrilVein", --4
+			["Silver"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_SilverVein", --5
+			["Thorium"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_ThoriumVein", --6
+			["Tin"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_TinVein", --7
+			["Truesilver"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_TruesilverVein", --8
+			["Adamantite"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_AdamantiteVein", --9
+			["Fel Iron"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_FelIronVein", --10
+			["Khorium"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_KhoriumVein", --11
+			["Cobalt"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CobaltVein", --12
+			["Saronite"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_SaroniteVein", --13
+			["Titanium"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_TitaniumVein", --14
+			-- Cataclysm
+			["Elementium"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Elementium", -- 15
+			["Obsidian"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Obsidian", -- 16
+			["Pyrite"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Pyrite", -- 17
+			-- Mists of Pandaria
+			["Ghost Iron"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_GhostIron", -- 18
+			["Kyparite"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Kyparite", -- 19
+			["Trillium"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Trillium" -- 20
+		}
+	};
 
-		-- convert saved notes from the old (pre-BFA) format into the new one
-		for mapname, notecollection in pairs(CT_UserMap_Notes) do
-			if (CT_MapMod_OldZones[mapname]) then
-				-- for now, just copy the data.  (proper processing still in development)
-				CT_MapMod_Notes[CT_MapMod_OldZones[mapname]] = { }
-				for i, note in pairs(notecollection) do
-					local set = nil;
-					if (note["set"] == 7) then
-						set = "Herb";
-						for k, v in pairs (CT_MapMod_OldNames["Herb"]) do
-							if (k == note["icon"]) then
-								subset = v;
-							end
-						end
-					elseif (note["set"] == 8) then
-						set = "Ore";
-						local num  = 0
-						for k, v in ipairs (CT_MapMod_OldNames["Ore"]) do
-							if (k == note["icon"]) then
-								subset = v;
-							end
-						end
-					else
-						set = "User";
-						local num  = 0
-						for k, v in pairs (CT_MapMod_OldNames["User"]) do
-							if (k == note["set"]) then
-								subset = v;
-							end
+	-- convert saved notes from the old (pre-BFA) format into the new one
+	for mapname, notecollection in pairs(CT_UserMap_Notes) do
+		if (CT_MapMod_OldZones[mapname]) then
+			local newmap = 0 + CT_MapMod_OldZones[mapname];
+			if not newmap then print(mapname); end
+			-- for now, just copy the data.  (proper processing still in development)
+			for i, note in pairs(notecollection) do
+				local set = nil;
+				if (note["set"] == 7) then
+					set = "Herb";
+					for k, v in pairs (CT_MapMod_OldNames["Herb"]) do
+						if (k == note["icon"]) then
+							subset = v;
 						end
 					end
-					local newnote =
-					{
-						["x"] = note["x"],
-						["y"] = note["y"],
-						["name"] = note["name"],
-						["set"] = set,
-						["subset"] = subset,
-						["descript"] = note["descript"]						
-					};
-					tinsert(CT_MapMod_Notes[CT_MapMod_OldZones[mapname]],newnote);
+				elseif (note["set"] == 8) then
+					set = "Ore";
+					local num  = 0
+					for k, v in ipairs (CT_MapMod_OldNames["Ore"]) do
+						if (k == note["icon"]) then
+							subset = v;
+						end
+					end
+				else
+					set = "User";
+					local num  = 0
+					for k, v in pairs (CT_MapMod_OldNames["User"]) do
+						if (k == note["set"]) then
+							subset = v;
+						end
+					end
 				end
-			else
-				--this note doesn't exist!
-				--in a future version of the addon it will be deleted
+				local newnote =
+				{
+					["x"] = note["x"],
+					["y"] = note["y"],
+					["name"] = note["name"],
+					["set"] = set,
+					["subset"] = subset,
+					["descript"] = note["descript"]						
+				};
+				if (not CT_MapMod_Notes[newmap]) then
+					CT_MapMod_Notes[newmap] = { }; 
+				end					
+				tinsert(CT_MapMod_Notes[newmap],newnote);
+				--wipe(note);
 			end
 		end
-		
-		-- load the DataProvider which does all the work
-		WorldMapFrame:AddDataProvider(CreateFromMixins(CT_MapMod_DataProviderMixin));
-	
-	else	
-		-- not much to do!
+		--wipe(notecollection);
 	end
+	wipe(CT_UserMap_Notes);
+
+	-- load the DataProvider which does all the work
+	WorldMapFrame:AddDataProvider(CreateFromMixins(CT_MapMod_DataProviderMixin));
 end
 
 
@@ -245,7 +243,7 @@ function CT_MapMod_DataProviderMixin:RefreshAllData(fromOnShow)
 	local mapid = self:GetMap():GetMapID();
 	if (mapid and CT_MapMod_Notes[mapid]) then
 		for i, info in ipairs(CT_MapMod_Notes[mapid]) do
-			self:GetMap():AcquirePin("CT_MapMod_PinTemplate", info["x"], info["y"], info["name"], info["descript"], info["set"], info["subset"]);
+			self:GetMap():AcquirePin("CT_MapMod_PinTemplate", mapid, i, info["x"], info["y"], info["name"], info["descript"], info["set"], info["subset"]);
 		end
 	end
 	
@@ -354,7 +352,7 @@ end
  
 function CT_MapMod_PinMixin:OnAcquired(...) -- the arguments here are anything that are passed into AcquirePin after the pinTemplate
 	-- Override in your mixin, called when this pin is being acquired by a data provider but before its added to the map
-	self.x, self.y, self.name, self.descript, self.set, self.subset = ...;
+	self.mapid, self.i, self.x, self.y, self.name, self.descript, self.set, self.subset = ...;
 	self:SetPosition(self.x, self.y);
 	if (self.set) then
 		self.texture:SetTexture(module.NoteTypes[self.set][self.subset or "DEFAULT"]);
@@ -377,24 +375,31 @@ end
  
 function CT_MapMod_PinMixin:OnClick(button)
 	-- Override in your mixin, called when this pin is clicked
+	if (IsShiftKeyDown() and IsControlKeyDown()) then
+		self:Hide();
+		tremove(CT_MapMod_Notes[self.mapid],self.i);
+	end
 end
 
 function CT_MapMod_PinMixin:OnMouseEnter()
 	-- Override in your mixin, called when the mouse enters this pin
-	if (self.name) then
-		GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 0, 5);
-		GameTooltip:SetText(self.name);
-		GameTooltip:Show();
-		self.isShowingTip = true;
+	if ( self.x > 0.5 ) then
+		WorldMapTooltip:SetOwner(self, "ANCHOR_LEFT");
+	else
+		WorldMapTooltip:SetOwner(self, "ANCHOR_RIGHT");
 	end
+	WorldMapTooltip:ClearLines();
+	WorldMapTooltip:AddDoubleLine(self.name, self.set, 0, 1, 0, 0.6, 0.6, 0.6);
+	if ( self.descript ) then
+		WorldMapTooltip:AddLine(self.descript, nil, nil, nil, 1);
+	end
+	WorldMapTooltip:AddLine("Shift-Ctrl Click to Remove", 0, 0.5, 0.9, 1);
+	WorldMapTooltip:Show();
 end
  
 function CT_MapMod_PinMixin:OnMouseLeave()
 	-- Override in your mixin, called when the mouse leaves this pin
-	if (self.isShowingTip) then
-		GameTooltip:Hide();
-		self.isShowingTip = nil;
-	end
+	WorldMapTooltip:Hide();
 end
  
 function CT_MapMod_PinMixin:OnMouseDown()
@@ -409,244 +414,26 @@ function CT_MapMod_PinMixin:OnMapInsetSizeChanged(mapInsetIndex, expanded)
   -- Optionally override in your mixin, called when a map inset changes sizes
 end
  
-function CT_MapMod_PinMixin:OnMapInsetMouseEnter(mapInsetIndex)
-  -- Optionally override in your mixin, called when a map inset gains mouse focus
-end
- 
-function CT_MapMod_PinMixin:OnMapInsetMouseLeave(mapInsetIndex)
-  -- Optionally override in your mixin, called when a map inset loses mouse focus
-end
-
-
---[[ 
-		function CT_MapMod_PinMixin:SetNudgeTargetFactor(newFactor)
-		  self.nudgeTargetFactor = newFactor;
-		end
-
-		function CT_MapMod_PinMixin:GetNudgeTargetFactor()
-		  return self.nudgeTargetFactor or 0;
-		end
-
-		function CT_MapMod_PinMixin:SetNudgeSourceRadius(newRadius)
-		  self.nudgeSourceRadius = newRadius;
-		end
-
-		function CT_MapMod_PinMixin:GetNudgeSourceRadius()
-		  return self.nudgeSourceRadius or 0;
-		end
-
-		function CT_MapMod_PinMixin:SetNudgeSourceMagnitude(nudgeSourceZoomedOutMagnitude, nudgeSourceZoomedInMagnitude)
-		  self.nudgeSourceZoomedOutMagnitude = nudgeSourceZoomedOutMagnitude;
-		  self.nudgeSourceZoomedInMagnitude = nudgeSourceZoomedInMagnitude;
-		end
-
-		function CT_MapMod_PinMixin:GetNudgeSourceZoomedOutMagnitude()
-		  return self.nudgeSourceZoomedOutMagnitude;
-		end
-
-		function CT_MapMod_PinMixin:GetNudgeSourceZoomedInMagnitude()
-		  return self.nudgeSourceZoomedInMagnitude;
-		end
-
-		function CT_MapMod_PinMixin:SetNudgeZoomedInFactor(newFactor)
-		  self.zoomedInNudge = newFactor;
-		end
-
-		function CT_MapMod_PinMixin:GetZoomedInNudgeFactor()
-		  return self.zoomedInNudge or 0;
-		end
-
-		function CT_MapMod_PinMixin:SetNudgeZoomedOutFactor(newFactor)
-		  self.zoomedOutNudge = newFactor;
-		end
-
-		function CT_MapMod_PinMixin:GetZoomedOutNudgeFactor()
-		  return self.zoomedOutNudge or 0;
-		end
-
-		function CT_MapMod_PinMixin:IgnoresNudging()
-		  return self.insetIndex or (self:GetNudgeSourceRadius() == 0 and self:GetNudgeTargetFactor() == 0);
-		end
-
-		function CT_MapMod_PinMixin:GetMap()
-		  return self.owningMap;
-		end
-
-		function CT_MapMod_PinMixin:GetNudgeVector()
-		  return self.nudgeVectorX, self.nudgeVectorY;
-		end
-
-		function CT_MapMod_PinMixin:GetNudgeSourcePinZoomedOutNudgeFactor()
-		  return self.nudgeSourcePinZoomedOutNudgeFactor or 0;
-		end
-
-		function CT_MapMod_PinMixin:GetNudgeSourcePinZoomedInNudgeFactor()
-		  return self.nudgeSourcePinZoomedInNudgeFactor or 0;
-		end
-
-		-- x and y should be a normalized vector.
-		function CT_MapMod_PinMixin:SetNudgeVector(sourcePinZoomedOutNudgeFactor, sourcePinZoomedInNudgeFactor, x, y)
-		  self.nudgeSourcePinZoomedOutNudgeFactor = sourcePinZoomedOutNudgeFactor;
-		  self.nudgeSourcePinZoomedInNudgeFactor = sourcePinZoomedInNudgeFactor;
-		  self.nudgeVectorX = x;
-		  self.nudgeVectorY = y;
-		  self:ApplyCurrentPosition();
-		end
-
-		function CT_MapMod_PinMixin:GetNudgeFactor()
-		  return self.nudgeFactor or 0;
-		end
-
-		function CT_MapMod_PinMixin:SetNudgeFactor(nudgeFactor)
-		  self.nudgeFactor = nudgeFactor;
-		  self:ApplyCurrentPosition();
-		end
-
-		function CT_MapMod_PinMixin:GetNudgeZoomFactor()
-		  local zoomPercent = self:GetMap():GetCanvasZoomPercent();
-		  local targetFactor = Lerp(self:GetZoomedOutNudgeFactor(), self:GetZoomedInNudgeFactor(), zoomPercent);
-		  local sourceFactor = Lerp(self:GetNudgeSourcePinZoomedOutNudgeFactor(), self:GetNudgeSourcePinZoomedInNudgeFactor(), zoomPercent);
-		  return targetFactor * sourceFactor;
-		end
-
-		function CT_MapMod_PinMixin:SetPosition(normalizedX, normalizedY, insetIndex)
-		  self.normalizedX = normalizedX;
-		  self.normalizedY = normalizedY;
-		  self.insetIndex = insetIndex;
-		  self:GetMap():SetPinPosition(self, normalizedX, normalizedY, insetIndex);
-		end
-
-		-- Returns the global position if not part of an inset, otherwise returns local coordinates of that inset
-		function CT_MapMod_PinMixin:GetPosition()
-		  return self.normalizedX, self.normalizedY, self.insetIndex;
-		end
-
-		-- Returns the global position, even if part of an inset
-		function CT_MapMod_PinMixin:GetGlobalPosition()
-		  if self.insetIndex then
-		    return self:GetMap():GetGlobalPosition(self.normalizedX, self.normalizedY, self.insetIndex);
-		  end
-		  return self.normalizedX, self.normalizedY;
-		end
-
-		function CT_MapMod_PinMixin:PanTo(normalizedXOffset, normalizedYOffset)
-		  local normalizedX, normalizedY = self:GetGlobalPosition();
-		  self:GetMap():PanTo(normalizedX + (normalizedXOffset or 0), (normalizedY or 0));
-		end
-
-		function CT_MapMod_PinMixin:PanAndZoomTo(normalizedXOffset, normalizedYOffset)
-		  local normalizedX, normalizedY = self:GetGlobalPosition();
-		  self:GetMap():PanAndZoomTo(normalizedX + (normalizedXOffset or 0), (normalizedY or 0));
-		end
-
-		function CT_MapMod_PinMixin:OnCanvasScaleChanged()
-		  self:ApplyCurrentScale();
-		  self:ApplyCurrentAlpha();
-		end
-
-		function CT_MapMod_PinMixin:OnCanvasPanChanged()
-		  -- Optionally override in your mixin, called when the pan location changes
-		end
-
-		function CT_MapMod_PinMixin:OnCanvasSizeChanged()
-		  -- Optionally override in your mixin, called when the canvas size changes
-		end
-
-		function CT_MapMod_PinMixin:SetIgnoreGlobalPinScale(ignore)
-		  self.ignoreGlobalPinScale = ignore;
-		end
-
-		function CT_MapMod_PinMixin:IsIgnoringGlobalPinScale()
-		  return not not self.ignoreGlobalPinScale;
-		end
-
-		function CT_MapMod_PinMixin:SetScalingLimits(scaleFactor, startScale, endScale)
-		  self.scaleFactor = scaleFactor;
-		  self.startScale = startScale and math.max(startScale, .01) or nil;
-		  self.endScale = endScale and math.max(endScale, .01) or nil;
-		end
-
-		AM_PIN_SCALE_STYLE_VISIBLE_WHEN_ZOOMED_IN = 1;
-		AM_PIN_SCALE_STYLE_VISIBLE_WHEN_ZOOMED_OUT = 2;
-		AM_PIN_SCALE_STYLE_WITH_TERRAIN = 3;
-
-		function CT_MapMod_PinMixin:SetScaleStyle(scaleStyle)
-		  if scaleStyle == AM_PIN_SCALE_STYLE_VISIBLE_WHEN_ZOOMED_IN then
-		    self:SetScalingLimits(1.5, 0.0, 2.55);
-		  elseif scaleStyle == AM_PIN_SCALE_STYLE_VISIBLE_WHEN_ZOOMED_OUT then
-		    self:SetScalingLimits(1.5, 0.825, 0.0);
-		  elseif scaleStyle == AM_PIN_SCALE_STYLE_WITH_TERRAIN then
-		    self:SetScalingLimits(nil, nil, nil);
-		    if self:IsIgnoringGlobalPinScale() then
-		      self:SetScale(1.0);
-		    else
-		      self:SetScale(self:GetGlobalPinScale());
-		    end
-		  end
-		end
-
-		function CT_MapMod_PinMixin:SetAlphaLimits(alphaFactor, startAlpha, endAlpha)
-		  self.alphaFactor = alphaFactor;
-		  self.startAlpha = startAlpha;
-		  self.endAlpha = endAlpha;
-		end
-
-		AM_PIN_ALPHA_STYLE_VISIBLE_WHEN_ZOOMED_IN = 1;
-		AM_PIN_ALPHA_STYLE_VISIBLE_WHEN_ZOOMED_OUT = 2;
-		AM_PIN_ALPHA_STYLE_ALWAYS_VISIBLE = 3;
-
-		function CT_MapMod_PinMixin:SetAlphaStyle(alphaStyle)
-		  if alphaStyle == AM_PIN_ALPHA_STYLE_VISIBLE_WHEN_ZOOMED_IN then
-		    self:SetAlphaLimits(2.0, 0.0, 1.0);
-		  elseif alphaStyle == AM_PIN_ALPHA_STYLE_VISIBLE_WHEN_ZOOMED_OUT then
-		    self:SetAlphaLimits(2.0, 1.0, 0.0);
-		  elseif alphaStyle == AM_PIN_ALPHA_STYLE_ALWAYS_VISIBLE then
-		    self:SetAlphaLimits(nil, nil, nil);
-		  end
-		end
-
-		function CT_MapMod_PinMixin:ApplyCurrentPosition()
-		  self:GetMap():ApplyPinPosition(self, self.normalizedX, self.normalizedY, self.insetIndex);
-		end
-
-		function CT_MapMod_PinMixin:ApplyCurrentScale()
-		  local scale;
-		  if self.startScale and self.startScale and self.endScale then
-		    local parentScaleFactor = 1.0 / self:GetMap():GetCanvasScale();
-		    scale = parentScaleFactor * Lerp(self.startScale, self.endScale, Saturate(self.scaleFactor * self:GetMap():GetCanvasZoomPercent()));
-		  elseif not self:IsIgnoringGlobalPinScale() then
-		    scale = 1;
-		  end
-		  if scale then
-		    if not self:IsIgnoringGlobalPinScale() then
-		      scale = scale * self:GetMap():GetGlobalPinScale();
-		    end
-		    self:SetScale(scale);
-		    self:ApplyCurrentPosition();
-		  end
-		end
-
-		function CT_MapMod_PinMixin:ApplyCurrentAlpha()
-		  if self.alphaFactor and self.startAlpha and self.endAlpha then
-		    local alpha = Lerp(self.startAlpha, self.endAlpha, Saturate(self.alphaFactor * self:GetMap():GetCanvasZoomPercent()));
-		    self:SetAlpha(alpha);
-		    self:SetShown(alpha > 0.05);
-		  end
-		end
-
-		function CT_MapMod_PinMixin:UseFrameLevelType(pinFrameLevelType, index)
-		  self.pinFrameLevelType = pinFrameLevelType;
-		  self.pinFrameLevelIndex = index;
-		end
-
-		function CT_MapMod_PinMixin:GetFrameLevelType(pinFrameLevelType)
-		  return self.pinFrameLevelType or "PIN_FRAME_LEVEL_DEFAULT";
-		end
---]]
 function CT_MapMod_PinMixin:ApplyFrameLevel()
 	--local frameLevel = self:GetMap():GetPinFrameLevelsManager():GetValidFrameLevel(self.pinFrameLevelType, self.pinFrameLevelIndex);
 	--self:SetFrameLevel(frameLevel);
 	self:SetFrameLevel(3000);
+end
+
+function CT_MapMod_PinMixin:OnMapInsetMouseEnter(mapInsetIndex)
+  -- Optionally override in your mixin, called when a map inset gains mouse focus
+end
+
+function CT_MapMod_PinMixin:OnMapInsetMouseLeave(mapInsetIndex)
+  -- Optionally override in your mixin, called when a map inset loses mouse focus
+end
+
+function CT_MapMod_PinMixin:OnCanvasPanChanged()
+  -- Optionally override in your mixin, called when the pan location changes
+end
+
+function CT_MapMod_PinMixin:OnCanvasSizeChanged()
+  -- Optionally override in your mixin, called when the canvas size changes
 end
 
 
@@ -692,6 +479,10 @@ do
 	module:getFrame	(
 		{
 			["button#n:CT_MapMod_WhereAmIButton#s:100:20#b:b:0:3#v:UIPanelButtonTemplate#Where am I?"] = {
+				["onload"] = function (self)
+					self:ClearAllPoints();
+					self:SetPoint("BOTTOM",WorldMapFrame.ScrollContainer,"BOTTOM",0,3);
+				end,
 				["onclick"] = function(self, arg1)
 					WorldMapFrame:SetMapID(C_Map.GetBestMapForUnit("player"));
 				end,
@@ -743,10 +534,7 @@ do
 			},
 		["frame#n:CT_MapMod_px#s:40:16#tl:t:-240:-3"] = { 
 				["onload"] = function(self)
-					local text = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
-					text:SetAllPoints();
-					text:SetText("x:");
-					module.px = text;
+					module.px = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
 				end,
 				["onenter"] = function(self)
 					GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, 15);
@@ -759,10 +547,7 @@ do
 			},
 		["frame#n:CT_MapMod_py#s:40:16#tl:t:-200:-3"] =  { 
 				["onload"] = function(self)
-					local text = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
-					text:SetAllPoints();
-					text:SetText("y:");
-					module.py = text;
+					module.py = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
 				end,
 				["onenter"] = function(self)
 					GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, 15);
@@ -775,11 +560,7 @@ do
 			},
 		["frame#n:CT_MapMod_cx#s:40:16#tl:t:-140:-3"] =  { 
 				["onload"] = function(self)
-					local text = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
-					text:SetTextColor(.6,.6,.6);
-					text:SetAllPoints();
-					text:SetText("x:");
-					module.cx = text;
+					module.cx = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
 				end,
 				["onenter"] = function(self)
 					GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, 15);
@@ -792,11 +573,8 @@ do
 			},
 		["frame#n:CT_MapMod_cy#s:40:16#tl:t:-100:-3"] =  { 
 				["onload"] = function(self)
-					local text = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
-					text:SetTextColor(.6,.6,.6);
-					text:SetAllPoints();
-					text:SetText("y:");
-					module.cy = text;
+					module.cy = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
+
 				end,
 				["onenter"] = function(self)
 					GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, 15);
@@ -810,7 +588,8 @@ do
 		},
 		WorldMapFrame.BorderFrame
 	);
-	
+		
+
 	-- Not necessary, depending on calculated positions instead (must be > 0 and < 100)
 	-- local ismouseovermap = false;
 	--WorldMapFrame.ScrollContainer:HookScript("OnEnter", function(self)
@@ -894,7 +673,119 @@ end
 
 
 --------------------------------------------
--- Options inside /ctmap
+-- Options handling
+
+
+local function CT_MapMod_GetCharKey()
+	-- Get the current character's name key (combination of player name and server name).
+	local characterKey = UnitName("player") .. "@" .. GetRealmName();
+
+	-- autoGather == (1 or nil) -- No longer used in 4.0100
+	-- autoHerbs ==  (true or false) -- Added in 4.0100
+	-- autoMinerals  (true or false) -- Added in 4.0100
+	-- hideGroups == (table)
+	-- receiveNotes == Player can receive notes
+	-- mainPos1 == Position of the notes button on the full size map.
+	-- mainPos2 == Position of the notes button on the small size map.
+	-- countPos1 == Position of the note count text relative to notes button on full size map (1==Left, 2==Top, 3==Right, 4==Bottom).
+	-- countPos2 == Position of the note count text relative to notes button on small size map (1==Left, 2==Top, 3==Right, 4==Bottom).
+	-- coordPos1 == Position of the coordinates frame on the full size map.
+	-- coordPos2 == Position of the coordinates frame on the small size map.
+	-- coordHide1 == Hide the coordinates frame on the full size map.
+	-- coordHide2 == Hide the coordinates frame on the small size map.
+	-- hideMainTooltip == Hide the Notes button tooltip.
+
+	if ( not CT_MapMod_Options[characterKey] ) then
+		CT_MapMod_Options[characterKey] = {
+			-- autoHerbs = true,
+			-- autoMinerals = true,
+			-- hideGroups = {},
+			-- receiveNotes = nil,
+			-- mainPos1 = nil,
+			-- mainPos2 = nil,
+			-- countPos1 = nil,
+			-- countPos2 = nil,
+			-- coordPos1 = nil,
+			-- coordPos2 = nil,
+			-- coordHide1 = nil,
+			-- coordHide2 = nil,
+			-- hideMainTooltip = nil,
+		};
+	end
+
+	return UnitName("player") .. "@" .. GetRealmName();
+end
+
+
+module.update = function(self, optName, value)
+	if (optName == "init") then		
+		CT_MapMod_Initialize();  -- handles things that arn't related to options
+		
+		local position = module:getOption("CT_MapMod_ShowPlayerCoordsOnMap") or 1;
+		if (position == 1) then
+			module.px:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-240,-3);
+			module.py:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-200,-3);
+		elseif (position == 2) then
+			module.px:SetPoint("BOTTOMLEFT",WorldMapFrame.ScrollContainer,"BOTTOM",-140,3);
+			module.py:SetPoint("BOTTOMLEFT",WorldMapFrame.ScrollContainer,"BOTTOM",-100,3);
+		else
+			module.px:Hide();
+			module.py:Hide();
+		end
+		position = module:getOption("CT_MapMod_ShowCursorCoordsOnMap") or 1;
+		if (position == 1) then
+			module.cx:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-140,-3);
+			module.cy:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-100,-3);
+		elseif (position == 2) then
+			module.cx:SetPoint("BOTTOMLEFT",WorldMapFrame.ScrollContainer,"BOTTOM",60,3);
+			module.cy:SetPoint("BOTTOMLEFT",WorldMapFrame.ScrollContainer,"BOTTOM",100,3);
+		else
+			module.cx:Hide();
+			module.cy:Hide();
+		end			
+		
+	elseif (optName == "CT_MapMod_ShowPlayerCoordsOnMap") then
+		if (not module.px and module.py) then return; end
+		module.px:Show();
+		module.py:Show();
+		if (value == 1) then
+			module.px:ClearAllPoints();
+			module.px:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-240,-3);
+			module.py:ClearAllPoints();
+			module.py:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-200,-3);
+		elseif (value == 2) then
+			module.px:ClearAllPoints();
+			module.px:SetPoint("BOTTOMLEFT",WorldMapFrame.BorderFrame,"BOTTOM",-140,3);
+			module.py:ClearAllPoints();
+			module.py:SetPoint("BOTTOMLEFT",WorldMapFrame.BorderFrame,"BOTTOM",-100,3);		
+		else
+			module.px:Hide();
+			module.py:Hide();
+		end
+	elseif (optName == "CT_MapMod_ShowCursorCoordsOnMap") then
+		if (not module.cx and module.cy) then return; end
+		module.cx:Show();
+		module.cy:Show();
+		if (value == 1) then
+			module.cx:ClearAllPoints();
+			module.cx:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-140,-3);
+			module.cy:ClearAllPoints();
+			module.cy:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-100,-3);
+		elseif (value == 2) then
+			module.cx:ClearAllPoints();
+			module.cx:SetPoint("BOTTOMLEFT",WorldMapFrame.BorderFrame,"BOTTOM",60,3);
+			module.cy:ClearAllPoints();
+			module.cy:SetPoint("BOTTOMLEFT",WorldMapFrame.BorderFrame,"BOTTOM",100,3);		
+		else
+			module.cx:Hide();
+			module.cy:Hide();
+		end
+	end
+end
+
+
+--------------------------------------------
+-- /ctmap options frame
 
 -- Slash command
 local function slashCommand(msg)
@@ -944,6 +835,14 @@ module.frame = function()
 		optionsAddObject( -2, 3*14, "font#t:0:%y#s:0:%s#l:13:0#r#You can use /ctmap, /ctmapmod, or /mapmod to open this options window directly.#" .. textColor2 .. ":l");
 		optionsAddObject( -5, 3*14, "font#t:0:%y#s:0:%s#l:13:0#r#To access most of the options for CT_MapMod, open the game's World Map and click on the 'Notes' button.#" .. textColor2 .. ":l");
 
+		
+		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Add Features to World Map");
+		optionsAddObject(-5, 3*14, "font#t:0:%y#s:0:%s#l:13:0#r#Coordinates show where you are on the map, and where your mouse cursor is#" .. textColor2 .. ":l");
+		optionsAddObject(-5, 1*14, "font#t:0:%y#s:0:%s#l:13:0#r#Show player coordinates#" .. textColor1 .. ":l");
+		optionsAddObject(-5,   17, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_ShowPlayerCoordsOnMap#n:CT_MapMod_ShowPlayerCoordsOnMap#At Top#At Bottom#Disabled");
+		optionsAddObject(-5, 1*14, "font#t:0:%y#s:0:%s#l:13:0#r#Show cursor coordinates#" .. textColor1 .. ":l");
+		optionsAddObject(-5,   17, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_ShowCursorCoordsOnMap#n:CT_MapMod_ShowPlayerCoordsOnMap#At Top#At Bottom#Disabled");
+
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Under Construction");
 		optionsAddObject(-10, 3*14, "font#t:0:%y#s:0:%s#l:13:0#r#Patch 8.0.1 broke everything!  Most functionality is still being rebuilt from scratch.  Sorry!#" .. textColor2 .. ":l");
 
@@ -984,7 +883,7 @@ CT_MapMod_OldNames =
 		"Ghost Mushroom", -- 10
 		"Golden Sansam", -- 11
 		"Goldthorn", -- 12
-		"GraveMoss", -- 13
+		"Grave Moss", -- 13
 		"Gromsblood", -- 14
 		"Icecap", -- 15
 		"Khadgars Whisker", -- 16
@@ -1016,7 +915,7 @@ CT_MapMod_OldNames =
 		"Icethorn", -- 42
 		"Lichbloom", -- 43
 		"Talandras Rose", -- 44
-		"TigerLily", -- 45
+		"Tiger Lily", -- 45
 		"Frozen Herb", -- 46
 		-- Cataclysm
 		"Sorrowmoss",  -- 47 Formerly known as Plaugebloom. Same icon.
@@ -1047,7 +946,7 @@ CT_MapMod_OldNames =
 		"Tin", -- 7
 		"Truesilver", -- 8
 		"Adamantite", -- 9
-		"FelIron", -- 10
+		"Fel Iron", -- 10
 		"Khorium", -- 11
 		"Cobalt", -- 12
 		"Saronite", -- 13

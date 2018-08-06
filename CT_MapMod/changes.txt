@@ -1,5 +1,8 @@
-CT_MapMod (8.0.1.4) 2018-08-05
-- Re-introducing player and cursor coords in the world map!
+CT_MapMod (8.0.1.4) 2018-08-06
+- Completely re-written from the ground up
+- All old notes (from 7.3) are once again viewable
+- Player and cursor coords are back
+- Still missing: ability to add, remove, edit notes
 
 CT_MapMod (8.0.1.0) 2018-07-17
 - Temporarily disabled all functionality to avoid errors, pending major rewrite for new expansion

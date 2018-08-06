@@ -1474,8 +1474,10 @@ objectHandlers.dropdown = function(self, parent, name, virtual, option, ...)
 			for i = 1, #entries, 1 do
 				dropdownEntry.text = entries[i];
 				dropdownEntry.value = i;
+				dropdownEntry.isNotRadio = false;
 				dropdownEntry.checked = nil;
 				dropdownEntry.func = dropdownClick;
+				dropdownEntry.arg1 = nil;
 				L_UIDropDownMenu_AddButton(dropdownEntry);
 			end
 		end);
