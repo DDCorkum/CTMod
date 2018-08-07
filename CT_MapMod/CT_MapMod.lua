@@ -238,6 +238,7 @@ function CT_MapMod_DataProviderMixin:RefreshAllData(fromOnShow)
 	
 	-- Clear the map
 	self:RemoveAllData();
+	module.PinHasFocus = nil;  --rather than calling this for each pin, just call it once when all pins are gone.
 	
 	-- Fetch the pins to be used for this map
 	local mapid = self:GetMap():GetMapID();
@@ -250,17 +251,6 @@ function CT_MapMod_DataProviderMixin:RefreshAllData(fromOnShow)
 	-- Create pins in the tl and br corners to calculate the map size (for cursor coords)
 	module.tl = self:GetMap():AcquirePin("CT_MapMod_CornerPinTemplate", "tl");
 	module.br = self:GetMap():AcquirePin("CT_MapMod_CornerPinTemplate", "br");
-	
-	-- DEBUGGING: create a couple extra pins for testing purposes only
-	local debugPins =
-	{
-		-- pins for testing purposes only
-		--[1] = { x = 0.5, y = 0.5, name = "HelloWorld!" },
-		--[2] = { x = 0.2, y = 0.3, name = "White Diamond" }
-	};
-	for i, info in ipairs(debugPins) do
-		self:GetMap():AcquirePin("CT_MapMod_PinTemplate", info["x"], info["y"], info["name"], info["descript"], info["set"], info["subset"]);
-	end
 end
  
 function CT_MapMod_DataProviderMixin:OnShow()
@@ -345,22 +335,95 @@ CT_MapMod_PinMixin = CreateFromMixins(MapCanvasPinMixin);
 
 function CT_MapMod_PinMixin:OnLoad()
 	-- Override in your mixin, called when this pin is created
-	self:SetWidth(20);
-	self:SetHeight(20);
+	
+	-- Create the basic properties of the pin itself
+	self:SetWidth(15);
+	self:SetHeight(15);
 	self.texture = self:CreateTexture(nil,"ARTWORK");
+	
+	-- Create the edit box that is associated to this pin	
+	self.editbox = CreateFrame("FRAME",nil,self,"CT_MapMod_EditBoxTemplate");
+	module:getFrame (
+		{	["button#s:80:25#br:b:-42:16#v:GameMenuButtonTemplate#Okay"] = {
+				["onload"] = function(self)
+					self:Disable();
+				end,
+				["onclick"] = function(self, arg1)
+					local pin = self:GetParent():GetParent();
+					--[[ NOT YET IMPLEMENTED
+					CT_MapMod_Notes[pin.mapid][pin.i] = {
+						["x"] = pin.x,
+						["y"] = pin.y,
+						["name"] = ---SOMETHING:GetText();
+						["set"] = ---SET DROPDOWN:GetSelectedValue();
+						["subset"] = ---SUBSET DROPDOWN:GetSelectedValue();
+						["descript"] = ---SOMETHING:GetText();
+					}
+					--]]
+					self:GetParent():Hide();
+					module.PinHasFocus = nil;
+					WorldMapFrame:RefreshAllDataProviders();
+				end,
+			},
+			["button#s:80:25#b:b:0:16#v:GameMenuButtonTemplate#Cancel"] = {
+				["onclick"] = function(self, arg1)
+					self:GetParent():Hide();
+					module.PinHasFocus = nil;
+				end,
+			},
+			["button#s:80:25#bl:b:42:16#v:GameMenuButtonTemplate#Delete"] = {
+				["onclick"] = function(self, arg1)
+					local pin = self:GetParent():GetParent();
+					tremove(CT_MapMod_Notes[pin.mapid],pin.i);
+					pin:Hide();
+					module.PinHasFocus = nil;
+				end,
+			},
+			["frame#s:100:50#t:t:0:-10"] = {
+				["onload"] = function(self)
+					local tex = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
+					tex:SetText("Under construction!\n\nWork continues on CT_MapMod for compatibility with WoW 8.0.\n\nFor now, please use the cancel or delete buttons.");
+					self:GetParent().constructionsign = tex;
+				end,
+			},		
+		},
+		self.editbox
+	);
 end
  
 function CT_MapMod_PinMixin:OnAcquired(...) -- the arguments here are anything that are passed into AcquirePin after the pinTemplate
 	-- Override in your mixin, called when this pin is being acquired by a data provider but before its added to the map
 	self.mapid, self.i, self.x, self.y, self.name, self.descript, self.set, self.subset = ...;
+	
+	-- Set basic properties for the pin itself
 	self:SetPosition(self.x, self.y);
 	if (self.set) then
 		self.texture:SetTexture(module.NoteTypes[self.set][self.subset or "DEFAULT"]);
 	else
 		self.texture:SetTexture("Interface\\RaidFrame\\UI-RaidFrame-Threat");
 	end
+	if (self.set == "User") then
+		self:SetHeight(25);
+		self:SetWidth(25);
+	else
+		self:SetHeight(15);
+		self:SetWidth(15);
+	end
 	self.texture:SetAllPoints();
 	self:Show();
+	
+	-- Set properties for the edit box (though its still hidden and not in use)
+	if (self.x <= 0.5) then
+		self.editbox:ClearAllPoints();
+		self.editbox:SetPoint("LEFT",self,"RIGHT",25,0);
+	else
+		self.editbox:ClearAllPoints();
+		self.editbox:SetPoint("RIGHT",self,"LEFT",-25,0);	
+	end
+	self.editbox:SetFrameLevel(3000)
+	self.editbox.constructionsign:ClearAllPoints();
+	self.editbox.constructionsign:SetPoint("TOP",self.editbox,"TOP",0,-10);
+	
 end
  
 function CT_MapMod_PinMixin:OnReleased()
@@ -369,15 +432,20 @@ function CT_MapMod_PinMixin:OnReleased()
 		GameTooltip:Hide();
 		self.isShowingTip = nil;
 	end
+	if (self.editbox) then self.editbox:Hide(); end
 	self:Hide();
 	
 end
  
 function CT_MapMod_PinMixin:OnClick(button)
 	-- Override in your mixin, called when this pin is clicked
-	if (IsShiftKeyDown() and IsControlKeyDown()) then
+	if (module.PinHasFocus) then return; end
+	if (IsShiftKeyDown() and IsControlKeyDown() and button == "LeftButton") then
 		self:Hide();
 		tremove(CT_MapMod_Notes[self.mapid],self.i);
+	elseif (button == "RightButton") then
+		self.editbox:Show();
+		module.PinHasFocus = self;
 	end
 end
 
@@ -393,7 +461,10 @@ function CT_MapMod_PinMixin:OnMouseEnter()
 	if ( self.descript ) then
 		WorldMapTooltip:AddLine(self.descript, nil, nil, nil, 1);
 	end
-	WorldMapTooltip:AddLine("Shift-Ctrl Click to Remove", 0, 0.5, 0.9, 1);
+	if (not module.PinHasFocus) then  -- clicking on pins won't do anything while the edit box is open for this or another pin
+		WorldMapTooltip:AddLine("Shift-Ctrl Click to Remove", 0, 0.5, 0.9, 1);
+		WorldMapTooltip:AddLine("Right Click to Edit", 0, 0.5, 0.9, 1);
+	end
 	WorldMapTooltip:Show();
 end
  
@@ -417,7 +488,7 @@ end
 function CT_MapMod_PinMixin:ApplyFrameLevel()
 	--local frameLevel = self:GetMap():GetPinFrameLevelsManager():GetValidFrameLevel(self.pinFrameLevelType, self.pinFrameLevelIndex);
 	--self:SetFrameLevel(frameLevel);
-	self:SetFrameLevel(3000);
+	self:SetFrameLevel(2200);
 end
 
 function CT_MapMod_PinMixin:OnMapInsetMouseEnter(mapInsetIndex)
@@ -447,9 +518,8 @@ function CT_MapMod_CornerPinMixin:OnLoad()
 	-- Override in your mixin, called when this pin is created
 	self:SetWidth(.1);
 	self:SetHeight(.1);
-	--self.texture = self:CreateTexture(nil,"ARTWORK");
 end
- 
+
 function CT_MapMod_CornerPinMixin:OnAcquired(...) -- the arguments here are anything that are passed into AcquirePin after the pinTemplate
 	-- Override in your mixin, called when this pin is being acquired by a data provider but before its added to the map
 	self.corner = ...;
@@ -468,8 +538,9 @@ end
 function CT_MapMod_CornerPinMixin:ApplyFrameLevel()
 	--local frameLevel = self:GetMap():GetPinFrameLevelsManager():GetValidFrameLevel(self.pinFrameLevelType, self.pinFrameLevelIndex);
 	--self:SetFrameLevel(frameLevel);
-	self:SetFrameLevel(3100);
+	self:SetFrameLevel(3000);
 end
+
 
 
 --------------------------------------------
@@ -743,7 +814,6 @@ module.update = function(self, optName, value)
 			module.cx:Hide();
 			module.cy:Hide();
 		end			
-		
 	elseif (optName == "CT_MapMod_ShowPlayerCoordsOnMap") then
 		if (not module.px and module.py) then return; end
 		module.px:Show();
