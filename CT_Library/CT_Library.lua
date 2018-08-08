@@ -1543,9 +1543,9 @@ objectHandlers.multidropdown = function(self, parent, name, virtual, option, ...
 	local entries = { ... };
 	
 	L_UIDropDownMenu_Initialize(frame, function()
-		for i = 2, #entries, 2 do
+		for i = 1, #entries, 2 do
 			dropdownEntry.text = entries[i];
-			dropdownEntry.value = i/2;
+			dropdownEntry.value = (i+1)/2;
 			dropdownEntry.isNotRadio = true;
 			dropdownEntry.checked = self:getOption(entries[i+1]);
 			dropdownEntry.func = dropdownClick;
