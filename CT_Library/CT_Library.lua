@@ -1104,6 +1104,8 @@ function lib:createMultiLineEditBox(name, width, height, parent, bdtype)
 	return frame;
 end
 
+
+
 function lib:setRadioButtonTextures(checkbutton)
 	-- Makes a check button look like a radio button by changing its textures.
 	local tex = "Interface\\Buttons\\UI-RadioButton";
@@ -1347,6 +1349,54 @@ objectHandlers.texture = function(self, parent, name, virtual, option, texture, 
 	return tex;
 end
 
+-- Texture
+objectHandlers.editbox = function(self, parent, name, virtual, option, font, bdtype, multiline, multilinewidth, multilineheight)
+	local frame;
+	local backdrop;
+	if (multiline) then
+		frame = lib:createMultiLineEditBox(name,multilinewidth,multilineheight,parent,bdtype);
+		if (font) then
+			frame.editBox:SetFontObject(font)
+		end
+		if (option) then
+			frame.editBox:SetText(self:getOption(option) or "");
+		end
+	else
+		frame = CreateFrame("EditBox", name, parent, virtual);
+		if (font) then
+			frame:SetFontObject(font)
+		end
+		if (tonumber(bdtype) == 1) then
+			backdrop = {
+				bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+				edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+				tile = true,
+				tileSize = 16,
+				edgeSize = 16,
+				insets = { left = 5, right = 5, top = 5, bottom = 5 },
+			};
+		elseif (tonumber(bdtype) == 2) then
+			backdrop = {
+				bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+				edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+				tile = true,
+				tileSize = 32,
+				edgeSize = 32,
+				insets = { left = 5, right = 5, top = 5, bottom = 5 },
+			};
+		end
+		if (backdrop) then
+			frame:SetBackdrop(backdrop);
+			frame:SetBackdropBorderColor(0.4, 0.4, 0.4);
+			frame:SetBackdropColor(0, 0, 0);
+		end
+		if (option) then
+			frame:SetText(self:getOption(option) or "");
+		end
+	end
+	return frame;
+end
+
 -- Option Frame
 local optionFrameOnMouseUp = function(self) self:GetParent():StopMovingOrSizing(); end
 local optionFrameOnEnter = function(self) lib:displayPredefinedTooltip(self, "DRAG"); end
@@ -1456,37 +1506,58 @@ objectHandlers.dropdown = function(self, parent, name, virtual, option, ...)
 
 	local entries = { ... };
 	
-	if (entries[1] == "CT_MultipleSelections") then
-		L_UIDropDownMenu_Initialize(frame, function()
-			for i = 2, #entries, 2 do
-				dropdownEntry.text = entries[i];
-				dropdownEntry.value = i/2;
-				dropdownEntry.isNotRadio = true;
-				dropdownEntry.checked = self:getOption(entries[i+1]);
-				dropdownEntry.func = dropdownClick;
-				dropdownEntry.arg1 = entries[i+1];
-				L_UIDropDownMenu_AddButton(dropdownEntry);
-			end
-		end);
-	else
-	
-		L_UIDropDownMenu_Initialize(frame, function()
-			for i = 1, #entries, 1 do
-				dropdownEntry.text = entries[i];
-				dropdownEntry.value = i;
-				dropdownEntry.isNotRadio = false;
-				dropdownEntry.checked = nil;
-				dropdownEntry.func = dropdownClick;
-				dropdownEntry.arg1 = nil;
-				L_UIDropDownMenu_AddButton(dropdownEntry);
-			end
-		end);
-		L_UIDropDownMenu_SetSelectedValue(frame, self:getOption(option) or 1);
-	end
+	L_UIDropDownMenu_Initialize(frame, function()
+		for i = 1, #entries, 1 do
+			dropdownEntry.text = entries[i];
+			dropdownEntry.value = i;
+			dropdownEntry.isNotRadio = false;
+			dropdownEntry.checked = nil;
+			dropdownEntry.func = dropdownClick;
+			dropdownEntry.arg1 = nil;
+			L_UIDropDownMenu_AddButton(dropdownEntry);
+		end
+	end);
+	L_UIDropDownMenu_SetSelectedValue(frame, self:getOption(option) or 1);
 
 	L_UIDropDownMenu_JustifyText(frame, "LEFT");
 	return frame;
 end
+
+objectHandlers.multidropdown = function(self, parent, name, virtual, option, ...)
+	local frame = CreateFrame("Frame", name, parent, virtual or "L_UIDropDownMenuTemplate");
+	frame.oldSetWidth = frame.SetWidth;
+	frame.SetWidth = dropdownSetWidth;
+	frame.ctDropdownClick = dropdownClick;
+	
+	-- Handle specializ
+	
+	-- Make the slider smaller
+	local left, right, mid, btn = _G[name.."Left"], _G[name.."Middle"], _G[name.."Right"], _G[name.."Button"];
+	local setHeight = left.SetHeight;
+
+	btn:SetPoint("TOPRIGHT", right, "TOPRIGHT", 12, -12);
+	setHeight(left, 50);
+	setHeight(right, 50);
+	setHeight(mid, 50);
+
+	local entries = { ... };
+	
+	L_UIDropDownMenu_Initialize(frame, function()
+		for i = 2, #entries, 2 do
+			dropdownEntry.text = entries[i];
+			dropdownEntry.value = i/2;
+			dropdownEntry.isNotRadio = true;
+			dropdownEntry.checked = self:getOption(entries[i+1]);
+			dropdownEntry.func = dropdownClick;
+			dropdownEntry.arg1 = entries[i+1];
+			L_UIDropDownMenu_AddButton(dropdownEntry);
+		end
+	end);
+	
+	L_UIDropDownMenu_JustifyText(frame, "LEFT");
+	return frame;
+end
+
 
 -- Slider
 local function updateSliderText(slider, value)

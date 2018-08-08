@@ -3,20 +3,29 @@
 	</Frame>
 	<Frame name="CT_MapMod_CornerPinTemplate" mixin="CT_MapMod_CornerPinMixin" hidden="true" virtual="true">
 	</Frame>
-	<Frame name="CT_MapMod_EditBoxTemplate" hidden="true" virtual="true">
+	<Frame name="CT_MapMod_NoteTemplate" hidden="true" virtual="true">
 		<Size>
-			<AbsDimension x="450" y="215"/>
+			<AbsDimension x="330" y="180"/>
 		</Size>
-		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+		<Backdrop bgFile="Interface/Tooltips/UI-Tooltip-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
 			<BackgroundInsets>
 				<AbsInset left="11" right="12" top="12" bottom="11"/>
 			</BackgroundInsets>
 			<TileSize>
-				<AbsValue val="32"/>
+				<AbsValue val="16"/>
 			</TileSize>
 			<EdgeSize>
 				<AbsValue val="32"/>
 			</EdgeSize>
+			<Color a="1" r="0.4" g="0.4" b="0.4"/>
 		</Backdrop>
 	</Frame>
+	<EditBox name="CT_MapMod_EditBoxTemplate" virtual="true">
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" tile="true">
+			<TileSize>
+				<AbsValue val="1"/>
+			</TileSize>
+		</Backdrop>
+		<FontString inherits="ChatFontSmall"/>
+	</EditBox>
 </Ui>

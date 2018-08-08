@@ -228,7 +228,6 @@ end
 function CT_MapMod_DataProviderMixin:RemoveAllData()
 	-- Override in your mixin, this method should remove everything that has been added to the map
 	self:GetMap():RemoveAllPinsByTemplate("CT_MapMod_PinTemplate");
-	self:GetMap():RemoveAllPinsByTemplate("CT_MapMod_CornerPinTemplate");
 	module.tl = nil;
 	module.br = nil;
 end
@@ -247,88 +246,10 @@ function CT_MapMod_DataProviderMixin:RefreshAllData(fromOnShow)
 			self:GetMap():AcquirePin("CT_MapMod_PinTemplate", mapid, i, info["x"], info["y"], info["name"], info["descript"], info["set"], info["subset"]);
 		end
 	end
-	
-	-- Create pins in the tl and br corners to calculate the map size (for cursor coords)
-	module.tl = self:GetMap():AcquirePin("CT_MapMod_CornerPinTemplate", "tl");
-	module.br = self:GetMap():AcquirePin("CT_MapMod_CornerPinTemplate", "br");
 end
- 
-function CT_MapMod_DataProviderMixin:OnShow()
-  -- Override in your mixin, called when the map canvas is shown
-end
- 
-function CT_MapMod_DataProviderMixin:OnHide()
-  -- Override in your mixin, called when the map canvas is closed
-end
- 
-function CT_MapMod_DataProviderMixin:OnMapInsetSizeChanged(mapInsetIndex, expanded)
-  -- Optionally override in your mixin, called when a map inset changes sizes
-end
- 
-function CT_MapMod_DataProviderMixin:OnMapInsetMouseEnter(mapInsetIndex)
-  -- Optionally override in your mixin, called when a map inset gains mouse focus
-end
- 
-function CT_MapMod_DataProviderMixin:OnMapInsetMouseLeave(mapInsetIndex)
-  -- Optionally override in your mixin, called when a map inset loses mouse focus
-end
- 
-function CT_MapMod_DataProviderMixin:OnCanvasScaleChanged()
-  -- Optionally override in your mixin, called when the canvas scale changes
-end
- 
-function CT_MapMod_DataProviderMixin:OnCanvasPanChanged()
-  -- Optionally override in your mixin, called when the pan location changes
-end
- 
-function CT_MapMod_DataProviderMixin:OnCanvasSizeChanged()
-  -- Optionally override in your mixin, called when the canvas size changes
-end
- 
-function CT_MapMod_DataProviderMixin:OnEvent(event, ...)
-  -- Override in your mixin to accept events register via RegisterEvent
-end
- 
-function CT_MapMod_DataProviderMixin:OnGlobalAlphaChanged()
-  -- Optionally override in your mixin if your data provider obeys global alpha, called when the global alpha changes
-end
- 
-function CT_MapMod_DataProviderMixin:GetMap()
-  return self.owningMap;
-end
- 
-function CT_MapMod_DataProviderMixin:OnMapChanged()
-  --  Optionally override in your mixin, called when map ID changes
-  self:RefreshAllData();
-end
- 
-function CT_MapMod_DataProviderMixin:RegisterEvent(event)
-  -- Since data providers aren't frames this provides a similar method of event registration, but always calls self:OnEvent(event, ...)
-  if not self.registeredEvents then
-    self.registeredEvents = {}
-  end
-  if not self.registeredEvents[event] then
-    self.registeredEvents[event] = true;
-    self:GetMap():AddDataProviderEvent(event);
-  end
-end
- 
-function CT_MapMod_DataProviderMixin:UnregisterEvent(event)
-  if self.registeredEvents and self.registeredEvents[event] then
-    self.registeredEvents[event] = nil;
-    self:GetMap():RemoveDataProviderEvent(event);
-  end
-end
- 
-function CT_MapMod_DataProviderMixin:SignalEvent(event, ...)
-  if self.registeredEvents and self.registeredEvents[event] then
-    self:OnEvent(event, ...);
-  end
-end
-
  
 --------------------------------------------
--- Primary PinMixin
+-- PinMixin
 -- Pins that may be added to the map canvas, like icons, blobs or text
 
 CT_MapMod_PinMixin = CreateFromMixins(MapCanvasPinMixin);
@@ -342,22 +263,28 @@ function CT_MapMod_PinMixin:OnLoad()
 	self.texture = self:CreateTexture(nil,"ARTWORK");
 	
 	-- Create the edit box that is associated to this pin	
-	self.editbox = CreateFrame("FRAME",nil,self,"CT_MapMod_EditBoxTemplate");
+	self.notepanel = CreateFrame("FRAME",nil,WorldMapFrame.BorderFrame,"CT_MapMod_NoteTemplate");
+	self.notepanel:SetScale(1.2);
+	self.notepanel.pin = self;
+	local textColor0 = "1.0:1.0:1.0";
+	local textColor1 = "0.9:0.9:0.9";
+	local textColor2 = "0.7:0.7:0.7";
+	local textColor3 = "0.9:0.72:0.0";
 	module:getFrame (
 		{	["button#s:80:25#br:b:-42:16#v:GameMenuButtonTemplate#Okay"] = {
 				["onload"] = function(self)
 					self:Disable();
 				end,
 				["onclick"] = function(self, arg1)
-					local pin = self:GetParent():GetParent();
+					local pin = self:GetParent().pin;
 					--[[ NOT YET IMPLEMENTED
 					CT_MapMod_Notes[pin.mapid][pin.i] = {
 						["x"] = pin.x,
 						["y"] = pin.y,
-						["name"] = ---SOMETHING:GetText();
-						["set"] = ---SET DROPDOWN:GetSelectedValue();
-						["subset"] = ---SUBSET DROPDOWN:GetSelectedValue();
-						["descript"] = ---SOMETHING:GetText();
+						["name"] = self:GetParent().namefield:GetText();
+						["set"] = self:GetParent().setdropdown:GetSelectedValue();
+						["subset"] = self:GetParent().subsetdropdown:GetSelectedValue();
+						["descript"] = self:GetParent().descriptfield:GetText();
 					}
 					--]]
 					self:GetParent():Hide();
@@ -373,21 +300,65 @@ function CT_MapMod_PinMixin:OnLoad()
 			},
 			["button#s:80:25#bl:b:42:16#v:GameMenuButtonTemplate#Delete"] = {
 				["onclick"] = function(self, arg1)
-					local pin = self:GetParent():GetParent();
+					local pin = self:GetParent().pin;
 					tremove(CT_MapMod_Notes[pin.mapid],pin.i);
+					self:GetParent():Hide();
 					pin:Hide();
 					module.PinHasFocus = nil;
 				end,
 			},
-			["frame#s:100:50#t:t:0:-10"] = {
+			["font#l:tr:-100:-20#x#" .. textColor2 .. ":l"] = { },
+			["editbox#l:tr:-85:-20#s:30:18#v:CT_MapMod_EditBoxTemplate"] = { 
 				["onload"] = function(self)
-					local tex = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
-					tex:SetText("Under construction!\n\nWork continues on CT_MapMod for compatibility with WoW 8.0.\n\nFor now, please use the cancel or delete buttons.");
-					self:GetParent().constructionsign = tex;
+					self:GetParent().xfield = self;
+					self:SetAutoFocus(false);
+					self:SetBackdropColor(1,1,1,0);
+					self:HookScript("OnEditFocusGained", function(self)
+						self:ClearFocus();
+					end);
 				end,
-			},		
+			},
+			["font#l:tr:-55:-20#y#" .. textColor2 .. ":l"] = { },
+			["editbox#l:tr:-40:-20#s:30:18#v:CT_MapMod_EditBoxTemplate"] = { 
+				["onload"] = function(self)
+					self:GetParent().yfield = self;
+					self:SetAutoFocus(false);
+					self:SetBackdropColor(1,1,1,0);
+					self:HookScript("OnEditFocusGained", function(self)
+						self:ClearFocus();
+					end);
+				end,
+			},
+			["font#l:tl:15:-30#Name#" .. textColor2 .. ":l"] = { },
+			["editbox#l:tl:55:-30#s:100:18#v:CT_MapMod_EditBoxTemplate"] = { 
+				["onload"] = function(self)
+					self:GetParent().namefield = self;
+					self:SetAutoFocus(false);
+					self:HookScript("OnEscapePressed", function(self)
+						self:ClearFocus();
+					end);
+					self:HookScript("OnEnterPressed", function(self)
+						self:ClearFocus();
+					end);
+				end,
+			},	
+			["font#l:tl:15:-60#Type#" .. textColor2 .. ":l"] = { },
+			["font#l:t:0:-60#Icon#" .. textColor2 .. ":l"] = { },
+			["font#l:tl:15:-90#Description#" .. textColor2 .. ":l"] = { },
+			["editbox#l:tl:20:-110#s:290:18#v:CT_MapMod_EditBoxTemplate"] = { 
+				["onload"] = function(self)
+					self:GetParent().descriptfield = self;
+					self:SetAutoFocus(false);
+					self:HookScript("OnEscapePressed", function(self)
+						self:ClearFocus();
+					end);
+					self:HookScript("OnEnterPressed", function(self)
+						self:ClearFocus();
+					end);
+				end,
+			},
 		},
-		self.editbox
+		self.notepanel
 	);
 end
  
@@ -413,16 +384,24 @@ function CT_MapMod_PinMixin:OnAcquired(...) -- the arguments here are anything t
 	self:Show();
 	
 	-- Set properties for the edit box (though its still hidden and not in use)
-	if (self.x <= 0.5) then
-		self.editbox:ClearAllPoints();
-		self.editbox:SetPoint("LEFT",self,"RIGHT",25,0);
+	self.notepanel:ClearAllPoints();
+	if (self.x <= 0.5) then	
+		if (self.y <= 0.5) then
+			self.notepanel:SetPoint("TOPLEFT",self,"BOTTOMRIGHT",30,0);
+		else
+			self.notepanel:SetPoint("BOTTOMLEFT",self,"TOPRIGHT",30,0);
+		end
 	else
-		self.editbox:ClearAllPoints();
-		self.editbox:SetPoint("RIGHT",self,"LEFT",-25,0);	
+		if (self.y <= 0.5) then
+			self.notepanel:SetPoint("TOPRIGHT",self,"BOTTOMLEFT",30,0);
+		else
+			self.notepanel:SetPoint("BOTTOMRIGHT",self,"TOPLEFT",30,0);
+		end	
 	end
-	self.editbox:SetFrameLevel(3000)
-	self.editbox.constructionsign:ClearAllPoints();
-	self.editbox.constructionsign:SetPoint("TOP",self.editbox,"TOP",0,-10);
+	self.notepanel.namefield:SetText(self.name);
+	self.notepanel.descriptfield:SetText(self.descript);
+	self.notepanel.xfield:SetText(math.floor(1000*self.x)/10);
+	self.notepanel.yfield:SetText(math.floor(1000*self.y)/10);
 	
 end
  
@@ -432,7 +411,7 @@ function CT_MapMod_PinMixin:OnReleased()
 		GameTooltip:Hide();
 		self.isShowingTip = nil;
 	end
-	if (self.editbox) then self.editbox:Hide(); end
+	if (self.notepanel) then self.notepanel:Hide(); end
 	self:Hide();
 	
 end
@@ -440,12 +419,9 @@ end
 function CT_MapMod_PinMixin:OnClick(button)
 	-- Override in your mixin, called when this pin is clicked
 	if (module.PinHasFocus) then return; end
-	if (IsShiftKeyDown() and IsControlKeyDown() and button == "LeftButton") then
-		self:Hide();
-		tremove(CT_MapMod_Notes[self.mapid],self.i);
-	elseif (button == "RightButton") then
-		self.editbox:Show();
+	if (IsShiftKeyDown()) then
 		module.PinHasFocus = self;
+		self.notepanel:Show();
 	end
 end
 
@@ -462,8 +438,7 @@ function CT_MapMod_PinMixin:OnMouseEnter()
 		WorldMapTooltip:AddLine(self.descript, nil, nil, nil, 1);
 	end
 	if (not module.PinHasFocus) then  -- clicking on pins won't do anything while the edit box is open for this or another pin
-		WorldMapTooltip:AddLine("Shift-Ctrl Click to Remove", 0, 0.5, 0.9, 1);
-		WorldMapTooltip:AddLine("Right Click to Edit", 0, 0.5, 0.9, 1);
+		WorldMapTooltip:AddLine("Shift-Click to Edit", 0, 0.5, 0.9, 1);
 	end
 	WorldMapTooltip:Show();
 end
@@ -473,74 +448,11 @@ function CT_MapMod_PinMixin:OnMouseLeave()
 	WorldMapTooltip:Hide();
 end
  
-function CT_MapMod_PinMixin:OnMouseDown()
-  -- Override in your mixin, called when the mouse is pressed on this pin
-end
- 
-function CT_MapMod_PinMixin:OnMouseUp()
-  -- Override in your mixin, called when the mouse is released
-end
- 
-function CT_MapMod_PinMixin:OnMapInsetSizeChanged(mapInsetIndex, expanded)
-  -- Optionally override in your mixin, called when a map inset changes sizes
-end
- 
 function CT_MapMod_PinMixin:ApplyFrameLevel()
 	--local frameLevel = self:GetMap():GetPinFrameLevelsManager():GetValidFrameLevel(self.pinFrameLevelType, self.pinFrameLevelIndex);
 	--self:SetFrameLevel(frameLevel);
 	self:SetFrameLevel(2200);
 end
-
-function CT_MapMod_PinMixin:OnMapInsetMouseEnter(mapInsetIndex)
-  -- Optionally override in your mixin, called when a map inset gains mouse focus
-end
-
-function CT_MapMod_PinMixin:OnMapInsetMouseLeave(mapInsetIndex)
-  -- Optionally override in your mixin, called when a map inset loses mouse focus
-end
-
-function CT_MapMod_PinMixin:OnCanvasPanChanged()
-  -- Optionally override in your mixin, called when the pan location changes
-end
-
-function CT_MapMod_PinMixin:OnCanvasSizeChanged()
-  -- Optionally override in your mixin, called when the canvas size changes
-end
-
-
---------------------------------------------
--- CornerPinMixin
--- Pins added to the tl and br corners for calculating the map size (to facilitate cursor coords)
-
-CT_MapMod_CornerPinMixin = CreateFromMixins(MapCanvasPinMixin);
-
-function CT_MapMod_CornerPinMixin:OnLoad()
-	-- Override in your mixin, called when this pin is created
-	self:SetWidth(.1);
-	self:SetHeight(.1);
-end
-
-function CT_MapMod_CornerPinMixin:OnAcquired(...) -- the arguments here are anything that are passed into AcquirePin after the pinTemplate
-	-- Override in your mixin, called when this pin is being acquired by a data provider but before its added to the map
-	self.corner = ...;
-	if (self.corner == "tl") then self:SetPosition(0.0,0.0); end
-	if (self.corner == "br") then self:SetPosition(1.0,1.0); end
-	--self.texture:SetTexture("Interface\\RaidFrame\\UI-RaidFrame-Threat");
-	--self:Show();
-end
- 
-function CT_MapMod_CornerPinMixin:OnReleased()
-	-- Override in your mixin, called when this pin is being released by a data provider and is no longer on the map
-	
-	-- nothing to do	
-end
-
-function CT_MapMod_CornerPinMixin:ApplyFrameLevel()
-	--local frameLevel = self:GetMap():GetPinFrameLevelsManager():GetValidFrameLevel(self.pinFrameLevelType, self.pinFrameLevelIndex);
-	--self:SetFrameLevel(frameLevel);
-	self:SetFrameLevel(3000);
-end
-
 
 
 --------------------------------------------
@@ -553,6 +465,9 @@ do
 				["onload"] = function (self)
 					self:ClearAllPoints();
 					self:SetPoint("BOTTOM",WorldMapFrame.ScrollContainer,"BOTTOM",0,3);
+					if ((module:getOption("CT_MapMod_ShowMapResetButton") or 1) == 3) then
+						self:Hide();
+					end
 				end,
 				["onclick"] = function(self, arg1)
 					WorldMapFrame:SetMapID(C_Map.GetBestMapForUnit("player"));
@@ -659,17 +574,7 @@ do
 		},
 		WorldMapFrame.BorderFrame
 	);
-		
-
-	-- Not necessary, depending on calculated positions instead (must be > 0 and < 100)
-	-- local ismouseovermap = false;
-	--WorldMapFrame.ScrollContainer:HookScript("OnEnter", function(self)
-	--	ismouseovermap = true;
-	--end);
-	--WorldMapFrame.ScrollContainer:HookScript("OnLeave", function(self)
-	--	ismouseovermap = false;
-	--end);
-	
+			
 	local timesinceupdate = 0;
 	WorldMapFrame.ScrollContainer:HookScript("OnUpdate", function(self, elapsed)
 		timesinceupdate = timesinceupdate + elapsed;
@@ -684,60 +589,36 @@ do
 				py = math.floor(py*1000)/10;
 				module.px:SetText("x:" .. px);
 				module.py:SetText("y:" .. py);
-				if (mapid == C_Map.GetBestMapForUnit("player")) then
-					-- we have calculated coords, AND this is the best map to do it with
-					module.px:SetTextColor(1,1,1);
-					module.py:SetTextColor(1,1,1);
-				else
-					-- although the player is technically on the map, its not the best one.
-					module.px:SetTextColor(.6,.6,.6);
-					module.py:SetTextColor(.6,.6,.6);
-				end
-				_G["CT_MapMod_WhereAmIButton"]:Hide();
 			else
-				module.px:SetText("x:");
-				module.py:SetText("y:");
-				module.px:SetTextColor(.6,.6,.6);
+				module.px:SetText("x: -");
+				module.py:SetText("y: -");
+			end
+			if (mapid == C_Map.GetBestMapForUnit("player")) then
+				module.px:SetTextColor(1,1,1);
+				module.py:SetTextColor(1,1,1);
+				if ((module:getOption("CT_MapMod_ShowMapResetButton") or 1) == 1) then
+					_G["CT_MapMod_WhereAmIButton"]:Hide();
+				end			
+			else
+				module.px:SetTextColor(.6,.6,.6);			
 				module.py:SetTextColor(.6,.6,.6);
-				_G["CT_MapMod_WhereAmIButton"]:Show();
+				if ((module:getOption("CT_MapMod_ShowMapResetButton") or 1) == 1) then
+					_G["CT_MapMod_WhereAmIButton"]:Show();
+				end				
 			end
-		end
-		if (mapid and module.tl and module.br) then 
-			local cursorx, cursory = GetCursorPosition();
-			local frameleft = module.tl:GetLeft() * module.tl:GetEffectiveScale();
-			local frametop = module.tl:GetBottom() * module.tl:GetEffectiveScale();
-			local framebottom = module.br:GetBottom() * module.br:GetEffectiveScale();
-			local frameright = module.br:GetLeft() * module.br:GetEffectiveScale();
-						
-			-- checking juuuuust to be safe
-			if (not cursorx or not cursory or not frameleft or not frametop or not framebottom or not frameright) then return; end
-			
-			local cx = (cursorx - frameleft) / (frameright - frameleft);
-			local cy = 1 - (cursory - framebottom) / (frametop - framebottom)
-			
-			if (cx >= 0 and cy >= 0 and cx <= 1 and cy <= 1) then
-				-- the cursor is over the map!
-				cx = math.floor(cx*1000)/10;
-				cx = math.max(math.min(cx,100),0);
-				cy = math.floor(cy*1000)/10;
-				cy = math.max(math.min(cy,100),0);
-				module.cx:SetText("x:" .. cx);
-				module.cy:SetText("y:" .. cy);
-				module.cx:SetTextColor(1,1,1);
-				module.cy:SetTextColor(1,1,1);
-			else
-				-- the cursor is NOT over the map after all :(
-				module.cx:SetText("x:");
-				module.cy:SetText("y:");
-				module.cx:SetTextColor(.6,.6,.6);
-				module.cy:SetTextColor(.6,.6,.6);
-			end
+		end	
+		local cx, cy = WorldMapFrame:GetNormalizedCursorPosition();
+		if (cx and cy) then
+			cx = math.floor(cx*1000)/10;
+			cx = math.max(math.min(cx,100),0);
+			cy = math.floor(cy*1000)/10;
+			cy = math.max(math.min(cy,100),0);				
+			module.cx:SetText("x:" .. cx);
+			module.cy:SetText("y:" .. cy);
 		else
 			-- the cursor is not over the map
 			module.cx:SetText("x:");
-			module.cy:SetText("y:");
-			module.cx:SetTextColor(.6,.6,.6);
-			module.cy:SetTextColor(.6,.6,.6);			
+			module.cy:SetText("y:");			
 		end
 	end);
 end
@@ -745,48 +626,6 @@ end
 
 --------------------------------------------
 -- Options handling
-
-
-local function CT_MapMod_GetCharKey()
-	-- Get the current character's name key (combination of player name and server name).
-	local characterKey = UnitName("player") .. "@" .. GetRealmName();
-
-	-- autoGather == (1 or nil) -- No longer used in 4.0100
-	-- autoHerbs ==  (true or false) -- Added in 4.0100
-	-- autoMinerals  (true or false) -- Added in 4.0100
-	-- hideGroups == (table)
-	-- receiveNotes == Player can receive notes
-	-- mainPos1 == Position of the notes button on the full size map.
-	-- mainPos2 == Position of the notes button on the small size map.
-	-- countPos1 == Position of the note count text relative to notes button on full size map (1==Left, 2==Top, 3==Right, 4==Bottom).
-	-- countPos2 == Position of the note count text relative to notes button on small size map (1==Left, 2==Top, 3==Right, 4==Bottom).
-	-- coordPos1 == Position of the coordinates frame on the full size map.
-	-- coordPos2 == Position of the coordinates frame on the small size map.
-	-- coordHide1 == Hide the coordinates frame on the full size map.
-	-- coordHide2 == Hide the coordinates frame on the small size map.
-	-- hideMainTooltip == Hide the Notes button tooltip.
-
-	if ( not CT_MapMod_Options[characterKey] ) then
-		CT_MapMod_Options[characterKey] = {
-			-- autoHerbs = true,
-			-- autoMinerals = true,
-			-- hideGroups = {},
-			-- receiveNotes = nil,
-			-- mainPos1 = nil,
-			-- mainPos2 = nil,
-			-- countPos1 = nil,
-			-- countPos2 = nil,
-			-- coordPos1 = nil,
-			-- coordPos2 = nil,
-			-- coordHide1 = nil,
-			-- coordHide2 = nil,
-			-- hideMainTooltip = nil,
-		};
-	end
-
-	return UnitName("player") .. "@" .. GetRealmName();
-end
-
 
 module.update = function(self, optName, value)
 	if (optName == "init") then		
@@ -850,6 +689,10 @@ module.update = function(self, optName, value)
 			module.cx:Hide();
 			module.cy:Hide();
 		end
+	elseif (optName == "CT_MapMod_ShowMapResetButton") then
+		if (not _G["CT_MapMod_WhereAmIButton"]) then return; end
+		if (value == 2) then _G["CT_MapMod_WhereAmIButton"]:Show(); end
+		if (value == 3) then _G["CT_MapMod_WhereAmIButton"]:Hide(); end
 	end
 end
 
@@ -904,17 +747,21 @@ module.frame = function()
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Tips");
 		optionsAddObject( -2, 3*14, "font#t:0:%y#s:0:%s#l:13:0#r#You can use /ctmap, /ctmapmod, or /mapmod to open this options window directly.#" .. textColor2 .. ":l");
 		optionsAddObject( -5, 3*14, "font#t:0:%y#s:0:%s#l:13:0#r#To access most of the options for CT_MapMod, open the game's World Map and click on the 'Notes' button.#" .. textColor2 .. ":l");
-
 		
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Add Features to World Map");
+		
 		optionsAddObject(-5, 3*14, "font#t:0:%y#s:0:%s#l:13:0#r#Coordinates show where you are on the map, and where your mouse cursor is#" .. textColor2 .. ":l");
 		optionsAddObject(-5, 1*14, "font#t:0:%y#s:0:%s#l:13:0#r#Show player coordinates#" .. textColor1 .. ":l");
 		optionsAddObject(-5,   17, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_ShowPlayerCoordsOnMap#n:CT_MapMod_ShowPlayerCoordsOnMap#At Top#At Bottom#Disabled");
 		optionsAddObject(-5, 1*14, "font#t:0:%y#s:0:%s#l:13:0#r#Show cursor coordinates#" .. textColor1 .. ":l");
-		optionsAddObject(-5,   17, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_ShowCursorCoordsOnMap#n:CT_MapMod_ShowPlayerCoordsOnMap#At Top#At Bottom#Disabled");
-
+		optionsAddObject(-5,   17, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_ShowCursorCoordsOnMap#n:CT_MapMod_ShowCursorCoordsOnMap#At Top#At Bottom#Disabled");
+		
+		optionsAddObject(-10, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#The \"where am I?\" button resets the map to your current zone#" .. textColor2 .. ":l");
+		optionsAddObject(-5, 1*14, "font#t:0:%y#s:0:%s#l:13:0#r#Show map reset button#" .. textColor1 .. ":l");
+		optionsAddObject(-5,   17, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_ShowMapResetButton#n:CT_MapMod_ShowMapResetButton#Auto#Always#Disabled");
+		
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Under Construction");
-		optionsAddObject(-10, 3*14, "font#t:0:%y#s:0:%s#l:13:0#r#Patch 8.0.1 broke everything!  Most functionality is still being rebuilt from scratch.  Sorry!#" .. textColor2 .. ":l");
+		optionsAddObject(-5, 3*14, "font#t:0:%y#s:0:%s#l:13:0#r#Patch 8.0.1 broke everything!  Most functionality is still being rebuilt from scratch.  Sorry!#" .. textColor2 .. ":l");
 
 	optionsEndFrame();
 
