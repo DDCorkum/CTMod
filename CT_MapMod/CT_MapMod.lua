@@ -98,28 +98,28 @@ local function CT_MapMod_Initialize()		-- called via module.update("init") from 
 		},
 		["Ore"] =     -- previously this was set = 8
 		{ 
-			{ ["name"] = "Copper", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein" }, --1
-			{ ["name"] = "Gold", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_GoldVein" }, --2
-			{ ["name"] = "Iron", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_IronVein" }, --3
-			{ ["name"] = "Mithril", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_MithrilVein" }, --4
-			{ ["name"] = "Silver", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_SilverVein" }, --5
-			{ ["name"] = "Thorium", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_ThoriumVein" }, --6
-			{ ["name"] = "Tin", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_TinVein" }, --7
-			{ ["name"] = "Truesilver", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_TruesilverVein" }, --8
-			{ ["name"] = "Adamantite", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_AdamantiteVein" }, --9
-			{ ["name"] = "Fel Iron", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_FelIronVein" }, --10
-			{ ["name"] = "Khorium", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_KhoriumVein" }, --11
-			{ ["name"] = "Cobalt", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CobaltVein" }, --12
-			{ ["name"] = "Saronite", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_SaroniteVein" }, --13
-			{ ["name"] = "Titanium", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_TitaniumVein" }, --14
+			{ ["name"] = "Copper Vein", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein" }, --1
+			{ ["name"] = "Gold Vein", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_GoldVein" }, --2
+			{ ["name"] = "Iron Vein", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_IronVein" }, --3
+			{ ["name"] = "Mithril Vein", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_MithrilVein" }, --4
+			{ ["name"] = "Silver Vein", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_SilverVein" }, --5
+			{ ["name"] = "Thorium Vein", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_ThoriumVein" }, --6
+			{ ["name"] = "Tin Vein", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_TinVein" }, --7
+			{ ["name"] = "Truesilver Vein", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_TruesilverVein" }, --8
+			{ ["name"] = "Adamantite Vein", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_AdamantiteVein" }, --9
+			{ ["name"] = "Fel Iron Vein", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_FelIronVein" }, --10
+			{ ["name"] = "Khorium Vein", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_KhoriumVein" }, --11
+			{ ["name"] = "Cobalt Vein", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CobaltVein" }, --12
+			{ ["name"] = "Saronite Vein", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_SaroniteVein" }, --13
+			{ ["name"] = "Titanium Vein", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_TitaniumVein" }, --14
 			-- Cataclysm
-			{ ["name"] = "Elementium", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Elementium" }, -- 15
-			{ ["name"] = "Obsidian", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Obsidian" }, -- 16
-			{ ["name"] = "Pyrite", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Pyrite" }, -- 17
+			{ ["name"] = "Elementium Vein", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Elementium" }, -- 15
+			{ ["name"] = "Obsidian Vein", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Obsidian" }, -- 16
+			{ ["name"] = "Pyrite Vein", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Pyrite" }, -- 17
 			-- Mists of Pandaria
-			{ ["name"] = "Ghost Iron", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_GhostIron" }, -- 18
-			{ ["name"] = "Kyparite", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Kyparite" }, -- 19
-			{ ["name"] = "Trillium", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Trillium" } -- 20
+			{ ["name"] = "Ghost Iron Vein", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_GhostIron" }, -- 18
+			{ ["name"] = "Kyparite Vein", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Kyparite" }, -- 19
+			{ ["name"] = "Trillium Vein", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Trillium" } -- 20
 		}
 	};
 
@@ -161,8 +161,11 @@ local function CT_MapMod_Initialize()		-- called via module.update("init") from 
 	end
 	wipe(CT_UserMap_Notes);
 
-	-- load the DataProvider which does all the work
+	-- load the DataProvider which has most of the horsepower
 	WorldMapFrame:AddDataProvider(CreateFromMixins(CT_MapMod_DataProviderMixin));
+	
+	-- configure auto-gathering
+	
 end
 
 
@@ -776,6 +779,107 @@ do
 			-- the cursor is not over the map
 			module.cx:SetText("x:");
 			module.cy:SetText("y:");			
+		end
+	end);
+end
+
+
+--------------------------------------------
+-- Auto-Gathering
+
+do
+	local frame = CreateFrame("Frame")
+	frame:RegisterEvent("UNIT_SPELLCAST_SENT")
+	frame:SetScript("OnEvent", function(self, event, arg1, arg2, arg3, arg4)
+		if (event == "UNIT_SPELLCAST_SENT" and arg1 == "player") then
+			if (InCombatLockdown() or IsInInstance()) then return; end
+			local mapid = C_Map.GetBestMapForUnit("player");
+			if (not mapid) then return; end
+			local x,y = C_Map.GetPlayerMapPosition(mapid,"player"):GetXY();
+			if (not x or not y or (x == 0 and y == 0)) then return; end
+			local herbskills =
+			{
+				265819,
+				2366,
+				158745,
+				2368,
+				3570,
+				11993,
+				28695,
+				50300,
+				74519,
+				110413,
+				265821,
+				265823,
+				265825,
+				265827,
+				265829,
+				265831,
+				265834,
+				265835				
+			}
+			local oreskills =
+			{
+				9999999999			
+			}
+			if ((module:getOption("CT_MapMod_AutoGatherHerbs") or 1) == 1) then
+				for i, val in ipairs(herbskills) do
+					if (arg4 == val) then
+						for j, type in ipairs(module.NoteTypes["Herb"]) do
+							if type["name"] == arg2 then
+								local istooclose = nil;
+								for k, note in ipairs(CT_MapMod_Notes[mapid]) do
+									if ((note["name"] == arg2) and (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.03)) then
+										istooclose = true;
+									end
+								end
+								if (not istooclose) then
+									local newnote = {
+										["x"] = x,
+										["y"] = y,
+										["name"] = arg2,
+										["set"] = "Herb",
+										["subset"] = arg2,
+										["descript"] = ""	
+									};
+									tinsert(CT_MapMod_Notes[mapid],newnote);
+								end
+								return;
+							end
+						end
+						return;
+					end
+				end
+			end
+			if ((module:getOption("CT_MapMod_AutoGatherOre") or 1) == 1) then
+				for i, val in ipairs(oreskills) do
+					if (arg4 == val) then
+						for j, type in ipairs(module.NoteTypes["Ore"]) do
+							if type["name"] == arg2 then
+								local istooclose = nil;
+								for k, note in ipairs(CT_MapMod_Notes[mapid]) do
+									if ((note["name"] == arg2) and (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.03)) then
+										istooclose = true;
+									end
+								end
+								if (not istooclose) then
+									local newnote = {
+										["x"] = x,
+										["y"] = y,
+										["name"] = arg2,
+										["set"] = "Ore",
+										["subset"] = arg2,
+										["descript"] = ""	
+									};
+									tinsert(CT_MapMod_Notes[mapid],newnote);
+								end
+								return;
+							end
+						end
+						return;
+					end
+				end
+			end
 		end
 	end);
 end
