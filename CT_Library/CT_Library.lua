@@ -1486,8 +1486,9 @@ local function dropdownClick(self, arg1, arg2, checked)
 	end
 end
 
-local dropdownEntry = { };
+-- basic radio-button dropdown without any fancy modifications.  Each arg is text to display
 objectHandlers.dropdown = function(self, parent, name, virtual, option, ...)
+	local dropdownEntry = { };
 	local frame = CreateFrame("Frame", name, parent, virtual or "L_UIDropDownMenuTemplate");
 	frame.oldSetWidth = frame.SetWidth;
 	frame.SetWidth = dropdownSetWidth;
@@ -1510,10 +1511,7 @@ objectHandlers.dropdown = function(self, parent, name, virtual, option, ...)
 		for i = 1, #entries, 1 do
 			dropdownEntry.text = entries[i];
 			dropdownEntry.value = i;
-			dropdownEntry.isNotRadio = false;
-			dropdownEntry.checked = nil;
 			dropdownEntry.func = dropdownClick;
-			dropdownEntry.arg1 = nil;
 			L_UIDropDownMenu_AddButton(dropdownEntry);
 		end
 	end);
@@ -1523,7 +1521,10 @@ objectHandlers.dropdown = function(self, parent, name, virtual, option, ...)
 	return frame;
 end
 
+-- variant of a dropdown using checkboxes, that allows selecting more than one at a time.
+-- two parameters (separated by #) are display-text and the CT option (similar to o:)
 objectHandlers.multidropdown = function(self, parent, name, virtual, option, ...)
+	local dropdownEntry = { };
 	local frame = CreateFrame("Frame", name, parent, virtual or "L_UIDropDownMenuTemplate");
 	frame.oldSetWidth = frame.SetWidth;
 	frame.SetWidth = dropdownSetWidth;
@@ -2626,7 +2627,7 @@ registerModule(module, 1);
 local optionsFrame, addonsFrame, fromChar;
 
 -- Dropdown Handling
-local dropdownEntry, flaggedCharacters;
+local importDropdownEntry, importFlaggedCharacters;
 local importRealm, importSetPlayer;
 local importRealm2;
 local importPlayerCount;
@@ -2684,25 +2685,25 @@ local function populateCharDropdownInit()
 	local players = {};
 	local name, realm, options;
 
-	if ( not dropdownEntry ) then
-		dropdownEntry = { };
-		flaggedCharacters = { };
+	if ( not importDropdownEntry ) then
+		importDropdownEntry = { };
+		importFlaggedCharacters = { };
 	else
-		lib:clearTable(dropdownEntry);
-		lib:clearTable(flaggedCharacters);
+		lib:clearTable(importDropdownEntry);
+		lib:clearTable(importFlaggedCharacters);
 	end
 
 	-- Prevent ourself from being added
-	flaggedCharacters[getCharKey()] = true;
+	importFlaggedCharacters[getCharKey()] = true;
 
 	for key, value in ipairs(modules) do
 		options = value.options;
 		if ( options ) then
 			for k, v in pairs(options) do
-				if ( not flaggedCharacters[k] ) then
+				if ( not importFlaggedCharacters[k] ) then
 					name, realm = k:match("^CHAR%-([^-]+)%-(.+)$");
 					if ( name and realm and realm == importRealm ) then
-						flaggedCharacters[k] = true;
+						importFlaggedCharacters[k] = true;
 						tinsert(players, k);
 					end
 				end
@@ -2716,11 +2717,11 @@ local function populateCharDropdownInit()
 	for key, value in ipairs(players) do
 		name, realm = value:match("^CHAR%-([^-]+)%-(.+)$");
 		if ( name and realm ) then
-			dropdownEntry.text = name; -- .. ", " .. realm;
-			dropdownEntry.value = value;
-			dropdownEntry.checked = nil;
-			dropdownEntry.func = dropdownClick;
-			L_UIDropDownMenu_AddButton(dropdownEntry);
+			importDropdownEntry.text = name; -- .. ", " .. realm;
+			importDropdownEntry.value = value;
+			importDropdownEntry.checked = nil;
+			importDropdownEntry.func = dropdownClick;
+			L_UIDropDownMenu_AddButton(importDropdownEntry);
 
 			importPlayerCount = importPlayerCount + 1;
 		end
@@ -2752,25 +2753,25 @@ local function populateServerDropdownInit()
 	local serversort = {};
 	local name, realm, options;
 
-	if ( not dropdownEntry ) then
-		dropdownEntry = { };
-		flaggedCharacters = { };
+	if ( not importDropdownEntry ) then
+		importDropdownEntry = { };
+		importFlaggedCharacters = { };
 	else
-		lib:clearTable(dropdownEntry);
-		lib:clearTable(flaggedCharacters);
+		lib:clearTable(importDropdownEntry);
+		lib:clearTable(importFlaggedCharacters);
 	end
 
 	-- Prevent ourself from being added
-	flaggedCharacters[getCharKey()] = true;
+	importFlaggedCharacters[getCharKey()] = true;
 
 	for key, value in ipairs(modules) do
 		options = value.options;
 		if ( options ) then
 			for k, v in pairs(options) do
-				if ( not flaggedCharacters[k] ) then
+				if ( not importFlaggedCharacters[k] ) then
 					name, realm = k:match("^CHAR%-([^-]+)%-(.+)$");
 					if ( name ) then
-						flaggedCharacters[k] = true;
+						importFlaggedCharacters[k] = true;
 						if (not servers[realm]) then
 							servers[realm] = 1;
 						else
@@ -2787,11 +2788,11 @@ local function populateServerDropdownInit()
 	sort(serversort);
 
 	for key, value in ipairs(serversort) do
-		dropdownEntry.text = value .. " (" .. servers[value] .. ")";
-		dropdownEntry.value = value;
-		dropdownEntry.checked = nil;
-		dropdownEntry.func = dropdownClick;
-		L_UIDropDownMenu_AddButton(dropdownEntry);
+		importDropdownEntry.text = value .. " (" .. servers[value] .. ")";
+		importDropdownEntry.value = value;
+		importDropdownEntry.checked = nil;
+		importDropdownEntry.func = dropdownClick;
+		L_UIDropDownMenu_AddButton(importDropdownEntry);
 	end
 
 	importPlayerCount = 0;

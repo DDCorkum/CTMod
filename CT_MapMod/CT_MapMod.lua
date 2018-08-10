@@ -34,112 +34,92 @@ local function CT_MapMod_Initialize()		-- called via module.update("init") from 
 	-- configure the hardcoded variables
 	module.NoteTypes =
 	{
-		["User"] = 
+		["User"] = 		-- previously this was set = 1 through 6.
 		{
-			["DEFAULT"] = "Interface\\RaidFrame\\UI-RaidFrame-Threat",
-			["Grey Note"] = "Interface\\AddOns\\CT_MapMod\\Skin\\GreyNote", --1
-			["Blue Shield"] = "Interface\\AddOns\\CT_MapMod\\Skin\\BlueShield", --2
-			["Red Dot"] = "Interface\\AddOns\\CT_MapMod\\Skin\\RedDot", --3
-			["White Circle"] = "Interface\\AddOns\\CT_MapMod\\Skin\\WhiteCircle", --4
-			["Green Square"] = "Interface\\AddOns\\CT_MapMod\\Skin\\GreenSquare", --5
-			["Red Cross"] = "Interface\\AddOns\\CT_MapMod\\Skin\\RedCross", --6
-			["Herb"] = "Interface\\AddOns\\CT_MapMod\\Skin\\Herb ", --7
-			["Ore"] = "Interface\\AddOns\\CT_MapMod\\Skin\\Ore", --8
-			["Diamond"] = "Interface\\RaidFrame\\UI-RaidFrame-Threat" --added in 8.0
+			{ ["name"] = "Grey Note", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Skin\\GreyNote" }, --1
+			{ ["name"] = "Blue Shield", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Skin\\BlueShield" }, --2
+			{ ["name"] = "Red Dot", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Skin\\RedDot" }, --3
+			{ ["name"] = "White Circle", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Skin\\WhiteCircle" }, --4
+			{ ["name"] = "Green Square", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Skin\\GreenSquare" }, --5
+			{ ["name"] = "Red Cross", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Skin\\RedCross" }, --6
+			-- 7 was for herb, but that's removed now
+			-- 8 was for ore, but that's removed now
+			{ ["name"] = "Diamond", ["icon"] = "Interface\\RaidFrame\\UI-RaidFrame-Threat" } -- added in 8.0
 		},			
-		["Herb"] =
+		["Herb"] =  		-- previously this was set = 7
 		{
-			["DEFAULT"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",
-			["Bruiseweed"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed", -- 1
-			["Arthas Tears"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_ArthasTears", -- 2
-			["Black Lotus"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_BlackLotus", -- 3
-			["Blindweed"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Blindweed", -- 4
-			["Briarthorn"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Briarthorn", -- 5
-			["Dreamfoil"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Dreamfoil", -- 6
-			["Earthroot"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Earthroot", -- 7
-			["Fadeleaf"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Fadeleaf", -- 8
-			["Firebloom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Firebloom", -- 9
-			["Ghost Mushroom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_GhostMushroom", -- 10
-			["Golden Sansam"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_GoldenSansam", -- 11
-			["Goldthorn"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Goldthorn", -- 12
-			["Grave Moss"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_GraveMoss", -- 13
-			["Gromsblood"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Gromsblood", -- 14
-			["Icecap"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Icecap", -- 15
-			["Khadgars Whisker"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_KhadgarsWhisker", -- 16
-			["Kingsblood"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Kingsblood", -- 17
-			["Liferoot"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Liferoot", -- 18
-			["Mageroyal"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Mageroyal", -- 19
-			["Mountain Silversage"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_MountainSilversage", -- 20
-			["Peacebloom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Peacebloom", -- 21
-			["Plaguebloom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Plaguebloom", -- 22
-			["Purple Lotus"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_PurpleLotus", -- 23
-			["Silverleaf"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Silverleaf", -- 24
-			["Stranglekelp"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Stranglekelp", -- 25
-			["Sungrass"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Sungrass", -- 26
-			["Swiftthistle"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Swiftthistle", -- 27
-			["Wild Steelbloom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_WildSteelbloom", -- 28
-			["Wintersbite"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Wintersbite", -- 29
-			["Dreaming Glory"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_DreamingGlory", -- 30
-			["Felweed"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Felweed", -- 31
-			["Flame Cap"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_FlameCap", -- 32
-			["Mana Thistle"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_ManaThistle", -- 33
-			["Netherbloom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Netherbloom", -- 34
-			["Netherdust Bush"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_NetherdustBush", -- 35
-			["Nightmare Vine"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_NightmareVine", -- 36
-			["Ragveil"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Ragveil", -- 37
-			["Terocone"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Terocone", -- 38
-			["Adders Tongue"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_AddersTongue", -- 39
-			["Frost Lotus"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_FrostLotus", -- 40
-			["Goldclover"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Goldclover", -- 41
-			["Icethorn"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Icethorn", -- 42
-			["Lichbloom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Lichbloom", -- 43
-			["Talandras Rose"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_TalandrasRose", -- 44
-			["Tiger Lily"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_TigerLily", -- 45
-			["Frozen Herb"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_FrozenHerb", -- 46
-			-- Cataclysm
-			["Sorrowmoss"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Sorrowmoss", -- 47 Formerly known as Plaugebloom. Same icon.
-			["Dragons Teeth"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_DragonsTeeth", -- 48 Formerly known as Wintersbite. New icon in 4.0.6.
-			["AzsharasVeil"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_AzsharasVeil", -- 49
-			["Cinderbloom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Cinderbloom", -- 50
-			["Heartblossom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Heartblossom", -- 51
-			["Stormvine"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Stormvine", -- 52
-			["Twilight Jasmine"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_TwilightJasmine", -- 53
-			["Whiptail"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Whiptail", -- 54
-			-- Mists of Pandaria
-			["Fools Cap"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_FoolsCap", -- 55
-			["Golden Lotus"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_GoldenLotus", -- 56
-			["Green Tea Leaf"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_GreenTeaLeaf", -- 57
-			["Rain Poppy"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_RainPoppy", -- 58
-			["Sha Herb"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_ShaHerb", -- 59
-			["Silkweed"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Silkweed", -- 60
-			["Snow Lily"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_SnowLily" -- 61
+			{ ["name"] = "Bruiseweed", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" }, -- 1
+			{ ["name"] = "Arthas Tears", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_ArthasTears" }, -- 2
+			{ ["name"] = "Black Lotus", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_BlackLotus" }, -- 3
+			{ ["name"] = "Blindweed", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Blindweed" }, -- 4
+			{ ["name"] = "Briarthorn", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Briarthorn" }, -- 5
+			{ ["name"] = "Dreamfoil", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Dreamfoil" }, -- 6
+			{ ["name"] = "Earthroot", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Earthroot" }, -- 7
+			{ ["name"] = "Fadeleaf", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Fadeleaf" }, -- 8
+			{ ["name"] = "Firebloom", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Firebloom" }, -- 9
+			{ ["name"] = "Ghost Mushroom", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_GhostMushroom" }, -- 10
+			{ ["name"] = "Golden Sansam", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_GoldenSansam" }, -- 11
+			{ ["name"] = "Goldthorn", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Goldthorn" }, -- 12
+			{ ["name"] = "Grave Moss", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_GraveMoss" }, -- 13
+			{ ["name"] = "Gromsblood", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Gromsblood" }, -- 14
+			{ ["name"] = "Icecap", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Icecap" }, -- 15
+			{ ["name"] = "Khadgars Whisker", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_KhadgarsWhisker" }, -- 16
+			{ ["name"] = "Kingsblood", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Kingsblood" }, -- 17
+			{ ["name"] = "Liferoot", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Liferoot" }, -- 18
+			{ ["name"] = "Mageroyal", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Mageroyal" }, -- 19
+			{ ["name"] = "Mountain Silversage", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_MountainSilversage" }, -- 20
+			{ ["name"] = "Peacebloom", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Peacebloom" }, -- 21
+			{ ["name"] = "Plaguebloom", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Plaguebloom" }, -- 22
+			{ ["name"] = "Purple Lotus", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_PurpleLotus" }, -- 23
+			{ ["name"] = "Silverleaf", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Silverleaf" }, -- 24
+			{ ["name"] = "Stranglekelp", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Stranglekelp" }, -- 25
+			{ ["name"] = "Sungrass", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Sungrass" }, -- 26
+			{ ["name"] = "Swiftthistle", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Swiftthistle" }, -- 27
+			{ ["name"] = "Wild Steelbloom", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_WildSteelbloom" }, -- 28
+			{ ["name"] = "Wintersbite", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Wintersbite" }, -- 29
+			{ ["name"] = "Dreaming Glory", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_DreamingGlory" }, -- 30
+			{ ["name"] = "Felweed", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Felweed" }, -- 31
+			{ ["name"] = "Flame Cap", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_FlameCap" }, -- 32
+			{ ["name"] = "Mana Thistle", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_ManaThistle" }, -- 33
+			{ ["name"] = "Netherbloom", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Netherbloom" }, -- 34
+			{ ["name"] = "Netherdust Bush", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_NetherdustBush" }, -- 35
+			{ ["name"] = "Nightmare Vine", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_NightmareVine" }, -- 36
+			{ ["name"] = "Ragveil", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Ragveil" }, -- 37
+			{ ["name"] = "Terocone", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Terocone" }, -- 38
+			{ ["name"] = "Adders Tongue", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_AddersTongue" }, -- 39
+			{ ["name"] = "Frost Lotus", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_FrostLotus" }, -- 40
+			{ ["name"] = "Goldclover", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Goldclover" }, -- 41
+			{ ["name"] = "Icethorn", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Icethorn" }, -- 42
+			{ ["name"] = "Lichbloom", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Lichbloom" }, -- 43
+			{ ["name"] = "Talandras Rose", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_TalandrasRose" }, -- 44
+			{ ["name"] = "Tiger Lily", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_TigerLily" }, -- 45
+			{ ["name"] = "Frozen Herb", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_FrozenHerb" }, -- 46
 
 		},
-		["Ore"] = 
-		{
-			["DEFAULT"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein", --1
-			["Copper"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein", --1
-			["Gold"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_GoldVein", --2
-			["Iron"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_IronVein", --3
-			["Mithril"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_MithrilVein", --4
-			["Silver"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_SilverVein", --5
-			["Thorium"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_ThoriumVein", --6
-			["Tin"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_TinVein", --7
-			["Truesilver"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_TruesilverVein", --8
-			["Adamantite"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_AdamantiteVein", --9
-			["Fel Iron"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_FelIronVein", --10
-			["Khorium"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_KhoriumVein", --11
-			["Cobalt"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CobaltVein", --12
-			["Saronite"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_SaroniteVein", --13
-			["Titanium"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_TitaniumVein", --14
+		["Ore"] =     -- previously this was set = 8
+		{ 
+			{ ["name"] = "Copper", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein" }, --1
+			{ ["name"] = "Gold", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_GoldVein" }, --2
+			{ ["name"] = "Iron", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_IronVein" }, --3
+			{ ["name"] = "Mithril", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_MithrilVein" }, --4
+			{ ["name"] = "Silver", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_SilverVein" }, --5
+			{ ["name"] = "Thorium", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_ThoriumVein" }, --6
+			{ ["name"] = "Tin", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_TinVein" }, --7
+			{ ["name"] = "Truesilver", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_TruesilverVein" }, --8
+			{ ["name"] = "Adamantite", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_AdamantiteVein" }, --9
+			{ ["name"] = "Fel Iron", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_FelIronVein" }, --10
+			{ ["name"] = "Khorium", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_KhoriumVein" }, --11
+			{ ["name"] = "Cobalt", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CobaltVein" }, --12
+			{ ["name"] = "Saronite", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_SaroniteVein" }, --13
+			{ ["name"] = "Titanium", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_TitaniumVein" }, --14
 			-- Cataclysm
-			["Elementium"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Elementium", -- 15
-			["Obsidian"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Obsidian", -- 16
-			["Pyrite"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Pyrite", -- 17
+			{ ["name"] = "Elementium", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Elementium" }, -- 15
+			{ ["name"] = "Obsidian", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Obsidian" }, -- 16
+			{ ["name"] = "Pyrite", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Pyrite" }, -- 17
 			-- Mists of Pandaria
-			["Ghost Iron"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_GhostIron", -- 18
-			["Kyparite"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Kyparite", -- 19
-			["Trillium"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Trillium" -- 20
+			{ ["name"] = "Ghost Iron", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_GhostIron" }, -- 18
+			{ ["name"] = "Kyparite", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Kyparite" }, -- 19
+			{ ["name"] = "Trillium", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Trillium" } -- 20
 		}
 	};
 
@@ -153,27 +133,13 @@ local function CT_MapMod_Initialize()		-- called via module.update("init") from 
 				local set = nil;
 				if (note["set"] == 7) then
 					set = "Herb";
-					for k, v in pairs (CT_MapMod_OldNames["Herb"]) do
-						if (k == note["icon"]) then
-							subset = v;
-						end
-					end
+					subset = module.NoteTypes["Herb"][note["icon"]]["name"];
 				elseif (note["set"] == 8) then
 					set = "Ore";
-					local num  = 0
-					for k, v in ipairs (CT_MapMod_OldNames["Ore"]) do
-						if (k == note["icon"]) then
-							subset = v;
-						end
-					end
+					subset = module.NoteTypes["Ore"][note["icon"]]["name"];
 				else
 					set = "User";
-					local num  = 0
-					for k, v in pairs (CT_MapMod_OldNames["User"]) do
-						if (k == note["set"]) then
-							subset = v;
-						end
-					end
+					subset = module.NoteTypes["User"][note["set"]]["name"];
 				end
 				local newnote =
 				{
@@ -272,21 +238,27 @@ function CT_MapMod_PinMixin:OnLoad()
 	local textColor3 = "0.9:0.72:0.0";
 	module:getFrame (
 		{	["button#s:80:25#br:b:-42:16#v:GameMenuButtonTemplate#Okay"] = {
-				["onload"] = function(self)
-					self:Disable();
-				end,
 				["onclick"] = function(self, arg1)
 					local pin = self:GetParent().pin;
-					--[[ NOT YET IMPLEMENTED
+					local set = self:GetParent().setdropdown.unapprovedValue or pin.set;
+					local subset;
+					if (set == "User") then subset = self:GetParent().usersubsetdropdown.unapprovedValue or pin.subset; end
+					if (set == "Herb") then subset = self:GetParent().herbsubsetdropdown.unapprovedValue or pin.subset; end
+					if (set == "Ore") then subset = self:GetParent().oresubsetdropdown.unapprovedValue or pin.subset; end
+					if (not subset) then return; end  -- this could happen if the user didn't pick an icon
+					self:GetParent().setdropdown.unapprovedValue = nil;
+					self:GetParent().usersubsetdropdown.unapprovedValue = nil;
+					self:GetParent().herbsubsetdropdown.unapprovedValue = nil;
+					self:GetParent().oresubsetdropdown.unapprovedValue = nil;
+					
 					CT_MapMod_Notes[pin.mapid][pin.i] = {
 						["x"] = pin.x,
 						["y"] = pin.y,
-						["name"] = self:GetParent().namefield:GetText();
-						["set"] = self:GetParent().setdropdown:GetSelectedValue();
-						["subset"] = self:GetParent().subsetdropdown:GetSelectedValue();
-						["descript"] = self:GetParent().descriptfield:GetText();
+						["name"] = self:GetParent().namefield:GetText() or pin.name;
+						["set"] = set;
+						["subset"] = subset;
+						["descript"] = self:GetParent().descriptfield:GetText() or pin.descript;
 					}
-					--]]
 					self:GetParent():Hide();
 					module.PinHasFocus = nil;
 					WorldMapFrame:RefreshAllDataProviders();
@@ -294,8 +266,46 @@ function CT_MapMod_PinMixin:OnLoad()
 			},
 			["button#s:80:25#b:b:0:16#v:GameMenuButtonTemplate#Cancel"] = {
 				["onclick"] = function(self, arg1)
+					local pin = self:GetParent().pin;
 					self:GetParent():Hide();
 					module.PinHasFocus = nil;
+					self:GetParent().setdropdown.unapprovedValue = nil;
+					self:GetParent().usersubsetdropdown.unapprovedValue = nil;
+					self:GetParent().herbsubsetdropdown.unapprovedValue = nil;
+					self:GetParent().oresubsetdropdown.unapprovedValue = nil;
+					L_UIDropDownMenu_SetText(pin.notepanel.setdropdown,pin.set);
+					if (pin.set and pin.subset) then
+						for i, val in ipairs(module.NoteTypes[pin.set]) do
+							if (val["name"] == pin.subset) then
+								pin.texture:SetTexture(val["icon"]);
+							end
+						end
+					else
+						pin.texture:SetTexture("Interface\\RaidFrame\\UI-RaidFrame-Threat");
+					end
+					if (pin.set == "User") then
+						pin:SetHeight(25);
+						pin:SetWidth(25);
+					else
+						pin:SetHeight(15);
+						pin:SetWidth(15);
+					end
+					if (pin.set == "User") then
+						pin.notepanel.usersubsetdropdown:Show();
+						L_UIDropDownMenu_SetText(pin.notepanel.usersubsetdropdown,pin.subset);
+						pin.notepanel.herbsubsetdropdown:Hide();
+						pin.notepanel.oresubsetdropdown:Hide();
+					elseif (pin.set == "Herb") then
+						pin.notepanel.usersubsetdropdown:Hide();
+						pin.notepanel.herbsubsetdropdown:Show();
+						L_UIDropDownMenu_SetText(pin.notepanel.herbsubsetdropdown,pin.subset);
+						pin.notepanel.oresubsetdropdown:Hide();	
+					elseif (pin.set == "Ore") then
+						pin.notepanel.usersubsetdropdown:Hide();
+						pin.notepanel.herbsubsetdropdown:Hide();
+						pin.notepanel.oresubsetdropdown:Show();
+						L_UIDropDownMenu_SetText(pin.notepanel.oresubsetdropdown,pin.subset);
+					end
 				end,
 			},
 			["button#s:80:25#bl:b:42:16#v:GameMenuButtonTemplate#Delete"] = {
@@ -360,6 +370,131 @@ function CT_MapMod_PinMixin:OnLoad()
 		},
 		self.notepanel
 	);
+	self.notepanel.setdropdown = CreateFrame("Frame", nil, self.notepanel, "L_UIDropDownMenuTemplate");
+	self.notepanel.usersubsetdropdown = CreateFrame("Frame", nil, self.notepanel, "L_UIDropDownMenuTemplate");
+	self.notepanel.herbsubsetdropdown = CreateFrame("Frame", nil, self.notepanel, "L_UIDropDownMenuTemplate");
+	self.notepanel.oresubsetdropdown = CreateFrame("Frame", nil, self.notepanel, "L_UIDropDownMenuTemplate");
+	
+	self.notepanel.setdropdown:SetPoint("LEFT",self.notepanel,"TOPLEFT",35,-60);
+	L_UIDropDownMenu_SetWidth(self.notepanel.setdropdown, 90);
+
+	self.notepanel.usersubsetdropdown:SetPoint("LEFT",self.notepanel,"TOP",35,-60);
+	L_UIDropDownMenu_SetWidth(self.notepanel.usersubsetdropdown, 90);
+
+	self.notepanel.herbsubsetdropdown:SetPoint("LEFT",self.notepanel,"TOP",35,-60);
+	L_UIDropDownMenu_SetWidth(self.notepanel.herbsubsetdropdown, 90);
+
+	self.notepanel.oresubsetdropdown:SetPoint("LEFT",self.notepanel,"TOP",35,-60);
+	L_UIDropDownMenu_SetWidth(self.notepanel.oresubsetdropdown, 90);
+
+	L_UIDropDownMenu_Initialize(self.notepanel.setdropdown, function()
+		local dropdownEntry = { };
+
+		-- properties common to all
+		dropdownEntry.func = function(self, arg1, arg2, checked)
+			local dropdown = L_UIDROPDOWNMENU_OPEN_MENU or L_UIDROPDOWNMENU_INIT_MENU
+			arg1:Show();
+			for i, val in ipairs(arg2) do
+				val:Hide();
+			end
+			dropdown.unapprovedValue = self.value;
+			L_UIDropDownMenu_SetText(dropdown,self.value);
+		end
+
+		-- user
+		dropdownEntry.value = "User";
+		dropdownEntry.text = "User-Selected Icon";
+		dropdownEntry.checked = nil;
+		if ((self.notepanel.setdropdown.unapprovedValue or self.set) == "User") then dropdownEntry.checked = true; end
+		dropdownEntry.arg1 = self.notepanel.usersubsetdropdown;
+		dropdownEntry.arg2 = { self.notepanel.herbsubsetdropdown, self.notepanel.oresubsetdropdown }
+		L_UIDropDownMenu_AddButton(dropdownEntry);
+		
+		-- herb
+		dropdownEntry.value = "Herb";
+		dropdownEntry.text = "Herbablism Node";
+		dropdownEntry.checked = nil;
+		if ((self.notepanel.setdropdown.unapprovedValue or self.set) == "Herb") then dropdownEntry.checked = true; end
+		dropdownEntry.arg1 = self.notepanel.herbsubsetdropdown;
+		dropdownEntry.arg2 = { self.notepanel.usersubsetdropdown, self.notepanel.oresubsetdropdown }
+		L_UIDropDownMenu_AddButton(dropdownEntry);
+		
+		-- ore
+		dropdownEntry.checked = nil;
+		if ((self.notepanel.setdropdown.unapprovedValue or self.set) == "Ore") then dropdownEntry.checked = true; end
+		dropdownEntry.value = "Ore";
+		dropdownEntry.text = "Mining Ore Node";
+		dropdownEntry.arg1 = self.notepanel.oresubsetdropdown;
+		dropdownEntry.arg2 = { self.notepanel.usersubsetdropdown, self.notepanel.herbsubsetdropdown }
+		L_UIDropDownMenu_AddButton(dropdownEntry);
+	end);
+	L_UIDropDownMenu_JustifyText(self.notepanel.setdropdown, "LEFT");
+
+	L_UIDropDownMenu_Initialize(self.notepanel.usersubsetdropdown, function()
+		local dropdownEntry = { };
+
+		-- properties common to all
+		dropdownEntry.func = function(self, arg1, arg2, checked)
+			local dropdown = L_UIDROPDOWNMENU_OPEN_MENU or L_UIDROPDOWNMENU_INIT_MENU
+			dropdown.unapprovedValue = self.value;
+			L_UIDropDownMenu_SetText(dropdown,self.value);
+		end
+
+		-- properties unique to each option
+		for i = 1, #module.NoteTypes["User"], 1 do
+			dropdownEntry.text = module.NoteTypes["User"][i]["name"];
+			dropdownEntry.value = module.NoteTypes["User"][i]["name"];
+			dropdownEntry.icon = module.NoteTypes["User"][i]["icon"];
+			dropdownEntry.checked = nil;
+			if (dropdownEntry.value == (self.notepanel.usersubsetdropdown.unapprovedValue or self.subset)) then dropdownEntry.checked = true; end
+			L_UIDropDownMenu_AddButton(dropdownEntry);
+		end
+	end);
+	L_UIDropDownMenu_JustifyText(self.notepanel.usersubsetdropdown, "LEFT");
+	
+	L_UIDropDownMenu_Initialize(self.notepanel.herbsubsetdropdown, function()
+		local dropdownEntry = { };
+
+		-- properties common to all
+		dropdownEntry.func = function(self, arg1, arg2, checked)
+			local dropdown = L_UIDROPDOWNMENU_OPEN_MENU or L_UIDROPDOWNMENU_INIT_MENU
+			dropdown.unapprovedValue = self.value;
+			L_UIDropDownMenu_SetText(dropdown,self.value);
+		end
+
+		-- properties unique to each option
+		for i = 1, #module.NoteTypes["Herb"], 1 do
+			dropdownEntry.text = module.NoteTypes["Herb"][i]["name"];
+			dropdownEntry.value = module.NoteTypes["Herb"][i]["name"];
+			dropdownEntry.icon = module.NoteTypes["Herb"][i]["icon"];
+			dropdownEntry.checked = nil;
+			if (dropdownEntry.value == (self.notepanel.herbsubsetdropdown.unapprovedValue or self.subset)) then dropdownEntry.checked = true; end
+			L_UIDropDownMenu_AddButton(dropdownEntry);
+		end
+	end);
+	L_UIDropDownMenu_JustifyText(self.notepanel.herbsubsetdropdown, "LEFT");
+	
+	L_UIDropDownMenu_Initialize(self.notepanel.oresubsetdropdown, function()
+		local dropdownEntry = { };
+
+		-- properties common to all
+		dropdownEntry.func = function(self, arg1, arg2, checked)
+			local dropdown = L_UIDROPDOWNMENU_OPEN_MENU or L_UIDROPDOWNMENU_INIT_MENU
+			dropdown.unapprovedValue = self.value;
+			L_UIDropDownMenu_SetText(dropdown,self.value);
+		end
+
+		-- properties unique to each option
+		for i = 1, #module.NoteTypes["Ore"], 1 do
+			dropdownEntry.text = module.NoteTypes["Ore"][i]["name"];
+			dropdownEntry.value = module.NoteTypes["Ore"][i]["name"];
+			dropdownEntry.icon = module.NoteTypes["Ore"][i]["icon"];
+			dropdownEntry.checked = nil;
+			if (dropdownEntry.value == (self.notepanel.oresubsetdropdown.unapprovedValue or self.subset)) then dropdownEntry.checked = true; end
+			L_UIDropDownMenu_AddButton(dropdownEntry);
+		end
+	end);
+	L_UIDropDownMenu_JustifyText(self.notepanel.oresubsetdropdown, "LEFT");
 end
  
 function CT_MapMod_PinMixin:OnAcquired(...) -- the arguments here are anything that are passed into AcquirePin after the pinTemplate
@@ -368,8 +503,12 @@ function CT_MapMod_PinMixin:OnAcquired(...) -- the arguments here are anything t
 	
 	-- Set basic properties for the pin itself
 	self:SetPosition(self.x, self.y);
-	if (self.set) then
-		self.texture:SetTexture(module.NoteTypes[self.set][self.subset or "DEFAULT"]);
+	if (self.set and self.subset) then
+		for i, val in ipairs(module.NoteTypes[self.set]) do
+			if (val["name"] == self.subset) then
+				self.texture:SetTexture(val["icon"]);
+			end
+		end
 	else
 		self.texture:SetTexture("Interface\\RaidFrame\\UI-RaidFrame-Threat");
 	end
@@ -402,6 +541,24 @@ function CT_MapMod_PinMixin:OnAcquired(...) -- the arguments here are anything t
 	self.notepanel.descriptfield:SetText(self.descript);
 	self.notepanel.xfield:SetText(math.floor(1000*self.x)/10);
 	self.notepanel.yfield:SetText(math.floor(1000*self.y)/10);
+			
+	if (self.set == "User") then
+		self.notepanel.usersubsetdropdown:Show();
+		L_UIDropDownMenu_SetText(self.notepanel.usersubsetdropdown,self.subset);
+		self.notepanel.herbsubsetdropdown:Hide();
+		self.notepanel.oresubsetdropdown:Hide();
+	elseif (self.set == "Herb") then
+		self.notepanel.usersubsetdropdown:Hide();
+		self.notepanel.herbsubsetdropdown:Show();
+		L_UIDropDownMenu_SetText(self.notepanel.herbsubsetdropdown,self.subset);
+		self.notepanel.oresubsetdropdown:Hide();	
+	elseif (self.set == "Ore") then
+		self.notepanel.usersubsetdropdown:Hide();
+		self.notepanel.herbsubsetdropdown:Hide();
+		self.notepanel.oresubsetdropdown:Show();
+		L_UIDropDownMenu_SetText(self.notepanel.oresubsetdropdown,self.subset);
+	end
+	L_UIDropDownMenu_SetText(self.notepanel.setdropdown,self.set);
 	
 end
  
@@ -772,112 +929,6 @@ end
 
 --------------------------------------------
 -- Legacy properties to convert from older note formats
-
-CT_MapMod_OldNames =
-{
-	["User"] =
-	{
-		"Grey Note",
-		"Blue Shield",
-		"Red Dot",
-		"White Circle",
-		"Green Square",
-		"Red Cross",
-		"Herb",
-		"Ore"
-	},
-	["Herb"] = 
-	{
-		"Bruiseweed", -- 1
-		"Arthas Tears", -- 2
-		"Black Lotus", -- 3
-		"Blindweed", -- 4
-		"Briarthorn", -- 5
-		"Dreamfoil", -- 6
-		"Earthroot", -- 7
-		"Fadeleaf", -- 8
-		"Firebloom", -- 9
-		"Ghost Mushroom", -- 10
-		"Golden Sansam", -- 11
-		"Goldthorn", -- 12
-		"Grave Moss", -- 13
-		"Gromsblood", -- 14
-		"Icecap", -- 15
-		"Khadgars Whisker", -- 16
-		"Kingsblood", -- 17
-		"Liferoot", -- 18
-		"Mageroyal", -- 19
-		"Mountain Silversage", -- 20
-		"Peacebloom", -- 21
-		"Plaguebloom", -- 22
-		"Purple Lotus", -- 23
-		"Silverleaf", -- 24
-		"Stranglekelp", -- 25
-		"Sungrass", -- 26
-		"Swiftthistle", -- 27
-		"Wild Steelbloom", -- 28
-		"Wintersbite", -- 29
-		"Dreaming Glory", -- 30
-		"Felweed", -- 31
-		"Flame Cap", -- 32
-		"Mana Thistle", -- 33
-		"Netherbloom", -- 34
-		"Netherdust Bush", -- 35
-		"Nightmare Vine", -- 36
-		"Ragveil", -- 37
-		"Terocone", -- 38
-		"Adders Tongue", -- 39
-		"Frost Lotus", -- 40
-		"Goldclover", -- 41
-		"Icethorn", -- 42
-		"Lichbloom", -- 43
-		"Talandras Rose", -- 44
-		"Tiger Lily", -- 45
-		"Frozen Herb", -- 46
-		-- Cataclysm
-		"Sorrowmoss",  -- 47 Formerly known as Plaugebloom. Same icon.
-		"Dragons Teeth",  -- 48 Formerly known as Wintersbite. New icon in 4.0.6.
-		"Azsharas Veil", -- 49
-		"Cinderbloom", -- 50
-		"Heartblossom", -- 51
-		"Stormvine", -- 52
-		"Twilight Jasmine", -- 53
-		"Whiptail", -- 54
-		-- Mists of Pandaria
-		"Fools Cap", -- 55
-		"Golden Lotus", -- 56
-		"Green Tea Leaf", -- 57
-		"Rain Poppy", -- 58
-		"Sha Herb", -- 59
-		"Silkweed", -- 60
-		"Snow Lily", -- 61
-	},
-	["Ore"] =
-	{
-		"Copper", -- 1
-		"Gold", -- 2
-		"Iron", -- 3
-		"Mithril", -- 4
-		"Silver", -- 5
-		"Thorium", -- 6
-		"Tin", -- 7
-		"Truesilver", -- 8
-		"Adamantite", -- 9
-		"Fel Iron", -- 10
-		"Khorium", -- 11
-		"Cobalt", -- 12
-		"Saronite", -- 13
-		"Titanium", -- 14
-		-- Cataclysm
-		"Elementium", -- 15
-		"Obsidian", -- 16
-		"Pyrite", -- 17
-		-- Mists of Pandaria
-		"Ghost Iron", -- 18
-		"Kyparite", -- 19
-		"Trillium", -- 20
-	}
-}
 
 CT_MapMod_OldZones = {
 	["4:0"]= 1,
