@@ -230,274 +230,6 @@ function CT_MapMod_PinMixin:OnLoad()
 	self:SetWidth(15);
 	self:SetHeight(15);
 	self.texture = self:CreateTexture(nil,"ARTWORK");
-	
-	-- Create the edit box that is associated to this pin	
-	self.notepanel = CreateFrame("FRAME",nil,WorldMapFrame.BorderFrame,"CT_MapMod_NoteTemplate");
-	self.notepanel:SetScale(1.2);
-	self.notepanel.pin = self;
-	local textColor0 = "1.0:1.0:1.0";
-	local textColor1 = "0.9:0.9:0.9";
-	local textColor2 = "0.7:0.7:0.7";
-	local textColor3 = "0.9:0.72:0.0";
-	module:getFrame (
-		{	["button#s:80:25#br:b:-42:16#v:GameMenuButtonTemplate#Okay"] = {
-				["onclick"] = function(self, arg1)
-					local pin = self:GetParent().pin;
-					local set = self:GetParent().setdropdown.unapprovedValue or pin.set;
-					local subset;
-					if (set == "User") then subset = self:GetParent().usersubsetdropdown.unapprovedValue or pin.subset; end
-					if (set == "Herb") then subset = self:GetParent().herbsubsetdropdown.unapprovedValue or pin.subset; end
-					if (set == "Ore") then subset = self:GetParent().oresubsetdropdown.unapprovedValue or pin.subset; end
-					if (not subset) then return; end  -- this could happen if the user didn't pick an icon
-					self:GetParent().setdropdown.unapprovedValue = nil;
-					self:GetParent().usersubsetdropdown.unapprovedValue = nil;
-					self:GetParent().herbsubsetdropdown.unapprovedValue = nil;
-					self:GetParent().oresubsetdropdown.unapprovedValue = nil;
-					
-					CT_MapMod_Notes[pin.mapid][pin.i] = {
-						["x"] = pin.x,
-						["y"] = pin.y,
-						["name"] = self:GetParent().namefield:GetText() or pin.name;
-						["set"] = set;
-						["subset"] = subset;
-						["descript"] = self:GetParent().descriptfield:GetText() or pin.descript;
-					}
-					self:GetParent():Hide();
-					module.PinHasFocus = nil;
-					WorldMapFrame:RefreshAllDataProviders();
-				end,
-			},
-			["button#s:80:25#b:b:0:16#v:GameMenuButtonTemplate#Cancel"] = {
-				["onclick"] = function(self, arg1)
-					local pin = self:GetParent().pin;
-					self:GetParent():Hide();
-					module.PinHasFocus = nil;
-					self:GetParent().setdropdown.unapprovedValue = nil;
-					self:GetParent().usersubsetdropdown.unapprovedValue = nil;
-					self:GetParent().herbsubsetdropdown.unapprovedValue = nil;
-					self:GetParent().oresubsetdropdown.unapprovedValue = nil;
-					L_UIDropDownMenu_SetText(pin.notepanel.setdropdown,pin.set);
-					if (pin.set and pin.subset) then
-						for i, val in ipairs(module.NoteTypes[pin.set]) do
-							if (val["name"] == pin.subset) then
-								pin.texture:SetTexture(val["icon"]);
-							end
-						end
-					else
-						pin.texture:SetTexture("Interface\\RaidFrame\\UI-RaidFrame-Threat");
-					end
-					if (pin.set == "User") then
-						pin:SetHeight(25);
-						pin:SetWidth(25);
-					else
-						pin:SetHeight(15);
-						pin:SetWidth(15);
-					end
-					if (pin.set == "User") then
-						pin.notepanel.usersubsetdropdown:Show();
-						L_UIDropDownMenu_SetText(pin.notepanel.usersubsetdropdown,pin.subset);
-						pin.notepanel.herbsubsetdropdown:Hide();
-						pin.notepanel.oresubsetdropdown:Hide();
-					elseif (pin.set == "Herb") then
-						pin.notepanel.usersubsetdropdown:Hide();
-						pin.notepanel.herbsubsetdropdown:Show();
-						L_UIDropDownMenu_SetText(pin.notepanel.herbsubsetdropdown,pin.subset);
-						pin.notepanel.oresubsetdropdown:Hide();	
-					elseif (pin.set == "Ore") then
-						pin.notepanel.usersubsetdropdown:Hide();
-						pin.notepanel.herbsubsetdropdown:Hide();
-						pin.notepanel.oresubsetdropdown:Show();
-						L_UIDropDownMenu_SetText(pin.notepanel.oresubsetdropdown,pin.subset);
-					end
-				end,
-			},
-			["button#s:80:25#bl:b:42:16#v:GameMenuButtonTemplate#Delete"] = {
-				["onclick"] = function(self, arg1)
-					local pin = self:GetParent().pin;
-					tremove(CT_MapMod_Notes[pin.mapid],pin.i);
-					self:GetParent():Hide();
-					pin:Hide();
-					module.PinHasFocus = nil;
-				end,
-			},
-			["font#l:tr:-100:-20#x#" .. textColor2 .. ":l"] = { },
-			["editbox#l:tr:-85:-20#s:30:18#v:CT_MapMod_EditBoxTemplate"] = { 
-				["onload"] = function(self)
-					self:GetParent().xfield = self;
-					self:SetAutoFocus(false);
-					self:SetBackdropColor(1,1,1,0);
-					self:HookScript("OnEditFocusGained", function(self)
-						self:ClearFocus();
-					end);
-				end,
-			},
-			["font#l:tr:-55:-20#y#" .. textColor2 .. ":l"] = { },
-			["editbox#l:tr:-40:-20#s:30:18#v:CT_MapMod_EditBoxTemplate"] = { 
-				["onload"] = function(self)
-					self:GetParent().yfield = self;
-					self:SetAutoFocus(false);
-					self:SetBackdropColor(1,1,1,0);
-					self:HookScript("OnEditFocusGained", function(self)
-						self:ClearFocus();
-					end);
-				end,
-			},
-			["font#l:tl:15:-30#Name#" .. textColor2 .. ":l"] = { },
-			["editbox#l:tl:55:-30#s:100:18#v:CT_MapMod_EditBoxTemplate"] = { 
-				["onload"] = function(self)
-					self:GetParent().namefield = self;
-					self:SetAutoFocus(false);
-					self:HookScript("OnEscapePressed", function(self)
-						self:ClearFocus();
-					end);
-					self:HookScript("OnEnterPressed", function(self)
-						self:ClearFocus();
-					end);
-				end,
-			},	
-			["font#l:tl:15:-60#Type#" .. textColor2 .. ":l"] = { },
-			["font#l:t:0:-60#Icon#" .. textColor2 .. ":l"] = { },
-			["font#l:tl:15:-90#Description#" .. textColor2 .. ":l"] = { },
-			["editbox#l:tl:20:-110#s:290:18#v:CT_MapMod_EditBoxTemplate"] = { 
-				["onload"] = function(self)
-					self:GetParent().descriptfield = self;
-					self:SetAutoFocus(false);
-					self:HookScript("OnEscapePressed", function(self)
-						self:ClearFocus();
-					end);
-					self:HookScript("OnEnterPressed", function(self)
-						self:ClearFocus();
-					end);
-				end,
-			},
-		},
-		self.notepanel
-	);
-	self.notepanel.setdropdown = CreateFrame("Frame", nil, self.notepanel, "L_UIDropDownMenuTemplate");
-	self.notepanel.usersubsetdropdown = CreateFrame("Frame", nil, self.notepanel, "L_UIDropDownMenuTemplate");
-	self.notepanel.herbsubsetdropdown = CreateFrame("Frame", nil, self.notepanel, "L_UIDropDownMenuTemplate");
-	self.notepanel.oresubsetdropdown = CreateFrame("Frame", nil, self.notepanel, "L_UIDropDownMenuTemplate");
-	
-	self.notepanel.setdropdown:SetPoint("LEFT",self.notepanel,"TOPLEFT",35,-60);
-	L_UIDropDownMenu_SetWidth(self.notepanel.setdropdown, 90);
-
-	self.notepanel.usersubsetdropdown:SetPoint("LEFT",self.notepanel,"TOP",35,-60);
-	L_UIDropDownMenu_SetWidth(self.notepanel.usersubsetdropdown, 90);
-
-	self.notepanel.herbsubsetdropdown:SetPoint("LEFT",self.notepanel,"TOP",35,-60);
-	L_UIDropDownMenu_SetWidth(self.notepanel.herbsubsetdropdown, 90);
-
-	self.notepanel.oresubsetdropdown:SetPoint("LEFT",self.notepanel,"TOP",35,-60);
-	L_UIDropDownMenu_SetWidth(self.notepanel.oresubsetdropdown, 90);
-
-	L_UIDropDownMenu_Initialize(self.notepanel.setdropdown, function()
-		local dropdownEntry = { };
-
-		-- properties common to all
-		dropdownEntry.func = function(self, arg1, arg2, checked)
-			local dropdown = L_UIDROPDOWNMENU_OPEN_MENU or L_UIDROPDOWNMENU_INIT_MENU
-			arg1:Show();
-			for i, val in ipairs(arg2) do
-				val:Hide();
-			end
-			dropdown.unapprovedValue = self.value;
-			L_UIDropDownMenu_SetText(dropdown,self.value);
-		end
-
-		-- user
-		dropdownEntry.value = "User";
-		dropdownEntry.text = "User-Selected Icon";
-		dropdownEntry.checked = nil;
-		if ((self.notepanel.setdropdown.unapprovedValue or self.set) == "User") then dropdownEntry.checked = true; end
-		dropdownEntry.arg1 = self.notepanel.usersubsetdropdown;
-		dropdownEntry.arg2 = { self.notepanel.herbsubsetdropdown, self.notepanel.oresubsetdropdown }
-		L_UIDropDownMenu_AddButton(dropdownEntry);
-		
-		-- herb
-		dropdownEntry.value = "Herb";
-		dropdownEntry.text = "Herbablism Node";
-		dropdownEntry.checked = nil;
-		if ((self.notepanel.setdropdown.unapprovedValue or self.set) == "Herb") then dropdownEntry.checked = true; end
-		dropdownEntry.arg1 = self.notepanel.herbsubsetdropdown;
-		dropdownEntry.arg2 = { self.notepanel.usersubsetdropdown, self.notepanel.oresubsetdropdown }
-		L_UIDropDownMenu_AddButton(dropdownEntry);
-		
-		-- ore
-		dropdownEntry.checked = nil;
-		if ((self.notepanel.setdropdown.unapprovedValue or self.set) == "Ore") then dropdownEntry.checked = true; end
-		dropdownEntry.value = "Ore";
-		dropdownEntry.text = "Mining Ore Node";
-		dropdownEntry.arg1 = self.notepanel.oresubsetdropdown;
-		dropdownEntry.arg2 = { self.notepanel.usersubsetdropdown, self.notepanel.herbsubsetdropdown }
-		L_UIDropDownMenu_AddButton(dropdownEntry);
-	end);
-	L_UIDropDownMenu_JustifyText(self.notepanel.setdropdown, "LEFT");
-
-	L_UIDropDownMenu_Initialize(self.notepanel.usersubsetdropdown, function()
-		local dropdownEntry = { };
-
-		-- properties common to all
-		dropdownEntry.func = function(self, arg1, arg2, checked)
-			local dropdown = L_UIDROPDOWNMENU_OPEN_MENU or L_UIDROPDOWNMENU_INIT_MENU
-			dropdown.unapprovedValue = self.value;
-			L_UIDropDownMenu_SetText(dropdown,self.value);
-		end
-
-		-- properties unique to each option
-		for i = 1, #module.NoteTypes["User"], 1 do
-			dropdownEntry.text = module.NoteTypes["User"][i]["name"];
-			dropdownEntry.value = module.NoteTypes["User"][i]["name"];
-			dropdownEntry.icon = module.NoteTypes["User"][i]["icon"];
-			dropdownEntry.checked = nil;
-			if (dropdownEntry.value == (self.notepanel.usersubsetdropdown.unapprovedValue or self.subset)) then dropdownEntry.checked = true; end
-			L_UIDropDownMenu_AddButton(dropdownEntry);
-		end
-	end);
-	L_UIDropDownMenu_JustifyText(self.notepanel.usersubsetdropdown, "LEFT");
-	
-	L_UIDropDownMenu_Initialize(self.notepanel.herbsubsetdropdown, function()
-		local dropdownEntry = { };
-
-		-- properties common to all
-		dropdownEntry.func = function(self, arg1, arg2, checked)
-			local dropdown = L_UIDROPDOWNMENU_OPEN_MENU or L_UIDROPDOWNMENU_INIT_MENU
-			dropdown.unapprovedValue = self.value;
-			L_UIDropDownMenu_SetText(dropdown,self.value);
-		end
-
-		-- properties unique to each option
-		for i = 1, #module.NoteTypes["Herb"], 1 do
-			dropdownEntry.text = module.NoteTypes["Herb"][i]["name"];
-			dropdownEntry.value = module.NoteTypes["Herb"][i]["name"];
-			dropdownEntry.icon = module.NoteTypes["Herb"][i]["icon"];
-			dropdownEntry.checked = nil;
-			if (dropdownEntry.value == (self.notepanel.herbsubsetdropdown.unapprovedValue or self.subset)) then dropdownEntry.checked = true; end
-			L_UIDropDownMenu_AddButton(dropdownEntry);
-		end
-	end);
-	L_UIDropDownMenu_JustifyText(self.notepanel.herbsubsetdropdown, "LEFT");
-	
-	L_UIDropDownMenu_Initialize(self.notepanel.oresubsetdropdown, function()
-		local dropdownEntry = { };
-
-		-- properties common to all
-		dropdownEntry.func = function(self, arg1, arg2, checked)
-			local dropdown = L_UIDROPDOWNMENU_OPEN_MENU or L_UIDROPDOWNMENU_INIT_MENU
-			dropdown.unapprovedValue = self.value;
-			L_UIDropDownMenu_SetText(dropdown,self.value);
-		end
-
-		-- properties unique to each option
-		for i = 1, #module.NoteTypes["Ore"], 1 do
-			dropdownEntry.text = module.NoteTypes["Ore"][i]["name"];
-			dropdownEntry.value = module.NoteTypes["Ore"][i]["name"];
-			dropdownEntry.icon = module.NoteTypes["Ore"][i]["icon"];
-			dropdownEntry.checked = nil;
-			if (dropdownEntry.value == (self.notepanel.oresubsetdropdown.unapprovedValue or self.subset)) then dropdownEntry.checked = true; end
-			L_UIDropDownMenu_AddButton(dropdownEntry);
-		end
-	end);
-	L_UIDropDownMenu_JustifyText(self.notepanel.oresubsetdropdown, "LEFT");
 end
  
 function CT_MapMod_PinMixin:OnAcquired(...) -- the arguments here are anything that are passed into AcquirePin after the pinTemplate
@@ -516,53 +248,67 @@ function CT_MapMod_PinMixin:OnAcquired(...) -- the arguments here are anything t
 		self.texture:SetTexture("Interface\\RaidFrame\\UI-RaidFrame-Threat");
 	end
 	if (self.set == "User") then
-		self:SetHeight(25);
-		self:SetWidth(25);
+		self:SetHeight(module:getOption("CT_MapMod_UserNoteSize") or 24);
+		self:SetWidth(module:getOption("CT_MapMod_UserNoteSize") or 24);
+	elseif (self.set == "Herb") then
+		self:SetHeight(module:getOption("CT_MapMod_HerbNoteSize") or 12);
+		self:SetWidth(module:getOption("CT_MapMod_HerbNoteSize") or 12);
 	else
-		self:SetHeight(15);
-		self:SetWidth(15);
+		self:SetHeight(module:getOption("CT_MapMod_OreNoteSize") or 12);
+		self:SetWidth(module:getOption("CT_MapMod_OreNoteSize") or 12);
 	end
 	self.texture:SetAllPoints();
 	self:Show();
 	
-	-- Set properties for the edit box (though its still hidden and not in use)
-	self.notepanel:ClearAllPoints();
-	if (self.x <= 0.5) then	
-		if (self.y <= 0.5) then
-			self.notepanel:SetPoint("TOPLEFT",self,"BOTTOMRIGHT",30,0);
+	-- update properties for the notepanel, if it exists.  If it doens't, this will be done onclick
+	if (self.notepanel) then
+		self.notepanel:ClearAllPoints();
+		if (self.x <= 0.5) then	
+			if (self.y <= 0.5) then
+				self.notepanel:SetPoint("TOPLEFT",self,"BOTTOMRIGHT",30,0);
+			else
+				self.notepanel:SetPoint("BOTTOMLEFT",self,"TOPRIGHT",30,0);
+			end
 		else
-			self.notepanel:SetPoint("BOTTOMLEFT",self,"TOPRIGHT",30,0);
+			if (self.y <= 0.5) then
+				self.notepanel:SetPoint("TOPRIGHT",self,"BOTTOMLEFT",30,0);
+			else
+				self.notepanel:SetPoint("BOTTOMRIGHT",self,"TOPLEFT",30,0);
+			end	
 		end
-	else
-		if (self.y <= 0.5) then
-			self.notepanel:SetPoint("TOPRIGHT",self,"BOTTOMLEFT",30,0);
-		else
-			self.notepanel:SetPoint("BOTTOMRIGHT",self,"TOPLEFT",30,0);
-		end	
+		self.notepanel.namefield:SetText(self.name);
+		self.notepanel.descriptfield:SetText(self.descript);
+		self.notepanel.xfield:SetText(math.floor(1000*self.x)/10);
+		self.notepanel.yfield:SetText(math.floor(1000*self.y)/10);
+
+		if (self.set == "User") then
+			self.notepanel.usersubsetdropdown:Show();
+			self.notepanel.herbsubsetdropdown:Hide();
+			self.notepanel.oresubsetdropdown:Hide();
+			L_UIDropDownMenu_SetText(self.notepanel.setdropdown,"User");
+			L_UIDropDownMenu_SetText(self.notepanel.usersubsetdropdown,self.subset);
+			L_UIDropDownMenu_SetText(self.notepanel.herbsubsetdropdown,module.NoteTypes["Herb"][1]["name"]);
+			L_UIDropDownMenu_SetText(self.notepanel.oresubsetdropdown,module.NoteTypes["Ore"][1]["name"]);
+		elseif (self.set == "Herb") then
+			self.notepanel.usersubsetdropdown:Hide();
+			self.notepanel.herbsubsetdropdown:Show();
+			self.notepanel.oresubsetdropdown:Hide();
+			L_UIDropDownMenu_SetText(self.notepanel.setdropdown,"Herb");
+			L_UIDropDownMenu_SetText(self.notepanel.usersubsetdropdown,module.NoteTypes["User"][1]["name"]);
+			L_UIDropDownMenu_SetText(self.notepanel.herbsubsetdropdown,self.subset);
+			L_UIDropDownMenu_SetText(self.notepanel.oresubsetdropdown,module.NoteTypes["Ore"][1]["name"]);
+		elseif (self.set == "Ore") then
+			self.notepanel.usersubsetdropdown:Hide();
+			self.notepanel.herbsubsetdropdown:Hide();
+			self.notepanel.oresubsetdropdown:Show();
+			L_UIDropDownMenu_SetText(self.notepanel.setdropdown,"Ore");
+			L_UIDropDownMenu_SetText(self.notepanel.usersubsetdropdown,module.NoteTypes["User"][1]["name"]);
+			L_UIDropDownMenu_SetText(self.notepanel.herbsubsetdropdown,module.NoteTypes["Herb"][1]["name"]);
+			L_UIDropDownMenu_SetText(self.notepanel.oresubsetdropdown,self.subset);
+
+		end
+		L_UIDropDownMenu_SetText(self.notepanel.setdropdown,self.set);
 	end
-	self.notepanel.namefield:SetText(self.name);
-	self.notepanel.descriptfield:SetText(self.descript);
-	self.notepanel.xfield:SetText(math.floor(1000*self.x)/10);
-	self.notepanel.yfield:SetText(math.floor(1000*self.y)/10);
-			
-	if (self.set == "User") then
-		self.notepanel.usersubsetdropdown:Show();
-		L_UIDropDownMenu_SetText(self.notepanel.usersubsetdropdown,self.subset);
-		self.notepanel.herbsubsetdropdown:Hide();
-		self.notepanel.oresubsetdropdown:Hide();
-	elseif (self.set == "Herb") then
-		self.notepanel.usersubsetdropdown:Hide();
-		self.notepanel.herbsubsetdropdown:Show();
-		L_UIDropDownMenu_SetText(self.notepanel.herbsubsetdropdown,self.subset);
-		self.notepanel.oresubsetdropdown:Hide();	
-	elseif (self.set == "Ore") then
-		self.notepanel.usersubsetdropdown:Hide();
-		self.notepanel.herbsubsetdropdown:Hide();
-		self.notepanel.oresubsetdropdown:Show();
-		L_UIDropDownMenu_SetText(self.notepanel.oresubsetdropdown,self.subset);
-	end
-	L_UIDropDownMenu_SetText(self.notepanel.setdropdown,self.set);
-	
 end
  
 function CT_MapMod_PinMixin:OnReleased()
@@ -578,11 +324,367 @@ end
  
 function CT_MapMod_PinMixin:OnClick(button)
 	-- Override in your mixin, called when this pin is clicked
+
+	-- create the notepanel if it hasn't been done already.   This is deferred from onload
+	if (not self.notepanel) then
+	
+		-- Create the note panel that is associated to this pin	
+		self.notepanel = CreateFrame("FRAME",nil,WorldMapFrame.BorderFrame,"CT_MapMod_NoteTemplate");
+		self.notepanel:SetScale(1.2);
+		self.notepanel.pin = self;
+		local textColor0 = "1.0:1.0:1.0";
+		local textColor1 = "0.9:0.9:0.9";
+		local textColor2 = "0.7:0.7:0.7";
+		local textColor3 = "0.9:0.72:0.0";
+		module:getFrame (
+			{	["button#s:80:25#br:b:-42:16#v:GameMenuButtonTemplate#Okay"] = {
+					["onclick"] = function(self, arg1)
+						local pin = self:GetParent().pin;
+						local set = L_UIDropDownMenu_GetText(self:GetParent().setdropdown);
+						local subset;
+						if (set == "User") then subset = L_UIDropDownMenu_GetText(self:GetParent().usersubsetdropdown); end
+						if (set == "Herb") then subset = L_UIDropDownMenu_GetText(self:GetParent().herbsubsetdropdown); end
+						if (set == "Ore") then subset = L_UIDropDownMenu_GetText(self:GetParent().oresubsetdropdown); end
+						if (not subset) then return; end  -- this could happen if the user didn't pick an icon
+						
+						CT_MapMod_Notes[pin.mapid][pin.i] = {
+							["x"] = pin.x,
+							["y"] = pin.y,
+							["name"] = self:GetParent().namefield:GetText() or pin.name;
+							["set"] = set;
+							["subset"] = subset;
+							["descript"] = self:GetParent().descriptfield:GetText() or pin.descript;
+						}
+						self:GetParent():Hide();
+						module.PinHasFocus = nil;
+						-- calling onAcquired will update tooltips and anything else that wasn't already changed
+						pin:OnAcquired(pin.mapid, pin.i, pin.x, pin.y, self:GetParent().namefield:GetText() or pin.name, self:GetParent().descriptfield:GetText() or pin.descript, set, subset);
+					end,
+				},
+				["button#s:80:25#b:b:0:16#v:GameMenuButtonTemplate#Cancel"] = {
+					["onclick"] = function(self, arg1)
+						local pin = self:GetParent().pin;
+						self:GetParent():Hide();
+						module.PinHasFocus = nil;
+						L_UIDropDownMenu_SetText(pin.notepanel.setdropdown,pin.set);
+						-- calling OnAcquired will reset everything user-visible to their original conditions
+						pin:OnAcquired(pin.mapid, pin.i, pin.x, pin.y, pin.name, pin.descript, pin.set, pin.subset);
+					end,
+				},
+				["button#s:80:25#bl:b:42:16#v:GameMenuButtonTemplate#Delete"] = {
+					["onclick"] = function(self, arg1)
+						local pin = self:GetParent().pin;
+						tremove(CT_MapMod_Notes[pin.mapid],pin.i);
+						self:GetParent():Hide();
+						pin:Hide();
+						module.PinHasFocus = nil;
+					end,
+				},
+				["font#l:tr:-100:-20#x#" .. textColor2 .. ":l"] = { },
+				["editbox#l:tr:-85:-20#s:30:18#v:CT_MapMod_EditBoxTemplate"] = { 
+					["onload"] = function(self)
+						self:GetParent().xfield = self;
+						self:SetAutoFocus(false);
+						self:SetBackdropColor(1,1,1,0);
+						self:HookScript("OnEditFocusGained", function(self)
+							self:ClearFocus();
+						end);
+					end,
+				},
+				["font#l:tr:-55:-20#y#" .. textColor2 .. ":l"] = { },
+				["editbox#l:tr:-40:-20#s:30:18#v:CT_MapMod_EditBoxTemplate"] = { 
+					["onload"] = function(self)
+						self:GetParent().yfield = self;
+						self:SetAutoFocus(false);
+						self:SetBackdropColor(1,1,1,0);
+						self:HookScript("OnEditFocusGained", function(self)
+							self:ClearFocus();
+						end);
+					end,
+				},
+				["font#l:tl:15:-30#Name#" .. textColor2 .. ":l"] = { },
+				["editbox#l:tl:55:-30#s:100:18#v:CT_MapMod_EditBoxTemplate"] = { 
+					["onload"] = function(self)
+						self:GetParent().namefield = self;
+						self:SetAutoFocus(false);
+						self:HookScript("OnEscapePressed", function(self)
+							self:ClearFocus();
+						end);
+						self:HookScript("OnEnterPressed", function(self)
+							self:ClearFocus();
+						end);
+					end,
+				},	
+				["font#l:tl:15:-60#Type#" .. textColor2 .. ":l"] = { },
+				["font#l:t:0:-60#Icon#" .. textColor2 .. ":l"] = { },
+				["font#l:tl:15:-90#Description#" .. textColor2 .. ":l"] = { },
+				["editbox#l:tl:20:-110#s:290:18#v:CT_MapMod_EditBoxTemplate"] = { 
+					["onload"] = function(self)
+						self:GetParent().descriptfield = self;
+						self:SetAutoFocus(false);
+						self:HookScript("OnEscapePressed", function(self)
+							self:ClearFocus();
+						end);
+						self:HookScript("OnEnterPressed", function(self)
+							self:ClearFocus();
+						end);
+					end,
+				},
+			},
+			self.notepanel
+		);
+		self.notepanel.setdropdown = CreateFrame("Frame", nil, self.notepanel, "L_UIDropDownMenuTemplate");
+		self.notepanel.usersubsetdropdown = CreateFrame("Frame", nil, self.notepanel, "L_UIDropDownMenuTemplate");
+		self.notepanel.herbsubsetdropdown = CreateFrame("Frame", nil, self.notepanel, "L_UIDropDownMenuTemplate");
+		self.notepanel.oresubsetdropdown = CreateFrame("Frame", nil, self.notepanel, "L_UIDropDownMenuTemplate");
+		
+		self.notepanel.setdropdown:SetPoint("LEFT",self.notepanel,"TOPLEFT",35,-60);
+		L_UIDropDownMenu_SetWidth(self.notepanel.setdropdown, 90);
+	
+		self.notepanel.usersubsetdropdown:SetPoint("LEFT",self.notepanel,"TOP",35,-60);
+		L_UIDropDownMenu_SetWidth(self.notepanel.usersubsetdropdown, 90);
+	
+		self.notepanel.herbsubsetdropdown:SetPoint("LEFT",self.notepanel,"TOP",35,-60);
+		L_UIDropDownMenu_SetWidth(self.notepanel.herbsubsetdropdown, 90);
+	
+		self.notepanel.oresubsetdropdown:SetPoint("LEFT",self.notepanel,"TOP",35,-60);
+		L_UIDropDownMenu_SetWidth(self.notepanel.oresubsetdropdown, 90);
+	
+		L_UIDropDownMenu_Initialize(self.notepanel.setdropdown, function()
+			local dropdownEntry = { };
+	
+			-- properties common to all
+			dropdownEntry.func = function(self)
+				local dropdown = L_UIDROPDOWNMENU_OPEN_MENU or L_UIDROPDOWNMENU_INIT_MENU;
+				local notepanel = dropdown:GetParent();
+				local pin = notepanel.pin;
+				dropdown.unapprovedValue = self.value;
+				if (self.value == "User") then
+					notepanel.usersubsetdropdown:Show();
+					notepanel.herbsubsetdropdown:Hide();
+					notepanel.oresubsetdropdown:Hide();
+					pin:SetHeight(module:getOption("CT_MapMod_UserNoteSize") or 24);
+					pin:SetWidth(module:getOption("CT_MapMod_UserNoteSize") or 24);
+					for i, val in ipairs(module.NoteTypes["User"]) do
+						if (val["name"] == L_UIDropDownMenu_GetText(notepanel.usersubsetdropdown)) then
+							pin.texture:SetTexture(val["icon"]);
+						end
+					end
+				elseif (self.value == "Herb") then
+					notepanel.usersubsetdropdown:Hide();
+					notepanel.herbsubsetdropdown:Show();
+					notepanel.oresubsetdropdown:Hide();
+					pin:SetHeight(module:getOption("CT_MapMod_HerbNoteSize") or 12);
+					pin:SetWidth(module:getOption("CT_MapMod_HerbNoteSize") or 12);
+					for i, val in ipairs(module.NoteTypes["Herb"]) do
+						if (val["name"] == L_UIDropDownMenu_GetText(notepanel.herbsubsetdropdown)) then
+							pin.texture:SetTexture(val["icon"]);
+						end
+					end
+				else
+					notepanel.usersubsetdropdown:Hide();
+					notepanel.herbsubsetdropdown:Hide();
+					notepanel.oresubsetdropdown:Show();
+					pin:SetHeight(module:getOption("CT_MapMod_OreNoteSize") or 12);
+					pin:SetWidth(module:getOption("CT_MapMod_OreNoteSize") or 12);
+					for i, val in ipairs(module.NoteTypes["Ore"]) do
+						if (val["name"] == L_UIDropDownMenu_GetText(notepanel.oresubsetdropdown)) then
+							pin.texture:SetTexture(val["icon"]);
+						end
+					end
+				end
+				L_UIDropDownMenu_SetText(dropdown,self.value);
+			end
+	
+			-- user
+			dropdownEntry.value = "User";
+			dropdownEntry.text = "User-Selected Icon";
+			dropdownEntry.checked = nil;
+			if ((self.notepanel.setdropdown.unapprovedValue or self.set) == "User") then dropdownEntry.checked = true; end
+			L_UIDropDownMenu_AddButton(dropdownEntry);
+			
+			-- herb
+			dropdownEntry.value = "Herb";
+			dropdownEntry.text = "Herbablism Node";
+			dropdownEntry.checked = nil;
+			if ((self.notepanel.setdropdown.unapprovedValue or self.set) == "Herb") then dropdownEntry.checked = true; end
+			L_UIDropDownMenu_AddButton(dropdownEntry);
+			
+			-- ore
+			dropdownEntry.checked = nil;
+			if ((self.notepanel.setdropdown.unapprovedValue or self.set) == "Ore") then dropdownEntry.checked = true; end
+			dropdownEntry.value = "Ore";
+			dropdownEntry.text = "Mining Ore Node";
+			L_UIDropDownMenu_AddButton(dropdownEntry);
+		end);
+		L_UIDropDownMenu_JustifyText(self.notepanel.setdropdown, "LEFT");
+	
+		L_UIDropDownMenu_Initialize(self.notepanel.usersubsetdropdown, function()
+			local dropdownEntry = { };
+	
+			-- properties common to all
+			dropdownEntry.func = function(self, arg1, arg2, checked)
+				local dropdown = L_UIDROPDOWNMENU_OPEN_MENU or L_UIDROPDOWNMENU_INIT_MENU
+				dropdown.unapprovedValue = self.value;
+				L_UIDropDownMenu_SetText(dropdown,self.value);
+				local pin = dropdown:GetParent().pin;
+				pin.texture:SetHeight(module:getOption("CT_MapMod_UserNoteSize") or 24);
+				pin.texture:SetWidth(module:getOption("CT_MapMod_UserNoteSize") or 24);
+				for i, val in ipairs(module.NoteTypes["User"]) do
+					if (val["name"] == self.value) then
+						pin.texture:SetTexture(val["icon"]);
+					end
+				end
+			end
+	
+			-- properties unique to each option
+			for i = 1, #module.NoteTypes["User"], 1 do
+				dropdownEntry.text = module.NoteTypes["User"][i]["name"];
+				dropdownEntry.value = module.NoteTypes["User"][i]["name"];
+				dropdownEntry.icon = module.NoteTypes["User"][i]["icon"];
+				if (dropdownEntry.value == (self.notepanel.usersubsetdropdown.unapprovedValue or self.subset)) then
+					dropdownEntry.checked = true;
+				elseif (not self.notepanel.usersubsetdropdown.unapprovedValue and self.set ~= "User" and i == 1) then
+					dropdownEntry.checked = true;
+				else
+					dropdownEntry.checked = false;
+				end
+				L_UIDropDownMenu_AddButton(dropdownEntry);
+			end
+		end);
+		L_UIDropDownMenu_JustifyText(self.notepanel.usersubsetdropdown, "LEFT");
+		
+		L_UIDropDownMenu_Initialize(self.notepanel.herbsubsetdropdown, function()
+			local dropdownEntry = { };
+	
+			-- properties common to all
+			dropdownEntry.func = function(self, arg1, arg2, checked)
+				local dropdown = L_UIDROPDOWNMENU_OPEN_MENU or L_UIDROPDOWNMENU_INIT_MENU
+				dropdown.unapprovedValue = self.value;
+				L_UIDropDownMenu_SetText(dropdown,self.value);
+				local pin = dropdown:GetParent().pin;
+				pin.texture:SetHeight(module:getOption("CT_MapMod_HerbNoteSize") or 12);
+				pin.texture:SetWidth(module:getOption("CT_MapMod_HerbNoteSize") or 12);
+				for i, val in ipairs(module.NoteTypes["Herb"]) do
+					if (val["name"] == self.value) then
+						pin.texture:SetTexture(val["icon"]);
+					end
+				end
+			end
+	
+			-- properties unique to each option
+			for i = 1, #module.NoteTypes["Herb"], 1 do
+				dropdownEntry.text = module.NoteTypes["Herb"][i]["name"];
+				dropdownEntry.value = module.NoteTypes["Herb"][i]["name"];
+				dropdownEntry.icon = module.NoteTypes["Herb"][i]["icon"];
+				if (dropdownEntry.value == (self.notepanel.herbsubsetdropdown.unapprovedValue or self.subset)) then
+					dropdownEntry.checked = true;
+				elseif (not self.notepanel.herbsubsetdropdown.unapprovedValue and self.set ~= "Herb" and i == 1) then
+					dropdownEntry.checked = true;
+				else
+					dropdownEntry.checked = false;
+				end
+				L_UIDropDownMenu_AddButton(dropdownEntry);
+			end
+		end);
+		L_UIDropDownMenu_JustifyText(self.notepanel.herbsubsetdropdown, "LEFT");
+		
+		L_UIDropDownMenu_Initialize(self.notepanel.oresubsetdropdown, function()
+			local dropdownEntry = { };
+	
+			-- properties common to all
+			dropdownEntry.func = function(self, arg1, arg2, checked)
+				local dropdown = L_UIDROPDOWNMENU_OPEN_MENU or L_UIDROPDOWNMENU_INIT_MENU
+				dropdown.unapprovedValue = self.value;
+				L_UIDropDownMenu_SetText(dropdown,self.value);
+				local pin = dropdown:GetParent().pin;
+				pin.texture:SetHeight(module:getOption("CT_MapMod_OreNoteSize") or 12);
+				pin.texture:SetWidth(module:getOption("CT_MapMod_OreNoteSize") or 12);
+				for i, val in ipairs(module.NoteTypes["Ore"]) do
+					if (val["name"] == self.value) then
+						pin.texture:SetTexture(val["icon"]);
+					end
+				end
+			end
+	
+			-- properties unique to each option
+			for i = 1, #module.NoteTypes["Ore"], 1 do
+				dropdownEntry.text = module.NoteTypes["Ore"][i]["name"];
+				dropdownEntry.value = module.NoteTypes["Ore"][i]["name"];
+				dropdownEntry.icon = module.NoteTypes["Ore"][i]["icon"];
+				if (dropdownEntry.value == (self.notepanel.oresubsetdropdown.unapprovedValue or self.subset)) then
+					dropdownEntry.checked = true;
+				elseif (not self.notepanel.oresubsetdropdown.unapprovedValue and self.set ~= "Ore" and i == 1) then
+					dropdownEntry.checked = true;
+				else
+					dropdownEntry.checked = false;
+				end
+				L_UIDropDownMenu_AddButton(dropdownEntry);
+			end
+		end);
+		L_UIDropDownMenu_JustifyText(self.notepanel.oresubsetdropdown, "LEFT");
+		
+
+		--this is a copy/paste of the pin:OnAcquired script now that the notepanel finally exists
+		self.notepanel:ClearAllPoints();
+		if (self.x <= 0.5) then	
+			if (self.y <= 0.5) then
+				self.notepanel:SetPoint("TOPLEFT",self,"BOTTOMRIGHT",30,0);
+			else
+				self.notepanel:SetPoint("BOTTOMLEFT",self,"TOPRIGHT",30,0);
+			end
+		else
+			if (self.y <= 0.5) then
+				self.notepanel:SetPoint("TOPRIGHT",self,"BOTTOMLEFT",30,0);
+			else
+				self.notepanel:SetPoint("BOTTOMRIGHT",self,"TOPLEFT",30,0);
+			end	
+		end
+		self.notepanel.namefield:SetText(self.name);
+		self.notepanel.descriptfield:SetText(self.descript);
+		self.notepanel.xfield:SetText(math.floor(1000*self.x)/10);
+		self.notepanel.yfield:SetText(math.floor(1000*self.y)/10);
+
+		if (self.set == "User") then
+			self.notepanel.usersubsetdropdown:Show();
+			self.notepanel.herbsubsetdropdown:Hide();
+			self.notepanel.oresubsetdropdown:Hide();
+			L_UIDropDownMenu_SetText(self.notepanel.setdropdown,"User");
+			L_UIDropDownMenu_SetText(self.notepanel.usersubsetdropdown,self.subset);
+			L_UIDropDownMenu_SetText(self.notepanel.herbsubsetdropdown,module.NoteTypes["Herb"][1]["name"]);
+			L_UIDropDownMenu_SetText(self.notepanel.oresubsetdropdown,module.NoteTypes["Ore"][1]["name"]);
+		elseif (self.set == "Herb") then
+			self.notepanel.usersubsetdropdown:Hide();
+			self.notepanel.herbsubsetdropdown:Show();
+			self.notepanel.oresubsetdropdown:Hide();
+			L_UIDropDownMenu_SetText(self.notepanel.setdropdown,"Herb");
+			L_UIDropDownMenu_SetText(self.notepanel.usersubsetdropdown,module.NoteTypes["User"][1]["name"]);
+			L_UIDropDownMenu_SetText(self.notepanel.herbsubsetdropdown,self.subset);
+			L_UIDropDownMenu_SetText(self.notepanel.oresubsetdropdown,module.NoteTypes["Ore"][1]["name"]);
+		elseif (self.set == "Ore") then
+			self.notepanel.usersubsetdropdown:Hide();
+			self.notepanel.herbsubsetdropdown:Hide();
+			self.notepanel.oresubsetdropdown:Show();
+			L_UIDropDownMenu_SetText(self.notepanel.setdropdown,"Ore");
+			L_UIDropDownMenu_SetText(self.notepanel.usersubsetdropdown,module.NoteTypes["User"][1]["name"]);
+			L_UIDropDownMenu_SetText(self.notepanel.herbsubsetdropdown,module.NoteTypes["Herb"][1]["name"]);
+			L_UIDropDownMenu_SetText(self.notepanel.oresubsetdropdown,self.subset);
+
+		end
+		L_UIDropDownMenu_SetText(self.notepanel.setdropdown,self.set);
+
+	end
+
+
 	if (module.PinHasFocus) then return; end
+
 	if (IsShiftKeyDown()) then
 		module.PinHasFocus = self;
 		self.notepanel:Show();
 	end
+
+
+
 end
 
 function CT_MapMod_PinMixin:OnMouseEnter()
