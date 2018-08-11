@@ -1579,8 +1579,9 @@ end
 
 objectHandlers.slider = function(self, parent, name, virtual, option, text, values)
 	local slider = CreateFrame("Slider", name, parent, virtual or "OptionsSliderTemplate");
-	local title, low, high = select(10, slider:GetRegions()); -- Hack to allow for unnamed sliders
-	title = _G[name .. "Text"];  -- Temporary fix for WoW 8.0.1
+	local title = _G[name .. "Text"];
+	local low = _G[name .. "Low"];
+	local high = _G[name .. "High"];
 	local titleText, lowText, highText = splitString(text, colonSeparator);
 	local minValue, maxValue, step = splitString(values, colonSeparator);
 

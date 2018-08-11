@@ -1092,6 +1092,11 @@ module.update = function(self, optName, value)
 		if (not _G["CT_MapMod_WhereAmIButton"]) then return; end
 		if (value == 2) then _G["CT_MapMod_WhereAmIButton"]:Show(); end
 		if (value == 3) then _G["CT_MapMod_WhereAmIButton"]:Hide(); end
+	elseif (optName == "CT_MapMod_UserNoteSize"
+		or optName == "CT_MapMod_HerbNoteSize"
+		or optName == "CT_MapMod_OreNoteSize"
+	) then
+		WorldMapFrame:RefreshAllDataProviders();
 	end
 end
 
@@ -1150,28 +1155,34 @@ module.frame = function()
 		
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Add Features to World Map");
 		
-		optionsAddObject(-5, 3*14, "font#t:0:%y#s:0:%s#l:13:0#r#Coordinates show where you are on the map, and where your mouse cursor is#" .. textColor2 .. ":l");
-		optionsAddObject(-5, 1*14, "font#t:0:%y#s:0:%s#l:13:0#r#Show player coordinates#" .. textColor1 .. ":l");
-		optionsAddObject(-5,   17, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_ShowPlayerCoordsOnMap#n:CT_MapMod_ShowPlayerCoordsOnMap#At Top#At Bottom#Disabled");
-		optionsAddObject(-5, 1*14, "font#t:0:%y#s:0:%s#l:13:0#r#Show cursor coordinates#" .. textColor1 .. ":l");
-		optionsAddObject(-5,   17, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_ShowCursorCoordsOnMap#n:CT_MapMod_ShowCursorCoordsOnMap#At Top#At Bottom#Disabled");
+		optionsAddObject(-5,   50, "font#t:0:%y#s:0:%s#l:13:0#r#Coordinates show where you are on the map, and where your mouse cursor is#" .. textColor2 .. ":l");
+		optionsAddObject(-5,   14, "font#t:0:%y#s:0:%s#l:13:0#r#Show player coordinates#" .. textColor1 .. ":l");
+		optionsAddObject(-5,   24, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_ShowPlayerCoordsOnMap#n:CT_MapMod_ShowPlayerCoordsOnMap#At Top#At Bottom#Disabled");
+		optionsAddObject(-5,   14, "font#t:0:%y#s:0:%s#l:13:0#r#Show cursor coordinates#" .. textColor1 .. ":l");
+		optionsAddObject(-5,   24, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_ShowCursorCoordsOnMap#n:CT_MapMod_ShowCursorCoordsOnMap#At Top#At Bottom#Disabled");
 		
-		optionsAddObject(-10, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#The \"where am I?\" button resets the map to your current zone.  Auto: show when viewing the wrong zone#" .. textColor2 .. ":l");
-		optionsAddObject(-5, 1*14, "font#t:0:%y#s:0:%s#l:13:0#r#Show map reset button#" .. textColor1 .. ":l");
-		optionsAddObject(-5,   17, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_ShowMapResetButton#n:CT_MapMod_ShowMapResetButton#Auto#Always#Disabled");
+		optionsAddObject(-10,  50, "font#t:0:%y#s:0:%s#l:13:0#r#The \"where am I?\" button resets the map to your current zone.  Auto: show when map on wrong zone#" .. textColor2 .. ":l");
+		optionsAddObject(-5,   14, "font#t:0:%y#s:0:%s#l:13:0#r#Show map reset button#" .. textColor1 .. ":l");
+		optionsAddObject(-5,   24, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_ShowMapResetButton#n:CT_MapMod_ShowMapResetButton#Auto#Always#Disabled");
 		
 		
-		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Create and Display Notes");
+		optionsAddObject(-20,  17, "font#tl:5:%y#v:GameFontNormalLarge#Create and Display Notes");
 		
-		optionsAddObject(-5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#Identify points of interest on the map with custom icons#" .. textColor2 .. ":l");
-		optionsAddObject(-5, 1*14, "font#t:0:%y#s:0:%s#l:13:0#r#Show user notes (custom icons)#" .. textColor1 .. ":l");
-		optionsAddObject(-5,   17, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_UserNoteDisplay#n:CT_MapMod_UserNoteDisplay#Always#Disabled");
+		optionsAddObject(-5,   50, "font#t:0:%y#s:0:%s#l:13:0#r#Identify points of interest on the map with custom icons#" .. textColor2 .. ":l");
+		optionsAddObject(-5,   14, "font#t:0:%y#s:0:%s#l:13:0#r#Show custom user notes#" .. textColor1 .. ":l");
+		optionsAddObject(-5,   24, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_UserNoteDisplay#n:CT_MapMod_UserNoteDisplay#Always#Disabled");
+		optionsAddObject(-5,    8, "font#t:0:%y#s:0:%s#l:13:0#r#Custom note size#" .. textColor1 .. ":l");
+		optionsAddFrame(-5,    28, "slider#tl:24:%y#s:169:15#o:CT_MapMod_UserNoteSize:24##12:24:1");
 		
-		optionsAddObject(-5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#Identify locations of herbalism and mining nodes.  Auto: show on toons with that profession#" .. textColor2 .. ":l");
-		optionsAddObject(-5, 1*14, "font#t:0:%y#s:0:%s#l:13:0#r#Show herb notes (herb gathering)#" .. textColor1 .. ":l");
-		optionsAddObject(-5,   17, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_HerbNoteDisplay#n:CT_MapMod_HerbNoteDisplay#Auto#Always#Disabled");
-		optionsAddObject(-5, 1*14, "font#t:0:%y#s:0:%s#l:13:0#r#Show ore notes (mining)#" .. textColor1 .. ":l");
-		optionsAddObject(-5,   17, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_OreNoteDisplay#n:CT_MapMod_OreNoteDisplay#Auto#Always#Disabled");
+		optionsAddObject(-5,   50, "font#t:0:%y#s:0:%s#l:13:0#r#Identify herbalism and mining nodes.\nAuto: show if toon has the profession#" .. textColor2 .. ":l");
+		optionsAddObject(-5,   14, "font#t:0:%y#s:0:%s#l:13:0#r#Show herbalism notes#" .. textColor1 .. ":l");
+		optionsAddObject(-5,   24, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_HerbNoteDisplay#n:CT_MapMod_HerbNoteDisplay#Auto#Always#Disabled");
+		optionsAddObject(-5,    8, "font#t:0:%y#s:0:%s#l:13:0#r#Herbalism note size#" .. textColor1 .. ":l");
+		optionsAddFrame(-5,    28, "slider#tl:24:%y#s:169:15#o:CT_MapMod_HerbNoteSize:12##12:24:1");
+		optionsAddObject(-5,   14, "font#t:0:%y#s:0:%s#l:13:0#r#Show mining notes#" .. textColor1 .. ":l");
+		optionsAddObject(-5,   24, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_OreNoteDisplay#n:CT_MapMod_OreNoteDisplay#Auto#Always#Disabled");
+		optionsAddObject(-5,    8, "font#t:0:%y#s:0:%s#l:13:0#r#Mining note size#" .. textColor1 .. ":l");
+		optionsAddFrame(-5,    28, "slider#tl:24:%y#s:169:15#o:CT_MapMod_OreNoteSize:12##12:24:1");
 		
 	optionsEndFrame();
 
