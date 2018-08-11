@@ -101,7 +101,7 @@ local function CT_MapMod_Initialize()		-- called via module.update("init") from 
 			{ ["name"] = "Azshara's Veil", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
 			{ ["name"] = "Stormvein", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
 			{ ["name"] = "Heartblossom", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
-			{ ["name"] = "Whiptail", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed },
+			{ ["name"] = "Whiptail", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
 			{ ["name"] = "Twilight Jasmine", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
 			-- Mists of Pandaria
 			{ ["name"] = "Green Tea Leaf", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
@@ -225,7 +225,6 @@ local function CT_MapMod_Initialize()		-- called via module.update("init") from 
 		elseif (icon == 136248) then 
 			module.isMiner = true; 
 		end
-		DEFAULT_CHAT_FRAME:AddMessage(name .. ": " .. icon)
 	end
 	if (prof2) then 
 		name, icon, skillLevel, maxSkillLevel, numAbilities, spellOffset, skillLine, skillModifier, specializationIndex, specializationOffset = GetProfessionInfo(prof2)
@@ -234,7 +233,6 @@ local function CT_MapMod_Initialize()		-- called via module.update("init") from 
 		elseif (icon == 134708) then 
 			module.isMiner = true;
 		end
-		DEFAULT_CHAT_FRAME:AddMessage(name .. ": " .. icon)
 	end
 end
 
