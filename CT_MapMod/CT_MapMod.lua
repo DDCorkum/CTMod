@@ -166,11 +166,11 @@ local function CT_MapMod_Initialize()		-- called via module.update("init") from 
 			{ ["name"] = "Blackrock", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein" },
 			{ ["name"] = "True Iron", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein" },
 			-- Legion
-			{ ["name"] = "Leystone", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein" },
-			{ ["name"] = "Felslate", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein" },
+			{ ["name"] = "Leystone", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Leystone" },
+			{ ["name"] = "Felslate", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Felslate" },
 			-- Battle for Azeroth
 			{ ["name"] = "Monelite", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein" },
-			{ ["name"] = "Storm Silver", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein" },
+			{ ["name"] = "Storm Silver", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_StormSilver" },
 		}
 	};
 
@@ -214,26 +214,6 @@ local function CT_MapMod_Initialize()		-- called via module.update("init") from 
 
 	-- load the DataProvider which has most of the horsepower
 	WorldMapFrame:AddDataProvider(CreateFromMixins(CT_MapMod_DataProviderMixin));
-	
-	-- configure auto-gathering
-	local prof1, prof2 = GetProfessions();
-	local name, icon, skillLevel, maxSkillLevel, numAbilities, spellOffset, skillLine, skillModifier, specializationIndex, specializationOffset;
-	if (prof1) then 
-		name, icon, skillLevel, maxSkillLevel, numAbilities, spellOffset, skillLine, skillModifier, specializationIndex, specializationOffset = GetProfessionInfo(prof1)
-		if (icon == 136246) then 
-			module.isHerbalist = true;
-		elseif (icon == 136248) then 
-			module.isMiner = true; 
-		end
-	end
-	if (prof2) then 
-		name, icon, skillLevel, maxSkillLevel, numAbilities, spellOffset, skillLine, skillModifier, specializationIndex, specializationOffset = GetProfessionInfo(prof2)
-		if (icon == 136246) then 
-			module.isHerbalist = true;
-		elseif (icon == 134708) then 
-			module.isMiner = true;
-		end
-	end
 end
 
 
@@ -253,6 +233,26 @@ function CT_MapMod_DataProviderMixin:RefreshAllData(fromOnShow)
 	self:RemoveAllData();
 	module.PinHasFocus = nil;  --rather than calling this for each pin, just call it once when all pins are gone.
 	
+	-- determine what types of notes to show
+	local prof1, prof2 = GetProfessions();
+	local name, icon, skillLevel, maxSkillLevel, numAbilities, spellOffset, skillLine, skillModifier, specializationIndex, specializationOffset;
+	if (prof1) then 
+		name, icon, skillLevel, maxSkillLevel, numAbilities, spellOffset, skillLine, skillModifier, specializationIndex, specializationOffset = GetProfessionInfo(prof1)
+		if (icon == 136246) then 
+			module.isHerbalist = true;
+		elseif (icon == 134708) then 
+			module.isMiner = true; 
+		end
+	end
+	if (prof2) then 
+		name, icon, skillLevel, maxSkillLevel, numAbilities, spellOffset, skillLine, skillModifier, specializationIndex, specializationOffset = GetProfessionInfo(prof2)
+		if (icon == 136246) then 
+			module.isHerbalist = true;
+		elseif (icon == 134708) then 
+			module.isMiner = true;
+		end
+	end
+
 	-- Fetch and push the pins to be used for this map
 	local mapid = self:GetMap():GetMapID();
 	if (mapid and CT_MapMod_Notes[mapid]) then
@@ -262,11 +262,11 @@ function CT_MapMod_DataProviderMixin:RefreshAllData(fromOnShow)
 				( (info["set"] == "User") and ((module:getOption("CT_MapMod_UserNoteDisplay") or 1) == 1) ) or
 				
 				-- if herb is set to always, or if herb is set to auto (the default) and the toon is an herbalist
-				( (info["set"] == "Herb") and ((module:getOption("CT_MapMod_HerbNoteDisplay") == nil) or (module:getOption("CT_MapMod_HerbNoteDisplay") == 1)) and (module.isHerbalist) ) or
+				( (info["set"] == "Herb") and ((module:getOption("CT_MapMod_HerbNoteDisplay") or 1) == 1) and (module.isHerbalist) ) or
 				( (info["set"] == "Herb") and ((module:getOption("CT_MapMod_HerbNoteDisplay") or 1) == 2) ) or
 				
 				-- if ore is set to always, or if ore is set to auto (the default) and the toon is a miner
-				( (info["set"] == "Ore") and ((module:getOption("CT_MapMod_HerbNoteDisplay") == nil) or (module:getOption("CT_MapMod_HerbNoteDisplay") == 1)) and (module.isMiner) ) or
+				( (info["set"] == "Ore") and ((module:getOption("CT_MapMod_HerbNoteDisplay") or 1) == 1) and (module.isMiner) ) or
 				( (info["set"] == "Ore") and ((module:getOption("CT_MapMod_OreNoteDisplay") or 1) == 2) )
 			) then
 				self:GetMap():AcquirePin("CT_MapMod_PinTemplate", mapid, i, info["x"], info["y"], info["name"], info["descript"], info["set"], info["subset"]);
@@ -769,7 +769,26 @@ do
 			},
 			["button#n:CT_MapMod_CreateNoteButton#s:80:16#tl:t:+120:-2#v:UIPanelButtonTemplate#New Pin"] =	{
 				["onload"] = function(self)
-					self:Disable();
+					WorldMapFrame:AddCanvasClickHandler(function(canvas, button)
+						if (not module.isCreatingNote) then return; end
+						module.isCreatingNote = nil;
+						if (InCombatLockdown()) then return; end
+						local mapid = WorldMapFrame:GetMapID();
+						local x,y = WorldMapFrame:GetNormalizedCursorPosition();
+						if (not mapid or not x or not y) then return; end
+						local newnote = {
+							["x"] = x,
+							["y"] = y,
+							["name"] = "New Note",
+							["set"] = "User",
+							["subset"] = "Grey Note",
+							["descript"] = "New note at cursor",
+						}
+						tinsert(CT_MapMod_Notes[mapid],newnote);
+						WorldMapFrame:RefreshAllDataProviders();
+						GameTooltip:Hide();
+					end);
+					
 				end,
 				["onclick"] = function(self, arg1)
 					if ( arg1 == "LeftButton" ) then
@@ -777,18 +796,19 @@ do
 							return;
 						else
 							module.isCreatingNote = true;
-							-- offer dialogue to create a note
-							DEFAULT_CHAT_FRAME:AddMessage("CT_MapMod: Sorry, this feature isn't rebuilt yet for WoW 8.0");
+							GameTooltip:SetText("CT: Click on the map!");
 						end
 					end
 				end,
 				["onenter"] = function(self)
-					GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, -60);
-					GameTooltip:SetText("CT: Add a new pin to the map");
-					GameTooltip:Show();
+					if (not module.isCreatingNote) then 
+						GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, -60);
+						GameTooltip:SetText("CT: Add a new pin to the map");
+						GameTooltip:Show();
+					end
 				end,
 				["onleave"] = function(self)
-					GameTooltip:Hide();
+					if (not module.isCreatingNote) then GameTooltip:Hide(); end
 				end
 			},
 		["button#n:CT_MapMod_OptionsButton#s:80:16#tl:t:+205:-3#v:UIPanelButtonTemplate#Options"] = {
@@ -932,10 +952,10 @@ do
 							if type["name"] == arg2 then
 								local istooclose = nil;
 								for k, note in ipairs(CT_MapMod_Notes[mapid]) do
-									if ((note["name"] == arg2) and (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.03)) then  --two herbs of the same kind not far apart
+									if ((note["name"] == arg2) and (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.025)) then  --two herbs of the same kind not far apart
 										istooclose = true;
 									end
-									if (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.015) then --two notes, even if they are different, extremely close together
+									if (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.0125) then --two notes, even if they are different, extremely close together
 										istooclose = true;
 										if (note["name"] == "Herb" and note["subset"] == "Bruiseweed") then  -- legacy herb from WoD or Legion that can now be updated
 											note["name"] = arg2;
