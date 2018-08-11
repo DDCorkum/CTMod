@@ -1046,8 +1046,8 @@ module.update = function(self, optName, value)
 			module.cx:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-140,-3);
 			module.cy:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-100,-3);
 		elseif (position == 2) then
-			module.cx:SetPoint("BOTTOMLEFT",WorldMapFrame.ScrollContainer,"BOTTOM",60,3);
-			module.cy:SetPoint("BOTTOMLEFT",WorldMapFrame.ScrollContainer,"BOTTOM",100,3);
+			module.cx:SetPoint("BOTTOMLEFT",WorldMapFrame.ScrollContainer,"BOTTOM",70,3);
+			module.cy:SetPoint("BOTTOMLEFT",WorldMapFrame.ScrollContainer,"BOTTOM",110,3);
 		else
 			module.cx:Hide();
 			module.cy:Hide();

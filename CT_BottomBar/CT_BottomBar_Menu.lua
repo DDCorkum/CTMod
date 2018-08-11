@@ -195,7 +195,7 @@ local function addon_Update_PetBattleUI(self)
 	setpoint(obj1, "BOTTOMLEFT", bar, "BOTTOMLEFT", anchorX, anchorY);
 
 	obj2:ClearAllPoints();
-	setpoint(obj2, "TOPLEFT", obj1, "BOTTOMLEFT", 0, 0);
+	setpoint(obj2, "TOPLEFT", obj1, "BOTTOMLEFT", 0, 2);
 end
 
 local function addon_UpdateOrientation_PetBattleUI(self, orientation)

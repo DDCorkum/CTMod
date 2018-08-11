@@ -1,6 +1,6 @@
-CT_BarMod (8.0.1.4) 2018-08-01
+CT_BarMod (8.0.1.4) 2018-08-11
 - Now requests user to /console refresh when done changing BarMod options
-- This prevents taint from impacting gameplay (including battleground queuing)
+- This prevents taint from impacting subsequent gameplay (particularly battleground queuing)
 
 CT_BarMod (8.0.1.2) 2018-07-21
 - Minor tweaks to default positions, to accomodate BottomBar changes
