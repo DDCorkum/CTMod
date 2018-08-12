@@ -199,7 +199,9 @@ local function CT_MapMod_Initialize()		-- called via module.update("init") from 
 					["name"] = note["name"],
 					["set"] = set,
 					["subset"] = subset,
-					["descript"] = note["descript"]						
+					["descript"] = note["descript"],
+					["datemodified"] = "20180716",
+					["version"] = "7.3.2.0",
 				};
 				if (not CT_MapMod_Notes[newmap]) then
 					CT_MapMod_Notes[newmap] = { }; 
@@ -269,7 +271,7 @@ function CT_MapMod_DataProviderMixin:RefreshAllData(fromOnShow)
 				( (info["set"] == "Ore") and ((module:getOption("CT_MapMod_HerbNoteDisplay") or 1) == 1) and (module.isMiner) ) or
 				( (info["set"] == "Ore") and ((module:getOption("CT_MapMod_OreNoteDisplay") or 1) == 2) )
 			) then
-				self:GetMap():AcquirePin("CT_MapMod_PinTemplate", mapid, i, info["x"], info["y"], info["name"], info["descript"], info["set"], info["subset"]);
+				self:GetMap():AcquirePin("CT_MapMod_PinTemplate", mapid, i, info["x"], info["y"], info["name"], info["descript"], info["set"], info["subset"], info["datemodified"], info["version"]);
 			end
 		end
 	end
@@ -295,7 +297,7 @@ end
  
 function CT_MapMod_PinMixin:OnAcquired(...) -- the arguments here are anything that are passed into AcquirePin after the pinTemplate
 	-- Override in your mixin, called when this pin is being acquired by a data provider but before its added to the map
-	self.mapid, self.i, self.x, self.y, self.name, self.descript, self.set, self.subset = ...;
+	self.mapid, self.i, self.x, self.y, self.name, self.descript, self.set, self.subset, self.datemodified, self.version = ...;
 	
 	-- Set basic properties for the pin itself
 	self:SetPosition(self.x, self.y);
@@ -312,11 +314,11 @@ function CT_MapMod_PinMixin:OnAcquired(...) -- the arguments here are anything t
 		self:SetHeight(module:getOption("CT_MapMod_UserNoteSize") or 24);
 		self:SetWidth(module:getOption("CT_MapMod_UserNoteSize") or 24);
 	elseif (self.set == "Herb") then
-		self:SetHeight(module:getOption("CT_MapMod_HerbNoteSize") or 12);
-		self:SetWidth(module:getOption("CT_MapMod_HerbNoteSize") or 12);
+		self:SetHeight(module:getOption("CT_MapMod_HerbNoteSize") or 14);
+		self:SetWidth(module:getOption("CT_MapMod_HerbNoteSize") or 14);
 	else
-		self:SetHeight(module:getOption("CT_MapMod_OreNoteSize") or 12);
-		self:SetWidth(module:getOption("CT_MapMod_OreNoteSize") or 12);
+		self:SetHeight(module:getOption("CT_MapMod_OreNoteSize") or 14);
+		self:SetWidth(module:getOption("CT_MapMod_OreNoteSize") or 14);
 	end
 	self.texture:SetAllPoints();
 	self:Show();
@@ -359,19 +361,32 @@ function CT_MapMod_PinMixin:OnClick(button)
 end
 
 function CT_MapMod_PinMixin:OnMouseEnter()
-	-- Override in your mixin, called when the mouse enters this pin
+	local icon = "";
+	for i, type in ipairs(module.NoteTypes[self.set]) do
+		if (type["name"] == self.subset) then
+			icon = type["icon"]
+		end
+	end
 	if ( self.x > 0.5 ) then
 		WorldMapTooltip:SetOwner(self, "ANCHOR_LEFT");
 	else
 		WorldMapTooltip:SetOwner(self, "ANCHOR_RIGHT");
 	end
 	WorldMapTooltip:ClearLines();
-	WorldMapTooltip:AddDoubleLine(self.name, self.set, 0, 1, 0, 0.6, 0.6, 0.6);
+	WorldMapTooltip:AddDoubleLine("|T"..icon..":20|t " .. self.name, self.set, 0, 1, 0, 0.6, 0.6, 0.6);
 	if ( self.descript ) then
 		WorldMapTooltip:AddLine(self.descript, nil, nil, nil, 1);
 	end
 	if (not module.PinHasFocus) then  -- clicking on pins won't do anything while the edit box is open for this or another pin
-		WorldMapTooltip:AddLine("Shift-Click to Edit", 0, 0.5, 0.9, 1);
+		if (self.datemodified and self.version) then
+			WorldMapTooltip:AddDoubleLine("Shift-Click to Edit", self.datemodified .. " (" .. self.version .. ")", 0.00, 0.50, 0.90, 0.45, 0.45, 0.45);
+		else	
+			WorldMapTooltip:AddLine("Shift-Click to Edit", 0, 0.5, 0.9, 1);
+		end
+	else
+		if (self.datemodified and self.version) then
+			WorldMapTooltip:AddDoubleLine(" ", self.datemodified .. " (" .. self.version .. ")", 0.00, 0.50, 0.90, 0.45, 0.45, 0.45);
+		end
 	end
 	WorldMapTooltip:Show();
 end
@@ -464,15 +479,17 @@ function CT_MapMod_PinMixin:CreateNotePanel()
 					CT_MapMod_Notes[pin.mapid][pin.i] = {
 						["x"] = pin.x,
 						["y"] = pin.y,
-						["name"] = self:GetParent().namefield:GetText() or pin.name;
-						["set"] = set;
-						["subset"] = subset;
-						["descript"] = self:GetParent().descriptfield:GetText() or pin.descript;
+						["name"] = self:GetParent().namefield:GetText() or pin.name,
+						["set"] = set,
+						["subset"] = subset,
+						["descript"] = self:GetParent().descriptfield:GetText() or pin.descript,
+						["datemodified"] = date("%Y%m%d"),
+						["version"] = MODULE_VERSION,
 					}
 					self:GetParent():Hide();
 					module.PinHasFocus = nil;
 					-- calling onAcquired will update tooltips and anything else that wasn't already changed
-					pin:OnAcquired(pin.mapid, pin.i, pin.x, pin.y, self:GetParent().namefield:GetText() or pin.name, self:GetParent().descriptfield:GetText() or pin.descript, set, subset);
+					pin:OnAcquired(pin.mapid, pin.i, pin.x, pin.y, self:GetParent().namefield:GetText() or pin.name, self:GetParent().descriptfield:GetText() or pin.descript, set, subset, date("%Y%m%d"), MODULE_VERSION );
 				end,
 			},
 			["button#s:80:25#b:b:0:16#v:GameMenuButtonTemplate#Cancel"] = {
@@ -482,7 +499,7 @@ function CT_MapMod_PinMixin:CreateNotePanel()
 					module.PinHasFocus = nil;
 					L_UIDropDownMenu_SetText(pin.notepanel.setdropdown,pin.set);
 					-- calling OnAcquired will reset everything user-visible to their original conditions
-					pin:OnAcquired(pin.mapid, pin.i, pin.x, pin.y, pin.name, pin.descript, pin.set, pin.subset);
+					pin:OnAcquired(pin.mapid, pin.i, pin.x, pin.y, pin.name, pin.descript, pin.set, pin.subset, pin.datemodified, pin.version);
 				end,
 			},
 			["button#s:80:25#bl:b:42:16#v:GameMenuButtonTemplate#Delete"] = {
@@ -588,8 +605,8 @@ function CT_MapMod_PinMixin:CreateNotePanel()
 				notepanel.usersubsetdropdown:Hide();
 				notepanel.herbsubsetdropdown:Show();
 				notepanel.oresubsetdropdown:Hide();
-				pin:SetHeight(module:getOption("CT_MapMod_HerbNoteSize") or 12);
-				pin:SetWidth(module:getOption("CT_MapMod_HerbNoteSize") or 12);
+				pin:SetHeight(module:getOption("CT_MapMod_HerbNoteSize") or 14);
+				pin:SetWidth(module:getOption("CT_MapMod_HerbNoteSize") or 14);
 				for i, val in ipairs(module.NoteTypes["Herb"]) do
 					if (val["name"] == L_UIDropDownMenu_GetText(notepanel.herbsubsetdropdown)) then
 						pin.texture:SetTexture(val["icon"]);
@@ -599,8 +616,8 @@ function CT_MapMod_PinMixin:CreateNotePanel()
 				notepanel.usersubsetdropdown:Hide();
 				notepanel.herbsubsetdropdown:Hide();
 				notepanel.oresubsetdropdown:Show();
-				pin:SetHeight(module:getOption("CT_MapMod_OreNoteSize") or 12);
-				pin:SetWidth(module:getOption("CT_MapMod_OreNoteSize") or 12);
+				pin:SetHeight(module:getOption("CT_MapMod_OreNoteSize") or 14);
+				pin:SetWidth(module:getOption("CT_MapMod_OreNoteSize") or 14);
 				for i, val in ipairs(module.NoteTypes["Ore"]) do
 					if (val["name"] == L_UIDropDownMenu_GetText(notepanel.oresubsetdropdown)) then
 						pin.texture:SetTexture(val["icon"]);
@@ -677,8 +694,8 @@ function CT_MapMod_PinMixin:CreateNotePanel()
 			dropdown.unapprovedValue = self.value;
 			L_UIDropDownMenu_SetText(dropdown,self.value);
 			local pin = dropdown:GetParent().pin;
-			pin.texture:SetHeight(module:getOption("CT_MapMod_HerbNoteSize") or 12);
-			pin.texture:SetWidth(module:getOption("CT_MapMod_HerbNoteSize") or 12);
+			pin.texture:SetHeight(module:getOption("CT_MapMod_HerbNoteSize") or 14);
+			pin.texture:SetWidth(module:getOption("CT_MapMod_HerbNoteSize") or 14);
 			for i, val in ipairs(module.NoteTypes["Herb"]) do
 				if (val["name"] == self.value) then
 					pin.texture:SetTexture(val["icon"]);
@@ -712,8 +729,8 @@ function CT_MapMod_PinMixin:CreateNotePanel()
 			dropdown.unapprovedValue = self.value;
 			L_UIDropDownMenu_SetText(dropdown,self.value);
 			local pin = dropdown:GetParent().pin;
-			pin.texture:SetHeight(module:getOption("CT_MapMod_OreNoteSize") or 12);
-			pin.texture:SetWidth(module:getOption("CT_MapMod_OreNoteSize") or 12);
+			pin.texture:SetHeight(module:getOption("CT_MapMod_OreNoteSize") or 14);
+			pin.texture:SetWidth(module:getOption("CT_MapMod_OreNoteSize") or 14);
 			for i, val in ipairs(module.NoteTypes["Ore"]) do
 				if (val["name"] == self.value) then
 					pin.texture:SetTexture(val["icon"]);
@@ -783,6 +800,8 @@ do
 							["set"] = "User",
 							["subset"] = "Grey Note",
 							["descript"] = "New note at cursor",
+							["datemodified"] = date("%Y%m%d"),
+							["version"] = MODULE_VERSION,
 						}
 						tinsert(CT_MapMod_Notes[mapid],newnote);
 						WorldMapFrame:RefreshAllDataProviders();
@@ -970,7 +989,9 @@ do
 										["name"] = arg2,
 										["set"] = "Herb",
 										["subset"] = arg2,
-										["descript"] = ""	
+										["descript"] = "",
+										["datemodified"] = date("%Y%m%d"),
+										["version"] = MODULE_VERSION,
 									};
 									tinsert(CT_MapMod_Notes[mapid],newnote);
 								end
@@ -1007,7 +1028,9 @@ do
 										["name"] = arg2,
 										["set"] = "Ore",
 										["subset"] = arg2,
-										["descript"] = ""	
+										["descript"] = "",
+										["datemodified"] = date("%Y%m%d"),
+										["version"] = MODULE_VERSION,
 									};
 									tinsert(CT_MapMod_Notes[mapid],newnote);
 								end
@@ -1095,6 +1118,9 @@ module.update = function(self, optName, value)
 	elseif (optName == "CT_MapMod_UserNoteSize"
 		or optName == "CT_MapMod_HerbNoteSize"
 		or optName == "CT_MapMod_OreNoteSize"
+		or optName == "CT_MapMod_UserNoteDisplay"
+		or optName == "CT_MapMod_HerbNoteDisplay"
+		or optName == "CT_MapMod_OreNoteDisplay"
 	) then
 		WorldMapFrame:RefreshAllDataProviders();
 	end
@@ -1172,17 +1198,17 @@ module.frame = function()
 		optionsAddObject(-5,   14, "font#t:0:%y#s:0:%s#l:13:0#r#Show custom user notes#" .. textColor1 .. ":l");
 		optionsAddObject(-5,   24, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_UserNoteDisplay#n:CT_MapMod_UserNoteDisplay#Always#Disabled");
 		optionsAddObject(-5,    8, "font#t:0:%y#s:0:%s#l:13:0#r#Custom note size#" .. textColor1 .. ":l");
-		optionsAddFrame(-5,    28, "slider#tl:24:%y#s:169:15#o:CT_MapMod_UserNoteSize:24##12:24:1");
+		optionsAddFrame(-5,    28, "slider#tl:24:%y#s:169:15#o:CT_MapMod_UserNoteSize:24##10:26:0.5");
 		
 		optionsAddObject(-5,   50, "font#t:0:%y#s:0:%s#l:13:0#r#Identify herbalism and mining nodes.\nAuto: show if toon has the profession#" .. textColor2 .. ":l");
 		optionsAddObject(-5,   14, "font#t:0:%y#s:0:%s#l:13:0#r#Show herbalism notes#" .. textColor1 .. ":l");
 		optionsAddObject(-5,   24, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_HerbNoteDisplay#n:CT_MapMod_HerbNoteDisplay#Auto#Always#Disabled");
 		optionsAddObject(-5,    8, "font#t:0:%y#s:0:%s#l:13:0#r#Herbalism note size#" .. textColor1 .. ":l");
-		optionsAddFrame(-5,    28, "slider#tl:24:%y#s:169:15#o:CT_MapMod_HerbNoteSize:12##12:24:1");
+		optionsAddFrame(-5,    28, "slider#tl:24:%y#s:169:15#o:CT_MapMod_HerbNoteSize:14##10:26:0.5");
 		optionsAddObject(-5,   14, "font#t:0:%y#s:0:%s#l:13:0#r#Show mining notes#" .. textColor1 .. ":l");
 		optionsAddObject(-5,   24, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_OreNoteDisplay#n:CT_MapMod_OreNoteDisplay#Auto#Always#Disabled");
 		optionsAddObject(-5,    8, "font#t:0:%y#s:0:%s#l:13:0#r#Mining note size#" .. textColor1 .. ":l");
-		optionsAddFrame(-5,    28, "slider#tl:24:%y#s:169:15#o:CT_MapMod_OreNoteSize:12##12:24:1");
+		optionsAddFrame(-5,    28, "slider#tl:24:%y#s:169:15#o:CT_MapMod_OreNoteSize:14##10:26:0.5");
 		
 	optionsEndFrame();
 
