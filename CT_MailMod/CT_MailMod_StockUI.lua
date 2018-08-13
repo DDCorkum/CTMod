@@ -1040,7 +1040,7 @@ function CT_MailMod_UpdateFilterDropDown()
 end
 
 do
-	sendmailframe = module:getFrame("dropdown#s:1:40#tl:182:-32#n:CT_MailModDropdown_autoCompleteFilters#o:autoCompleteFilters:1#CT_MultipleSelections#Online and/or nearby toons#sendmailAutoCompleteOnline#Friends list (including offline)#sendmailAutoCompleteFriends#Guild list (including offline)#sendmailAutoCompleteGuild#Current Group#sendmailAutoCompleteGroup#Recently Interacted#sendmailAutoCompleteInteracted#Own toons on this account#sendmailAutoCompleteAccount",SendMailFrame);
+	sendmailframe = module:getFrame("multidropdown#s:1:40#tl:182:-32#n:CT_MailModDropdown_autoCompleteFilters#o:autoCompleteFilters:1#Online and/or nearby toons#sendmailAutoCompleteOnline#Friends list (including offline)#sendmailAutoCompleteFriends#Guild list (including offline)#sendmailAutoCompleteGuild#Current Group#sendmailAutoCompleteGroup#Recently Interacted#sendmailAutoCompleteInteracted#Own toons on this account#sendmailAutoCompleteAccount",SendMailFrame);
 	filterdropdown = select(#(sendmailframe:GetChildren())-1, sendmailframe:GetChildren());
 	filterdropdown:SetScript("OnEnter", function(...)
 		GameTooltip:SetOwner(filterdropdown, "ANCHOR_TOPLEFT", 35, 10);

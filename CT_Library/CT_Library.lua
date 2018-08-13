@@ -11,7 +11,7 @@
 -----------------------------------------------
 -- Initialization
 
-local LIBRARY_VERSION = 8.01030;
+local LIBRARY_VERSION = 8.01040;
 local LIBRARY_NAME = "CT_Library";
 
 local _G = getfenv(0);
@@ -1104,6 +1104,8 @@ function lib:createMultiLineEditBox(name, width, height, parent, bdtype)
 	return frame;
 end
 
+
+
 function lib:setRadioButtonTextures(checkbutton)
 	-- Makes a check button look like a radio button by changing its textures.
 	local tex = "Interface\\Buttons\\UI-RadioButton";
@@ -1347,6 +1349,54 @@ objectHandlers.texture = function(self, parent, name, virtual, option, texture, 
 	return tex;
 end
 
+-- Texture
+objectHandlers.editbox = function(self, parent, name, virtual, option, font, bdtype, multiline, multilinewidth, multilineheight)
+	local frame;
+	local backdrop;
+	if (multiline) then
+		frame = lib:createMultiLineEditBox(name,multilinewidth,multilineheight,parent,bdtype);
+		if (font) then
+			frame.editBox:SetFontObject(font)
+		end
+		if (option) then
+			frame.editBox:SetText(self:getOption(option) or "");
+		end
+	else
+		frame = CreateFrame("EditBox", name, parent, virtual);
+		if (font) then
+			frame:SetFontObject(font)
+		end
+		if (tonumber(bdtype) == 1) then
+			backdrop = {
+				bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+				edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+				tile = true,
+				tileSize = 16,
+				edgeSize = 16,
+				insets = { left = 5, right = 5, top = 5, bottom = 5 },
+			};
+		elseif (tonumber(bdtype) == 2) then
+			backdrop = {
+				bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+				edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+				tile = true,
+				tileSize = 32,
+				edgeSize = 32,
+				insets = { left = 5, right = 5, top = 5, bottom = 5 },
+			};
+		end
+		if (backdrop) then
+			frame:SetBackdrop(backdrop);
+			frame:SetBackdropBorderColor(0.4, 0.4, 0.4);
+			frame:SetBackdropColor(0, 0, 0);
+		end
+		if (option) then
+			frame:SetText(self:getOption(option) or "");
+		end
+	end
+	return frame;
+end
+
 -- Option Frame
 local optionFrameOnMouseUp = function(self) self:GetParent():StopMovingOrSizing(); end
 local optionFrameOnEnter = function(self) lib:displayPredefinedTooltip(self, "DRAG"); end
@@ -1436,8 +1486,9 @@ local function dropdownClick(self, arg1, arg2, checked)
 	end
 end
 
-local dropdownEntry = { };
+-- basic radio-button dropdown without any fancy modifications.  Each arg is text to display
 objectHandlers.dropdown = function(self, parent, name, virtual, option, ...)
+	local dropdownEntry = { };
 	local frame = CreateFrame("Frame", name, parent, virtual or "L_UIDropDownMenuTemplate");
 	frame.oldSetWidth = frame.SetWidth;
 	frame.SetWidth = dropdownSetWidth;
@@ -1456,35 +1507,59 @@ objectHandlers.dropdown = function(self, parent, name, virtual, option, ...)
 
 	local entries = { ... };
 	
-	if (entries[1] == "CT_MultipleSelections") then
-		L_UIDropDownMenu_Initialize(frame, function()
-			for i = 2, #entries, 2 do
-				dropdownEntry.text = entries[i];
-				dropdownEntry.value = i/2;
-				dropdownEntry.isNotRadio = true;
-				dropdownEntry.checked = self:getOption(entries[i+1]);
-				dropdownEntry.func = dropdownClick;
-				dropdownEntry.arg1 = entries[i+1];
-				L_UIDropDownMenu_AddButton(dropdownEntry);
-			end
-		end);
-	else
-	
-		L_UIDropDownMenu_Initialize(frame, function()
-			for i = 1, #entries, 1 do
-				dropdownEntry.text = entries[i];
-				dropdownEntry.value = i;
-				dropdownEntry.checked = nil;
-				dropdownEntry.func = dropdownClick;
-				L_UIDropDownMenu_AddButton(dropdownEntry);
-			end
-		end);
-		L_UIDropDownMenu_SetSelectedValue(frame, self:getOption(option) or 1);
-	end
+	L_UIDropDownMenu_Initialize(frame, function()
+		for i = 1, #entries, 1 do
+			dropdownEntry.text = entries[i];
+			dropdownEntry.value = i;
+			dropdownEntry.checked = nil;
+			dropdownEntry.func = dropdownClick;
+			L_UIDropDownMenu_AddButton(dropdownEntry);
+		end
+	end);
+	L_UIDropDownMenu_SetSelectedValue(frame, self:getOption(option) or 1);
 
 	L_UIDropDownMenu_JustifyText(frame, "LEFT");
 	return frame;
 end
+
+-- variant of a dropdown using checkboxes, that allows selecting more than one at a time.
+-- two parameters (separated by #) are display-text and the CT option (similar to o:)
+objectHandlers.multidropdown = function(self, parent, name, virtual, option, ...)
+	local dropdownEntry = { };
+	local frame = CreateFrame("Frame", name, parent, virtual or "L_UIDropDownMenuTemplate");
+	frame.oldSetWidth = frame.SetWidth;
+	frame.SetWidth = dropdownSetWidth;
+	frame.ctDropdownClick = dropdownClick;
+	
+	-- Handle specializ
+	
+	-- Make the slider smaller
+	local left, right, mid, btn = _G[name.."Left"], _G[name.."Middle"], _G[name.."Right"], _G[name.."Button"];
+	local setHeight = left.SetHeight;
+
+	btn:SetPoint("TOPRIGHT", right, "TOPRIGHT", 12, -12);
+	setHeight(left, 50);
+	setHeight(right, 50);
+	setHeight(mid, 50);
+
+	local entries = { ... };
+	
+	L_UIDropDownMenu_Initialize(frame, function()
+		for i = 1, #entries, 2 do
+			dropdownEntry.text = entries[i];
+			dropdownEntry.value = (i+1)/2;
+			dropdownEntry.isNotRadio = true;
+			dropdownEntry.checked = self:getOption(entries[i+1]);
+			dropdownEntry.func = dropdownClick;
+			dropdownEntry.arg1 = entries[i+1];
+			L_UIDropDownMenu_AddButton(dropdownEntry);
+		end
+	end);
+	
+	L_UIDropDownMenu_JustifyText(frame, "LEFT");
+	return frame;
+end
+
 
 -- Slider
 local function updateSliderText(slider, value)
@@ -1504,8 +1579,9 @@ end
 
 objectHandlers.slider = function(self, parent, name, virtual, option, text, values)
 	local slider = CreateFrame("Slider", name, parent, virtual or "OptionsSliderTemplate");
-	local title, low, high = select(10, slider:GetRegions()); -- Hack to allow for unnamed sliders
-	title = _G[name .. "Text"];  -- Temporary fix for WoW 8.0.1
+	local title = _G[name .. "Text"];
+	local low = _G[name .. "Low"];
+	local high = _G[name .. "High"];
 	local titleText, lowText, highText = splitString(text, colonSeparator);
 	local minValue, maxValue, step = splitString(values, colonSeparator);
 
@@ -2236,7 +2312,7 @@ end
 
 local function selectControlPanelModule(self)
 	local parent = self.parent;
-	local newModule = self:GetID();
+	local newModule = self:GetID()-700;  		 --700 is an offset to prevent taint affecting battleground queueing
 	PlaySound(1115);
 
 	local module = modules[newModule];
@@ -2251,7 +2327,7 @@ local function selectControlPanelModule(self)
 		-- Highlight the correct bullet
 		self.bullet:SetVertexColor(1, 0, 0);
 		local obj, module;
-		local num = 0;
+		local num = 700;			--700 is an offset to prevent taint affecting battleground queueing
 		for key, value in ipairs(modules) do
 			if ( value.frame ) then
 				num = num + 1;
@@ -2362,7 +2438,7 @@ local function controlPanelSkeleton()
 
 			-- Show/Hide our bullets
 			local listing = self.listing;
-			local num = 0;
+			local num = 700;		--700 is an offset to prevent taint affecting battleground queueing
 			local version;
 			for i = 1, #modules, 1 do
 				module = modules[i];
@@ -2370,7 +2446,7 @@ local function controlPanelSkeleton()
 					num = num + 1;
 					version = module.version;
 					obj = listing[tostring(num)];
-					obj:SetID(i);
+					obj:SetID(num);
 					obj:Show();
 					obj:SetText(module.name);
 
@@ -2388,7 +2464,7 @@ local function controlPanelSkeleton()
 					end
 				end
 			end
-			for i = num + 1, 14, 1 do
+			for i = num + 1, 714, 1 do
 				listing[tostring(i)]:Hide();
 			end
 			PlaySound(1115);
@@ -2437,21 +2513,22 @@ local function controlPanelSkeleton()
 			"font#tl:-3:-69#v:GameFontNormalLarge#Mod Listing:",
 			"texture#i:hover#l:5:0#s:290:25#hidden#1:1:1:0.125",
 			"texture#i:select#l:5:0#s:290:25#hidden#1:1:1:0.25",
-			"font#b:-10:-5#CTMod - www.ctmod.net#0.72:0.36:0",
-			["button#i:1#hidden#s:263:25#tl:17:-85"] = modListButtonTemplate,
-			["button#i:2#hidden#s:263:25#tl:17:-110"] = modListButtonTemplate,
-			["button#i:3#hidden#s:263:25#tl:17:-135"] = modListButtonTemplate,
-			["button#i:4#hidden#s:263:25#tl:17:-160"] = modListButtonTemplate,
-			["button#i:5#hidden#s:263:25#tl:17:-185"] = modListButtonTemplate,
-			["button#i:6#hidden#s:263:25#tl:17:-210"] = modListButtonTemplate,
-			["button#i:7#hidden#s:263:25#tl:17:-235"] = modListButtonTemplate,
-			["button#i:8#hidden#s:263:25#tl:17:-260"] = modListButtonTemplate,
-			["button#i:9#hidden#s:263:25#tl:17:-285"] = modListButtonTemplate,
-			["button#i:10#hidden#s:263:25#tl:17:-310"] = modListButtonTemplate,
-			["button#i:11#hidden#s:263:25#tl:17:-335"] = modListButtonTemplate,
-			["button#i:12#hidden#s:263:25#tl:17:-360"] = modListButtonTemplate,
-			["button#i:13#hidden#s:263:25#tl:17:-385"] = modListButtonTemplate,
-			["button#i:14#hidden#s:263:25#tl:17:-410"] = modListButtonTemplate,
+			"font#bl:-10:-5#CTMod - www.ctmod.net#0.72:0.36:0",
+						--700 is an offset to prevent taint affecting battleground queueing
+			["button#i:701#hidden#s:263:25#tl:17:-85"] = modListButtonTemplate,	
+			["button#i:702#hidden#s:263:25#tl:17:-110"] = modListButtonTemplate,
+			["button#i:703#hidden#s:263:25#tl:17:-135"] = modListButtonTemplate,
+			["button#i:704#hidden#s:263:25#tl:17:-160"] = modListButtonTemplate,
+			["button#i:705#hidden#s:263:25#tl:17:-185"] = modListButtonTemplate,
+			["button#i:706#hidden#s:263:25#tl:17:-210"] = modListButtonTemplate,
+			["button#i:707#hidden#s:263:25#tl:17:-235"] = modListButtonTemplate,
+			["button#i:708#hidden#s:263:25#tl:17:-260"] = modListButtonTemplate,
+			["button#i:709#hidden#s:263:25#tl:17:-285"] = modListButtonTemplate,
+			["button#i:710#hidden#s:263:25#tl:17:-310"] = modListButtonTemplate,
+			["button#i:711#hidden#s:263:25#tl:17:-335"] = modListButtonTemplate,
+			["button#i:712#hidden#s:263:25#tl:17:-360"] = modListButtonTemplate,
+			["button#i:713#hidden#s:263:25#tl:17:-385"] = modListButtonTemplate,
+			["button#i:714#hidden#s:263:25#tl:17:-410"] = modListButtonTemplate,
 		},
 		["frame#s:315:0#tr:-15:-30#b:0:15#i:options#hidden"] = {
 			["onload"] = function(self)
@@ -2508,7 +2585,7 @@ function lib:showModuleOptions(modname)
 	-- Look up the addon name to deterine which button to click.
 	local listing = CTCONTROLPANEL.listing;
 	local button;
-	local num = 0;
+	local num = 700;			--700 is an offset to prevent taint affecting battleground queueing
 	for i, v in ipairs(modules) do
 		if (v.frame) then
 			num = num + 1;
@@ -2552,7 +2629,7 @@ registerModule(module, 1);
 local optionsFrame, addonsFrame, fromChar;
 
 -- Dropdown Handling
-local dropdownEntry, flaggedCharacters;
+local importDropdownEntry, importFlaggedCharacters;
 local importRealm, importSetPlayer;
 local importRealm2;
 local importPlayerCount;
@@ -2610,25 +2687,25 @@ local function populateCharDropdownInit()
 	local players = {};
 	local name, realm, options;
 
-	if ( not dropdownEntry ) then
-		dropdownEntry = { };
-		flaggedCharacters = { };
+	if ( not importDropdownEntry ) then
+		importDropdownEntry = { };
+		importFlaggedCharacters = { };
 	else
-		lib:clearTable(dropdownEntry);
-		lib:clearTable(flaggedCharacters);
+		lib:clearTable(importDropdownEntry);
+		lib:clearTable(importFlaggedCharacters);
 	end
 
 	-- Prevent ourself from being added
-	flaggedCharacters[getCharKey()] = true;
+	importFlaggedCharacters[getCharKey()] = true;
 
 	for key, value in ipairs(modules) do
 		options = value.options;
 		if ( options ) then
 			for k, v in pairs(options) do
-				if ( not flaggedCharacters[k] ) then
+				if ( not importFlaggedCharacters[k] ) then
 					name, realm = k:match("^CHAR%-([^-]+)%-(.+)$");
 					if ( name and realm and realm == importRealm ) then
-						flaggedCharacters[k] = true;
+						importFlaggedCharacters[k] = true;
 						tinsert(players, k);
 					end
 				end
@@ -2642,11 +2719,11 @@ local function populateCharDropdownInit()
 	for key, value in ipairs(players) do
 		name, realm = value:match("^CHAR%-([^-]+)%-(.+)$");
 		if ( name and realm ) then
-			dropdownEntry.text = name; -- .. ", " .. realm;
-			dropdownEntry.value = value;
-			dropdownEntry.checked = nil;
-			dropdownEntry.func = dropdownClick;
-			L_UIDropDownMenu_AddButton(dropdownEntry);
+			importDropdownEntry.text = name; -- .. ", " .. realm;
+			importDropdownEntry.value = value;
+			importDropdownEntry.checked = nil;
+			importDropdownEntry.func = dropdownClick;
+			L_UIDropDownMenu_AddButton(importDropdownEntry);
 
 			importPlayerCount = importPlayerCount + 1;
 		end
@@ -2678,25 +2755,25 @@ local function populateServerDropdownInit()
 	local serversort = {};
 	local name, realm, options;
 
-	if ( not dropdownEntry ) then
-		dropdownEntry = { };
-		flaggedCharacters = { };
+	if ( not importDropdownEntry ) then
+		importDropdownEntry = { };
+		importFlaggedCharacters = { };
 	else
-		lib:clearTable(dropdownEntry);
-		lib:clearTable(flaggedCharacters);
+		lib:clearTable(importDropdownEntry);
+		lib:clearTable(importFlaggedCharacters);
 	end
 
 	-- Prevent ourself from being added
-	flaggedCharacters[getCharKey()] = true;
+	importFlaggedCharacters[getCharKey()] = true;
 
 	for key, value in ipairs(modules) do
 		options = value.options;
 		if ( options ) then
 			for k, v in pairs(options) do
-				if ( not flaggedCharacters[k] ) then
+				if ( not importFlaggedCharacters[k] ) then
 					name, realm = k:match("^CHAR%-([^-]+)%-(.+)$");
 					if ( name ) then
-						flaggedCharacters[k] = true;
+						importFlaggedCharacters[k] = true;
 						if (not servers[realm]) then
 							servers[realm] = 1;
 						else
@@ -2713,11 +2790,11 @@ local function populateServerDropdownInit()
 	sort(serversort);
 
 	for key, value in ipairs(serversort) do
-		dropdownEntry.text = value .. " (" .. servers[value] .. ")";
-		dropdownEntry.value = value;
-		dropdownEntry.checked = nil;
-		dropdownEntry.func = dropdownClick;
-		L_UIDropDownMenu_AddButton(dropdownEntry);
+		importDropdownEntry.text = value .. " (" .. servers[value] .. ")";
+		importDropdownEntry.value = value;
+		importDropdownEntry.checked = nil;
+		importDropdownEntry.func = dropdownClick;
+		L_UIDropDownMenu_AddButton(importDropdownEntry);
 	end
 
 	importPlayerCount = 0;

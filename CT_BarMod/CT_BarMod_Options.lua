@@ -926,6 +926,11 @@ local function optionsEndFrame()
 end
 
 module.frame = function()
+
+	-- Prints a message only the first time that the user views the CT_BarMod options
+	-- This is necessary to prevent taint from the keybinding options affecting battleground queuing
+	DEFAULT_CHAT_FRAME:AddMessage("CT_BarMod:  When you are done, please type:  /console reloadui",1,1,.5);
+	
 	local textColor0 = "1.0:1.0:1.0";
 	local textColor1 = "0.9:0.9:0.9";
 	local textColor2 = "0.7:0.7:0.7";
