@@ -2513,7 +2513,7 @@ local function controlPanelSkeleton()
 			"font#tl:-3:-69#v:GameFontNormalLarge#Mod Listing:",
 			"texture#i:hover#l:5:0#s:290:25#hidden#1:1:1:0.125",
 			"texture#i:select#l:5:0#s:290:25#hidden#1:1:1:0.25",
-			"font#b:-10:-5#CTMod - www.ctmod.net#0.72:0.36:0",
+			"font#bl:-10:-5#CTMod - www.ctmod.net#0.72:0.36:0",
 						--700 is an offset to prevent taint affecting battleground queueing
 			["button#i:701#hidden#s:263:25#tl:17:-85"] = modListButtonTemplate,	
 			["button#i:702#hidden#s:263:25#tl:17:-110"] = modListButtonTemplate,

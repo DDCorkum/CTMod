@@ -803,6 +803,7 @@ do
 							["datemodified"] = date("%Y%m%d"),
 							["version"] = MODULE_VERSION,
 						}
+						if (not CT_MapMod_Notes[mapid]) then CT_MapMod_Notes[mapid] = { }; end
 						tinsert(CT_MapMod_Notes[mapid],newnote);
 						WorldMapFrame:RefreshAllDataProviders();
 						GameTooltip:Hide();
@@ -970,6 +971,7 @@ do
 						for j, type in ipairs(module.NoteTypes["Herb"]) do
 							if type["name"] == arg2 then
 								local istooclose = nil;
+								if (not CT_MapMod_Notes[mapid]) then CT_MapMod_Notes[mapid] = { }; end
 								for k, note in ipairs(CT_MapMod_Notes[mapid]) do
 									if ((note["name"] == arg2) and (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.025)) then  --two herbs of the same kind not far apart
 										istooclose = true;
@@ -1013,6 +1015,7 @@ do
 						for j, type in ipairs(module.NoteTypes["Ore"]) do
 							if type["name"] == arg2 then
 								local istooclose = nil;
+								if (not CT_MapMod_Notes[mapid]) then CT_MapMod_Notes[mapid] = { }; end
 								for k, note in ipairs(CT_MapMod_Notes[mapid]) do
 									if ((note["name"] == arg2) and (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.03)) then    --two veins of the same kind not far apart
 										istooclose = true;
