@@ -131,7 +131,7 @@ local function CT_MapMod_Initialize()		-- called via module.update("init") from 
 			{ ["name"] = "Akunda's Bite", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_AkundasBite" },
 			{ ["name"] = "Anchor Weed", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_AnchorWeed" },
 			{ ["name"] = "Riverbud", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Riverbud" },
-			{ ["name"] = "Sea Stalk", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_SeaStalk" },
+			{ ["name"] = "Sea Stalks", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_SeaStalk" },
 			{ ["name"] = "Siren's Song", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
 			{ ["name"] = "Star Moss", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_StarMoss" },
 			{ ["name"] = "Winter's Kiss", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_WintersKiss" },
@@ -207,12 +207,19 @@ local function CT_MapMod_Initialize()		-- called via module.update("init") from 
 					CT_MapMod_Notes[newmap] = { }; 
 				end					
 				tinsert(CT_MapMod_Notes[newmap],newnote);
-				--wipe(note);
 			end
 		end
-		--wipe(notecollection);
 	end
 	wipe(CT_UserMap_Notes);
+	
+	-- update saved notes from more recent versions (8.0.1.4 onwards) to the current format, as required
+	for mapid, notetable in pairs(CT_MapMod_Notes)
+		for i, note in ipairs(notetable)
+			if (note["set"] == "Herb" and note["subset"] == "Sea Stalk") then note["subset"] = "Sea Stalks"; end		-- Fixing typo in 8.0.1.4
+			-- add here any future changes to the NoteTypes tables
+		end
+		--add here any future changes to mapid
+	end
 
 	-- load the DataProvider which has most of the horsepower
 	WorldMapFrame:AddDataProvider(CreateFromMixins(CT_MapMod_DataProviderMixin));
