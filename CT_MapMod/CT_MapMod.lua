@@ -132,7 +132,7 @@ local function CT_MapMod_Initialize()		-- called via module.update("init") from 
 			{ ["name"] = "Anchor Weed", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_AnchorWeed" },
 			{ ["name"] = "Riverbud", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Riverbud" },
 			{ ["name"] = "Sea Stalks", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_SeaStalk" },
-			{ ["name"] = "Siren's Song", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
+			{ ["name"] = "Siren's Sting", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
 			{ ["name"] = "Star Moss", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_StarMoss" },
 			{ ["name"] = "Winter's Kiss", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_WintersKiss" },
 		},
@@ -213,9 +213,10 @@ local function CT_MapMod_Initialize()		-- called via module.update("init") from 
 	wipe(CT_UserMap_Notes);
 	
 	-- update saved notes from more recent versions (8.0.1.4 onwards) to the current format, as required
-	for mapid, notetable in pairs(CT_MapMod_Notes)
-		for i, note in ipairs(notetable)
-			if (note["set"] == "Herb" and note["subset"] == "Sea Stalk") then note["subset"] = "Sea Stalks"; end		-- Fixing typo in 8.0.1.4
+	for mapid, notetable in pairs(CT_MapMod_Notes) do
+		for i, note in ipairs(notetable) do
+			if (note["set"] == "Herb" and note["subset"] == "Sea Stalk") then note["subset"] = "Sea Stalks"; end		-- 8.0.1.4 to 8.0.1.5
+			if (note["set"] == "Herb" and note["subset"] == "Siren's Song") then note["subset"] = "Siren's Sting"; end	-- 8.0.1.4 to 8.0.1.5
 			-- add here any future changes to the NoteTypes tables
 		end
 		--add here any future changes to mapid
@@ -404,9 +405,34 @@ function CT_MapMod_PinMixin:OnMouseLeave()
 end
  
 function CT_MapMod_PinMixin:ApplyFrameLevel()
-	--local frameLevel = self:GetMap():GetPinFrameLevelsManager():GetValidFrameLevel(self.pinFrameLevelType, self.pinFrameLevelIndex);
-	--self:SetFrameLevel(frameLevel);
 	self:SetFrameLevel(2200);
+end
+
+function CT_MapMod_PinMixin:ApplyCurrentScale()
+	local scale;
+	local startScale = 0.80;
+	local endScale = 1.60;
+	local scaleFactor = 1;
+	if (WorldMapFrame:IsMaximized()) then
+		scale = 1.5 / self:GetMap():GetCanvasScale() * Lerp(startScale, endScale, Saturate(scaleFactor * self:GetMap():GetCanvasZoomPercent()))
+	else
+		scale = 1.0 / self:GetMap():GetCanvasScale() * Lerp(startScale, endScale, Saturate(scaleFactor * self:GetMap():GetCanvasZoomPercent()))
+	end
+	if scale then
+		if not self:IsIgnoringGlobalPinScale() then
+			scale = scale * self:GetMap():GetGlobalPinScale();
+		end
+		self:SetScale(scale);
+		self:ApplyCurrentPosition();
+	end
+end
+
+function CT_MapMod_PinMixin:ApplyCurrentAlpha()
+	if (WorldMapFrame:IsMaximized()) then
+		self:SetAlpha(Lerp( 0.3 + 0.7*((module:getOption("CT_MapMod_AlphaAmount")) or 0.75), 1.00, Saturate(1.00 * self:GetMap():GetCanvasZoomPercent())));
+	else
+		self:SetAlpha(Lerp( 0.0 + 1.0*((module:getOption("CT_MapMod_AlphaAmount")) or 0.75), 1.00, Saturate(1.00 * self:GetMap():GetCanvasZoomPercent())));
+	end  	
 end
 
 -- This function is called the first time the pin is clicked on, and also every subsequent time the pin is acquired
@@ -579,13 +605,13 @@ function CT_MapMod_PinMixin:CreateNotePanel()
 	self.notepanel.setdropdown:SetPoint("LEFT",self.notepanel,"TOPLEFT",35,-60);
 	L_UIDropDownMenu_SetWidth(self.notepanel.setdropdown, 90);
 
-	self.notepanel.usersubsetdropdown:SetPoint("LEFT",self.notepanel,"TOP",35,-60);
+	self.notepanel.usersubsetdropdown:SetPoint("LEFT",self.notepanel,"TOP",30,-60);
 	L_UIDropDownMenu_SetWidth(self.notepanel.usersubsetdropdown, 90);
 
-	self.notepanel.herbsubsetdropdown:SetPoint("LEFT",self.notepanel,"TOP",35,-60);
+	self.notepanel.herbsubsetdropdown:SetPoint("LEFT",self.notepanel,"TOP",30,-60);
 	L_UIDropDownMenu_SetWidth(self.notepanel.herbsubsetdropdown, 90);
 
-	self.notepanel.oresubsetdropdown:SetPoint("LEFT",self.notepanel,"TOP",35,-60);
+	self.notepanel.oresubsetdropdown:SetPoint("LEFT",self.notepanel,"TOP",30,-60);
 	L_UIDropDownMenu_SetWidth(self.notepanel.oresubsetdropdown, 90);
 
 	L_UIDropDownMenu_Initialize(self.notepanel.setdropdown, function()
@@ -1131,6 +1157,7 @@ module.update = function(self, optName, value)
 		or optName == "CT_MapMod_UserNoteDisplay"
 		or optName == "CT_MapMod_HerbNoteDisplay"
 		or optName == "CT_MapMod_OreNoteDisplay"
+		or optName == "CT_MapMod_AlphaAmount"
 	) then
 		WorldMapFrame:RefreshAllDataProviders();
 	end
@@ -1202,7 +1229,7 @@ module.frame = function()
 		optionsAddObject(-5,   24, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_ShowMapResetButton#n:CT_MapMod_ShowMapResetButton#Auto#Always#Disabled");
 		
 		
-		optionsAddObject(-20,  17, "font#tl:5:%y#v:GameFontNormalLarge#Create and Display Notes");
+		optionsAddObject(-20,  17, "font#tl:5:%y#v:GameFontNormalLarge#Create and Display Pins");
 		
 		optionsAddObject(-5,   50, "font#t:0:%y#s:0:%s#l:13:0#r#Identify points of interest on the map with custom icons#" .. textColor2 .. ":l");
 		optionsAddObject(-5,   14, "font#t:0:%y#s:0:%s#l:13:0#r#Show custom user notes#" .. textColor1 .. ":l");
@@ -1219,6 +1246,10 @@ module.frame = function()
 		optionsAddObject(-5,   24, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_OreNoteDisplay#n:CT_MapMod_OreNoteDisplay#Auto#Always#Disabled");
 		optionsAddObject(-5,    8, "font#t:0:%y#s:0:%s#l:13:0#r#Mining note size#" .. textColor1 .. ":l");
 		optionsAddFrame(-5,    28, "slider#tl:24:%y#s:169:15#o:CT_MapMod_OreNoteSize:14##10:26:0.5");
+		
+		optionsAddObject(-5,   50, "font#t:0:%y#s:0:%s#l:13:0#r#Reduce pin alpha to see other map features.\nAlpha is always 100% when zoomed in\nMore alpha = more opaque#" .. textColor2 .. ":l");
+		optionsAddObject(-5,    8, "font#t:0:%y#s:0:%s#l:13:0#r#Alpha when zoomed out#" .. textColor1 .. ":l");
+		optionsAddFrame(-5,    28, "slider#tl:24:%y#s:169:15#o:CT_MapMod_AlphaAmount:0.75##0.50:1.00:0.05");
 		
 	optionsEndFrame();
 
