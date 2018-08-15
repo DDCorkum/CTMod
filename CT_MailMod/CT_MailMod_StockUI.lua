@@ -989,6 +989,7 @@ function InboxFrame_OnClick(self, index)
 		OpenMail_Update();
 		--OpenMailFrame:Show();
 		ShowUIPanel(OpenMailFrame);
+		OpenMailFrameInset:SetPoint("TOPLEFT", 4, -80);
 		PlaySound(829);
 		module:initOpenMail(); -- *new*
 	else

@@ -1,3 +1,6 @@
+CT_MailMod (8.0.1.5) 2018-08-15
+- Aesthetic adjustment to open mail frame
+
 CT_MailMod (8.0.1.3) 2018-07-28
 - Fixed and improved auto-complete filters
 
