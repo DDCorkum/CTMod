@@ -56,6 +56,7 @@ CT_RA_CLASS_SHAMAN = "Shaman";
 CT_RA_CLASS_PALADIN = "Paladin";
 CT_RA_CLASS_DEATHKNIGHT = "Death Knight";
 CT_RA_CLASS_MONK = "Monk";
+CT_RA_CLASS_DEMONHUNTER = "Demon Hunter";
 
 -- Messages
 CT_RA_MESSAGE_AFK = "You are now Away: (.+)";

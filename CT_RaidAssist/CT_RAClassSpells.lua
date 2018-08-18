@@ -36,19 +36,6 @@ end
 
 function CT_RA_GetClassTalents()
 	CT_RA_ClassTalents = { };
---[[
-	-- WoW 4
-	local name, iconPath, tier, column, currentRank, maxRank;
-	for i = 1, GetNumTalentTabs(), 1 do
-		for y = 1, GetNumTalents(i), 1 do
-			name, iconPath, tier, column, currentRank, maxRank = GetTalentInfo(i, y);
-			if (name and currentRank and currentRank > 0) then
-				CT_RA_ClassTalents[name] = currentRank;
-			end
-		end
-	end
---]]
-	-- WoW 5
 	local id, name, description, iconPath, background, role;
 	local currentRank;
 	for i = 1, GetNumSpecializations(), 1 do

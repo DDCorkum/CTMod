@@ -689,6 +689,7 @@ module.update = function(self, optName, value)
 		module:loadAddon("Vehicle Bar");
 		module:loadAddon("Status Bar");
 		module:loadAddon("Framerate Bar");
+		module:loadAddon("Talking Head");
 	end
 
 	-- Hook some functions.

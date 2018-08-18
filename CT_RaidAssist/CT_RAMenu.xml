@@ -2635,6 +2635,8 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</Frame>
 							<Frame name="$parentDebuffsClass11" id="11" inherits="CT_RAMenuNotifyClassTemplate">
 							</Frame>
+							<Frame name="$parentDebuffsClass12" id="12" inherits="CT_RAMenuNotifyClassTemplate">
+							</Frame>
 						</Frames>
 						<Scripts>
 							<OnShow>
