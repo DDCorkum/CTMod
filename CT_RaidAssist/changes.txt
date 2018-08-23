@@ -1,6 +1,7 @@
-CT_RaidAssit (8.0.1.5) 2018-08-17
-- Updated class buff icons
+CT_RaidAssist (8.0.1.5) 2018-08-21
+- Updated class buff icons to BFA
 - Added demon-hunter group
+- Fixed HasSoulstone() error
 
 CT_RaidAssist (8.0.1.3) 2018-07-27
 - Changing some legacy code to avoid future taint issues.

@@ -1341,15 +1341,17 @@ function CT_RA_OnEvent(self, event, arg1, arg2, ...)
 	end
 end
 
-CT_RA_oldUseSoulstone = UseSoulstone;
-function CT_RA_newUseSoulstone()
-	local text = HasSoulstone();
-	if ( text and text == CT_RA_REZ_REINCARNATION ) then  -- Shaman
-		CT_RA_AddMessage("CD 2 30");
+--[[	-- HasSoulstone() no longer appears to be a valid instruction.
+	CT_RA_oldUseSoulstone = UseSoulstone;
+	function CT_RA_newUseSoulstone()
+		local text = HasSoulstone();
+		if ( text and text == CT_RA_REZ_REINCARNATION ) then  -- Shaman
+			CT_RA_AddMessage("CD 2 30");
+		end
+		CT_RA_oldUseSoulstone();
 	end
-	CT_RA_oldUseSoulstone();
-end
-UseSoulstone = CT_RA_newUseSoulstone;
+	UseSoulstone = CT_RA_newUseSoulstone;
+--]]
 
 -----------------------------------------------------
 --                  Update Functions               --
@@ -4686,7 +4688,7 @@ StaticPopupDialogs["RESURRECT_NO_TIMER"].OnShow = function(self) oldDialogs["RES
 StaticPopupDialogs["RESURRECT"].OnHide = function() CT_RA_AddMessage("NORESSED") end;
 StaticPopupDialogs["RESURRECT_NO_SICKNESS"].OnHide = function() CT_RA_AddMessage("NORESSED") end;
 StaticPopupDialogs["RESURRECT_NO_TIMER"].OnHide = function() if ( not StaticPopup_FindVisible("DEATH") ) then CT_RA_AddMessage("NORESSED") end end;
-StaticPopupDialogs["DEATH"].OnShow = function(self) oldDialogs["DEATHSHOW"](self) if ( HasSoulstone() ) then CT_RA_AddMessage("CANRES") end end;
+StaticPopupDialogs["DEATH"].OnShow = function(self) oldDialogs["DEATHSHOW"](self) if ( ResurrectGetOfferer() and not ResurrectHasSickness() ) then CT_RA_AddMessage("CANRES") end end;
 
 -- Hook StaticPopup_OnShow
 hooksecurefunc("StaticPopup_OnShow", function(self)

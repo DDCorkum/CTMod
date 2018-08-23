@@ -265,7 +265,8 @@ module.frame = function()
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Tips");
 		optionsAddObject( -2, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#You can use /ctcore to open this options window directly.#" .. textColor2 .. ":l");
 		optionsAddObject( -2, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#You can use /hail to hail your current target. A key binding is also available for this.#" .. textColor2 .. ":l");
-
+		optionsAddObject( -8, 4*13, "font#t:0:%y#s:0:%s#l:13:0#r#Temporary notice:\nStarting in version 8.0105, CT_BottomBar has the option to hide the main-bar gryphons#" .. textColor3 .. ":l");
+		
 	-- Alternate Power Bar
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Alternate Power Bar");
 		optionsAddObject( -2, 5*14, "font#t:0:%y#s:0:%s#l:13:0#r#The game sometimes uses this bar to show the status of a quest, or your status in a fight, etc. The bar can vary in size, and its default position is centered near the bottom of the screen.#" .. textColor2 .. ":l");
@@ -438,11 +439,9 @@ module.frame = function()
 
 	-- General
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#General");
-		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#i:hideGryphons#o:hideGryphons#Hide the Main Bar gryphons");
 		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:tickMod#Display health/mana regeneration rates");
 		optionsAddObject( -2,   14, "font#tl:60:%y#v:ChatFontNormal#Format:");
 		optionsAddObject( 14,   20, "dropdown#tl:100:%y#s:125:%s#o:tickModFormat#n:CTCoreDropdown1#Health - Mana#HP/Tick - MP/Tick#HP - MP");
-
 	-- Merchant options
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Merchant");
 		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:merchantAltClickItem:true#Alt click a merchant's item to buy a stack");

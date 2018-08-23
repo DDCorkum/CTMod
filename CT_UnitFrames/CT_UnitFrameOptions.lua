@@ -90,6 +90,7 @@ function CT_UnitFramesOptions_Box_OnLoad(self)
 	_G[self:GetName() .. "Name"]:SetText(CT_UFO_BOX[self:GetID()]);
 	if ( self:GetID() == 1 ) then
 		_G[self:GetName() .. "PlayerTextLeftCBName"]:SetText(CT_UFO_TEXTLEFT);
+		_G[self:GetName() .. "PlayerCoordsRightCBName"]:SetText(CT_UFO_SHOWCOORDS);
 	elseif ( self:GetID() == 3 ) then
 		_G[self:GetName() .. "ClassFrameCBName"]:SetText(CT_UFO_TARGETCLASS);
 		_G[self:GetName() .. "TargetTextRightCBName"]:SetText(CT_UFO_TEXTRIGHT);
@@ -122,6 +123,9 @@ function CT_UnitFrameOptions_OnEvent(self, event, ...)
 		CT_UnitFramesOptionsFrameBox5LockCB:Enable();
 	elseif (event == "PLAYER_LOGIN") then
 		local fixLeft, fixEnemy;
+
+		-- added in 8.0.1.5.
+		CT_UnitFramesOptions.playerCoordsRight = not not CT_UnitFramesOptions.playerCoordsRight;
 
 		-- Assign default values if any rows are missing, and upgrade current users if needed.
 		if (not CT_UnitFramesOptions["styles"]) then
@@ -235,6 +239,7 @@ function CT_UnitFramesOptions_Radio_Update()
 	end
 
 	CT_UnitFramesOptionsFrameBox1PlayerTextLeftCB:SetChecked(CT_UnitFramesOptions.playerTextLeft);
+	CT_UnitFramesOptionsFrameBox1PlayerCoordsRightCB:SetChecked(CT_UnitFramesOptions.playerCoordsRight);
 	CT_UnitFramesOptionsFrameBox3ClassFrameCB:SetChecked(CT_UnitFramesOptions.displayTargetClass);
 	CT_UnitFramesOptionsFrameBox3TargetTextRightCB:SetChecked(CT_UnitFramesOptions.targetTextRight);
 	CT_UnitFramesOptionsFrameBox4DisplayCB:SetChecked(CT_UnitFramesOptions.shallDisplayAssist);
@@ -328,6 +333,10 @@ function CT_UnitFramesOptions_Box_CB_OnClick(self)
 			-- "Show health/mana on left"
 			CT_UnitFramesOptions.playerTextLeft = self:GetChecked();
 			CT_PlayerFrame_AnchorSideText();
+		elseif (self:GetID() == 63) then
+			-- "Show player coordinates"
+			CT_UnitFramesOptions.playerCoordsRight = self:GetChecked();
+			CT_PlayerFrame_PlayerCoords();
 		end
 	elseif ( self:GetParent():GetID() == 3 ) then
 		-- Box3
@@ -591,6 +600,8 @@ module.update = function(self, type, value)
 		end
 
 		CT_UnitFrameOptions_SetOptionsFrame("player");
+		
+		CT_PlayerFrame_PlayerCoords()
 	else
 
 	end

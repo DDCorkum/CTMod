@@ -19,13 +19,7 @@ local module = _G.CT_BottomBar;
 local ctRelativeFrame = module.ctRelativeFrame;
 local appliedOptions;
 
-local CT_BottomBar_Arrows_MainMenuBarArtFrameDefaultPosition = nil;
-local CT_BB_Arrows_MainMenuArtDefaultPoint = nil;
-local CT_BB_Arrows_MainMenuArtDefaultRelativeTo = nil;
-local CT_BB_Arrows_MainMenuArtDefaultRelativePoint = nil;
-local CT_BB_Arrows_MainMenuArtDefaultX = nil;
-local CT_BB_Arrows_MainMenuArtDefaultY = nil;
-local CT_BB_Arrows_isEnabled = nil;
+local CT_BB_PageNumber;
 
 --------------------------------------------
 -- Action bar arrows and page number
@@ -37,7 +31,6 @@ local function addon_Update(self)
 	local objUp = ActionBarUpButton;
 	local objDown = ActionBarDownButton;
 
-
 	self.helperFrame:ClearAllPoints();
 	self.helperFrame:SetPoint("TOPLEFT", objUp, "TOPLEFT", -5, 5);
 	self.helperFrame:SetPoint("BOTTOMRIGHT", objDown, "BOTTOMRIGHT", 15, -5);
@@ -48,33 +41,31 @@ local function addon_Update(self)
 	objDown:ClearAllPoints();
 	objUp:ClearAllPoints();
 
-	objDown:SetPoint("BOTTOMLEFT", self.frame, 0, 0);
+	objDown:SetPoint("TOPRIGHT", self.frame, 0, 0);
 	objUp:SetPoint("BOTTOMLEFT", objDown, "TOPLEFT", 0, 0);
-	
-	--From WoW 8.0 forward, this moves the number next to the arrows but ONLY if the background textures are hidden
-	CT_BottomBar_Arrows_FixMainMenuBarArtFrameBackground(self)
-
-	
-end
-
-function CT_BottomBar_Arrows_FixMainMenuBarArtFrameBackground(self)
-	if (appliedOptions.hideTexturesBackground and CT_BB_Arrows_isEnabled) then
-		MainMenuBarArtFrameBackground:ClearAllPoints();
-		MainMenuBarArtFrameBackground:SetPoint("BOTTOMLEFT", self.frame, "BOTTOMLEFT", -512, 0);
-	else
-		MainMenuBarArtFrameBackground:ClearAllPoints();
-		MainMenuBarArtFrameBackground:SetPoint(CT_BB_Arrows_MainMenuArtDefaultPoint, CT_BB_Arrows_MainMenuArtDefaultRelativeTo, CT_BB_Arrows_MainMenuArtDefaultRelativePoint, CT_BB_Arrows_MainMenuArtDefaultX, CT_BB_Arrows_MainMenuArtDefaultY);
-	end
 end
 
 local function addon_Enable(self)
-	CT_BB_Arrows_isEnabled = true;
 	self.frame:SetClampRectInsets(10, -10, 39, 10);
+	MainMenuBarArtFrame.PageNumber:Hide();
+	if (CT_BB_PageNumber) then
+		CT_BB_PageNumber:Show();
+	else
+		CT_BB_PageNumber = self.frame:CreateFontString(nil,"OVERLAY","GameFontNormalSmall");
+		CT_BB_PageNumber:SetText(GetActionBarPage());
+		CT_BB_PageNumber:SetPoint("LEFT",self.frame,"RIGHT", 5, 0);
+		self.frame:RegisterEvent("ACTIONBAR_PAGE_CHANGED");
+		self.frame:SetScript("OnEvent",function(newself, event, ...)
+			if (event == "ACTIONBAR_PAGE_CHANGED") then
+				CT_BB_PageNumber:SetText(GetActionBarPage());
+			end
+		end);
+	end
 end
 
 local function addon_Disable(self)
-	CT_BB_Arrows_isEnabled = false;
-	CT_BottomBar_Arrows_FixMainMenuBarArtFrameBackground(self)
+	MainMenuBarArtFrame.PageNumber:Show();
+	CT_BB_PageNumber:Hide();
 end
 
 local function addon_Init(self)
@@ -89,8 +80,6 @@ local function addon_Init(self)
 
 	local frame = CreateFrame("Frame", "CT_BottomBar_" .. self.frameName .. "_GuideFrame");
 	self.helperFrame = frame;
-	
-	CT_BB_Arrows_MainMenuArtDefaultPoint, CT_BB_Arrows_MainMenuArtDefaultRelativeTo, CT_BB_Arrows_MainMenuArtDefaultRelativePoint, CT_BB_Arrows_MainMenuArtDefaultX, CT_BB_Arrows_MainMenuArtDefaultY = MainMenuBarArtFrameBackground:GetPoint(1);
 
 	return true;
 end
@@ -115,8 +104,7 @@ local function addon_Register()
 		addon_Disable,  -- no disable function
 		"helperFrame",
 		ActionBarUpButton,
-		ActionBarDownButton,
-		MainMenuBarArtFrame.PageNumber
+		ActionBarDownButton
 	);
 end
 

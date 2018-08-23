@@ -1,3 +1,6 @@
+CT_UnitFrames (8.0.1.5) 2018-08-21
+- Added option to show player coords next to player frame.  (default: not shown)
+
 CT_UnitFrames (8.0.1.0) 2018-07-17
 - Updated for 8.0.1
 

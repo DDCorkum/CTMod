@@ -65,3 +65,36 @@ function CT_PetFrame_TextStatusBar_UpdateTextString(bar)
 end
 hooksecurefunc("TextStatusBar_UpdateTextString", CT_PetFrame_TextStatusBar_UpdateTextString);
 
+local playerelapsed = 0;
+local isfirsttime = true;
+function CT_PlayerFrame_PlayerCoords()
+	if (CT_UnitFramesOptions.playerCoordsRight) then
+		CT_PlayerCoordsRight:Show();
+		if (isfirsttime) then
+			isfirsttime = false;
+			CT_PlayerFrame:HookScript("OnUpdate", function(self, elapsed)
+				playerelapsed = playerelapsed + elapsed;
+				if (playerelapsed < 1) then return; end
+				playerelapsed = 0;
+				local mapid = C_Map.GetBestMapForUnit("player");
+				if (mapid) then
+					local playerposition = C_Map.GetPlayerMapPosition(mapid,"player");
+					if (playerposition) then
+						local px, py = playerposition:GetXY();
+						if (not px or not py) then return; end  -- don't think this can ever happen
+						px = math.floor(px*100);
+						py = math.floor(py*100);
+						CT_PlayerCoordsRight:SetText(px .. "," .. py);
+					else
+						CT_PlayerCoordsRight:SetText("");
+					end
+				else
+					CT_PlayerCoordsRight:SetText("");
+				end
+			end);
+		end
+	else
+		CT_PlayerCoordsRight:Hide();
+	end
+end
+

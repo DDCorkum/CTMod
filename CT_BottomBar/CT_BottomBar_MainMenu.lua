@@ -81,20 +81,6 @@ function module:toggleGryphons(hide)
 		MainMenuBarArtFrame.LeftEndCap:Show();
 		MainMenuBarArtFrame.RightEndCap:Show();
 	end
-	if (type(module.frame) == "table") then
-		-- Change the checkbox in CT_BottomBar
-		local cb = module.frame.general.hideGryphons;
-		cb:SetChecked(hide);
-	end
-	if (CT_Core) then
-		local opt = "hideGryphons";
-		if (CT_Core:getOption(opt) ~= hide) then
-			-- Change the same option in CT_Core
-			gryphonLoop = true;
-			CT_Core:setOption(opt, hide, true);
-			gryphonLoop = nil;
-		end
-	end
 end
 
 --------------------------------------------
@@ -140,9 +126,6 @@ function module:hideTexturesBackground(hide)
 		MainMenuBarArtFrameBackground:Show();
 		hidMainBackground = false;
 	end
-	
-	-- From WoW 8.0.1 foward, it is necessary for this frame to follow the arrows when it is hidden, but stay in place when visible
-	CT_BottomBar_Arrows_FixMainMenuBarArtFrameBackground(module.ctActionBarPage);
 	
 end
 

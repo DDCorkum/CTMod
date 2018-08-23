@@ -103,7 +103,7 @@ local function addon_Register()
 		"Talking Head",  -- option name
 		"CTTalkingHead",  -- used in frame names
 		"Talking Head",  -- shown in options window & tooltips
-		"Talking",  -- title for horizontal orientation
+		"Talking Head (quest dialogue)",  -- title for horizontal orientation
 		nil,  -- title for vertical orientation
 		{ "BOTTOM", ctRelativeFrame, "BOTTOM", 0, 96 },
 		{ -- settings

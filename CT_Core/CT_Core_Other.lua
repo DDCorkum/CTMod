@@ -1519,46 +1519,6 @@ hooksecurefunc("ContainerFrameItemButton_OnModifiedClick", CT_Core_ContainerFram
 CT_Core_ContainerFrameItemButton_OnModifiedClick_Register(CT_Core_AddToAuctions);
 
 --------------------------------------------
--- Hide Gryphons
-
-local gryphonLoop;
-
-local function toggleGryphons(hide)
-	if (gryphonLoop) then
-		-- Ensure no infinite loop.
-		gryphonLoop = nil;
-		return;
-	end
-	-- Hide/Show the gryphons
-	if ( hide ) then
-		MainMenuBarArtFrame.LeftEndCap:Hide();
-		MainMenuBarArtFrame.RightEndCap:Hide();
-	else
-		MainMenuBarArtFrame.LeftEndCap:Show();
-		MainMenuBarArtFrame.RightEndCap:Show();
-	end
-	if (CT_BottomBar) then
-		-- CT_BottomBar is loaded, and it may also have an option
-		-- to hide the gryphons.
-		local optCore = "hideGryphons";
-		local optBott = "hideGryphons";
-		if (type(module.frame) == "table") then
-			-- Update our "hide gryphons" option checkbox.
-			-- This is needed for those times when CT_BottomBar calls us
-			-- to change the CT_Core "hide gryphons" option.
-			local cb = module.frame.section1[optCore];
-			cb:SetChecked(hide);
-		end
-		if (CT_BottomBar:getOption(optBott) ~= module:getOption(optCore)) then
-			-- Change CT_BottomBar's "hide gryphons" option.
-			gryphonLoop = true;
-			CT_BottomBar:setOption(optBott, hide, true);
-			gryphonLoop = nil;
-		end
-	end
-end
-
---------------------------------------------
 -- Hide World Map Minimap Button
 
 local function toggleWorldMap(hide)
@@ -3031,7 +2991,6 @@ local modFunctions = {
 	["tooltipMouseAnchor"] = setTooltipMouseAnchor,
 	["tooltipFrameDisableFade"] = setTooltipFrameDisableFade,
 	["tooltipMouseDisableFade"] = setTooltipMouseDisableFade,
-	["hideGryphons"] = toggleGryphons,
 	["hideWorldMap"] = toggleWorldMap,
 	["castingbarEnabled"] = castingbar_ToggleStatus,
 	["castingbarMovable"] = castingbar_ToggleMovable,

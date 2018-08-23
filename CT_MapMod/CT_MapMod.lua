@@ -817,7 +817,7 @@ do
 					GameTooltip:Hide();
 				end
 			},
-			["button#n:CT_MapMod_CreateNoteButton#s:80:16#tl:t:+120:-2#v:UIPanelButtonTemplate#New Pin"] =	{
+			["button#n:CT_MapMod_CreateNoteButton#s:75:16#tr:tr:-125:-3#v:UIPanelButtonTemplate#New Pin"] =	{
 				["onload"] = function(self)
 					WorldMapFrame:AddCanvasClickHandler(function(canvas, button)
 						if (not module.isCreatingNote) then return; end
@@ -864,7 +864,7 @@ do
 					if (not module.isCreatingNote) then GameTooltip:Hide(); end
 				end
 			},
-		["button#n:CT_MapMod_OptionsButton#s:80:16#tl:t:+205:-3#v:UIPanelButtonTemplate#Options"] = {
+		["button#n:CT_MapMod_OptionsButton#s:75:16#tr:tr:-50:-3#v:UIPanelButtonTemplate#Options"] = {
 				["onclick"] = function(self, arg1)
 					module:showModuleOptions(module.name);
 				end,
@@ -877,35 +877,48 @@ do
 					GameTooltip:Hide();
 				end
 			},
-		["frame#n:CT_MapMod_px#s:40:16#tl:t:-240:-3"] = { 
+		["frame#n:CT_MapMod_px#s:40:16#bl:b:-140:0"] = { 
 				["onload"] = function(self)
-					module.px = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
+					module.px = self
+					self.text = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
 				end,
 				["onenter"] = function(self)
 					GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, 15);
-					GameTooltip:SetText("CT: Player Coords");
+					local playerposition = C_Map.GetPlayerMapPosition(WorldMapFrame:GetMapID(),"player");
+					if (playerposition) then
+						GameTooltip:SetText("CT: Player Coords");
+					else
+						GameTooltip:SetText("Player coords not available here");
+					end
 					GameTooltip:Show();
 				end,
 				["onleave"] = function(self)
 					GameTooltip:Hide();
 				end
 			},
-		["frame#n:CT_MapMod_py#s:40:16#tl:t:-200:-3"] =  { 
+		["frame#n:CT_MapMod_py#s:40:16#bl:b:-100:0"] =  { 
 				["onload"] = function(self)
-					module.py = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
+					module.py = self
+					self.text = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
 				end,
 				["onenter"] = function(self)
 					GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, 15);
-					GameTooltip:SetText("CT: Player Coords");
+					local playerposition = C_Map.GetPlayerMapPosition(WorldMapFrame:GetMapID(),"player");
+					if (playerposition) then
+						GameTooltip:SetText("CT: Player Coords");
+					else
+						GameTooltip:SetText("Player coords not available here");
+					end
 					GameTooltip:Show();
 				end,
 				["onleave"] = function(self)
 					GameTooltip:Hide();
 				end
 			},
-		["frame#n:CT_MapMod_cx#s:40:16#tl:t:-140:-3"] =  { 
+		["frame#n:CT_MapMod_cx#s:40:16#bl:b:70:0"] =  { 
 				["onload"] = function(self)
-					module.cx = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
+					module.cx = self
+					self.text = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
 				end,
 				["onenter"] = function(self)
 					GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, 15);
@@ -916,9 +929,10 @@ do
 					GameTooltip:Hide();
 				end
 			},
-		["frame#n:CT_MapMod_cy#s:40:16#tl:t:-100:-3"] =  { 
+		["frame#n:CT_MapMod_cy#s:40:16#bl:b:110:0"] =  { 
 				["onload"] = function(self)
-					module.cy = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
+					module.cy = self
+					self.text = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
 
 				end,
 				["onenter"] = function(self)
@@ -946,21 +960,21 @@ do
 				local px, py = playerposition:GetXY();
 				px = math.floor(px*1000)/10;
 				py = math.floor(py*1000)/10;
-				module.px:SetText("x:" .. px);
-				module.py:SetText("y:" .. py);
+				module.px.text:SetText("x:" .. px);
+				module.py.text:SetText("y:" .. py);
 			else
-				module.px:SetText("x: -");
-				module.py:SetText("y: -");
+				module.px.text:SetText("x: -");
+				module.py.text:SetText("y: -");
 			end
 			if (mapid == C_Map.GetBestMapForUnit("player")) then
-				module.px:SetTextColor(1,1,1);
-				module.py:SetTextColor(1,1,1);
+				module.px.text:SetTextColor(1,1,1,1);
+				module.py.text:SetTextColor(1,1,1,1);
 				if ((module:getOption("CT_MapMod_ShowMapResetButton") or 1) == 1) then
 					_G["CT_MapMod_WhereAmIButton"]:Hide();
 				end			
 			else
-				module.px:SetTextColor(.6,.6,.6);			
-				module.py:SetTextColor(.6,.6,.6);
+				module.px.text:SetTextColor(1,1,1,.3);			
+				module.py.text:SetTextColor(1,1,1,.3);
 				if ((module:getOption("CT_MapMod_ShowMapResetButton") or 1) == 1) then
 					_G["CT_MapMod_WhereAmIButton"]:Show();
 				end				
@@ -968,16 +982,20 @@ do
 		end	
 		local cx, cy = WorldMapFrame:GetNormalizedCursorPosition();
 		if (cx and cy) then
+			if (cx > 0 and cx < 1 and cy > 0 and cy < 1) then
+				module.cx.text:SetTextColor(1,1,1,1);
+				module.cy.text:SetTextColor(1,1,1,1);
+			else
+				module.cx.text:SetTextColor(1,1,1,.3);			
+				module.cy.text:SetTextColor(1,1,1,.3);
+			end
 			cx = math.floor(cx*1000)/10;
 			cx = math.max(math.min(cx,100),0);
 			cy = math.floor(cy*1000)/10;
 			cy = math.max(math.min(cy,100),0);				
-			module.cx:SetText("x:" .. cx);
-			module.cy:SetText("y:" .. cy);
-		else
-			-- the cursor is not over the map
-			module.cx:SetText("x:");
-			module.cy:SetText("y:");			
+			module.cx.text:SetText("x:" .. cx);
+			module.cy.text:SetText("y:" .. cy);
+			
 		end
 	end);
 end
@@ -1006,15 +1024,14 @@ do
 								local istooclose = nil;
 								if (not CT_MapMod_Notes[mapid]) then CT_MapMod_Notes[mapid] = { }; end
 								for k, note in ipairs(CT_MapMod_Notes[mapid]) do
-									if ((note["name"] == arg2) and (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.025)) then  --two herbs of the same kind not far apart
+									if ((note["name"] == arg2) and (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.02)) then   --two herbs of the same kind not far apart
 										istooclose = true;
 									end
-									if (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.0125) then --two notes, even if they are different, extremely close together
+									if ((note["set"] == "Herb") and (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.01)) then 	--two herbs of different kinds very close together
 										istooclose = true;
-										if (note["name"] == "Herb" and note["subset"] == "Bruiseweed") then  -- legacy herb from WoD or Legion that can now be updated
-											note["name"] = arg2;
-											note["subset"] = arg2;
-										end
+									end
+									if (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.005) then 		--two notes of completely different kinds EXTREMELY close together
+										istooclose = true;
 									end
 								end
 								if (not istooclose) then
@@ -1027,7 +1044,7 @@ do
 										["descript"] = "",
 										["datemodified"] = date("%Y%m%d"),
 										["version"] = MODULE_VERSION,
-									};
+				m					};
 									tinsert(CT_MapMod_Notes[mapid],newnote);
 								end
 								return;
@@ -1050,10 +1067,13 @@ do
 								local istooclose = nil;
 								if (not CT_MapMod_Notes[mapid]) then CT_MapMod_Notes[mapid] = { }; end
 								for k, note in ipairs(CT_MapMod_Notes[mapid]) do
-									if ((note["name"] == arg2) and (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.03)) then    --two veins of the same kind not far apart
+									if ((note["name"] == arg2) and (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.02)) then   --two veins of the same kind not far apart
 										istooclose = true;
 									end
-									if (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.015) then --two notes, even if they are different, extremely close together
+									if ((note["set"] == "Ore") and (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.01)) then 	--two veins of different kinds very close together
+										istooclose = true;
+									end
+									if (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.005) then 		--two notes of completely different kinds EXTREMELY close together
 										istooclose = true;
 									end
 								end
@@ -1088,11 +1108,14 @@ end
 module.update = function(self, optName, value)
 	if (optName == "init") then		
 		CT_MapMod_Initialize();  -- handles things that arn't related to options
-		
-		local position = module:getOption("CT_MapMod_ShowPlayerCoordsOnMap") or 1;
+		module.px:ClearAllPoints();
+		module.py:ClearAllPoints();
+		module.cx:ClearAllPoints();
+		module.cy:ClearAllPoints();
+		local position = module:getOption("CT_MapMod_ShowPlayerCoordsOnMap") or 2;
 		if (position == 1) then
-			module.px:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-240,-3);
-			module.py:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-200,-3);
+			module.px:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-145,-3);
+			module.py:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-105,-3);
 		elseif (position == 2) then
 			module.px:SetPoint("BOTTOMLEFT",WorldMapFrame.ScrollContainer,"BOTTOM",-140,3);
 			module.py:SetPoint("BOTTOMLEFT",WorldMapFrame.ScrollContainer,"BOTTOM",-100,3);
@@ -1100,53 +1123,64 @@ module.update = function(self, optName, value)
 			module.px:Hide();
 			module.py:Hide();
 		end
-		position = module:getOption("CT_MapMod_ShowCursorCoordsOnMap") or 1;
+		module.px.text:SetAllPoints();
+		module.py.text:SetAllPoints();
+		position = module:getOption("CT_MapMod_ShowCursorCoordsOnMap") or 2;
 		if (position == 1) then
-			module.cx:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-140,-3);
-			module.cy:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-100,-3);
+			module.cx:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",65,-3);
+			module.cy:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",105,-3);
 		elseif (position == 2) then
 			module.cx:SetPoint("BOTTOMLEFT",WorldMapFrame.ScrollContainer,"BOTTOM",70,3);
 			module.cy:SetPoint("BOTTOMLEFT",WorldMapFrame.ScrollContainer,"BOTTOM",110,3);
 		else
 			module.cx:Hide();
 			module.cy:Hide();
-		end			
+		end		
+		module.cx.text:SetAllPoints();
+		module.cy.text:SetAllPoints();
 	elseif (optName == "CT_MapMod_ShowPlayerCoordsOnMap") then
-		if (not module.px and module.py) then return; end
-		module.px:Show();
-		module.py:Show();
+		if (not module.px or not module.py) then return; end
+		module.px:ClearAllPoints();
+		module.py:ClearAllPoints();
 		if (value == 1) then
-			module.px:ClearAllPoints();
-			module.px:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-240,-3);
-			module.py:ClearAllPoints();
-			module.py:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-200,-3);
+			module.px:Show();
+			module.py:Show();
+			module.px:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-145,-3);
+			module.py:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-105,-3);
 		elseif (value == 2) then
-			module.px:ClearAllPoints();
-			module.px:SetPoint("BOTTOMLEFT",WorldMapFrame.BorderFrame,"BOTTOM",-140,3);
-			module.py:ClearAllPoints();
-			module.py:SetPoint("BOTTOMLEFT",WorldMapFrame.BorderFrame,"BOTTOM",-100,3);		
+			module.px:Show();
+			module.py:Show();
+			module.px:SetPoint("BOTTOMLEFT",WorldMapFrame.ScrollContainer,"BOTTOM",-140,3);
+			module.py:SetPoint("BOTTOMLEFT",WorldMapFrame.ScrollContainer,"BOTTOM",-100,3);		
 		else
 			module.px:Hide();
 			module.py:Hide();
 		end
+		module.px.text:SetAllPoints();
+		module.py.text:SetAllPoints();
 	elseif (optName == "CT_MapMod_ShowCursorCoordsOnMap") then
-		if (not module.cx and module.cy) then return; end
-		module.cx:Show();
-		module.cy:Show();
+		if (not module.cx or not module.cy) then return; end
+
 		if (value == 1) then
+			module.cx:Show();
+			module.cy:Show();
 			module.cx:ClearAllPoints();
-			module.cx:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-140,-3);
 			module.cy:ClearAllPoints();
-			module.cy:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-100,-3);
+			module.cx:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",65,-3);
+			module.cy:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",105,-3);
 		elseif (value == 2) then
+			module.cx:Show();
+			module.cy:Show();
 			module.cx:ClearAllPoints();
-			module.cx:SetPoint("BOTTOMLEFT",WorldMapFrame.BorderFrame,"BOTTOM",60,3);
 			module.cy:ClearAllPoints();
-			module.cy:SetPoint("BOTTOMLEFT",WorldMapFrame.BorderFrame,"BOTTOM",100,3);		
+			module.cx:SetPoint("BOTTOMLEFT",WorldMapFrame.ScrollContainer,"BOTTOM",60,3);
+			module.cy:SetPoint("BOTTOMLEFT",WorldMapFrame.ScrollContainer,"BOTTOM",100,3);		
 		else
 			module.cx:Hide();
 			module.cy:Hide();
 		end
+		module.cx.text:SetAllPoints();
+		module.cy.text:SetAllPoints();
 	elseif (optName == "CT_MapMod_ShowMapResetButton") then
 		if (not _G["CT_MapMod_WhereAmIButton"]) then return; end
 		if (value == 2) then _G["CT_MapMod_WhereAmIButton"]:Show(); end
@@ -1220,9 +1254,9 @@ module.frame = function()
 		
 		optionsAddObject(-5,   50, "font#t:0:%y#s:0:%s#l:13:0#r#Coordinates show where you are on the map, and where your mouse cursor is#" .. textColor2 .. ":l");
 		optionsAddObject(-5,   14, "font#t:0:%y#s:0:%s#l:13:0#r#Show player coordinates#" .. textColor1 .. ":l");
-		optionsAddObject(-5,   24, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_ShowPlayerCoordsOnMap#n:CT_MapMod_ShowPlayerCoordsOnMap#At Top#At Bottom#Disabled");
+		optionsAddObject(-5,   24, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_ShowPlayerCoordsOnMap:2#n:CT_MapMod_ShowPlayerCoordsOnMap#At Top#At Bottom#Disabled");
 		optionsAddObject(-5,   14, "font#t:0:%y#s:0:%s#l:13:0#r#Show cursor coordinates#" .. textColor1 .. ":l");
-		optionsAddObject(-5,   24, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_ShowCursorCoordsOnMap#n:CT_MapMod_ShowCursorCoordsOnMap#At Top#At Bottom#Disabled");
+		optionsAddObject(-5,   24, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_ShowCursorCoordsOnMap:2#n:CT_MapMod_ShowCursorCoordsOnMap#At Top#At Bottom#Disabled");
 		
 		optionsAddObject(-10,  50, "font#t:0:%y#s:0:%s#l:13:0#r#The \"where am I?\" button resets the map to your current zone.  Auto: show when map on wrong zone#" .. textColor2 .. ":l");
 		optionsAddObject(-5,   14, "font#t:0:%y#s:0:%s#l:13:0#r#Show map reset button#" .. textColor1 .. ":l");

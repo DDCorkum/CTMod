@@ -327,7 +327,7 @@ function module:updateOption(optName, value)
 		end
 		
 		
-
+--[[ REMOVED IN 8.0.1.5
 	elseif (optName == "repBarHideNoRep" or
 		optName == "repBarCoverExpBar" or
 		optName == "expBarShowMaxLevelBar"
@@ -427,6 +427,8 @@ function module:updateOption(optName, value)
 			ReputationWatchBar_Update();
 		end
 
+END REMOVED IN 8.0.1.5 --]]
+
 	elseif (optName == "hideGryphons") then
 		value = value ~= false;
 		if (applyUnprotectedOption(optName, value)) then
@@ -461,12 +463,12 @@ function module:updateOption(optName, value)
 			end
 		end
 
-	elseif (optName == "dragHideTooltip") then
-		value = not not value;
-		applyUnprotectedOption(optName, value);
+	-- REMOVED IN 8.0.1.5 -- elseif (optName == "dragHideTooltip") then
+	-- REMOVED IN 8.0.1.5 -- 	value = not not value;
+	-- REMOVED IN 8.0.1.5 -- 	applyUnprotectedOption(optName, value);
 
 	elseif (optName == "clampFrames") then
-		value = not not value;
+		value = value ~= false;  -- change in 8.0.1.5 to default as true
 		if (applyUnprotectedOption(optName, value)) then
 			for key, obj in ipairs(module.addons) do
 				if (not obj.isDisabled) then
@@ -624,54 +626,17 @@ module.frame = function()
 
 	-- Tips
 	optionsBeginFrame(-5, 0, "frame#tl:0:%y#r");
-		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Tips");
 		optionsAddObject( -5, 3*14, "font#t:0:%y#s:0:%s#l:13:0#r#You can use /ctbb, /ctbottom, or /ctbottombar to open this options window directly.#" .. textColor2 .. ":l");
-		optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#Bars are only movable when this options window is open.#" .. textColor2 .. ":l");
-		optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#Some options if changed will only be applied when you are not in combat.#" .. textColor2 .. ":l");
-	optionsEndFrame();
-
-	-- Options window
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
-		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Options window");
-		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:dragHideTooltip#Hide drag frame tooltips");
-		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:clampFrames#Cannot drag bars completely off screen");
-		if (CT_BarMod) then
-			optionsAddObject( -5,   26, "checkbutton#tl:20:%y#i:showCTBarMod#o:showCTBarMod#Show drag frames for CT_BarMod bars");
-		end
-	optionsEndFrame();
-
-	-- Artwork Options
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b#i:general");
-		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Artwork");
-
-		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#i:showLions#o:showLions#Show lions instead of gryphons");
-		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#i:hideGryphons#o:hideGryphons:true#Hide the gryphons/lions");
-		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#i:hideTexturesBackground#o:hideTexturesBackground:true#Hide the background textures");
-		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#i:hideMenuAndBagsBackground#o:hideMenuAndBagsBackground:true#Hide the menu and bags textures");
-	optionsEndFrame();
-
-	-- Override Frame
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
-		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Override/Vehicle Frame");
-		optionsAddObject( -5, 4*14, "font#t:0:%y#s:0:%s#l:20:0#r#This is a large frame used for vehicle and override bars. If you hide the frame you will need to use an alternate bar that can show vehicle and override buttons.#" .. textColor2 .. ":l");
-		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:vehicleHideFrame#Hide the override/vehicle frame.");
-		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:vehicleHideEnabledBars:true#Hide the activated CT_BottomBar bars.");
-	optionsEndFrame();
-
-	-- Pet Battle Frame
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
-		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Pet Battle Frame");
-		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:petbattleHideEnabledBars:true#Hide the activated CT_BottomBar bars.");
+		optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#Remember to scroll down!  There are lots of customizations down below.#" .. textColor2 .. ":l");
 	optionsEndFrame();
 
 	-- Bars
 	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b#i:bar");
 		optionsAddObject(  0,    1, "texture#tl:5:%y#br:tr:0:%b#1:1:1");
-		optionsAddObject(-15,   17, "font#tl:5:%y#v:GameFontNormalLarge#Bars");
+		optionsAddObject(-15,   17, "font#tl:5:%y#v:GameFontNormalLarge#Movable Bars");
 
-		optionsAddObject(-10, 3*14, "font#t:0:%y#s:0:%s#l:15:0#r#An activated bar can be moved, hidden, and possibly rotated. Some other options may also be available depending on the bar.#" .. textColor2 .. ":l");
-		optionsAddObject( -5, 3*14, "font#t:0:%y#s:0:%s#l:15:0#r#When you deactivate a bar, an attempt will be made to restore the bar to its default state if applicable.#" .. textColor2 .. ":l");
-		optionsAddObject( -5, 3*14, "font#t:0:%y#s:0:%s#l:15:0#r#If a bar does not deactivate as expected, restart your addons once using the /reload command.#" .. textColor2 .. ":l");
+		optionsAddObject(-10, 3*14, "font#t:0:%y#s:0:%s#l:15:0#r#Activate a bar to control it with this addon.  Deactivate it to restore the original condition.#" .. textColor2 .. ":l");
+		optionsAddObject( -5, 3*14, "font#t:0:%y#s:0:%s#l:15:0#r#If a bar does not deactivate as expected, try\n/console reloadui#" .. textColor2 .. ":l");
 
 		do
 			local off = -15;
@@ -717,11 +682,53 @@ module.frame = function()
 				updateBarWidgets();
 			end
 		);
+		
+		optionsAddObject(  -15,    1, "texture#tl:5:%y#br:tr:0:%b#1:1:1");
+		
+	optionsEndFrame();
+
+	-- General Options
+	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
+		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Important General Options");
+		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormal#Background Textures");
+		optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#Control the grey backgrounds behind the default UI bar positions.#" .. textColor2 .. ":l");
+		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#i:showLions#o:showLions#Show lions instead of gryphons");
+		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#i:hideGryphons#o:hideGryphons:true#Hide the gryphons/lions");
+		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#i:hideTexturesBackground#o:hideTexturesBackground:true#Hide the background textures");
+		--optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#Warning: don't hide the bag/menu background if you unchecked 'Activate' up above#" .. textColor2 .. ":l");
+		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#i:hideMenuAndBagsBackground#o:hideMenuAndBagsBackground:true#Hide the menu and bags textures");
+		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormal#How to move bars");
+		optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#You can move a bar off the screen if you want... but consider just hiding it instead#" .. textColor2 .. ":l");
+		optionsAddObject(  -5,   26, "checkbutton#tl:20:%y#o:clampFrames:true#Cannot drag bars completely off screen");
+		if (CT_BarMod) then
+			optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#The numbered bars are part of CT_BarMod.\nCheck this to move them at the same time.#" .. textColor2 .. ":l");
+			optionsAddObject( -5,   26, "checkbutton#tl:20:%y#i:showCTBarMod#o:showCTBarMod#Move CT_BarMod bars at the same time");
+		end
+		optionsAddObject(  -15,    1, "texture#tl:5:%y#br:tr:0:%b#1:1:1");
+	optionsEndFrame();
+	
+	-- Bar-Specific Options
+	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
+		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Bar-Specific Options");
+	optionsEndFrame();
+	
+	-- Override Frame
+	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
+		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormal#Override/Vehicle Frame");
+		optionsAddObject( -5, 4*14, "font#t:0:%y#s:0:%s#l:20:0#r#This is a large frame used for vehicle and override bars. If you hide the frame you will need to use an alternate bar that can show vehicle and override buttons.#" .. textColor2 .. ":l");
+		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:vehicleHideFrame#Hide the override/vehicle frame.");
+		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:vehicleHideEnabledBars:true#Hide the activated CT_BottomBar bars.");
+	optionsEndFrame();
+
+	-- Pet Battle Frame
+	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
+		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormal#Pet Battle Frame");
+		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:petbattleHideEnabledBars:true#Hide the activated CT_BottomBar bars.");
 	optionsEndFrame();
 
 	-- Action bar options
 	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b#i:actionbar");
-		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Action Bar");
+		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormal#Action Bar");
 
 		optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:20:0#r#CT_BottomBar does not include support for manipulating the default main action bar.#" .. textColor2 .. ":l");
 		optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:20:0#r#The main action bar can either be used in its default state or it can be disabled.#" .. textColor2 .. ":l");
@@ -742,7 +749,7 @@ module.frame = function()
 	-- Bags Bar
 	if (module.ctBagsBar) then
 		optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
-			optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Bags Bar");
+			optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormal#Bags Bar");
 
 			optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:20:0#r#These options will have no effect if the Bags Bar is not activated.#" .. textColor3 .. ":l");
 
@@ -755,7 +762,7 @@ module.frame = function()
 	-- Experience & Reputation Status Bar
 	if (module.ctStatusBar) then
 		optionsBeginFrame(-25, 0, "frame#tl:0:%y#br:tr:0:%b#i:status#r");
-			optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Exp/Rep/Power Status Bars");
+			optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormal#Exp/Rep/Power Status Bars");
 
 			optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:20:0#r#These options will have no effect if the Status Bar is not activated.#" .. textColor3 .. ":l");
 
@@ -790,7 +797,7 @@ module.frame = function()
 	-- Extra Bar
 	if (module.ctExtraBar) then
 		optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
-			optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Extra Bar");
+			optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormal#Extra Bar");
 
 			optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:20:0#r#The following options will have no effect if the Extra Bar is not activated.#" .. textColor3 .. ":l");
 			optionsAddObject( -5, 3*14, "font#t:0:%y#s:0:%s#l:20:0#r#The Extra Bar consists of a single button which the game will show when needed (usually during certain boss fights).#" .. textColor2 .. ":l");
@@ -804,7 +811,7 @@ module.frame = function()
 	-- Pet Bar
 	if (module.ctPetBar) then
 		optionsBeginFrame(-30, 0, "frame#tl:0:%y#br:tr:0:%b");
-			optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Pet Bar");
+			optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormal#Pet Bar");
 
 			optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:20:0#r#These options will have no effect if the Pet Bar is not activated.#" .. textColor3 .. ":l");
 
@@ -817,7 +824,7 @@ module.frame = function()
 	-- Vehicle Tools Bar
 	if (module.ctVehicleBar) then
 		optionsBeginFrame(-30, 0, "frame#tl:0:%y#br:tr:0:%b");
-			optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Vehicle Tools Bar");
+			optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormal#Vehicle Tools Bar");
 
 			optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:20:0#r#These options will have no effect if the Vehicle Tools Bar is not activated.#" .. textColor3 .. ":l");
 			optionsAddObject( -2, 3*14, "font#t:0:%y#s:0:%s#l:20:0#r#If you are in a vehicle with no abilities then a leave vehicle button will be shown on this bar only if the vehicle can be exited.#" .. textColor2 .. ":l");
@@ -886,8 +893,8 @@ function module:optionsInitApplied()
 	-- successfully applied.
 
 	appliedOptions.showCTBarMod = not not module:getOption("showCTBarMod");
-	appliedOptions.dragHideTooltip = not not module:getOption("dragHideTooltip");
-	appliedOptions.clampFrames = not not module:getOption("clampFrames");
+	-- REMOVED IN 8.0.1.5 -- appliedOptions.dragHideTooltip = not not module:getOption("dragHideTooltip");
+	appliedOptions.clampFrames = module:getOption("clampFrames") ~= false;
 
 	appliedOptions.hideGryphons = module:getOption("hideGryphons") ~= false;
 	appliedOptions.showLions = not not module:getOption("showLions");
