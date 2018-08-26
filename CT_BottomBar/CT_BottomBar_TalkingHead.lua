@@ -73,16 +73,8 @@ local function addon_Init(self)
 	end
 	
 	TalkingHeadFrame.ignoreFramePositionManager = true;
-	--TalkingHeadFrame:SetParent(self.frame);
 	
-	--local timeelapsed = 0;
 	hooksecurefunc("TalkingHeadFrame_PlayCurrent", function()
-	--[[TalkingHeadFrame:HookScript("OnUpdate", function(thframe, elapsed)
-	 	timeelapsed = timeelapsed + elapsed;
-	 	if timeelapsed > 0.1 then
-	 		DEFAULT_CHAT_FRAME:AddMessage("test");
-	 		timeelapsed = 0;
-	 	end--]]
 	 	if (CT_BB_TalkingHead_IsEnabled) then
 			TalkingHeadFrame:ClearAllPoints();
 			TalkingHeadFrame:SetPoint("BOTTOM",self.frame,"BOTTOM", 0,0);

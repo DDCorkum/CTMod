@@ -405,7 +405,11 @@ function CT_MapMod_PinMixin:OnMouseLeave()
 end
  
 function CT_MapMod_PinMixin:ApplyFrameLevel()
-	self:SetFrameLevel(2200);
+	if (self.set == "User") then
+		self:SetFrameLevel (2099)
+	else
+		self:SetFrameLevel(2012);  -- herbalism and mining nodes don't cover over the flypoints
+	end
 end
 
 function CT_MapMod_PinMixin:ApplyCurrentScale()
@@ -795,6 +799,7 @@ end
 -- UI elements added to the world map title bar
 
 do
+	local newpinmousestart = nil;
 	module:getFrame	(
 		{
 			["button#n:CT_MapMod_WhereAmIButton#s:100:20#b:b:0:3#v:UIPanelButtonTemplate#Where am I?"] = {
@@ -841,11 +846,82 @@ do
 						WorldMapFrame:RefreshAllDataProviders();
 						GameTooltip:Hide();
 					end);
-					
+					self:RegisterForDrag("RightButton");
+					self:HookScript("OnDragStart", function()
+						if (not module.isCreatingNote) then
+							newpinmousestart = GetCursorPosition(); --only interested in the X coord
+							local value = module:getOption("CT_MapMod_CreateNoteButtonX") or -125;
+							if (WorldMapFrame:IsMaximized()) then
+								if (value < -1625) then module:setOption("CT_MapMod_CreateNoteButtonX", -1625, true, true); end
+							elseif (WorldMapFrame.SidePanelToggle.OpenButton:IsShown()) then
+								if (value < -535) then module:setOption("CT_MapMod_CreateNoteButtonX", -535, true, true); end
+							else
+								if (value < -820) then module:setOption("CT_MapMod_CreateNoteButtonX", -820, true, true); end
+							end
+							GameTooltip:SetText("|cFF999999Drag to set distance from RIGHT edge of map|r");
+						end  
+					end);
+					self:HookScript("OnDragStop", function()
+						if (not newpinmousestart) then return; end
+						local value = module:getOption("CT_MapMod_CreateNoteButtonX") or -125;
+						value = value + (GetCursorPosition() - newpinmousestart);
+						if (value > -125) then value = -125; end
+						if (WorldMapFrame:IsMaximized()) then
+							if (value < -1625) then value = -1625; end
+						elseif (WorldMapFrame.SidePanelToggle.OpenButton:IsShown()) then
+							if (value < -535) then value = -535; end
+						else
+							if (value < -820) then value = -820; end
+						end
+						module:setOption("CT_MapMod_CreateNoteButtonX", value, true, true)
+						newpinmousestart = nil;
+						GameTooltip:Hide();
+					end);
+					local duration = 0;
+					self:HookScript("OnUpdate", function(newself, elapsed)
+						duration = duration + elapsed;
+						if (duration < .1) then return; end
+						duration = 0;
+						local value = module:getOption("CT_MapMod_CreateNoteButtonX") or -125;
+						if (newpinmousestart) then
+							-- Currently dragging the frame
+							value = value + (GetCursorPosition() - newpinmousestart);
+							if (value > -125) then value = -125; end
+							if (WorldMapFrame:IsMaximized()) then
+								if (value < -1625) then value = -1625; end
+							elseif (WorldMapFrame.SidePanelToggle.OpenButton:IsShown()) then
+								if (value < -535) then value = -535; end
+							else
+								if (value < -820) then value = -820; end
+							end
+						elseif (not WorldMapFrame:IsMaximized() and WorldMapFrame.SidePanelToggle.OpenButton:IsShown()) then
+							-- Minimized without quest frame
+							if (value < -225 and value > -350) then value = -225; end
+							if (value < -350 and value > -477) then value = -477; end
+							if (value < -535) then value = -535; end
+						elseif (not WorldMapFrame:IsMaximized() and WorldMapFrame.SidePanelToggle.CloseButton:IsShown()) then
+							-- Minimized with quest frame
+							if (value < -370 and value > -495) then value = -370; end
+							if (value < -495 and value > -620) then value = -620; end
+							if (value < -820) then value = -820; end
+						else
+							-- Maximized
+							if (value < -760 and value > -850) then value = -760; end
+							if (value < -850 and value > -940) then value = -940; end
+						end
+						self:ClearAllPoints();
+						self:SetPoint("TOPRIGHT",WorldMapFrame.BorderFrame,"TOPRIGHT",value,-3)
+					end);
+					self:HookScript("OnHide",function()
+						if (module.isCreatingNote) then
+							GameTooltip:Hide();
+							module.isCreatingNote = nil;
+						end
+					end);
 				end,
 				["onclick"] = function(self, arg1)
 					if ( arg1 == "LeftButton" ) then
-						if (module.isEditingNote or module.isCreatingNote) then
+						if (module.isEditingNote or module.isCreatingNote or newpinmousestart) then
 							return;
 						else
 							module.isCreatingNote = true;
@@ -854,27 +930,66 @@ do
 					end
 				end,
 				["onenter"] = function(self)
-					if (not module.isCreatingNote) then 
+					if (not module.isCreatingNote and not newpinmousestart) then 
 						GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, -60);
-						GameTooltip:SetText("CT: Add a new pin to the map");
+						GameTooltip:SetText("CT: Add a new pin to the map|n|cFF999999(Right-Click to Drag)|r");
 						GameTooltip:Show();
 					end
 				end,
 				["onleave"] = function(self)
-					if (not module.isCreatingNote) then GameTooltip:Hide(); end
-				end
+					if (not module.isCreatingNote and not newpinmousestart) then GameTooltip:Hide(); end
+				end,
 			},
 		["button#n:CT_MapMod_OptionsButton#s:75:16#tr:tr:-50:-3#v:UIPanelButtonTemplate#Options"] = {
 				["onclick"] = function(self, arg1)
 					module:showModuleOptions(module.name);
 				end,
 				["onenter"] = function(self)
-					GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, -60);
-					GameTooltip:SetText("/ctmap");
-					GameTooltip:Show();
+					if (not module.isCreatingNote and not newpinmousestart) then
+						GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, -60);
+						GameTooltip:SetText("/ctmap|n|cFF999999(Right-Click to Drag)|r");
+						GameTooltip:Show();
+					end
 				end,
 				["onleave"] = function(self)
-					GameTooltip:Hide();
+					if (not module.isCreatingNote and not newpinmousestart) then
+						GameTooltip:Hide();
+					end
+				end,
+				["onload"] = function(self)
+					self:ClearAllPoints();
+					self:SetPoint("LEFT",CT_MapMod_CreateNoteButton,"RIGHT",0,0);
+					self:RegisterForDrag("RightButton");
+					self:HookScript("OnDragStart", function()
+						if (not module.isCreatingNote) then
+							newpinmousestart = GetCursorPosition(); --only interested in the X coord
+							local value = module:getOption("CT_MapMod_CreateNoteButtonX") or -125;
+							if (WorldMapFrame:IsMaximized()) then
+								if (value < -1625) then module:setOption("CT_MapMod_CreateNoteButtonX", -1625, true, true); end
+							elseif (WorldMapFrame.SidePanelToggle.OpenButton:IsShown()) then
+								if (value < -535) then module:setOption("CT_MapMod_CreateNoteButtonX", -535, true, true); end
+							else
+								if (value < -820) then module:setOption("CT_MapMod_CreateNoteButtonX", -820, true, true); end
+							end
+							GameTooltip:SetText("|cFF999999Drag to set distance from RIGHT edge of map|r");
+						end  
+					end);
+					self:HookScript("OnDragStop", function()
+						if (not newpinmousestart) then return; end
+						local value = module:getOption("CT_MapMod_CreateNoteButtonX") or -125;
+						value = value + (GetCursorPosition() - newpinmousestart);
+						if (value > -125) then value = -125; end
+						if (WorldMapFrame:IsMaximized()) then
+							if (value < -1625) then value = -1625; end
+						elseif (WorldMapFrame.SidePanelToggle.OpenButton:IsShown()) then
+							if (value < -535) then value = -535; end
+						else
+							if (value < -820) then value = -820; end
+						end
+						module:setOption("CT_MapMod_CreateNoteButtonX", value, true, true)
+						newpinmousestart = nil;
+						GameTooltip:Hide();
+					end);
 				end
 			},
 		["frame#n:CT_MapMod_px#s:40:16#bl:b:-140:0"] = { 
@@ -1138,6 +1253,10 @@ module.update = function(self, optName, value)
 		end		
 		module.cx.text:SetAllPoints();
 		module.cy.text:SetAllPoints();
+		
+		CT_MapMod_CreateNoteButton:ClearAllPoints();
+		CT_MapMod_CreateNoteButton:SetPoint("TOPRIGHT",WorldMapFrame.BorderFrame,"TOPRIGHT",module:getOption("CT_MapMod_CreateNoteButtonX") or -125,-3)
+		
 	elseif (optName == "CT_MapMod_ShowPlayerCoordsOnMap") then
 		if (not module.px or not module.py) then return; end
 		module.px:ClearAllPoints();
@@ -1284,6 +1403,36 @@ module.frame = function()
 		optionsAddObject(-5,   50, "font#t:0:%y#s:0:%s#l:13:0#r#Reduce pin alpha to see other map features.\nAlpha is always 100% when zoomed in\nMore alpha = more opaque#" .. textColor2 .. ":l");
 		optionsAddObject(-5,    8, "font#t:0:%y#s:0:%s#l:13:0#r#Alpha when zoomed out#" .. textColor1 .. ":l");
 		optionsAddFrame(-5,    28, "slider#tl:24:%y#s:169:15#o:CT_MapMod_AlphaAmount:0.75##0.50:1.00:0.05");
+		
+		
+		-- Reset Options
+		optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
+			optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Reset Options");
+			optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:CT_MapMod_resetAll#Reset options for all of your characters");
+			optionsBeginFrame(   0,   30, "button#t:0:%y#s:120:%s#v:UIPanelButtonTemplate#Reset options");
+				optionsAddScript("onclick",
+					function(self)
+						if (module:getOption("CT_MapMod_resetAll")) then
+							CT_MapModOptions = {};
+							ConsoleExec("RELOADUI");
+						else
+							-- eventually this should be replaced with code that wipes the variables completely away, to be truly "default"
+							module:setOption("CT_MapMod_CreateNoteButtonX",-125,true,false);
+							module:setOption("CT_MapMod_ShowPlayerCoordsOnMap",2,true,false);
+							module:setOption("CT_MapMod_ShowCursorCoordsOnMap",2,true,false);
+							module:setOption("CT_MapMod_AlphaAmount",0.75,true,false);
+							module:setOption("CT_MapMod_UserNoteSize",24,true,false);
+							module:setOption("CT_MapMod_HerbNoteSize",14,true,false);
+							module:setOption("CT_MapMod_OreNoteSize",14,true,false);
+							module:setOption("CT_MapMod_UserNoteDisplay",1,true,false);
+							module:setOption("CT_MapMod_HerbNoteDisplay",1,true,false);
+							module:setOption("CT_MapMod_OreNoteDisplay",1,true,false);
+							ConsoleExec("RELOADUI");
+						end
+					end
+				);
+		optionsEndFrame();
+		optionsAddObject(  0, 3*13, "font#t:0:%y#s:0:%s#l#r#Note: This will reset the options to default and then reload your UI.#" .. textColor2);
 		
 	optionsEndFrame();
 
