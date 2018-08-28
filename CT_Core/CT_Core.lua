@@ -265,7 +265,36 @@ module.frame = function()
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Tips");
 		optionsAddObject( -2, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#You can use /ctcore to open this options window directly.#" .. textColor2 .. ":l");
 		optionsAddObject( -2, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#You can use /hail to hail your current target. A key binding is also available for this.#" .. textColor2 .. ":l");
-		optionsAddObject( -8, 4*13, "font#t:0:%y#s:0:%s#l:13:0#r#Temporary notice:\nStarting in version 8.0105, CT_BottomBar has the option to hide the main-bar gryphons#" .. textColor3 .. ":l");
+		optionsAddObject( -8, 4*13, "font#t:0:%y#s:0:%s#l:13:0#r#DEPRECIATED FEATURE:\nCT_Core no longer hides main-bar gryphons!\nThat option is now found in CT_BottomBar.#" .. textColor3 .. ":l");
+		optionsBeginFrame( -10,   30, "button#t:0:%y#s:180:%s#n:CT_Core_DepreciatedHideGryphons#v:GameMenuButtonTemplate#Restore gryphons");
+			optionsAddScript("onclick",
+				function(self)
+					module:setOption("hideGryphons",nil,true);
+					GameTooltip:Hide();
+					self:Hide();
+					
+				end
+			);
+			optionsAddScript("onload",
+				function(self)
+					if (module:getOption("hideGryphons") == nil) then 
+						self:Hide();
+					end
+				end
+			);
+			optionsAddScript("onenter",
+				function(self)
+					GameTooltip:SetOwner(self, "ANCHOR_BOTTOM", 0, -5);
+					GameTooltip:SetText("|cFFFF5555This action cannot be undone!|r|nYou will need |cFFFFFFFFCT_BottomBar|r to hide them again");
+					GameTooltip:Show();
+				end
+			);
+			optionsAddScript("onleave",
+				function(self)
+					GameTooltip:Hide();
+				end
+			);
+		optionsEndFrame();
 		
 	-- Alternate Power Bar
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Alternate Power Bar");
