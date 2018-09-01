@@ -1,6 +1,10 @@
+CT_BottomBar (8.0.1.6) 2018-08-31
+- The XP/Rep/Azerite bar is properly disabled, if directed, when logging on
+
 CT_BottomBar (8.0.1.5) 2018-08-15
 - The "talking head" quest dialogue is now movable!  No longer stuck over custom bars.
 - The movable action-bar arrows and action bar are less clunky
+
 
 CT_BottomBar (8.0.1.3) 2018-07-29
 - Fixed combat taint issue that was introduced in 8.0.1.2

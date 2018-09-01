@@ -83,6 +83,10 @@ local function addon_Init(self)
 	return true;
 end
 
+local function addon_PostInit(self)
+	if (module:getOption("enableStatus Bar") == false) then addon_Disable(self); end
+end
+
 
 function CT_BottomBar_StatusBar_UpdateBarsShown(self)
  	local visibleBars = {};
@@ -111,7 +115,7 @@ local function addon_Register()
 			orientation = "ACROSS",
 		},
 		addon_Init,
-		nil,  -- no post init function
+		addon_PostInit,  -- no post init function
 		nil,  -- no config function
 		addon_Update,
 		nil,  -- no orientation function
