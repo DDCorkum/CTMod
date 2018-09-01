@@ -739,6 +739,15 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 					</Anchor>
 				</Anchors>
 			</CheckButton>
+			<CheckButton name="CT_RAOptions2ClassCB12" inherits="CT_RaCheckButtonClassTemplate" id="12">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="CT_RAOptions2ClassCB11">
+						<Offset>
+							<AbsDimension x="135" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
 			<CheckButton name="CT_RASortWindowPositions" hidden="false" inherits="OptionsCheckButtonTemplate">
 				<HitRectInsets>
 					<AbsInset left="0" right="0" top="0" bottom="0"/>

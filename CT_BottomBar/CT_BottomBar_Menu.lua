@@ -21,7 +21,6 @@
 -- AchievementMicroButton
 -- QuestLogMicroButton
 -- GuildMicroButton
--- PVPMicroButton
 -- LFDMicroButton
 -- CollectionsMicroButton
 -- EJMicroButton
@@ -91,9 +90,7 @@ local function addon_UpdateOrientation_OurUI(self, orientation)
 		if (orientation == "ACROSS") then
 			setpoint(obj, "LEFT", frames[i-1], "RIGHT", -3, 0);
 		else
-			-- Using a large Y value (23) since the buttons look shorter than they are.
-			-- See also the talent and achievement hooked functions for the same Y value.
-			setpoint(obj, "TOP", frames[i-1], "BOTTOM", 0, 23);
+			setpoint(obj, "TOP", frames[i-1], "BOTTOM", 0, 1);
 		end
 	end
 
@@ -107,11 +104,11 @@ local function addon_Update_OurUI(self)
 
 	-- Anchor the left and right most buttons to our helper frame.
 	local objChar = CharacterMicroButton;  -- Left most button
-	local objHelp = HelpMicroButton;  -- Right most button
+	local objHelp = MainMenuMicroButton;  -- Right most button
 	local frame = self.helperFrame;
 	frame:ClearAllPoints();
-	frame:SetPoint("TOPLEFT", objChar, 0, -20);
-	frame:SetPoint("BOTTOMRIGHT", objHelp);
+	frame:SetPoint("TOPLEFT", objChar, "TOPLEFT", -3, 3);
+	frame:SetPoint("BOTTOMRIGHT", objHelp, "BOTTOMRIGHT", 3, -3);
 
 	-- Orient for our UI.
 	addon_UpdateOrientation_OurUI(self, self.orientation);
@@ -144,7 +141,7 @@ local function addon_Update_OverrideUI(self)
 	local anchorX, anchorY = addon_OverrideActionBar_GetMicroButtonAnchor();
 
 	local obj1 = frames[2];  -- CharacterMicroButton
-	local obj2 = frames[8];  -- PVPMicroButton
+	local obj2 = frames[8];  -- LFDMicroButton
 
 	obj1:ClearAllPoints();
 	setpoint(obj1, "BOTTOMLEFT", bar, "BOTTOMLEFT", anchorX, anchorY);
@@ -189,7 +186,7 @@ local function addon_Update_PetBattleUI(self)
 	local anchorX, anchorY = -9, 25;
 
 	local obj1 = frames[2];  -- CharacterMicroButton
-	local obj2 = frames[8];  -- PVPMicroButton
+	local obj2 = frames[8];  -- LFDMicroButton
 
 	obj1:ClearAllPoints();
 	setpoint(obj1, "BOTTOMLEFT", bar, "BOTTOMLEFT", anchorX, anchorY);
@@ -452,14 +449,14 @@ local function addon_Register()
 		TalentMicroButton, -- 4
 		AchievementMicroButton, -- 5
 		QuestLogMicroButton, -- 6
-		GuildMicroButton, -- 7
-		--PVPMicroButton, -- 8
-		LFDMicroButton, -- 9
-		CollectionsMicroButton, -- 10
-		EJMicroButton, -- 11
-		StoreMicroButton, -- 12
-		MainMenuMicroButton -- 13
-		--HelpMicroButton -- 14
+		GuildMicroButton, -- 7	
+		LFDMicroButton, -- 8
+		CollectionsMicroButton, -- 9
+		EJMicroButton, -- 10
+		StoreMicroButton, -- 11
+		MainMenuMicroButton -- 12
+		--PVPMicroButton, -- old 8
+		--HelpMicroButton -- old 14
 	);
 end
 

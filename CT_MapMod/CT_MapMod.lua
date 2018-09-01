@@ -131,8 +131,8 @@ local function CT_MapMod_Initialize()		-- called via module.update("init") from 
 			{ ["name"] = "Akunda's Bite", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_AkundasBite" },
 			{ ["name"] = "Anchor Weed", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_AnchorWeed" },
 			{ ["name"] = "Riverbud", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Riverbud" },
-			{ ["name"] = "Sea Stalk", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_SeaStalk" },
-			{ ["name"] = "Siren's Song", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
+			{ ["name"] = "Sea Stalks", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_SeaStalk" },
+			{ ["name"] = "Siren's Sting", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
 			{ ["name"] = "Star Moss", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_StarMoss" },
 			{ ["name"] = "Winter's Kiss", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_WintersKiss" },
 		},
@@ -207,12 +207,20 @@ local function CT_MapMod_Initialize()		-- called via module.update("init") from 
 					CT_MapMod_Notes[newmap] = { }; 
 				end					
 				tinsert(CT_MapMod_Notes[newmap],newnote);
-				--wipe(note);
 			end
 		end
-		--wipe(notecollection);
 	end
 	wipe(CT_UserMap_Notes);
+	
+	-- update saved notes from more recent versions (8.0.1.4 onwards) to the current format, as required
+	for mapid, notetable in pairs(CT_MapMod_Notes) do
+		for i, note in ipairs(notetable) do
+			if (note["set"] == "Herb" and note["subset"] == "Sea Stalk") then note["subset"] = "Sea Stalks"; end		-- 8.0.1.4 to 8.0.1.5
+			if (note["set"] == "Herb" and note["subset"] == "Siren's Song") then note["subset"] = "Siren's Sting"; end	-- 8.0.1.4 to 8.0.1.5
+			-- add here any future changes to the NoteTypes tables
+		end
+		--add here any future changes to mapid
+	end
 
 	-- load the DataProvider which has most of the horsepower
 	WorldMapFrame:AddDataProvider(CreateFromMixins(CT_MapMod_DataProviderMixin));
@@ -397,9 +405,38 @@ function CT_MapMod_PinMixin:OnMouseLeave()
 end
  
 function CT_MapMod_PinMixin:ApplyFrameLevel()
-	--local frameLevel = self:GetMap():GetPinFrameLevelsManager():GetValidFrameLevel(self.pinFrameLevelType, self.pinFrameLevelIndex);
-	--self:SetFrameLevel(frameLevel);
-	self:SetFrameLevel(2200);
+	if (self.set == "User") then
+		self:SetFrameLevel (2099)
+	else
+		self:SetFrameLevel(2012);  -- herbalism and mining nodes don't cover over the flypoints
+	end
+end
+
+function CT_MapMod_PinMixin:ApplyCurrentScale()
+	local scale;
+	local startScale = 0.80;
+	local endScale = 1.60;
+	local scaleFactor = 1;
+	if (WorldMapFrame:IsMaximized()) then
+		scale = 1.5 / self:GetMap():GetCanvasScale() * Lerp(startScale, endScale, Saturate(scaleFactor * self:GetMap():GetCanvasZoomPercent()))
+	else
+		scale = 1.0 / self:GetMap():GetCanvasScale() * Lerp(startScale, endScale, Saturate(scaleFactor * self:GetMap():GetCanvasZoomPercent()))
+	end
+	if scale then
+		if not self:IsIgnoringGlobalPinScale() then
+			scale = scale * self:GetMap():GetGlobalPinScale();
+		end
+		self:SetScale(scale);
+		self:ApplyCurrentPosition();
+	end
+end
+
+function CT_MapMod_PinMixin:ApplyCurrentAlpha()
+	if (WorldMapFrame:IsMaximized()) then
+		self:SetAlpha(Lerp( 0.3 + 0.7*((module:getOption("CT_MapMod_AlphaAmount")) or 0.75), 1.00, Saturate(1.00 * self:GetMap():GetCanvasZoomPercent())));
+	else
+		self:SetAlpha(Lerp( 0.0 + 1.0*((module:getOption("CT_MapMod_AlphaAmount")) or 0.75), 1.00, Saturate(1.00 * self:GetMap():GetCanvasZoomPercent())));
+	end  	
 end
 
 -- This function is called the first time the pin is clicked on, and also every subsequent time the pin is acquired
@@ -572,13 +609,13 @@ function CT_MapMod_PinMixin:CreateNotePanel()
 	self.notepanel.setdropdown:SetPoint("LEFT",self.notepanel,"TOPLEFT",35,-60);
 	L_UIDropDownMenu_SetWidth(self.notepanel.setdropdown, 90);
 
-	self.notepanel.usersubsetdropdown:SetPoint("LEFT",self.notepanel,"TOP",35,-60);
+	self.notepanel.usersubsetdropdown:SetPoint("LEFT",self.notepanel,"TOP",30,-60);
 	L_UIDropDownMenu_SetWidth(self.notepanel.usersubsetdropdown, 90);
 
-	self.notepanel.herbsubsetdropdown:SetPoint("LEFT",self.notepanel,"TOP",35,-60);
+	self.notepanel.herbsubsetdropdown:SetPoint("LEFT",self.notepanel,"TOP",30,-60);
 	L_UIDropDownMenu_SetWidth(self.notepanel.herbsubsetdropdown, 90);
 
-	self.notepanel.oresubsetdropdown:SetPoint("LEFT",self.notepanel,"TOP",35,-60);
+	self.notepanel.oresubsetdropdown:SetPoint("LEFT",self.notepanel,"TOP",30,-60);
 	L_UIDropDownMenu_SetWidth(self.notepanel.oresubsetdropdown, 90);
 
 	L_UIDropDownMenu_Initialize(self.notepanel.setdropdown, function()
@@ -762,6 +799,7 @@ end
 -- UI elements added to the world map title bar
 
 do
+	local newpinmousestart = nil;
 	module:getFrame	(
 		{
 			["button#n:CT_MapMod_WhereAmIButton#s:100:20#b:b:0:3#v:UIPanelButtonTemplate#Where am I?"] = {
@@ -784,7 +822,7 @@ do
 					GameTooltip:Hide();
 				end
 			},
-			["button#n:CT_MapMod_CreateNoteButton#s:80:16#tl:t:+120:-2#v:UIPanelButtonTemplate#New Pin"] =	{
+			["button#n:CT_MapMod_CreateNoteButton#s:75:16#tr:tr:-125:-3#v:UIPanelButtonTemplate#New Pin"] =	{
 				["onload"] = function(self)
 					WorldMapFrame:AddCanvasClickHandler(function(canvas, button)
 						if (not module.isCreatingNote) then return; end
@@ -808,11 +846,82 @@ do
 						WorldMapFrame:RefreshAllDataProviders();
 						GameTooltip:Hide();
 					end);
-					
+					self:RegisterForDrag("RightButton");
+					self:HookScript("OnDragStart", function()
+						if (not module.isCreatingNote) then
+							newpinmousestart = GetCursorPosition(); --only interested in the X coord
+							local value = module:getOption("CT_MapMod_CreateNoteButtonX") or -125;
+							if (WorldMapFrame:IsMaximized()) then
+								if (value < -1625) then module:setOption("CT_MapMod_CreateNoteButtonX", -1625, true, true); end
+							elseif (WorldMapFrame.SidePanelToggle.OpenButton:IsShown()) then
+								if (value < -535) then module:setOption("CT_MapMod_CreateNoteButtonX", -535, true, true); end
+							else
+								if (value < -820) then module:setOption("CT_MapMod_CreateNoteButtonX", -820, true, true); end
+							end
+							GameTooltip:SetText("|cFF999999Drag to set distance from RIGHT edge of map|r");
+						end  
+					end);
+					self:HookScript("OnDragStop", function()
+						if (not newpinmousestart) then return; end
+						local value = module:getOption("CT_MapMod_CreateNoteButtonX") or -125;
+						value = value + (GetCursorPosition() - newpinmousestart);
+						if (value > -125) then value = -125; end
+						if (WorldMapFrame:IsMaximized()) then
+							if (value < -1625) then value = -1625; end
+						elseif (WorldMapFrame.SidePanelToggle.OpenButton:IsShown()) then
+							if (value < -535) then value = -535; end
+						else
+							if (value < -820) then value = -820; end
+						end
+						module:setOption("CT_MapMod_CreateNoteButtonX", value, true, true)
+						newpinmousestart = nil;
+						GameTooltip:Hide();
+					end);
+					local duration = 0;
+					self:HookScript("OnUpdate", function(newself, elapsed)
+						duration = duration + elapsed;
+						if (duration < .1) then return; end
+						duration = 0;
+						local value = module:getOption("CT_MapMod_CreateNoteButtonX") or -125;
+						if (newpinmousestart) then
+							-- Currently dragging the frame
+							value = value + (GetCursorPosition() - newpinmousestart);
+							if (value > -125) then value = -125; end
+							if (WorldMapFrame:IsMaximized()) then
+								if (value < -1625) then value = -1625; end
+							elseif (WorldMapFrame.SidePanelToggle.OpenButton:IsShown()) then
+								if (value < -535) then value = -535; end
+							else
+								if (value < -820) then value = -820; end
+							end
+						elseif (not WorldMapFrame:IsMaximized() and WorldMapFrame.SidePanelToggle.OpenButton:IsShown()) then
+							-- Minimized without quest frame
+							if (value < -225 and value > -350) then value = -225; end
+							if (value < -350 and value > -477) then value = -477; end
+							if (value < -535) then value = -535; end
+						elseif (not WorldMapFrame:IsMaximized() and WorldMapFrame.SidePanelToggle.CloseButton:IsShown()) then
+							-- Minimized with quest frame
+							if (value < -370 and value > -495) then value = -370; end
+							if (value < -495 and value > -620) then value = -620; end
+							if (value < -820) then value = -820; end
+						else
+							-- Maximized
+							if (value < -760 and value > -850) then value = -760; end
+							if (value < -850 and value > -940) then value = -940; end
+						end
+						self:ClearAllPoints();
+						self:SetPoint("TOPRIGHT",WorldMapFrame.BorderFrame,"TOPRIGHT",value,-3)
+					end);
+					self:HookScript("OnHide",function()
+						if (module.isCreatingNote) then
+							GameTooltip:Hide();
+							module.isCreatingNote = nil;
+						end
+					end);
 				end,
 				["onclick"] = function(self, arg1)
 					if ( arg1 == "LeftButton" ) then
-						if (module.isEditingNote or module.isCreatingNote) then
+						if (module.isEditingNote or module.isCreatingNote or newpinmousestart) then
 							return;
 						else
 							module.isCreatingNote = true;
@@ -821,58 +930,110 @@ do
 					end
 				end,
 				["onenter"] = function(self)
-					if (not module.isCreatingNote) then 
+					if (not module.isCreatingNote and not newpinmousestart) then 
 						GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, -60);
-						GameTooltip:SetText("CT: Add a new pin to the map");
+						GameTooltip:SetText("CT: Add a new pin to the map|n|cFF999999(Right-Click to Drag)|r");
 						GameTooltip:Show();
 					end
 				end,
 				["onleave"] = function(self)
-					if (not module.isCreatingNote) then GameTooltip:Hide(); end
-				end
+					if (not module.isCreatingNote and not newpinmousestart) then GameTooltip:Hide(); end
+				end,
 			},
-		["button#n:CT_MapMod_OptionsButton#s:80:16#tl:t:+205:-3#v:UIPanelButtonTemplate#Options"] = {
+		["button#n:CT_MapMod_OptionsButton#s:75:16#tr:tr:-50:-3#v:UIPanelButtonTemplate#Options"] = {
 				["onclick"] = function(self, arg1)
 					module:showModuleOptions(module.name);
 				end,
 				["onenter"] = function(self)
-					GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, -60);
-					GameTooltip:SetText("/ctmap");
-					GameTooltip:Show();
+					if (not module.isCreatingNote and not newpinmousestart) then
+						GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, -60);
+						GameTooltip:SetText("/ctmap|n|cFF999999(Right-Click to Drag)|r");
+						GameTooltip:Show();
+					end
 				end,
 				["onleave"] = function(self)
-					GameTooltip:Hide();
+					if (not module.isCreatingNote and not newpinmousestart) then
+						GameTooltip:Hide();
+					end
+				end,
+				["onload"] = function(self)
+					self:ClearAllPoints();
+					self:SetPoint("LEFT",CT_MapMod_CreateNoteButton,"RIGHT",0,0);
+					self:RegisterForDrag("RightButton");
+					self:HookScript("OnDragStart", function()
+						if (not module.isCreatingNote) then
+							newpinmousestart = GetCursorPosition(); --only interested in the X coord
+							local value = module:getOption("CT_MapMod_CreateNoteButtonX") or -125;
+							if (WorldMapFrame:IsMaximized()) then
+								if (value < -1625) then module:setOption("CT_MapMod_CreateNoteButtonX", -1625, true, true); end
+							elseif (WorldMapFrame.SidePanelToggle.OpenButton:IsShown()) then
+								if (value < -535) then module:setOption("CT_MapMod_CreateNoteButtonX", -535, true, true); end
+							else
+								if (value < -820) then module:setOption("CT_MapMod_CreateNoteButtonX", -820, true, true); end
+							end
+							GameTooltip:SetText("|cFF999999Drag to set distance from RIGHT edge of map|r");
+						end  
+					end);
+					self:HookScript("OnDragStop", function()
+						if (not newpinmousestart) then return; end
+						local value = module:getOption("CT_MapMod_CreateNoteButtonX") or -125;
+						value = value + (GetCursorPosition() - newpinmousestart);
+						if (value > -125) then value = -125; end
+						if (WorldMapFrame:IsMaximized()) then
+							if (value < -1625) then value = -1625; end
+						elseif (WorldMapFrame.SidePanelToggle.OpenButton:IsShown()) then
+							if (value < -535) then value = -535; end
+						else
+							if (value < -820) then value = -820; end
+						end
+						module:setOption("CT_MapMod_CreateNoteButtonX", value, true, true)
+						newpinmousestart = nil;
+						GameTooltip:Hide();
+					end);
 				end
 			},
-		["frame#n:CT_MapMod_px#s:40:16#tl:t:-240:-3"] = { 
+		["frame#n:CT_MapMod_px#s:40:16#bl:b:-140:0"] = { 
 				["onload"] = function(self)
-					module.px = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
+					module.px = self
+					self.text = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
 				end,
 				["onenter"] = function(self)
 					GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, 15);
-					GameTooltip:SetText("CT: Player Coords");
+					local playerposition = C_Map.GetPlayerMapPosition(WorldMapFrame:GetMapID(),"player");
+					if (playerposition) then
+						GameTooltip:SetText("CT: Player Coords");
+					else
+						GameTooltip:SetText("Player coords not available here");
+					end
 					GameTooltip:Show();
 				end,
 				["onleave"] = function(self)
 					GameTooltip:Hide();
 				end
 			},
-		["frame#n:CT_MapMod_py#s:40:16#tl:t:-200:-3"] =  { 
+		["frame#n:CT_MapMod_py#s:40:16#bl:b:-100:0"] =  { 
 				["onload"] = function(self)
-					module.py = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
+					module.py = self
+					self.text = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
 				end,
 				["onenter"] = function(self)
 					GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, 15);
-					GameTooltip:SetText("CT: Player Coords");
+					local playerposition = C_Map.GetPlayerMapPosition(WorldMapFrame:GetMapID(),"player");
+					if (playerposition) then
+						GameTooltip:SetText("CT: Player Coords");
+					else
+						GameTooltip:SetText("Player coords not available here");
+					end
 					GameTooltip:Show();
 				end,
 				["onleave"] = function(self)
 					GameTooltip:Hide();
 				end
 			},
-		["frame#n:CT_MapMod_cx#s:40:16#tl:t:-140:-3"] =  { 
+		["frame#n:CT_MapMod_cx#s:40:16#bl:b:70:0"] =  { 
 				["onload"] = function(self)
-					module.cx = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
+					module.cx = self
+					self.text = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
 				end,
 				["onenter"] = function(self)
 					GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, 15);
@@ -883,9 +1044,10 @@ do
 					GameTooltip:Hide();
 				end
 			},
-		["frame#n:CT_MapMod_cy#s:40:16#tl:t:-100:-3"] =  { 
+		["frame#n:CT_MapMod_cy#s:40:16#bl:b:110:0"] =  { 
 				["onload"] = function(self)
-					module.cy = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
+					module.cy = self
+					self.text = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
 
 				end,
 				["onenter"] = function(self)
@@ -913,21 +1075,21 @@ do
 				local px, py = playerposition:GetXY();
 				px = math.floor(px*1000)/10;
 				py = math.floor(py*1000)/10;
-				module.px:SetText("x:" .. px);
-				module.py:SetText("y:" .. py);
+				module.px.text:SetText("x:" .. px);
+				module.py.text:SetText("y:" .. py);
 			else
-				module.px:SetText("x: -");
-				module.py:SetText("y: -");
+				module.px.text:SetText("x: -");
+				module.py.text:SetText("y: -");
 			end
 			if (mapid == C_Map.GetBestMapForUnit("player")) then
-				module.px:SetTextColor(1,1,1);
-				module.py:SetTextColor(1,1,1);
+				module.px.text:SetTextColor(1,1,1,1);
+				module.py.text:SetTextColor(1,1,1,1);
 				if ((module:getOption("CT_MapMod_ShowMapResetButton") or 1) == 1) then
 					_G["CT_MapMod_WhereAmIButton"]:Hide();
 				end			
 			else
-				module.px:SetTextColor(.6,.6,.6);			
-				module.py:SetTextColor(.6,.6,.6);
+				module.px.text:SetTextColor(1,1,1,.3);			
+				module.py.text:SetTextColor(1,1,1,.3);
 				if ((module:getOption("CT_MapMod_ShowMapResetButton") or 1) == 1) then
 					_G["CT_MapMod_WhereAmIButton"]:Show();
 				end				
@@ -935,16 +1097,20 @@ do
 		end	
 		local cx, cy = WorldMapFrame:GetNormalizedCursorPosition();
 		if (cx and cy) then
+			if (cx > 0 and cx < 1 and cy > 0 and cy < 1) then
+				module.cx.text:SetTextColor(1,1,1,1);
+				module.cy.text:SetTextColor(1,1,1,1);
+			else
+				module.cx.text:SetTextColor(1,1,1,.3);			
+				module.cy.text:SetTextColor(1,1,1,.3);
+			end
 			cx = math.floor(cx*1000)/10;
 			cx = math.max(math.min(cx,100),0);
 			cy = math.floor(cy*1000)/10;
 			cy = math.max(math.min(cy,100),0);				
-			module.cx:SetText("x:" .. cx);
-			module.cy:SetText("y:" .. cy);
-		else
-			-- the cursor is not over the map
-			module.cx:SetText("x:");
-			module.cy:SetText("y:");			
+			module.cx.text:SetText("x:" .. cx);
+			module.cy.text:SetText("y:" .. cy);
+			
 		end
 	end);
 end
@@ -973,15 +1139,14 @@ do
 								local istooclose = nil;
 								if (not CT_MapMod_Notes[mapid]) then CT_MapMod_Notes[mapid] = { }; end
 								for k, note in ipairs(CT_MapMod_Notes[mapid]) do
-									if ((note["name"] == arg2) and (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.025)) then  --two herbs of the same kind not far apart
+									if ((note["name"] == arg2) and (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.02)) then   --two herbs of the same kind not far apart
 										istooclose = true;
 									end
-									if (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.0125) then --two notes, even if they are different, extremely close together
+									if ((note["set"] == "Herb") and (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.01)) then 	--two herbs of different kinds very close together
 										istooclose = true;
-										if (note["name"] == "Herb" and note["subset"] == "Bruiseweed") then  -- legacy herb from WoD or Legion that can now be updated
-											note["name"] = arg2;
-											note["subset"] = arg2;
-										end
+									end
+									if (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.005) then 		--two notes of completely different kinds EXTREMELY close together
+										istooclose = true;
 									end
 								end
 								if (not istooclose) then
@@ -994,7 +1159,7 @@ do
 										["descript"] = "",
 										["datemodified"] = date("%Y%m%d"),
 										["version"] = MODULE_VERSION,
-									};
+				m					};
 									tinsert(CT_MapMod_Notes[mapid],newnote);
 								end
 								return;
@@ -1017,10 +1182,13 @@ do
 								local istooclose = nil;
 								if (not CT_MapMod_Notes[mapid]) then CT_MapMod_Notes[mapid] = { }; end
 								for k, note in ipairs(CT_MapMod_Notes[mapid]) do
-									if ((note["name"] == arg2) and (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.03)) then    --two veins of the same kind not far apart
+									if ((note["name"] == arg2) and (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.02)) then   --two veins of the same kind not far apart
 										istooclose = true;
 									end
-									if (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.015) then --two notes, even if they are different, extremely close together
+									if ((note["set"] == "Ore") and (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.01)) then 	--two veins of different kinds very close together
+										istooclose = true;
+									end
+									if (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.005) then 		--two notes of completely different kinds EXTREMELY close together
 										istooclose = true;
 									end
 								end
@@ -1055,11 +1223,14 @@ end
 module.update = function(self, optName, value)
 	if (optName == "init") then		
 		CT_MapMod_Initialize();  -- handles things that arn't related to options
-		
-		local position = module:getOption("CT_MapMod_ShowPlayerCoordsOnMap") or 1;
+		module.px:ClearAllPoints();
+		module.py:ClearAllPoints();
+		module.cx:ClearAllPoints();
+		module.cy:ClearAllPoints();
+		local position = module:getOption("CT_MapMod_ShowPlayerCoordsOnMap") or 2;
 		if (position == 1) then
-			module.px:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-240,-3);
-			module.py:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-200,-3);
+			module.px:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-145,-3);
+			module.py:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-105,-3);
 		elseif (position == 2) then
 			module.px:SetPoint("BOTTOMLEFT",WorldMapFrame.ScrollContainer,"BOTTOM",-140,3);
 			module.py:SetPoint("BOTTOMLEFT",WorldMapFrame.ScrollContainer,"BOTTOM",-100,3);
@@ -1067,53 +1238,68 @@ module.update = function(self, optName, value)
 			module.px:Hide();
 			module.py:Hide();
 		end
-		position = module:getOption("CT_MapMod_ShowCursorCoordsOnMap") or 1;
+		module.px.text:SetAllPoints();
+		module.py.text:SetAllPoints();
+		position = module:getOption("CT_MapMod_ShowCursorCoordsOnMap") or 2;
 		if (position == 1) then
-			module.cx:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-140,-3);
-			module.cy:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-100,-3);
+			module.cx:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",65,-3);
+			module.cy:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",105,-3);
 		elseif (position == 2) then
 			module.cx:SetPoint("BOTTOMLEFT",WorldMapFrame.ScrollContainer,"BOTTOM",70,3);
 			module.cy:SetPoint("BOTTOMLEFT",WorldMapFrame.ScrollContainer,"BOTTOM",110,3);
 		else
 			module.cx:Hide();
 			module.cy:Hide();
-		end			
+		end		
+		module.cx.text:SetAllPoints();
+		module.cy.text:SetAllPoints();
+		
+		CT_MapMod_CreateNoteButton:ClearAllPoints();
+		CT_MapMod_CreateNoteButton:SetPoint("TOPRIGHT",WorldMapFrame.BorderFrame,"TOPRIGHT",module:getOption("CT_MapMod_CreateNoteButtonX") or -125,-3)
+		
 	elseif (optName == "CT_MapMod_ShowPlayerCoordsOnMap") then
-		if (not module.px and module.py) then return; end
-		module.px:Show();
-		module.py:Show();
+		if (not module.px or not module.py) then return; end
+		module.px:ClearAllPoints();
+		module.py:ClearAllPoints();
 		if (value == 1) then
-			module.px:ClearAllPoints();
-			module.px:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-240,-3);
-			module.py:ClearAllPoints();
-			module.py:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-200,-3);
+			module.px:Show();
+			module.py:Show();
+			module.px:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-145,-3);
+			module.py:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-105,-3);
 		elseif (value == 2) then
-			module.px:ClearAllPoints();
-			module.px:SetPoint("BOTTOMLEFT",WorldMapFrame.BorderFrame,"BOTTOM",-140,3);
-			module.py:ClearAllPoints();
-			module.py:SetPoint("BOTTOMLEFT",WorldMapFrame.BorderFrame,"BOTTOM",-100,3);		
+			module.px:Show();
+			module.py:Show();
+			module.px:SetPoint("BOTTOMLEFT",WorldMapFrame.ScrollContainer,"BOTTOM",-140,3);
+			module.py:SetPoint("BOTTOMLEFT",WorldMapFrame.ScrollContainer,"BOTTOM",-100,3);		
 		else
 			module.px:Hide();
 			module.py:Hide();
 		end
+		module.px.text:SetAllPoints();
+		module.py.text:SetAllPoints();
 	elseif (optName == "CT_MapMod_ShowCursorCoordsOnMap") then
-		if (not module.cx and module.cy) then return; end
-		module.cx:Show();
-		module.cy:Show();
+		if (not module.cx or not module.cy) then return; end
+
 		if (value == 1) then
+			module.cx:Show();
+			module.cy:Show();
 			module.cx:ClearAllPoints();
-			module.cx:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-140,-3);
 			module.cy:ClearAllPoints();
-			module.cy:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-100,-3);
+			module.cx:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",65,-3);
+			module.cy:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",105,-3);
 		elseif (value == 2) then
+			module.cx:Show();
+			module.cy:Show();
 			module.cx:ClearAllPoints();
-			module.cx:SetPoint("BOTTOMLEFT",WorldMapFrame.BorderFrame,"BOTTOM",60,3);
 			module.cy:ClearAllPoints();
-			module.cy:SetPoint("BOTTOMLEFT",WorldMapFrame.BorderFrame,"BOTTOM",100,3);		
+			module.cx:SetPoint("BOTTOMLEFT",WorldMapFrame.ScrollContainer,"BOTTOM",60,3);
+			module.cy:SetPoint("BOTTOMLEFT",WorldMapFrame.ScrollContainer,"BOTTOM",100,3);		
 		else
 			module.cx:Hide();
 			module.cy:Hide();
 		end
+		module.cx.text:SetAllPoints();
+		module.cy.text:SetAllPoints();
 	elseif (optName == "CT_MapMod_ShowMapResetButton") then
 		if (not _G["CT_MapMod_WhereAmIButton"]) then return; end
 		if (value == 2) then _G["CT_MapMod_WhereAmIButton"]:Show(); end
@@ -1124,6 +1310,7 @@ module.update = function(self, optName, value)
 		or optName == "CT_MapMod_UserNoteDisplay"
 		or optName == "CT_MapMod_HerbNoteDisplay"
 		or optName == "CT_MapMod_OreNoteDisplay"
+		or optName == "CT_MapMod_AlphaAmount"
 	) then
 		WorldMapFrame:RefreshAllDataProviders();
 	end
@@ -1186,16 +1373,16 @@ module.frame = function()
 		
 		optionsAddObject(-5,   50, "font#t:0:%y#s:0:%s#l:13:0#r#Coordinates show where you are on the map, and where your mouse cursor is#" .. textColor2 .. ":l");
 		optionsAddObject(-5,   14, "font#t:0:%y#s:0:%s#l:13:0#r#Show player coordinates#" .. textColor1 .. ":l");
-		optionsAddObject(-5,   24, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_ShowPlayerCoordsOnMap#n:CT_MapMod_ShowPlayerCoordsOnMap#At Top#At Bottom#Disabled");
+		optionsAddObject(-5,   24, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_ShowPlayerCoordsOnMap:2#n:CT_MapMod_ShowPlayerCoordsOnMap#At Top#At Bottom#Disabled");
 		optionsAddObject(-5,   14, "font#t:0:%y#s:0:%s#l:13:0#r#Show cursor coordinates#" .. textColor1 .. ":l");
-		optionsAddObject(-5,   24, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_ShowCursorCoordsOnMap#n:CT_MapMod_ShowCursorCoordsOnMap#At Top#At Bottom#Disabled");
+		optionsAddObject(-5,   24, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_ShowCursorCoordsOnMap:2#n:CT_MapMod_ShowCursorCoordsOnMap#At Top#At Bottom#Disabled");
 		
 		optionsAddObject(-10,  50, "font#t:0:%y#s:0:%s#l:13:0#r#The \"where am I?\" button resets the map to your current zone.  Auto: show when map on wrong zone#" .. textColor2 .. ":l");
 		optionsAddObject(-5,   14, "font#t:0:%y#s:0:%s#l:13:0#r#Show map reset button#" .. textColor1 .. ":l");
 		optionsAddObject(-5,   24, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_ShowMapResetButton#n:CT_MapMod_ShowMapResetButton#Auto#Always#Disabled");
 		
 		
-		optionsAddObject(-20,  17, "font#tl:5:%y#v:GameFontNormalLarge#Create and Display Notes");
+		optionsAddObject(-20,  17, "font#tl:5:%y#v:GameFontNormalLarge#Create and Display Pins");
 		
 		optionsAddObject(-5,   50, "font#t:0:%y#s:0:%s#l:13:0#r#Identify points of interest on the map with custom icons#" .. textColor2 .. ":l");
 		optionsAddObject(-5,   14, "font#t:0:%y#s:0:%s#l:13:0#r#Show custom user notes#" .. textColor1 .. ":l");
@@ -1212,6 +1399,40 @@ module.frame = function()
 		optionsAddObject(-5,   24, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_OreNoteDisplay#n:CT_MapMod_OreNoteDisplay#Auto#Always#Disabled");
 		optionsAddObject(-5,    8, "font#t:0:%y#s:0:%s#l:13:0#r#Mining note size#" .. textColor1 .. ":l");
 		optionsAddFrame(-5,    28, "slider#tl:24:%y#s:169:15#o:CT_MapMod_OreNoteSize:14##10:26:0.5");
+		
+		optionsAddObject(-5,   50, "font#t:0:%y#s:0:%s#l:13:0#r#Reduce pin alpha to see other map features.\nAlpha is always 100% when zoomed in\nMore alpha = more opaque#" .. textColor2 .. ":l");
+		optionsAddObject(-5,    8, "font#t:0:%y#s:0:%s#l:13:0#r#Alpha when zoomed out#" .. textColor1 .. ":l");
+		optionsAddFrame(-5,    28, "slider#tl:24:%y#s:169:15#o:CT_MapMod_AlphaAmount:0.75##0.50:1.00:0.05");
+		
+		
+		-- Reset Options
+		optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
+			optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Reset Options");
+			optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:CT_MapMod_resetAll#Reset options for all of your characters");
+			optionsBeginFrame(   0,   30, "button#t:0:%y#s:120:%s#v:UIPanelButtonTemplate#Reset options");
+				optionsAddScript("onclick",
+					function(self)
+						if (module:getOption("CT_MapMod_resetAll")) then
+							CT_MapModOptions = {};
+							ConsoleExec("RELOADUI");
+						else
+							-- eventually this should be replaced with code that wipes the variables completely away, to be truly "default"
+							module:setOption("CT_MapMod_CreateNoteButtonX",-125,true,false);
+							module:setOption("CT_MapMod_ShowPlayerCoordsOnMap",2,true,false);
+							module:setOption("CT_MapMod_ShowCursorCoordsOnMap",2,true,false);
+							module:setOption("CT_MapMod_AlphaAmount",0.75,true,false);
+							module:setOption("CT_MapMod_UserNoteSize",24,true,false);
+							module:setOption("CT_MapMod_HerbNoteSize",14,true,false);
+							module:setOption("CT_MapMod_OreNoteSize",14,true,false);
+							module:setOption("CT_MapMod_UserNoteDisplay",1,true,false);
+							module:setOption("CT_MapMod_HerbNoteDisplay",1,true,false);
+							module:setOption("CT_MapMod_OreNoteDisplay",1,true,false);
+							ConsoleExec("RELOADUI");
+						end
+					end
+				);
+		optionsEndFrame();
+		optionsAddObject(  0, 3*13, "font#t:0:%y#s:0:%s#l#r#Note: This will reset the options to default and then reload your UI.#" .. textColor2);
 		
 	optionsEndFrame();
 

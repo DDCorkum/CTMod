@@ -16,3 +16,4 @@ CT_UFO_LEFTSPACING = "Beside health/mana bar spacing = ";
 CT_UFO_RIGHTSPACING = "Beside health/mana bar spacing = ";
 CT_UFO_TEXTRIGHT = "Show health/mana on right side";
 CT_UFO_TEXTLEFT = "Show health/mana on left side";
+CT_UFO_SHOWCOORDS = "Show player coordinates";

@@ -25,6 +25,16 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 						</Anchor>
 					</Anchors>
 				</FontString>
+				<FontString name="CT_PlayerCoordsRight" inherits="GameFontNormalSmall" text="">
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="PlayerFrame" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="-3.4" y="-30"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				
 			</Layer>
 		</Layers>
 		<Scripts>

@@ -70,18 +70,18 @@ CT_RA_REZ_REINCARNATION = (GetSpellInfo(27740)) or "Reincarnation"; -- (see Stat
 -- .icon == Icon texture name (no path, just the file name).
 CT_RA_BuffSpellData = {
 	[1]  = { spellid = 21562, opt =       9 }, -- Power Word: Fortitude
-	[2]  = { spellid =  1126, opt =       9 }, -- Mark of the Wild
-	[3]  = { spellid =  1459, opt =       9 }, -- Arcane Brilliance
+--	[2]  = { spellid =  1126, opt =       9 }, -- Mark of the Wild  (removed in CTRA 8.0.1.5)
+	[3]  = { spellid =  1459, opt =       9 }, -- Arcane Intellect/Brilliance
 --	[4]  = { spellid =   nil, opt =       9 }, -- ? (Number 4 hasn't been used in a long time)
 --	[5]  = { spellid = 27683, opt =       9 }, -- Shadow Protection (Not in WoW 5.04)
 	[6]  = { spellid =    17, opt =  2      }, -- Power Word: Shield
 	[7]  = { spellid = 20707, opt =      8  }, -- Soulstone Resurrection
 --	[8]  = { spellid = 16875, opt =       9 }, -- Divine Spirit (Not in WoW 4.0.1)
 --	[9]  = { spellid =   467, opt =     7   }, -- Thorns (Not in WoW 5.04)
-	[10] = { spellid =  6346, opt =   5     }, -- Fear Ward
-	[11] = { spellid = 19740, opt =       9 }, -- Blessing of Might
+--	[10] = { spellid =  6346, opt =   5     }, -- Fear Ward  (removed in CTRA 8.0.1.5)
+--	[11] = { spellid = 19740, opt =       9 }, -- Blessing of Might (removed in CTRA 8.0.1.5)
 --	[12] = { spellid = 56521, opt =       9 }, -- Blessing of Wisdom (Not in WoW 4.0.1)
-	[13] = { spellid = 20217, opt =       9 }, -- Blessing of Kings
+--	[13] = { spellid = 20217, opt =       9 }, -- Blessing of Kings (removed in CTRA 8.0.1.5)
 --	[14] = { spellid =   nil, opt =       9 }, -- Blessing of Salvation (Not in WoW 4.0.1)
 --	[15] = { spellid = 32770, opt =       9 }, -- Blessing of Light (Not in WoW 4.0.1)
 --	[16] = { spellid =   nil, opt =       9 }, -- Blessing of Sanctuary (Not in WoW 4.0.1)
@@ -93,40 +93,21 @@ CT_RA_BuffSpellData = {
 	[22] = { spellid = 33763, opt = 1       }, -- Lifebloom
 	[23] = { spellid = 48438, opt = 1       }, -- Wild Growth
 	[24] = { spellid = 33076, opt = 1       }, -- Prayer of Mending (added in CTRA 4.003)
-	[25] = { spellid = 61316, opt =       9 }, -- Dalaran Brilliance (added in CTRA 4.003, was previously bundled with Arcane Intellect, etc)
+--	[25] = { spellid = 61316, opt =       9 }, -- Dalaran Brilliance (added in CTRA 4.003, remoted in CTRA 8.0.1.5
 };
 
 -- Fill in other data using GetSpellInfo()
 for num, spellData in pairs(CT_RA_BuffSpellData) do
 	local name, rank, icon, cost, isFunnel, powerType, castTime, minRange, maxRange;
 	local spellid = spellData["spellid"];
---	if (type(spellid) == "table") then
---		for i, id in pairs(spellid) do
---			name, rank, icon, cost, isFunnel, powerType, castTime, minRange, maxRange = GetSpellInfo(id);
---			if (not spellData["name"]) then
---				spellData["name"] = {};
---			end
---			if (not spellData["icon"]) then
---				spellData["icon"] = {};
---			end
---			if (not spellData["name"][i]) then
---				spellData["name"][i] = name or UNKNOWN or "Unknown";
---			end
---			if (not spellData["icon"][i]) then
---				spellData["icon"][i] = icon or "Interface\\Icons\\Spell_Holy_WordFortitude";
---				spellData["icon"][i] = gsub(spellData["icon"][i], "^Interface\\Icons\\(.+)$", "%1");
---			end
---		end
---	elseif (spellid) then
-		name, rank, icon, cost, isFunnel, powerType, castTime, minRange, maxRange = GetSpellInfo(spellid);
-		if (not spellData["name"]) then
-			spellData["name"] = name or UNKNOWN or "Unknown";
-		end
-		if (not spellData["icon"]) then
-			spellData["icon"] = icon or "Interface\\Icons\\Spell_Holy_WordFortitude";
-			spellData["icon"] = gsub(spellData["icon"], "^Interface\\Icons\\(.+)$", "%1");
-		end
---	end
+	name, rank, icon, cost, isFunnel, powerType, castTime, minRange, maxRange = GetSpellInfo(spellid);
+	if (not spellData["name"]) then
+		spellData["name"] = name or UNKNOWN or "Unknown";
+	end
+	if (not spellData["icon"]) then
+		spellData["icon"] = icon; -- or "Interface\\Icons\\Spell_Holy_WordFortitude";
+		--spellData["icon"] = gsub(spellData["icon"], "^Interface\\Icons\\(.+)$", "%1");
+	end
 end
 
 -- Build table of internal id numbers indexed by buff name.

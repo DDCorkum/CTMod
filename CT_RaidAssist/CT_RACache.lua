@@ -1,7 +1,7 @@
 -- This is the first file to get loaded, so some stuff will get set here to be sure its available elsewhere.
 
 CT_RA_NumGroups = 8;  -- When sorting by group this is 8, when sorting by class this is the number of classes in the game.
-CT_RA_MaxGroups = 11;  -- This is the maximum number of possible groups (when sorting by group or class).
+CT_RA_MaxGroups = 12;  -- This is the maximum number of possible groups (when sorting by group or class).
 
 -- Ensure the ClickCastFrames table exists, since we'll be using adding some of our frames to it.
 ClickCastFrames = ClickCastFrames or { };
@@ -25,6 +25,7 @@ CT_RA_CLASS_WARLOCK_EN = "WARLOCK";
 CT_RA_CLASS_WARRIOR_EN = "WARRIOR";
 CT_RA_CLASS_DEATHKNIGHT_EN = "DEATHKNIGHT";
 CT_RA_CLASS_MONK_EN = "MONK";
+CT_RA_CLASS_DEMONHUNTER_EN = "DEMONHUNTER";
 
 
 function CT_RA_UnitName(unit)

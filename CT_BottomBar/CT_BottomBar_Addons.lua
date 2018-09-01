@@ -29,22 +29,22 @@ local addonFrameTable;
 local function addonFrame_OnEnter(self)
 	local object = self.object;
 
-	if (not appliedOptions.dragHideTooltip) then
-		-- Show addon name and drag instructions.
-		local text = "|c00FFFFFF" .. object.addonName .. "|r\n" .. "Left click to drag";
+	-- REMOVED CONDITIONAL IN 8.0.1.5 -- if (not appliedOptions.dragHideTooltip) then
+	-- Show addon name and drag instructions.
+	local text = "|c00FFFFFF" .. object.addonName .. "|r\n" .. "Left click to drag";
 
-		-- If this frame is capable of rotation...
-		if (object.rotateFunc) then
-			-- Show rotation instructions.
-			text = text .. "\nRight click to rotate";
-		end
-
-		-- Show reset instructions.
-		text = text .. "\nShift click to reset";
-
-		-- Show the tooltip.
-		module:displayTooltip(self, text);
+	-- If this frame is capable of rotation...
+	if (object.rotateFunc) then
+		-- Show rotation instructions.
+		text = text .. "\nRight click to rotate";
 	end
+
+	-- Show reset instructions.
+	text = text .. "\nShift click to reset";
+
+	-- Show the tooltip.
+	module:displayTooltip(self, text);
+	-- REMOVED CONDITIONAL IN 8.0.1.5 -- end
 end
 
 local function addonFrame_OnLeave(self)

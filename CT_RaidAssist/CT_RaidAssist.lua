@@ -37,6 +37,7 @@ CT_RA_ClassPositions = {
 	[CT_RA_CLASS_SHAMAN] = 9,
 	[CT_RA_CLASS_DEATHKNIGHT] = 10,
 	[CT_RA_CLASS_MONK] = 11,
+	[CT_RA_CLASS_DEMONHUNTER] = 12,
 };
 CT_RA_ClassIndices = {
 	"WARRIOR",
@@ -50,6 +51,7 @@ CT_RA_ClassIndices = {
 	"SHAMAN",
 	"DEATHKNIGHT",
 	"MONK",
+	"DEMONHUNTER",
 };
 CT_RA_ClassSorted = {};
 for k, v in pairs(CT_RA_ClassPositions) do
@@ -81,7 +83,7 @@ CT_RA_NumRaidMembers = 0;
 
 function CT_RA_ClassUsesMana(class)
 	-- Returns true if specified class uses mana.
-	return not (class == CT_RA_CLASS_WARRIOR or class == CT_RA_CLASS_ROGUE or class == CT_RA_CLASS_DEATHKNIGHT or class == CT_RA_CLASS_HUNTER);
+	return not (class == CT_RA_CLASS_WARRIOR or class == CT_RA_CLASS_ROGUE or class == CT_RA_CLASS_DEATHKNIGHT or class == CT_RA_CLASS_HUNTER or class == CT_RA_CLASS_DEMONHUNTER);
 end
 
 function CT_RA_HideClassManaBar(class)
@@ -244,8 +246,16 @@ function CT_RA_SetGroup(num, show)
 	if (not sortOptions["ShowGroups"]) then
 		sortOptions["ShowGroups"] = {};
 	end
-	sortOptions["ShowGroups"][num] = show;
-	sortOptions["HiddenGroups"] = nil;
+	if (not sortOptions["HiddenGroups"]) then
+		sortOptions["HiddenGroups"] = {};
+	end
+	if (show) then
+		sortOptions["ShowGroups"][num] = 1;
+		sortOptions["HiddenGroups"][num] = nil
+	else
+		sortOptions["HiddenGroups"][num] = 1;
+		sortOptions["ShowGroups"][num] = nil;
+	end
 	CT_RA_LoadSortOptions_ShowHideWindows();
 end
 
@@ -256,8 +266,16 @@ function CT_RA_SetClass(num, show)
 	if (not sortOptions["ShowGroups"]) then
 		sortOptions["ShowGroups"] = {};
 	end
-	sortOptions["ShowGroups"][num] = show;
-	sortOptions["HiddenGroups"] = nil;
+	if (not sortOptions["HiddenGroups"]) then
+		sortOptions["HiddenGroups"] = {};
+	end
+	if (show) then
+		sortOptions["ShowGroups"][num] = 1;
+		sortOptions["HiddenGroups"][num] = nil
+	else
+		sortOptions["HiddenGroups"][num] = 1;
+		sortOptions["ShowGroups"][num] = nil;
+	end
 	CT_RA_LoadSortOptions_ShowHideWindows();
 end
 
@@ -641,20 +659,6 @@ function CT_RA_ParseMessage(nick, msg)
 			end
 			name = spellData["name"];
 			icon = spellData["icon"];
---			if ( type(name) == "table" ) then
---				if ( val3 ) then
---					name = name[val3];
---				else
---					return update;
---				end
---			end
---			if ( type(icon) == "table" ) then
---				if ( val3 ) then
---					icon = icon[val3];
---				else
---					return update;
---				end
---			end
 		end
 		if ( not name ) then
 			return update;
@@ -1337,15 +1341,17 @@ function CT_RA_OnEvent(self, event, arg1, arg2, ...)
 	end
 end
 
-CT_RA_oldUseSoulstone = UseSoulstone;
-function CT_RA_newUseSoulstone()
-	local text = HasSoulstone();
-	if ( text and text == CT_RA_REZ_REINCARNATION ) then  -- Shaman
-		CT_RA_AddMessage("CD 2 30");
+--[[	-- HasSoulstone() no longer appears to be a valid instruction.
+	CT_RA_oldUseSoulstone = UseSoulstone;
+	function CT_RA_newUseSoulstone()
+		local text = HasSoulstone();
+		if ( text and text == CT_RA_REZ_REINCARNATION ) then  -- Shaman
+			CT_RA_AddMessage("CD 2 30");
+		end
+		CT_RA_oldUseSoulstone();
 	end
-	CT_RA_oldUseSoulstone();
-end
-UseSoulstone = CT_RA_newUseSoulstone;
+	UseSoulstone = CT_RA_newUseSoulstone;
+--]]
 
 -----------------------------------------------------
 --                  Update Functions               --
@@ -1664,15 +1670,6 @@ function CT_RA_UpdateUnitBuffs(buffs, frame, nick)
 					spellData = next(CT_RA_BuffSpellData);
 				end
 				local name, texName;
---				if ( type(spellData["name"]) == "table" ) then
---					local t = spellData["name"]; -- t == Table of 'equivalent' buff names
---					for n = 1, #t do
---						if ( buffs[ (t[n]) ] ) then
---							name = t[n];
---							texName = spellData["icon"][n];
---							break;
---						end
---					end
 				if ( buffs[ (spellData["name"]) ] ) then
 					name = spellData["name"];
 					texName = spellData["icon"];
@@ -1680,7 +1677,7 @@ function CT_RA_UpdateUnitBuffs(buffs, frame, nick)
 				if ( name and texName ) then
 					if ( num <= 4 and val["show"] ~= -1 ) then -- Change 4 to number of buffs
 						local button = frame["BuffButton"..num];
-						frameCache[button].Icon:SetTexture("Interface\\Icons\\" .. texName);
+						frameCache[button].Icon:SetTexture(texName);
 						button.name = name;
 						button.owner = nick;
 						button.texture = texName;
@@ -4691,7 +4688,7 @@ StaticPopupDialogs["RESURRECT_NO_TIMER"].OnShow = function(self) oldDialogs["RES
 StaticPopupDialogs["RESURRECT"].OnHide = function() CT_RA_AddMessage("NORESSED") end;
 StaticPopupDialogs["RESURRECT_NO_SICKNESS"].OnHide = function() CT_RA_AddMessage("NORESSED") end;
 StaticPopupDialogs["RESURRECT_NO_TIMER"].OnHide = function() if ( not StaticPopup_FindVisible("DEATH") ) then CT_RA_AddMessage("NORESSED") end end;
-StaticPopupDialogs["DEATH"].OnShow = function(self) oldDialogs["DEATHSHOW"](self) if ( HasSoulstone() ) then CT_RA_AddMessage("CANRES") end end;
+StaticPopupDialogs["DEATH"].OnShow = function(self) oldDialogs["DEATHSHOW"](self) if ( ResurrectGetOfferer() and not ResurrectHasSickness() ) then CT_RA_AddMessage("CANRES") end end;
 
 -- Hook StaticPopup_OnShow
 hooksecurefunc("StaticPopup_OnShow", function(self)
