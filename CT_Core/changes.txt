@@ -1,5 +1,7 @@
-CT_Core (8.0.1.5) 2018-08-18
-- Removed option to hide main-bar gryphons (but the option remains in CT_BottomBar)
+CT_Core (8.0.1.5) 2018-08-27
+- Depreciated option to hide main-bar gryphons
+- The option is still part of CT_BottomBar
+- Users without CT_BottomBar will receive partial functionality for backwards compatibility
 
 CT_Core (8.0.1.1) 2018-07-17
 - Further updates for 8.0.1
