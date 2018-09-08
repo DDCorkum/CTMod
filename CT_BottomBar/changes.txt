@@ -1,5 +1,5 @@
-CT_BottomBar (8.0.1.6) 2018-08-31
-- The XP/Rep/Azerite bar is properly disabled, if directed, when logging on
+CT_BottomBar (8.0.1.6) 2018-09-08
+- The XP/Rep/Azerite bars properly disable, if directed, when logging on
 
 CT_BottomBar (8.0.1.5) 2018-08-15
 - The "talking head" quest dialogue is now movable!  No longer stuck over custom bars.

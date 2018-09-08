@@ -85,16 +85,17 @@ end
 
 local function addon_PostInit(self)
 	if (module:getOption("enableStatus Bar") == false) then addon_Disable(self); end
+	CT_BottomBar_StatusBar_UpdateBarsShown(self)	
 end
 
 
 function CT_BottomBar_StatusBar_UpdateBarsShown(self)
  	local visibleBars = {};
- 	if ( CT_BottomBar_StatusBar_CustomManager.bars[1].ShouldBeVisible() and not appliedOptions.customStatusBarHideReputation) then	table.insert(visibleBars, CT_BottomBar_StatusBar_CustomManager.bars[1]); end
-  	if ( CT_BottomBar_StatusBar_CustomManager.bars[2].ShouldBeVisible() and not appliedOptions.customStatusBarHideHonor) then table.insert(visibleBars, CT_BottomBar_StatusBar_CustomManager.bars[2]); end
-  	if ( CT_BottomBar_StatusBar_CustomManager.bars[3].ShouldBeVisible() and not appliedOptions.customStatusBarHideArtifact) then table.insert(visibleBars, CT_BottomBar_StatusBar_CustomManager.bars[3]); end
-  	if ( CT_BottomBar_StatusBar_CustomManager.bars[4].ShouldBeVisible() and not appliedOptions.customStatusBarHideExp) then	table.insert(visibleBars, CT_BottomBar_StatusBar_CustomManager.bars[4]); end
-  	if ( CT_BottomBar_StatusBar_CustomManager.bars[5].ShouldBeVisible() and not appliedOptions.customStatusBarHideAzerite) then table.insert(visibleBars, CT_BottomBar_StatusBar_CustomManager.bars[5]); end
+ 	if ( CT_BottomBar_StatusBar_CustomManager.bars[1].ShouldBeVisible() and not module:getOption("customStatusBarHideReputation")) then	table.insert(visibleBars, CT_BottomBar_StatusBar_CustomManager.bars[1]); end
+  	if ( CT_BottomBar_StatusBar_CustomManager.bars[2].ShouldBeVisible() and not module:getOption("customStatusBarHideHonor")) then table.insert(visibleBars, CT_BottomBar_StatusBar_CustomManager.bars[2]); end
+  	if ( CT_BottomBar_StatusBar_CustomManager.bars[3].ShouldBeVisible() and not module:getOption("customStatusBarHideArtifact")) then table.insert(visibleBars, CT_BottomBar_StatusBar_CustomManager.bars[3]); end
+  	if ( CT_BottomBar_StatusBar_CustomManager.bars[4].ShouldBeVisible() and not module:getOption("customStatusBarHideExp")) then	table.insert(visibleBars, CT_BottomBar_StatusBar_CustomManager.bars[4]); end
+  	if ( CT_BottomBar_StatusBar_CustomManager.bars[5].ShouldBeVisible() and not module:getOption("customStatusBarHideAzerite")) then table.insert(visibleBars, CT_BottomBar_StatusBar_CustomManager.bars[5]); end
    	table.sort(visibleBars, function(left, right) return left:GetPriority() < right:GetPriority() end);
 	CT_BottomBar_StatusBar_CustomManager:LayoutBars(visibleBars); 	
 end
