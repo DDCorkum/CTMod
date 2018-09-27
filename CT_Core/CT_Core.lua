@@ -265,37 +265,7 @@ module.frame = function()
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Tips");
 		optionsAddObject( -2, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#You can use /ctcore to open this options window directly.#" .. textColor2 .. ":l");
 		optionsAddObject( -2, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#You can use /hail to hail your current target. A key binding is also available for this.#" .. textColor2 .. ":l");
-		optionsAddObject( -8, 4*13, "font#t:0:%y#s:0:%s#l:13:0#r#DEPRECIATED FEATURE:\nCT_Core no longer hides main-bar gryphons!\nThat option is now found in CT_BottomBar.#" .. textColor3 .. ":l");
-		optionsBeginFrame( -10,   30, "button#t:0:%y#s:180:%s#n:CT_Core_DepreciatedHideGryphons#v:GameMenuButtonTemplate#Restore gryphons");
-			optionsAddScript("onclick",
-				function(self)
-					module:setOption("hideGryphons",nil,true);
-					GameTooltip:Hide();
-					self:Hide();
-					
-				end
-			);
-			optionsAddScript("onload",
-				function(self)
-					if (module:getOption("hideGryphons") == nil) then 
-						self:Hide();
-					end
-				end
-			);
-			optionsAddScript("onenter",
-				function(self)
-					GameTooltip:SetOwner(self, "ANCHOR_BOTTOM", 0, -5);
-					GameTooltip:SetText("|cFFFF5555This action cannot be undone!|r|nYou will need |cFFFFFFFFCT_BottomBar|r to hide them again");
-					GameTooltip:Show();
-				end
-			);
-			optionsAddScript("onleave",
-				function(self)
-					GameTooltip:Hide();
-				end
-			);
-		optionsEndFrame();
-		
+
 	-- Alternate Power Bar
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Alternate Power Bar");
 		optionsAddObject( -2, 5*14, "font#t:0:%y#s:0:%s#l:13:0#r#The game sometimes uses this bar to show the status of a quest, or your status in a fight, etc. The bar can vary in size, and its default position is centered near the bottom of the screen.#" .. textColor2 .. ":l");
@@ -466,11 +436,14 @@ module.frame = function()
 		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:blockDuels#Block all duels");
 		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:blockDuelsMessage#Show message when a duel is blocked");
 
-	-- General
-		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#General");
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:tickMod#Display health/mana regeneration rates");
-		optionsAddObject( -2,   14, "font#tl:60:%y#v:ChatFontNormal#Format:");
-		optionsAddObject( 14,   20, "dropdown#tl:100:%y#s:125:%s#o:tickModFormat#n:CTCoreDropdown1#Health - Mana#HP/Tick - MP/Tick#HP - MP");
+	-- Hide Gryphons
+		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Hide Gryphons");
+		if (not CT_BottomBar) then
+			optionsAddObject( -5,   26, "checkbutton#tl:10:%y#i:hideGryphons#o:hideGryphons#Hide the Main Bar gryphons");
+		else
+			optionsAddObject( -5,   26, "font#tl:0:%y#v:GameFontNormal#This feature is now in CT_BottomBar#" .. textColor2 .. ":1");
+		end
+
 	-- Merchant options
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Merchant");
 		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:merchantAltClickItem:true#Alt click a merchant's item to buy a stack");
@@ -529,6 +502,12 @@ module.frame = function()
 	-- Quests
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Quests");
 		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:questLevels#Display quest levels in the Quest Log");
+
+	-- Regen Rates
+		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Regen Rates");
+		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:tickMod#Display health/mana regeneration rates");
+		optionsAddObject( -2,   14, "font#tl:60:%y#v:ChatFontNormal#Format:");
+		optionsAddObject( 14,   20, "dropdown#tl:100:%y#s:125:%s#o:tickModFormat#n:CTCoreDropdown1#Health - Mana#HP/Tick - MP/Tick#HP - MP");
 
 	-- Tooltip Relocation
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Tooltip Relocation");

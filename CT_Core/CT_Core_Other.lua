@@ -1519,20 +1519,17 @@ hooksecurefunc("ContainerFrameItemButton_OnModifiedClick", CT_Core_ContainerFram
 CT_Core_ContainerFrameItemButton_OnModifiedClick_Register(CT_Core_AddToAuctions);
 
 --------------------------------------------
--- DEPRECIATED FUNCTION FOR BACKWARD COMPATIBILITY
 -- Hides the gryphons if the user does not have CT_BottomBar installed
 
-local function depreciated_hide_gryphons()
-	if (CT_BottomBar and module:getOption("hideGryphons") ~= nil) then
-		module:setOption("hideGryphons", nil, true);
-	elseif (module:getOption("hideGryphons")) then
+local function hide_gryphons()
+	if (CT_BottomBar) then return; end
+	if (module:getOption("hideGryphons")) then
 		MainMenuBarArtFrame.LeftEndCap:Hide();
 		MainMenuBarArtFrame.RightEndCap:Hide();
 	else
 		MainMenuBarArtFrame.LeftEndCap:Show();
 		MainMenuBarArtFrame.RightEndCap:Show();
 	end
-		
 end
 
 --------------------------------------------
@@ -3039,7 +3036,7 @@ local modFunctions = {
 	["powerbaraltEnabled"] = powerbaralt_toggleStatus,
 	["powerbaraltMovable"] = powerbaralt_toggleMovable,
 	["powerbaraltShowAnchor"] = powerbaralt_toggleAnchor,
-	["hideGryphons"] = depreciated_hide_gryphons
+	["hideGryphons"] = hide_gryphons
 };
 
 local modFunctionsTrue = {
