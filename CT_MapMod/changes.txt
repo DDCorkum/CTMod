@@ -1,3 +1,6 @@
+CT_MapMod (8.0.1.7) 2018-09-26
+- Small fix to disabling "Where am I?" button
+
 CT_MapMod (8.0.1.5) 2018-08-25
 - Further updates for new BFA Zones
 - Added at transparency (alpha) option for pins

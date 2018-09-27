@@ -182,7 +182,15 @@ end
 
 -- Get current resolution in x and y
 function CT_Viewport_GetCurrentResolution(...)
-	local currRes = select(GetCurrentResolution(), ...);
+	local currRes = nil;
+	
+	if (GetCurrentResolution() > 0) then
+		-- a standard resolution, found on the dropdown list
+		currRes = select(GetCurrentResolution(), ...);
+	else
+		-- a custom resolution in windowed mode
+		currRes = GetCVar("gxWindowedResolution");
+	end	
 	if ( currRes ) then
 		local useless, useless, x, y = string.find(currRes, "(%d+)x(%d+)");
 		if ( x and y ) then
