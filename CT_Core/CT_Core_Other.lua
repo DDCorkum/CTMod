@@ -1825,6 +1825,13 @@ do
 
 		["VOID_STORAGE_OPEN"]     = {option = "voidOpenBags", open = true, backpack = "voidOpenBackpack", nobags = "voidOpenNoBags"},
 		["VOID_STORAGE_CLOSE"]    = {option = "voidCloseBags"},
+
+		["OBLITERUM_FORGE_SHOW"]     = {option = "obliterumOpenBags", open = true, backpack = "obliterumOpenBackpack", nobags = "obliterumOpenNoBags"},
+		["OBLITERUM_FORGE_CLOSE"]    = {option = "obliterumCloseBags"},
+		
+		["SCRAPPING_MACHINE_SHOW"]     = {option = "scrappingOpenBags", open = true, backpack = "scrappingOpenBackpack", nobags = "scrappingOpenNoBags"},
+		["SCRAPPING_MACHINE_CLOSE"]    = {option = "scrappingCloseBags"},
+
 	};
 
 	local function onEvent(event)
@@ -1982,6 +1989,31 @@ local function setBagOption(value, optName)
 		uncheckBagOption("voidOpenNoBags");
 		uncheckBagOption("voidOpenBackpack");
 
+	-- Obliterum
+	elseif (optName == "obliterumOpenNoBags") then
+		uncheckBagOption("obliterumOpenBackpack");
+		uncheckBagOption("obliterumOpenBags");
+
+	elseif (optName == "obliterumOpenBackpack") then
+		uncheckBagOption("obliterumOpenNoBags");
+		uncheckBagOption("obliterumOpenBags");
+
+	elseif (optName == "obliterumOpenBags") then
+		uncheckBagOption("obliterumOpenNoBags");
+		uncheckBagOption("obliterumOpenBackpack");
+		
+	-- Scrapping Machine
+	elseif (optName == "scrappingOpenNoBags") then
+		uncheckBagOption("scrappingOpenBackpack");
+		uncheckBagOption("scrappingOpenBags");
+
+	elseif (optName == "scrappingOpenBackpack") then
+		uncheckBagOption("scrappingOpenNoBags");
+		uncheckBagOption("scrappingOpenBags");
+
+	elseif (optName == "scrappingOpenBags") then
+		uncheckBagOption("scrappingOpenNoBags");
+		uncheckBagOption("scrappingOpenBackpack");
 	end
 end
 
@@ -3033,6 +3065,12 @@ local modFunctions = {
 	["voidOpenNoBags"] = setBagOption,
 	["voidOpenBackpack"] = setBagOption,
 	["voidOpenBags"] = setBagOption,
+	["obliterumOpenNoBags"] = setBagOption,
+	["obliterumOpenBackpack"] = setBagOption,
+	["obliterumOpenBags"] = setBagOption,
+	["scrappingOpenNoBags"] = setBagOption,
+	["scrappingOpenBackpack"] = setBagOption,
+	["scrappingOpenBags"] = setBagOption,
 	["powerbaraltEnabled"] = powerbaralt_toggleStatus,
 	["powerbaraltMovable"] = powerbaralt_toggleMovable,
 	["powerbaraltShowAnchor"] = powerbaralt_toggleAnchor,

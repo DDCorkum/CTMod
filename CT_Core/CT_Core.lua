@@ -258,7 +258,7 @@ module.frame = function()
 
 	optionsInit();
 
-	local bagMessage = "CT_Core does not open or close any bags when the following bag options are disabled. You may need to disable these options if you are using a separate bag addon.";
+	local bagMessage = "If you have other bag addons, uncheck the options below to avoid conflicts";
 
 	-- Tips
 	optionsBeginFrame(-5, 0, "frame#tl:0:%y#r#i:section1");
@@ -287,38 +287,115 @@ module.frame = function()
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Auction House");
 		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:auctionAltClickItem#Alt left-click to add an item to the Auctions tab");
 
-		optionsAddObject( -8, 4*13, "font#t:0:%y#s:0:%s#l:13:0#r#" .. bagMessage .. "#" .. textColor2 .. ":l");
+	-- Bag automation
 
-		optionsAddObject( -6,   15, "font#tl:15:%y#v:ChatFontNormal#When the auction house opens:");
-		optionsAddObject( -3,   26, "checkbutton#tl:35:%y#o:auctionOpenBags#i:auctionOpenBags#Open all bags");
-		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:auctionOpenBackpack#i:auctionOpenBackpack#Open only the backpack");
-		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:auctionOpenNoBags#i:auctionOpenNoBags#Close all bags");
+		local bagAutomationEvents = {
+			{shortlabel = "AH", label = "Auction House", openAll = "auctionOpenBags", open = true, backpack = "auctionOpenBackpack", nobags = "auctionOpenNoBags", close = "auctionCloseBags"},
+			{shortlabel = "Bank", label = "Player Bank", openAll = "bankOpenBags", backpack = "bankOpenBackpack", nobags = "bankOpenNoBags", bank = "bankOpenBankBags", close = "bankCloseBags"},
+			{shortlabel = "G-Bank", label = "Guild Bank", openAll = "gbankOpenBags", open = true, backpack = "gbankOpenBackpack", nobags = "gbankOpenNoBags", close = "gbankCloseBags"},
+			{shortlabel = "Merchant", label = "Merchant Frame", openAll =  "merchantOpenBags", open = true, backpack = "merchantOpenBackpack", nobags = "merchantOpenNoBags", close = "merchantCloseBags"},
+			{shortlabel = "Trading", label = "Player Trading Frame", openAll = "tradeOpenBags", open = true, backpack = "tradeOpenBackpack", nobags = "tradeOpenNoBags", close = "tradeCloseBags"},
+			{shortlabel = "Void-Stg", label = "Void Storage", openAll = "voidOpenBags", open = true, backpack = "voidOpenBackpack", nobags = "voidOpenNoBags", close = "voidCloseBags"},
+			{shortlabel = "Obliterum", label = "Obliterum Forge (Legion)", openAll = "obliterumOpenBags", open = true, backpack = "obliterumOpenBackpack", nobags = "obliterumOpenNoBags", close = "obliterumCloseBags"},
+			{shortlabel = "Scrapping", label = "Scrapping Machine (BFA)", openAll = "scrappingOpenBags", open = true, backpack = "scrappingOpenBackpack", nobags = "scrappingOpenNoBags", close = "scrappingCloseBags"},
+		};
 
-		optionsAddObject( -6,   15, "font#tl:15:%y#v:ChatFontNormal#When the auction house closes:");
-		optionsAddObject( -3,   26, "checkbutton#tl:35:%y#o:auctionCloseBags#Close all bags");
+
+		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Bag automation options");
+		optionsAddObject( -8, 3*13, "font#t:0:%y#s:0:%s#l:13:0#r#" .. bagMessage .. "#" .. textColor2 .. ":l");
+		
+		-- table header rows
+		--optionsAddObject( -10, 0, "font#tl:15:%y#Should bags open automatically?");	
+
+		-- generate table content
+		for i, bagevent in ipairs(bagAutomationEvents) do
+			optionsAddObject ( -15, 15, "font#tl:25:%y#v:GameFontNormal#" .. bagevent.label);
+			if (bagevent.openAll) then
+				optionsBeginFrame( -5, 15, "checkbutton#tl:60:%y#o:" .. bagevent.openAll .. "#i:" .. bagevent.openAll .. "#Open all bags");
+					optionsAddScript("onenter",
+						function(self)
+							GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 120, -5);
+							GameTooltip:SetText("|cFFCCCCCCWhen the |r" .. bagevent.label .. "|cFFCCCCCC opens, open |rall|cFFCCCCCC bags");
+							GameTooltip:Show();
+						end
+					);
+					optionsAddScript("onleave",
+						function(self)
+							GameTooltip:Hide();
+						end
+					);
+				optionsEndFrame();
+			end
+			if (bagevent.backpack) then
+				optionsBeginFrame(  -5, 15, "checkbutton#tl:60:%y#o:" .. bagevent.backpack .. "#i:" .. bagevent.backpack .. "#Backpack only");
+					optionsAddScript("onenter",
+						function(self)
+							GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 120, -5);
+							GameTooltip:SetText("|cFFCCCCCCWhen the |r" .. bagevent.label .. "|cFFCCCCCC opens, open the |rbackpack|cFFCCCCCC only");
+							GameTooltip:Show();
+						end
+					);
+					optionsAddScript("onleave",
+						function(self)
+							GameTooltip:Hide();
+						end
+					);
+				optionsEndFrame();
+			end
+			if (bagevent.nobags) then
+				optionsBeginFrame(  -5, 15, "checkbutton#tl:60:%y#o:" .. bagevent.nobags .. "#i:" .. bagevent.nobags .. "#Leave bags shut");
+					optionsAddScript("onenter",
+						function(self)
+							GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 120, -5);
+							GameTooltip:SetText("|cFFCCCCCCWhen the |r" .. bagevent.label .. "|cFFCCCCCC opens, |rshut|cFFCCCCCC all bags");
+							GameTooltip:AddLine("|cFF888888This closes already-openned bags; leave unchecked to 'do nothing'");
+							GameTooltip:Show();
+						end
+					);
+					optionsAddScript("onleave",
+						function(self)
+							GameTooltip:Hide();
+						end
+					);
+				optionsEndFrame();
+			end
+			if (bagevent.bank) then
+				optionsBeginFrame(  -10, 15, "checkbutton#tl:60:%y#o:" .. bagevent.bank .. "#i:" .. bagevent.bank .. "#...and open all bank slots");
+					optionsAddScript("onenter",
+						function(self)
+							GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 120, -5);
+							GameTooltip:SetText("|cFFCCCCCCWhen the |r" .. bagevent.label .. "|cFFCCCCCC opens, open all |rbank slots");
+							GameTooltip:Show();
+						end
+					);
+					optionsAddScript("onleave",
+						function(self)
+							GameTooltip:Hide();
+						end
+					);
+				optionsEndFrame();
+			end	
+			if (bagevent.close) then
+				optionsBeginFrame(  -10, 15, "checkbutton#tl:60:%y#o:" .. bagevent.close .. "#i:" .. bagevent.close .. "#...and close when finished");
+					optionsAddScript("onenter",
+						function(self)
+							GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 120, -5);
+							GameTooltip:SetText("|cFFCCCCCCWhen the " .. bagevent.label .. " |rcloses|cFFCCCCCC, shut all bags");
+							GameTooltip:Show();
+						end
+					);
+					optionsAddScript("onleave",
+						function(self)
+							GameTooltip:Hide();
+						end
+					);
+				optionsEndFrame();
+			end	
+		end
 
 	-- Bank options
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Bank and Guild Bank");
 		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:blockBankTrades#Block trades while using bank or guild bank");
-
-		optionsAddObject( -8, 4*13, "font#t:0:%y#s:0:%s#l:13:0#r#" .. bagMessage .. "#" .. textColor2 .. ":l");
-
-		optionsAddObject( -6,   15, "font#tl:15:%y#v:ChatFontNormal#When the bank opens:");
-		optionsAddObject( -3,   26, "checkbutton#tl:35:%y#o:bankOpenBags#i:bankOpenBags#Open all bags");
-		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:bankOpenBackpack#i:bankOpenBackpack#Open only the backpack");
-		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:bankOpenNoBags#i:bankOpenNoBags#Close all bags");
-		optionsAddObject( -3,   26, "checkbutton#tl:35:%y#o:bankOpenBankBags#Open all bank bags");
-
-		optionsAddObject( -6,   15, "font#tl:15:%y#v:ChatFontNormal#When the bank closes:");
-		optionsAddObject( -3,   26, "checkbutton#tl:35:%y#o:bankCloseBags#Close all bags");
-
-		optionsAddObject( -6,   15, "font#tl:15:%y#v:ChatFontNormal#When the guild bank opens:");
-		optionsAddObject( -3,   26, "checkbutton#tl:35:%y#o:gbankOpenBags#i:gbankOpenBags#Open all bags");
-		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:gbankOpenBackpack#i:gbankOpenBackpack#Open only the backpack");
-		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:gbankOpenNoBags#i:gbankOpenNoBags#Close all bags");
-
-		optionsAddObject( -6,   15, "font#tl:15:%y#v:ChatFontNormal#When the guild bank closes:");
-		optionsAddObject( -3,   26, "checkbutton#tl:35:%y#o:gbankCloseBags#Close all bags");
 
 	-- Casting Bar options
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Casting Bar");
@@ -448,16 +525,6 @@ module.frame = function()
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Merchant");
 		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:merchantAltClickItem:true#Alt click a merchant's item to buy a stack");
 
-		optionsAddObject( -8, 4*13, "font#t:0:%y#s:0:%s#l:13:0#r#" .. bagMessage .. "#" .. textColor2 .. ":l");
-
-		optionsAddObject( -6,   15, "font#tl:15:%y#v:ChatFontNormal#When a merchant opens:");
-		optionsAddObject( -3,   26, "checkbutton#tl:35:%y#o:merchantOpenBags#i:merchantOpenBags#Open all bags");
-		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:merchantOpenBackpack#i:merchantOpenBackpack#Open only the backpack");
-		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:merchantOpenNoBags#i:merchantOpenNoBags#Close all bags");
-
-		optionsAddObject( -6,   15, "font#tl:15:%y#v:ChatFontNormal#When a merchant closes:");
-		optionsAddObject( -3,   26, "checkbutton#tl:35:%y#o:merchantCloseBags#Close all bags");
-
 	-- Minimap Options
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Minimap "); -- Need the blank after "Minimap" otherwise the word won't appear on screen.
 		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:hideWorldMap#Hide the World Map minimap button");
@@ -543,29 +610,6 @@ module.frame = function()
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Trading");
 		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:tradeAltClickOpen#Alt left-click an item to open trade with target");
 		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:tradeAltClickAdd#Alt left-click to add an item to the trade window");
-
-		optionsAddObject( -8, 4*13, "font#t:0:%y#s:0:%s#l:13:0#r#" .. bagMessage .. "#" .. textColor2 .. ":l");
-
-		optionsAddObject( -6,   15, "font#tl:15:%y#v:ChatFontNormal#When a trade window opens:");
-		optionsAddObject( -3,   26, "checkbutton#tl:35:%y#o:tradeOpenBags#i:tradeOpenBags#Open all bags");
-		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:tradeOpenBackpack#i:tradeOpenBackpack#Open only the backpack");
-		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:tradeOpenNoBags#i:tradeOpenNoBags#Close all bags");
-
-		optionsAddObject( -6,   15, "font#tl:15:%y#v:ChatFontNormal#When a trade window closes:");
-		optionsAddObject( -3,   26, "checkbutton#tl:35:%y#o:tradeCloseBags#Close all bags");
-
-	-- Void storage options
-		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Void Storage");
-
-		optionsAddObject( -8, 4*13, "font#t:0:%y#s:0:%s#l:13:0#r#" .. bagMessage .. "#" .. textColor2 .. ":l");
-
-		optionsAddObject( -6,   15, "font#tl:15:%y#v:ChatFontNormal#When void storage opens:");
-		optionsAddObject( -3,   26, "checkbutton#tl:35:%y#o:voidOpenBags#i:voidOpenBags#Open all bags");
-		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:voidOpenBackpack#i:voidOpenBackpack#Open only the backpack");
-		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:voidOpenNoBags#i:voidOpenNoBags#Close all bags");
-
-		optionsAddObject( -6,   15, "font#tl:15:%y#v:ChatFontNormal#When void storage closes:");
-		optionsAddObject( -3,   26, "checkbutton#tl:35:%y#o:voidCloseBags#Close all bags");
 	optionsEndFrame();
 
 	-- Reset Options
