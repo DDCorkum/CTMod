@@ -1,4 +1,4 @@
-CT_Viewport (8.0.1.6) 2018-09-26
+CT_Viewport (8.0.1.7) 2018-09-26
 - Compatible with custom (non-standard) resolutions in windowed mode
 
 CT_Viewport (8.0.1.0) 2018-07-17
