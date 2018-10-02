@@ -1841,6 +1841,11 @@ do
 			-- This is not a recognized event.
 			return;
 		end
+		
+		if (module:getOption("disableBagAutomation")) then
+			-- Bag automation is completely disabled, so go no further
+			return;
+		end
 
 		if (data.open) then
 			-- This is an open event.

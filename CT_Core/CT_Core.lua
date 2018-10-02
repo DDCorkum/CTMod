@@ -283,8 +283,6 @@ module.frame = function()
 
 	optionsInit();
 
-	local bagMessage = "If you have other bag addons, uncheck the options below to avoid conflicts";
-
 	-- Tips
 	optionsBeginFrame(-5, 0, "frame#tl:0:%y#r#i:section1");
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Tips");
@@ -314,7 +312,44 @@ module.frame = function()
 
 	-- Bag automation
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Bag automation options");
-		optionsAddObject( -8, 2*13, "font#t:0:%y#s:0:%s#l:13:0#r#" .. bagMessage .. "#" .. textColor2 .. ":l");	
+		optionsAddObject( -8, 2*13, "font#t:0:%y#s:0:%s#l:13:0#r#Disable bag automation if you have other bag management addons#" .. textColor2 .. ":l");	
+		optionsBeginFrame( -3, 15, "checkbutton#tl:60:%y#o:disableBagAutomation#i:disableBagAutomation#|cFFFF6666Disable all bag automation");
+			optionsAddScript("onenter",
+				function(self)
+					GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 120, -5);
+					GameTooltip:SetText("|rDisables|cFFCCCCCC all bag automation for compatibility with other addons.");
+					GameTooltip:Show();
+				end
+			);
+			optionsAddScript("onleave",
+				function(self)
+					GameTooltip:Hide();
+				end
+			);
+			optionsAddScript("onclick",
+				function(self)
+					if (not self:GetChecked()) then
+						module:setOption("disableBagAutomation",false,true);
+						for i, bagevent in ipairs(bagAutomationEvents) do
+							if (bagevent.openAll) then _G[bagevent.openAll]:Enable(); end
+							if (bagevent.backpack) then _G[bagevent.backpack]:Enable(); end
+							if (bagevent.nobags) then _G[bagevent.nobags]:Enable(); end
+							if (bagevent.bank) then _G[bagevent.bank]:Enable(); end
+							if (bagevent.close) then _G[bagevent.close]:Enable(); end
+						end
+					else
+						module:setOption("disableBagAutomation",true,true);
+						for i, bagevent in ipairs(bagAutomationEvents) do
+							if (bagevent.openAll) then _G[bagevent.openAll]:Disable(); end
+							if (bagevent.backpack) then _G[bagevent.backpack]:Disable(); end
+							if (bagevent.nobags) then _G[bagevent.nobags]:Disable(); end
+							if (bagevent.bank) then _G[bagevent.bank]:Disable(); end
+							if (bagevent.close) then _G[bagevent.close]:Disable(); end
+						end
+					end
+				end
+			);
+		optionsEndFrame();
 		-- refer to local variable bagAutomationEvents
 		for i, bagevent in ipairs(bagAutomationEvents) do
 			optionsAddObject ( -18, 15, "font#tl:25:%y#v:GameFontNormal#" .. bagevent.label);
@@ -332,6 +367,11 @@ module.frame = function()
 							GameTooltip:Hide();
 						end
 					);
+					optionsAddScript("onload",
+						function(self)
+							if (module:getOption("disableBagAutomation")) then self:Disable(); end
+						end
+					);
 				optionsEndFrame();
 			end
 			if (bagevent.backpack) then
@@ -346,6 +386,11 @@ module.frame = function()
 					optionsAddScript("onleave",
 						function(self)
 							GameTooltip:Hide();
+						end
+					);
+					optionsAddScript("onload",
+						function(self)
+							if (module:getOption("disableBagAutomation")) then self:Disable(); end
 						end
 					);
 				optionsEndFrame();
@@ -365,6 +410,11 @@ module.frame = function()
 							GameTooltip:Hide();
 						end
 					);
+					optionsAddScript("onload",
+						function(self)
+							if (module:getOption("disableBagAutomation")) then self:Disable(); end
+						end
+					);
 				optionsEndFrame();
 			end
 			if (bagevent.bank) then
@@ -381,6 +431,11 @@ module.frame = function()
 							GameTooltip:Hide();
 						end
 					);
+					optionsAddScript("onload",
+						function(self)
+							if (module:getOption("disableBagAutomation")) then self:Disable(); end
+						end
+					);
 				optionsEndFrame();
 			end	
 			if (bagevent.close) then
@@ -395,6 +450,11 @@ module.frame = function()
 					optionsAddScript("onleave",
 						function(self)
 							GameTooltip:Hide();
+						end
+					);
+					optionsAddScript("onload",
+						function(self)
+							if (module:getOption("disableBagAutomation")) then self:Disable(); end
 						end
 					);
 				optionsEndFrame();
