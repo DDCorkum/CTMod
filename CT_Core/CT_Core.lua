@@ -24,6 +24,21 @@ _G[MODULE_NAME] = module;
 CT_Library:registerModule(module);
 
 --------------------------------------------
+-- Helper variable for bag automation
+
+-- New events added here should also be added to local variable "events" in CT_Core_Other.lua
+local bagAutomationEvents = {
+	{shortlabel = "AH", label = "Auction House", openAll = "auctionOpenBags", backpack = "auctionOpenBackpack", nobags = "auctionOpenNoBags", close = "auctionCloseBags"},
+	{shortlabel = "Bank", label = "Player Bank", openAll = "bankOpenBags", backpack = "bankOpenBackpack", nobags = "bankOpenNoBags", bank = "bankOpenBankBags", close = "bankCloseBags"},
+	{shortlabel = "G-Bank", label = "Guild Bank", openAll = "gbankOpenBags", backpack = "gbankOpenBackpack", nobags = "gbankOpenNoBags", close = "gbankCloseBags"},
+	{shortlabel = "Merchant", label = "Merchant Frame", openAll =  "merchantOpenBags", backpack = "merchantOpenBackpack", nobags = "merchantOpenNoBags", close = "merchantCloseBags"},
+	{shortlabel = "Trading", label = "Player Trading Frame", openAll = "tradeOpenBags", backpack = "tradeOpenBackpack", nobags = "tradeOpenNoBags", close = "tradeCloseBags"},
+	{shortlabel = "Void-Stg", label = "Void Storage", openAll = "voidOpenBags", backpack = "voidOpenBackpack", nobags = "voidOpenNoBags", close = "voidCloseBags"},
+	{shortlabel = "Obliterum", label = "Obliterum Forge (Legion)", openAll = "obliterumOpenBags", backpack = "obliterumOpenBackpack", nobags = "obliterumOpenNoBags", close = "obliterumCloseBags"},
+	{shortlabel = "Scrapping", label = "Scrapping Machine (BFA)", openAll = "scrappingOpenBags", backpack = "scrappingOpenBackpack", nobags = "scrappingOpenNoBags", close = "scrappingCloseBags"},
+};
+
+--------------------------------------------
 -- Minimap Handler
 
 local sqrt, abs = sqrt, abs;
@@ -167,6 +182,16 @@ module.update = function(self, optName, value)
 	if ( optName == "init" or optName == "minimapIcon" ) then
 		showMinimap(self:getOption("minimapIcon") ~= false);
 	end
+	if (optName == "init") then
+		-- sets default options for bag automation.  Refer to helper variable for adding further automation
+		for i, bagevent in ipairs(bagAutomationEvents) do
+			if (bagevent.openAll) then module:setOption(bagevent.openAll,module:getOption(bagevent.openAll) ~= false, true); end
+			if (bagevent.backpack) then module:setOption(bagevent.backpack,not not module:getOption(bagevent.backpack), true); end
+			if (bagevent.nobags) then module:setOption(bagevent.nobags,not not module:getOption(bagevent.nobags), true); end
+			if (bagevent.bank) then module:setOption(bagevent.bank,module:getOption(bagevent.bank) ~= false, true); end
+			if (bagevent.close) then module:setOption(bagevent.close,module:getOption(bagevent.close) ~= false, true); end
+		end
+	end
 end
 
 
@@ -288,30 +313,13 @@ module.frame = function()
 		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:auctionAltClickItem#Alt left-click to add an item to the Auctions tab");
 
 	-- Bag automation
-
-		local bagAutomationEvents = {
-			{shortlabel = "AH", label = "Auction House", openAll = "auctionOpenBags", open = true, backpack = "auctionOpenBackpack", nobags = "auctionOpenNoBags", close = "auctionCloseBags"},
-			{shortlabel = "Bank", label = "Player Bank", openAll = "bankOpenBags", backpack = "bankOpenBackpack", nobags = "bankOpenNoBags", bank = "bankOpenBankBags", close = "bankCloseBags"},
-			{shortlabel = "G-Bank", label = "Guild Bank", openAll = "gbankOpenBags", open = true, backpack = "gbankOpenBackpack", nobags = "gbankOpenNoBags", close = "gbankCloseBags"},
-			{shortlabel = "Merchant", label = "Merchant Frame", openAll =  "merchantOpenBags", open = true, backpack = "merchantOpenBackpack", nobags = "merchantOpenNoBags", close = "merchantCloseBags"},
-			{shortlabel = "Trading", label = "Player Trading Frame", openAll = "tradeOpenBags", open = true, backpack = "tradeOpenBackpack", nobags = "tradeOpenNoBags", close = "tradeCloseBags"},
-			{shortlabel = "Void-Stg", label = "Void Storage", openAll = "voidOpenBags", open = true, backpack = "voidOpenBackpack", nobags = "voidOpenNoBags", close = "voidCloseBags"},
-			{shortlabel = "Obliterum", label = "Obliterum Forge (Legion)", openAll = "obliterumOpenBags", open = true, backpack = "obliterumOpenBackpack", nobags = "obliterumOpenNoBags", close = "obliterumCloseBags"},
-			{shortlabel = "Scrapping", label = "Scrapping Machine (BFA)", openAll = "scrappingOpenBags", open = true, backpack = "scrappingOpenBackpack", nobags = "scrappingOpenNoBags", close = "scrappingCloseBags"},
-		};
-
-
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Bag automation options");
-		optionsAddObject( -8, 3*13, "font#t:0:%y#s:0:%s#l:13:0#r#" .. bagMessage .. "#" .. textColor2 .. ":l");
-		
-		-- table header rows
-		--optionsAddObject( -10, 0, "font#tl:15:%y#Should bags open automatically?");	
-
-		-- generate table content
+		optionsAddObject( -8, 2*13, "font#t:0:%y#s:0:%s#l:13:0#r#" .. bagMessage .. "#" .. textColor2 .. ":l");	
+		-- refer to local variable bagAutomationEvents
 		for i, bagevent in ipairs(bagAutomationEvents) do
-			optionsAddObject ( -15, 15, "font#tl:25:%y#v:GameFontNormal#" .. bagevent.label);
+			optionsAddObject ( -18, 15, "font#tl:25:%y#v:GameFontNormal#" .. bagevent.label);
 			if (bagevent.openAll) then
-				optionsBeginFrame( -5, 15, "checkbutton#tl:60:%y#o:" .. bagevent.openAll .. "#i:" .. bagevent.openAll .. "#Open all bags");
+				optionsBeginFrame( -3, 15, "checkbutton#tl:60:%y#o:" .. bagevent.openAll .. "#i:" .. bagevent.openAll .. "#Open all bags");
 					optionsAddScript("onenter",
 						function(self)
 							GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 120, -5);
@@ -327,7 +335,7 @@ module.frame = function()
 				optionsEndFrame();
 			end
 			if (bagevent.backpack) then
-				optionsBeginFrame(  -5, 15, "checkbutton#tl:60:%y#o:" .. bagevent.backpack .. "#i:" .. bagevent.backpack .. "#Backpack only");
+				optionsBeginFrame(  -3, 15, "checkbutton#tl:60:%y#o:" .. bagevent.backpack .. "#i:" .. bagevent.backpack .. "#Backpack only");
 					optionsAddScript("onenter",
 						function(self)
 							GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 120, -5);
@@ -343,7 +351,7 @@ module.frame = function()
 				optionsEndFrame();
 			end
 			if (bagevent.nobags) then
-				optionsBeginFrame(  -5, 15, "checkbutton#tl:60:%y#o:" .. bagevent.nobags .. "#i:" .. bagevent.nobags .. "#Leave bags shut");
+				optionsBeginFrame(  -3, 15, "checkbutton#tl:60:%y#o:" .. bagevent.nobags .. "#i:" .. bagevent.nobags .. "#Leave bags shut");
 					optionsAddScript("onenter",
 						function(self)
 							GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 120, -5);
@@ -360,7 +368,7 @@ module.frame = function()
 				optionsEndFrame();
 			end
 			if (bagevent.bank) then
-				optionsBeginFrame(  -10, 15, "checkbutton#tl:60:%y#o:" .. bagevent.bank .. "#i:" .. bagevent.bank .. "#...and open all bank slots");
+				optionsBeginFrame(  -8, 15, "checkbutton#tl:60:%y#o:" .. bagevent.bank .. "#i:" .. bagevent.bank .. "#...and open all bank slots");
 					optionsAddScript("onenter",
 						function(self)
 							GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 120, -5);
@@ -376,7 +384,7 @@ module.frame = function()
 				optionsEndFrame();
 			end	
 			if (bagevent.close) then
-				optionsBeginFrame(  -10, 15, "checkbutton#tl:60:%y#o:" .. bagevent.close .. "#i:" .. bagevent.close .. "#...and close when finished");
+				optionsBeginFrame(  -8, 15, "checkbutton#tl:60:%y#o:" .. bagevent.close .. "#i:" .. bagevent.close .. "#...and close when finished");
 					optionsAddScript("onenter",
 						function(self)
 							GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 120, -5);
@@ -392,6 +400,7 @@ module.frame = function()
 				optionsEndFrame();
 			end	
 		end
+		optionsAddObject( -18, 1*13, "font#tl:25:%y#s:0:%s#l:13:0#r#Also see CT_MailMod for bag settings#" .. textColor2 .. ":l");	
 
 	-- Bank options
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Bank and Guild Bank");
