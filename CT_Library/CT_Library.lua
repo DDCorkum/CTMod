@@ -2280,7 +2280,8 @@ end
 -- Control Panel
 
 CT_LIBRARY_THANKYOU = "Thank You!";
-CT_LIBRARY_INTRODUCTION = "Thank you for using CTMod!\nYou can open this window with /ct or /ctmod\n\nClick below to open options for each module";
+CT_LIBRARY_INTRODUCTION = "Thank you for using CTMod. You can open this window with /ct or /ctmod. Below is a listing of mods that have registered "..
+	"themselves. Click a mod to bring up a list of its available options.";
 
 local controlPanelFrame;
 local selectedModule;
@@ -2507,7 +2508,7 @@ local function controlPanelSkeleton()
 			end,
 		},
 		["frame#s:300:0#tl:15:-30#b:0:15#i:listing"] = {
-			"font#tl:-6:0#s:285:60#CT_LIBRARY_INTRODUCTION#t",
+			"font#tl:-6:0#s:285:60#CT_LIBRARY_INTRODUCTION#tl",
 			"texture#tl:0:-64#br:tr:-25:-65#1:1:1",
 			"font#tl:-3:-69#v:GameFontNormalLarge#Mod Listing:",
 			"texture#i:hover#l:5:0#s:290:25#hidden#1:1:1:0.125",
