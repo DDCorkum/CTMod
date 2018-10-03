@@ -806,9 +806,6 @@ do
 				["onload"] = function (self)
 					self:ClearAllPoints();
 					self:SetPoint("BOTTOM",WorldMapFrame.ScrollContainer,"BOTTOM",0,3);
-					if ((module:getOption("CT_MapMod_ShowMapResetButton") or 1) == 3) then
-						self:Hide();
-					end
 				end,
 				["onclick"] = function(self, arg1)
 					WorldMapFrame:SetMapID(C_Map.GetBestMapForUnit("player"));
@@ -1253,9 +1250,12 @@ module.update = function(self, optName, value)
 		end		
 		module.cx.text:SetAllPoints();
 		module.cy.text:SetAllPoints();
-		
+
 		CT_MapMod_CreateNoteButton:ClearAllPoints();
 		CT_MapMod_CreateNoteButton:SetPoint("TOPRIGHT",WorldMapFrame.BorderFrame,"TOPRIGHT",module:getOption("CT_MapMod_CreateNoteButtonX") or -125,-3)
+		
+		local showmapresetbutton = module:getOption("CT_MapMod_ShowMapResetButton") or 1;
+		if (showmapresetbutton == 3) then _G["CT_MapMod_WhereAmIButton"]:Hide(); end
 		
 	elseif (optName == "CT_MapMod_ShowPlayerCoordsOnMap") then
 		if (not module.px or not module.py) then return; end
@@ -1431,6 +1431,7 @@ module.frame = function()
 						end
 					end
 				);
+			optionsEndFrame();
 		optionsEndFrame();
 		optionsAddObject(  0, 3*13, "font#t:0:%y#s:0:%s#l#r#Note: This will reset the options to default and then reload your UI.#" .. textColor2);
 		

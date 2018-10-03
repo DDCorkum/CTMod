@@ -11,7 +11,7 @@
 -----------------------------------------------
 -- Initialization
 
-local LIBRARY_VERSION = 8.01050;
+local LIBRARY_VERSION = 8.01070;
 local LIBRARY_NAME = "CT_Library";
 
 local _G = getfenv(0);
@@ -2280,8 +2280,7 @@ end
 -- Control Panel
 
 CT_LIBRARY_THANKYOU = "Thank You!";
-CT_LIBRARY_INTRODUCTION = "Thank you for using CTMod. You can open this window with /ct or /ctmod. Below is a listing of mods that have registered "..
-	"themselves. Click a mod to bring up a list of its available options.";
+CT_LIBRARY_INTRODUCTION = "Thank you for using CTMod!\nYou can open this window with /ct or /ctmod\n\nClick below to open options for each module";
 
 local controlPanelFrame;
 local selectedModule;
@@ -2508,12 +2507,12 @@ local function controlPanelSkeleton()
 			end,
 		},
 		["frame#s:300:0#tl:15:-30#b:0:15#i:listing"] = {
-			"font#tl:-6:0#s:285:60#CT_LIBRARY_INTRODUCTION#tl",
+			"font#tl:-6:0#s:285:60#CT_LIBRARY_INTRODUCTION#t",
 			"texture#tl:0:-64#br:tr:-25:-65#1:1:1",
 			"font#tl:-3:-69#v:GameFontNormalLarge#Mod Listing:",
 			"texture#i:hover#l:5:0#s:290:25#hidden#1:1:1:0.125",
 			"texture#i:select#l:5:0#s:290:25#hidden#1:1:1:0.25",
-			"font#bl:-10:-5#CTMod - www.ctmod.net#0.72:0.36:0",
+			"font#b:-10:0#www.CTMod.net\ncurseforge.com/wow/addons/CTMod#0.72:0.36:0",
 						--700 is an offset to prevent taint affecting battleground queueing
 			["button#i:701#hidden#s:263:25#tl:17:-85"] = modListButtonTemplate,	
 			["button#i:702#hidden#s:263:25#tl:17:-110"] = modListButtonTemplate,

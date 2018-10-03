@@ -24,6 +24,21 @@ _G[MODULE_NAME] = module;
 CT_Library:registerModule(module);
 
 --------------------------------------------
+-- Helper variable for bag automation
+
+-- New events added here should also be added to local variable "events" in CT_Core_Other.lua
+local bagAutomationEvents = {
+	{shortlabel = "AH", label = "Auction House", openAll = "auctionOpenBags", backpack = "auctionOpenBackpack", nobags = "auctionOpenNoBags", close = "auctionCloseBags"},
+	{shortlabel = "Bank", label = "Player Bank", openAll = "bankOpenBags", backpack = "bankOpenBackpack", nobags = "bankOpenNoBags", bank = "bankOpenBankBags", close = "bankCloseBags"},
+	{shortlabel = "G-Bank", label = "Guild Bank", openAll = "gbankOpenBags", backpack = "gbankOpenBackpack", nobags = "gbankOpenNoBags", close = "gbankCloseBags"},
+	{shortlabel = "Merchant", label = "Merchant Frame", openAll =  "merchantOpenBags", backpack = "merchantOpenBackpack", nobags = "merchantOpenNoBags", close = "merchantCloseBags"},
+	{shortlabel = "Trading", label = "Player Trading Frame", openAll = "tradeOpenBags", backpack = "tradeOpenBackpack", nobags = "tradeOpenNoBags", close = "tradeCloseBags"},
+	{shortlabel = "Void-Stg", label = "Void Storage", openAll = "voidOpenBags", backpack = "voidOpenBackpack", nobags = "voidOpenNoBags", close = "voidCloseBags"},
+	{shortlabel = "Obliterum", label = "Obliterum Forge (Legion)", openAll = "obliterumOpenBags", backpack = "obliterumOpenBackpack", nobags = "obliterumOpenNoBags", close = "obliterumCloseBags"},
+	{shortlabel = "Scrapping", label = "Scrapping Machine (BFA)", openAll = "scrappingOpenBags", backpack = "scrappingOpenBackpack", nobags = "scrappingOpenNoBags", close = "scrappingCloseBags"},
+};
+
+--------------------------------------------
 -- Minimap Handler
 
 local sqrt, abs = sqrt, abs;
@@ -167,6 +182,16 @@ module.update = function(self, optName, value)
 	if ( optName == "init" or optName == "minimapIcon" ) then
 		showMinimap(self:getOption("minimapIcon") ~= false);
 	end
+	if (optName == "init") then
+		-- sets default options for bag automation.  Refer to helper variable for adding further automation
+		for i, bagevent in ipairs(bagAutomationEvents) do
+			if (bagevent.openAll) then module:setOption(bagevent.openAll,module:getOption(bagevent.openAll) ~= false, true); end
+			if (bagevent.backpack) then module:setOption(bagevent.backpack,not not module:getOption(bagevent.backpack), true); end
+			if (bagevent.nobags) then module:setOption(bagevent.nobags,not not module:getOption(bagevent.nobags), true); end
+			if (bagevent.bank) then module:setOption(bagevent.bank,module:getOption(bagevent.bank) ~= false, true); end
+			if (bagevent.close) then module:setOption(bagevent.close,module:getOption(bagevent.close) ~= false, true); end
+		end
+	end
 end
 
 
@@ -258,8 +283,6 @@ module.frame = function()
 
 	optionsInit();
 
-	local bagMessage = "CT_Core does not open or close any bags when the following bag options are disabled. You may need to disable these options if you are using a separate bag addon.";
-
 	-- Tips
 	optionsBeginFrame(-5, 0, "frame#tl:0:%y#r#i:section1");
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Tips");
@@ -287,38 +310,162 @@ module.frame = function()
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Auction House");
 		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:auctionAltClickItem#Alt left-click to add an item to the Auctions tab");
 
-		optionsAddObject( -8, 4*13, "font#t:0:%y#s:0:%s#l:13:0#r#" .. bagMessage .. "#" .. textColor2 .. ":l");
-
-		optionsAddObject( -6,   15, "font#tl:15:%y#v:ChatFontNormal#When the auction house opens:");
-		optionsAddObject( -3,   26, "checkbutton#tl:35:%y#o:auctionOpenBags#i:auctionOpenBags#Open all bags");
-		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:auctionOpenBackpack#i:auctionOpenBackpack#Open only the backpack");
-		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:auctionOpenNoBags#i:auctionOpenNoBags#Close all bags");
-
-		optionsAddObject( -6,   15, "font#tl:15:%y#v:ChatFontNormal#When the auction house closes:");
-		optionsAddObject( -3,   26, "checkbutton#tl:35:%y#o:auctionCloseBags#Close all bags");
-
-	-- Bank options
-		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Bank and Guild Bank");
-		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:blockBankTrades#Block trades while using bank or guild bank");
-
-		optionsAddObject( -8, 4*13, "font#t:0:%y#s:0:%s#l:13:0#r#" .. bagMessage .. "#" .. textColor2 .. ":l");
-
-		optionsAddObject( -6,   15, "font#tl:15:%y#v:ChatFontNormal#When the bank opens:");
-		optionsAddObject( -3,   26, "checkbutton#tl:35:%y#o:bankOpenBags#i:bankOpenBags#Open all bags");
-		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:bankOpenBackpack#i:bankOpenBackpack#Open only the backpack");
-		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:bankOpenNoBags#i:bankOpenNoBags#Close all bags");
-		optionsAddObject( -3,   26, "checkbutton#tl:35:%y#o:bankOpenBankBags#Open all bank bags");
-
-		optionsAddObject( -6,   15, "font#tl:15:%y#v:ChatFontNormal#When the bank closes:");
-		optionsAddObject( -3,   26, "checkbutton#tl:35:%y#o:bankCloseBags#Close all bags");
-
-		optionsAddObject( -6,   15, "font#tl:15:%y#v:ChatFontNormal#When the guild bank opens:");
-		optionsAddObject( -3,   26, "checkbutton#tl:35:%y#o:gbankOpenBags#i:gbankOpenBags#Open all bags");
-		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:gbankOpenBackpack#i:gbankOpenBackpack#Open only the backpack");
-		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:gbankOpenNoBags#i:gbankOpenNoBags#Close all bags");
-
-		optionsAddObject( -6,   15, "font#tl:15:%y#v:ChatFontNormal#When the guild bank closes:");
-		optionsAddObject( -3,   26, "checkbutton#tl:35:%y#o:gbankCloseBags#Close all bags");
+	-- Bag automation
+		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Bag automation options");
+		optionsAddObject( -8, 2*13, "font#t:0:%y#s:0:%s#l:13:0#r#Disable bag automation if you have other bag management addons#" .. textColor2 .. ":l");	
+		optionsBeginFrame( -3, 15, "checkbutton#tl:60:%y#o:disableBagAutomation#i:disableBagAutomation#|cFFFF6666Disable bag automation");
+			optionsAddScript("onenter",
+				function(self)
+					GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 120, -5);
+					GameTooltip:SetText("|rDisables|cFFCCCCCC all bag automation by CT_Core for compatibility with other addons.");
+					GameTooltip:Show();
+				end
+			);
+			optionsAddScript("onleave",
+				function(self)
+					GameTooltip:Hide();
+				end
+			);
+			optionsAddScript("onclick",
+				function(self)
+					if (not self:GetChecked()) then
+						module:setOption("disableBagAutomation",false,true);
+						for i, bagevent in ipairs(bagAutomationEvents) do
+							local labelobj = _G[bagevent.openAll.."Label"];
+							labelobj:SetTextColor(1,.82,0);
+							labelobj:SetText(strsub(labelobj:GetText(),1,strlen(labelobj:GetText())-17));
+							_G[bagevent.openAll]:Enable();
+							_G[bagevent.backpack]:Enable();
+							_G[bagevent.nobags]:Enable();
+							if (bagevent.bank) then _G[bagevent.bank]:Enable(); end
+							if (bagevent.close) then _G[bagevent.close]:Enable(); end
+						end
+					else
+						module:setOption("disableBagAutomation",true,true);
+						for i, bagevent in ipairs(bagAutomationEvents) do
+							local labelobj = _G[bagevent.openAll.."Label"];
+							labelobj:SetTextColor(.5,.5,.5);
+							labelobj:SetText(labelobj:GetText() .. " (disabled above)");
+							_G[bagevent.openAll]:Disable();
+							_G[bagevent.backpack]:Disable();
+							_G[bagevent.nobags]:Disable();
+							if (bagevent.bank) then _G[bagevent.bank]:Disable(); end
+							if (bagevent.close) then _G[bagevent.close]:Disable(); end
+						end
+					end
+				end
+			);
+		optionsEndFrame();
+		-- refer to local variable bagAutomationEvents
+		for i, bagevent in ipairs(bagAutomationEvents) do
+			-- refer to the on-load script for the next frame
+			optionsAddObject( -18, 15, "font#tl:25:%y#v:GameFontNormal#i:" .. bagevent.openAll .. "Label#" .. bagevent.label);
+			optionsBeginFrame( -3, 15, "checkbutton#tl:60:%y#o:" .. bagevent.openAll .. "#i:" .. bagevent.openAll .. "#Open all bags");
+				optionsAddScript("onenter",
+					function(self)
+						GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 120, -5);
+						GameTooltip:SetText("|cFFCCCCCCWhen the |r" .. bagevent.label .. "|cFFCCCCCC opens, open |rall|cFFCCCCCC bags");
+						GameTooltip:Show();
+					end
+				);
+				optionsAddScript("onleave",
+					function(self)
+						GameTooltip:Hide();
+					end
+				);
+				optionsAddScript("onload",
+					function(self)
+						if (module:getOption("disableBagAutomation")) then
+							self:Disable();
+							_G[bagevent.openAll .. "Label"]:SetTextColor(.5,.5,.5);
+							_G[bagevent.openAll .. "Label"]:SetText(bagevent.label .. " (disabled above)");
+						end
+					end
+				);
+			optionsEndFrame();
+			optionsBeginFrame(  -3, 15, "checkbutton#tl:60:%y#o:" .. bagevent.backpack .. "#i:" .. bagevent.backpack .. "#Backpack only");
+				optionsAddScript("onenter",
+					function(self)
+						GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 120, -5);
+						GameTooltip:SetText("|cFFCCCCCCWhen the |r" .. bagevent.label .. "|cFFCCCCCC opens, open the |rbackpack|cFFCCCCCC only");
+						GameTooltip:Show();
+					end
+				);
+				optionsAddScript("onleave",
+					function(self)
+						GameTooltip:Hide();
+					end
+				);
+				optionsAddScript("onload",
+					function(self)
+						if (module:getOption("disableBagAutomation")) then self:Disable(); end
+					end
+				);
+			optionsEndFrame();
+			optionsBeginFrame(  -3, 15, "checkbutton#tl:60:%y#o:" .. bagevent.nobags .. "#i:" .. bagevent.nobags .. "#Leave bags shut");
+				optionsAddScript("onenter",
+					function(self)
+						GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 120, -5);
+						GameTooltip:SetText("|cFFCCCCCCWhen the |r" .. bagevent.label .. "|cFFCCCCCC opens, |rshut|cFFCCCCCC all bags");
+						GameTooltip:AddLine("|cFF888888This closes already-openned bags; leave unchecked to 'do nothing'");
+						GameTooltip:Show();
+					end
+				);
+				optionsAddScript("onleave",
+					function(self)
+						GameTooltip:Hide();
+					end
+				);
+				optionsAddScript("onload",
+					function(self)
+						if (module:getOption("disableBagAutomation")) then self:Disable(); end
+					end
+				);
+			optionsEndFrame();
+			if (bagevent.bank) then
+				optionsBeginFrame(  -8, 15, "checkbutton#tl:60:%y#o:" .. bagevent.bank .. "#i:" .. bagevent.bank .. "#...and open all bank slots");
+					optionsAddScript("onenter",
+						function(self)
+							GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 120, -5);
+							GameTooltip:SetText("|cFFCCCCCCWhen the |r" .. bagevent.label .. "|cFFCCCCCC opens, open all |rbank slots");
+							GameTooltip:Show();
+						end
+					);
+					optionsAddScript("onleave",
+						function(self)
+							GameTooltip:Hide();
+						end
+					);
+					optionsAddScript("onload",
+						function(self)
+							if (module:getOption("disableBagAutomation")) then self:Disable(); end
+						end
+					);
+				optionsEndFrame();
+			end	
+			if (bagevent.close) then
+				optionsBeginFrame(  -8, 15, "checkbutton#tl:60:%y#o:" .. bagevent.close .. "#i:" .. bagevent.close .. "#...and close when finished");
+					optionsAddScript("onenter",
+						function(self)
+							GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 120, -5);
+							GameTooltip:SetText("|cFFCCCCCCWhen the " .. bagevent.label .. " |rcloses|cFFCCCCCC, shut all bags");
+							GameTooltip:Show();
+						end
+					);
+					optionsAddScript("onleave",
+						function(self)
+							GameTooltip:Hide();
+						end
+					);
+					optionsAddScript("onload",
+						function(self)
+							if (module:getOption("disableBagAutomation")) then self:Disable(); end
+						end
+					);
+				optionsEndFrame();
+			end	
+		end
+		optionsAddObject( -18, 1*13, "font#tl:25:%y#s:0:%s#l:13:0#r#Also see CT_MailMod for bag settings#" .. textColor2 .. ":l");	
 
 	-- Casting Bar options
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Casting Bar");
@@ -448,16 +595,6 @@ module.frame = function()
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Merchant");
 		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:merchantAltClickItem:true#Alt click a merchant's item to buy a stack");
 
-		optionsAddObject( -8, 4*13, "font#t:0:%y#s:0:%s#l:13:0#r#" .. bagMessage .. "#" .. textColor2 .. ":l");
-
-		optionsAddObject( -6,   15, "font#tl:15:%y#v:ChatFontNormal#When a merchant opens:");
-		optionsAddObject( -3,   26, "checkbutton#tl:35:%y#o:merchantOpenBags#i:merchantOpenBags#Open all bags");
-		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:merchantOpenBackpack#i:merchantOpenBackpack#Open only the backpack");
-		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:merchantOpenNoBags#i:merchantOpenNoBags#Close all bags");
-
-		optionsAddObject( -6,   15, "font#tl:15:%y#v:ChatFontNormal#When a merchant closes:");
-		optionsAddObject( -3,   26, "checkbutton#tl:35:%y#o:merchantCloseBags#Close all bags");
-
 	-- Minimap Options
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Minimap "); -- Need the blank after "Minimap" otherwise the word won't appear on screen.
 		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:hideWorldMap#Hide the World Map minimap button");
@@ -543,29 +680,7 @@ module.frame = function()
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Trading");
 		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:tradeAltClickOpen#Alt left-click an item to open trade with target");
 		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:tradeAltClickAdd#Alt left-click to add an item to the trade window");
-
-		optionsAddObject( -8, 4*13, "font#t:0:%y#s:0:%s#l:13:0#r#" .. bagMessage .. "#" .. textColor2 .. ":l");
-
-		optionsAddObject( -6,   15, "font#tl:15:%y#v:ChatFontNormal#When a trade window opens:");
-		optionsAddObject( -3,   26, "checkbutton#tl:35:%y#o:tradeOpenBags#i:tradeOpenBags#Open all bags");
-		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:tradeOpenBackpack#i:tradeOpenBackpack#Open only the backpack");
-		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:tradeOpenNoBags#i:tradeOpenNoBags#Close all bags");
-
-		optionsAddObject( -6,   15, "font#tl:15:%y#v:ChatFontNormal#When a trade window closes:");
-		optionsAddObject( -3,   26, "checkbutton#tl:35:%y#o:tradeCloseBags#Close all bags");
-
-	-- Void storage options
-		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Void Storage");
-
-		optionsAddObject( -8, 4*13, "font#t:0:%y#s:0:%s#l:13:0#r#" .. bagMessage .. "#" .. textColor2 .. ":l");
-
-		optionsAddObject( -6,   15, "font#tl:15:%y#v:ChatFontNormal#When void storage opens:");
-		optionsAddObject( -3,   26, "checkbutton#tl:35:%y#o:voidOpenBags#i:voidOpenBags#Open all bags");
-		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:voidOpenBackpack#i:voidOpenBackpack#Open only the backpack");
-		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:voidOpenNoBags#i:voidOpenNoBags#Close all bags");
-
-		optionsAddObject( -6,   15, "font#tl:15:%y#v:ChatFontNormal#When void storage closes:");
-		optionsAddObject( -3,   26, "checkbutton#tl:35:%y#o:voidCloseBags#Close all bags");
+		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:blockBankTrades#Block trades while using bank or guild bank");
 	optionsEndFrame();
 
 	-- Reset Options
