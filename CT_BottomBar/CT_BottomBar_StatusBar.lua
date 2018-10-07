@@ -78,6 +78,10 @@ local function addon_Init(self)
 	CT_BottomBar_StatusBar_CustomManager:AddBarFromTemplate("FRAME", "ExpStatusBarTemplate");
         CT_BottomBar_StatusBar_CustomManager:AddBarFromTemplate("FRAME", "AzeriteBarTemplate"); 
 	CT_BottomBar_StatusBar_CustomManager.UpdateBarsShown = CT_BottomBar_StatusBar_UpdateBarsShown;
+	for i, bar in ipairs(CT_BottomBar_StatusBar_CustomManager.bars) do
+		-- prevents mouseover text (such as how much xp or rep you have) from appearing overtop the world map frame
+		bar.OverlayFrame:SetFrameStrata("MEDIUM");	
+	end
 
 	addon_Update(self);
 	return true;
