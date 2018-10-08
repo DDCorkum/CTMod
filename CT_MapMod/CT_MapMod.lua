@@ -804,8 +804,17 @@ do
 		{
 			["button#n:CT_MapMod_WhereAmIButton#s:100:20#b:b:0:3#v:UIPanelButtonTemplate#Where am I?"] = {
 				["onload"] = function (self)
-					self:ClearAllPoints();
-					self:SetPoint("BOTTOM",WorldMapFrame.ScrollContainer,"BOTTOM",0,3);
+					self:HookScript("OnShow",function()
+						self:ClearAllPoints();
+						local option = module:getOption("CT_MapMod_MapResetButtonPlacement") or 1;
+						if (option == 1) then
+							self:SetPoint("BOTTOM",WorldMapFrame.ScrollContainer,"BOTTOM",0,3);
+						elseif (option == 2) then
+							self:SetPoint("TOP",WorldMapFrame.ScrollContainer,"TOP",0,-1);
+						else
+							self:SetPoint("TOPLEFT",WorldMapFrame.ScrollContainer,"TOPLEFT",3,3);
+						end
+					end);
 				end,
 				["onclick"] = function(self, arg1)
 					WorldMapFrame:SetMapID(C_Map.GetBestMapForUnit("player"));
@@ -849,13 +858,15 @@ do
 							newpinmousestart = GetCursorPosition(); --only interested in the X coord
 							local value = module:getOption("CT_MapMod_CreateNoteButtonX") or -125;
 							if (WorldMapFrame:IsMaximized()) then
-								if (value < -1625) then module:setOption("CT_MapMod_CreateNoteButtonX", -1625, true, true); end
+								if (value < 75 - WorldMapFrame:GetWidth()) then module:setOption("CT_MapMod_CreateNoteButtonX", 75 - WorldMapFrame:GetWidth(), true, true); end
 							elseif (WorldMapFrame.SidePanelToggle.OpenButton:IsShown()) then
 								if (value < -535) then module:setOption("CT_MapMod_CreateNoteButtonX", -535, true, true); end
 							else
 								if (value < -820) then module:setOption("CT_MapMod_CreateNoteButtonX", -820, true, true); end
 							end
-							GameTooltip:SetText("|cFF999999Drag to set distance from RIGHT edge of map|r");
+							GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, -60);
+							GameTooltip:SetText("|cFF999999Drag to set distance from TOP RIGHT corner");
+							GameTooltip:Show();
 						end  
 					end);
 					self:HookScript("OnDragStop", function()
@@ -864,7 +875,7 @@ do
 						value = value + (GetCursorPosition() - newpinmousestart);
 						if (value > -125) then value = -125; end
 						if (WorldMapFrame:IsMaximized()) then
-							if (value < -1625) then value = -1625; end
+							if (value < 75 - WorldMapFrame:GetWidth()) then value = 75 - WorldMapFrame:GetWidth(); end
 						elseif (WorldMapFrame.SidePanelToggle.OpenButton:IsShown()) then
 							if (value < -535) then value = -535; end
 						else
@@ -873,6 +884,8 @@ do
 						module:setOption("CT_MapMod_CreateNoteButtonX", value, true, true)
 						newpinmousestart = nil;
 						GameTooltip:Hide();
+						self:Disable();
+						self:Enable();
 					end);
 					local duration = 0;
 					self:HookScript("OnUpdate", function(newself, elapsed)
@@ -885,7 +898,7 @@ do
 							value = value + (GetCursorPosition() - newpinmousestart);
 							if (value > -125) then value = -125; end
 							if (WorldMapFrame:IsMaximized()) then
-								if (value < -1625) then value = -1625; end
+								if (value < 75 - WorldMapFrame:GetWidth()) then value = 75 - WorldMapFrame:GetWidth(); end
 							elseif (WorldMapFrame.SidePanelToggle.OpenButton:IsShown()) then
 								if (value < -535) then value = -535; end
 							else
@@ -899,12 +912,13 @@ do
 						elseif (not WorldMapFrame:IsMaximized() and WorldMapFrame.SidePanelToggle.CloseButton:IsShown()) then
 							-- Minimized with quest frame
 							if (value < -370 and value > -495) then value = -370; end
-							if (value < -495 and value > -620) then value = -620; end
+							if (value < -495 and value > -622) then value = -622; end
 							if (value < -820) then value = -820; end
 						else
 							-- Maximized
-							if (value < -760 and value > -850) then value = -760; end
-							if (value < -850 and value > -940) then value = -940; end
+							if (value < 75 - WorldMapFrame:GetWidth()) then value = 75 - WorldMapFrame:GetWidth(); end
+							if (value < -(WorldMapFrame:GetWidth()/2)+90 and value > -(WorldMapFrame:GetWidth()/2)) then value = -(WorldMapFrame:GetWidth()/2)+90; end
+							if (value < -(WorldMapFrame:GetWidth()/2) and value > -(WorldMapFrame:GetWidth()/2)-90) then value = -(WorldMapFrame:GetWidth()/2)-90; end
 						end
 						self:ClearAllPoints();
 						self:SetPoint("TOPRIGHT",WorldMapFrame.BorderFrame,"TOPRIGHT",value,-3)
@@ -929,7 +943,8 @@ do
 				["onenter"] = function(self)
 					if (not module.isCreatingNote and not newpinmousestart) then 
 						GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, -60);
-						GameTooltip:SetText("CT: Add a new pin to the map|n|cFF999999(Right-Click to Drag)|r");
+						GameTooltip:SetText("CT: Add a new pin to the map");
+						GameTooltip:AddLine("Right-click to drag", .5, .5, .5);
 						GameTooltip:Show();
 					end
 				end,
@@ -944,7 +959,8 @@ do
 				["onenter"] = function(self)
 					if (not module.isCreatingNote and not newpinmousestart) then
 						GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, -60);
-						GameTooltip:SetText("/ctmap|n|cFF999999(Right-Click to Drag)|r");
+						GameTooltip:SetText("CT Map Options  (/ctmap)");
+						GameTooltip:AddLine("Right-click to drag", .5, .5, .5);
 						GameTooltip:Show();
 					end
 				end,
@@ -962,13 +978,15 @@ do
 							newpinmousestart = GetCursorPosition(); --only interested in the X coord
 							local value = module:getOption("CT_MapMod_CreateNoteButtonX") or -125;
 							if (WorldMapFrame:IsMaximized()) then
-								if (value < -1625) then module:setOption("CT_MapMod_CreateNoteButtonX", -1625, true, true); end
+								if (value < 75 - WorldMapFrame:GetWidth()) then module:setOption("CT_MapMod_CreateNoteButtonX", 75 - WorldMapFrame:GetWidth(), true, true); end
 							elseif (WorldMapFrame.SidePanelToggle.OpenButton:IsShown()) then
 								if (value < -535) then module:setOption("CT_MapMod_CreateNoteButtonX", -535, true, true); end
 							else
 								if (value < -820) then module:setOption("CT_MapMod_CreateNoteButtonX", -820, true, true); end
 							end
-							GameTooltip:SetText("|cFF999999Drag to set distance from RIGHT edge of map|r");
+							GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, -60);
+							GameTooltip:SetText("|cFF999999Drag to set distance from TOP RIGHT corner");
+							GameTooltip:Show();
 						end  
 					end);
 					self:HookScript("OnDragStop", function()
@@ -977,7 +995,7 @@ do
 						value = value + (GetCursorPosition() - newpinmousestart);
 						if (value > -125) then value = -125; end
 						if (WorldMapFrame:IsMaximized()) then
-							if (value < -1625) then value = -1625; end
+							if (value < 75 - WorldMapFrame:GetWidth()) then value = 75 - WorldMapFrame:GetWidth(); end
 						elseif (WorldMapFrame.SidePanelToggle.OpenButton:IsShown()) then
 							if (value < -535) then value = -535; end
 						else
@@ -986,6 +1004,8 @@ do
 						module:setOption("CT_MapMod_CreateNoteButtonX", value, true, true)
 						newpinmousestart = nil;
 						GameTooltip:Hide();
+						self:Disable();
+						self:Enable();
 					end);
 				end
 			},
@@ -1302,8 +1322,18 @@ module.update = function(self, optName, value)
 		module.cy.text:SetAllPoints();
 	elseif (optName == "CT_MapMod_ShowMapResetButton") then
 		if (not _G["CT_MapMod_WhereAmIButton"]) then return; end
-		if (value == 2) then _G["CT_MapMod_WhereAmIButton"]:Show(); end
-		if (value == 3) then _G["CT_MapMod_WhereAmIButton"]:Hide(); end
+		if (value == 2) then _G["CT_MapMod_WhereAmIButton"]:Show();
+		elseif (value == 3) then _G["CT_MapMod_WhereAmIButton"]:Hide(); end
+	elseif (optName == "CT_MapMod_MapResetButtonPlacement") then
+		if (not _G["CT_MapMod_WhereAmIButton"]) then return; end
+		_G["CT_MapMod_WhereAmIButton"]:ClearAllPoints();
+		if (value == 1) then
+			_G["CT_MapMod_WhereAmIButton"]:SetPoint("BOTTOM",WorldMapFrame.ScrollContainer,"BOTTOM",0,3);
+		elseif (value == 2) then
+			_G["CT_MapMod_WhereAmIButton"]:SetPoint("TOP",WorldMapFrame.ScrollContainer,"TOP",0,-1);
+		else
+			_G["CT_MapMod_WhereAmIButton"]:SetPoint("TOPLEFT",WorldMapFrame.ScrollContainer,"TOPLEFT",3,3);
+		end
 	elseif (optName == "CT_MapMod_UserNoteSize"
 		or optName == "CT_MapMod_HerbNoteSize"
 		or optName == "CT_MapMod_OreNoteSize"
@@ -1380,7 +1410,17 @@ module.frame = function()
 		optionsAddObject(-10,  50, "font#t:0:%y#s:0:%s#l:13:0#r#The \"where am I?\" button resets the map to your current zone.  Auto: show when map on wrong zone#" .. textColor2 .. ":l");
 		optionsAddObject(-5,   14, "font#t:0:%y#s:0:%s#l:13:0#r#Show map reset button#" .. textColor1 .. ":l");
 		optionsAddObject(-5,   24, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_ShowMapResetButton#n:CT_MapMod_ShowMapResetButton#Auto#Always#Disabled");
-		
+		optionsBeginFrame(-5,   24, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_MapResetButtonPlacement#n:CT_MapMod_MapResetButtonPlacement#Bottom#Top#Top Left");
+			optionsAddScript("onupdate",	
+				function(self)
+					if (module:getOption("CT_MapMod_ShowMapResetButton") == 3) then
+						L_UIDropDownMenu_DisableDropDown(CT_MapMod_MapResetButtonPlacement);
+					else
+						L_UIDropDownMenu_EnableDropDown(CT_MapMod_MapResetButtonPlacement);
+					end
+				end
+			);
+		optionsEndFrame();
 		
 		optionsAddObject(-20,  17, "font#tl:5:%y#v:GameFontNormalLarge#Create and Display Pins");
 		
