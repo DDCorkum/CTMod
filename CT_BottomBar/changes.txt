@@ -1,4 +1,4 @@
-CT_BottomBar (8.0.1.8) 2018-10-05
+CT_BottomBar (8.1.0.0) 2018-12-11
 - Small tweak to prevent XP/Rep/Azerite mouseover text from showing through other frames
 
 CT_BottomBar (8.0.1.6) 2018-09-08

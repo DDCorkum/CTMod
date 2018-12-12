@@ -1,3 +1,6 @@
+CT_Core (8.1.0.0) 2018-12-11
+- Depreciated CT player notes because the default UI now provides this feature
+
 CT_Core (8.0.1.7) 2018-10-01
 - Bag automation now includes Scrapping Machine (BFA) and Obliterum Forge (Legion)
 - Options for bag automation now streamlined, and default to active

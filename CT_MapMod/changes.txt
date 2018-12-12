@@ -1,4 +1,4 @@
-CT_MapMod (8.0.1.8) 2018-10-07
+CT_MapMod (8.1.0.0) 2018-12-11
 - More control over placement of UI elements added to WorldMapFrame
 
 CT_MapMod (8.0.1.7) 2018-09-26
