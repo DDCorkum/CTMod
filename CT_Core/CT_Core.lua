@@ -631,10 +631,8 @@ module.frame = function()
 		optionsAddObject(  5, 5*13, "font#t:0:%y#s:0:%s#l:70:0#r#Note: To use a wider objectives window without enabling this option, you can enable the 'Wider objectives tracker' option in the game's Interface options.#" .. textColor2 .. ":l");
 
 	-- Player Notes
-		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Player Notes");
-		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:showFriendNotes:true#Enable notes in the Friends window");
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:showIgnoreNotes:true#Enable notes in the Ignore window");
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:showGuildNotes:true#Enable notes in the Guild window");
+		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Player Notes#" .. textColor2 .. ":1");
+		optionsAddObject( -5,   26, "font#tl:0:%y#v:GameFontNormal#Blizzard's default UI has replaced CT notes#" .. textColor2 .. ":1");
 
 	-- Quests
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Quests");
