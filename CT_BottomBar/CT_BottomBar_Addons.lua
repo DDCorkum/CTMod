@@ -676,6 +676,9 @@ function addon:updateVisibility()
 				-- Hide the bar.
 				cond = "hide";
 			else
+				if (frame.RequiresPetToShow) then
+					cond = cond .. "[@pet,noexists]hide; ";
+				end				
 				if (appliedOptions.petbattleHideEnabledBars) then
 					-- Player does not want to show the bar when there is a pet battle UI.
 					cond = cond .. "[petbattle]hide; ";

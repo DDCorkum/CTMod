@@ -11,7 +11,7 @@
 -----------------------------------------------
 -- Initialization
 
-local LIBRARY_VERSION = 8.01070;
+local LIBRARY_VERSION = 8.01010;
 local LIBRARY_NAME = "CT_Library";
 
 local _G = getfenv(0);

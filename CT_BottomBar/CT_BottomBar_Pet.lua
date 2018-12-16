@@ -160,6 +160,10 @@ local function addon_Enable(self)
 	frame:RegisterEvent("UNIT_PET");
 
 	frame:SetScript("OnEvent", addon_OnEvent);
+	
+	-- hides the default bar securely
+	RegisterStateDriver(PetActionBarFrame,"visibility","hide");
+
 end
 
 local function addon_Disable(self)
@@ -170,6 +174,9 @@ local function addon_Disable(self)
 	frame:UnregisterEvent("UNIT_PET");
 
 	frame:SetScript("OnEvent", nil);
+	
+	-- allows the default bar to behave pseudo-normally, securely
+	RegisterStateDriver(PetActionBarFrame,"visibility","[@pet,noexists]hide; show");
 
 	if (CT_BarMod and CT_BarMod.CT_BarMod_Shift_Pet_UpdatePositions) then
 		CT_BarMod.CT_BarMod_Shift_Pet_UpdatePositions();
@@ -200,6 +207,9 @@ local function addon_Init(self)
 
 	local frame = CreateFrame("Frame", "CT_BottomBar_" .. self.frameName .. "_GuideFrame");
 	self.helperFrame = frame;
+	
+	-- causes bar to be hidden if there is no pet (see CT_BottomBar_Addons.lua)
+	self.frame.RequiresPetToShow = 1;
 
 	return true;
 end
