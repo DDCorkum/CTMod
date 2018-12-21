@@ -1,5 +1,5 @@
-## Interface: 80000
-## Version: 8.0.1.7
+## Interface: 80100
+## Version: 8.1.0.1
 ## Title: CT_Library
 ## Notes: Library features for CTMod. 
 ## DefaultState: Enabled

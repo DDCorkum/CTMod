@@ -1,4 +1,4 @@
-## Interface: 80000
+## Interface: 80100
 ## Version: 8.0.1.0
 ## Title: CT_Timer
 ## Notes: Shows a timer that counts both up and down.

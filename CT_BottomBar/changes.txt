@@ -1,3 +1,7 @@
+CT_BottomBar (8.1.0.1) 2018-12-16
+- Dismissing pets properly hides buttons from the pet bar
+- Summoning pets no longer creates "dead zones" on other bars 
+
 CT_BottomBar (8.1.0.0) 2018-12-11
 - Small tweak to prevent XP/Rep/Azerite mouseover text from showing through other frames
 

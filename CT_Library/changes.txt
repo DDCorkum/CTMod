@@ -1,3 +1,6 @@
+CT_Library (8.1.0.1) 2018-12-15
+- Changed TOC for all modules to match post-patch hotfix
+
 CT_Library (8.0.1.4) 2017-08-11
 - Library updates
 - Resolves additional battleground queuing taint from options panel
