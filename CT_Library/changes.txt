@@ -1,3 +1,6 @@
+CT_Library (8.1.0.2) 2018-12-22
+- Library updates
+
 CT_Library (8.1.0.1) 2018-12-15
 - Changed TOC for all modules to match post-patch hotfix
 
