@@ -77,14 +77,68 @@ module.frame = function()
 		-- Inbox Options
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Inbox");
 		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:inboxMouseWheel:true#Enable mouse wheel scrolling");
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:inboxShowNumbers:true#Show message numbers");
+		optionsBeginFrame( 6,   26, "checkbutton#tl:10:%y#o:inboxShowNumbers:true#Show message numbers on checkboxes");
+			optionsAddScript("onenter",
+				function(self)
+					if (module:getOption("hideOpenCloseFeature")) then
+						GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 15, -25);
+						GameTooltip:SetText("Disabled while checkboxes and open/close buttons hidden");
+						GameTooltip:Show();
+					end
+				end
+			);
+			optionsAddScript("onleave",
+				function(self)
+					GameTooltip:Hide();
+				end
+			);
+			optionsAddScript("onupdate",
+				function(self)
+					if (module:getOption("hideOpenCloseFeature")) then
+						--self.text:SetTextColor(0.5, 0.5, 0.5, 1);
+						self:SetAlpha(0.5);
+					else
+						--self.text:SetTextColor(1,1,1,1);
+						self:SetAlpha(1);
+					end
+				end
+			);
+		optionsEndFrame();
 		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:inboxShowLong:true#Show long subjects on two lines");
 		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:inboxShowExpiry:true#Show message expiry buttons");
 		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:inboxShowInbox:true#Show number of messages in the inbox");
 		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:inboxShowMailbox:true#Show number of messages not in the inbox");
 		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:toolMultipleItems:true#Show all attachments in message tooltips");
 		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:toolSelectMsg:true#Show tooltip for message checkboxes");
-		--optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:hideLogButton#Hide the 'Mail Log' button");
+		optionsBeginFrame( 6,   26, "checkbutton#tl:10:%y#o:hideLogButton#|cFFFF9999Hide|r the 'Mail Log' button");
+			optionsAddScript("onenter",
+				function(self)
+					GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 15, -25);
+					GameTooltip:SetText("This only hides the button; options further below control logging");
+					GameTooltip:AddLine("|c999999FFWhile hidden, right-click on the 'globe' or type /maillog");
+					GameTooltip:Show();
+				end
+			);
+			optionsAddScript("onleave",
+				function(self)
+					GameTooltip:Hide();
+				end
+			);
+		optionsEndFrame();
+		optionsBeginFrame( 6,   26, "checkbutton#tl:10:%y#o:hideOpenCloseFeature#|cFFFF9999Hide|r checkboxes and open/close buttons");
+			optionsAddScript("onenter",
+				function(self)
+					GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 15, -25);
+					GameTooltip:SetText("This disables some custom CT features; leaving default UI intact");
+					GameTooltip:Show();
+				end
+			);
+			optionsAddScript("onleave",
+				function(self)
+					GameTooltip:Hide();
+				end
+			);
+		optionsEndFrame();
 		optionsAddObject(-10, 1*13, "font#t:0:%y#s:0:%s#l:13:0#r#Tips#" .. textColor3 .. ":l");
 		optionsAddObject(-10, 2*13, "font#t:0:%y#s:0:%s#l:13:0#r#Right-click the Prev/Next buttons to jump to the first/last page of the inbox.#" .. textColor1 .. ":l");
 
@@ -209,7 +263,10 @@ module.update = function(self, optName, value)
 		opt.logWindowScale = getoption("logWindowScale", 1);
 		opt.logColor = getoption("logColor", defaultLogColor);
 		opt.hideLogButton = getoption("hideLogButton", false);
-		--module:updateMailLogButton();
+		module:updateMailLogButton();
+		opt.hideOpenCloseFeature = getoption("hideOpenCloseFeature", false);
+		module:updateOpenCloseButtons();
+		module:updateSelectAllCheckbox();
 
 		module:setOption("resetLog", nil, true);
 
@@ -247,8 +304,13 @@ module.update = function(self, optName, value)
 		elseif (optName == "logColor") then
 			module:updateMailLogColor();
 
-		--[[elseif (optName == "hideLogButton") then
-			module:updateMailLogButton();]]
+		elseif (optName == "hideLogButton") then
+			module:updateMailLogButton();
+			
+		elseif (optName == "hideOpenCloseFeature") then
+			module:updateOpenCloseButtons();  -- hide the open/close buttons
+			module:updateSelectAllCheckbox(); -- hide the select all checkbox
+			module:inboxUpdateSelection();    -- hide any currently open checkboxes
 
 		elseif (optName == "resetLog") then
 			if (optionsFrame) then
