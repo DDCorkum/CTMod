@@ -1,3 +1,7 @@
+CT_BarMod (8.1.0.2) 2018-12-21
+- Summoning pets no longer creates "dead zones", even without CT_BottomBar's custom pet bar
+- Added clarity to CT_BarMod options for shifting certain bars up/down without CT_BottomBar
+
 CT_BarMod (8.0.1.4) 2018-08-11
 - Now requests user to /console refresh when done changing BarMod options
 - This prevents taint from impacting subsequent gameplay (particularly battleground queuing)

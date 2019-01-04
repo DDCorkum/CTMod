@@ -1006,11 +1006,102 @@ module.frame = function()
 		optionsAddObject(-10,   26, "checkbutton#tl:20:%y#o:shiftFocus:true#Shift default focus frame to the right");
 		optionsAddFrame( -10,   17, "slider#tl:50:%y#s:220:%s#o:shiftFocusOffset:37#Position = <value>#0:200:1");
 
-		optionsAddObject(-15, 3*14, "font#t:0:%y#s:0:%s#l:20:0#r#The following options will have no effect if the corresponding bar is activated in CT_BottomBar.#" .. textColor3 .. ":l");
-		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:shiftShapeshift:true#Shift default class bar up");
-		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:shiftPet:true#Shift default pet bar up");
-		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:shiftPossess:true#Shift default possess bar up");
-		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:shiftMultiCast:true#Shift default multicast bar up");
+		if (CT_BottomBar) then optionsAddObject(-15, 3*14, "font#t:0:%y#s:0:%s#l:20:0#r#These options can be overridden by CT_BottomBar#" .. textColor2 .. ":l"); end
+		optionsBeginFrame( -5,   26, "checkbutton#tl:20:%y#i:ctbar_shiftShapeshift#o:shiftShapeshift:true#Shift default class bar up");
+			optionsAddScript("onshow",
+				function(self)
+					if ((CT_BottomBar and CT_BottomBar.ctClassBar and not CT_BottomBar.ctClassBar.isDisabled) or (CT_BottomBar and not CT_BottomBar.ctClassBar)) then
+						-- The custom CT_BB class bar is present in this version
+						self:SetAlpha(.5);
+					else
+						-- Either CT_BB is not installed, or the custom CT_BB class bar has been disabled
+						self:SetAlpha(1);
+					end
+				end
+			);
+			optionsAddScript("onenter",
+				function(self)
+					GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 120, -5);
+					GameTooltip:SetText("|cFFCCCCCCMoves the class/stance bar further from the bottom of screen.");
+					if ((CT_BottomBar and CT_BottomBar.ctClassBar and not CT_BottomBar.ctClassBar.isDisabled) or (CT_BottomBar and not CT_BottomBar.ctClassBar)) then
+						GameTooltip:AddLine("|cFFFF9999Currently overriden by CT_BottomBar.");
+					end
+					GameTooltip:Show();
+				end
+			);
+			optionsAddScript("onleave",
+				function(self)
+					GameTooltip:Hide();
+				end
+			);
+		optionsEndFrame();
+		optionsBeginFrame(  6,   26, "checkbutton#tl:20:%y#i:ctbar_shiftPet#o:shiftPet:true#Shift default pet bar up");
+			optionsAddScript("onshow",
+				function(self)
+					if (CT_BottomBar and CT_BottomBar.ctPetBar) then
+						-- This version of CT_BottomBar supports deactivation of this bar.
+						if (not CT_BottomBar.ctPetBar.isDisabled) then
+							-- The bar is activated, 
+							-- Let CT_BottomBar handle it.
+							self:SetAlpha(.5);
+						else
+							self:SetAlpha(1);
+						end
+					elseif (CT_BottomBar) then
+						-- This version of CT_BottomBar does not support deactivation of this bar.
+						-- Let CT_BottomBar handle it.
+						self:SetAlpha(.5);
+					else
+						-- CT_BottomBar isn't even installed
+						self:SetAlpha(1);
+					end
+				end
+			);
+			optionsAddScript("onenter",
+				function(self)
+					GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 120, -5);
+					GameTooltip:SetText("|cFFCCCCCCMoves the pet bar further from the bottom of screen.");
+					if ((CT_BottomBar and CT_BottomBar.ctPetBar and not CT_BottomBar.ctPetBar.isDisabled) or (CT_BottomBar and not CT_BottomBar.ctPetBar)) then
+						GameTooltip:AddLine("|cFFFF9999Currently overriden by CT_BottomBar.");
+					end
+					GameTooltip:Show();
+				end
+			);
+			optionsAddScript("onleave",
+				function(self)
+					GameTooltip:Hide();
+				end
+			);
+		optionsEndFrame();
+		optionsBeginFrame(  6,   26, "checkbutton#tl:20:%y#i:ctbar_shiftPossess#o:shiftPossess:true#Shift default possess bar up");
+					optionsAddScript("onshow",
+						function(self)
+							if ((CT_BottomBar and CT_BottomBar.ctPossess and not CT_BottomBar.ctPossess.isDisabled) or (CT_BottomBar and not CT_BottomBar.ctPossess)) then
+								-- The custom CT_BB class bar is present in this version
+								self:SetAlpha(.5);
+							else
+								-- Either CT_BB is not installed, or the custom CT_BB class bar has been disabled
+								self:SetAlpha(1);
+							end
+						end
+					);
+					optionsAddScript("onenter",
+						function(self)
+							GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 120, -5);
+							GameTooltip:SetText("|cFFCCCCCCMoves the default possess bar further from the bottom of screen.");
+							if ((CT_BottomBar and CT_BottomBar.ctPossess and not CT_BottomBar.ctPossess.isDisabled) or (CT_BottomBar and not CT_BottomBar.ctPossess)) then
+								GameTooltip:AddLine("|cFFFF9999Currently overriden by CT_BottomBar.");
+							end
+							GameTooltip:Show();
+						end
+					);
+					optionsAddScript("onleave",
+						function(self)
+							GameTooltip:Hide();
+						end
+					);
+		optionsEndFrame();
+		-- removed from game in 2012 -- optionsAddObject(  6,   26, "checkbutton#tl:20:%y#i:ctbar_shiftMultiCast#o:shiftMultiCast:true#Shift default multicast bar up");
 	optionsEndFrame();
 
 	----------

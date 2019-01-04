@@ -182,6 +182,16 @@ do
 		},
 	}, InboxFrame);
 
+	function module:updateOpenCloseButtons()
+		if (module.opt.hideOpenCloseFeature) then
+			CTMailModOpenSelected:Hide();
+			CTMailModReturnSelected:Hide();
+		else
+			CTMailModOpenSelected:Show();
+			CTMailModReturnSelected:Show();
+		end
+	end
+
 	local function customEvents_OpenReturn(self, event, data)
 		if (event == "INCOMING_START") then
 			CTMailModOpenSelected:SetText(module:getText("STOP_SELECTED"));
@@ -232,6 +242,16 @@ do
 			end,
 		},
 	}, InboxFrame);
+
+	function module:updateSelectAllCheckbox()
+		if (module.opt.hideOpenCloseFeature) then
+			CTMailModSelectAll:Hide();
+			fsNumSelected:Hide();
+		else
+			CTMailModSelectAll:Show();
+			fsNumSelected:Show();
+		end
+	end
 
 	local similarSubjects = {
 		(gsub(AUCTION_EXPIRED_MAIL_SUBJECT, "%%s", ".*")),  -- "Auction expired: %s";
@@ -493,7 +513,14 @@ do
 					chbox.textSmall:Hide();
 					chbox.textNormal:Hide();
 				end
-				chbox:Show();
+				
+				-- Show the checkbox ONLY if the feature isn't disabled (since CT_MailMod v8.1.0.2)
+				if (not module.opt.hideOpenCloseFeature) then
+					chbox:Show();
+				else
+					chbox:Hide();
+				end
+
 			end
 			-- Set or clear the check mark in the selection checkbox.
 			if (module:inboxIsSelected(mailIndex)) then
