@@ -1,9 +1,10 @@
 ## Interface: 80100
-## Version: 8.1.0.1
+## Version: 8.1.0.3
 ## Title: CT_RaidAssist
 ## Notes: Allows you to monitor Raid HP.
 ## DefaultState: Enabled
 ## LoadOnDemand: 0
+## Dependencies: CT_Library
 ## SavedVariables: CT_RA_CurrPositions
 ## SavedVariables: CT_RA_CustomPositions
 ## SavedVariables: CT_RA_DebuffTemplates
