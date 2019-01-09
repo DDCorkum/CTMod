@@ -448,6 +448,7 @@ local function CT_BarMod_Shift_Pet_UpdateTextures()
 	end
 end
 
+local PetPoint, PetRelativeTo, PetRelativePoint, PetX, PetY;
 function CT_BarMod_Shift_Pet_UpdatePositions()
 	if (not CT_BarMod_Shift_Pet_areWeShifting()) then
 		return;
@@ -459,48 +460,32 @@ function CT_BarMod_Shift_Pet_UpdatePositions()
 		return;
 	end
 
-	local frame1, frame2, yoffset;
-	frame1 = CT_BarMod_PetActionBarFrame;
-	frame2 = PetActionBarFrame;	
+	local frame, yoffset;
+	frame = PetActionBarFrame;	
 	local shift = CT_BarMod_Shift_Pet_GetShiftOption();
+	
+	if (not PetPoint) then
+		PetPoint, PetRelativeTo, PetRelativePoint, PetX, PetY = frame:GetPoint(1);
+	end
 
 	if (shift) then
-			yoffset = 2;
+			yoffset = 2 + frame:GetHeight();
 			if (PetActionBarFrame_IsAboveStance and PetActionBarFrame_IsAboveStance()) then
 				yoffset = 0;
 			end
-			frame1:SetHeight(frame2:GetHeight());
-			frame1:SetWidth(frame2:GetWidth());
-			frame1:ClearAllPoints();
-			frame1:SetPoint("BOTTOMLEFT", frame2, "TOPLEFT", 0, yoffset)
+			frame:ClearAllPoints();
+			frame:SetPoint(PetPoint, PetRelativeTo, PetRelativePoint, PetX, PetY + yoffset)
 			
 			petIsShifted = true;
 
 	else
 			yoffset = 0
-			frame1:SetHeight(frame2:GetHeight());
-			frame1:SetWidth(frame2:GetWidth());
-			frame1:ClearAllPoints();
-			frame1:SetPoint("BOTTOMLEFT", frame2, "BOTTOMLEFT", 0, yoffset)
+			frame:ClearAllPoints();
+			frame:SetPoint(PetPoint, PetRelativeTo, PetRelativePoint, PetX, PetY + yoffset)
 			
 			petIsShifted = false;
 
 	end
-	
-	
-	frameClearAllPoints(PetActionButton1);
-	frameSetPoint(PetActionButton1, "BOTTOMLEFT", frame1, 36, 2);
-	PetActionButton1:SetParent(frame1);
-
-	local obj;
-	for i = 2, 10, 1 do
-		obj = _G["PetActionButton"..i];
-		frameClearAllPoints(obj);
-		frameSetPoint(obj, "LEFT", _G["PetActionButton"..(i-1)], "RIGHT", 8, 0);
-		obj:SetParent(frame1);
-	end
-	frame2:Hide();
-	RegisterStateDriver(frame1,"visibility","[@pet,noexists]hide; show");
 end
 
 local function CT_BarMod_Shift_Pet_SetPoint(self, ap, rt, rp, x, y)
