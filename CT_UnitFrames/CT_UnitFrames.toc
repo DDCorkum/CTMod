@@ -1,5 +1,5 @@
 ## Interface: 80100
-## Version: 8.1.0.1
+## Version: 8.1.0.3
 ## Title: CT_UnitFrames
 ## Notes: Changes display of hp/mana values and adds a percentage.
 ## DefaultState: Enabled

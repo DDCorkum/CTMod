@@ -789,16 +789,24 @@ local function justifyH(fs, justify, default)
 	return false;
 end
 
--- Time format 1 (unabbreviated minutes/seconds): 1 hour / 35 minutes
--- Time format 2 (abbreviated minutes/seconds): 1 hour / 35 min
--- Time format 3 (single letter for hour/minute/second): 1h / 35m
--- Time format 4 (single letter for hour/minute/second, and shows 2 values): 1h 35m / 35m 30s
--- Time format 5 (2 values with a colon): 1:35h / 1:35 / 0:35
+-- Time format 1 (unabbreviated days, hours, minutes or seconds): 4 days / 1 hour / 35 minutes
+-- Time format 2 (abbreviated minutes/seconds): 4 days / 1 hour / 35 min
+-- Time format 3 (single letter for day, hour, minute or second): 4d / 1h / 35m
+-- Time format 4 (single letter and shows 2 values): 4d 16h / 1h 35m / 35m 30s
+-- Time format 5 (shows two values with a colon): 112:15h / 1:35h / 1:35 / 0:35
 
-local function timeFormat1(timeValue)
+local function timeFormat1(timeValue, showDays)
 	-- Time format 1 (unabbreviated minutes/seconds): 1 hour / 35 minutes
 	timeValue = ceil(timeValue);
-	if ( timeValue > 3540 ) then
+	if ( timeValue > 86340 and showDays) then
+		-- Days
+		local days = ceil(timeValue / 86400);
+		if ( days ~= 1 ) then
+			return format("%d days", days);
+		else
+			return "1 day";
+		end
+	elseif ( timeValue > 3540 ) then
 		-- Hours
 		local hours = ceil(timeValue / 3600);
 		if ( hours ~= 1 ) then
@@ -824,10 +832,18 @@ local function timeFormat1(timeValue)
 	end
 end
 
-local function timeFormat2(timeValue)
+local function timeFormat2(timeValue, showDays)
 	-- Time format 2 (abbreviated minutes/seconds): 1 hour / 35 min
 	timeValue = ceil(timeValue);
-	if ( timeValue > 3540 ) then
+	if ( timeValue > 86340 and showDays) then
+		-- Days
+		local days = ceil(timeValue / 86400);
+		if ( days ~= 1 ) then
+			return format("%d days", days);
+		else
+			return "1 day";
+		end
+	elseif ( timeValue > 3540 ) then
 		-- Hours
 		local hours = ceil(timeValue / 3600);
 		if ( hours ~= 1 ) then
@@ -844,10 +860,14 @@ local function timeFormat2(timeValue)
 	end
 end
 
-local function timeFormat3(timeValue)
+local function timeFormat3(timeValue, showDays)
 	-- Time format 3 (single letter for hour/minute/second): 1h / 35m
 	timeValue = ceil(timeValue);
-	if ( timeValue > 3540 ) then
+	if ( timeValue > 86340 and showDays) then
+		-- Days
+		local days = ceil(timeValue / 86400);
+		return format("%dd", days);
+	elseif ( timeValue > 3540 ) then
 		-- Hours
 		return format("%dh", ceil(timeValue / 3600));
 	elseif ( timeValue > 60 ) then
@@ -859,10 +879,14 @@ local function timeFormat3(timeValue)
 	end
 end
 
-local function timeFormat4(timeValue)
+local function timeFormat4(timeValue, showDays)
 	-- Time format 4 (single letter for hour/minute/second, and shows 2 values): 1h 35m / 35m 30s
 	timeValue = ceil(timeValue);
-	if ( timeValue >= 3600 ) then
+	if ( timeValue > 86400 and showDays) then
+		-- Days & Hours
+		local days = floor(timeValue / 86400);
+		return format("%dd %dh", days, floor((timeValue - days * 86400) / 3600 ));
+	elseif ( timeValue >= 3600 ) then
 		-- Hours & Minutes
 		local hours = floor(timeValue / 3600);
 		return format("%dh %dm", hours, floor((timeValue - hours * 3600) / 60));
@@ -875,10 +899,14 @@ local function timeFormat4(timeValue)
 	end
 end
 
-local function timeFormat5(timeValue)
+local function timeFormat5(timeValue, showDays)
 	-- Time format 5 (2 values with a colon): 1:35h / 1:35 / 0:35
 	timeValue = ceil(timeValue);
-	if ( timeValue >= 3600 ) then
+	if ( timeValue > 86400 and showDays) then
+		-- Days & Hours
+		local days = floor(timeValue / 86400);
+		return format("%dd, %d:%.2dh", days, floor((timeValue % 86400) / 3600 ), floor((timeValue % 3600) / 60 ));
+	elseif ( timeValue >= 3600 ) then
 		-- Hours & Minutes
 		local hours = floor(timeValue / 3600);
 		return format("%d:%.2dh", hours, floor((timeValue - hours * 3600) / 60));
@@ -2233,7 +2261,7 @@ local function auraButton_updateTimeDisplay(button)
 		) then
 			fsTimeleft:SetText("");
 		else
-			fsTimeleft:SetText(frameObject.durationFunc2(timeRemaining));
+			fsTimeleft:SetText(frameObject.durationFunc2(timeRemaining,frameObject.showDays2));
 		end
 	else
 		if (
@@ -2243,7 +2271,7 @@ local function auraButton_updateTimeDisplay(button)
 		) then
 			fsTimeleft:SetText("");
 		else
-			fsTimeleft:SetText(frameObject.durationFunc1(timeRemaining));
+			fsTimeleft:SetText(frameObject.durationFunc1(timeRemaining,frameObject.showDays1));
 			if (button.timeleftFlag) then
 				auraButton_updateTimeNameSpecial(button);
 			end
@@ -3329,6 +3357,8 @@ function frameClass:applyUnprotectedOptions(initFlag)
 	self.nameJustifyWithTime1 = frameOptions.nameJustifyWithTime1 or constants.JUSTIFY_DEFAULT;
 	self.nameJustifyNoTime1 = frameOptions.nameJustifyNoTime1 or constants.JUSTIFY_DEFAULT;
 	self.timeJustifyNoName1 = frameOptions.timeJustifyNoName1 or constants.JUSTIFY_DEFAULT;
+	self.showDays1 = frameOptions.showDays1 ~= false;
+	self.showDays2 = frameOptions.showDays2 ~= false;
 
 	if (not initFlag) then
 		self.needUpdate = true;
@@ -9075,8 +9105,9 @@ end
 local function options_updateUnprotected(optName, value, windowId)
 	-- Update an "unprotected" option.
 	local primaryObject = options_updateValue(optName, value, windowId);
-
+	
 	if (primaryObject) then
+		
 		-- The option changed. Apply the options.
 		primaryObject:applyUnprotectedOptions(false);
 
@@ -9361,6 +9392,8 @@ module.optionUpdate = function(self, optName, value)
 		optName == "dataSide2" or
 		optName == "durationFormat1" or
 		optName == "durationFormat2" or
+		optName == "showDays1" or
+		optName == "showDays2" or
 		optName == "durationLocation1" or
 		optName == "nameJustifyWithTime1" or
 		optName == "nameJustifyNoTime1" or
@@ -10272,8 +10305,10 @@ module.frame = function()
 		optionsAddObject( -5,   26, "checkbutton#tl:30:%y#i:showTimers1#o:showTimers1:true#Show time remaining text");
 
 		optionsAddObject( -3,   15, "font#tl:70:%y#v:ChatFontNormal#Format:");
-		optionsAddObject( 15,   20, "dropdown#tl:115:%y#s:145:%s#n:CT_BuffModDropdown_durationFormat1#i:durationFormat1#o:durationFormat1:1#1 hour / 35 minutes#1 hour / 35 min#1h / 35m#1h 35m / 35m 15s#1:35h / 35:15");
-
+		optionsAddObject( 15,   20, "dropdown#tl:115:%y#s:145:%s#n:CT_BuffModDropdown_durationFormat1#i:durationFormat1#o:durationFormat1:1#1 hour  /  30 minutes#1 hour  /  30 min#1h  /  30m#1h 22m  /  30m 45s#1:22h  /  30:45");
+		
+		optionsAddObject(  6,   26, "checkbutton#tl:66:%y#i:CTBuffMod_showDaysFormat1#o:showDays1:true#Show days if >24 hours");
+		
 		optionsAddObject( -5,   15, "font#tl:70:%y#v:ChatFontNormal#Location:");
 		optionsAddObject( 15,   20, "dropdown#tl:115:%y#s:145:%s#n:CT_BuffModDropdown_durationLocation1#i:durationLocation1#o:durationLocation1:" .. constants.DURATION_LOCATION_DEFAULT .. "#Default#Left of the name#Right of the name#Above the name#Below the name");
 
@@ -10310,8 +10345,10 @@ module.frame = function()
 		optionsAddObject( -6,   26, "checkbutton#tl:30:%y#i:showTimers2#o:showTimers2:true#Show time remaining text");
 
 		optionsAddObject( -2,   15, "font#tl:70:%y#v:ChatFontNormal#Format:");
-		optionsAddObject( 12,   20, "dropdown#tl:115:%y#s:145:%s#n:CT_BuffModDropdown_durationFormat2#i:durationFormat2#o:durationFormat2:1#1 hour / 35 minutes#1 hour / 35 min#1h / 35m#1h 35m / 35m 15s#1:35h / 35:15");
-
+		optionsAddObject( 12,   20, "dropdown#tl:115:%y#s:145:%s#n:CT_BuffModDropdown_durationFormat2#i:durationFormat2#o:durationFormat2:1#1 hour  /  30 minutes#1 hour  /  30 min#1h  /  30m#1h 22m  /  30m 45s#1:22h  /  30:45");
+		
+		optionsAddObject(  6,   26, "checkbutton#tl:66:%y#i:CTBuffMod_showDaysFormat2#o:showDays2:true#Show days if >24 hours");
+		
 		optionsAddObject( -6,   15, "font#tl:70:%y#v:ChatFontNormal#Location:");
 		optionsAddObject( 12,   20, "dropdown#tl:115:%y#s:145:%s#n:CT_BuffModDropdown_dataSide2#i:dataSide2#o:dataSide2:" .. constants.DATA_SIDE_BOTTOM .. "#Left#Right#Above#Below");
 

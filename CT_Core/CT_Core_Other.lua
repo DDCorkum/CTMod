@@ -851,11 +851,37 @@ end
 -- Casting Bar Timer
 
 local displayTimers;
-local castingBarFrames = { "CastingBarFrame", "TargetFrameSpellBar" };
+local castingBarFrames = { "CastingBarFrame", "TargetFrameSpellBar", "FocusFrameSpellBar" };
 
 local function castingtimer_createFS(castBarFrame)
 	castBarFrame.countDownText = castBarFrame:CreateFontString(nil, "ARTWORK", "GameFontHighlight");
 	castBarFrame.ctElapsed = 0;
+	castBarFrame:HookScript("OnUpdate",
+		function(self, secondsElapsed)
+			if (not self.ctElapsed) then
+				return;
+			end
+		
+			local elapsed = ( self.ctElapsed or 0 ) - secondsElapsed;
+			if ( elapsed < 0 ) then
+				if ( displayTimers ) then
+					-- We need to update
+					if ( self.casting ) then
+						self.countDownText:SetText(format("%0.1fs", max(self.maxValue - self.value, 0)));
+					elseif ( self.channeling ) then
+						self.countDownText:SetText(format("%0.1fs", max(self.value, 0)));
+					else
+						self.countDownText:SetText("");
+					end
+				end
+				self.ctElapsed = 0.1;
+				
+			else
+				self.ctElapsed = elapsed;
+			end
+		end
+	);
+	
 end
 
 for i, frameName in ipairs(castingBarFrames) do
@@ -866,7 +892,7 @@ for i, frameName in ipairs(castingBarFrames) do
 end
 
 local function castingtimer_configure(castBarFrame)
-
+	
 	local castingBarText = castBarFrame.Text;
 	local countDownText = castBarFrame.countDownText;
 
@@ -938,32 +964,6 @@ end
 hooksecurefunc("PlayerFrame_DetachCastBar", castingtimer_PlayerFrame_DetachCastBar);
 hooksecurefunc("PlayerFrame_AttachCastBar", castingtimer_PlayerFrame_AttachCastBar);
 
--- Hook the CastingBarFrame's OnUpdate
-local function CT_Core_CastingBarFrame_OnUpdate(self, secondsElapsed)
-	if (not self.ctElapsed) then
-		return;
-	end
-
-	local elapsed = ( self.ctElapsed or 0 ) - secondsElapsed;
-	if ( elapsed < 0 ) then
-		if ( displayTimers ) then
-			-- We need to update
-			if ( self.casting ) then
-				self.countDownText:SetText(format("%0.1fs", max(self.maxValue - self.value, 0)));
-			elseif ( self.channeling ) then
-				self.countDownText:SetText(format("%0.1fs", max(self.value, 0)));
-			else
-				self.countDownText:SetText("");
-			end
-		end
-		self.ctElapsed = 0.1;
-	else
-		self.ctElapsed = elapsed;
-	end
-	-- self.text:SetText("abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz");
-end
-hooksecurefunc("CastingBarFrame_OnUpdate", CT_Core_CastingBarFrame_OnUpdate);
-
 local function toggleCastingTimers(enable)
 	displayTimers = enable;
 
@@ -974,6 +974,16 @@ local function toggleCastingTimers(enable)
 		end
 	end
 end
+
+local function addCastingBarFrame(name)
+	local frame = _G[name];
+	if (frame) then
+		castingtimer_configure(frame);
+		tinsert(castingBarFrames,name);
+	end
+end
+
+module.addCastingBarFrame = addCastingBarFrame;
 
 --------------------------------------------
 -- Alt+Right-Click to buy full stack

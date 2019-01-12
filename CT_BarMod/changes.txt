@@ -1,3 +1,6 @@
+CT_BarMod (8.1.0.3) 2019-01-08
+- Fixed compatibility issue with MoveEverything addon created by 8.1.0.2
+
 CT_BarMod (8.1.0.2) 2018-12-21
 - Summoning pets no longer creates "dead zones", even without CT_BottomBar's custom pet bar
 - Added clarity to CT_BarMod options for shifting certain bars up/down without CT_BottomBar

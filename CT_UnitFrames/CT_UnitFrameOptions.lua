@@ -602,6 +602,12 @@ module.update = function(self, type, value)
 		CT_UnitFrameOptions_SetOptionsFrame("player");
 		
 		CT_PlayerFrame_PlayerCoords()
+		
+		if (CT_Core and CT_Core.addCastingBarFrame) then
+			-- Allows CT_Core 8.1.0.3 and later to add timer to casting bars
+			CT_Core.addCastingBarFrame("CT_FocusFrameSpellBar");
+			CT_Core.addCastingBarFrame("CT_AssistFrameSpellBar");
+		end
 	else
 
 	end
