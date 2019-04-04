@@ -1080,13 +1080,12 @@ end
 --------------------------------------------
 -- Override default action bar key bindings.
 
-local function setActionBindings()
+local function setActionBindings(prevehicle)
 	-- Set or clear the overrride bindings for the action bar.
 	if (InCombatLockdown()) then
 		module.needSetActionBindings = true;
 		return;
 	end
-
 	-- These CT_BarMod groups correspond with action bars in the default UI.
 	-- Each of the buttons in these groups is associated with an action name
 	-- (eg. "ACTIONBUTTON1", "MULTIACTIONBAR1BUTTON1", etc).
@@ -1106,7 +1105,7 @@ local function setActionBindings()
 
 			if (groupId == module.actionBarId) then
 				useDefault = module:getOption("actionBindings") ~= false;
-				if (CT_BarMod_SecureFrame:GetAttribute("hasPetBattle") or CT_BarMod_SecureFrame:GetAttribute("hasOverrideBar")) then
+				if (prevehicle or CT_BarMod_SecureFrame:GetAttribute("hasPetBattle") or CT_BarMod_SecureFrame:GetAttribute("hasOverrideBar") or CT_BarMod_SecureFrame:GetAttribute("hasVehicleUI")) then
 					-- We are in a pet battle or the override bar is showing
 					-- 1. Leave the main action bar's override bindings cleared.
 					useDefault = false;
