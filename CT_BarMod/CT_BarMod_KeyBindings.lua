@@ -1106,8 +1106,8 @@ local function setActionBindings()
 
 			if (groupId == module.actionBarId) then
 				useDefault = module:getOption("actionBindings") ~= false;
-				if (CT_BarMod_SecureFrame:GetAttribute("hasPetBattle")) then
-					-- We are in a pet battle.
+				if (CT_BarMod_SecureFrame:GetAttribute("hasPetBattle") or CT_BarMod_SecureFrame:GetAttribute("hasOverrideBar")) then
+					-- We are in a pet battle or the override bar is showing
 					-- 1. Leave the main action bar's override bindings cleared.
 					useDefault = false;
 					-- 2. Assign override bindings to the actions "ACTIONBUTTON1"

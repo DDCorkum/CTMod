@@ -1,3 +1,6 @@
+CT_BarMod (8.1.5.1) 2019-04-03
+- Bar 12 keybindings do not block the override bar used in vehicles and world quests
+
 CT_BarMod (8.1.0.3) 2019-01-08
 - Fixed compatibility issue with MoveEverything addon created by 8.1.0.2
 
