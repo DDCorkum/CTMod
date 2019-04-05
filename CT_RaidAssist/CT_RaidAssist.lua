@@ -1451,6 +1451,20 @@ function CT_RA_UpdateRange()
 	end
 end
 
+-- Update name
+function CT_RA_GenerateNameString(name, combatRole)
+	if (not name) then
+		return "";
+	end
+	if (combatRole == "TANK") then
+		return "|TInterface\\AddOns\\CT_RaidAssist\\Images\\tankicon:0|t" .. name;
+	elseif (combatRole == "HEALER") then
+		return "|TInterface\\AddOns\\CT_RaidAssist\\Images\\healicon:0|t" .. name;
+	else
+		return name;
+	end
+end
+
 -- Update health
 function CT_RA_UpdateUnitHealth(frame)
 	local tempOptions = CT_RAMenu_Options["temp"];
@@ -1572,7 +1586,7 @@ function CT_RA_UpdateUnitStatus(frame)
 	end
 
 	local width, height, scale = CT_RA_GetFrameData(id);
-	local name, rank, subgroup, level, class, fileName, zone, online, isDead = GetRaidRosterInfo(id);
+	local name, rank, subgroup, level, class, fileName, zone, online, isDead, role, isML, combatRole = GetRaidRosterInfo(id);
 
 	if ( tempOptions["HideBorder"] ) then
 		if ( height == 28 ) then
@@ -1605,7 +1619,9 @@ function CT_RA_UpdateUnitStatus(frame)
 	end
 
 	local stats = CT_RA_Stats[name];
-	frame.Name:SetText(name);
+	
+	frame.Name:SetText(CT_RA_GenerateNameString(name,combatRole));	
+	
 	CT_RA_UpdateUnitDead(frame);
 	if ( stats ) then
 		CT_RA_UpdateUnitBuffs(stats["Buffs"], frame, name);
@@ -3310,7 +3326,7 @@ function CT_RA_UpdateRaidGroup(updateType)
 	for i=1, MAX_RAID_MEMBERS do
 		if ( i <= numRaidMembers ) then
 			local unitid = "raid" .. i;
-			name, rank, subgroup, level, class, fileName, zone, online, isDead = GetRaidRosterInfo(i);
+			name, rank, subgroup, level, class, fileName, zone, online, isDead, role, isML, combatRole = GetRaidRosterInfo(i);
 			if ( UnitIsDead(unitid) or UnitIsGhost(unitid) ) then
 				isDead = 1;
 			end
@@ -3333,7 +3349,7 @@ function CT_RA_UpdateRaidGroup(updateType)
 				local group = button.frameParent;
 				if ( group ) then
 					if ( tempOptions["ShowGroups"] and tempOptions["ShowGroups"][group.id] ) then
-						button.Name:SetText(name);
+						button.Name:SetText(CT_RA_GenerateNameString(name,combatRole));
 						button.unitName = name;
 						if ( button.update or updateType == 0 ) then
 							CT_RA_UpdateUnitStatus(button);

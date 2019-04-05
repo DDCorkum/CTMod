@@ -932,23 +932,6 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 			</Layer>
 		</Layers>
 		<Frames>
-			<Frame name="$parentDropDown" inherits="L_UIDropDownMenuTemplate" id="1" hidden="true">
-				<Size>
-					<AbsDimension x="125" y="15"/>
-				</Size>
-				<Anchors>
-					<Anchor point="TOP">
-						<Offset>
-							<AbsDimension x="70" y="10"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnLoad>
-						CT_RA_Emergency_DropDown_OnLoad(self);
-					</OnLoad>
-				</Scripts>
-			</Frame>
 			<Frame name="$parentFrame1" inherits="CT_RA_EmergencyTemplate" id="1">
 				<Anchors>
 					<Anchor point="TOP">
@@ -997,6 +980,13 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 		</Frames>
 		<Scripts>
 			<OnLoad>
+				-- lua-based dropdowns from 8.1.5.1 onwards
+				local frame = L_Create_UIDropDownMenu("CT_RA_EmergencyFrameDropDown",self);
+				frame:SetSize(125,15);
+				frame:SetPoint("TOP",70,10);
+				CT_RA_Emergency_DropDown_OnLoad(frame);
+				
+				-- original onload script before 8.1.5.1				
 				self.frame1 = CT_RA_Cache[self].Frame1;
 				self.frame2 = CT_RA_Cache[self].Frame2;
 				self.frame3 = CT_RA_Cache[self].Frame3;
@@ -1004,7 +994,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				self.frame5 = CT_RA_Cache[self].Frame5;
 				self:SetBackdropColor(0, 0, 0, 0.33);
 				self:SetBackdropBorderColor(1, 1, 1, 0);
-			</OnLoad>
+		</OnLoad>
 		</Scripts>
 	</Frame>
 	<Frame name="CT_RA_EmergencyFrameDrag" movable="true" parent="UIParent" hidden="true">
@@ -1089,27 +1079,15 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				<AbsInset left="5" right="5" top="5" bottom="5"/>
 			</BackgroundInsets>
 		</Backdrop>
-		<Frames>
-			<Frame name="$parentDropDown" inherits="L_UIDropDownMenuTemplate" id="1" hidden="true">
-				<Size>
-					<AbsDimension x="10" y="10"/>
-				</Size>
-				<Anchors>
-					<Anchor point="TOP">
-						<Offset>
-							<AbsDimension x="70" y="10"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnLoad>
-						CT_RA_ResFrame_OnLoad(self);
-					</OnLoad>
-				</Scripts>
-			</Frame>
-		</Frames>
 		<Scripts>
 			<OnLoad>
+				-- lua-based dropdowns from 8.1.5.1 onwards
+				local frame = L_Create_UIDropDownMenu("CT_RA_ResFrameDropDown",self);
+				frame:SetSize(10,15);
+				frame:SetPoint("TOP",70,10);
+				CT_RA_ResFrame_OnLoad(frame);
+				
+				-- original onload script before 8.1.5.1	
 				self:SetBackdropColor(0, 0, 0, 0.5);
 			</OnLoad>
 			<OnMouseDown>

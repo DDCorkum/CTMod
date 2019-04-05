@@ -2643,11 +2643,14 @@ function CT_RA_MTPlayers_CT_RAMTGroupDragOnMouseDown(self, button)
 				return;
 			end
 
-			local oDrop = CT_RA_MTPlayers_DropDown;
+			local oDrop = CT_RA_MTPlayers_DropDown or L_Create_UIDropDownMenu("CT_RA_MTPlayers_DropDown");
 			local cFrame = self:GetName();
 			if (not dropdownInitialized) then
+				oDrop:SetSize(10,10);
+				oDrop:SetPoint("TOP",70,10);
 				CT_RA_MTPlayers_DropDown_OnLoad(oDrop);
 				dropdownInitialized = true;
+				CT_RA_MTPlayers_DropDown = oDrop;
 			end
 			L_ToggleDropDownMenu(1, nil, oDrop, cFrame, 47, 15);
 			return;

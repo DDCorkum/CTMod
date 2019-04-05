@@ -66,7 +66,7 @@ end
 
 function CT_RAOptionsGroupButton_OnMouseDown(self, button)
 	if ( button == "RightButton" and self.name ) then
-		ToggleDropDownMenu(1, nil, _G["CT_RAOptionsGroupButton"..self:GetID().."DropDown"]);
+		L_ToggleDropDownMenu(1, nil, _G["CT_RAOptionsGroupButton"..self:GetID().."DropDown"]);
 	end
 end
 

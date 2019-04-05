@@ -1,5 +1,5 @@
 ## Interface: 80100
-## Version: 8.1.0.3
+## Version: 8.1.5.1
 ## Title: CT_RaidAssist
 ## Notes: Allows you to monitor Raid HP.
 ## DefaultState: Enabled

@@ -601,10 +601,16 @@ function CT_MapMod_PinMixin:CreateNotePanel()
 		},
 		self.notepanel
 	);
-	self.notepanel.setdropdown = CreateFrame("Frame", nil, self.notepanel, "L_UIDropDownMenuTemplate");
-	self.notepanel.usersubsetdropdown = CreateFrame("Frame", nil, self.notepanel, "L_UIDropDownMenuTemplate");
-	self.notepanel.herbsubsetdropdown = CreateFrame("Frame", nil, self.notepanel, "L_UIDropDownMenuTemplate");
-	self.notepanel.oresubsetdropdown = CreateFrame("Frame", nil, self.notepanel, "L_UIDropDownMenuTemplate");
+	--self.notepanel.setdropdown = CreateFrame("Frame", nil, self.notepanel, "L_UIDropDownMenuTemplate");
+	self.notepanel.setdropdown = L_Create_UIDropDownMenu(nil or "", self.notepanel);
+	--self.notepanel.usersubsetdropdown = CreateFrame("Frame", nil, self.notepanel, "L_UIDropDownMenuTemplate");
+	self.notepanel.usersubsetdropdown = L_Create_UIDropDownMenu(nil or "", self.notepanel);
+	--self.notepanel.herbsubsetdropdown = CreateFrame("Frame", nil, self.notepanel, "L_UIDropDownMenuTemplate");
+	self.notepanel.herbsubsetdropdown = L_Create_UIDropDownMenu(nil or "", self.notepanel);
+	--self.notepanel.oresubsetdropdown = CreateFrame("Frame", nil, self.notepanel, "L_UIDropDownMenuTemplate");
+	self.notepanel.oresubsetdropdown = L_Create_UIDropDownMenu(nil or "", self.notepanel);
+	
+
 
 	self.notepanel.setdropdown:SetPoint("LEFT",self.notepanel,"TOPLEFT",35,-60);
 	L_UIDropDownMenu_SetWidth(self.notepanel.setdropdown, 90);
