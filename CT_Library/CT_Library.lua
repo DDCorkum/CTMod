@@ -11,7 +11,7 @@
 -----------------------------------------------
 -- Initialization
 
-local LIBRARY_VERSION = 8.01030;
+local LIBRARY_VERSION = 8.151;
 local LIBRARY_NAME = "CT_Library";
 
 local _G = getfenv(0);
@@ -978,8 +978,10 @@ function lib:stopMovable(id)
 		end
 
 		pos[1], pos[2], pos[3], pos[4], pos[5], pos[6] = a, b, c, d, e, scale;
-		frame:ClearAllPoints();
-		frame:SetPoint(a, b, c, d, e);
+		if (not InCombatLockdown()) then
+			frame:ClearAllPoints();
+			frame:SetPoint(a, b, c, d, e);
+		end
 	else
 		local a, b, c, d, e = frame:GetPoint(1);
 		local scale = frame:GetScale();

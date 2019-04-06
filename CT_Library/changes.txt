@@ -1,6 +1,6 @@
 CT_Library (8.1.5.1) 2019-04-05
 - Library update to LibUIDropDownMenu-2.0
-- Not compatible with addons using older LibUIDropDownMenu
+- Fixed error when trying to drag custom bars while in combat
 
 CT_Library (8.1.0.2) 2018-12-22
 - Library updates
