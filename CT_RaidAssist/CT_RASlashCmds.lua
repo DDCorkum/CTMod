@@ -69,67 +69,6 @@ function CT_RA_RegisterSlashCmd(title, description, height, identifier, func, ..
 	tinsert(CT_RA_SlashCmds, { height, title, description, otherCmds });
 end
 
-
--- Functions used by slash commands
-function CT_RA_CheckReady()
-	if ( CT_RA_Level >= 1 ) then
-		SendChatMessage("<CTRaid> " .. UnitName("player") .. " has performed a ready check.", "RAID");
-		CT_RA_AddMessage("CHECKREADY");
-		local numValid = 0;
-		for i = 1, GetNumRaidMembers(), 1 do
-			local name, rank, subgroup, level, class, fileName, zone, online, isDead = GetRaidRosterInfo(i);
-			if ( name ~= UnitName("player") and CT_RA_Stats[name] and CT_RA_Stats[name]["Reporting"] and online and CT_RA_Stats[name]["Version"] and CT_RA_Stats[name]["Version"] >= 1.097 ) then
-				numValid = numValid + 1;
-				CT_RA_Stats[name]["notready"] = 1;
-			end
-		end
-		if ( numValid == 1 ) then
-			CT_RA_Print("<CTRaid> Ready status is being checked for |c00FFFFFF" .. numValid .. "|r raid member.", 1, 1, 0);
-		else
-			CT_RA_Print("<CTRaid> Ready status is being checked for |c00FFFFFF" .. numValid .. "|r raid members.", 1, 1, 0);
-		end
-		CT_RA_UpdateFrame.readyTimer = 30;
-		CT_RA_UpdateRaidGroup(0);
-	else
-		CT_RA_Print("<CTRaid> You need to be promoted or leader to do that!", 1, 1, 0);
-	end
-end
-
-function CT_RA_CheckVote(question)
-	if ( CT_RA_Level >= 1 ) then
-		SendChatMessage("<CTRaid> " .. UnitName("player") .. " has performed a vote: " .. question, "RAID");
-		CT_RA_AddMessage("VOTE " .. question);
-		CT_RA_Print("<CTRaid> Performing raid vote: |c00FFFFFF" .. question .. "|r", 1, 1, 0);
-		CT_RA_UpdateFrame.voteTimer = 30;
-	else
-		CT_RA_Print("<CTRaid> You need to be promoted or leader to do that!", 1, 1, 0);
-	end
-end
-
-function CT_RA_CheckRly()
-	if ( CT_RA_Level >= 1 ) then
---~ 		SendChatMessage("<CTRaid> " .. UnitName("player") .. " asks the raid: O RLY?", "RAID");
-		CT_RA_AddMessage("CHECKRLY");
-		local numValid = 0;
-		for i = 1, GetNumRaidMembers(), 1 do
-			local name, rank, subgroup, level, class, fileName, zone, online, isDead = GetRaidRosterInfo(i);
-			if ( name ~= UnitName("player") and CT_RA_Stats[name] and CT_RA_Stats[name]["Reporting"] and online and CT_RA_Stats[name]["Version"] and CT_RA_Stats[name]["Version"] >= 1.097 ) then
-				numValid = numValid + 1;
-				CT_RA_Stats[name]["rly"] = 1;
-			end
-		end
-		if ( numValid == 1 ) then
-			CT_RA_Print("<CTRaid> O RLY status is being checked for |c00FFFFFF" .. numValid .. "|r raid member.", 1, 1, 0);
-		else
-			CT_RA_Print("<CTRaid> O RLY status is being checked for |c00FFFFFF" .. numValid .. "|r raid members.", 1, 1, 0);
-		end
-		CT_RA_UpdateFrame.rlyTimer = 30;
-		CT_RA_UpdateRaidGroup(0);
-	else
-		CT_RA_Print("<CTRaid> You need to be promoted or leader to do that!", 1, 1, 0);
-	end
-end
-
 function CT_RA_Invite(msg)
 	if ( not GetGuildInfo("player") ) then
 		CT_RA_Print("<CTRaid> You need to be in a guild to mass invite.");
@@ -329,15 +268,6 @@ end, "/rahide");
 CT_RA_RegisterSlashCmd("/raoptions", "Shows the options dialog.", 20, "RAOPTIONS", function(msg)
 	CT_RAMenuFrame:Show();
 end, "/raoptions", "/ctra", "/ctraid");
-
-	-- /raready
-CT_RA_RegisterSlashCmd("/raready", "Performs a ready check, asking all CTRA users if they are ready (|brequires promoted or leader status|eb).", 30, "RAREADY", CT_RA_CheckReady, "/raready", "/rar");
-
-	-- /ravote
-CT_RA_RegisterSlashCmd("/ravote", "Usage: |b/ravote [question]|eb - Performs a vote, asking the raid for their opinion on the question. Results are broadcasted to raid chat after 30 seconds.", 30, "RAVOTE", CT_RA_CheckVote, "/ravote");
-
-	-- /rarly
-CT_RA_RegisterSlashCmd("/rarly", "Performs a rly check, asking all CTRA users if they are rly (|brequires promoted or leader status|eb).", 30, "RARLY", CT_RA_CheckRly, "/rarly", "/rly");
 
 	-- /rainvite
 CT_RA_RegisterSlashCmd("/rainvite", "Usable via |b/rainvite minlevel-maxlevel|eb or |b/rainvite level|eb this will invite all guild members within the chosen level range.", 30, "RAINVITE", function(msg)
