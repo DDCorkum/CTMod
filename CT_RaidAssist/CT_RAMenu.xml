@@ -1937,7 +1937,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 					</Frame>
 					<Frame name="$parentDisplay">
 						<Size>
-							<AbsDimension x="550" y="145"/>
+							<AbsDimension x="550" y="170"/>
 						</Size>
 						<Anchors>
 							<Anchor point="TOP">
@@ -2058,6 +2058,15 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 										</Anchor>
 									</Anchors>
 								</FontString>
+								<FontString name="$parentShowRoleIcons" inherits="ChatFontNormal" text="Show Role Icons">
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="35" y="-140"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
 							</Layer>
 						</Layers>
 						<Frames>
@@ -2138,6 +2147,26 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 								</Scripts>
 								<NormalTexture name="$parentNormalTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
 							</Button>
+							<CheckButton name="$parentShowRoleIconsCB" hidden="false" id="4" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentShowRoleIcons">
+										<Offset>
+											<AbsDimension x="0" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<HitRectInsets>
+									<AbsInset left="0" right="0" top="0" bottom="0"/>
+								</HitRectInsets>
+								<Size>
+									<AbsDimension x="24" y="24"/>
+								</Size>
+								<Scripts>
+									<OnClick>
+										CT_RAMenu_Misc_ShowRoleIcons(self);
+									</OnClick>
+								</Scripts>
+							</CheckButton>
 							<CheckButton name="$parentShowAFKCB" hidden="false" id="4" inherits="OptionsCheckButtonTemplate">
 								<Anchors>
 									<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentShowAFKText">

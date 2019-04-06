@@ -1456,10 +1456,15 @@ function CT_RA_GenerateNameString(name, combatRole)
 	if (not name) then
 		return "";
 	end
+	if (CT_RAMenu_Options["temp"]["showRoleIcons"] == false) then
+		return name;
+	end
 	if (combatRole == "TANK") then
 		return "|TInterface\\AddOns\\CT_RaidAssist\\Images\\tankicon:0|t" .. name;
 	elseif (combatRole == "HEALER") then
 		return "|TInterface\\AddOns\\CT_RaidAssist\\Images\\healicon:0|t" .. name;
+	elseif (combatRole == "DAMAGER") then
+		return "|TInterface\\AddOns\\CT_RaidAssist\\Images\\dpsicon:0|t" .. name;
 	else
 		return name;
 	end
