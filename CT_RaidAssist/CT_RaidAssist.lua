@@ -802,6 +802,76 @@ function CT_RA_ParseMessage(nick, msg)
 		CT_RA_UpdateResFrame();
 		return update;
 	end
+	-- Check ready
+
+	if ( msg == "CHECKREADY" ) then
+		if ( rank >= 1 ) then
+			CT_RA_CheckReady_Person = nick;
+			if ( nick ~= playerName ) then
+				PlaySoundFile("Sound\\interface\\levelup2.wav");
+				CT_RA_ReadyFrame:Show();
+			end
+		end
+		return update;
+	elseif ( ( msg == "READY" or msg == "NOTREADY" ) and CT_RA_CheckReady_Person == playerName ) then
+		if ( msg == "READY" ) then
+			unitStats["notready"] = nil;
+		else
+			unitStats["notready"] = 2;
+		end
+		local all_ready = true;
+		local nobody_ready = true;
+		for k, v in pairs(CT_RA_Stats) do
+			if ( v["notready"] ) then
+				all_ready = false;
+				if ( v["notready"] == 1 ) then
+					nobody_ready = false;
+				end
+			end
+		end
+		if ( all_ready ) then
+			CT_RA_Print("<CTRaid> Everybody is ready.", 1, 1, 0);
+		elseif ( not all_ready and nobody_ready ) then
+			CT_RA_UpdateFrame.readyTimer = 0.1;
+		end
+		CT_RA_UpdateUnitDead(frame);
+		return update;
+	end
+
+	-- Check Rly
+	if ( msg == "CHECKRLY" ) then
+		if ( rank >= 1 ) then
+			CT_RA_CheckRly_Person = nick;
+			if ( nick ~= UnitName("player") ) then
+				PlaySoundFile("Sound\\interface\\levelup2.wav");
+				CT_RA_RlyFrame:Show();
+			end
+		end
+		return update;
+	elseif ( ( msg == "YARLY" or msg == "NORLY" ) and CT_RA_CheckRly_Person == playerName ) then
+		if ( msg == "YARLY" ) then
+			unitStats["rly"] = nil;
+		else
+			unitStats["rly"] = 1;
+		end
+		local all_ready = true;
+		local nobody_ready = true;
+		for k, v in pairs(CT_RA_Stats) do
+			if ( v["rly"] ) then
+				all_ready = false;
+				if ( v["rly"] == 1 ) then
+					nobody_ready = false;
+				end
+			end
+		end
+		if ( all_ready ) then
+			CT_RA_Print("<CTRaid> Ya rly.", 1, 1, 0);
+		elseif ( not all_ready and nobody_ready ) then
+			CT_RA_UpdateFrame.rlyTimer = 0.1;
+		end
+		CT_RA_UpdateUnitDead(frame);
+		return update;
+	end
 
 	-- Check AFK
 
@@ -986,6 +1056,27 @@ function CT_RA_ParseMessage(nick, msg)
 			if ( name and name == playerName ) then
 				HideUIPanel(CT_RA_AssistFrame);
 			end
+		end
+		return update;
+	end
+
+	-- Vote
+	local _, _, question = string.find(msg, "^VOTE (.+)$");
+	if ( question ) then
+		if ( rank >= 1 ) then
+			CT_RA_VotePerson = { nick, 0, 0, question };
+			if ( nick ~= playerName ) then
+				PlaySoundFile("Sound\\interface\\levelup2.wav");
+				CT_RA_VoteFrame.question = question;
+				CT_RA_VoteFrame:Show();
+			end
+		end
+		return update;
+	elseif ( ( msg == "VOTEYES" or msg == "VOTENO" ) and CT_RA_VotePerson and CT_RA_VotePerson[1] == playerName ) then
+		if ( msg == "VOTEYES" ) then
+			CT_RA_VotePerson[2] = CT_RA_VotePerson[2] + 1;
+		elseif ( msg == "VOTENO" ) then
+			CT_RA_VotePerson[3] = CT_RA_VotePerson[3] + 1;
 		end
 		return update;
 	end
@@ -1360,21 +1451,23 @@ function CT_RA_UpdateRange()
 	end
 end
 
--- Updates name any any icons (textures) in the string
+-- Update name
 function CT_RA_GenerateNameString(name, combatRole)
 	if (not name) then
 		return "";
 	end
-	if (CT_RAMenu_Options["temp"]["showRoleIcons"] ~= false) then
-		if (combatRole == "TANK") then
-			name = "|TInterface\\AddOns\\CT_RaidAssist\\Images\\tankicon:0|t" .. name;
-		elseif (combatRole == "HEALER") then
-			name =  "|TInterface\\AddOns\\CT_RaidAssist\\Images\\healicon:0|t" .. name;
-		elseif (combatRole == "DAMAGER") then
-			name = "|TInterface\\AddOns\\CT_RaidAssist\\Images\\dpsicon:0|t" .. name;
-		end
+	if (CT_RAMenu_Options["temp"]["showRoleIcons"] == false) then
+		return name;
 	end
-	return name;
+	if (combatRole == "TANK") then
+		return "|TInterface\\AddOns\\CT_RaidAssist\\Images\\tankicon:0|t" .. name;
+	elseif (combatRole == "HEALER") then
+		return "|TInterface\\AddOns\\CT_RaidAssist\\Images\\healicon:0|t" .. name;
+	elseif (combatRole == "DAMAGER") then
+		return "|TInterface\\AddOns\\CT_RaidAssist\\Images\\dpsicon:0|t" .. name;
+	else
+		return name;
+	end
 end
 
 -- Update health
@@ -1547,62 +1640,6 @@ function CT_RA_UpdateUnitStatus(frame)
 	end
 end
 
--- Update ready / not ready / afk status
-
-function CT_RA_StartReadyStatus()
-	local numRaidMembers = GetNumGroupMembers();
-	if (InCombatLockdown()) then return; end -- don't mess up the board while in combat!
-	for i=1, MAX_RAID_MEMBERS do
-		if ( i <= numRaidMembers ) then
-			local stats = CT_RA_Stats[UnitName("raid" .. i)];
-			if (stats and not stats["readycheck"] and not UnitIsUnit("raid" .. i,"player")) then
-				stats["readycheck"] = "noreply";
-			end
-		end
-	end
-end
-
-function CT_RA_UpdateReadyStatus(arg1)
-	if (arg1) then
-		local stats = CT_RA_Stats[UnitName(arg1)];
-		if (stats) then
-			print(arg1 .. " stats");
-			local readyCheckStatus = GetReadyCheckStatus(arg1);
-			print(readyCheckStatus);
-			if (readyCheckStatus == "notready" or readyCheckStatus == "nil") then
-				stats["readycheck"] = "notready";
-			else
-				stats["readycheck"] = "ready";
-			end
-		end
-	end
-	CT_RA_UpdateRaidGroup();
-end
-
-function CT_RA_RushReadyStatus() -- called when entering combat during a ready check
-	for i=1, MAX_RAID_MEMBERS do
-		local stats = CT_RA_Stats[UnitName("raid" .. i)];
-		if (stats and stats["readycheck"]) then
-			stats["raedycheck"] = nil;
-		end
-		CT_RA_UpdateRaidGroup();
-	end
-end
-
-function CT_RA_FinishReadyStatus()
-	C_Timer.After(5,
-		function()
-			for i=1, MAX_RAID_MEMBERS do
-				local stats = CT_RA_Stats[UnitName("raid" .. i)];
-				if (stats and stats["readycheck"]) then
-					stats["readycheck"] = nil;
-				end
-			end	
-			CT_RA_UpdateRaidGroup();
-		end
-	);
-end
-
 function CT_RA_CanShowInfo(id)
 	local tempOptions = CT_RAMenu_Options["temp"];
 	local stats = CT_RA_Stats[UnitName(id)];
@@ -1612,7 +1649,7 @@ function CT_RA_CanShowInfo(id)
 	showHP = ( hp and hp <= 3 );
 	hasFD = ( stats and stats["FD"] );
 	isRessed = ( stats and stats["Ressed"] );
-	isNotReady = ( stats and (stats["readycheck"] == "notready" or stats["readycheck"] == "noreply") );
+	isNotReady = ( stats and stats["notready"] );
 	showAFK = ( tempOptions["ShowAFK"] and stats and stats["AFK"] );
 	isDead = ( ( stats and stats["Dead"] ) or UnitIsDead(id) or UnitIsGhost(id) );
 	if ( showHP and not hasFD and not isRessed and not isNotReady and not showAFK and not isDead ) then
@@ -1745,7 +1782,7 @@ function CT_RA_UpdateUnitDead(frame, didUpdateHealth)
 		frame.MPBG:Hide();
 		frame:SetAlpha(CT_RA_UnitAlpha(raidid, nil));
 		return;
-	elseif ( stats and stats["readycheck"] == "noreply" or stats["readycheck"] == "notready" ) then
+	elseif ( stats and stats["notready"] ) then
 		frame.Status:Show();
 		if (not InCombatLockdown()) then
 			if ( tempOptions["HideBorder"] ) then
@@ -1755,7 +1792,7 @@ function CT_RA_UpdateUnitDead(frame, didUpdateHealth)
 			end
 		end
 
-		if ( stats["readycheck"] == "noreply" ) then
+		if ( stats["notready"] == 1 ) then
 			frame.status = "noreply";
 			frame.Status:SetText("No Reply");
 			frame:SetBackdropColor(0.45, 0.45, 0.45, 1);
@@ -4165,6 +4202,123 @@ function CT_RA_UpdateFrame_OnUpdate(self, elapsed)
 			CT_RA_UpdateRaidGroup(1);
 		end
 	end
+	if ( self.voteTimer ) then
+		self.voteTimer = self.voteTimer - elapsed;
+		if ( self.voteTimer <= 0 ) then
+			if ( CT_RA_VotePerson ) then
+				local numCount = 0;
+				for i = 1, GetNumRaidMembers(), 1 do
+					if ( UnitIsConnected("raid" .. i) ) then
+						numCount = numCount + 1;
+					end
+				end
+				local noVotes = numCount-(CT_RA_VotePerson[2]+CT_RA_VotePerson[3]+1);
+				local yesPercent, noPercent, noVotePercent = 0, 0, 0;
+				if ( CT_RA_VotePerson[2] > 0 ) then
+					yesPercent = floor(CT_RA_VotePerson[2]/(CT_RA_VotePerson[2]+CT_RA_VotePerson[3]+noVotes)*100+0.5);
+				end
+				if ( CT_RA_VotePerson[3] > 0 ) then
+					noPercent = floor(CT_RA_VotePerson[3]/(CT_RA_VotePerson[2]+CT_RA_VotePerson[3]+noVotes)*100+0.5);
+				end
+				if ( yesPercent+noPercent < 100 ) then
+					noVotePercent = 100-(yesPercent+noPercent);
+				end
+				CT_RA_Print("<CTRaid> Vote results for \"|c00FFFFFF" .. CT_RA_VotePerson[4] .. "|r\": |c00FFFFFF" .. CT_RA_VotePerson[2] .. "|r (|c00FFFFFF" .. yesPercent .. "%|r) Yes / |c00FFFFFF" .. CT_RA_VotePerson[3] .. "|r (|c00FFFFFF" .. noPercent .. "%|r) No / |c00FFFFFF" .. noVotes .. "|r (|c00FFFFFF" .. noVotePercent .. "%|r) did not vote.", 1, 0.5, 0);
+				SendChatMessage("<CTRaid> Vote results for \"" .. CT_RA_VotePerson[4] .. "\": " .. CT_RA_VotePerson[2] .. " (" .. yesPercent .. "%) Yes / " .. CT_RA_VotePerson[3] .. " (" .. noPercent .. "%) No / " .. noVotes .. " (" .. noVotePercent .. "%) did not vote.", "RAID");
+				CT_RA_VotePerson = nil;
+			end
+			self.voteTimer = nil;
+		end
+	end
+	if ( self.readyTimer ) then
+		self.readyTimer = self.readyTimer - elapsed;
+		if ( self.readyTimer <= 0 ) then
+			CT_RA_CheckReady_Person = nil;
+			self.readyTimer = nil;
+			local numNotReady, numAfk = 0, 0
+			local notReadyString, afkString = "", "";
+			for k, v in pairs(CT_RA_Stats) do
+				if ( v["notready"] and v["notready"] == 2 ) then
+					numNotReady = numNotReady + 1;
+					if ( strlen(notReadyString) > 0 ) then
+						notReadyString = notReadyString .. ", ";
+					end
+					notReadyString = notReadyString .. "|c00FFFFFF" .. k .. "|r";
+				elseif ( v["notready"] and v["notready"] == 1 ) then
+					numAfk = numAfk + 1;
+					if ( strlen(afkString) > 0 ) then
+						afkString = afkString .. ", ";
+					end
+					afkString = afkString .. "|c00FFFFFF" .. k .. "|r";
+				end
+				CT_RA_Stats[k]["notready"] = nil;
+			end
+			if ( numNotReady > 0 ) then
+				if ( numNotReady == 1 ) then
+					CT_RA_Print("<CTRaid> " .. notReadyString .. " is not ready.", 1, 1, 0);
+				elseif ( numNotReady >= 8 ) then
+					CT_RA_Print("<CTRaid> |c00FFFFFF" .. numNotReady .. "|r raid members are not ready.", 1, 1, 0);
+				else
+					CT_RA_Print("<CTRaid> |c00FFFFFF" .. numNotReady .. "|r raid members (" .. notReadyString .. ") are not ready.", 1, 1, 0);
+				end
+				CT_RA_UpdateRaidGroup(1);
+			end
+			if ( numAfk > 0 ) then
+				if ( numAfk == 1 ) then
+					CT_RA_Print("<CTRaid> " ..afkString .. " is away from keyboard.", 1, 1, 0);
+				elseif ( numAfk >= 8 ) then
+					CT_RA_Print("<CTRaid> |c00FFFFFF" .. numAfk.. "|r raid members are away from keyboard.", 1, 1, 0);
+				else
+					CT_RA_Print("<CTRaid> |c00FFFFFF" .. numAfk .. "|r raid members (" .. afkString .. ") are away from keyboard.", 1, 1, 0);
+				end
+				CT_RA_UpdateRaidGroup(1);
+			end
+		end
+	end
+	if ( self.rlyTimer ) then
+		self.rlyTimer = self.rlyTimer - elapsed;
+		if ( self.rlyTimer <= 0 ) then
+			self.rlyTimer = nil;
+			local numNotReady, numAfk = 0, 0
+			local notReadyString, afkString = "", "";
+			for k, v in pairs(CT_RA_Stats) do
+				if ( v["rly"] and v["rly"] == 2 ) then
+					numNotReady = numNotReady + 1;
+					if ( strlen(notReadyString) > 0 ) then
+						notReadyString = notReadyString .. ", ";
+					end
+					notReadyString = notReadyString .. "|c00FFFFFF" .. k .. "|r";
+				elseif ( v["rly"] and v["rly"] == 1 ) then
+					numAfk = numAfk + 1;
+					if ( strlen(afkString) > 0 ) then
+						afkString = afkString .. ", ";
+					end
+					afkString = afkString .. "|c00FFFFFF" .. k .. "|r";
+				end
+				CT_RA_Stats[k]["rly"] = nil;
+			end
+			if ( numNotReady > 0 ) then
+				if ( numNotReady == 1 ) then
+					CT_RA_Print("<CTRaid> " .. notReadyString .. " says |c00FFFFFFNO WAI!|r.", 1, 1, 0);
+				elseif ( numNotReady >= 8 ) then
+					CT_RA_Print("<CTRaid> |c00FFFFFF" .. numNotReady .. "|r raid members say |c00FFFFFFNO WAI!|r.", 1, 1, 0);
+				else
+					CT_RA_Print("<CTRaid> |c00FFFFFF" .. numNotReady .. "|r raid members (" .. notReadyString .. ") say |c00FFFFFFNO WAI!|r.", 1, 1, 0);
+				end
+				CT_RA_UpdateRaidGroup(1);
+			end
+			if ( numAfk > 0 ) then
+				if ( numAfk == 1 ) then
+					CT_RA_Print("<CTRaid> " ..afkString .. " says nothing.", 1, 1, 0);
+				elseif ( numAfk >= 8 ) then
+					CT_RA_Print("<CTRaid> |c00FFFFFF" .. numAfk.. "|r raid members say nothing.", 1, 1, 0);
+				else
+					CT_RA_Print("<CTRaid> |c00FFFFFF" .. numAfk .. "|r raid members (" .. afkString .. ") say nothing.", 1, 1, 0);
+				end
+				CT_RA_UpdateRaidGroup(1);
+			end
+		end
+	end
 	if ( CT_RA_Squelch > 0 ) then
 		CT_RA_Squelch = CT_RA_Squelch - elapsed;
 		if ( CT_RA_Squelch <= 0 ) then
@@ -4219,14 +4373,6 @@ function CT_RA_UpdateFrame_OnEvent(self, event, arg1, ...)
 			self.lastInvite = nil;
 			SendChatMessage("<CTRaid> You are already grouped.", "WHISPER", nil, name);
 		end
-	elseif ( event == "READY_CHECK" ) then
-		CT_RA_StartReadyStatus();
-	elseif ( event == "READY_CHECK_CONFIRM" ) then
-		CT_RA_UpdateReadyStatus(arg1);
-	elseif ( event == "READY_CHECK_FINISHED" ) then
-		CT_RA_FinishReadyStatus();
-	elseif ( event == "PLAYER_REGEN_DISABLED" ) then
-		CT_RA_RushReadyStatus(); -- finishes immediately instead of after 5 seconds
 	end
 end
 
@@ -4688,6 +4834,39 @@ end
 
 function CT_RA_ResFrame_OnLoad(self)
 	L_UIDropDownMenu_Initialize(self, CT_RA_ResFrame_InitButtons, "MENU");
+end
+
+function CT_RA_SendReady()
+	CT_RA_AddMessage("READY");
+end
+
+function CT_RA_SendNotReady()
+	CT_RA_AddMessage("NOTREADY");
+end
+
+function CT_RA_SendYes()
+	CT_RA_AddMessage("VOTEYES");
+end
+
+function CT_RA_SendNo()
+	CT_RA_AddMessage("VOTENO");
+end
+
+function CT_RA_SendRly()
+	CT_RA_AddMessage("YARLY");
+end
+
+function CT_RA_SendNoRly()
+	CT_RA_AddMessage("NORLY");
+end
+
+function CT_RA_ReadyFrame_OnUpdate(self, elapsed)
+	if ( self.hide ) then
+		self.hide = self.hide - elapsed;
+		if ( self.hide <= 0 ) then
+			self:Hide();
+		end
+	end
 end
 
 function CT_RA_ToggleGroupSort()
