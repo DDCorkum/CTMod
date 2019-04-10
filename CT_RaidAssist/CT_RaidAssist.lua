@@ -1549,13 +1549,13 @@ end
 
 -- Update ready / not ready / afk status
 
-function CT_RA_StartReadyStatus()
+function CT_RA_StartReadyStatus(startedByPlayer)
 	local numRaidMembers = GetNumGroupMembers();
 	if (InCombatLockdown()) then return; end -- don't mess up the board while in combat!
 	for i=1, MAX_RAID_MEMBERS do
 		if ( i <= numRaidMembers ) then
 			local stats = CT_RA_Stats[UnitName("raid" .. i)];
-			if (stats and not stats["readycheck"] and not UnitIsUnit("raid" .. i,"player")) then
+			if (stats and not stats["readycheck"] and not UnitIsUnit("raid" .. i,startedByPlayer)) then
 				stats["readycheck"] = "noreply";
 			end
 		end
@@ -1566,9 +1566,7 @@ function CT_RA_UpdateReadyStatus(arg1)
 	if (arg1) then
 		local stats = CT_RA_Stats[UnitName(arg1)];
 		if (stats) then
-			print(arg1 .. " stats");
 			local readyCheckStatus = GetReadyCheckStatus(arg1);
-			print(readyCheckStatus);
 			if (readyCheckStatus == "notready" or readyCheckStatus == "nil") then
 				stats["readycheck"] = "notready";
 			else
@@ -4220,9 +4218,9 @@ function CT_RA_UpdateFrame_OnEvent(self, event, arg1, ...)
 			SendChatMessage("<CTRaid> You are already grouped.", "WHISPER", nil, name);
 		end
 	elseif ( event == "READY_CHECK" ) then
-		CT_RA_StartReadyStatus();
+		CT_RA_StartReadyStatus(arg1);  --arg1 is the person who started the readycheck
 	elseif ( event == "READY_CHECK_CONFIRM" ) then
-		CT_RA_UpdateReadyStatus(arg1);
+		CT_RA_UpdateReadyStatus(arg1);  --arg1 is the person confirming their status
 	elseif ( event == "READY_CHECK_FINISHED" ) then
 		CT_RA_FinishReadyStatus();
 	elseif ( event == "PLAYER_REGEN_DISABLED" ) then
