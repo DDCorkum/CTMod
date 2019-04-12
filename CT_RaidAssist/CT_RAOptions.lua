@@ -1,7 +1,7 @@
 local UnitName = CT_RA_UnitName;
 local GetNumRaidMembers = CT_RA_GetNumRaidMembers;
 
-CT_RA_VersionNumber = 8.0105; -- Used for number comparisons
+CT_RA_VersionNumber = 8.151; -- Used for number comparisons
 
 CT_RA_Version = "v" .. CT_RA_VersionNumber;
 CT_RA_MOVINGMEMBER = nil;
@@ -66,7 +66,7 @@ end
 
 function CT_RAOptionsGroupButton_OnMouseDown(self, button)
 	if ( button == "RightButton" and self.name ) then
-		ToggleDropDownMenu(1, nil, _G["CT_RAOptionsGroupButton"..self:GetID().."DropDown"]);
+		L_ToggleDropDownMenu(1, nil, _G["CT_RAOptionsGroupButton"..self:GetID().."DropDown"]);
 	end
 end
 

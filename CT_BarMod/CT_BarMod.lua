@@ -510,7 +510,7 @@ local function secureFrame_updateButton_unsecure(self, groupNum, buttonNum)
 end
 
 local function secureFrame_OnAttributeChanged_unsecure(self, name, value)
-	if (name == "state-petbattle") then
+	if (name == "state-petbattle" or name == "state-overridebar" or name == "state-vehicleui") then
 		-- The pet battle state is changing.
 		-- Set the action button override key bindings.
 		module.setActionBindings();
@@ -659,7 +659,7 @@ local secureFrame_OnAttributeChanged = [=[
 			groupNum = groupNum + 1;
 			groupFrame = self:GetFrameRef("group" .. groupNum);
 		end
-	elseif (name == "state-petbattle") then
+	elseif (name == "state-petbattle" or name == "state-vehicleui" or name == "overridebar") then
 		self:CallMethod("OnAttributeChanged_unsecure", name, value);
 	end
 ]=];
@@ -713,6 +713,23 @@ local function initSecureFrame()
 	-- Detect when the petbattle state changes.
 	RegisterStateDriver(frame, "petbattle", "[petbattle]1;nil");
 end
+
+--------------------------------------------
+-- Unsecure pre-vehicle trigger
+
+-- This code allows activating vehicleui "faster" before some world quests begin combat
+
+local unsecureWatchFrame = CreateFrame("Frame")
+unsecureWatchFrame:RegisterEvent("UNIT_ENTERING_VEHICLE");
+unsecureWatchFrame:SetScript("OnEvent",
+	function(self, event, ...)
+		local unitToken = ...;
+		if (event == "UNIT_ENTERING_VEHICLE" and unitToken == "player") then
+			module.setActionBindings(true);
+		end
+	end
+);
+
 
 --------------------------------------------
 -- Mod Initialization

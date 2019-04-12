@@ -31,25 +31,6 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				</FontString>
 			</Layer>
 		</Layers>
-		<Frames>
-			<Frame name="$parentDropDown" inherits="L_UIDropDownMenuTemplate" id="1" hidden="true">
-				<Size>
-					<AbsDimension x="10" y="10"/>
-				</Size>
-				<Anchors>
-					<Anchor point="TOP">
-						<Offset>
-							<AbsDimension x="70" y="10"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnLoad>
-						--CT_RAMeters_DropDown_OnLoad(self);
-					</OnLoad>
-				</Scripts>
-			</Frame>
-		</Frames>
 		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" setAllPoints="true" tile="true">
 			<EdgeSize>
 				<AbsValue val="16"/>
@@ -63,6 +44,15 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 		</Backdrop>
 		<Scripts>
 			<OnLoad>
+				-- addition in 8.1.5.1 for lua-based dropdowns
+				local frame = L_Create_UIDropDownMenu("CT_RAMeters_DropDown",self)
+				frame:SetSize(10,10);
+				frame:SetPoint("TOP",70,10);
+				frame:SetID(1);
+				frame:Hide();
+				-- execution deferred until later -- CT_RAMeters_DropDown_OnLoad(frame);
+
+				-- original onload before 8.1.5.1
 				CT_RAMeters_OnLoad(self);
 				self.update = 2;
 			</OnLoad>

@@ -295,6 +295,7 @@ function CT_RAMenu_UpdateMenu()
 		CT_RAMenuFrameMiscDisplayHideResMonitorUntilNeededCB:Disable();
 		CT_RAMenuFrameMiscDisplayHideResMonitorUntilNeeded:SetTextColor(0.3, 0.3, 0.3);
 	end
+	CT_RAMenuFrameMiscDisplayShowRoleIconsCB:SetChecked( tempOptions["showRoleIcons"] ~= false );
 	CT_RAMenuFrameMiscDisplayColorLeaderCB:SetChecked( ( not tempOptions["leaderColor"] or tempOptions["leaderColor"].enabled ) );
 	if ( tempOptions["leaderColor"] ) then
 		CT_RAMenuFrameMiscDisplayColorLeaderColorSwatchNormalTexture:SetVertexColor(tempOptions["leaderColor"].r, tempOptions["leaderColor"].g, tempOptions["leaderColor"].b);
@@ -1555,6 +1556,11 @@ function CT_RAMenu_Misc_ColorLeader(self)
 			r = 1, g = 1, b = 0, enabled = true
 		};
 	end
+end
+
+function CT_RAMenu_Misc_ShowRoleIcons(self)
+	CT_RAMenu_Options["temp"]["showRoleIcons"] = self:GetChecked();
+	CT_RA_UpdateRaidGroup();
 end
 
 function CT_RAMenu_Misc_ColorLeader_ShowColorPicker(frame)

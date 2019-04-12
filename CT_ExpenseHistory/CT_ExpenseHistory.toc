@@ -1,5 +1,5 @@
 ## Interface: 80100
-## Version: 8.0.1.0
+## Version: 8.1.5.1
 ## Title: CT_ExpenseHistory
 ## Notes: Detailed log of character expenses.
 ## DefaultState: Enabled

@@ -13,24 +13,6 @@
 			</OnEvent>
 		</Scripts>
 	</Frame>
-	<Frame name="CT_RA_MTPlayers_DropDown" inherits="L_UIDropDownMenuTemplate" id="1" hidden="true">
-		<Size>
-			<AbsDimension x="10" y="10"/>
-		</Size>
-		<Anchors>
-			<Anchor point="TOP">
-				<Offset>
-					<AbsDimension x="70" y="10"/>
-				</Offset>
-			</Anchor>
-		</Anchors>
-		<Scripts>
-			<OnLoad>
-				--CT_RA_MTPlayers_DropDown_OnLoad(self);
-			</OnLoad>
-		</Scripts>
-	</Frame>
-
 	<Frame name="CT_RAMTGroupPlayer" parent="UIParent" inherits="CT_RAGroupTemplate" id="102" hidden="true"/>
 	<Frame name="CT_RAMTGroupPet" parent="UIParent" inherits="CT_RAGroupTemplate" id="103" hidden="true"/>
 

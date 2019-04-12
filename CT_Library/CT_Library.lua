@@ -11,7 +11,7 @@
 -----------------------------------------------
 -- Initialization
 
-local LIBRARY_VERSION = 8.01030;
+local LIBRARY_VERSION = 8.151;
 local LIBRARY_NAME = "CT_Library";
 
 local _G = getfenv(0);
@@ -50,6 +50,38 @@ lib.version = LIBRARY_VERSION;
 
 -- End Initialization
 -----------------------------------------------
+
+
+
+
+-----------------------------------------------
+-- LibUIDropDownMenu Conflict Warning
+
+
+-- this warning is temporary, and should be removed after a few months
+-- addons using "LibUIDropDownMenu-2.0" are incompatible with addons using "LibUIDropDownMenu"
+local LibStub = _G.LibStub
+if LibStub then
+	if LibStub:GetLibrary("LibUIDropDownMenu",true) then
+		C_Timer.After(30,
+			function()
+				print("|n|cFFFFFF00Warning by CTMod Addon:|r|nOne of your addons uses an outdated version of LibUIDropDownMenu.|nThis could break some dropdown menus.  Please don't shoot the messenger!|n(The offending addon likely comes |cFFFFFF00earlier|r in the alphabet than ct)")
+			end
+		);
+	else
+		C_Timer.After(30,
+			function()
+				if LibStub:GetLibrary("LibUIDropDownMenu",true) then
+					print("|n|cFFFFFF00Warning by CTMod Addon:|r|nOne of your addons uses an outdated version of LibUIDropDownMenu.|nThis could break some dropdown menus.  Please don't shoot the messenger!|n(The offending addon likely comes |cFFFFFF00later|r in the alphabet than ct)")
+				end
+			end
+		);		
+	end
+end
+
+-- End LibUIDropDownMenu Conflict Warning
+-----------------------------------------------
+
 
 -----------------------------------------------
 -- Local Copies
@@ -946,8 +978,10 @@ function lib:stopMovable(id)
 		end
 
 		pos[1], pos[2], pos[3], pos[4], pos[5], pos[6] = a, b, c, d, e, scale;
-		frame:ClearAllPoints();
-		frame:SetPoint(a, b, c, d, e);
+		if (not InCombatLockdown()) then
+			frame:ClearAllPoints();
+			frame:SetPoint(a, b, c, d, e);
+		end
 	else
 		local a, b, c, d, e = frame:GetPoint(1);
 		local scale = frame:GetScale();
@@ -1489,7 +1523,12 @@ end
 -- basic radio-button dropdown without any fancy modifications.  Each arg is text to display
 objectHandlers.dropdown = function(self, parent, name, virtual, option, ...)
 	local dropdownEntry = { };
-	local frame = CreateFrame("Frame", name, parent, virtual or "L_UIDropDownMenuTemplate");
+	local frame;
+	if (virtual) then
+		frame = CreateFrame("Frame", name, parent, virtual);
+	else
+		frame = L_Create_UIDropDownMenu(name, parent);
+	end
 	frame.oldSetWidth = frame.SetWidth;
 	frame.SetWidth = dropdownSetWidth;
 	frame.ctDropdownClick = dropdownClick;
@@ -1526,7 +1565,12 @@ end
 -- two parameters (separated by #) are display-text and the CT option (similar to o:)
 objectHandlers.multidropdown = function(self, parent, name, virtual, option, ...)
 	local dropdownEntry = { };
-	local frame = CreateFrame("Frame", name, parent, virtual or "L_UIDropDownMenuTemplate");
+	local frame;
+	if (virtual) then
+		frame = CreateFrame("Frame", name, parent, virtual);
+	else
+		frame = L_Create_UIDropDownMenu(name, parent);
+	end
 	frame.oldSetWidth = frame.SetWidth;
 	frame.SetWidth = dropdownSetWidth;
 	frame.ctDropdownClick = dropdownClick;

@@ -771,6 +771,10 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				self:RegisterEvent("SPELLS_CHANGED");
 				self:RegisterEvent("PLAYER_TALENT_UPDATE");
 				self:RegisterEvent("CHAT_MSG_SYSTEM");
+				self:RegisterEvent("READY_CHECK");
+				self:RegisterEvent("READY_CHECK_CONFIRM");
+				self:RegisterEvent("READY_CHECK_FINISHED");
+				self:RegisterEvent("PLAYER_REGEN_DISABLED");
 				CT_RA_GetClassSpells();
 				CT_RA_GetClassTalents();
 				self.update = 0;
@@ -932,23 +936,6 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 			</Layer>
 		</Layers>
 		<Frames>
-			<Frame name="$parentDropDown" inherits="L_UIDropDownMenuTemplate" id="1" hidden="true">
-				<Size>
-					<AbsDimension x="125" y="15"/>
-				</Size>
-				<Anchors>
-					<Anchor point="TOP">
-						<Offset>
-							<AbsDimension x="70" y="10"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnLoad>
-						CT_RA_Emergency_DropDown_OnLoad(self);
-					</OnLoad>
-				</Scripts>
-			</Frame>
 			<Frame name="$parentFrame1" inherits="CT_RA_EmergencyTemplate" id="1">
 				<Anchors>
 					<Anchor point="TOP">
@@ -997,6 +984,13 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 		</Frames>
 		<Scripts>
 			<OnLoad>
+				-- lua-based dropdowns from 8.1.5.1 onwards
+				local frame = L_Create_UIDropDownMenu("CT_RA_EmergencyFrameDropDown",self);
+				frame:SetSize(125,15);
+				frame:SetPoint("TOP",70,10);
+				CT_RA_Emergency_DropDown_OnLoad(frame);
+				
+				-- original onload script before 8.1.5.1				
 				self.frame1 = CT_RA_Cache[self].Frame1;
 				self.frame2 = CT_RA_Cache[self].Frame2;
 				self.frame3 = CT_RA_Cache[self].Frame3;
@@ -1004,7 +998,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				self.frame5 = CT_RA_Cache[self].Frame5;
 				self:SetBackdropColor(0, 0, 0, 0.33);
 				self:SetBackdropBorderColor(1, 1, 1, 0);
-			</OnLoad>
+		</OnLoad>
 		</Scripts>
 	</Frame>
 	<Frame name="CT_RA_EmergencyFrameDrag" movable="true" parent="UIParent" hidden="true">
@@ -1089,27 +1083,15 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				<AbsInset left="5" right="5" top="5" bottom="5"/>
 			</BackgroundInsets>
 		</Backdrop>
-		<Frames>
-			<Frame name="$parentDropDown" inherits="L_UIDropDownMenuTemplate" id="1" hidden="true">
-				<Size>
-					<AbsDimension x="10" y="10"/>
-				</Size>
-				<Anchors>
-					<Anchor point="TOP">
-						<Offset>
-							<AbsDimension x="70" y="10"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnLoad>
-						CT_RA_ResFrame_OnLoad(self);
-					</OnLoad>
-				</Scripts>
-			</Frame>
-		</Frames>
 		<Scripts>
 			<OnLoad>
+				-- lua-based dropdowns from 8.1.5.1 onwards
+				local frame = L_Create_UIDropDownMenu("CT_RA_ResFrameDropDown",self);
+				frame:SetSize(10,15);
+				frame:SetPoint("TOP",70,10);
+				CT_RA_ResFrame_OnLoad(frame);
+				
+				-- original onload script before 8.1.5.1	
 				self:SetBackdropColor(0, 0, 0, 0.5);
 			</OnLoad>
 			<OnMouseDown>
@@ -1127,309 +1109,6 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 			<OnHide>
 				self:StopMovingOrSizing();
 			</OnHide>
-		</Scripts>
-	</Frame>
-	<Frame name="CT_RA_ReadyFrame" toplevel="true" frameStrata="DIALOG" movable="true" enableMouse="true" hidden="true" parent="UIParent">
-		<Size>
-			<AbsDimension x="325" y="125"/>
-		</Size>
-		<Anchors>
-			<Anchor point="CENTER" relativeTo="UIParent"/>
-		</Anchors>
-		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
-			<BackgroundInsets>
-				<AbsInset left="11" right="12" top="12" bottom="11"/>
-			</BackgroundInsets>
-			<TileSize>
-				<AbsValue val="32"/>
-			</TileSize>
-			<EdgeSize>
-				<AbsValue val="32"/>
-			</EdgeSize>
-		</Backdrop>
-		<Layers>
-			<Layer level="ARTWORK">
-				<Texture name="$parentHeaderTexture" file="Interface\DialogFrame\UI-DialogBox-Header">
-					<Size>
-						<AbsDimension x="256" y="64"/>
-					</Size>
-					<Anchors>
-						<Anchor point="TOP">
-							<Offset>
-								<AbsDimension x="0" y="12"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</Texture>
-				<FontString name="$parentHeaderText" inherits="GameFontNormal" text="Are you ready?">
-					<Anchors>
-						<Anchor point="TOP" relativeTo="$parentHeaderTexture">
-							<Offset>
-								<AbsDimension x="0" y="-14"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</FontString>
-				<FontString name="$parentInfo" justifyV="top" inherits="GameFontNormal">
-					<Size>
-						<AbsDimension x="350" y="32"/>
-					</Size>
-					<Anchors>
-						<Anchor point="TOP">
-							<Offset>
-								<AbsDimension x="0" y="-30"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</FontString>
-			</Layer>
-		</Layers>
-		<Frames>
-			<Button name="$parentReadyButton" hidden="false" inherits="GameMenuButtonTemplate" text="Ready">
-				<Size>
-					<AbsDimension x="125" y="32"/>
-				</Size>
-				<Anchors>
-					<Anchor point="RIGHT" relativePoint="CENTER">
-						<Offset>
-							<AbsDimension x="-10" y="-20"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnClick>
-						CT_RA_SendReady();
-						self:GetParent():Hide();
-					</OnClick>
-				</Scripts>
-			</Button>
-			<Button name="$parentNotReadyButton" hidden="false" inherits="GameMenuButtonTemplate" text="Not Ready">
-				<Size>
-					<AbsDimension x="125" y="32"/>
-				</Size>
-				<Anchors>
-					<Anchor point="LEFT" relativePoint="CENTER">
-						<Offset>
-							<AbsDimension x="10" y="-20"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnClick>
-						CT_RA_SendNotReady();
-						self:GetParent():Hide();
-					</OnClick>
-				</Scripts>
-			</Button>
-		</Frames>
-		<Scripts>
-			<OnShow>
-				PlaySound(1115);
-				self.hide = 30;
-				_G[self:GetName() .. "Info"]:SetText("'|c00FFFFFF" .. CT_RA_CheckReady_Person .. "|r' has requested a ready check.\nPress ready if you are ready.");
-			</OnShow>
-			<OnHide>
-				self.hide = nil;
-				PlaySound(1115);
-			</OnHide>
-			<OnUpdate>
-				CT_RA_ReadyFrame_OnUpdate(self, elapsed);
-			</OnUpdate>
-		</Scripts>
-	</Frame>
-	<Frame name="CT_RA_VoteFrame" toplevel="true" frameStrata="DIALOG" movable="true" enableMouse="true" hidden="true" parent="UIParent">
-		<Size>
-			<AbsDimension x="325" y="125"/>
-		</Size>
-		<Anchors>
-			<Anchor point="CENTER" relativeTo="UIParent"/>
-		</Anchors>
-		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
-			<BackgroundInsets>
-				<AbsInset left="11" right="12" top="12" bottom="11"/>
-			</BackgroundInsets>
-			<TileSize>
-				<AbsValue val="32"/>
-			</TileSize>
-			<EdgeSize>
-				<AbsValue val="32"/>
-			</EdgeSize>
-		</Backdrop>
-		<Layers>
-			<Layer level="ARTWORK">
-				<Texture name="$parentHeaderTexture" file="Interface\DialogFrame\UI-DialogBox-Header">
-					<Size>
-						<AbsDimension x="256" y="64"/>
-					</Size>
-					<Anchors>
-						<Anchor point="TOP">
-							<Offset>
-								<AbsDimension x="0" y="12"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</Texture>
-				<FontString name="$parentHeaderText" inherits="GameFontNormal" text="Vote">
-					<Anchors>
-						<Anchor point="TOP" relativeTo="$parentHeaderTexture">
-							<Offset>
-								<AbsDimension x="0" y="-14"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</FontString>
-				<FontString name="$parentInfo" justifyV="top" inherits="GameFontNormal">
-					<Size>
-						<AbsDimension x="350" y="32"/>
-					</Size>
-					<Anchors>
-						<Anchor point="TOP">
-							<Offset>
-								<AbsDimension x="0" y="-30"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</FontString>
-			</Layer>
-		</Layers>
-		<Frames>
-			<Button name="$parentYesButton" hidden="false" inherits="GameMenuButtonTemplate" text="Yes">
-				<Size>
-					<AbsDimension x="125" y="32"/>
-				</Size>
-				<Anchors>
-					<Anchor point="RIGHT" relativePoint="CENTER">
-						<Offset>
-							<AbsDimension x="-10" y="-20"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnClick>
-						CT_RA_SendYes();
-						self:GetParent():Hide();
-					</OnClick>
-				</Scripts>
-			</Button>
-			<Button name="$parentNoButton" hidden="false" inherits="GameMenuButtonTemplate" text="No">
-				<Size>
-					<AbsDimension x="125" y="32"/>
-				</Size>
-				<Anchors>
-					<Anchor point="LEFT" relativePoint="CENTER">
-						<Offset>
-							<AbsDimension x="10" y="-20"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnClick>
-						CT_RA_SendNo();
-						self:GetParent():Hide();
-					</OnClick>
-				</Scripts>
-			</Button>
-		</Frames>
-		<Scripts>
-			<OnShow>
-				PlaySound(1115);
-				self.hide = 30;
-				_G[self:GetName() .. "Info"]:SetText(self.question);
-			</OnShow>
-			<OnHide>
-				self.hide = nil;
-				PlaySound(1115);
-			</OnHide>
-			<OnUpdate>
-				CT_RA_ReadyFrame_OnUpdate(self, elapsed);
-			</OnUpdate>
-		</Scripts>
-	</Frame>
-	<Frame name="CT_RA_RlyFrame" toplevel="true" frameStrata="DIALOG" movable="true" enableMouse="true" hidden="true" parent="UIParent">
-		<Size>
-			<AbsDimension x="325" y="125"/>
-		</Size>
-		<Anchors>
-			<Anchor point="CENTER" relativeTo="UIParent"/>
-		</Anchors>
-		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
-			<BackgroundInsets>
-				<AbsInset left="11" right="12" top="12" bottom="11"/>
-			</BackgroundInsets>
-			<TileSize>
-				<AbsValue val="32"/>
-			</TileSize>
-			<EdgeSize>
-				<AbsValue val="32"/>
-			</EdgeSize>
-		</Backdrop>
-		<Layers>
-			<Layer level="ARTWORK">
-				<FontString name="$parentInfo" justifyV="top" inherits="GameFontNormal">
-					<Size>
-						<AbsDimension x="350" y="32"/>
-					</Size>
-					<Anchors>
-						<Anchor point="TOP">
-							<Offset>
-								<AbsDimension x="0" y="-30"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</FontString>
-			</Layer>
-		</Layers>
-		<Frames>
-			<Button name="$parentReadyButton" hidden="false" inherits="GameMenuButtonTemplate" text="YA RLY!">
-				<Size>
-					<AbsDimension x="125" y="32"/>
-				</Size>
-				<Anchors>
-					<Anchor point="RIGHT" relativePoint="CENTER">
-						<Offset>
-							<AbsDimension x="-10" y="-20"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnClick>
-						CT_RA_SendRly();
-						self:GetParent():Hide();
-					</OnClick>
-				</Scripts>
-			</Button>
-			<Button name="$parentNotReadyButton" hidden="false" inherits="GameMenuButtonTemplate" text="NO WAI!">
-				<Size>
-					<AbsDimension x="125" y="32"/>
-				</Size>
-				<Anchors>
-					<Anchor point="LEFT" relativePoint="CENTER">
-						<Offset>
-							<AbsDimension x="10" y="-20"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnClick>
-						CT_RA_SendNoRly();
-						self:GetParent():Hide();
-					</OnClick>
-				</Scripts>
-			</Button>
-		</Frames>
-		<Scripts>
-			<OnShow>
-				PlaySound(1115);
-				self.hide = 30;
-				_G[self:GetName() .. "Info"]:SetText("O RLY?");
-			</OnShow>
-			<OnHide>
-				self.hide = nil;
-				PlaySound(1115);
-			</OnHide>
-			<OnUpdate>
-				CT_RA_ReadyFrame_OnUpdate(self, elapsed);
-			</OnUpdate>
 		</Scripts>
 	</Frame>
 	<Button name="CT_RA_DurabilityTemplate" hidden="true" virtual="true">

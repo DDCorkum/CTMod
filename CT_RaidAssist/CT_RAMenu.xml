@@ -1011,23 +1011,6 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 									</OnClick>
 								</Scripts>
 							</CheckButton>
-							<Frame name="$parentHealthDropDown" inherits="L_UIDropDownMenuTemplate" hidden="false">
-								<Size>
-									<AbsDimension x="128" y="16"/>
-								</Size>
-								<Anchors>
-									<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentHealthText">
-										<Offset>
-											<AbsDimension x="-10" y="-3"/>
-										</Offset>
-									</Anchor>
-								</Anchors>
-								<Scripts>
-									<OnLoad>
-										CT_RAMenuFrameGeneralDisplayHealthDropDown_OnLoad(self);
-									</OnLoad>
-								</Scripts>
-							</Frame>
 							<CheckButton name="$parentShowHealthCB" checked="false" hidden="false" inherits="OptionsCheckButtonTemplate">
 								<Anchors>
 									<Anchor point="TOPLEFT">
@@ -1160,6 +1143,15 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 								<NormalTexture name="$parentNormalTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
 							</Button>
 						</Frames>
+						<Scripts>
+							<OnLoad>
+								-- lua-based dropdowns from 8.1.5.1 onwards
+								local frame = L_Create_UIDropDownMenu("CT_RAMenuFrameGeneralDisplayHealthDropDown",self);
+								frame:SetSize(128,16);
+								frame:SetPoint("LEFT","CT_RAMenuFrameGeneralDisplayHealthText","RIGHT",-10,-3);
+								CT_RAMenuFrameGeneralDisplayHealthDropDown_OnLoad(frame);
+							</OnLoad>
+						</Scripts>
 					</Frame>
 					<Frame name="$parentMisc">
 						<Size>
@@ -1409,24 +1401,15 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 									</OnClick>
 								</Scripts>
 							</CheckButton>
-							<Frame name="$parentDropDown" inherits="L_UIDropDownMenuTemplate" hidden="false">
-								<Size>
-									<AbsDimension x="128" y="16"/>
-								</Size>
-								<Anchors>
-									<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentSortText">
-										<Offset>
-											<AbsDimension x="5" y="-3"/>
-										</Offset>
-									</Anchor>
-								</Anchors>
-								<Scripts>
-									<OnLoad>
-										CT_RAMenuFrameGeneralMiscDropDown_OnLoad(self);
-									</OnLoad>
-								</Scripts>
-							</Frame>
 						</Frames>
+						<Scripts>
+							<OnLoad>
+								local frame = L_Create_UIDropDownMenu("CT_RAMenuFrameGeneralMiscDropDown",self);
+								frame:SetSize(128,16);
+								frame:SetPoint("LEFT","CT_RAMenuFrameGeneralMiscSortText","RIGHT",5,-3);
+								CT_RAMenuFrameGeneralMiscDropDown_OnLoad(frame);
+							</OnLoad>
+						</Scripts>
 					</Frame>
 					<Frame name="$parentMTs">
 						<Size>
@@ -1954,7 +1937,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 					</Frame>
 					<Frame name="$parentDisplay">
 						<Size>
-							<AbsDimension x="550" y="145"/>
+							<AbsDimension x="550" y="170"/>
 						</Size>
 						<Anchors>
 							<Anchor point="TOP">
@@ -2075,6 +2058,15 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 										</Anchor>
 									</Anchors>
 								</FontString>
+								<FontString name="$parentShowRoleIcons" inherits="ChatFontNormal" text="Show Role Icons">
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="35" y="-140"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
 							</Layer>
 						</Layers>
 						<Frames>
@@ -2155,6 +2147,26 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 								</Scripts>
 								<NormalTexture name="$parentNormalTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
 							</Button>
+							<CheckButton name="$parentShowRoleIconsCB" hidden="false" id="4" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentShowRoleIcons">
+										<Offset>
+											<AbsDimension x="0" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<HitRectInsets>
+									<AbsInset left="0" right="0" top="0" bottom="0"/>
+								</HitRectInsets>
+								<Size>
+									<AbsDimension x="24" y="24"/>
+								</Size>
+								<Scripts>
+									<OnClick>
+										CT_RAMenu_Misc_ShowRoleIcons(self);
+									</OnClick>
+								</Scripts>
+							</CheckButton>
 							<CheckButton name="$parentShowAFKCB" hidden="false" id="4" inherits="OptionsCheckButtonTemplate">
 								<Anchors>
 									<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentShowAFKText">
@@ -2844,26 +2856,16 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 						</Anchors>
 					</Frame>
 
-					<Frame name="$parentBuffsDropDown" inherits="L_UIDropDownMenuTemplate" hidden="false">
-						<Anchors>
-							<Anchor point="BOTTOMLEFT">
-								<Offset>
-									<AbsDimension x="230" y="40"/>
-								</Offset>
-							</Anchor>
-						</Anchors>
-						<Size>
-							<AbsDimension x="180" y="16"/>
-						</Size>
-						<Scripts>
-							<OnLoad>
-								CT_RAMenuFrameBuffsBuffsDropDown_OnLoad(self);
-							</OnLoad>
-						</Scripts>
-					</Frame>
 				</Frames>
 				<Scripts>
 					<OnLoad>
+						-- lua-based dropdown in 8.1.5.1
+						local frame = L_Create_UIDropDownMenu("CT_RAMenuFrameBuffsBuffsDropDown",self);
+						frame:SetSize(180,16);
+						frame:SetPoint("BOTTOMLEFT",230,40);
+						CT_RAMenuFrameBuffsBuffsDropDown_OnLoad(frame);
+						
+						-- original script before 8.1.5.1
 						self:RegisterEvent("VARIABLES_LOADED");
 					</OnLoad>
 					<OnEvent>

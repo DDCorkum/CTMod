@@ -376,32 +376,32 @@ function CT_MapMod_PinMixin:OnMouseEnter()
 		end
 	end
 	if ( self.x > 0.5 ) then
-		WorldMapTooltip:SetOwner(self, "ANCHOR_LEFT");
+		GameTooltip:SetOwner(self, "ANCHOR_LEFT");
 	else
-		WorldMapTooltip:SetOwner(self, "ANCHOR_RIGHT");
+		GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 	end
-	WorldMapTooltip:ClearLines();
-	WorldMapTooltip:AddDoubleLine("|T"..icon..":20|t " .. self.name, self.set, 0, 1, 0, 0.6, 0.6, 0.6);
+	GameTooltip:ClearLines();
+	GameTooltip:AddDoubleLine("|T"..icon..":20|t " .. self.name, self.set, 0, 1, 0, 0.6, 0.6, 0.6);
 	if ( self.descript ) then
-		WorldMapTooltip:AddLine(self.descript, nil, nil, nil, 1);
+		GameTooltip:AddLine(self.descript, nil, nil, nil, 1);
 	end
 	if (not module.PinHasFocus) then  -- clicking on pins won't do anything while the edit box is open for this or another pin
 		if (self.datemodified and self.version) then
-			WorldMapTooltip:AddDoubleLine("Shift-Click to Edit", self.datemodified .. " (" .. self.version .. ")", 0.00, 0.50, 0.90, 0.45, 0.45, 0.45);
+			GameTooltip:AddDoubleLine("Shift-Click to Edit", self.datemodified .. " (" .. self.version .. ")", 0.00, 0.50, 0.90, 0.45, 0.45, 0.45);
 		else	
-			WorldMapTooltip:AddLine("Shift-Click to Edit", 0, 0.5, 0.9, 1);
+			GameTooltip:AddLine("Shift-Click to Edit", 0, 0.5, 0.9, 1);
 		end
 	else
 		if (self.datemodified and self.version) then
-			WorldMapTooltip:AddDoubleLine(" ", self.datemodified .. " (" .. self.version .. ")", 0.00, 0.50, 0.90, 0.45, 0.45, 0.45);
+			GameTooltip:AddDoubleLine(" ", self.datemodified .. " (" .. self.version .. ")", 0.00, 0.50, 0.90, 0.45, 0.45, 0.45);
 		end
 	end
-	WorldMapTooltip:Show();
+	GameTooltip:Show();
 end
  
 function CT_MapMod_PinMixin:OnMouseLeave()
 	-- Override in your mixin, called when the mouse leaves this pin
-	WorldMapTooltip:Hide();
+	GameTooltip:Hide();
 end
  
 function CT_MapMod_PinMixin:ApplyFrameLevel()
@@ -601,10 +601,16 @@ function CT_MapMod_PinMixin:CreateNotePanel()
 		},
 		self.notepanel
 	);
-	self.notepanel.setdropdown = CreateFrame("Frame", nil, self.notepanel, "L_UIDropDownMenuTemplate");
-	self.notepanel.usersubsetdropdown = CreateFrame("Frame", nil, self.notepanel, "L_UIDropDownMenuTemplate");
-	self.notepanel.herbsubsetdropdown = CreateFrame("Frame", nil, self.notepanel, "L_UIDropDownMenuTemplate");
-	self.notepanel.oresubsetdropdown = CreateFrame("Frame", nil, self.notepanel, "L_UIDropDownMenuTemplate");
+	--self.notepanel.setdropdown = CreateFrame("Frame", nil, self.notepanel, "L_UIDropDownMenuTemplate");
+	self.notepanel.setdropdown = L_Create_UIDropDownMenu(nil or "", self.notepanel);
+	--self.notepanel.usersubsetdropdown = CreateFrame("Frame", nil, self.notepanel, "L_UIDropDownMenuTemplate");
+	self.notepanel.usersubsetdropdown = L_Create_UIDropDownMenu(nil or "", self.notepanel);
+	--self.notepanel.herbsubsetdropdown = CreateFrame("Frame", nil, self.notepanel, "L_UIDropDownMenuTemplate");
+	self.notepanel.herbsubsetdropdown = L_Create_UIDropDownMenu(nil or "", self.notepanel);
+	--self.notepanel.oresubsetdropdown = CreateFrame("Frame", nil, self.notepanel, "L_UIDropDownMenuTemplate");
+	self.notepanel.oresubsetdropdown = L_Create_UIDropDownMenu(nil or "", self.notepanel);
+	
+
 
 	self.notepanel.setdropdown:SetPoint("LEFT",self.notepanel,"TOPLEFT",35,-60);
 	L_UIDropDownMenu_SetWidth(self.notepanel.setdropdown, 90);

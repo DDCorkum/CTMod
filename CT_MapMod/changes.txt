@@ -1,3 +1,6 @@
+CT_MapMod (8.1.5.1) 2019-04-03
+- Depreciated WorldMapTooltip for GameTooltip to prevent future errors
+
 CT_MapMod (8.1.0.0) 2018-12-11
 - More control over placement of UI elements added to WorldMapFrame
 

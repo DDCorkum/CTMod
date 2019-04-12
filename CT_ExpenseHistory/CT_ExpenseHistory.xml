@@ -714,41 +714,19 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</Frame>
 						</Frames>
 					</Frame>
-					<Frame name="CT_ExpenseHistoryFrameServerDropDown" inherits="L_UIDropDownMenuTemplate" id="2">
-						<Size>
-							<AbsDimension x="100" y="15"/>
-						</Size>
-						<Anchors>
-							<Anchor point="TOPLEFT">
-								<Offset>
-									<AbsDimension x="0" y="-475"/>
-								</Offset>
-							</Anchor>
-						</Anchors>
-						<Scripts>
-							<OnLoad>
-								--CT_EH_ServerDropDown_OnLoad(self);
-							</OnLoad>
-						</Scripts>
-					</Frame>
-					<Frame name="CT_ExpenseHistoryFrameDropDown" inherits="L_UIDropDownMenuTemplate" id="1">
-						<Size>
-							<AbsDimension x="200" y="15"/>
-						</Size>
-						<Anchors>
-							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CT_ExpenseHistoryFrameServerDropDown">
-								<Offset>
-									<AbsDimension x="-30" y="0"/>
-								</Offset>
-							</Anchor>
-						</Anchors>
-						<Scripts>
-							<OnLoad>
-								--CT_EH_DropDown_OnLoad(self);
-							</OnLoad>
-						</Scripts>
-					</Frame>
 				</Frames>
+				<Scripts>
+					<OnLoad>
+						local frame1 = L_Create_UIDropDownMenu("CT_ExpenseHistoryFrameServerDropDown",self);
+						frame1:SetID(2);
+						frame1:SetPoint("TOPLEFT",0,-475);
+						frame1:SetSize(100,15);
+						local frame2 = L_Create_UIDropDownMenu("CT_ExpenseHistoryFrameDropDown",self);
+						frame2:SetID(1);
+						frame2:SetSize(200,15);
+						frame2:SetPoint("LEFT", frame1, "RIGHT", -30, 0);
+					</OnLoad>
+				</Scripts>
 			</Frame>
 			<Frame name="$parentLog" hidden="true">
 				<Anchors>
