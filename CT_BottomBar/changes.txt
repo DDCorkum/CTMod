@@ -1,3 +1,6 @@
+CT_BottomBar (8.1.5.2) 2019-04-15
+- Fixed option sliders that were not showing current and min/max values since 8.0
+
 CT_BottomBar (8.1.0.2) 2018-12-21
 - The previous change is now also integrated to CT_BarMod and the default pet bar
 

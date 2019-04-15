@@ -1428,15 +1428,15 @@ module.frame = function()
 			end);
 		optionsEndFrame();
 
-		optionsAddFrame( -28,   17, "slider#tl:42:%y#s:238:%s#o:barSpacing:6#i:spacing#Spacing = <value>#-36:72:1");
-		optionsAddFrame( -28,   17, "slider#tl:42:%y#s:238:%s#o:barScale:1#i:scale#Scale = <value>#0.25:2:0.01");
+		optionsAddFrame( -28,   17, "slider#tl:42:%y#s:238:%s#o:barSpacing:6#i:spacing#n:ctbarSpacing#Spacing = <value>#-36:72:1");
+		optionsAddFrame( -28,   17, "slider#tl:42:%y#s:238:%s#o:barScale:1#i:scale#n:ctbarScale#Scale = <value>#0.25:2:0.01");
 
 		----------
 		-- Opacity
 		----------
 
 		optionsAddObject(-18,   14, "font#tl:15:%y#Opacity");
-		optionsAddFrame( -17,   17, "slider#tl:42:%y#s:100:%s#o:barOpacity:1#i:opacity#Normal = <value>#0:1:0.01");
+		optionsAddFrame( -17,   17, "slider#tl:42:%y#s:100:%s#o:barOpacity:1#i:opacity#n:ctbarOpacity#Normal = <value>#0:1:0.01");
 		optionsAddFrame(  17,   17, "slider#tl:180:%y#s:100:%s#o:barFaded:0#i:barFaded#Faded = <value>#0:1:0.01");
 		optionsAddObject(-10,   26, "checkbutton#tl:40:%y#i:mouseover#o:barMouseover:false#Fade when mouse is not over the bar");
 

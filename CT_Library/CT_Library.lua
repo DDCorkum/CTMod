@@ -11,7 +11,7 @@
 -----------------------------------------------
 -- Initialization
 
-local LIBRARY_VERSION = 8.151;
+local LIBRARY_VERSION = 8.152;
 local LIBRARY_NAME = "CT_Library";
 
 local _G = getfenv(0);
@@ -2042,7 +2042,7 @@ local function generalObjectHandler(self, specializedHandler, str, parent, initi
 	end
 
 	-- Check override name
-	name = overrideName or name or identifier or option;  -- Temporary fix for WoW 8.0.1, added "or identifier or option"
+	name = overrideName or name or identifier or option;  -- Added "or identifier or option" in WoW 8.0 (Battle for Azeroth) because sliders now need unique global names
 
 	anch1 = anch1 or "mid";
 

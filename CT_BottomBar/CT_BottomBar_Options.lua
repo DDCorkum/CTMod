@@ -755,7 +755,7 @@ module.frame = function()
 
 			optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:bagsBarHideBags#Hide all buttons except for the backpack");
 
-			optionsAddFrame( -25,   17, "slider#tl:30:%y#s:250:%s#i:spacing#o:bagsBarSpacing:2#Button Spacing = <value>#0:25:1");
+			optionsAddFrame( -25,   17, "slider#tl:30:%y#s:250:%s#i:spacing#n:bagsBarSpacing#o:bagsBarSpacing:2#Button Spacing = <value>#0:25:1");
 		optionsEndFrame();
 	end
 
@@ -804,7 +804,7 @@ module.frame = function()
 
 			optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:extraBarTexture#Hide bar textures.");
 
-			optionsAddFrame( -25,   17, "slider#tl:30:%y#s:250:%s#i:scale#o:extraBarScale:1#Scale = <value>#0.25:2:0.01");
+			optionsAddFrame( -25,   17, "slider#tl:30:%y#s:250:%s#i:scale#n:extraBarScale#o:extraBarScale:1#Scale = <value>#0.25:2:0.01");
 		optionsEndFrame();
 	end
 
@@ -815,9 +815,9 @@ module.frame = function()
 
 			optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:20:0#r#These options will have no effect if the Pet Bar is not activated.#" .. textColor3 .. ":l");
 
-			optionsAddFrame( -25,   17, "slider#tl:30:%y#s:250:%s#i:scale#o:petBarScale:1#Scale = <value>#0.25:2:0.01");
-			optionsAddFrame( -25,   17, "slider#tl:30:%y#s:250:%s#i:opacity#o:petBarOpacity:1#Opacity = <value>#0:1:0.01");
-			optionsAddFrame( -25,   17, "slider#tl:30:%y#s:250:%s#i:spacing#o:petBarSpacing:6#Button Spacing = <value>#0:25:1");
+			optionsAddFrame( -25,   17, "slider#tl:30:%y#s:250:%s#i:scale#n:petBarScale#o:petBarScale:1#Scale = <value>#0.25:2:0.01");
+			optionsAddFrame( -25,   17, "slider#tl:30:%y#s:250:%s#i:opacity#n:petBarOpacity#o:petBarOpacity:1#Opacity = <value>#0:1:0.01");
+			optionsAddFrame( -25,   17, "slider#tl:30:%y#s:250:%s#i:spacing#n:petBarSpacing#o:petBarSpacing:6#Button Spacing = <value>#0:25:1");
 		optionsEndFrame();
 	end
 
