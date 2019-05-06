@@ -129,7 +129,7 @@ local function CT_MapMod_Initialize()		-- called via module.update("init") from 
 			{ ["name"] = "Starlight Rose", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_StarlightRose" },
 			-- Battle for Azeroth
 			{ ["name"] = "Akunda's Bite", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_AkundasBite" },
-			{ ["name"] = "Anchor Weed", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_AnchorWeed" },
+			{ ["name"] = "Anchor Weed", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_AnchorWeed", ["ignoregather"] = true },  --ignoregather added in 8.1.5.2
 			{ ["name"] = "Riverbud", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Riverbud" },
 			{ ["name"] = "Sea Stalks", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_SeaStalk" },
 			{ ["name"] = "Siren's Sting", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
@@ -173,57 +173,31 @@ local function CT_MapMod_Initialize()		-- called via module.update("init") from 
 			{ ["name"] = "Storm Silver", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_StormSilver" },
 		}
 	};
-
-	-- convert saved notes from the old (pre-BFA) format into the new one  (this should be deleted once its clear that all users have switched to a new version)
-	for mapname, notecollection in pairs(CT_UserMap_Notes) do
-		if (CT_MapMod_OldZones[mapname]) then
-			local newmap = 0 + CT_MapMod_OldZones[mapname];
-			if not newmap then print(mapname); end
-			-- for now, just copy the data.  (proper processing still in development)
-			for i, note in pairs(notecollection) do
-				local set = nil;
-				if (note["set"] == 7) then
-					set = "Herb";
-					subset = module.NoteTypes["Herb"][note["icon"]]["name"];
-				elseif (note["set"] == 8) then
-					set = "Ore";
-					subset = module.NoteTypes["Ore"][note["icon"]]["name"];
-				else
-					set = "User";
-					subset = module.NoteTypes["User"][note["set"]]["name"];
-				end
-				local newnote =
-				{
-					["x"] = note["x"],
-					["y"] = note["y"],
-					["name"] = note["name"],
-					["set"] = set,
-					["subset"] = subset,
-					["descript"] = note["descript"],
-					["datemodified"] = "20180716",
-					["version"] = "7.3.2.0",
-				};
-				if (not CT_MapMod_Notes[newmap]) then
-					CT_MapMod_Notes[newmap] = { }; 
-				end					
-				tinsert(CT_MapMod_Notes[newmap],newnote);
-			end
-		end
-	end
-	wipe(CT_UserMap_Notes);
 	
-	-- update saved notes from more recent versions (8.0.1.4 onwards) to the current format, as required
-	for mapid, notetable in pairs(CT_MapMod_Notes) do
-		for i, note in ipairs(notetable) do
-			if (note["set"] == "Herb" and note["subset"] == "Sea Stalk") then note["subset"] = "Sea Stalks"; end		-- 8.0.1.4 to 8.0.1.5
-			if (note["set"] == "Herb" and note["subset"] == "Siren's Song") then note["subset"] = "Siren's Sting"; end	-- 8.0.1.4 to 8.0.1.5
-			-- add here any future changes to the NoteTypes tables
-		end
-		--add here any future changes to mapid
-	end
+	-- allows pins to appear at flight masters if there is a corresponding world-map that looks identical
+	-- key: GetTaxiMapID() when at a flight master using FlightMapFrame
+	-- val: GetMapID() when looking at a continent in the WorldMapFrame
+	module.FlightMaps = 
+	{
+		 [990] = 552, -- Draenor  -- never used, because WoD has the TaxiRouteFrame instead of FlightMapFrame
+		[1011] = 875, -- Zandalar
+		[1014] = 876, -- Kul Tiras
+		[1208] =  13, -- Eastern Kingdoms
+		[1209] =  12, -- Kalimdor
+		[1384] = 113, -- Northrend
+		[1467] = 101, -- Outland
+	};
+
+	-- Convert notes from older versions of the addon to the most recent (using function defined near bottom)
+	CT_MapMod_ConvertOldNotes();
 
 	-- load the DataProvider which has most of the horsepower
 	WorldMapFrame:AddDataProvider(CreateFromMixins(CT_MapMod_DataProviderMixin));
+	
+	-- flight path map
+	if (not FlightMapFrame) then FlightMap_LoadUI(); end
+	FlightMapFrame:AddDataProvider(CreateFromMixins(CT_MapMod_DataProviderMixin));
+	
 end
 
 
@@ -265,16 +239,23 @@ function CT_MapMod_DataProviderMixin:RefreshAllData(fromOnShow)
 
 	-- Fetch and push the pins to be used for this map
 	local mapid = self:GetMap():GetMapID();
+	if ( (mapid) and ((module:getOption("CT_MapMod_ShowOnFlightMaps") or 1) == 1) ) then
+		for key, val in pairs(module.FlightMaps) do   --continent pins will appear in corresponding flight maps
+			if (mapid == key) then
+				mapid = val;
+			end
+		end
+	end
 	if (mapid and CT_MapMod_Notes[mapid]) then
 		for i, info in ipairs(CT_MapMod_Notes[mapid]) do
 			if (
 				-- if user is set to always (the default)
 				( (info["set"] == "User") and ((module:getOption("CT_MapMod_UserNoteDisplay") or 1) == 1) ) or
-				
+
 				-- if herb is set to always, or if herb is set to auto (the default) and the toon is an herbalist
 				( (info["set"] == "Herb") and ((module:getOption("CT_MapMod_HerbNoteDisplay") or 1) == 1) and (module.isHerbalist) ) or
 				( (info["set"] == "Herb") and ((module:getOption("CT_MapMod_HerbNoteDisplay") or 1) == 2) ) or
-				
+
 				-- if ore is set to always, or if ore is set to auto (the default) and the toon is a miner
 				( (info["set"] == "Ore") and ((module:getOption("CT_MapMod_HerbNoteDisplay") or 1) == 1) and (module.isMiner) ) or
 				( (info["set"] == "Ore") and ((module:getOption("CT_MapMod_OreNoteDisplay") or 1) == 2) )
@@ -336,6 +317,37 @@ function CT_MapMod_PinMixin:OnAcquired(...) -- the arguments here are anything t
 	if (self.notepanel) then
 		self:UpdateNotePanel();
 	end
+	
+	-- create the ability to move the pin around
+	self.isBeingDragged = nil;
+	self:RegisterForDrag("RightButton");
+	self:HookScript("OnDragStart", function()
+		if (module.PinHasFocus) then return; end
+		self.isBeingDragged = true;
+		self:HookScript("OnUpdate",
+			function()
+				if (self.isBeingDragged) then
+					local x,y = self:GetMap():GetNormalizedCursorPosition();
+					if (x and y) then
+						self:SetPosition(x,y);
+					end
+				end
+			end
+		);
+	end);
+	self:HookScript("OnDragStop", function()
+		if (not self.isBeingDragged) then return; end
+		self.isBeingDragged = nil;
+		local x,y = self:GetMap():GetNormalizedCursorPosition();
+		if (x and y) then
+			CT_MapMod_Notes[self.mapid][self.i] ["x"] = x;
+			CT_MapMod_Notes[self.mapid][self.i] ["y"] = y;
+			self.x = x;
+			self.y = y;
+			self:SetPosition(x,y);
+		end
+	end);
+	
 end
  
 function CT_MapMod_PinMixin:OnReleased()
@@ -391,6 +403,7 @@ function CT_MapMod_PinMixin:OnMouseEnter()
 		else	
 			GameTooltip:AddLine("Shift-Click to Edit", 0, 0.5, 0.9, 1);
 		end
+		GameTooltip:AddDoubleLine("Right-Click to Drag", self.mapid, 0.00, 0.50, 0.90, 0.05, 0.05, 0.05 );
 	else
 		if (self.datemodified and self.version) then
 			GameTooltip:AddDoubleLine(" ", self.datemodified .. " (" .. self.version .. ")", 0.00, 0.50, 0.90, 0.45, 0.45, 0.45);
@@ -402,7 +415,7 @@ end
 function CT_MapMod_PinMixin:OnMouseLeave()
 	-- Override in your mixin, called when the mouse leaves this pin
 	GameTooltip:Hide();
-end
+end	
  
 function CT_MapMod_PinMixin:ApplyFrameLevel()
 	if (self.set == "User") then
@@ -495,7 +508,7 @@ end
 function CT_MapMod_PinMixin:CreateNotePanel()
 	if (self.notepanel) then return; end  --this shoud NEVER happen.  CreateNotePanel() is only supposed to happen once per pin!
 	-- Create the note panel that is associated to this pin	
-	self.notepanel = CreateFrame("FRAME",nil,WorldMapFrame.BorderFrame,"CT_MapMod_NoteTemplate");
+	self.notepanel = CreateFrame("FRAME",nil,self:GetMap().BorderFrame,"CT_MapMod_NoteTemplate");
 	self.notepanel:SetScale(1.2);
 	self.notepanel.pin = self;
 	local textColor0 = "1.0:1.0:1.0";
@@ -855,6 +868,7 @@ do
 						}
 						if (not CT_MapMod_Notes[mapid]) then CT_MapMod_Notes[mapid] = { }; end
 						tinsert(CT_MapMod_Notes[mapid],newnote);
+						C_Timer.After(0.01,function() if (WorldMapFrame:GetMapID() ~= mapid) then WorldMapFrame:SetMapID(mapid) end end); --to add pins on the parts of a map in other zones
 						WorldMapFrame:RefreshAllDataProviders();
 						GameTooltip:Hide();
 					end);
@@ -898,6 +912,12 @@ do
 						duration = duration + elapsed;
 						if (duration < .1) then return; end
 						duration = 0;
+						if (module.isCreatingNote) then
+							GameTooltip:SetOwner(newself);
+							GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, -60);
+							GameTooltip:SetText("Click on the map where you want the pin");
+							GameTooltip:Show();
+						end
 						local value = module:getOption("CT_MapMod_CreateNoteButtonX") or -125;
 						if (newpinmousestart) then
 							-- Currently dragging the frame
@@ -942,14 +962,14 @@ do
 							return;
 						else
 							module.isCreatingNote = true;
-							GameTooltip:SetText("CT: Click on the map!");
+							GameTooltip:SetText("Click on the map where you want the pin");
 						end
 					end
 				end,
 				["onenter"] = function(self)
 					if (not module.isCreatingNote and not newpinmousestart) then 
 						GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, -60);
-						GameTooltip:SetText("CT: Add a new pin to the map");
+						GameTooltip:SetText("Add a new pin to the map");
 						GameTooltip:AddLine("Right-click to drag", .5, .5, .5);
 						GameTooltip:Show();
 					end
@@ -1158,7 +1178,7 @@ do
 				for i, val in ipairs(herbskills) do
 					if (arg4 == val) then
 						for j, type in ipairs(module.NoteTypes["Herb"]) do
-							if type["name"] == arg2 then
+							if (type["name"] == arg2 and not type["ignoregather"]) then
 								local istooclose = nil;
 								if (not CT_MapMod_Notes[mapid]) then CT_MapMod_Notes[mapid] = { }; end
 								for k, note in ipairs(CT_MapMod_Notes[mapid]) do
@@ -1201,7 +1221,7 @@ do
 						if (arg2:sub(-8) == " Deposit") then arg2 = arg2:sub(1,-9); end
 						if (arg2:sub(-5) == " Seam") then arg2 = arg2:sub(1,-6); end
 						for j, type in ipairs(module.NoteTypes["Ore"]) do
-							if type["name"] == arg2 then
+							if (type["name"] == arg2 and not type["ignoregather"]) then
 								local istooclose = nil;
 								if (not CT_MapMod_Notes[mapid]) then CT_MapMod_Notes[mapid] = { }; end
 								for k, note in ipairs(CT_MapMod_Notes[mapid]) do
@@ -1347,8 +1367,10 @@ module.update = function(self, optName, value)
 		or optName == "CT_MapMod_HerbNoteDisplay"
 		or optName == "CT_MapMod_OreNoteDisplay"
 		or optName == "CT_MapMod_AlphaAmount"
+		or optName == "CT_MapMod_ShowOnFlightMaps"
 	) then
 		WorldMapFrame:RefreshAllDataProviders();
+		CloseTaxiMap();
 	end
 end
 
@@ -1450,6 +1472,9 @@ module.frame = function()
 		optionsAddObject(-5,    8, "font#t:0:%y#s:0:%s#l:13:0#r#Alpha when zoomed out#" .. textColor1 .. ":l");
 		optionsAddFrame(-5,    28, "slider#tl:24:%y#s:169:15#o:CT_MapMod_AlphaAmount:0.75##0.50:1.00:0.05");
 		
+		optionsAddObject(-5,   50, "font#t:0:%y#s:0:%s#l:13:0#r#Also show pins on flight maps#" .. textColor1 .. ":l");
+		optionsAddObject(-5,   24, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_ShowOnFlightMaps#n:CT_MapMod_ShowOnFlightMaps#Always#Disabled");
+		
 		
 		-- Reset Options
 		optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
@@ -1489,11 +1514,84 @@ end
 
 
 --------------------------------------------
--- Legacy properties to convert from older note formats
+-- Converting notes from older addon versions into the latest one
+
+
+function CT_MapMod_ConvertOldNotes()
+	-- Pre-BFA to 8.0.1.X
+	for mapname, notecollection in pairs(CT_UserMap_Notes) do
+		if (CT_MapMod_OldZones[mapname]) then
+			local newmap = 0 + CT_MapMod_OldZones[mapname];
+			for i, note in pairs(notecollection) do
+				local set = nil;
+				if (note["set"] == 7) then
+					set = "Herb";
+					subset = module.NoteTypes["Herb"][note["icon"]]["name"];
+				elseif (note["set"] == 8) then
+					set = "Ore";
+					subset = module.NoteTypes["Ore"][note["icon"]]["name"];
+				else
+					set = "User";
+					subset = module.NoteTypes["User"][note["set"]]["name"];
+				end
+				local newnote =
+				{
+					["x"] = note["x"],
+					["y"] = note["y"],
+					["name"] = note["name"],
+					["set"] = set,
+					["subset"] = subset,
+					["descript"] = note["descript"],
+					["datemodified"] = "20180716",
+					["version"] = "7.3.2.0",
+				};
+				if (not CT_MapMod_Notes[newmap]) then
+					CT_MapMod_Notes[newmap] = { }; 
+				end					
+				tinsert(CT_MapMod_Notes[newmap],newnote);
+			end
+		end
+	end
+	wipe(CT_UserMap_Notes);
+	
+	-- Correcting mis-labelled herbs in early BFA
+	for mapid, notetable in pairs(CT_MapMod_Notes) do
+		for i, note in ipairs(notetable) do
+			if (note["set"] == "Herb" and note["subset"] == "Sea Stalk") then note["subset"] = "Sea Stalks"; end		-- 8.0.1.4 to 8.0.1.5
+			if (note["set"] == "Herb" and note["subset"] == "Siren's Song") then note["subset"] = "Siren's Sting"; end	-- 8.0.1.4 to 8.0.1.5
+			if (note["set"] == "Herb" and note["subset"] == "Anchor Weed" and note["name"] == "Anchor Weed" and note["descript"] == "") then
+				--removing anchor's weed from pre-8.1.5.2, when "ignoregather" was added
+				-- but leaving in place if the user created or edited the note manually
+				if (note["version"] == "8.0.0.0" or
+					note["version"] == "8.0.5.0" or --mislabel of 8.0.1.5 during beta test
+					note["version"] == "8.0.1.1" or 
+					note["version"] == "8.0.1.2" or 
+					note["version"] == "8.0.1.3" or 
+					note["version"] == "8.0.1.4" or 
+					note["version"] == "8.0.1.5" or
+					note["version"] == "8.0.1.6" or
+					note["version"] == "8.0.1.7" or
+					note["version"] == "8.0.1.8" or
+					note["version"] == "8.1.0.0" or
+					note["version"] == "8.1.0.1" or
+					note["version"] == "8.1.0.2" or
+					note["version"] == "8.1.0.3" or
+					note["version"] == "8.1.5.1"
+				) then
+					tremove(notetable,i);
+					--print("found one at " .. mapid .. " (#" .. i .. ") " .. note["x"] .. ", " .. note["y"]);
+				end
+			
+			end
+		end
+		--add here any future changes to mapid
+	end
+end
 
 
 
--- This variable should be deleted some time in the future when it is certain that ALL users have upgraded to the newest version.
+
+-- This variable may be deleted some time in the future when it is certain that ALL users have upgraded to the newest version.
 CT_MapMod_OldZones = {
 	["4:0"]= 1, ["4:8"]= 2, ["4:10"]= 3, ["4:11"]= 4, ["4:12"]= 5, ["4:19"]= 6, ["9:0"]= 7, ["9:6"]= 8, ["9:7"]= 9,
 	["11:0"]= 10, ["11:20"]= 11, ["13:0"]= 12, ["14:0"]= 13, ["16:0"]= 14, ["17:0"]= 15, ["17:18"]= 16, ["19:0"]= 17, ["20:0"]= 18, ["20:13"]= 19,
@@ -1593,3 +1691,6 @@ CT_MapMod_OldZones = {
 	["1215:0"]= 971, ["1216:0"]= 972, ["1217:1"]= 973, ["1219:0"]= 974, ["1219:1"]= 975, ["1219:2"]= 976, ["1219:3"]= 977, ["1219:4"]= 978, ["1219:5"]= 979,
 	["1219:6"]= 980, ["1220:0"]= 981, ["1184:0"]= 994, ["382:0"]= 998,
 }
+
+
+
