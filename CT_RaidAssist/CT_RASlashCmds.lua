@@ -482,3 +482,23 @@ function SendChatMessage(msg, type, language, target)
 		end
 		oldSendChatMessage(msg, type, language, target);
 end
+
+	-- /ralog
+local raLogAlreadyShown = nil;
+local function CT_RAChanges_DisplayDialog()
+	if (not raLogAlreadyShown) then
+		raLogAlreadyShown = true;
+		DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF99CT RAID ASSIST (CTRA) RECENT CHANGES:|n");
+		DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF99- (8.1.5.2) Simplified /ralog to reduce bloat (you are seeing it now)");
+		DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF99- (8.1.5.1) Custom raid frames now mark tanks, heals and dps roles");
+		DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF99- (8.1.5.1) Custom raid frames now integrated with default Blizzard /readycheck");
+		DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF99- (8.1.5.1) Removed /rardy, /rarly and /ravote to reduce bloat");
+		DEFAULT_CHAT_FRAME:AddMessage("|cFF999999For full changes, see changes.txt in every folder");
+		C_Timer.After(15,
+			function()
+				raLogAlreadyShown = nil;
+			end
+		);
+	end
+end
+CT_RA_RegisterSlashCmd("/ralog", "Shows the changelog for this version.", 15, "RALOG", CT_RAChanges_DisplayDialog, "/ralog");

@@ -1,3 +1,6 @@
+CT_BarMod (8.1.5.2) 2019-04-15
+- Fixed option sliders that were not showing current and min/max values since 8.0
+
 CT_BarMod (8.1.5.1) 2019-04-03
 - Bar 12 keybindings do not block the override bar used in vehicles and world quests
 

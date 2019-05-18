@@ -111,6 +111,7 @@ constants.DATA_SIDE_LEFT = 1;
 constants.DATA_SIDE_RIGHT = 2;
 constants.DATA_SIDE_TOP = 3;
 constants.DATA_SIDE_BOTTOM = 4;
+constants.DATA_SIDE_CENTER = 5;
 
 constants.DURATION_LOCATION_DEFAULT = 1;
 constants.DURATION_LOCATION_LEFT = 2;
@@ -2641,6 +2642,8 @@ local function auraButton_updateAppearance(button)
 				fsTimeleft:SetPoint("LEFT", button, "RIGHT", offset, 0);  -- right of icon
 			elseif (side == constants.DATA_SIDE_BOTTOM) then
 				fsTimeleft:SetPoint("TOP", button, "BOTTOM", 0, -offset);  -- below icon
+			elseif (side == constants.DATA_SIDE_CENTER) then
+				fsTimeleft:SetPoint("CENTER", button, "CENTER", 0, 0); -- middle of icon, without any offset
 			else -- if (side == constants.DATA_SIDE_LEFT) then
 				fsTimeleft:SetPoint("RIGHT", button, "LEFT", -offset, 0);  -- left of icon
 			end
@@ -10258,20 +10261,123 @@ module.frame = function()
 		----------
 		optionsAddObject(-25, 1*13, "font#tl:15:%y#Button appearance");
 
+		local Style1Objects = { }
+
 		-- Button style
 		optionsAddObject(-20,   14, "font#tl:28:%y#v:ChatFontNormal#Use style:");
-		optionsAddObject( 15,   20, "dropdown#tl:80:%y#s:170:%s#n:CT_BuffModDropdown_buttonStyle#i:buttonStyle#o:buttonStyle:1#Style 1 (icon and bar)#Style 2 (icon and time)");
+		optionsBeginFrame( 15,   20, "dropdown#tl:80:%y#s:170:%s#n:CT_BuffModDropdown_buttonStyle#i:buttonStyle#o:buttonStyle:1#Style 1 (icon and bar)#Style 2 (icon and time)");
+			local elapsedbuttonstyle = 0;
+			optionsAddScript("onupdate",
+				function(self, elapsed)
+					elapsedbuttonstyle = elapsedbuttonstyle + elapsed;
+					if elapsedbuttonstyle < 0.5 then return; end
+					elapsedbuttonstyle = 0;
+					if (L_UIDropDownMenu_GetSelectedID(CT_BuffModDropdown_buttonStyle) == 1) then
+						-- maximize Style 1 options, minimize Style 2 options
+						CT_BuffMod_Style1Label:Show();
+						CT_BuffMod_Style1SizeLabel:Show();
+						buffSize1:Show();
+						CT_BuffMod_Style1PositionLabel:Show();
+						CT_BuffModDropdown_rightAlign1:Show();
+						colorCodeIcons1:Show();
+						detailWidth1:Show();
+						colorBuffs1:Show();
+						colorCodeBackground1:Show();
+						showNames1:Show();
+						colorCodeDebuffs1:Show();
+						CT_BuffMod_Style1JustifyLabel1:Show();
+						CT_BuffModDropdown_nameJustifyWithTime1:Show();
+						CT_BuffMod_Style1JustifyLabel2:Show();
+						CT_BuffModDropdown_nameJustifyNoTime1:Show();
+						showTimers1:Show();
+						CT_BuffMod_Style1FormatLabel:Show();
+						CT_BuffModDropdown_durationFormat1:Show();
+						CTBuffMod_showDaysFormat1	:Show();
+						CT_BuffMod_Style1LocationLabel:Show();
+						CT_BuffModDropdown_durationLocation1:Show();
+						CT_BuffMod_Style1JustifyLabel3:Show();
+						CT_BuffModDropdown_timeJustifyNoName1:Show();
+						showBuffTimer1:Show();
+						showTimerBackground1:Show();
+						CT_BuffMod_Style1OffsetLabel1:Show();
+						spacingOnLeft1:Show();
+						CT_BuffMod_Style1OffsetLabel2:Show();
+						spacingOnRight1:Show();
+						CT_BuffMod_Style2Label:Hide();
+						CT_BuffMod_Style2SizeLabel:Hide();
+						buffSize2:Hide();
+						colorCodeIcons2:Hide();
+						showTimers2:Hide();
+						CT_BuffMod_Style2FormatLabel:Hide();
+						CT_BuffModDropdown_durationFormat2:Hide();
+						CTBuffMod_showDaysFormat2:Hide();
+						CT_BuffMod_Style2LocationLabel:Hide();
+						CT_BuffModDropdown_dataSide2:Hide();
+						CT_BuffMod_Style2OffsetLabel:Hide();
+						spacingFromIcon2:Hide();
+						CT_BuffMod_Style2ContinueLabel:Hide();
+						
+						
+					else
+						-- minimize Style 1 options, maximize Style 2 options
+						CT_BuffMod_Style1Label:Hide();
+						CT_BuffMod_Style1SizeLabel:Hide();
+						buffSize1:Hide();
+						CT_BuffMod_Style1PositionLabel:Hide();
+						CT_BuffModDropdown_rightAlign1:Hide();
+						colorCodeIcons1:Hide();
+						detailWidth1:Hide();
+						colorBuffs1:Hide();
+						colorCodeBackground1:Hide();
+						showNames1:Hide();
+						colorCodeDebuffs1:Hide();
+						CT_BuffMod_Style1JustifyLabel1:Hide();
+						CT_BuffModDropdown_nameJustifyWithTime1:Hide();
+						CT_BuffMod_Style1JustifyLabel2:Hide();
+						CT_BuffModDropdown_nameJustifyNoTime1:Hide();
+						showTimers1:Hide();
+						CT_BuffMod_Style1FormatLabel:Hide();
+						CT_BuffModDropdown_durationFormat1:Hide();
+						CTBuffMod_showDaysFormat1:Hide();
+						CT_BuffMod_Style1LocationLabel:Hide();
+						CT_BuffModDropdown_durationLocation1:Hide();
+						CT_BuffMod_Style1JustifyLabel3:Hide();
+						CT_BuffModDropdown_timeJustifyNoName1:Hide();
+						showBuffTimer1:Hide();
+						showTimerBackground1:Hide();
+						CT_BuffMod_Style1OffsetLabel1:Hide();
+						spacingOnLeft1:Hide();
+						CT_BuffMod_Style1OffsetLabel2:Hide();
+						spacingOnRight1:Hide();
+						CT_BuffMod_Style2Label:Show();
+						CT_BuffMod_Style2SizeLabel:Show();
+						buffSize2:Show();
+						colorCodeIcons2:Show();
+						showTimers2:Show();
+						CT_BuffMod_Style2FormatLabel:Show();
+						CT_BuffModDropdown_durationFormat2:Show();
+						CTBuffMod_showDaysFormat2:Show();
+						CT_BuffMod_Style2LocationLabel:Show();
+						CT_BuffModDropdown_dataSide2:Show();
+						CT_BuffMod_Style2OffsetLabel:Show();
+						spacingFromIcon2:Show();
+						CT_BuffMod_Style2ContinueLabel:Show();
+					end
+				end
+			);
+		optionsEndFrame();
 
 
 		-- Style 1
-		optionsAddObject(-15, 1*13, "font#tl:22:%y#Style 1 (icon and bar)");
+		optionsAddObject(-25, 1*13, "font#tl:22:%y#n:CT_BuffMod_Style1Label#Style 1 (icon and bar)");
 
+		
 		-- Size of the icon
-		optionsAddObject(-20,   14, "font#tl:35:%y#v:ChatFontNormal#Size of the icon:");
+		optionsAddObject(-20,   14, "font#tl:35:%y#v:ChatFontNormal#n:CT_BuffMod_Style1SizeLabel#Size of the icon:");
 		optionsAddObject( 15,   17, "slider#tl:165:%y#s:120:%s#i:buffSize1#o:buffSize1:" .. constants.BUFF_SIZE_DEFAULT .. "#<value>#" .. constants.BUFF_SIZE_MINIMUM ..":" .. constants.BUFF_SIZE_MAXIMUM .. ":1");
 
 		-- Icon position
-		optionsAddObject(-20,   15, "font#tl:35:%y#v:ChatFontNormal#Icon position:");
+		optionsAddObject(-20,   15, "font#tl:35:%y#n:CT_BuffMod_Style1PositionLabel#v:ChatFontNormal#Icon position:");
 		optionsAddObject( 15,   20, "dropdown#tl:140:%y#s:120:%s#n:CT_BuffModDropdown_rightAlign1#i:rightAlign1#o:rightAlign1:" .. constants.RIGHT_ALIGN_DEFAULT .. "#Default#Left side#Right side");
 
 		-- Color code border of debuff icons
@@ -10292,10 +10398,10 @@ module.frame = function()
 		optionsAddObject( -5,   26, "checkbutton#tl:30:%y#i:showNames1#o:showNames1:true#Show name");
 		optionsAddObject(  6,   26, "checkbutton#tl:66:%y#i:colorCodeDebuffs1#o:colorCodeDebuffs1#Color code debuff names");
 
-		optionsAddObject( -3,   15, "font#tl:70:%y#v:ChatFontNormal#Justify (beside time):");
+		optionsAddObject( -3,   15, "font#tl:70:%y#v:ChatFontNormal#n:CT_BuffMod_Style1JustifyLabel1#Justify (beside time):");
 		optionsAddObject( 15,   20, "dropdown#tl:180:%y#s:80:%s#n:CT_BuffModDropdown_nameJustifyWithTime1#i:nameJustifyWithTime1#o:nameJustifyWithTime1:" .. constants.JUSTIFY_DEFAULT .. "#Default#Left#Right#Center");
 
-		optionsAddObject( -5,   15, "font#tl:70:%y#v:ChatFontNormal#Justify (when alone):");
+		optionsAddObject( -5,   15, "font#tl:70:%y#v:ChatFontNormal#n:CT_BuffMod_Style1JustifyLabel2#Justify (when alone):");
 		optionsAddObject( 15,   20, "dropdown#tl:180:%y#s:80:%s#n:CT_BuffModDropdown_nameJustifyNoTime1#i:nameJustifyNoTime1#o:nameJustifyNoTime1:" .. constants.JUSTIFY_DEFAULT .. "#Default#Left#Right#Center");
 
 		-- Show time remaining text
@@ -10304,15 +10410,15 @@ module.frame = function()
 		--	Justify (when alone)
 		optionsAddObject( -5,   26, "checkbutton#tl:30:%y#i:showTimers1#o:showTimers1:true#Show time remaining text");
 
-		optionsAddObject( -3,   15, "font#tl:70:%y#v:ChatFontNormal#Format:");
+		optionsAddObject( -3,   15, "font#tl:70:%y#v:ChatFontNormal#n:CT_BuffMod_Style1FormatLabel#Format:");
 		optionsAddObject( 15,   20, "dropdown#tl:115:%y#s:145:%s#n:CT_BuffModDropdown_durationFormat1#i:durationFormat1#o:durationFormat1:1#1 hour  /  30 minutes#1 hour  /  30 min#1h  /  30m#1h 22m  /  30m 45s#1:22h  /  30:45");
 		
 		optionsAddObject(  6,   26, "checkbutton#tl:66:%y#i:CTBuffMod_showDaysFormat1#o:showDays1:true#Show days if >24 hours");
 		
-		optionsAddObject( -5,   15, "font#tl:70:%y#v:ChatFontNormal#Location:");
+		optionsAddObject( -5,   15, "font#tl:70:%y#v:ChatFontNormal#n:CT_BuffMod_Style1LocationLabel#Location:");
 		optionsAddObject( 15,   20, "dropdown#tl:115:%y#s:145:%s#n:CT_BuffModDropdown_durationLocation1#i:durationLocation1#o:durationLocation1:" .. constants.DURATION_LOCATION_DEFAULT .. "#Default#Left of the name#Right of the name#Above the name#Below the name");
 
-		optionsAddObject( -5,   15, "font#tl:70:%y#v:ChatFontNormal#Justify (when alone):");
+		optionsAddObject( -5,   15, "font#tl:70:%y#v:ChatFontNormal#n:CT_BuffMod_Style1JustifyLabel3#Justify (when alone):");
 		optionsAddObject( 15,   20, "dropdown#tl:180:%y#s:80:%s#n:CT_BuffModDropdown_timeJustifyNoName1#i:timeJustifyNoName1#o:timeJustifyNoName1:" .. constants.JUSTIFY_DEFAULT .. "#Default#Left#Right#Center");
 
 		-- Show time remaining bar
@@ -10321,19 +10427,19 @@ module.frame = function()
 		optionsAddObject(  6,   26, "checkbutton#tl:66:%y#i:showTimerBackground1#o:showTimerBackground1:true#Show the bar's background");
 
 		-- Spacing between left side of detail frame and text
-		optionsAddObject(-15,   14, "font#tl:35:%y#v:ChatFontNormal#Text offset (left side):");
+		optionsAddObject(-15,   14, "font#tl:35:%y#v:ChatFontNormal#n:CT_BuffMod_Style1OffsetLabel1#Text offset (left side):");
 		optionsAddObject( 15,   17, "slider#tl:190:%y#s:100:%s#i:spacingOnLeft1#o:spacingOnLeft1:0#<value>#0:50:1");
 
 		-- Spacing between right side of detail frame and text
-		optionsAddObject(-20,   14, "font#tl:35:%y#v:ChatFontNormal#Text offset (right side):");
+		optionsAddObject(-20,   14, "font#tl:35:%y#v:ChatFontNormal#n:CT_BuffMod_Style1OffsetLabel2#Text offset (right side):");
 		optionsAddObject( 15,   17, "slider#tl:190:%y#s:100:%s#i:spacingOnRight1#o:spacingOnRight1:0#<value>#0:50:1");
 
 
 		-- Style 2
-		optionsAddObject(-25, 1*13, "font#tl:22:%y#Style 2 (icon and time)");
+		optionsAddObject(552, 1*13, "font#tl:22:%y#n:CT_BuffMod_Style2Label#Style 2 (icon and time)");
 
 		-- Icon size
-		optionsAddObject(-20,   14, "font#tl:35:%y#v:ChatFontNormal#Size of the icon:");
+		optionsAddObject(-20,   14, "font#tl:35:%y#n:CT_BuffMod_Style2SizeLabel#v:ChatFontNormal#Size of the icon:");
 		optionsAddObject( 15,   17, "slider#tl:165:%y#s:120:%s#i:buffSize2#o:buffSize2:" .. constants.BUFF_SIZE_DEFAULT .. "#<value>#" .. constants.BUFF_SIZE_MINIMUM ..":" .. constants.BUFF_SIZE_MAXIMUM .. ":1");
 
 		-- Color code border of debuff icons
@@ -10344,17 +10450,35 @@ module.frame = function()
 		--	Location
 		optionsAddObject( -6,   26, "checkbutton#tl:30:%y#i:showTimers2#o:showTimers2:true#Show time remaining text");
 
-		optionsAddObject( -2,   15, "font#tl:70:%y#v:ChatFontNormal#Format:");
+		optionsAddObject( -2,   15, "font#tl:70:%y#n:CT_BuffMod_Style2FormatLabel#v:ChatFontNormal#Format:");
 		optionsAddObject( 12,   20, "dropdown#tl:115:%y#s:145:%s#n:CT_BuffModDropdown_durationFormat2#i:durationFormat2#o:durationFormat2:1#1 hour  /  30 minutes#1 hour  /  30 min#1h  /  30m#1h 22m  /  30m 45s#1:22h  /  30:45");
 		
 		optionsAddObject(  6,   26, "checkbutton#tl:66:%y#i:CTBuffMod_showDaysFormat2#o:showDays2:true#Show days if >24 hours");
 		
-		optionsAddObject( -6,   15, "font#tl:70:%y#v:ChatFontNormal#Location:");
-		optionsAddObject( 12,   20, "dropdown#tl:115:%y#s:145:%s#n:CT_BuffModDropdown_dataSide2#i:dataSide2#o:dataSide2:" .. constants.DATA_SIDE_BOTTOM .. "#Left#Right#Above#Below");
+		optionsAddObject( -6,   15, "font#tl:70:%y#n:CT_BuffMod_Style2LocationLabel#v:ChatFontNormal#Location:");
+		optionsAddObject( 12,   20, "dropdown#tl:115:%y#s:145:%s#n:CT_BuffModDropdown_dataSide2#i:dataSide2#o:dataSide2:" .. constants.DATA_SIDE_BOTTOM .. "#Left#Right#Above#Below#Center");
 
 		-- Spacing between icon and text
-		optionsAddObject(-17,   14, "font#tl:70:%y#v:ChatFontNormal#Offset from icon:");
-		optionsAddObject( 15,   17, "slider#tl:190:%y#s:100:%s#i:spacingFromIcon2#o:spacingFromIcon2:0#<value>#0:50:1");
+		optionsAddObject(-17,   14, "font#tl:70:%y#n:CT_BuffMod_Style2OffsetLabel#v:ChatFontNormal#Offset from icon:");
+		optionsBeginFrame(15,   17, "slider#tl:190:%y#s:100:%s#i:spacingFromIcon2#o:spacingFromIcon2:0#<value>#0:50:1");
+			optionsAddScript("onupdate",
+				function(self)
+					if (L_UIDropDownMenu_GetSelectedID(CT_BuffModDropdown_dataSide2) == constants.DATA_SIDE_CENTER) then
+						self:Disable();
+						spacingFromIcon2Low:SetTextColor(.5,.5,.5)
+						spacingFromIcon2Text:SetTextColor(.5,.5,.5)
+						spacingFromIcon2High:SetTextColor(.5,.5,.5)
+					else
+						self:Enable();
+						spacingFromIcon2Low:SetTextColor(1,1,1);
+						spacingFromIcon2Text:SetTextColor(1,1,1)
+						spacingFromIcon2High:SetTextColor(1,1,1)
+					end
+				end
+			);
+		optionsEndFrame();
+		
+		optionsAddObject( -85, 2*14, "font#t:0:%y#s:0:%s#l:13:0#n:CT_BuffMod_Style2ContinueLabel#r#Continue scrolling for further options#" .. textColor2 .. ":l");
 
 
 		----------
@@ -10385,7 +10509,7 @@ module.frame = function()
 		);
 	optionsEndFrame();
 
-	optionsBeginFrame(-25, 0, "frame#tl:0:%y#br:tr:0:%b");
+	optionsBeginFrame(-244	, 0, "frame#tl:0:%y#br:tr:0:%b");
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Reset Options");
 		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:resetAll#Reset options for all of your characters");
 		optionsBeginFrame(  -5,   30, "button#t:0:%y#s:120:%s#v:UIPanelButtonTemplate#Reset options");

@@ -1,5 +1,5 @@
 ## Interface: 80100
-## Version: 8.1.5.1
+## Version: 8.1.5.2
 ## Title: CT_RaidAssist
 ## Notes: Allows you to monitor Raid HP.
 ## DefaultState: Enabled
@@ -34,6 +34,6 @@ CT_RAOptions.xml
 CT_RAMenu.xml
 CT_RADetectSpells.xml
 CT_RATarget.xml
-CT_RAChanges.xml
+# CT_RAChanges.xml  # Repaced in 8.1.5.2 with CT_RAChanges_DisplayDialog() in CT_RASlashCmds.lua
 CT_RAMeters.xml
 CT_RATab.lua
