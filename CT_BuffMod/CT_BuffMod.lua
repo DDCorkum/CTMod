@@ -6958,8 +6958,11 @@ function primaryClass:registerAuraFrameEvents()
 
 	auraFrame:RegisterEvent("PLAYER_REGEN_DISABLED");
 	auraFrame:RegisterEvent("PLAYER_REGEN_ENABLED");
-	auraFrame:RegisterEvent("UNIT_ENTERED_VEHICLE");
-	auraFrame:RegisterEvent("UNIT_EXITED_VEHICLE");
+	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+		-- WoW 3.0 and later, but not WoW Classic
+		auraFrame:RegisterEvent("UNIT_ENTERED_VEHICLE");
+		auraFrame:RegisterEvent("UNIT_EXITED_VEHICLE");
+	end
 	if (CT_BuffMod_xoptUnits) then
 		auraFrame:RegisterEvent("PLAYER_TARGET_CHANGED");
 		auraFrame:RegisterEvent("PLAYER_FOCUS_CHANGED");
@@ -6978,8 +6981,11 @@ function primaryClass:unregisterAuraFrameEvents()
 
 	auraFrame:UnregisterEvent("PLAYER_REGEN_DISABLED");
 	auraFrame:UnregisterEvent("PLAYER_REGEN_ENABLED");
-	auraFrame:UnregisterEvent("UNIT_ENTERED_VEHICLE");
-	auraFrame:UnregisterEvent("UNIT_EXITED_VEHICLE");
+	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+		-- WoW 3.0 and later, but not WoW Classic
+		auraFrame:UnregisterEvent("UNIT_ENTERED_VEHICLE");
+		auraFrame:UnregisterEvent("UNIT_EXITED_VEHICLE");
+	end
 	if (CT_BuffMod_xoptUnits) then
 		auraFrame:UnregisterEvent("PLAYER_TARGET_CHANGED");
 		auraFrame:UnregisterEvent("PLAYER_FOCUS_CHANGED");

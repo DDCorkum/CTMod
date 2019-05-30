@@ -8,3 +8,4 @@
 
 CT_MapMod.xml
 CT_MapMod.lua
+localization.lua

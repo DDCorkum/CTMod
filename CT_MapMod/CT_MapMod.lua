@@ -68,7 +68,7 @@ local function CT_MapMod_Initialize()		-- called via module.update("init") from 
 			{ ["name"] = "Liferoot", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Liferoot" }, -- 18
 			{ ["name"] = "Mageroyal", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Mageroyal" }, -- 19
 			{ ["name"] = "Mountain Silversage", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_MountainSilversage" }, -- 20
-			{ ["name"] = "Peacebloom", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Peacebloom" }, -- 21
+			{ ["name"] = "Peacebloom", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Peacebloom", ["id"] = 2447, ["frFR"] = "Pacifique" }, -- 21
 			{ ["name"] = "Plaguebloom", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Plaguebloom" }, -- 22
 			{ ["name"] = "Purple Lotus", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_PurpleLotus" }, -- 23
 			{ ["name"] = "Silverleaf", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Silverleaf" }, -- 24
@@ -194,9 +194,11 @@ local function CT_MapMod_Initialize()		-- called via module.update("init") from 
 	-- load the DataProvider which has most of the horsepower
 	WorldMapFrame:AddDataProvider(CreateFromMixins(CT_MapMod_DataProviderMixin));
 	
-	-- flight path map
-	if (not FlightMapFrame) then FlightMap_LoadUI(); end
-	FlightMapFrame:AddDataProvider(CreateFromMixins(CT_MapMod_DataProviderMixin));
+	-- flight path map in the retail version only
+	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+		if (not FlightMapFrame) then FlightMap_LoadUI(); end
+		FlightMapFrame:AddDataProvider(CreateFromMixins(CT_MapMod_DataProviderMixin));
+	end
 	
 end
 
@@ -218,7 +220,12 @@ function CT_MapMod_DataProviderMixin:RefreshAllData(fromOnShow)
 	module.PinHasFocus = nil;  --rather than calling this for each pin, just call it once when all pins are gone.
 	
 	-- determine what types of notes to show
-	local prof1, prof2 = GetProfessions();
+	local prof1, prof2;
+	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+		prof1, prof2 = GetProfessions();
+	else
+		-- TODO: some other method of getting professions on classic servers
+	end
 	local name, icon, skillLevel, maxSkillLevel, numAbilities, spellOffset, skillLine, skillModifier, specializationIndex, specializationOffset;
 	if (prof1) then 
 		name, icon, skillLevel, maxSkillLevel, numAbilities, spellOffset, skillLine, skillModifier, specializationIndex, specializationOffset = GetProfessionInfo(prof1)
@@ -430,7 +437,8 @@ function CT_MapMod_PinMixin:ApplyCurrentScale()
 	local startScale = 0.80;
 	local endScale = 1.60;
 	local scaleFactor = 1;
-	if (WorldMapFrame:IsMaximized()) then
+	if ((module:getGameVersion() == CT_GAME_VERSION_CLASSIC) or (WorldMapFrame:IsMaximized())) then
+		-- This is WoW Classic, or this is WoW Retail and the window is maximized
 		scale = 1.5 / self:GetMap():GetCanvasScale() * Lerp(startScale, endScale, Saturate(scaleFactor * self:GetMap():GetCanvasZoomPercent()))
 	else
 		scale = 1.0 / self:GetMap():GetCanvasScale() * Lerp(startScale, endScale, Saturate(scaleFactor * self:GetMap():GetCanvasZoomPercent()))
@@ -445,7 +453,7 @@ function CT_MapMod_PinMixin:ApplyCurrentScale()
 end
 
 function CT_MapMod_PinMixin:ApplyCurrentAlpha()
-	if (WorldMapFrame:IsMaximized()) then
+	if ((module:getGameVersion() == CT_GAME_VERSION_CLASSIC) or (WorldMapFrame:IsMaximized())) then
 		self:SetAlpha(Lerp( 0.3 + 0.7*((module:getOption("CT_MapMod_AlphaAmount")) or 0.75), 1.00, Saturate(1.00 * self:GetMap():GetCanvasZoomPercent())));
 	else
 		self:SetAlpha(Lerp( 0.0 + 1.0*((module:getOption("CT_MapMod_AlphaAmount")) or 0.75), 1.00, Saturate(1.00 * self:GetMap():GetCanvasZoomPercent())));
@@ -510,13 +518,16 @@ function CT_MapMod_PinMixin:CreateNotePanel()
 	-- Create the note panel that is associated to this pin	
 	self.notepanel = CreateFrame("FRAME",nil,self:GetMap().BorderFrame,"CT_MapMod_NoteTemplate");
 	self.notepanel:SetScale(1.2);
+	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+		self.notepanel:SetFrameStrata("FULLSCREEN_DIALOG");
+	end
 	self.notepanel.pin = self;
 	local textColor0 = "1.0:1.0:1.0";
 	local textColor1 = "0.9:0.9:0.9";
 	local textColor2 = "0.7:0.7:0.7";
 	local textColor3 = "0.9:0.72:0.0";
 	module:getFrame (
-		{	["button#s:80:25#br:b:-42:16#v:GameMenuButtonTemplate#Okay"] = {
+		{	["button#s:80:25#br:b:-42:16#v:GameMenuButtonTemplate#" .. module.text.Okay] = {
 				["onclick"] = function(self, arg1)
 					local pin = self:GetParent().pin;
 					local set = L_UIDropDownMenu_GetText(self:GetParent().setdropdown);
@@ -542,7 +553,7 @@ function CT_MapMod_PinMixin:CreateNotePanel()
 					pin:OnAcquired(pin.mapid, pin.i, pin.x, pin.y, self:GetParent().namefield:GetText() or pin.name, self:GetParent().descriptfield:GetText() or pin.descript, set, subset, date("%Y%m%d"), MODULE_VERSION );
 				end,
 			},
-			["button#s:80:25#b:b:0:16#v:GameMenuButtonTemplate#Cancel"] = {
+			["button#s:80:25#b:b:0:16#v:GameMenuButtonTemplate#" .. module.text.Cancel] = {
 				["onclick"] = function(self, arg1)
 					local pin = self:GetParent().pin;
 					self:GetParent():Hide();
@@ -552,7 +563,7 @@ function CT_MapMod_PinMixin:CreateNotePanel()
 					pin:OnAcquired(pin.mapid, pin.i, pin.x, pin.y, pin.name, pin.descript, pin.set, pin.subset, pin.datemodified, pin.version);
 				end,
 			},
-			["button#s:80:25#bl:b:42:16#v:GameMenuButtonTemplate#Delete"] = {
+			["button#s:80:25#bl:b:42:16#v:GameMenuButtonTemplate#" .. module.text.Delete] = {
 				["onclick"] = function(self, arg1)
 					local pin = self:GetParent().pin;
 					tremove(CT_MapMod_Notes[pin.mapid],pin.i);
@@ -583,7 +594,7 @@ function CT_MapMod_PinMixin:CreateNotePanel()
 					end);
 				end,
 			},
-			["font#l:tl:15:-30#Name#" .. textColor2 .. ":l"] = { },
+			["font#l:tl:15:-30#" .. module.text.Name .. "#" .. textColor2 .. ":l"] = { },
 			["editbox#l:tl:55:-30#s:100:18#v:CT_MapMod_EditBoxTemplate"] = { 
 				["onload"] = function(self)
 					self:GetParent().namefield = self;
@@ -596,9 +607,9 @@ function CT_MapMod_PinMixin:CreateNotePanel()
 					end);
 				end,
 			},	
-			["font#l:tl:15:-60#Type#" .. textColor2 .. ":l"] = { },
-			["font#l:t:0:-60#Icon#" .. textColor2 .. ":l"] = { },
-			["font#l:tl:15:-90#Description#" .. textColor2 .. ":l"] = { },
+			["font#l:tl:15:-60#" .. module.text.Type .. "#" .. textColor2 .. ":l"] = { },
+			["font#l:t:0:-60#" .. module.text.Icon .. "#" .. textColor2 .. ":l"] = { },
+			["font#l:tl:15:-90#" .. module.text.Description .. "#" .. textColor2 .. ":l"] = { },
 			["editbox#l:tl:20:-110#s:290:18#v:CT_MapMod_EditBoxTemplate"] = { 
 				["onload"] = function(self)
 					self:GetParent().descriptfield = self;
@@ -725,10 +736,10 @@ function CT_MapMod_PinMixin:CreateNotePanel()
 		end
 
 		-- properties unique to each option
-		for i = 1, #module.NoteTypes["User"], 1 do
-			dropdownEntry.text = module.NoteTypes["User"][i]["name"];
-			dropdownEntry.value = module.NoteTypes["User"][i]["name"];
-			dropdownEntry.icon = module.NoteTypes["User"][i]["icon"];
+		for i, type in ipairs(module.NoteTypes["User"]) do
+			dropdownEntry.text = type[GetLocale()] or type["name"];
+			dropdownEntry.value = type["name"];
+			dropdownEntry.icon = type["icon"];
 			if (dropdownEntry.value == (self.notepanel.usersubsetdropdown.unapprovedValue or self.subset)) then
 				dropdownEntry.checked = true;
 			elseif (not self.notepanel.usersubsetdropdown.unapprovedValue and self.set ~= "User" and i == 1) then
@@ -760,10 +771,10 @@ function CT_MapMod_PinMixin:CreateNotePanel()
 		end
 
 		-- properties unique to each option
-		for i = 1, #module.NoteTypes["Herb"], 1 do
-			dropdownEntry.text = module.NoteTypes["Herb"][i]["name"];
-			dropdownEntry.value = module.NoteTypes["Herb"][i]["name"];
-			dropdownEntry.icon = module.NoteTypes["Herb"][i]["icon"];
+		for i, type in ipairs(module.NoteTypes["Herb"]) do
+			dropdownEntry.text = type[GetLocale()] or type["name"];
+			dropdownEntry.value = type["name"];
+			dropdownEntry.icon = type["icon"];
 			if (dropdownEntry.value == (self.notepanel.herbsubsetdropdown.unapprovedValue or self.subset)) then
 				dropdownEntry.checked = true;
 			elseif (not self.notepanel.herbsubsetdropdown.unapprovedValue and self.set ~= "Herb" and i == 1) then
@@ -795,10 +806,10 @@ function CT_MapMod_PinMixin:CreateNotePanel()
 		end
 
 		-- properties unique to each option
-		for i = 1, #module.NoteTypes["Ore"], 1 do
-			dropdownEntry.text = module.NoteTypes["Ore"][i]["name"];
-			dropdownEntry.value = module.NoteTypes["Ore"][i]["name"];
-			dropdownEntry.icon = module.NoteTypes["Ore"][i]["icon"];
+		for i, type in ipairs(module.NoteTypes["Ore"]) do
+			dropdownEntry.text = type[GetLocale()] or type["name"];
+			dropdownEntry.value = type["name"];
+			dropdownEntry.icon = type["icon"];
 			if (dropdownEntry.value == (self.notepanel.oresubsetdropdown.unapprovedValue or self.subset)) then
 				dropdownEntry.checked = true;
 			elseif (not self.notepanel.oresubsetdropdown.unapprovedValue and self.set ~= "Ore" and i == 1) then
@@ -849,6 +860,9 @@ do
 			},
 			["button#n:CT_MapMod_CreateNoteButton#s:75:16#tr:tr:-125:-3#v:UIPanelButtonTemplate#New Pin"] =	{
 				["onload"] = function(self)
+					if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+						self:SetFrameStrata("FULLSCREEN_DIALOG");
+					end
 					WorldMapFrame:AddCanvasClickHandler(function(canvas, button)
 						if (not module.isCreatingNote) then return; end
 						module.isCreatingNote = nil;
@@ -877,7 +891,7 @@ do
 						if (not module.isCreatingNote) then
 							newpinmousestart = GetCursorPosition(); --only interested in the X coord
 							local value = module:getOption("CT_MapMod_CreateNoteButtonX") or -125;
-							if (WorldMapFrame:IsMaximized()) then
+							if ((module:getGameVersion() == CT_GAME_VERSION_CLASSIC) or (WorldMapFrame:IsMaximized())) then
 								if (value < 75 - WorldMapFrame:GetWidth()) then module:setOption("CT_MapMod_CreateNoteButtonX", 75 - WorldMapFrame:GetWidth(), true, true); end
 							elseif (WorldMapFrame.SidePanelToggle.OpenButton:IsShown()) then
 								if (value < -535) then module:setOption("CT_MapMod_CreateNoteButtonX", -535, true, true); end
@@ -894,7 +908,7 @@ do
 						local value = module:getOption("CT_MapMod_CreateNoteButtonX") or -125;
 						value = value + (GetCursorPosition() - newpinmousestart);
 						if (value > -125) then value = -125; end
-						if (WorldMapFrame:IsMaximized()) then
+						if ((module:getGameVersion() == CT_GAME_VERSION_CLASSIC) or (WorldMapFrame:IsMaximized())) then
 							if (value < 75 - WorldMapFrame:GetWidth()) then value = 75 - WorldMapFrame:GetWidth(); end
 						elseif (WorldMapFrame.SidePanelToggle.OpenButton:IsShown()) then
 							if (value < -535) then value = -535; end
@@ -923,25 +937,25 @@ do
 							-- Currently dragging the frame
 							value = value + (GetCursorPosition() - newpinmousestart);
 							if (value > -125) then value = -125; end
-							if (WorldMapFrame:IsMaximized()) then
+							if ((module:getGameVersion() == CT_GAME_VERSION_CLASSIC) or (WorldMapFrame:IsMaximized())) then
 								if (value < 75 - WorldMapFrame:GetWidth()) then value = 75 - WorldMapFrame:GetWidth(); end
 							elseif (WorldMapFrame.SidePanelToggle.OpenButton:IsShown()) then
 								if (value < -535) then value = -535; end
 							else
 								if (value < -820) then value = -820; end
 							end
-						elseif (not WorldMapFrame:IsMaximized() and WorldMapFrame.SidePanelToggle.OpenButton:IsShown()) then
+						elseif (module:getGameVersion() == CT_GAME_VERSION_RETAIL and not WorldMapFrame:IsMaximized() and WorldMapFrame.SidePanelToggle.OpenButton:IsShown()) then
 							-- Minimized without quest frame
 							if (value < -225 and value > -350) then value = -225; end
 							if (value < -350 and value > -477) then value = -477; end
 							if (value < -535) then value = -535; end
-						elseif (not WorldMapFrame:IsMaximized() and WorldMapFrame.SidePanelToggle.CloseButton:IsShown()) then
+						elseif (module:getGameVersion() == CT_GAME_VERSION_RETAIL and not WorldMapFrame:IsMaximized() and WorldMapFrame.SidePanelToggle.CloseButton:IsShown()) then
 							-- Minimized with quest frame
 							if (value < -370 and value > -495) then value = -370; end
 							if (value < -495 and value > -622) then value = -622; end
 							if (value < -820) then value = -820; end
 						else
-							-- Maximized
+							-- Maximized (or WoW Classic)
 							if (value < 75 - WorldMapFrame:GetWidth()) then value = 75 - WorldMapFrame:GetWidth(); end
 							if (value < -(WorldMapFrame:GetWidth()/2)+90 and value > -(WorldMapFrame:GetWidth()/2)) then value = -(WorldMapFrame:GetWidth()/2)+90; end
 							if (value < -(WorldMapFrame:GetWidth()/2) and value > -(WorldMapFrame:GetWidth()/2)-90) then value = -(WorldMapFrame:GetWidth()/2)-90; end
@@ -996,6 +1010,9 @@ do
 					end
 				end,
 				["onload"] = function(self)
+					if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+						self:SetFrameStrata("FULLSCREEN_DIALOG");
+					end
 					self:ClearAllPoints();
 					self:SetPoint("LEFT",CT_MapMod_CreateNoteButton,"RIGHT",0,0);
 					self:RegisterForDrag("RightButton");
@@ -1003,7 +1020,7 @@ do
 						if (not module.isCreatingNote) then
 							newpinmousestart = GetCursorPosition(); --only interested in the X coord
 							local value = module:getOption("CT_MapMod_CreateNoteButtonX") or -125;
-							if (WorldMapFrame:IsMaximized()) then
+							if ((module:getGameVersion() == CT_GAME_VERSION_CLASSIC) or (WorldMapFrame:IsMaximized())) then
 								if (value < 75 - WorldMapFrame:GetWidth()) then module:setOption("CT_MapMod_CreateNoteButtonX", 75 - WorldMapFrame:GetWidth(), true, true); end
 							elseif (WorldMapFrame.SidePanelToggle.OpenButton:IsShown()) then
 								if (value < -535) then module:setOption("CT_MapMod_CreateNoteButtonX", -535, true, true); end
@@ -1020,7 +1037,7 @@ do
 						local value = module:getOption("CT_MapMod_CreateNoteButtonX") or -125;
 						value = value + (GetCursorPosition() - newpinmousestart);
 						if (value > -125) then value = -125; end
-						if (WorldMapFrame:IsMaximized()) then
+						if ((module:getGameVersion() == CT_GAME_VERSION_CLASSIC) or (WorldMapFrame:IsMaximized())) then
 							if (value < 75 - WorldMapFrame:GetWidth()) then value = 75 - WorldMapFrame:GetWidth(); end
 						elseif (WorldMapFrame.SidePanelToggle.OpenButton:IsShown()) then
 							if (value < -535) then value = -535; end
@@ -1037,6 +1054,9 @@ do
 			},
 		["frame#n:CT_MapMod_px#s:40:16#bl:b:-140:0"] = { 
 				["onload"] = function(self)
+					if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+						self:SetFrameStrata("FULLSCREEN_DIALOG");
+					end
 					module.px = self
 					self.text = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
 				end,
@@ -1056,6 +1076,9 @@ do
 			},
 		["frame#n:CT_MapMod_py#s:40:16#bl:b:-100:0"] =  { 
 				["onload"] = function(self)
+					if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+						self:SetFrameStrata("FULLSCREEN_DIALOG");
+					end
 					module.py = self
 					self.text = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
 				end,
@@ -1075,6 +1098,9 @@ do
 			},
 		["frame#n:CT_MapMod_cx#s:40:16#bl:b:70:0"] =  { 
 				["onload"] = function(self)
+					if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+						self:SetFrameStrata("FULLSCREEN_DIALOG");
+					end
 					module.cx = self
 					self.text = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
 				end,
@@ -1089,6 +1115,9 @@ do
 			},
 		["frame#n:CT_MapMod_cy#s:40:16#bl:b:110:0"] =  { 
 				["onload"] = function(self)
+					if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+						self:SetFrameStrata("FULLSCREEN_DIALOG");
+					end
 					module.cy = self
 					self.text = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
 
@@ -1178,7 +1207,7 @@ do
 				for i, val in ipairs(herbskills) do
 					if (arg4 == val) then
 						for j, type in ipairs(module.NoteTypes["Herb"]) do
-							if (type["name"] == arg2 and not type["ignoregather"]) then
+							if ( ((type[GetLocale()] or type["name"]) == arg2) and (not type["ignoregather"]) ) then
 								local istooclose = nil;
 								if (not CT_MapMod_Notes[mapid]) then CT_MapMod_Notes[mapid] = { }; end
 								for k, note in ipairs(CT_MapMod_Notes[mapid]) do
@@ -1196,7 +1225,7 @@ do
 									local newnote = {
 										["x"] = x,
 										["y"] = y,
-										["name"] = arg2,
+										["name"] = type[GetLocale()] or arg2,
 										["set"] = "Herb",
 										["subset"] = arg2,
 										["descript"] = "",
@@ -1239,7 +1268,7 @@ do
 									local newnote = {
 										["x"] = x,
 										["y"] = y,
-										["name"] = arg2,
+										["name"] = type[GetLocale()] or arg2,
 										["set"] = "Ore",
 										["subset"] = arg2,
 										["descript"] = "",
