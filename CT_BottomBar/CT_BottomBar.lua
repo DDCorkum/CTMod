@@ -537,11 +537,12 @@ local function registerEvents()
 
 	local frame = CT_BottomBar_Frame;
 
---	frame:RegisterEvent("UNIT_ENTERING_VEHICLE");
---	frame:RegisterEvent("UNIT_EXITING_VEHICLE");
-
-	frame:RegisterEvent("UNIT_ENTERED_VEHICLE");
-	frame:RegisterEvent("UNIT_EXITED_VEHICLE");
+	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+		-- frame:RegisterEvent("UNIT_ENTERING_VEHICLE");
+		-- frame:RegisterEvent("UNIT_EXITING_VEHICLE");
+		frame:RegisterEvent("UNIT_ENTERED_VEHICLE");
+		frame:RegisterEvent("UNIT_EXITED_VEHICLE");
+	end
 
 	frame:RegisterEvent("PLAYER_REGEN_ENABLED");
 	frame:RegisterEvent("PLAYER_REGEN_DISABLED");
@@ -587,28 +588,35 @@ local function hook_UIParent_ManageFramePositions()
 	StanceBarFrame:HookScript("OnShow", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
 	StanceBarFrame:HookScript("OnHide", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
 
-	-- From PossessActionBarFrame.xml
-	PossessBarFrame:HookScript("OnShow", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
-	PossessBarFrame:HookScript("OnHide", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
-
 	-- From DurabilityFrame.xml
 	DurabilityFrame:HookScript("OnShow", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
 	DurabilityFrame:HookScript("OnHide", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
-
-	-- From MainMenuBar.xml
-	-- (Requires overhaul in WoW 8.0.1) MainMenuBarMaxLevelBar:HookScript("OnShow", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
-	-- (Requires overhaul in WoW 8.0.1) MainMenuBarMaxLevelBar:HookScript("OnHide", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
-
-	-- From MultiCastActionBarFrame.xml
-	MultiCastActionBarFrame:HookScript("OnShow", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
-	MultiCastActionBarFrame:HookScript("OnHide", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
 
 	-- From PetActionBarFrame.xml
 	PetActionBarFrame:HookScript("OnShow", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
 	PetActionBarFrame:HookScript("OnHide", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
 
-	-- From ReputationFrame.xml
-	-- (Requires overhaul in WoW 8.0.1) ReputationWatchBar:HookScript("OnHide", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
+	
+	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+	
+		-- From PossessActionBarFrame.xml
+		PossessBarFrame:HookScript("OnShow", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
+		PossessBarFrame:HookScript("OnHide", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
+
+		-- From MultiCastActionBarFrame.xml
+		MultiCastActionBarFrame:HookScript("OnShow", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
+		MultiCastActionBarFrame:HookScript("OnHide", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
+	
+	elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+
+		-- From MainMenuBar.xml
+		-- (Requires overhaul in WoW 8.0.1) MainMenuBarMaxLevelBar:HookScript("OnShow", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
+		-- (Requires overhaul in WoW 8.0.1) MainMenuBarMaxLevelBar:HookScript("OnHide", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
+	
+		-- From ReputationFrame.xml
+		-- (Requires overhaul in WoW 8.0.1) ReputationWatchBar:HookScript("OnHide", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
+	end
+	
 end
 
 local function hookFunctions()
@@ -651,7 +659,9 @@ module.update = function(self, optName, value)
 	configureActionBar();
 
 	-- Initialize some bars bar
-	module:initOverrideActionBar();
+	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+		module:initOverrideActionBar();
+	end
 	module:initMainMenuBar();
 
 	-- Make sure Blizzard managed frames are in position.
@@ -665,7 +675,9 @@ module.update = function(self, optName, value)
 	pendingOptions = module.pendingOptions;
 
 	-- Initialize some other lua files.
-	module:overrideInit();
+	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then	
+		module:overrideInit();
+	end
 	module:mainmenuInit();
 	module:optionsInit();
 	module:addonsInit();
@@ -676,20 +688,30 @@ module.update = function(self, optName, value)
 		--
 		-- "Experience Bar" needs to load before "Reputation Bar".
 		--
-		module:loadAddon("Action Bar Arrows");
-		module:loadAddon("Bags Bar");
-		module:loadAddon("Class Bar");
-		-- (Replaced by status bar) module:loadAddon("Experience Bar");
-		-- (Replaced by status bar) module:loadAddon("Reputation Bar");  -- Show after exp bar in options window
-		module:loadAddon("Extra Bar");
-		module:loadAddon("Menu Bar");
-		module:loadAddon("Pet Bar");
-		module:loadAddon("Possess Bar");
-		module:loadAddon("MultiCastBar");  -- Totem bar
-		module:loadAddon("Vehicle Bar");
-		module:loadAddon("Status Bar");
-		module:loadAddon("Framerate Bar");
-		module:loadAddon("Talking Head");
+		if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then	
+			module:loadAddon("Action Bar Arrows");
+			module:loadAddon("Bags Bar");
+			module:loadAddon("Class Bar");
+			module:loadAddon("Extra Bar");
+			module:loadAddon("Menu Bar");
+			module:loadAddon("Pet Bar");
+			module:loadAddon("Possess Bar");
+			module:loadAddon("MultiCastBar");  -- Totem bar
+			module:loadAddon("Vehicle Bar");
+			module:loadAddon("Status Bar");
+			module:loadAddon("Framerate Bar");
+			module:loadAddon("Talking Head");
+		elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+			-- module:loadAddon("Action Bar Arrows");
+			module:loadAddon("Bags Bar");
+			-- module:loadAddon("Experience Bar");
+			-- module:loadAddon("Reputation Bar");  -- Show after exp bar in options window
+			module:loadAddon("Menu Bar");
+			module:loadAddon("Pet Bar");
+			module:loadAddon("MultiCastBar");  -- Totem bar
+			-- module:loadAddon("Vehicle Bar");
+			module:loadAddon("Framerate Bar");		
+		end
 	end
 
 	-- Hook some functions.

@@ -11,7 +11,7 @@
 local _G = getfenv(0);
 local module = _G.CT_Core;
 local NUM_CHAT_WINDOWS = NUM_CHAT_WINDOWS;
-local WatchFrame = ObjectiveTrackerFrame
+local WatchFrame = ObjectiveTrackerFrame or QuestWatchFrame;  -- QuestWatchFrame in WoW Classic
 --------------------------------------------
 -- Quest Levels
 
@@ -161,7 +161,9 @@ do
 	-- blocking to its original state.
 	module:regEvent("PLAYER_LEAVING_WORLD", restoreBlockState);
 	module:regEvent("BANKFRAME_CLOSED", restoreBlockState);
-	module:regEvent("GUILDBANKFRAME_CLOSED", restoreBlockState);
+	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+		module:regEvent("GUILDBANKFRAME_CLOSED", restoreBlockState);
+	end
 
 	-- If the bank frame has just opened, and the user wants to block while
 	-- at the bank, then start blocking.
@@ -173,12 +175,14 @@ do
 
 	-- If the guild bank frame has just opened, and the user wants to block while
 	-- at the guild bank, then start blocking.
-	module:regEvent("GUILDBANKFRAME_OPENED", function()
-		if (blockOption) then
-			enableBlockState();
-		end
-	end);
-
+	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+		module:regEvent("GUILDBANKFRAME_OPENED", function()
+			if (blockOption) then
+				enableBlockState();
+			end
+		end);
+	end
+	
 	-- Configure blocking option.
 	module.configureBlockTradesBank = function(block)
 		blockOption = block; -- Save the option's value in a local variable
@@ -1156,11 +1160,21 @@ CT_Core_ContainerFrameItemButton_OnModifiedClick_Register(CT_Core_AddToAuctions)
 local function hide_gryphons()
 	if (CT_BottomBar) then return; end
 	if (module:getOption("hideGryphons")) then
-		MainMenuBarArtFrame.LeftEndCap:Hide();
-		MainMenuBarArtFrame.RightEndCap:Hide();
+		if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+			MainMenuBarArtFrame.LeftEndCap:Hide();
+			MainMenuBarArtFrame.RightEndCap:Hide();
+		elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+			MainMenuBarLeftEndCap:Hide();
+			MainMenuBarRightEndCap:Hide();
+		end
 	else
-		MainMenuBarArtFrame.LeftEndCap:Show();
-		MainMenuBarArtFrame.RightEndCap:Show();
+		if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+			MainMenuBarArtFrame.LeftEndCap:Show();
+			MainMenuBarArtFrame.RightEndCap:Show();
+		elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+			MainMenuBarLeftEndCap:Show();
+			MainMenuBarRightEndCap:Show();
+		end
 	end
 end
 
@@ -1270,17 +1284,31 @@ local function castingbar_CreateAnchorFrame()
 			-- 	<OnHide function="UIParent_ManageFramePositions"/>
 			StanceBarFrame:HookScript("OnShow", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
 			StanceBarFrame:HookScript("OnHide", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
-			PossessBarFrame:HookScript("OnShow", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
-			PossessBarFrame:HookScript("OnHide", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
+			
+					if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+						MainMenuBarArtFrame.LeftEndCap:Hide();
+						MainMenuBarArtFrame.RightEndCap:Hide();
+					elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+						MainMenuBarLeftEndCap:Hide();
+						MainMenuBarRightEndCap:Hide();
+		end
 			DurabilityFrame:HookScript("OnShow", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
 			DurabilityFrame:HookScript("OnHide", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
-			-- (Needs overhaul in WoW 8.0.1) MainMenuBarMaxLevelBar:HookScript("OnShow", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
-			-- (Needs overhaul in WoW 8.0.1) MainMenuBarMaxLevelBar:HookScript("OnHide", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
-			MultiCastActionBarFrame:HookScript("OnShow", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
-			MultiCastActionBarFrame:HookScript("OnHide", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
 			PetActionBarFrame:HookScript("OnShow", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
 			PetActionBarFrame:HookScript("OnHide", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
-			-- (Needs overhaul in WoW 8.0.1) ReputationWatchBar:HookScript("OnHide", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
+			-- (Removed in WoW 8.0.1) ReputationWatchBar:HookScript("OnHide", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
+			-- (Removed in WoW 8.0.1) MainMenuBarMaxLevelBar:HookScript("OnShow", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
+			-- (Removed in WoW 8.0.1) MainMenuBarMaxLevelBar:HookScript("OnHide", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
+			if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+				-- these don't happen in WoW Classic
+				MultiCastActionBarFrame:HookScript("OnShow", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
+				MultiCastActionBarFrame:HookScript("OnHide", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
+				PossessBarFrame:HookScript("OnShow", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
+				PossessBarFrame:HookScript("OnHide", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
+			elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+				--TODO: determine if anything needs to be here
+			end
+
 
 			-- By now GetCVar("uiScale") has a value, so if Blizzard_CombatLog is already loaded
 			-- then it won't cause an error when it tries to multiply by the uiScale.
@@ -1440,20 +1468,20 @@ do
 	--	Does not open or close any bags.
 
 	local events = {
-		["BANKFRAME_OPENED"]      = {option = "bankOpenBags", open = true, backpack = "bankOpenBackpack", nobags = "bankOpenNoBags", bank = "bankOpenBankBags"},
-		["BANKFRAME_CLOSED"]      = {option = "bankCloseBags"},
+		["BANKFRAME_OPENED"]      = {option = "bankOpenBags", open = true, backpack = "bankOpenBackpack", nobags = "bankOpenNoBags", bank = "bankOpenBankBags", classic = true},
+		["BANKFRAME_CLOSED"]      = {option = "bankCloseBags", classic = true},
 
 		["GUILDBANKFRAME_OPENED"] = {option = "gbankOpenBags", open = true, backpack = "gbankOpenBackpack", nobags = "gbankOpenNoBags"},
 		["GUILDBANKFRAME_CLOSED"] = {option = "gbankCloseBags"},
 
-		["MERCHANT_SHOW"]         = {option = "merchantOpenBags", open = true, backpack = "merchantOpenBackpack", nobags = "merchantOpenNoBags"},
-		["MERCHANT_CLOSED"]       = {option = "merchantCloseBags"},
+		["MERCHANT_SHOW"]         = {option = "merchantOpenBags", open = true, backpack = "merchantOpenBackpack", nobags = "merchantOpenNoBags", classic = true},
+		["MERCHANT_CLOSED"]       = {option = "merchantCloseBags", classic = true},
 
-		["AUCTION_HOUSE_SHOW"]    = {option = "auctionOpenBags", open = true, backpack = "auctionOpenBackpack", nobags = "auctionOpenNoBags"},
-		["AUCTION_HOUSE_CLOSED"]  = {option = "auctionCloseBags"},
+		["AUCTION_HOUSE_SHOW"]    = {option = "auctionOpenBags", open = true, backpack = "auctionOpenBackpack", nobags = "auctionOpenNoBags", classic = true},
+		["AUCTION_HOUSE_CLOSED"]  = {option = "auctionCloseBags", classic = true},
 
-		["TRADE_SHOW"]            = {option = "tradeOpenBags", open = true, backpack = "tradeOpenBackpack", nobags = "tradeOpenNoBags"},
-		["TRADE_CLOSED"]          = {option = "tradeCloseBags"},
+		["TRADE_SHOW"]            = {option = "tradeOpenBags", open = true, backpack = "tradeOpenBackpack", nobags = "tradeOpenNoBags", classic = true},
+		["TRADE_CLOSED"]          = {option = "tradeCloseBags", classic = true},
 
 		["VOID_STORAGE_OPEN"]     = {option = "voidOpenBags", open = true, backpack = "voidOpenBackpack", nobags = "voidOpenNoBags"},
 		["VOID_STORAGE_CLOSE"]    = {option = "voidCloseBags"},
@@ -1476,6 +1504,11 @@ do
 		
 		if (module:getOption("disableBagAutomation")) then
 			-- Bag automation is completely disabled, so go no further
+			return;
+		end
+		
+		if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC and not data.classic) then
+			-- This didn't exist in vanilla/classic WoW, so go no further
 			return;
 		end
 
@@ -1530,7 +1563,10 @@ do
 	end
 
 	for event, data in pairs(events) do
-		module:regEvent(event, onEvent);
+		if (module:getGameVersion() == CT_GAME_VERSION_RETAIL or data.classic) then
+			-- register all events, or just the ones that are in WoW Classic
+			module:regEvent(event, onEvent);
+		end
 	end
 end
 
@@ -1898,7 +1934,7 @@ do
 			-- when the WatchFrameHeader is shown.
 			-- Also show our watchFrame if at least one auto quest pop up frame is shown, even if
 			-- there are no objectives being tracked. These pop up frames have a height of 82.
-			if (ObjectiveTrackerFrame:IsShown() or (GetNumAutoQuestPopUps() or 0) > 0) then
+			if (WatchFrame:IsShown() or (GetNumAutoQuestPopUps() or 0) > 0) then
 				watchFrame:Show();
 			else
 				-- Blizzard hid their WatchFrame, so hide ours also.
@@ -2459,11 +2495,13 @@ local powerbaraltShowAnchor;
 local powerbaralt__createAnchorFrame;
 
 local function powerbaralt_reanchor()
+	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return; end
 	PlayerPowerBarAlt:ClearAllPoints();
 	PlayerPowerBarAlt:SetPoint("CENTER", powerbaraltAnchorFrame, "CENTER", 0, 0);
 end
 
 local function powerbaralt_resetPosition()
+	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return; end
 	local self = powerbaraltAnchorFrame;
 	self:ClearAllPoints();
 	self:SetPoint("BOTTOM", UIParent, "BOTTOM", 0, 150);
@@ -2472,6 +2510,7 @@ end
 module.powerbaralt_resetPosition = powerbaralt_resetPosition;
 
 local function powerbaralt_updateAnchorVisibility()
+	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return; end
 	local self = powerbaraltAnchorFrame;
 	if (not self) then
 		powerbaralt__createAnchorFrame();
@@ -2493,6 +2532,7 @@ local function powerbaralt_updateAnchorVisibility()
 end
 
 local function powerbaralt_isModifiedButton()
+	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return; end
 	local modifier = module:getOption("powerbaraltModifier") or 1;
 	local alt = IsAltKeyDown();
 	local control = IsControlKeyDown();
@@ -2512,6 +2552,7 @@ local function powerbaralt_isModifiedButton()
 end
 
 local function powerbaralt_onMouseDown(self, button)
+	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return; end
 	if (powerbaraltEnabled and powerbaraltMovable) then
 		if ( button == "LeftButton" and powerbaralt_isModifiedButton() ) then
 			module:moveMovable(self.movable);
@@ -2520,6 +2561,7 @@ local function powerbaralt_onMouseDown(self, button)
 end
 
 local function powerbaralt_onMouseUp(self, button)
+	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return; end
 	if (powerbaraltEnabled and powerbaraltMovable) then
 		if ( button == "LeftButton" ) then
 			module:stopMovable(self.movable);
@@ -2531,16 +2573,19 @@ local function powerbaralt_onMouseUp(self, button)
 end
 
 local function powerbaralt_onEnter(self)
+	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return; end
 	-- module:displayTooltip(self, "|c00FFFFFFAlternate Power Bar Anchor|r\nShift-click to drag.\nRight-click to reset.");
 end
 
 local function powerbaralt_UIParent_ManageFramePositions()
+	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return; end
 	if (powerbaraltEnabled) then
 		powerbaralt_reanchor();
 	end
 end
 
 local function powerbaralt_onEvent(self, event, arg1, ...)
+	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return; end
 	if (event == "PLAYER_LOGIN") then
 		PlayerPowerBarAlt:HookScript("OnMouseDown",
 			function(self, button)
@@ -2571,6 +2616,7 @@ local function powerbaralt_onEvent(self, event, arg1, ...)
 end
 
 local function powerbaralt_createAnchorFrame()
+	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return; end
 	local movable = "PowerBarAltAnchor";
 
 	local self = CreateFrame("Button", "CT_Core_PlayerPowerBarAltAnchorFrame", UIParent);
@@ -2612,6 +2658,7 @@ end
 powerbaralt__createAnchorFrame = powerbaralt_createAnchorFrame;
 
 local function powerbaralt_toggleStatus(enable)
+	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return; end
 	-- Use custom bar position
 	powerbaraltEnabled = enable;
 	powerbaralt_updateAnchorVisibility();
@@ -2648,12 +2695,14 @@ local function powerbaralt_toggleStatus(enable)
 end
 
 local function powerbaralt_toggleMovable(movable)
+	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return; end
 	-- Unlock bar
 	powerbaraltMovable = movable;
 	powerbaralt_updateAnchorVisibility();
 end
 
 local function powerbaralt_toggleAnchor(show)
+	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return; end
 	-- Show anchor when bar is hidden
 	powerbaraltShowAnchor = show;
 	powerbaralt_updateAnchorVisibility();
