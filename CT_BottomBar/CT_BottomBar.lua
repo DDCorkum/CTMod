@@ -698,14 +698,14 @@ module.update = function(self, optName, value)
 			module:loadAddon("Possess Bar");
 			module:loadAddon("MultiCastBar");  -- Totem bar
 			module:loadAddon("Vehicle Bar");
-			module:loadAddon("Status Bar");
+			module:loadAddon("Status Bar");	-- replaced the experience and reputation bars in WoW 8.0
 			module:loadAddon("Framerate Bar");
 			module:loadAddon("Talking Head");
 		elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
 			-- module:loadAddon("Action Bar Arrows");
 			module:loadAddon("Bags Bar");
-			-- module:loadAddon("Experience Bar");
-			-- module:loadAddon("Reputation Bar");  -- Show after exp bar in options window
+			module:loadAddon("Experience Bar");
+			module:loadAddon("Reputation Bar");  -- Show after exp bar in options window
 			module:loadAddon("Menu Bar");
 			module:loadAddon("Pet Bar");
 			module:loadAddon("MultiCastBar");  -- Totem bar
