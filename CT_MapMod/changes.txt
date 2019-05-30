@@ -1,6 +1,6 @@
 CT_MapMod (8.1.5.3) 2019-05-29
 - Changes to begin re-introducing language localizations
-- Compatability with both WoW Classic and WoW Retail editions
+- Compatibility with WoW Classic and Retail editions
 
 CT_MapMod (8.1.5.2) 2019-05-04
 - Auto-gathering now ignores Anchor Weed appearing in lieu of other herbs

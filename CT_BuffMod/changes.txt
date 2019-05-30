@@ -1,5 +1,5 @@
 CT_BuffMod (8.1.5.3) 2019-05-29
-- Changes to be compatible with WoW Classic and Retail editions
+- Compatibility with WoW Classic and Retail editions
 
 CT_BuffMod (8.1.5.2) 2019-05-06
 - Improved options for Style 2 (icon and time) appearance
