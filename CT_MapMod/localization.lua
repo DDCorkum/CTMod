@@ -1,80 +1,276 @@
+------------------------------------------------
+--                 CT_MapMod                  --
+--                                            --
+-- Simple addon that allows the user to add   --
+-- notes and gathered nodes to the world map. --
+-- Please do not modify or otherwise          --
+-- redistribute this without the consent of   --
+-- the CTMod Team. Thank you.                 --
+--					      --
+-- Original credits to Cide and TS (Vanilla)  --
+-- Maintained by Resike from 2014 to 2017     --
+-- Rebuilt by Dahk Celes in 2018              --
+------------------------------------------------
+
 local module = CT_MapMod
 module.text = { };
 
-module.text.Name = "Name";
-module.text.Description = "Description";
-module.text.Type = "Type";
-module.text.Icon = "Icon";
-
-module.text.Okay = "Okay";
-module.text.Cancel = "Cancel";
-module.text.Delete = "Delete";
-module.text.mouseover =
-{
-	[1] = "Shift-Click to Edit";
-	[2] = "Right-Click to Drag";
-};
-
-
-CT_MAPMOD_SETS = { };
-
-CT_MAPMOD_SETS[1] = "General";
-CT_MAPMOD_SETS[2] = "NPCs";
-CT_MAPMOD_SETS[3] = "Mobs";
-CT_MAPMOD_SETS[4] = "Locations";
-CT_MAPMOD_SETS[5] = "Items";
-CT_MAPMOD_SETS[6] = "Misc";
-CT_MAPMOD_SETS[7] = "Herbs";
-CT_MAPMOD_SETS[8] = "Minerals";
-
-
+local L = module.text
+L["CT_MapMod/Herb/Adder's Tongue"] = "Adder's Tongue"
+L["CT_MapMod/Herb/Aethril"] = "Aethril"
+L["CT_MapMod/Herb/Akunda's Bite"] = "Akunda's Bite"
+L["CT_MapMod/Herb/Anchor Weed"] = "Anchor Weed"
+L["CT_MapMod/Herb/Ancient Lichen"] = "Ancient Lichen"
+L["CT_MapMod/Herb/Arthas' Tears"] = "Arthas' Tears"
+L["CT_MapMod/Herb/Astral Glory"] = "Astral Glory"
+L["CT_MapMod/Herb/Azshara's Veil"] = "Azshara's Veil"
+L["CT_MapMod/Herb/Blindweed"] = "Blindweed"
+L["CT_MapMod/Herb/Briarthorn"] = "Briarthorn"
+L["CT_MapMod/Herb/Bruiseweed"] = "Bruiseweed"
+L["CT_MapMod/Herb/Cinderbloom"] = "Cinderbloom"
+L["CT_MapMod/Herb/Dreamfoil"] = "Dreamfoil"
+L["CT_MapMod/Herb/Dreaming Glory"] = "Dreaming Glory"
+L["CT_MapMod/Herb/Dreamleaf"] = "Dreamleaf"
+L["CT_MapMod/Herb/Earthroot"] = "Earthroot"
+L["CT_MapMod/Herb/Fadeleaf"] = "Fadeleaf"
+L["CT_MapMod/Herb/Felweed"] = "Felweed"
+L["CT_MapMod/Herb/Fire Leaf"] = "Fire Leaf"
+L["CT_MapMod/Herb/Firebloom"] = "Firebloom"
+L["CT_MapMod/Herb/Fireweed"] = "Fireweed"
+L["CT_MapMod/Herb/Fjarnskaggl"] = "Fjarnskaggl"
+L["CT_MapMod/Herb/Fool's Cap"] = "Fool's Cap"
+L["CT_MapMod/Herb/Foxflower"] = "Foxflower"
+L["CT_MapMod/Herb/Frostweed"] = "Frostweed"
+L["CT_MapMod/Herb/Ghost Mushroom"] = "Ghost Mushroom"
+L["CT_MapMod/Herb/Goldclover"] = "Goldclover"
+L["CT_MapMod/Herb/Golden Sansam"] = "Golden Sansam"
+L["CT_MapMod/Herb/Goldthorn"] = "Goldthorn"
+L["CT_MapMod/Herb/Gorgrond Flytrap"] = "Gorgrond Flytrap"
+L["CT_MapMod/Herb/Grave Moss"] = "Grave Moss"
+L["CT_MapMod/Herb/Green Tea Leaf"] = "Green Tea Leaf"
+L["CT_MapMod/Herb/Gromsblood"] = "Gromsblood"
+L["CT_MapMod/Herb/Heartblossom"] = "Heartblossom"
+L["CT_MapMod/Herb/Icecap"] = "Icecap"
+L["CT_MapMod/Herb/Icethorn"] = "Icethorn"
+L["CT_MapMod/Herb/Khadgar's Whisker"] = "Khadgar's Whisker"
+L["CT_MapMod/Herb/Kingsblood"] = "Kingsblood"
+L["CT_MapMod/Herb/Lichbloom"] = "Lichbloom"
+L["CT_MapMod/Herb/Liferoot"] = "Liferoot"
+L["CT_MapMod/Herb/Mageroyal"] = "Mageroyal"
+L["CT_MapMod/Herb/Mana Thistle"] = "Mana Thistle"
+L["CT_MapMod/Herb/Mountain Silversage"] = "Mountain Silversage"
+L["CT_MapMod/Herb/Nagrand Arrowbloom"] = "Nagrand Arrowbloom"
+L["CT_MapMod/Herb/Netherbloom"] = "Netherbloom"
+L["CT_MapMod/Herb/Nightmare Vine"] = "Nightmare Vine"
+L["CT_MapMod/Herb/Peacebloom"] = "Peacebloom"
+L["CT_MapMod/Herb/Purple Lotus"] = "Purple Lotus"
+L["CT_MapMod/Herb/Ragveil"] = "Ragveil"
+L["CT_MapMod/Herb/Rain Poppy"] = "Rain Poppy"
+L["CT_MapMod/Herb/Riverbud"] = "Riverbud"
+L["CT_MapMod/Herb/Sea Stalk"] = "Sea Stalk"
+L["CT_MapMod/Herb/Silkweed"] = "Silkweed"
+L["CT_MapMod/Herb/Silverleaf"] = "Silverleaf"
+L["CT_MapMod/Herb/Siren's Pollen"] = "Siren's Pollen"
+L["CT_MapMod/Herb/Snow Lily"] = "Snow Lily"
+L["CT_MapMod/Herb/Sorrowmoss"] = "Sorrowmoss"
+L["CT_MapMod/Herb/Star Moss"] = "Star Moss"
+L["CT_MapMod/Herb/Starflower"] = "Starflower"
+L["CT_MapMod/Herb/Starlight Rose"] = "Starlight Rose"
+L["CT_MapMod/Herb/Stormvine"] = "Stormvine"
+L["CT_MapMod/Herb/Stranglekelp"] = "Stranglekelp"
+L["CT_MapMod/Herb/Sungrass"] = "Sungrass"
+L["CT_MapMod/Herb/Swiftthistle"] = "Swiftthistle"
+L["CT_MapMod/Herb/Talador Orchid"] = "Talador Orchid"
+L["CT_MapMod/Herb/Talandra's Rose"] = "Talandra's Rose"
+L["CT_MapMod/Herb/Terocone"] = "Terocone"
+L["CT_MapMod/Herb/Tiger Lily"] = "Tiger Lily"
+L["CT_MapMod/Herb/Twilight Jasmine"] = "Twilight Jasmine"
+L["CT_MapMod/Herb/Whiptail"] = "Whiptail"
+L["CT_MapMod/Herb/Wild Steelbloom"] = "Wild Steelbloom"
+L["CT_MapMod/Herb/Winter's Kiss"] = "Winter's Kiss"
+L["CT_MapMod/Map/Add a new pin to the map"] = "Add a new pin to the map"
+L["CT_MapMod/Map/Click on the map where you want the pin"] = "Click on the map where you want the pin"
+L["CT_MapMod/Map/New Pin"] = "New Pin"
+L["CT_MapMod/Map/Right-Click to Drag"] = "Right-Click to Drag"
+L["CT_MapMod/Pin/Cancel"] = "Cancel"
+L["CT_MapMod/Pin/Delete"] = "Delete"
+L["CT_MapMod/Pin/Description"] = "Description"
+L["CT_MapMod/Pin/Icon"] = "Icon"
+L["CT_MapMod/Pin/Name"] = "Name"
+L["CT_MapMod/Pin/Okay"] = "Okay"
+L["CT_MapMod/Pin/Right-Click to Drag"] = "Right-Click to Drag"
+L["CT_MapMod/Pin/Shift-Click to Edit"] = "Shift-Click to Edit"
+L["CT_MapMod/Pin/Type"] = "Type"
 
 if (GetLocale() == "frFR") then
-
-	-- Original translation contributed by Sasmira
-	-- Changes made by DDCorkum in 2019 for version 8.2
+	-- Original CT_MapMod frFR translations before 2017 were creditted to Sasmira
+	-- Several herb translations were sourced from community-submitted translations to Wowpedia and other addons hosted on CurseForge
+	L["CT_MapMod/Herb/Adder's Tongue"] = "Langue de serpent"
+	L["CT_MapMod/Herb/Aethril"] = "Aethril"
+	L["CT_MapMod/Herb/Akunda's Bite"] = "Mâche d’Akunda"
+	L["CT_MapMod/Herb/Anchor Weed"] = "Ancoracée"
+	L["CT_MapMod/Herb/Ancient Lichen"] = "Lichen ancien"
+	L["CT_MapMod/Herb/Arthas' Tears"] = "Larmes d'Arthas"
+	L["CT_MapMod/Herb/Astral Glory"] = "Astralée"
+	L["CT_MapMod/Herb/Azshara's Veil"] = "Voile d'Azshara"
+	L["CT_MapMod/Herb/Blindweed"] = "Aveuglette"
+	L["CT_MapMod/Herb/Briarthorn"] = "Eglantine"
+	L["CT_MapMod/Herb/Bruiseweed"] = "Doulourante"
+	L["CT_MapMod/Herb/Cinderbloom"] = "Cendrelle"
+	L["CT_MapMod/Herb/Dreamfoil"] = "Feuillerêve"
+	L["CT_MapMod/Herb/Dreaming Glory"] = "Glaurier"
+	L["CT_MapMod/Herb/Dreamleaf"] = "Songefeuille"
+	L["CT_MapMod/Herb/Earthroot"] = "Terrestrine"
+	L["CT_MapMod/Herb/Fadeleaf"] = "Pâlerette"
+	L["CT_MapMod/Herb/Felweed"] = "Gangrelette"
+	L["CT_MapMod/Herb/Fire Leaf"] = "Feuille de feu"
+	L["CT_MapMod/Herb/Firebloom"] = "Fleur de feu"
+	L["CT_MapMod/Herb/Fireweed"] = "Ignescente"
+	L["CT_MapMod/Herb/Fjarnskaggl"] = "Fjarnskaggl"
+	L["CT_MapMod/Herb/Fool's Cap"] = "Berluette"
+	L["CT_MapMod/Herb/Foxflower"] = "Vulpille"
+	L["CT_MapMod/Herb/Frostweed"] = "Givrelette"
+	L["CT_MapMod/Herb/Ghost Mushroom"] = "Champignon fantôme"
+	L["CT_MapMod/Herb/Goldclover"] = "Trèfle doré"
+	L["CT_MapMod/Herb/Golden Sansam"] = "Sansam doré"
+	L["CT_MapMod/Herb/Goldthorn"] = "Dorépine"
+	L["CT_MapMod/Herb/Gorgrond Flytrap"] = "Dionée de Gorgrond"
+	L["CT_MapMod/Herb/Grave Moss"] = "Tombeline"
+	L["CT_MapMod/Herb/Green Tea Leaf"] = "Feuille de thé vert"
+	L["CT_MapMod/Herb/Gromsblood"] = "Gromsang"
+	L["CT_MapMod/Herb/Heartblossom"] = "Pétale de cœur"
+	L["CT_MapMod/Herb/Icecap"] = "Chapeglace"
+	L["CT_MapMod/Herb/Icethorn"] = "Glacépine"
+	L["CT_MapMod/Herb/Khadgar's Whisker"] = "Moustache de Khadgar"
+	L["CT_MapMod/Herb/Kingsblood"] = "Sang-royal"
+	L["CT_MapMod/Herb/Lichbloom"] = "Fleur-de-liche"
+	L["CT_MapMod/Herb/Liferoot"] = "Vietérule"
+	L["CT_MapMod/Herb/Mageroyal"] = "Mage royal"
+	L["CT_MapMod/Herb/Mana Thistle"] = "Chardon de mana"
+	L["CT_MapMod/Herb/Mountain Silversage"] = "Sauge-argent des montagnes"
+	L["CT_MapMod/Herb/Nagrand Arrowbloom"] = "Sagittaire de Nagrand"
+	L["CT_MapMod/Herb/Netherbloom"] = "Néantine"
+	L["CT_MapMod/Herb/Nightmare Vine"] = "Cauchemardelle"
+	L["CT_MapMod/Herb/Peacebloom"] = "Pacifique"
+	L["CT_MapMod/Herb/Purple Lotus"] = "Lotus pourpre"
+	L["CT_MapMod/Herb/Ragveil"] = "Voile-misère"
+	L["CT_MapMod/Herb/Rain Poppy"] = "Pavot de pluie"
+	L["CT_MapMod/Herb/Riverbud"] = "Rivebulbe"
+	L["CT_MapMod/Herb/Sea Stalk"] = "Brin-de-mer"
+	L["CT_MapMod/Herb/Silkweed"] = "Herbe à soie"
+	L["CT_MapMod/Herb/Silverleaf"] = "Feuillargent"
+	L["CT_MapMod/Herb/Siren's Pollen"] = "Pollen de sirène"
+	L["CT_MapMod/Herb/Snow Lily"] = "Lys des neiges"
+	L["CT_MapMod/Herb/Sorrowmoss"] = "Chagrinelle"
+	L["CT_MapMod/Herb/Star Moss"] = "Mousse étoilée"
+	L["CT_MapMod/Herb/Starflower"] = "Bourrache"
+	L["CT_MapMod/Herb/Starlight Rose"] = "Rose lumétoile"
+	L["CT_MapMod/Herb/Stormvine"] = "Vignétincelle"
+	L["CT_MapMod/Herb/Stranglekelp"] = "Etouffante"
+	L["CT_MapMod/Herb/Sungrass"] = "Soleillette"
+	L["CT_MapMod/Herb/Swiftthistle"] = "Chardonnier"
+	L["CT_MapMod/Herb/Talador Orchid"] = "Orchidée de Talador"
+	L["CT_MapMod/Herb/Talandra's Rose"] = "Rose de Talandra"
+	L["CT_MapMod/Herb/Terocone"] = "Terocône"
+	L["CT_MapMod/Herb/Tiger Lily"] = "Lys tigré"
+	L["CT_MapMod/Herb/Twilight Jasmine"] = "Jasmin crépusculaire"
+	L["CT_MapMod/Herb/Whiptail"] = "Fouettine"
+	L["CT_MapMod/Herb/Wild Steelbloom"] = "Aciérite sauvage"
+	L["CT_MapMod/Herb/Winter's Kiss"] = "Bise-d’hiver"
+	L["CT_MapMod/Map/Add a new pin to the map"] = "Ajouter un icône à la carte"
+	L["CT_MapMod/Map/Click on the map where you want the pin"] = "Cliquez sur la carte pour placer l'icône"
+	L["CT_MapMod/Map/New Pin"] = "Ajouter"
+	L["CT_MapMod/Map/Right-Click to Drag"] = "Clic droit pour faire glisser"
+	L["CT_MapMod/Pin/Cancel"] = "Annuler"
+	L["CT_MapMod/Pin/Delete"] = "Supprimer"
+	L["CT_MapMod/Pin/Description"] = "Description"
+	L["CT_MapMod/Pin/Icon"] = "Icône"
+	L["CT_MapMod/Pin/Name"] = "Nom"
+	L["CT_MapMod/Pin/Okay"] = "Accepter"
+	L["CT_MapMod/Pin/Right-Click to Drag"] = "Clic droit pour faire glisser"
+	L["CT_MapMod/Pin/Shift-Click to Edit"] = "<Maj>-Clic pour éditer"
+	L["CT_MapMod/Pin/Type"] = "Type"
 	
-	module.text.Name = "Nom";
-	module.text.Description = "Description";
-	module.text.Type = "Type";
-	module.text.Icon = "Ic�ne";
-	
-	module.text.Okay = "OK";
-	module.text.Cancel = "Annuler";
-	module.text.Delete = "Supprimer";
-	-- module.text.mouseover[1] = "<Maj>-Click to Edit";
-	-- module.text.mouseover[2] = "Right-Click to Drag";
-	
-	CT_MAPMOD_SETS[1] = "G\195\169n\195\169ral";
-	CT_MAPMOD_SETS[2] = "PNJs";
-	CT_MAPMOD_SETS[3] = "Montres";
-	CT_MAPMOD_SETS[4] = "Locations";
-	CT_MAPMOD_SETS[5] = "Objets";
-	CT_MAPMOD_SETS[6] = "Divers";
-	
-end
-
-if (GetLocale() == "deDE") then
-
-	-- Original translation contributed by Hj�rvar�r
-	-- Changes made by DDCorkum in 2019 for version 8.2
-
-	module.text.Name = "Name";
-	module.text.Description = "Beschreibung";
-	module.text.Type = "Art";
-	module.text.Icon = "Symbol";
-	
-	module.text.Okay = "Ok";
-	module.text.Cancel = "Abbrechen";
-	module.text.Delete = "L\195\182schen";   -- \195\182 = �
-	-- module.text.mouseover[1] = "Shift-Click to Edit";
-	-- module.text.mouseover[2] = "Right-Click to Drag";
-
-	CT_MAPMOD_SETS[1] = "Allgemeines";
-	CT_MAPMOD_SETS[2] = "NSC";
-	CT_MAPMOD_SETS[3] = "Monster";
-	CT_MAPMOD_SETS[4] = "Orte";
-	CT_MAPMOD_SETS[5] = "Gegenst\195\164nde";
-	CT_MAPMOD_SETS[6] = "Verschiedenes";
-
+elseif (GetLocale() == "deDE") then
+	-- Original CT_MapMod deDE translations before 2017 were creditted to Hjörvarör
+	-- Several herb translations were sourced from community-submitted translations to Wowpedia and other addons hosted on CurseForge
+	L["CT_MapMod/Herb/Adder's Tongue"] = "Schlangenzunge"
+	L["CT_MapMod/Herb/Aethril"] = "Aethril"
+	L["CT_MapMod/Herb/Akunda's Bite"] = "Akundas Biss"
+	L["CT_MapMod/Herb/Anchor Weed"] = "Ankerkraut"
+	L["CT_MapMod/Herb/Ancient Lichen"] = "Urflechte"
+	L["CT_MapMod/Herb/Arthas' Tears"] = "Arthas' Tränen"
+	L["CT_MapMod/Herb/Astral Glory"] = "Astralwinde"
+	L["CT_MapMod/Herb/Azshara's Veil"] = "Azsharas Schleier"
+	L["CT_MapMod/Herb/Blindweed"] = "Blindkraut"
+	L["CT_MapMod/Herb/Briarthorn"] = "Wilddornrose"
+	L["CT_MapMod/Herb/Bruiseweed"] = "Beulengras"
+	L["CT_MapMod/Herb/Cinderbloom"] = "Aschenblüte"
+	L["CT_MapMod/Herb/Dreamfoil"] = "Traumblatt"
+	L["CT_MapMod/Herb/Dreaming Glory"] = "Traumwinde"
+	L["CT_MapMod/Herb/Dreamleaf"] = "Traumlaub"
+	L["CT_MapMod/Herb/Earthroot"] = "Erdwurzel"
+	L["CT_MapMod/Herb/Fadeleaf"] = "Blassblatt"
+	L["CT_MapMod/Herb/Felweed"] = "Teufelsgras"
+	L["CT_MapMod/Herb/Fire Leaf"] = "Feuerblatt"
+	L["CT_MapMod/Herb/Firebloom"] = "Feuerblüte"
+	L["CT_MapMod/Herb/Fireweed"] = "Feuerwurz"
+	L["CT_MapMod/Herb/Fjarnskaggl"] = "Fjarnskaggl"
+	L["CT_MapMod/Herb/Fool's Cap"] = "Narrenkappe"
+	L["CT_MapMod/Herb/Foxflower"] = "Fuchsblume"
+	L["CT_MapMod/Herb/Frostweed"] = "Frostwurz"
+	L["CT_MapMod/Herb/Ghost Mushroom"] = "Geisterpilz"
+	L["CT_MapMod/Herb/Goldclover"] = "Goldklee"
+	L["CT_MapMod/Herb/Golden Sansam"] = "Goldener Sansam"
+	L["CT_MapMod/Herb/Goldthorn"] = "Golddorn"
+	L["CT_MapMod/Herb/Gorgrond Flytrap"] = "Gorgrondfliegenfalle"
+	L["CT_MapMod/Herb/Grave Moss"] = "Grabmoos"
+	L["CT_MapMod/Herb/Green Tea Leaf"] = "Teepflanze"
+	L["CT_MapMod/Herb/Gromsblood"] = "Gromsblut"
+	L["CT_MapMod/Herb/Heartblossom"] = "Herzblüte"
+	L["CT_MapMod/Herb/Icecap"] = "Eiskappe"
+	L["CT_MapMod/Herb/Icethorn"] = "Eisdorn"
+	L["CT_MapMod/Herb/Khadgar's Whisker"] = "Khadgars Schnurrbart"
+	L["CT_MapMod/Herb/Kingsblood"] = "Königsblut"
+	L["CT_MapMod/Herb/Lichbloom"] = "Lichblüte"
+	L["CT_MapMod/Herb/Liferoot"] = "Lebenswurz"
+	L["CT_MapMod/Herb/Mageroyal"] = "Maguskönigskraut"
+	L["CT_MapMod/Herb/Mana Thistle"] = "Manadistel"
+	L["CT_MapMod/Herb/Mountain Silversage"] = "Bergsilbersalbei"
+	L["CT_MapMod/Herb/Nagrand Arrowbloom"] = "Nagrandpfeilkelch"
+	L["CT_MapMod/Herb/Netherbloom"] = "Netherblüte"
+	L["CT_MapMod/Herb/Nightmare Vine"] = "Alptraumranke"
+	L["CT_MapMod/Herb/Peacebloom"] = "Friedensblume"
+	L["CT_MapMod/Herb/Purple Lotus"] = "Lila Lotus"
+	L["CT_MapMod/Herb/Ragveil"] = "Zottelkappe"
+	L["CT_MapMod/Herb/Rain Poppy"] = "Regenmohn"
+	L["CT_MapMod/Herb/Riverbud"] = "Flussknospe"
+	L["CT_MapMod/Herb/Sea Stalk"] = "Meeresstängel"
+	L["CT_MapMod/Herb/Silkweed"] = "Seidenkraut"
+	L["CT_MapMod/Herb/Silverleaf"] = "Silberblatt"
+	L["CT_MapMod/Herb/Siren's Pollen"] = "Sirenenpollen"
+	L["CT_MapMod/Herb/Snow Lily"] = "Schneelilie"
+	L["CT_MapMod/Herb/Sorrowmoss"] = "Trauermoos"
+	L["CT_MapMod/Herb/Star Moss"] = "Sternmoos"
+	L["CT_MapMod/Herb/Starflower"] = "Sternenblume"
+	L["CT_MapMod/Herb/Starlight Rose"] = "Sternlichtrose"
+	L["CT_MapMod/Herb/Stormvine"] = "Sturmwinde"
+	L["CT_MapMod/Herb/Stranglekelp"] = "Würgetang"
+	L["CT_MapMod/Herb/Sungrass"] = "Sonnengras"
+	L["CT_MapMod/Herb/Swiftthistle"] = "Flitzdistel"
+	L["CT_MapMod/Herb/Talador Orchid"] = "Taladororchidee"
+	L["CT_MapMod/Herb/Talandra's Rose"] = "Talandras Rose"
+	L["CT_MapMod/Herb/Terocone"] = "Terozapfen"
+	L["CT_MapMod/Herb/Tiger Lily"] = "Tigerlilie"
+	L["CT_MapMod/Herb/Twilight Jasmine"] = "Schattenjasmin"
+	L["CT_MapMod/Herb/Whiptail"] = "Gertenrohr"
+	L["CT_MapMod/Herb/Wild Steelbloom"] = "Wildstahlblume"
+	L["CT_MapMod/Herb/Winter's Kiss"] = "Winterkuss"
+	L["CT_MapMod/Pin/Cancel"] = "Abbrechen"
+	L["CT_MapMod/Pin/Delete"] = "Löschen"
+	L["CT_MapMod/Pin/Description"] = "Beschreibung"
+	L["CT_MapMod/Pin/Icon"] = "Symbol"
+	L["CT_MapMod/Pin/Name"] = "Name"
+	L["CT_MapMod/Pin/Okay"] = "Ok"
+	L["CT_MapMod/Pin/Type"] = "Art"
 end
