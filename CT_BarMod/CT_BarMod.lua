@@ -414,6 +414,10 @@ function module:setAttributes()
 end
 
 local function initUpdateButtonType()
+	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+		return;
+	end
+	
 	-- Wrap the OnShow and OnHide scripts of the possess button that cancels possession so that
 	-- we know when Blizzard has shown or hidden it. They do so after checking the "enable" return
 	-- value from GetPossessInfo() which is something we can't do from secure code, so we'll let
@@ -702,6 +706,7 @@ local function initSecureFrame()
 	--
 	-- Also, I'm not sure why they are calling UnitCanAssist in the first place.
 	--
+	
 	RegisterStateDriver(frame, "vehicleui", "[vehicleui]1;nil");
 	
 	-- Detect when the overridebar state changes.
@@ -719,17 +724,18 @@ end
 
 -- This code allows activating vehicleui "faster" before some world quests begin combat
 
-local unsecureWatchFrame = CreateFrame("Frame")
-unsecureWatchFrame:RegisterEvent("UNIT_ENTERING_VEHICLE");
-unsecureWatchFrame:SetScript("OnEvent",
-	function(self, event, ...)
-		local unitToken = ...;
-		if (event == "UNIT_ENTERING_VEHICLE" and unitToken == "player") then
-			module.setActionBindings(true);
+if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+	local unsecureWatchFrame = CreateFrame("Frame")
+	unsecureWatchFrame:RegisterEvent("UNIT_ENTERING_VEHICLE");
+	unsecureWatchFrame:SetScript("OnEvent",
+		function(self, event, ...)
+			local unitToken = ...;
+			if (event == "UNIT_ENTERING_VEHICLE" and unitToken == "player") then
+				module.setActionBindings(true);
+			end
 		end
-	end
-);
-
+	);
+end
 
 --------------------------------------------
 -- Mod Initialization

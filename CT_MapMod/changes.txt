@@ -1,3 +1,9 @@
+CT_MapMod (8.1.5.3) 2019-06-02
+- Compatibility with WoW Classic and Retail editions
+- Re-introducing language localization for FR and DE
+- Herb and ore dropdown lists broken up for easier navigation
+- No longer backwards compatible with 7.3 and earlier
+
 CT_MapMod (8.1.5.2) 2019-05-04
 - Auto-gathering now ignores Anchor Weed appearing in lieu of other herbs
 - Notes can now be dragged to new positions on the map

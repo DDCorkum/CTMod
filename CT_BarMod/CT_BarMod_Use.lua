@@ -303,7 +303,9 @@ function useButton:constructor(buttonId, actionId, groupId, count, ...)
 	SecureHandlerSetFrameRef(button, "SecureFrame", CT_BarMod_SecureFrame);
 
 	-- Assign to the button a reference to the SpellFlyout frame so we can hide it from the button's secure code.
-	SecureHandlerSetFrameRef(button, "SpellFlyout", SpellFlyout);
+	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+		SecureHandlerSetFrameRef(button, "SpellFlyout", SpellFlyout);
+	end
 
 	SecureHandlerWrapScript(button, "OnDragStart", button,
 		[=[
@@ -338,7 +340,9 @@ function useButton:constructor(buttonId, actionId, groupId, count, ...)
 				) then
 					-- Hide the spell flyout frame
 					local flyout = self:GetFrameRef("SpellFlyout");
-					flyout:Hide();
+					if (flyout) then
+						flyout:Hide();
+					end
 
 					-- Update the button before the action gets picked up.
 					self:CallMethod("ondragstart", button, actionId, kind, value, ...);
@@ -378,7 +382,9 @@ function useButton:constructor(buttonId, actionId, groupId, count, ...)
 			if (actionId and kind) then
 				-- Hide the spell flyout frame
 				local flyout = self:GetFrameRef("SpellFlyout");
-				flyout:Hide();
+				if (flyout) then
+					flyout:Hide();
+				end
 
 				-- Update the button before the action gets placed.
 				self:CallMethod("onreceivedrag", actionId, kind, value, ...);
@@ -835,7 +841,9 @@ local function CT_BarMod__ActionButton_UpdateOverlayGlow(self)
 end
 
 function useButton:updateOverlayGlow()
-	CT_BarMod__ActionButton_UpdateOverlayGlow(self.button);
+	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+		CT_BarMod__ActionButton_UpdateOverlayGlow(self.button);
+	end
 end
 
 function useButton:showOverlayGlow(arg1)
@@ -1938,7 +1946,6 @@ module.useEnable = function(self)
 	self:regEvent("UPDATE_INVENTORY_ALERTS", eventHandler_UpdateUsable);
 	self:regEvent("TRADE_SKILL_SHOW", eventHandler_UpdateState);
 	self:regEvent("TRADE_SKILL_CLOSE", eventHandler_UpdateState);
-	self:regEvent("ARCHAEOLOGY_CLOSED", eventHandler_UpdateState);
 	self:regEvent("UPDATE_BINDINGS", eventHandler_UpdateBindings);
 	self:regEvent("PLAYER_ENTER_COMBAT", eventHandler_CheckRepeat);
 	self:regEvent("PLAYER_LEAVE_COMBAT", eventHandler_CheckRepeat);
@@ -1947,18 +1954,21 @@ module.useEnable = function(self)
 	self:regEvent("PLAYER_TARGET_CHANGED", rangeTargetUpdater);
 	self:regEvent("PLAYER_REGEN_ENABLED", combatFlagger);
 	self:regEvent("PLAYER_REGEN_DISABLED", combatFlagger);
-	self:regEvent("UNIT_ENTERED_VEHICLE", eventHandler_UpdateStateVehicle);
-	self:regEvent("UNIT_EXITED_VEHICLE", eventHandler_UpdateStateVehicle);
-	self:regEvent("COMPANION_UPDATE", eventHandler_UpdateStateCompanion);
-	self:regEvent("SPELL_ACTIVATION_OVERLAY_GLOW_SHOW", eventHandler_ShowOverlayGlow);
-	self:regEvent("SPELL_ACTIVATION_OVERLAY_GLOW_HIDE", eventHandler_HideOverlayGlow);
 	self:regEvent("SPELL_UPDATE_CHARGES", eventHandler_UpdateCount);
-	self:regEvent("UPDATE_VEHICLE_ACTIONBAR", eventHandler_UpdateAll);
-	self:regEvent("UPDATE_OVERRIDE_ACTIONBAR", eventHandler_UpdateAll);
-	self:regEvent("UPDATE_POSSESS_BAR", eventHandler_UpdateAll);
-	self:regEvent("UPDATE_MULTI_CAST_ACTIONBAR", eventHandler_UpdateAll);
-	self:regEvent("UPDATE_SUMMONPETS_ACTION", eventHandler_updateSummonPets);
 	self:regEvent("LOSS_OF_CONTROL_UPDATE", eventHandler_UpdateCooldown);
+	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+		self:regEvent("UNIT_ENTERED_VEHICLE", eventHandler_UpdateStateVehicle);
+		self:regEvent("UNIT_EXITED_VEHICLE", eventHandler_UpdateStateVehicle);
+		self:regEvent("ARCHAEOLOGY_CLOSED", eventHandler_UpdateState);
+		self:regEvent("UPDATE_VEHICLE_ACTIONBAR", eventHandler_UpdateAll);
+		self:regEvent("UPDATE_OVERRIDE_ACTIONBAR", eventHandler_UpdateAll);
+		self:regEvent("UPDATE_POSSESS_BAR", eventHandler_UpdateAll);
+		self:regEvent("UPDATE_MULTI_CAST_ACTIONBAR", eventHandler_UpdateAll);
+		self:regEvent("COMPANION_UPDATE", eventHandler_UpdateStateCompanion);
+		self:regEvent("SPELL_ACTIVATION_OVERLAY_GLOW_SHOW", eventHandler_ShowOverlayGlow);
+		self:regEvent("SPELL_ACTIVATION_OVERLAY_GLOW_HIDE", eventHandler_HideOverlayGlow);
+		self:regEvent("UPDATE_SUMMONPETS_ACTION", eventHandler_updateSummonPets);
+	end
 	self:schedule(0.5, true, rangeUpdater);
 end
 
@@ -1976,7 +1986,6 @@ module.useDisable = function(self)
 	self:unregEvent("UPDATE_INVENTORY_ALERTS", eventHandler_UpdateUsable);
 	self:unregEvent("TRADE_SKILL_SHOW", eventHandler_UpdateState);
 	self:unregEvent("TRADE_SKILL_CLOSE", eventHandler_UpdateState);
-	self:unregEvent("ARCHAEOLOGY_CLOSED", eventHandler_UpdateState);
 	self:unregEvent("UPDATE_BINDINGS", eventHandler_UpdateBindings);
 	self:unregEvent("PLAYER_ENTER_COMBAT", eventHandler_CheckRepeat);
 	self:unregEvent("PLAYER_LEAVE_COMBAT", eventHandler_CheckRepeat);
@@ -1985,18 +1994,21 @@ module.useDisable = function(self)
 	self:unregEvent("PLAYER_TARGET_CHANGED", rangeTargetUpdater);
 	self:unregEvent("PLAYER_REGEN_ENABLED", combatFlagger);
 	self:unregEvent("PLAYER_REGEN_DISABLED", combatFlagger);
-	self:unregEvent("UNIT_ENTERED_VEHICLE", eventHandler_UpdateStateVehicle);
-	self:unregEvent("UNIT_EXITED_VEHICLE", eventHandler_UpdateStateVehicle);
-	self:unregEvent("COMPANION_UPDATE", eventHandler_UpdateStateCompanion);
-	self:unregEvent("SPELL_ACTIVATION_OVERLAY_GLOW_SHOW", eventHandler_ShowOverlayGlow);
-	self:unregEvent("SPELL_ACTIVATION_OVERLAY_GLOW_HIDE", eventHandler_HideOverlayGlow);
 	self:unregEvent("SPELL_UPDATE_CHARGES", eventHandler_UpdateCount);
-	self:unregEvent("UPDATE_VEHICLE_ACTIONBAR", eventHandler_UpdateAll);
-	self:unregEvent("UPDATE_OVERRIDE_ACTIONBAR", eventHandler_UpdateAll);
-	self:unregEvent("UPDATE_POSSESS_BAR", eventHandler_UpdateAll);
-	self:unregEvent("UPDATE_MULTI_CAST_ACTIONBAR", eventHandler_UpdateAll);
 	self:unregEvent("UPDATE_SUMMONPETS_ACTION", eventHandler_updateSummonPets);
-	self:unregEvent("LOSS_OF_CONTROL_UPDATE", eventHandler_UpdateCooldown);
+	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+		self:unregEvent("UNIT_ENTERED_VEHICLE", eventHandler_UpdateStateVehicle);
+		self:unregEvent("UNIT_EXITED_VEHICLE", eventHandler_UpdateStateVehicle);
+		self:unregEvent("ARCHAEOLOGY_CLOSED", eventHandler_UpdateState);
+		self:unregEvent("UPDATE_VEHICLE_ACTIONBAR", eventHandler_UpdateAll);
+		self:unregEvent("UPDATE_OVERRIDE_ACTIONBAR", eventHandler_UpdateAll);
+		self:unregEvent("UPDATE_POSSESS_BAR", eventHandler_UpdateAll);
+		self:unregEvent("UPDATE_MULTI_CAST_ACTIONBAR", eventHandler_UpdateAll);
+		self:unregEvent("COMPANION_UPDATE", eventHandler_UpdateStateCompanion);
+		self:unregEvent("SPELL_ACTIVATION_OVERLAY_GLOW_SHOW", eventHandler_ShowOverlayGlow);
+		self:unregEvent("SPELL_ACTIVATION_OVERLAY_GLOW_HIDE", eventHandler_HideOverlayGlow);
+		self:unregEvent("LOSS_OF_CONTROL_UPDATE", eventHandler_UpdateCooldown);
+	end
 	self:unschedule(rangeUpdater, true);
 end
 

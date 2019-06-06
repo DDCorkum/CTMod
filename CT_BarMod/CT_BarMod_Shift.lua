@@ -105,19 +105,25 @@ end
 local focusShifted, shiftFocus, reshiftFocus;
 
 function CT_BarMod_Shift_Focus_SetFlag()
+	if (not FocusFrame) then
+		return;
+	end
 	-- Set flag that indicates we need to shift the focus frame when possible.
 	-- This gets called when the user toggles the shift focus option.
 	shiftFocus = 1;
 end
 
 function CT_BarMod_Shift_Focus_SetReshiftFlag()
+	if (not FocusFrame) then
+		return;
+	end
 	-- Set flag that indicates we need to reshift the focus frame when possible.
 	-- This gets called when the user toggles the shift focus offset option.
 	reshiftFocus = 1;
 end
 
 local function CT_BarMod_Shift_Focus_Move2(shift)
-	if (InCombatLockdown()) then
+	if (InCombatLockdown() or not FocusFrame) then
 		return;
 	end
 	local point, rel, relpoint, x, y = FocusFrame:GetPoint(1);
@@ -140,7 +146,7 @@ local function CT_BarMod_Shift_Focus_Move2(shift)
 end
 
 function CT_BarMod_Shift_Focus_Move()
-	if (InCombatLockdown()) then
+	if (InCombatLockdown() or not FocusFrame) then
 		return;
 	end
 	if (reshiftFocus) then
@@ -544,7 +550,10 @@ end
 -- Shift the possess bar.
 
 local function CT_BarMod_Shift_Possess_areWeShifting()
-	if (CT_BottomBar and CT_BottomBar.ctPossess) then
+	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+		-- there isn't a possess bar in Vanilla/Classic!
+		return false;
+	elseif (CT_BottomBar and CT_BottomBar.ctPossess) then
 		-- This version of CT_BottomBar supports deactivation of this bar.
 		if (not CT_BottomBar.ctPossess.isDisabled) then
 			-- The bar is activated.
@@ -951,22 +960,28 @@ local function CT_BarMod_Shift_OnEvent(self, event, arg1, ...)
 		StanceBarFrame:HookScript("OnShow", CT_BarMod_Shift_UIParent_ManageFramePositions);
 		StanceBarFrame:HookScript("OnHide", CT_BarMod_Shift_UIParent_ManageFramePositions);
 
-		PossessBarFrame:HookScript("OnShow", CT_BarMod_Shift_UIParent_ManageFramePositions);
-		PossessBarFrame:HookScript("OnHide", CT_BarMod_Shift_UIParent_ManageFramePositions);
-
 		DurabilityFrame:HookScript("OnShow", CT_BarMod_Shift_UIParent_ManageFramePositions);
 		DurabilityFrame:HookScript("OnHide", CT_BarMod_Shift_UIParent_ManageFramePositions);
-
-		-- (Requires overhaul in WoW 8.0.1) MainMenuBarMaxLevelBar:HookScript("OnShow", CT_BarMod_Shift_UIParent_ManageFramePositions);
-		-- (Requires overhaul in WoW 8.0.1) MainMenuBarMaxLevelBar:HookScript("OnHide", CT_BarMod_Shift_UIParent_ManageFramePositions);
-
-		MultiCastActionBarFrame:HookScript("OnShow", CT_BarMod_Shift_UIParent_ManageFramePositions);
-		MultiCastActionBarFrame:HookScript("OnHide", CT_BarMod_Shift_UIParent_ManageFramePositions);
-
+		
 		PetActionBarFrame:HookScript("OnShow", CT_BarMod_Shift_UIParent_ManageFramePositions);
 		PetActionBarFrame:HookScript("OnHide", CT_BarMod_Shift_UIParent_ManageFramePositions);
 
-		-- (Requires overhaul in WoW 8.0.1) ReputationWatchBar:HookScript("OnHide", CT_BarMod_Shift_UIParent_ManageFramePositions);
+		if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+		
+			PossessBarFrame:HookScript("OnShow", CT_BarMod_Shift_UIParent_ManageFramePositions);
+			PossessBarFrame:HookScript("OnHide", CT_BarMod_Shift_UIParent_ManageFramePositions);		
+
+			MultiCastActionBarFrame:HookScript("OnShow", CT_BarMod_Shift_UIParent_ManageFramePositions);
+			MultiCastActionBarFrame:HookScript("OnHide", CT_BarMod_Shift_UIParent_ManageFramePositions);
+		
+		elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+	
+			ReputationWatchBar:HookScript("OnHide", CT_BarMod_Shift_UIParent_ManageFramePositions);
+			
+			MainMenuBarMaxLevelBar:HookScript("OnShow", CT_BarMod_Shift_UIParent_ManageFramePositions);
+			MainMenuBarMaxLevelBar:HookScript("OnHide", CT_BarMod_Shift_UIParent_ManageFramePositions);
+	
+		end
 	end
 
 	if (event == "PLAYER_REGEN_ENABLED" or event == "PLAYER_ENTERING_WORLD") then

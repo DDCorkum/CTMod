@@ -75,11 +75,21 @@ function module:toggleGryphons(hide)
 	end
 	-- Hide/Show the gryphons
 	if ( hide ) then
-		MainMenuBarArtFrame.LeftEndCap:Hide();
-		MainMenuBarArtFrame.RightEndCap:Hide();
+		if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+			MainMenuBarArtFrame.LeftEndCap:Hide();
+			MainMenuBarArtFrame.RightEndCap:Hide();
+		elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+			MainMenuBarLeftEndCap:Hide();
+			MainMenuBarRightEndCap:Hide();
+		end
 	else
-		MainMenuBarArtFrame.LeftEndCap:Show();
-		MainMenuBarArtFrame.RightEndCap:Show();
+		if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+			MainMenuBarArtFrame.LeftEndCap:Show();
+			MainMenuBarArtFrame.RightEndCap:Show();
+		elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+			MainMenuBarLeftEndCap:Show();
+			MainMenuBarRightEndCap:Show();
+		end
 	end
 end
 
@@ -116,24 +126,32 @@ function module:hideTexturesBackground(hide)
 	-- Changed in WoW 8.0.1 to now hide the "small" texture when only the left half is showing.
 
 	if (hide) then
-		MainMenuBarArtFrameBackground:Hide();
+		if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+			MainMenuBarArtFrameBackground:Hide();
+		elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+			MainMenuBarArtFrame:Hide();
+		end
 		hidMainBackground = true;
 	else
 		-- Only show the textures if we previously hid them.
 		if (not hidMainBackground) then
 			return;
 		end
-		MainMenuBarArtFrameBackground:Show();
+		if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+			MainMenuBarArtFrameBackground:Show();
+		elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+			MainMenuBarArtFrame:Show();
+		end
 		hidMainBackground = false;
 	end
 	
 end
 
---From WoW 8.0.1 forward, this hides the micro-button menu and bags artwork in the bottom right
+--From WoW 8.0.1 forward (retail only), this hides the micro-button menu and bags artwork in the bottom right
 function module:hideMenuAndBagsBackground(hide)
 	-- Hide/Show the background textures
 	
-	if (hide) then
+	if (hide and module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
 		MicroButtonAndBagsBar:Hide();
 		
 		hidMenuAndBagsBackground = true;

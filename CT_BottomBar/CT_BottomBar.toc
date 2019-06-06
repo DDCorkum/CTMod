@@ -1,5 +1,5 @@
 ## Interface: 80100
-## Version: 8.1.5.2
+## Version: 8.1.5.3
 ## Title: CT_BottomBar
 ## Notes: Breaks up the main menu bar into movable pieces.
 ## DefaultState: Enabled
@@ -24,3 +24,5 @@ CT_BottomBar_Vehicle.lua
 CT_BottomBar_StatusBar.lua
 CT_BottomBar_FPS.lua
 CT_BottomBar_TalkingHead.lua
+CT_BottomBar_Exp.lua
+CT_BottomBar_Rep.lua

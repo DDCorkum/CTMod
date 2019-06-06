@@ -321,7 +321,11 @@ local setActionPage_unsecure = function(self, page)
 	-- Blizzard doesn't update the page number font string on the
 	-- action bar arrows when you get into a vehicle, even though
 	-- the game has changed the action bar page to 1 (GetActionBarPage() == 1).
-	MainMenuBarArtFrame.PageNumber:SetText(GetActionBarPage());   --Changed in WoW 8.0.1
+	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+		MainMenuBarArtFrame.PageNumber:SetText(GetActionBarPage());   --Changed in WoW 8.0.1
+	elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+		MainMenuBarPageNumber:SetText(GetActionBarPage());
+	end
 
 	-- Update our key bindings list if the window is visible.
 	module.keybindings_buttonsUpdateList();
@@ -1870,14 +1874,16 @@ function module:buildPageBasicCondition(groupId)
 	local bar;
 	local condition = "";
 
-	if (groupId == module.actionBarId) then
-		condition = condition .. "[vehicleui]" .. GetVehicleBarIndex() .. "; ";
-		condition = condition .. "[overridebar]" .. GetOverrideBarIndex() .. "; ";
-		condition = condition .. "[possessbar]" .. GetVehicleBarIndex() .. "; ";
-	elseif (groupId == module.controlBarId) then
-		condition = condition .. "[vehicleui]" .. GetVehicleBarIndex() .. "; ";
-		condition = condition .. "[overridebar]" .. GetOverrideBarIndex() .. "; ";
-		condition = condition .. "[possessbar]" .. GetVehicleBarIndex() .. "; ";
+	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+		if (groupId == module.actionBarId) then
+			condition = condition .. "[vehicleui]" .. GetVehicleBarIndex() .. "; ";
+			condition = condition .. "[overridebar]" .. GetOverrideBarIndex() .. "; ";
+			condition = condition .. "[possessbar]" .. GetVehicleBarIndex() .. "; ";
+		elseif (groupId == module.controlBarId) then
+			condition = condition .. "[vehicleui]" .. GetVehicleBarIndex() .. "; ";
+			condition = condition .. "[overridebar]" .. GetOverrideBarIndex() .. "; ";
+			condition = condition .. "[possessbar]" .. GetVehicleBarIndex() .. "; ";
+		end
 	end
 
 	bar = module:getOption("pageAltKey" .. groupId) or 1;

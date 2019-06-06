@@ -152,6 +152,22 @@ function lib:clearTable(tbl, clearMeta)
 	end
 end
 
+-- Identify if this is WoW Retail (1) or WoW Classic (2)
+CT_GAME_VERSION_UNKNOWN = 0;
+CT_GAME_VERSION_RETAIL  = 1;
+CT_GAME_VERSION_CLASSIC = 2;
+function lib:getGameVersion()
+	local version = CT_GAME_VERSION_UNKNOWN;
+	if (MainMenuBarArtFrame and MainMenuBarArtFrame.LeftEndCap) then
+		-- The gryphons were changed in WoW 8.0
+		version = CT_GAME_VERSION_RETAIL;
+	elseif (MainMenuBarLeftEndCap) then
+		-- Older gryphons pre-8.0, and existing today only in Classic
+		version = CT_GAME_VERSION_CLASSIC;
+	end
+	return version;
+end
+
 -- Print a formatted message in yellow to ChatFrame1
 function lib:printformat(...)
 	printText(ChatFrame1, 1, 1, 0, format(...));
@@ -724,7 +740,9 @@ function lib:getSpell(name)
 end
 
 lib:regEvent("LEARNED_SPELL_IN_TAB", updateSpellDatabase);
-lib:regEvent("PLAYER_TALENT_UPDATE", updateSpellDatabase);
+if (lib:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+	lib:regEvent("PLAYER_TALENT_UPDATE", updateSpellDatabase);
+end
 
 -- End Spell Database
 -----------------------------------------------

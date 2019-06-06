@@ -24,12 +24,14 @@ local frame_EnableMouse;
 -- Miscellaneous
 
 function module:hasVehicleUI()
+	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return false; end
 	local hasVehicleUI = CT_BottomBar_SecureFrame:GetAttribute("has-vehicleui");
 	local hasSkin = UnitVehicleSkin("player") and UnitVehicleSkin("player") ~= "";
 	return hasVehicleUI and hasSkin;
 end
 
 function module:hasOverrideUI()
+	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return false; end
 	local hasOverrideUI = CT_BottomBar_SecureFrame:GetAttribute("has-overridebar");
 	local hasSkin = GetOverrideBarSkin() and GetOverrideBarSkin() ~= "";
 	return hasOverrideUI and hasSkin;
@@ -40,19 +42,21 @@ end
 
 local animFlag;
 
-OverrideActionBar.slideOut:HookScript("OnPlay",
-	function(self)
-		animFlag= true;
-		module:animStarted();
-	end
-);
-OverrideActionBar.slideOut:HookScript("OnFinished",
-	function(self)
-		animFlag= false;
-		module:animStopped();
-	end
-);
-
+if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+	-- WoW Classic does not have an OverrideActionBar
+	OverrideActionBar.slideOut:HookScript("OnPlay",
+		function(self)
+			animFlag= true;
+			module:animStarted();
+		end
+	);
+	OverrideActionBar.slideOut:HookScript("OnFinished",
+		function(self)
+			animFlag= false;
+			module:animStopped();
+		end
+	);
+end
 function module:isOverrideActionBarAnimating()
 	return animFlag;
 end
@@ -166,19 +170,21 @@ local function override_ShowFrames()
 
 	for i, name in ipairs(overrideFrames) do
 		frame = _G[name];
-		if (frame.ctInUse) then
-			-- We are using the frame in CT_BottomBar.
-			-- Set the values to the ones being used.
-			alpha = frame.ctUseAlpha;
-			mouse = frame.ctUseMouse;
-		else
-			-- Set the values so that we "show" the frame by restoring the saved values.
-			alpha = frame.ctSaveAlpha;
-			mouse = frame.ctSaveMouse;
-		end
-		frame_SetAlpha(frame, alpha);
-		if (not (frame:IsProtected() and inCombatLockdown)) then
-			frame_EnableMouse(frame, mouse);
+		if (frame) then
+			if (frame.ctInUse) then
+				-- We are using the frame in CT_BottomBar.
+				-- Set the values to the ones being used.
+				alpha = frame.ctUseAlpha;
+				mouse = frame.ctUseMouse;
+			else
+				-- Set the values so that we "show" the frame by restoring the saved values.
+				alpha = frame.ctSaveAlpha;
+				mouse = frame.ctSaveMouse;
+			end
+			frame_SetAlpha(frame, alpha);
+			if (not (frame:IsProtected() and inCombatLockdown)) then
+				frame_EnableMouse(frame, mouse);
+			end
 		end
 	end
 end
