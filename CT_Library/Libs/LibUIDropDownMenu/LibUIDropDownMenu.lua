@@ -280,69 +280,77 @@ end
 
 -- //////////////////////////////////////////////////////////////
 -- L_UIDropDownMenuTemplate
+local function appendSuffixOrNil(name, suffix)
+	if (name and suffix) then
+		return name .. suffix;
+	end
+	return nil
+end
+
 local function create_UIDropDownMenu(name, parent)
 	local f
 	if type(name) == "table" then
 		f = name
-		name = f:GetName()
+		name = f:GetName();
 	else
 		f = CreateFrame("Frame", name, parent or nil)
 	end
+	
 	f:SetSize(40, 32)
 	
-	f.Left = f:CreateTexture(name.."Left", "ARTWORK")
+	f.Left = f:CreateTexture(appendSuffixOrNil(name, "Left"), "ARTWORK")
 	f.Left:SetTexture("Interface\\Glues\\CharacterCreate\\CharacterCreate-LabelFrame")
 	f.Left:SetSize(25, 64)
 	f.Left:SetPoint("TOPLEFT", f, 0, 17)
 	f.Left:SetTexCoord(0, 0.1953125, 0, 1)
 	
-	f.Middle = f:CreateTexture(name.."Middle", "ARTWORK")
+	f.Middle = f:CreateTexture(appendSuffixOrNil(name, "Middle"), "ARTWORK")
 	f.Middle:SetTexture("Interface\\Glues\\CharacterCreate\\CharacterCreate-LabelFrame")
 	f.Middle:SetSize(115, 64)
 	f.Middle:SetPoint("LEFT", f.Left, "RIGHT")
 	f.Middle:SetTexCoord(0.1953125, 0.8046875, 0, 1)
 	
-	f.Right = f:CreateTexture(name.."Right", "ARTWORK")
+	f.Right = f:CreateTexture(appendSuffixOrNil(name, "Right"), "ARTWORK")
 	f.Right:SetTexture("Interface\\Glues\\CharacterCreate\\CharacterCreate-LabelFrame")
 	f.Right:SetSize(25, 64)
 	f.Right:SetPoint("LEFT", f.Middle, "RIGHT")
 	f.Right:SetTexCoord(0.8046875, 1, 0, 1)
 	
-	f.Text = f:CreateFontString(name.."Text", "ARTWORK", "GameFontHighlightSmall")
+	f.Text = f:CreateFontString(appendSuffixOrNil(name, "Text"), "ARTWORK", "GameFontHighlightSmall")
 	f.Text:SetWordWrap(false)
 	f.Text:SetJustifyH("RIGHT")
 	f.Text:SetSize(0, 10)
 	f.Text:SetPoint("RIGHT", f.Right, -43, 2)
 	
-	f.Icon = f:CreateTexture(name.."Icon", "OVERLAY")
+	f.Icon = f:CreateTexture(appendSuffixOrNil(name, "Icon"), "OVERLAY")
 	f.Icon:Hide()
 	f.Icon:SetSize(16, 16)
 	f.Icon:SetPoint("LEFT", 30, 2)
 	
-	f.Button = CreateFrame("Button", name.."Button", f)
+	f.Button = CreateFrame("Button", appendSuffixOrNil(name, "Button"), f)
 	f.Button:SetMotionScriptsWhileDisabled(true)
 	f.Button:SetSize(24, 24)
 	f.Button:SetPoint("TOPRIGHT", f.Right, -16, -18)
 	
-	f.Button.NormalTexture = f.Button:CreateTexture(name.."NormalTexture")
+	f.Button.NormalTexture = f.Button:CreateTexture(appendSuffixOrNil(name, "NormalTexture"))
 	f.Button.NormalTexture:SetTexture("Interface\\ChatFrame\\UI-ChatIcon-ScrollDown-Up")
 	f.Button.NormalTexture:SetSize(24, 24)
 	f.Button.NormalTexture:SetPoint("RIGHT", f.Button, 0, 0)
 	f.Button:SetNormalTexture(f.Button.NormalTexture)
 	
-	f.Button.PushedTexture = f.Button:CreateTexture(name.."PushedTexture")
+	f.Button.PushedTexture = f.Button:CreateTexture(appendSuffixOrNil(name, "PushedTexture"))
 	f.Button.PushedTexture:SetTexture("Interface\\ChatFrame\\UI-ChatIcon-ScrollDown-Down")
 	f.Button.PushedTexture:SetSize(24, 24)
 	f.Button.PushedTexture:SetPoint("RIGHT", f.Button, 0, 0)
 	f.Button:SetPushedTexture(f.Button.PushedTexture)
 	
-	f.Button.DisabledTexture = f.Button:CreateTexture(name.."DisabledTexture")
+	f.Button.DisabledTexture = f.Button:CreateTexture(appendSuffixOrNil(name, "DisabledTexture"))
 	f.Button.DisabledTexture:SetTexture("Interface\\ChatFrame\\UI-ChatIcon-ScrollDown-Disabled")
 	f.Button.DisabledTexture:SetSize(24, 24)
 	f.Button.DisabledTexture:SetPoint("RIGHT", f.Button, 0, 0)
 	f.Button:SetDisabledTexture(f.Button.DisabledTexture)
 	
-	f.Button.HighlightTexture = f.Button:CreateTexture(name.."HighlightTexture")
+	f.Button.HighlightTexture = f.Button:CreateTexture(appendSuffixOrNil(name, "HighlightTexture"))
 	f.Button.HighlightTexture:SetTexture("Interface\\Buttons\\UI-Common-MouseHilight")
 	f.Button.HighlightTexture:SetSize(24, 24)
 	f.Button.HighlightTexture:SetPoint("RIGHT", f.Button, 0, 0)

@@ -1,11 +1,16 @@
 ## Interface: 80100
-## Version: 8.1.5.3
+## Version: 8.1.5.4
 ## Title: CT_Library
 ## Notes: Library features for CTMod. 
 ## DefaultState: Enabled
+## Author: Cide, TS, Resike, Dahk
+
 
 Libs\LibStub\LibStub.lua
 Libs\LibUIDropDownMenu\LibUIDropDownMenu.xml
 Libs\DropDownFix\DropDownFix.lua
 
 CT_Library.lua
+localization.lua
+CT_Library_TitanPlugin.lua
+
