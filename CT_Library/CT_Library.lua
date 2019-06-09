@@ -6,20 +6,12 @@
 -- Please do not modify or otherwise          --
 -- redistribute this without the consent of   --
 -- the CTMod Team. Thank you.                 --
---                                            --
--- Original credits to Cide and TS (Vanilla)  --
--- Maintained by Resike from 2014 to 2017     --
--- Maintained by Dahk Celes since 2018        --
---                                            --
--- This file contains the overall CTMod       --
--- structure used by all modules, and several --
--- helper functions to simplify coding        --
 ------------------------------------------------
 
 -----------------------------------------------
 -- Initialization
 
-local LIBRARY_VERSION = 8.154;
+local LIBRARY_VERSION = 8.152;
 local LIBRARY_NAME = "CT_Library";
 
 local _G = getfenv(0);
@@ -50,7 +42,6 @@ else
 	-- Create a new lib table.
 	lib = { };
 	_G[LIBRARY_NAME] = lib;
-	lib.text = { };  -- this will be populated by localization.lua
 end
 
 -- Set the variables used
@@ -59,6 +50,7 @@ lib.version = LIBRARY_VERSION;
 
 -- End Initialization
 -----------------------------------------------
+
 
 
 
@@ -2349,6 +2341,9 @@ end
 -----------------------------------------------
 -- Control Panel
 
+CT_LIBRARY_THANKYOU = "Thank You!";
+CT_LIBRARY_INTRODUCTION = "Thank you for using CTMod!\nYou can open this window with /ct or /ctmod\n\nClick below to open options for each module";
+
 local controlPanelFrame;
 local selectedModule;
 local previousModule;
@@ -2514,17 +2509,8 @@ local function controlPanelSkeleton()
 					obj = listing[tostring(num)];
 					obj:SetID(num);
 					obj:Show();
-
-					-- localize the title of these two modules specifically
-					if (num == 701 and module.name == "|c00FFFFCCSettings Import|r" and lib.text["CT_Library/SettingsImport/Heading"]) then
-						module.name = "|c00FFFFCC" .. lib.text["CT_Library/SettingsImport/Heading"] .. "|r";
-					elseif (num == 702 and module.name == "|c00FFFFCCHelp|r" and lib.text["CT_Library/Help/Heading"]) then
-						module.name = "|c00FFFFCC" .. lib.text["CT_Library/Help/Heading"] .. "|r";
-					end
-					
 					obj:SetText(module.name);
 
-					
 					if ( version and version ~= "" ) then
 						obj.version:SetText("|c007F7F7Fv|r"..module.version);
 					end
@@ -2534,12 +2520,12 @@ local function controlPanelSkeleton()
 						obj.bullet:SetVertexColor(1, 0.82, 0);
 					end
 
-					if ( num == 15 ) then
+					if ( num == 14 ) then
 						break;
 					end
 				end
 			end
-			for i = num + 1, 715, 1 do
+			for i = num + 1, 714, 1 do
 				listing[tostring(i)]:Hide();
 			end
 			PlaySound(1115);
@@ -2583,28 +2569,27 @@ local function controlPanelSkeleton()
 			end,
 		},
 		["frame#s:300:0#tl:15:-30#b:0:15#i:listing"] = {
-			"font#tl:-6:0#s:285:60#" .. lib.text["CT_Library/Introduction"] .. "#t",
+			"font#tl:-6:0#s:285:60#CT_LIBRARY_INTRODUCTION#t",
 			"texture#tl:0:-64#br:tr:-25:-65#1:1:1",
-			"font#tl:-3:-69#v:GameFontNormalLarge#" .. lib.text["CT_Library/ModListing"],
+			"font#tl:-3:-69#v:GameFontNormalLarge#Mod Listing:",
 			"texture#i:hover#l:5:0#s:290:25#hidden#1:1:1:0.125",
 			"texture#i:select#l:5:0#s:290:25#hidden#1:1:1:0.25",
-			--"font#b:-10:-10#www.CTMod.net\ncurseforge.com/wow/addons/CTMod#0.72:0.36:0",
+			"font#b:-10:0#www.CTMod.net\ncurseforge.com/wow/addons/CTMod#0.72:0.36:0",
 						--700 is an offset to prevent taint affecting battleground queueing
-			["button#i:703#hidden#s:263:25#tl:17:-85"] = modListButtonTemplate,	
-			["button#i:704#hidden#s:263:25#tl:17:-110"] = modListButtonTemplate,
-			["button#i:705#hidden#s:263:25#tl:17:-135"] = modListButtonTemplate,
-			["button#i:706#hidden#s:263:25#tl:17:-160"] = modListButtonTemplate,
-			["button#i:707#hidden#s:263:25#tl:17:-185"] = modListButtonTemplate,
-			["button#i:708#hidden#s:263:25#tl:17:-210"] = modListButtonTemplate,
-			["button#i:709#hidden#s:263:25#tl:17:-235"] = modListButtonTemplate,
-			["button#i:710#hidden#s:263:25#tl:17:-260"] = modListButtonTemplate,
-			["button#i:711#hidden#s:263:25#tl:17:-285"] = modListButtonTemplate,
-			["button#i:712#hidden#s:263:25#tl:17:-310"] = modListButtonTemplate,
-			["button#i:713#hidden#s:263:25#tl:17:-335"] = modListButtonTemplate,
-			["button#i:714#hidden#s:263:25#tl:17:-360"] = modListButtonTemplate,
-			["button#i:715#hidden#s:263:25#tl:17:-385"] = modListButtonTemplate,
-			["button#i:701#hidden#s:263:25#tl:17:-410"] = modListButtonTemplate, -- settings import
-			["button#i:702#hidden#s:263:25#tl:17:-435"] = modListButtonTemplate, -- settings import
+			["button#i:701#hidden#s:263:25#tl:17:-85"] = modListButtonTemplate,	
+			["button#i:702#hidden#s:263:25#tl:17:-110"] = modListButtonTemplate,
+			["button#i:703#hidden#s:263:25#tl:17:-135"] = modListButtonTemplate,
+			["button#i:704#hidden#s:263:25#tl:17:-160"] = modListButtonTemplate,
+			["button#i:705#hidden#s:263:25#tl:17:-185"] = modListButtonTemplate,
+			["button#i:706#hidden#s:263:25#tl:17:-210"] = modListButtonTemplate,
+			["button#i:707#hidden#s:263:25#tl:17:-235"] = modListButtonTemplate,
+			["button#i:708#hidden#s:263:25#tl:17:-260"] = modListButtonTemplate,
+			["button#i:709#hidden#s:263:25#tl:17:-285"] = modListButtonTemplate,
+			["button#i:710#hidden#s:263:25#tl:17:-310"] = modListButtonTemplate,
+			["button#i:711#hidden#s:263:25#tl:17:-335"] = modListButtonTemplate,
+			["button#i:712#hidden#s:263:25#tl:17:-360"] = modListButtonTemplate,
+			["button#i:713#hidden#s:263:25#tl:17:-385"] = modListButtonTemplate,
+			["button#i:714#hidden#s:263:25#tl:17:-410"] = modListButtonTemplate,
 		},
 		["frame#s:315:0#tr:-15:-30#b:0:15#i:options#hidden"] = {
 			["onload"] = function(self)
@@ -2655,24 +2640,14 @@ function lib:showControlPanel(show)
 end
 
 -- Show the CTMod control panel options for the specified addon name.
--- if ustCustomFunction is true then an attempt will be made to open a module's custom options function instead
-function lib:showModuleOptions(modname, useCustomFunction)
+function lib:showModuleOptions(modname)
+	-- Show the control panel
 	self:showControlPanel(true);
+	-- Look up the addon name to deterine which button to click.
 	local listing = CTCONTROLPANEL.listing;
 	local button;
 	local num = 700;			--700 is an offset to prevent taint affecting battleground queueing
-
-	-- First scans modules to find the right one
-	-- If the module has a custom function, activates it if appropriate
-	-- Otherwise, identifies the "button" that a user would normally click to open the module's options
-	-- Then shows the control panel and simulates a click on that button
-	
 	for i, v in ipairs(modules) do
-		if (useCustomFunction and v.customOpenFunction) then
-			self:showControlPanel(false);
-			v.customOpenFunction()
-			return;
-		end
 		if (v.frame) then
 			num = num + 1;
 			if (v.name == modname) then
@@ -2681,7 +2656,6 @@ function lib:showModuleOptions(modname, useCustomFunction)
 			end
 		end
 	end
-	
 	if (button) then
 		-- Click the addon's button to open the options
 		button:Click();
@@ -2700,13 +2674,12 @@ lib:updateSlashCmd(displayControlPanel, "/ct", "/ctmod");
 -- End Control Panel
 -----------------------------------------------
 
-
 -----------------------------------------------
--- Settings Import (1)
+-- Importing
 
 -- Initialization
 local module = { };
-module.name = "|c00FFFFCCSettings Import|r"; -- this is changed to a localized string during the button's onLoad
+module.name = "|c00FFFFCCSettings Import|r";
 module.optionsName = "Settings Import";
 module.version = "";
 -- Register as module 1 only, since this will code will get executed once per different
@@ -3117,160 +3090,4 @@ module.frame = function()
 	end
 
 	return "frame#all", optionsTable;
-end
-
-
------------------------------------------------
--- Help (2)
-
--- Initialization
-local module = { };
-module.name = "|c00FFFFCCHelp|r";
-module.optionsName = "Help";
-module.version = "";
--- Register as module 2 only, since this will code will get executed once per different
--- version of CT_Library. We don't want multiple copies showing up in the
--- control panel.
-registerModule(module, 2);
-
-local helpFrameList;
-local function helpInit()
-	optionsFrameList = module:framesInit();
-end
-local function helpGetData()
-	return module:framesGetData(optionsFrameList);
-end
-local function helpAddFrame(offset, size, details, data)
-	module:framesAddFrame(optionsFrameList, offset, size, details, data);
-end
-local function helpAddObject(offset, size, details)
-	module:framesAddObject(optionsFrameList, offset, size, details);
-end
-local function helpAddScript(name, func)
-	module:framesAddScript(optionsFrameList, name, func);
-end
-local function helpBeginFrame(offset, size, details, data)
-	module:framesBeginFrame(optionsFrameList, offset, size, details, data);
-end
-local function helpEndFrame()
-	module:framesEndFrame(optionsFrameList);
-end
-
-module.frame = function()
-	local textColor0 = "1.0:1.0:1.0";
-	local textColor1 = "0.9:0.9:0.9";
-	local textColor2 = "0.7:0.7:0.7";
-	local textColor3 = "1.0:0.4:0.4";
-	
-	helpInit();
-	
-	-- About CTMod
-	helpBeginFrame(-5, 0, "frame#tl:0:%y#r");
-		
-		helpAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. lib.text["CT_Library/Help/About/Heading"]); -- About CTMod
-		
-		helpAddObject( -5, 2*14, "font#tl:10:%y#s:0:%s#l:13:0#r#" .. lib.text["CT_Library/Help/About/Credits"] .. "#" .. textColor1 .. ":l");  -- Two lines giving credits to Cide, TS, Resike and Dahk
-		
-		helpAddObject(-15,   14, "font#tl:10:%y#s:0:%s#l:13:0#r#" .. lib.text["CT_Library/Help/About/Updates"] .. "#" .. textColor1 .. ":l");  -- "Updates are available at:"
-		helpAddObject( -5,   14, "font#tl:30:%y#s:0:%s#l:13:0#r#www.CTMod.net#" .. textColor0 .. ":l");
-		helpAddObject( -5,   14, "font#tl:30:%y#s:0:%s#l:13:0#r#CurseForge.com/WoW/Addons/CTMod# " .. textColor0 .. ":l");
-	
-	helpEndFrame();
-	
-	-- What is CTMod?
-	helpBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
-		local sNotInstalled = lib.text["CT_Library/Help/WhatIs/NotInstalled"];
-		helpAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. lib.text["CT_Library/Help/WhatIs/Heading"]); -- What is CTMod?
-		
-		helpAddObject( -5,   14, "font#tl:10:%y#s:0:%s#r#" .. lib.text["CT_Library/Help/WhatIs/Line1"] .. "#" .. textColor1 .. ":l"); -- CTMod contains several modules
-		if (CT_BarMod and CT_BottomBar) then
-			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#BarMod (/ctbar) and BottomBar (/ctbb)#" .. textColor0 .. ":l");
-			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Changes the appearance of action bars and other UI elements#" .. textColor2 .. ":l");
-		elseif (CT_BarMod) then
-			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#BarMod (/ctbar)#" .. textColor0 .. ":l");
-			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Changes the appearance of action bars#" .. textColor2 .. ":l");
-			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#BottomBar (" .. sNotInstalled .. ")#" .. textColor3 .. ":l");
-			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Changes the appearance of other UI elements#" .. textColor2 .. ":l");
-		elseif (CT_BottomBar) then
-			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#BarMod (" .. sNotInstalled .. ")#" .. textColor3 .. ":l");
-			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Changes the appearance of action bars#" .. textColor2 .. ":l");
-			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#BottomBar (/ctbb)#" .. textColor0 .. ":l");
-			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Changes the appearance of other UI elements#" .. textColor2 .. ":l");
-		else
-			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#BarMod and BottomBar (" .. sNotInstalled .. ")#" .. textColor3 .. ":l");
-			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Changes the appearance of action bars and other UI elements#" .. textColor2 .. ":l");		
-		end
-		if (CT_BuffMod) then
-			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#BuffMod (/ctbuff)#" .. textColor0 .. ":l");
-			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Changes the appearance of buffs, debuffs and auras#" .. textColor2 .. ":l");
-		else
-			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#BuffMod (" .. sNotInstalled .. ")#" .. textColor3 .. ":l");
-			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Changes the appearance of buffs, debuffs and auras#" .. textColor2 .. ":l");		
-		end
-		if (CT_Core) then
-			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#Core (/ctcore)#" .. textColor0 .. ":l");
-			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Packages several light-weight modifications to the game#" .. textColor2 .. ":l");
-		else
-			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#Core (" .. sNotInstalled .. ")#" .. textColor3 .. ":l");
-			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Packages several light-weight modifications to the game#" .. textColor2 .. ":l");
-		end
-		if (CT_ExpenseHistory) then
-			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#ExpenseHistory (/cteh)#" .. textColor0 .. ":l");
-			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Tracks for how much you spend on repairs, flights, etc.#" .. textColor2 .. ":l");
-		else
-			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#ExpenseHistory (" .. sNotInstalled .. ")#" .. textColor3 .. ":l");
-			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Tracks for how much you spend on repairs, flights, etc.#" .. textColor2 .. ":l");
-		end
-		if (CT_MailMod) then
-			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#MailMod (/ctmail)#" .. textColor0 .. ":l");
-			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Adds logging and other features to the in-game mailbox#" .. textColor2 .. ":l");
-		else
-			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#MailMod (" .. sNotInstalled .. ")#" .. textColor3 .. ":l");
-			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Adds logging and other features to the in-game mailbox#" .. textColor2 .. ":l");
-		end
-		
-		if (CT_MapMod) then
-			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#MapMod (/ctmap)#" .. textColor0 .. ":l");
-			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Adds pins to the world map for hightlighting points of interest#" .. textColor2 .. ":l");
-		else
-			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#MapMod (" .. sNotInstalled .. ")#" .. textColor3 .. ":l");
-			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Adds pins to the world map for hightlighting points of interest#" .. textColor2 .. ":l");
-		end
-		if (CT_PartyBuffs and CT_UnitFrames) then
-			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#PartyBuffs (/ctparty) and UnitFrames (/ctuf)#" .. textColor0 .. ":l");
-			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Changes the appearance of self, party, focus and assist frames#" .. textColor2 .. ":l");
-		elseif (CT_PartyBuffs) then
-			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#PartyBuffs (/ctparty)#" .. textColor0 .. ":l");
-			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Adds buffs to party member frames#" .. textColor2 .. ":l");
-			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#UnitFrames (" .. sNotInstalled .. ")#" .. textColor3 .. ":l");
-			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Changes the appearance of self, focus and assist frames#" .. textColor2 .. ":l");
-		elseif (CT_UnitFrames) then
-			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#PartyBuffs (" .. sNotInstalled .. ")#" .. textColor3 .. ":l");
-			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Adds buffs to party member frames#" .. textColor2 .. ":l");
-			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#UnitFrames (/uf)#" .. textColor0 .. ":l");
-			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Changes the appearance of self, focus and assist frames#" .. textColor2 .. ":l");
-		else
-			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#PartyBuffs (" .. sNotInstalled .. ")#" .. textColor3 .. ":l");
-			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Adds buffs to party member frames#" .. textColor2 .. ":l");
-			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#UnitFrames (" .. sNotInstalled .. ")#" .. textColor3 .. ":l");
-			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Changes the appearance of self, focus and assist frames#" .. textColor2 .. ":l");
-		end
-		if (CT_Viewport) then
-			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#Viewport (/ctvp)#" .. textColor0 .. ":l");
-			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Changes the rendering of the world on the screen#" .. textColor2 .. ":l");				
-		else
-			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#Viewport (" .. sNotInstalled .. ")#" .. textColor3 .. ":l");
-			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Changes the rendering of the world on the screen#" .. textColor2 .. ":l");
-		end
-
-		if (CT_RA_Version) then
-		helpAddObject(-15, 4*14, "font#tl:10:%y#s:0:%s#r#CTMod is also associated with CT Raid Assist\nType /ctra to access those options#" .. textColor1 .. ":l");
-		else
-		helpAddObject(-15, 4*14, "font#tl:10:%y#s:0:%s#r#CTMod is also associated with CT Raid Assist\n(" .. sNotInstalled .. ")#" .. textColor1 .. ":l");
-		end
-		
-	
-	helpEndFrame();
-	
-	return "frame#all", helpGetData();
 end

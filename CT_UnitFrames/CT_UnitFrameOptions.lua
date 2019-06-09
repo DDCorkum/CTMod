@@ -543,17 +543,14 @@ end
 --------------------------------------------
 -- Mod Options
 
--- function to open and close the window, that can be recognized by CT_Library (to bypass the CTMod panel)
-module.customOpenFunction = function()
+-- Slash command
+module:setSlashCmd(function()
 	if ( CT_UnitFramesOptionsFrame:IsVisible() ) then
 		HideUIPanel(CT_UnitFramesOptionsFrame);
 	else
 		ShowUIPanel(CT_UnitFramesOptionsFrame);
 	end
-end
-
--- Slash command
-module:setSlashCmd(module.customOpenFunction, "/uf", "/ctuf", "/unitframes");
+end, "/uf", "/ctuf", "/unitframes");
 
 -- Mod Initialization
 module.update = function(self, type, value)

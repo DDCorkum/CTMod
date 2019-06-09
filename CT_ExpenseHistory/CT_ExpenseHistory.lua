@@ -444,15 +444,13 @@ function CT_EH_newRepairAllItems(...)
 end
 RepairAllItems = CT_EH_newRepairAllItems;
 
-module.customOpenFunction = function()
+SlashCmdList["EXPENSEHISTORY"] = function()
 	if ( CT_ExpenseHistoryFrame:IsVisible() ) then
 		HideUIPanel(CT_ExpenseHistoryFrame);
 	else
 		ShowUIPanel(CT_ExpenseHistoryFrame);
 	end
 end
-
-SlashCmdList["EXPENSEHISTORY"] = module.customOpenFunction;
 
 SLASH_EXPENSEHISTORY1 = "/eh";
 SLASH_EXPENSEHISTORY2 = "/expensehistory";

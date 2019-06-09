@@ -81,11 +81,6 @@ SLASH_VIEWPORT1 = "/viewport";
 SLASH_VIEWPORT2 = "/ctvp";
 SLASH_VIEWPORT3 = "/ctviewport";
 
--- Direct loading of the frame from other means
-module.customOpenFunction = function()
-	ShowUIPanel(CT_ViewportFrame);
-end
-
 -- Resizing functions
 function CT_Viewport_Resize(button, anchorPoint)
 	local ivalues = CT_Viewport.initialValues;

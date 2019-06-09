@@ -1,4 +1,4 @@
-CT_UnitFrames (8.1.0.3) 2019-01-11
+CT_UnitFrames (8.1.0.3) 2018-01-11
 - Integrated the custom assist and focus frames with CT_Core casting bar timers
 
 CT_UnitFrames (8.0.1.5) 2018-08-21

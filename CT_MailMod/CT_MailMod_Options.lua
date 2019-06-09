@@ -379,27 +379,3 @@ module.update = function(self, optName, value)
 		end
 	end
 end
-
-
-module.externalDropDown_Initialize = function()
-	info = { };
-	info.text = "CT_MailMod";
-	info.isTitle = 1;
-	info.justifyH = "CENTER";
-	info.notCheckable = 1;
-	L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL);
-
-	info = { };
-	info.text = "Open options";
-	info.notCheckable = 1;
-	info.func = function()
-		module:showModuleOptions(module.name);
-	end
-	L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL);	
-	
-	info = { };
-	info.text = "Open mail log";
-	info.notCheckable = 1;
-	info.func = module.showMailLog;
-	L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL);	
-end

@@ -1652,9 +1652,9 @@ module.frame = function()
 		
 		-- Reset Options
 		optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
-			optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. module.text["CT_MapMod/Options/Reset/Heading"]); -- Reset Options
-			optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:CT_MapMod_resetAll#" .. module.text["CT_MapMod/Options/Reset/ResetAllCheckbox"]); -- Reset options for all of your characters
-			optionsBeginFrame(   0,   30, "button#t:0:%y#s:120:%s#v:UIPanelButtonTemplate#" .. module.text["CT_MapMod/Options/Reset/ResetButton"]);  -- Reset options
+			optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. module.text["CTMapMod/Options/Reset/Heading"]); -- Reset Options
+			optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:CT_MapMod_resetAll#" .. module.text["CTMapMod/Options/Reset/ResetAllCheckbox"]); -- Reset options for all of your characters
+			optionsBeginFrame(   0,   30, "button#t:0:%y#s:120:%s#v:UIPanelButtonTemplate#" .. module.text["CTMapMod/Options/Reset/ResetButton"]);  -- Reset options
 				optionsAddScript("onclick",
 					function(self)
 						if (module:getOption("CT_MapMod_resetAll")) then
@@ -1681,7 +1681,7 @@ module.frame = function()
 				);
 			optionsEndFrame();
 		optionsEndFrame();
-		optionsAddObject(  0, 3*13, "font#t:0:%y#s:0:%s#l#r#" .. module.text["CT_MapMod/Options/Reset/Line 1"] .. "#" .. textColor2); --Note: This will reset the options to default and then reload your UI.
+		optionsAddObject(  0, 3*13, "font#t:0:%y#s:0:%s#l#r#" .. module.text["CTMapMod/Options/Reset/Line 1"] .. "#" .. textColor2); --Note: This will reset the options to default and then reload your UI.
 		
 	optionsEndFrame();
 
