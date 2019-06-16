@@ -434,7 +434,7 @@ function CT_RASets_DropDown_Initialize(self)
 	info.isTitle = 1;
 	info.justifyH = "CENTER";
 	info.notCheckable = 1;
-	L_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL);
 
 	info = { };
 	info.text = "Open CTRA options";
@@ -442,7 +442,7 @@ function CT_RASets_DropDown_Initialize(self)
 	info.notCheckable = 1;
 	info.disabled = inCombat;
 	info.func = CT_RASets_DropDown_OnClick;
-	L_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL);
 
 	info = { };
 	info.text = "Open CTRA raid window";
@@ -450,7 +450,7 @@ function CT_RASets_DropDown_Initialize(self)
 	info.notCheckable = 1;
 	info.disabled = inCombat;
 	info.func = CT_RASets_DropDown_OnClick;
-	L_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL);
 
 	if ( ( CT_RASets_OpenedLevel or 0 ) >= 1 ) then
 		info = { };
@@ -459,7 +459,7 @@ function CT_RASets_DropDown_Initialize(self)
 		info.notCheckable = 1;
 		info.disabled = inCombat;
 		info.func = CT_RASets_DropDown_OnClick;
-		L_UIDropDownMenu_AddButton(info);
+		L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL);
 	end
 
 	info = { };
@@ -472,7 +472,7 @@ function CT_RASets_DropDown_Initialize(self)
 	info.notCheckable = 1;
 	info.disabled = inCombat;
 	info.func = CT_RASets_DropDown_OnClick;
-	L_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL);
 
 	info = { };
 	info.text = "Edit option sets";
@@ -480,7 +480,7 @@ function CT_RASets_DropDown_Initialize(self)
 	info.notCheckable = 1;
 	info.disabled = inCombat;
 	info.func = CT_RASets_DropDown_OnClick;
-	L_UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL);
 
 	local numSets = 0;
 	local sets = {};
@@ -506,7 +506,7 @@ function CT_RASets_DropDown_Initialize(self)
 		info.isTitle = 1;
 		info.justifyH = "CENTER";
 		info.notCheckable = 1;
-		L_UIDropDownMenu_AddButton(info);
+		L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL);
 
 		for i, k in ipairs(sets) do
 			info = { };
@@ -520,7 +520,7 @@ function CT_RASets_DropDown_Initialize(self)
 			info.tooltipTitle = "Change Set";
 			info.tooltipText = "Changes the current option set to this one, updating all of your settings to match the ones specified in the option set.";
 			info.func = CT_RASets_DropDown_OnClick;
-			L_UIDropDownMenu_AddButton(info);
+			L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL);
 		end
 	end
 end

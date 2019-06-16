@@ -1156,10 +1156,10 @@ CT_Core_ContainerFrameItemButton_OnModifiedClick_Register(CT_Core_AddToAuctions)
 
 --------------------------------------------
 -- Hides the gryphons if the user does not have CT_BottomBar installed
-
-local function hide_gryphons()
+-- val is true should the gryphons be hidden, or false should they remain visible
+local function hide_gryphons(val)
 	if (CT_BottomBar) then return; end
-	if (module:getOption("hideGryphons")) then
+	if (val) then
 		if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
 			MainMenuBarArtFrame.LeftEndCap:Hide();
 			MainMenuBarArtFrame.RightEndCap:Hide();
@@ -1284,21 +1284,10 @@ local function castingbar_CreateAnchorFrame()
 			-- 	<OnHide function="UIParent_ManageFramePositions"/>
 			StanceBarFrame:HookScript("OnShow", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
 			StanceBarFrame:HookScript("OnHide", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
-			
-					if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
-						MainMenuBarArtFrame.LeftEndCap:Hide();
-						MainMenuBarArtFrame.RightEndCap:Hide();
-					elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-						MainMenuBarLeftEndCap:Hide();
-						MainMenuBarRightEndCap:Hide();
-		end
 			DurabilityFrame:HookScript("OnShow", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
 			DurabilityFrame:HookScript("OnHide", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
 			PetActionBarFrame:HookScript("OnShow", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
 			PetActionBarFrame:HookScript("OnHide", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
-			-- (Removed in WoW 8.0.1) ReputationWatchBar:HookScript("OnHide", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
-			-- (Removed in WoW 8.0.1) MainMenuBarMaxLevelBar:HookScript("OnShow", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
-			-- (Removed in WoW 8.0.1) MainMenuBarMaxLevelBar:HookScript("OnHide", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
 			if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
 				-- these don't happen in WoW Classic
 				MultiCastActionBarFrame:HookScript("OnShow", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
@@ -1307,6 +1296,9 @@ local function castingbar_CreateAnchorFrame()
 				PossessBarFrame:HookScript("OnHide", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
 			elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
 				--TODO: determine if anything needs to be here
+				-- (Removed in WoW 8.0.1, but should be here???) -- ReputationWatchBar:HookScript("OnHide", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
+				-- (Removed in WoW 8.0.1, but should be here???) -- MainMenuBarMaxLevelBar:HookScript("OnShow", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
+				-- (Removed in WoW 8.0.1, but should be here???) -- MainMenuBarMaxLevelBar:HookScript("OnHide", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
 			end
 
 
