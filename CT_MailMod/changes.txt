@@ -1,3 +1,7 @@
+CT_MailMod (8.1.5.5) 2019-06-15
+- Incorporating community-based localization via CurseForge
+- More informative handling of overflowing inbox (>50 items)
+
 CT_MailMod (8.1.0.2) 2019-01-02
 - Added option to hide the checkboxes and open/close buttons at top
 - Restored option to hide the log button at top

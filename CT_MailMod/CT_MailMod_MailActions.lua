@@ -153,7 +153,7 @@ function module:cancelProcessing()
 	endProcessing();
 
 	if (wasProcessing) then
-		print(module:getText("PROCESSING_CANCELLED"));
+		print(module.text["CT_MailMod/PROCESSING_CANCELLED"]);
 	end
 end
 
@@ -247,7 +247,7 @@ function module:mailActionHandler(func)
 			-- already done what was needed to cancel itself.
 			module:clearMailActions();
 			endProcessing();
-			print(module:getText("PROCESSING_CANCELLED"));
+			print(module.text["CT_MailMod/PROCESSING_CANCELLED"]);
 			break;
 
 		elseif (type(ret) == "number") then

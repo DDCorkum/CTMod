@@ -154,9 +154,9 @@ do
 		if (module:getOption("showMoneyChange")) then
 			local moneyDifference = GetMoney() - moneyAtOpen;
 			if (moneyDifference < 0) then
-				print(format(module:getText("MONEY_DECREASED"), module:convertMoneyToString(-moneyDifference)));
+				print(format(module.text["CT_MailMod/MONEY_DECREASED"], module:convertMoneyToString(-moneyDifference)));
 			elseif (moneyDifference > 0) then
-				print(format(module:getText("MONEY_INCREASED"), module:convertMoneyToString(moneyDifference)));
+				print(format(module.text["CT_MailMod/MONEY_INCREASED"], module:convertMoneyToString(moneyDifference)));
 			end
 		end
 
@@ -211,7 +211,7 @@ do
 					-- If user isn't downloading mail, then cancel processing.
 					local actionType = module:getCurrentActionType();
 					if (actionType ~= "download") then
-						print(module:getText("MAIL_DOWNLOAD_END"));
+						print(module.text["CT_MailMod/MAIL_DOWNLOAD_END"]);
 						module:cancelProcessing();
 						module:closeOpenMail();
 					end
@@ -221,7 +221,7 @@ do
 						-- Only suppress this message once (when the mailbox opens).
 						suppressDownloadPrint = false;
 					else
-						print(module:getText("MAIL_DOWNLOAD_END"));
+						print(module.text["CT_MailMod/MAIL_DOWNLOAD_END"]);
 					end
 					-- Make sure nothing is selected.
 					module:inboxUnselectAll();
