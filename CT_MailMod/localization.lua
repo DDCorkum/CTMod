@@ -16,96 +16,93 @@ local module = _G["CT_MailMod"];
 
 --------------------------------------------
 -- Localization
+module.text = { }
+local L = module.text
 
--- Generic
-module:setText("NUMBER_SELECTED", "%d selected");
-module:setText("INBOX_COUNT", "Inbox: %d");
-module:setText("MAILBOX_COUNT", "Mailbox: %d");
-module:setText("MAILBOX_BUTTON_TIP1", "Download mail");
+L["CT_MailMod/DELETE_POPUP1"] = "%d items including %s"
+L["CT_MailMod/DELETE_POPUP2"] = "some money and %s"
+L["CT_MailMod/DELETE_POPUP3"] = "some money and %d items including %s"
+L["CT_MailMod/MAIL_DELETE_NO"] = "Not deleted."
+L["CT_MailMod/MAIL_DELETE_OK"] = "Deleting mail."
+L["CT_MailMod/MAIL_DOWNLOAD_BEGIN"] = "Waiting for mail to download into the inbox."
+L["CT_MailMod/MAIL_DOWNLOAD_END"] = "Mail has downloaded into the inbox."
+L["CT_MailMod/MAIL_LOG"] = "Log"
+L["CT_MailMod/MAIL_LOOT_ERROR"] = "Item not taken:"
+L["CT_MailMod/MAIL_OPEN_CLICK"] = "Press |c0080A0FFAlt-click|r to take the contents."
+L["CT_MailMod/MAIL_OPEN_IS_COD"] = "Mail is Cash on Delivery."
+L["CT_MailMod/MAIL_OPEN_IS_GM"] = "Mail is from Blizzard."
+L["CT_MailMod/MAIL_OPEN_NO"] = "Not opened."
+L["CT_MailMod/MAIL_OPEN_NO_ITEMS_MONEY"] = "Mail has no items or money."
+L["CT_MailMod/MAIL_OPEN_OK"] = "Opening mail."
+L["CT_MailMod/MAIL_RETURN_CLICK"] = "Press |c0080A0FFCtrl-click|r to return the message."
+L["CT_MailMod/MAIL_RETURN_IS_GM"] = "Mail is from Blizzard."
+L["CT_MailMod/MAIL_RETURN_IS_RETURNED"] = "Mail is returning to you."
+L["CT_MailMod/MAIL_RETURN_NO"] = "Not returned."
+L["CT_MailMod/MAIL_RETURN_NO_ITEMS_MONEY"] = "Mail has no items or money."
+L["CT_MailMod/MAIL_RETURN_NO_REPLY"] = "Mail cannot be replied to."
+L["CT_MailMod/MAIL_RETURN_NO_SENDER"] = "Mail has no sender."
+L["CT_MailMod/MAIL_RETURN_OK"] = "Returning mail."
+L["CT_MailMod/MAIL_SEND_OK"] = "Mail sent."
+L["CT_MailMod/MAIL_TAKE_ITEM_OK"] = "Taking attachment."
+L["CT_MailMod/MAIL_TAKE_MONEY_OK"] = "Taking money."
+L["CT_MailMod/MAIL_TIMEOUT"] = "Action timed out."
+L["CT_MailMod/MAILBOX_BUTTON_TIP1"] = "Download mail"
+L["CT_MailMod/MAILBOX_OVERFLOW_COUNT"] = "Overflow: %d"
+L["CT_MailMod/MAILBOX_DOWNLOAD_MORE_NOW"] = "Download more mail"
+L["CT_MailMod/MAILBOX_DOWNLOAD_MORE_SOON"] = [=[Download more mail
+in %d seconds]=]
+L["CT_MailMod/MAILBOX_OPTIONS_TIP1"] = [=[To access CT_MailMod options and tips, click this button or type /ctmail.
+Right click to toggle the mail log window or type /maillog.]=]
+L["CT_MailMod/MONEY_DECREASED"] = "Your money decreased by: %s"
+L["CT_MailMod/MONEY_INCREASED"] = "Your money increased by: %s"
+L["CT_MailMod/NOTHING_SELECTED"] = "No messages are selected."
+L["CT_MailMod/NUMBER_SELECTED_PLURAL"] = "%d selected"
+L["CT_MailMod/NUMBER_SELECTED_SINGLE"] = "%d selected"
+L["CT_MailMod/NUMBER_SELECTED_ZERO"] = "%d selected"
+L["CT_MailMod/OPEN_SELECTED"] = "Open"
+L["CT_MailMod/PROCESSING_CANCELLED"] = "Mailbox processing cancelled."
+L["CT_MailMod/QUICK_DELETE_TIP1"] = "Delete the message now"
+L["CT_MailMod/QUICK_RETURN_TIP1"] = "Return the message now"
+L["CT_MailMod/RETURN_SELECTED"] = "Return"
+L["CT_MailMod/SELECT_ALL"] = "Select All"
+L["CT_MailMod/SELECT_MESSAGE_TIP1"] = "Update message selection"
+L["CT_MailMod/SELECT_MESSAGE_TIP2"] = [=[
+|c0080A0FFClick:|r Select or unselect single
 
-module:setText("SELECT_ALL", "Select All");
-module:setText("MAIL_LOG", "Log");
+|c0080A0FFAlt Left-click:|r Select similar subjects
+|c0080A0FFAlt Right-click:|r Unselect similar subjects
 
-module:setText("NOTHING_SELECTED", "No messages are selected.");
-module:setText("OPEN_SELECTED", "Open");
-module:setText("RETURN_SELECTED", "Return");
-module:setText("STOP_SELECTED", "Cancel");
-module:setText("PROCESSING_CANCELLED", "Mailbox processing cancelled.");
+|c0080A0FFCtrl Left-click:|r Select same sender
+|c0080A0FFCtrl Right-click:|r Unselect same sender
 
-module:setText("SELECT_MESSAGE_TIP1", "Update message selection");
-module:setText("SELECT_MESSAGE_TIP2",
-	   "\n|c0080A0FFClick:|r Select or unselect single\n\n"
-	.. "|c0080A0FFAlt Left-click:|r Select similar subjects\n"
-	.. "|c0080A0FFAlt Right-click:|r Unselect similar subjects\n\n"
-	.. "|c0080A0FFCtrl Left-click:|r Select same sender\n"
-	.. "|c0080A0FFCtrl Right-click:|r Unselect same sender\n\n"
-	.. "|c0080A0FFShift click:|r Mark start of range\n"
-	.. "|c0080A0FFShift Left-click:|r End range and select mail\n"
-	.. "|c0080A0FFShift Right-click:|r End range and unselect mail"
-);
+|c0080A0FFShift click:|r Mark start of range
+|c0080A0FFShift Left-click:|r End range and select mail
+|c0080A0FFShift Right-click:|r End range and unselect mail]=]
+L["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_COPPER"] = "%d copper"
+L["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_GOLD"] = "%d gold %d silver %d copper"
+L["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_SILVER"] = "%d silver %d copper"
+L["CT_MailMod/STOP_SELECTED"] = "Cancel"
 
-module:setText("QUICK_RETURN_TIP1", "Return the message now");
-module:setText("QUICK_DELETE_TIP1", "Delete the message now");
 
-module:setText("MAIL_OPEN_CLICK", "Press |c0080A0FFAlt-click|r to take the contents.");
-module:setText("MAIL_RETURN_CLICK", "Press |c0080A0FFCtrl-click|r to return the message.");
 
-module:setText("MONEY_INCREASED", "Your money increased by: %s");
-module:setText("MONEY_DECREASED", "Your money decreased by: %s");
+if (GetLocale() == "frFR") then
 
-module:setText("MAIL_DOWNLOAD_BEGIN", "Waiting for mail to download into the inbox.");
-module:setText("MAIL_DOWNLOAD_END", "Mail has downloaded into the inbox.");
+L["CT_MailMod/DELETE_POPUP1"] = "%d objets incluant %s"
+L["CT_MailMod/DELETE_POPUP2"] = "d'argent et %s"
+L["CT_MailMod/DELETE_POPUP3"] = "d'argent et %d objets incluant %s"
+L["CT_MailMod/MAILBOX_DOWNLOAD_MORE_NOW"] = "Recevoir plus de courrier"
+L["CT_MailMod/MAILBOX_DOWNLOAD_MORE_SOON"] = [=[Plus de courrier arrive
+dans %d seconds]=]
+L["CT_MailMod/NUMBER_SELECTED_PLURAL"] = "%d sélectionnés"
+L["CT_MailMod/NUMBER_SELECTED_SINGLE"] = "%d sélectionné"
+L["CT_MailMod/NUMBER_SELECTED_ZERO"] = "%d sélectionné"
+L["CT_MailMod/OPEN_SELECTED"] = "Ouvrir"
+L["CT_MailMod/RETURN_SELECTED"] = "Renvoyer"
+L["CT_MailMod/SELECT_ALL"] = "Tous"
+L["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_COPPER"] = "%d cuivre"
+L["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_GOLD"] = "%d or %d argent %d cuivre"
+L["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_SILVER"] = "%d argent %d cuivre"
+L["CT_MailMod/STOP_SELECTED"] = "Annuler"
 
-module:setText("MAILBOX_OPTIONS_TIP1", "To access CT_MailMod options and tips, click this button or type /ctmail.\nRight click to toggle the mail log window or type /maillog.");
 
--- Send Mail
-module:setText("SEND_MAIL_MONEY_SUBJECT_GOLD", "%d gold %d silver %d copper");
-module:setText("SEND_MAIL_MONEY_SUBJECT_SILVER", "%d silver %d copper");
-module:setText("SEND_MAIL_MONEY_SUBJECT_COPPER", "%d copper");
-
--- Mass Mailing
-module:setText("MASS_MAILING", "Mass Mailing");
-module:setText("MASS_MAILING_INFO", "You may send as many items as you want to a single person. " ..
-			   "Drag and drop an item to the green box below, or Alt Right-click an item in your inventory.");
-module:setText("MASS_MAILING_ITEMS", "Items");
-module:setText("MASS_MAILING_DROP_ITEMS", "Drop items here to add to mail.");
-module:setText("MASS_MAILING_DROP_HERE", "Drop the item here to add it to the mail.");
-module:setText("MASS_MAILING_CLICK_REMOVE", "Click to remove item from mail.");
-module:setText("MASS_MAILING_POSTAGE", "Postage:");
-module:setText("MASS_MAILING_SEND", "Send");
-module:setText("MASS_MAILING_CANCEL", "Cancel");
-
--- Log messages
-module:setText("MAIL_LOOT_ERROR", "Item not taken:");
-module:setText("MAIL_TIMEOUT", "Action timed out.");
-
-module:setText("MAIL_OPEN_OK",             "Opening mail.");
-module:setText("MAIL_OPEN_NO",             "Not opened.");
-module:setText("MAIL_OPEN_IS_COD",         "Mail is Cash on Delivery.");
-module:setText("MAIL_OPEN_IS_GM",          "Mail is from Blizzard.");
-module:setText("MAIL_OPEN_NO_ITEMS_MONEY", "Mail has no items or money.");
-
-module:setText("MAIL_RETURN_OK",             "Returning mail.");
-module:setText("MAIL_RETURN_NO",             "Not returned.");
-module:setText("MAIL_RETURN_NO_SENDER",      "Mail has no sender.");
-module:setText("MAIL_RETURN_IS_RETURNED",    "Mail is returning to you.");
-module:setText("MAIL_RETURN_IS_GM",          "Mail is from Blizzard.");
-module:setText("MAIL_RETURN_NO_ITEMS_MONEY", "Mail has no items or money.");
-module:setText("MAIL_RETURN_NO_REPLY",       "Mail cannot be replied to.");
-
-module:setText("MAIL_DELETE_OK", "Deleting mail.");
-module:setText("MAIL_DELETE_NO", "Not deleted.");
-
-module:setText("MAIL_TAKE_ITEM_OK",  "Taking attachment.");
-
-module:setText("MAIL_TAKE_MONEY_OK", "Taking money.");
-
-module:setText("MAIL_SEND_OK", "Mail sent.");
-
--- "Deleting this may will also destroy "
---   <number> items including <item>
---   some money and <item>
---   some money and <number> items including <item>
-module:setText("DELETE_POPUP1", "%d items including %s");
-module:setText("DELETE_POPUP2", "some money and %s");
-module:setText("DELETE_POPUP3", "some money and %d items including %s");
+end

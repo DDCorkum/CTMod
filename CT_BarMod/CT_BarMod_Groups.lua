@@ -823,6 +823,13 @@ defaultPositions[3] = {
 	[12] = {"BOTTOMLEFT", "BOTTOM", -516, 65, "ACROSS", "AB"},  -- Bar 12, Action Bar position
 };
 
+if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+	-- override positions to fit better with classic
+	defaultPositions[1][12][4] = 45;
+	defaultPositions[2][12][4] = 45;
+	defaultPositions[3][12][4] = 45;
+end
+
 function group:position(orientation, stdPositions)
 	if (InCombatLockdown()) then
 		return;

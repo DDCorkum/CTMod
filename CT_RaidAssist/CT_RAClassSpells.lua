@@ -36,13 +36,24 @@ end
 
 function CT_RA_GetClassTalents()
 	CT_RA_ClassTalents = { };
-	local id, name, description, iconPath, background, role;
-	local currentRank;
-	for i = 1, GetNumSpecializations(), 1 do
-		id, name, description, iconPath, background, role = GetSpecializationInfo(i);
-		currentRank = 1;
-		if (name and currentRank and currentRank > 0) then
-			CT_RA_ClassTalents[name] = currentRank;
+	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+		local id, name, description, iconPath, background, role, currentRank;
+		for i = 1, GetNumSpecializations(), 1 do
+			id, name, description, iconPath, background, role = GetSpecializationInfo(i);
+			currentRank = 1;
+			if (name and currentRank and currentRank > 0) then
+				CT_RA_ClassTalents[name] = currentRank;
+			end
+		end
+	elseif (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+		local name, iconPath, iconX, iconY, currentRank, maxRank;
+		for tab=1, 3 do
+			for i = 1, GetNumTalents(tab) do
+				name, iconPath, iconX, iconY, currentRank, maxRank = GetTalentInfo(tab, i);
+				if (name and currentRank and currentRank > 0) then
+					CT_RA_ClassTalents[name] = currentRank;
+				end
+			end
 		end
 	end
 end

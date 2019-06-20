@@ -56,9 +56,9 @@ end
 --------------------------------------------
 -- Fill in subject with money amount being entered.
 do
-	local amount3 = module:getText("SEND_MAIL_MONEY_SUBJECT_GOLD");
-	local amount2 = module:getText("SEND_MAIL_MONEY_SUBJECT_SILVER");
-	local amount1 = module:getText("SEND_MAIL_MONEY_SUBJECT_COPPER");
+	local amount3 = module.text["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_GOLD"];
+	local amount2 = module.text["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_SILVER"];
+	local amount1 = module.text["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_COPPER"];
 	local find3 = "^" .. amount3:gsub("%%d", "%%d+") .. "$";
 	local find2 = "^" .. amount2:gsub("%%d", "%%d+") .. "$";
 	local find1 = "^" .. amount1:gsub("%%d", "%%d+") .. "$";
