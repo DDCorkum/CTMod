@@ -1,4 +1,4 @@
-## Interface: 80100
+## Interface: 11302
 ## Version: 8.1.0.2
 ## Title: CT_MailMod
 ## Notes: Heavily improves the in-game mail functionality.
