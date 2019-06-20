@@ -32,11 +32,7 @@ local function addon_UpdateOrientation(self, orientation)
 	local spacing;
 
 	orientation = orientation or "ACROSS";
-	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
-		spacing = spacing or appliedOptions.bagsBarSpacing or 2;
-	elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		spacing = spacing or appliedOptions.bagsBarSpacing or 4;
-	end
+	spacing = spacing or appliedOptions.bagsBarSpacing or 2;
 
 	for i = 2, #frames do
 		obj = frames[i];
@@ -110,21 +106,13 @@ local function addon_Init(self)
 end
 
 local function addon_Register()
-	local x, y;
-	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
-		x = 345;
-		y = 28;
-	elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		x = 300;
-		y = 3;
-	end		
 	module:registerAddon(
 		"Bags Bar",  -- option name
 		"BagsBar",  -- used in frame names
 		"Bags Bar",  -- shown in options window & tooltips
 		"Bags Bar",  -- title for horizontal orientation
 		"Bags",  -- title for vertical orientation
-		{ "BOTTOMLEFT", ctRelativeFrame, "BOTTOM", x, y },  --default position
+		{ "BOTTOMLEFT", ctRelativeFrame, "BOTTOM", 345, 28 },
 		{ -- settings
 			orientation = "ACROSS",
 			saveShown = true, -- save/load the shown state of frames

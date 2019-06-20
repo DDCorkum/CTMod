@@ -2417,8 +2417,8 @@ module.optionUpdate = function(self, optName, value)
 		CT_BarMod_Shift_Focus_SetReshiftFlag();
 		CT_BarMod_Shift_Focus_Move();
 
-	--elseif ( optName == "shiftMultiCast" ) then   --removed from the game in 2012
-	--	CT_BarMod_Shift_MultiCast_UpdatePositions();
+	elseif ( optName == "shiftMultiCast" ) then
+		CT_BarMod_Shift_MultiCast_UpdatePositions();
 
 	elseif ( optName == "shiftPet" ) then
 		CT_BarMod_Shift_Pet_UpdatePositions();

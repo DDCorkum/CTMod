@@ -32,10 +32,7 @@ CT_NUM_PET_BUFFS = 9;
 local numBuffs, numDebuffs, numPetBuffs;
 
 function CT_PartyBuffs_OnLoad(self)
-	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
-		-- this was causing errors in classic; more investigation required
-		PetFrameDebuff1:SetPoint("TOPLEFT", PetFrame, "TOPLEFT", 48, -59);
-	end
+	PetFrameDebuff1:SetPoint("TOPLEFT", PetFrame, "TOPLEFT", 48, -59);
 end
 
 function CT_PartyBuffs_PetFrame_OnLoad(self)

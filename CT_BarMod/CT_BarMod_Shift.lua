@@ -164,13 +164,7 @@ end
 -------------------------------
 -- Shift the MultiCast bar.
 
---[[  removed in 2012
-
-
 local function CT_BarMod_Shift_MultiCast_areWeShifting()
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return false;
-	end
 	if (CT_BottomBar and CT_BottomBar.ctMultiCast) then
 		-- This version of CT_BottomBar supports deactivation of this bar.
 		if (not CT_BottomBar.ctMultiCast.isDisabled) then
@@ -401,8 +395,6 @@ local function CT_BarMod_Shift_MultiCast_Init()
 
 	CT_BarMod_Shift_MultiCast_UpdatePositions();
 end
-
-removed in 2012 --]]
 
 -------------------------------
 -- Shift the pet bar.
@@ -696,11 +688,6 @@ local function CT_BarMod_Shift_Possess_UpdateState()
 end
 
 local function CT_BarMod_Shift_Possess_Init()
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		-- there isn't a possess bar in Vanilla/Classic!
-		return false;
-	end
-	
 	local frame1, frame2;
 
 	-- Our frame for the possess action buttons
@@ -917,7 +904,7 @@ end
 
 local function CT_BarMod_Shift_UIParent_ManageFramePositions()
 	-- (hook) This is called after Blizzard's UIParent_ManageFramePositions function in UIParent.lua.
-	-- removed from game in 2012 -- CT_BarMod_Shift_MultiCast_UpdateTextures();
+	CT_BarMod_Shift_MultiCast_UpdateTextures();
 	CT_BarMod_Shift_Pet_UpdateTextures();
 	CT_BarMod_Shift_Possess_UpdateTextures();
 	CT_BarMod_Shift_Stance_UpdateTextures();
@@ -939,11 +926,10 @@ local function CT_BarMod_Shift_OnEvent(self, event, arg1, ...)
 		-- the multicast, pet, possess, and class bars if the bar is activated
 		-- in CT_BottomBar.
 
-		--[[ removed from game in 2012
 		-- If CT_BottomBar is not loaded, or if it supports deactivation of this bar...
 		if ((not CT_BottomBar) or (CT_BottomBar and CT_BottomBar.ctMultiCast)) then
 			CT_BarMod_Shift_MultiCast_Init();
-		end --]]
+		end
 
 		-- If CT_BottomBar is not loaded, or if it supports deactivation of this bar...
 		if ((not CT_BottomBar) or (CT_BottomBar and CT_BottomBar.ctPetBar)) then
@@ -1021,7 +1007,7 @@ end
 -- Miscellaneous
 
 function CT_BarMod_Shift_UpdatePositions()
-	-- removed in 2012 -- CT_BarMod_Shift_MultiCast_UpdatePositions();
+	CT_BarMod_Shift_MultiCast_UpdatePositions();
 	CT_BarMod_Shift_Pet_UpdatePositions();
 	CT_BarMod_Shift_Possess_UpdatePositions();
 	CT_BarMod_Shift_Stance_UpdatePositions();
@@ -1053,7 +1039,7 @@ function CT_BarMod_Shift_Init()
 end
 
 -- CT_BottomBar 4.008 and greater use these:
--- removed in 2012 -- module.CT_BarMod_Shift_MultiCast_UpdatePositions = CT_BarMod_Shift_MultiCast_UpdatePositions;
+module.CT_BarMod_Shift_MultiCast_UpdatePositions = CT_BarMod_Shift_MultiCast_UpdatePositions;
 module.CT_BarMod_Shift_Pet_UpdatePositions = CT_BarMod_Shift_Pet_UpdatePositions;
 module.CT_BarMod_Shift_Possess_UpdatePositions = CT_BarMod_Shift_Possess_UpdatePositions;
 module.CT_BarMod_Shift_Stance_UpdatePositions = CT_BarMod_Shift_Stance_UpdatePositions;

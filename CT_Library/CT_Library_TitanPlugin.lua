@@ -26,7 +26,7 @@ TS.addon = "TitanCTMod";
 
 TS.button_label = TS.id
 TS.menu_text = TS.id
-TS.tooltip_header = TS.id.." Options"
+TS.tooltip_header = TS.id.." CTMod Options"
 
 --  Get data from the TOC file.
 TS.version = tostring(GetAddOnMetadata("CT_Library", "Version")) or "Unknown" 
@@ -147,7 +147,7 @@ listener:RegisterEvent("ADDON_LOADED");
 listener:SetScript("OnEvent",
 	function(addon)
 		if (TitanPanelTooltip and not alreadyDoneListening) then
-			local f = CreateFrame("Button", "TitanPanelCTModButton", listener, "TitanPanelComboTemplate");
+			local f = CreateFrame("Button", "TitanPanelCTModButton", listener, "TitanPanelTextTemplate");
 			f:SetFrameStrata("FULLSCREEN");
 			f.registry = {
 				id = TS.id,
@@ -182,9 +182,7 @@ listener:SetScript("OnEvent",
 					ShowIcon = 1,
 					ShowLabelText = 1,
 					ShowColoredText = 1,               
-				},
-				icon = "Interface\\Addons\\CT_Library\\Images\\minimapIcon",
-				iconWidth = 16,
+				}
 			};
 			alreadyDoneListening = true;
 			f:HookScript("OnClick",

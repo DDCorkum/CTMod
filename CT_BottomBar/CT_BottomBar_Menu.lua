@@ -422,75 +422,42 @@ local function addon_PostInit(self)
 end
 
 local function addon_Register()
-	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
-		module:registerAddon(
-			"Menu Bar",  -- option name
-			"MenuBar",  -- used in frame names
-			"Menu Bar",  -- shown in options window & tooltips
-			"Menu Bar",  -- title for horizontal orientation
-			"Menu",  -- title for vertical orientation
-			{ "BOTTOMLEFT", ctRelativeFrame, "BOTTOM", 36, 28 },
-			{ -- settings
-				orientation = "ACROSS",
-				usedOnVehicleUI = true,
-				usedOnOverrideUI = true,
-				usedOnPetBattleUI = true,
-				OnDelayedUpdate = addon_OnDelayedUpdate,
-			},
-			addon_Init,
-			addon_PostInit,
-			nil,  -- no config function
-			addon_Update,
-			addon_UpdateOrientation,
-			nil,  -- no enable function
-			addon_Disable,
-			"helperFrame", -- 1
-			CharacterMicroButton, -- 2
-			SpellbookMicroButton, -- 3
-			TalentMicroButton, -- 4
-			AchievementMicroButton, -- 5
-			QuestLogMicroButton, -- 6
-			GuildMicroButton, -- 7	
-			LFDMicroButton, -- 8
-			CollectionsMicroButton, -- 9
-			EJMicroButton, -- 10
-			StoreMicroButton, -- 11
-			MainMenuMicroButton -- 12
-			--PVPMicroButton, -- old 8
-			--HelpMicroButton -- old 14
-		);
-	elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		module:registerAddon(
-			"Menu Bar",  -- option name
-			"MenuBar",  -- used in frame names
-			"Menu Bar",  -- shown in options window & tooltips
-			"Menu Bar",  -- title for horizontal orientation
-			"Menu",  -- title for vertical orientation
-			{ "BOTTOMLEFT", ctRelativeFrame, "BOTTOM", 65, 4 },
-			{ -- settings
-				orientation = "ACROSS",
-				usedOnVehicleUI = true,
-				usedOnOverrideUI = true,
-				usedOnPetBattleUI = true,
-				OnDelayedUpdate = addon_OnDelayedUpdate,
-			},
-			addon_Init,
-			addon_PostInit,
-			nil,  -- no config function
-			addon_Update,
-			addon_UpdateOrientation,
-			nil,  -- no enable function
-			addon_Disable,
-			"helperFrame", -- 1
-			CharacterMicroButton, -- 2
-			SpellbookMicroButton, -- 3
-			QuestLogMicroButton, -- 4
-			SocialsMicroButton, --5
-			WorldMapMicroButton, --6
-			MainMenuMicroButton, --7
-			HelpMicroButton --8
-		);
-	end
+	module:registerAddon(
+		"Menu Bar",  -- option name
+		"MenuBar",  -- used in frame names
+		"Menu Bar",  -- shown in options window & tooltips
+		"Menu Bar",  -- title for horizontal orientation
+		"Menu",  -- title for vertical orientation
+		{ "BOTTOMLEFT", ctRelativeFrame, "BOTTOM", 36, 28 },
+		{ -- settings
+			orientation = "ACROSS",
+			usedOnVehicleUI = true,
+			usedOnOverrideUI = true,
+			usedOnPetBattleUI = true,
+			OnDelayedUpdate = addon_OnDelayedUpdate,
+		},
+		addon_Init,
+		addon_PostInit,
+		nil,  -- no config function
+		addon_Update,
+		addon_UpdateOrientation,
+		nil,  -- no enable function
+		addon_Disable,
+		"helperFrame", -- 1
+		CharacterMicroButton, -- 2
+		SpellbookMicroButton, -- 3
+		TalentMicroButton, -- 4
+		AchievementMicroButton, -- 5
+		QuestLogMicroButton, -- 6
+		GuildMicroButton, -- 7	
+		LFDMicroButton, -- 8
+		CollectionsMicroButton, -- 9
+		EJMicroButton, -- 10
+		StoreMicroButton, -- 11
+		MainMenuMicroButton -- 12
+		--PVPMicroButton, -- old 8
+		--HelpMicroButton -- old 14
+	);
 end
 
 module.loadedAddons["Menu Bar"] = addon_Register;

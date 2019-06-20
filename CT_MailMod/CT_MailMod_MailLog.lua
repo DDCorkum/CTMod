@@ -88,15 +88,15 @@ local function encodeLogEntry(success, type, mail, message)
 		if (not mail) then
 			-- Old type "0" format: (no longer added to the log as of CT_MailMod 3.210)
 			--   success, type, message
-			-- entry = ("0#%s#%s"):format(type, module.text[message]);
+			-- entry = ("0#%s#%s"):format(type, module:getText(message));
 
 			-- Type "3" format: (added as of CT_MailMod 3.210)
 			--   success, type, timestamp, message
-			entry = ("3#%s#%d#%s"):format(type, time(), module.text[message]);
+			entry = ("3#%s#%d#%s"):format(type, time(), module:getText(message));
 		else
 			-- Format:
 			--   success, type, receiver, sender, subject, timestamp, message
-			entry = ("2#%s#%s#%s#%s#%d#%s"):format(type, receiver, sender, mail.subject, time(), module.text[message]);
+			entry = ("2#%s#%s#%s#%s#%d#%s"):format(type, receiver, sender, mail.subject, time(), module:getText(message));
 		end
 	end
 
@@ -161,7 +161,7 @@ end
 function module:printLogMessage(success, mail, message)
 	-- Print a message in the chat window.
 	if (module.opt.printLog) then
-		local message = module.text[message];
+		local message = module:getText(message);
 		if (mail) then
 			message = ("%s: %s"):format(mail:getName(), message);
 		end
@@ -321,7 +321,7 @@ do
 
 		return "frame#n:CT_MailMod_MailLog#s:" .. defaultLogWidth .. ":500", {
 			"backdrop#tooltip#0:0:0:0.75",
-			"font#t:0:-10#v:GameFontNormalHuge#" .. module.text["CT_MailMod/MAIL_LOG"] .. "#1:1:1",
+			"font#t:0:-10#v:GameFontNormalHuge#MAIL_LOG#1:1:1",
 
 			"font#tl:60:-47#i:receiverHeading#v:GameFontNormalLarge#Receiver#1:1:1",
 			"font#tl:165:-47#i:senderHeading#v:GameFontNormalLarge#Sender#1:1:1",

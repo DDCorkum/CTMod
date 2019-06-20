@@ -1,7 +1,7 @@
 local UnitName = CT_RA_UnitName;
 local GetNumRaidMembers = CT_RA_GetNumRaidMembers;
 
-CT_RA_VersionNumber = 8.155; -- Used for number comparisons
+CT_RA_VersionNumber = 8.152; -- Used for number comparisons
 
 CT_RA_Version = "v" .. CT_RA_VersionNumber;
 CT_RA_MOVINGMEMBER = nil;
