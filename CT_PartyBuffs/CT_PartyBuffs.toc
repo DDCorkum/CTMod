@@ -1,5 +1,5 @@
 ## Interface: 80100
-## Version: 8.1.0.1
+## Version: 8.1.5.5
 ## Title: CT_PartyBuffs
 ## Notes: Shows buffs at party member frames.
 ## DefaultState: Enabled
