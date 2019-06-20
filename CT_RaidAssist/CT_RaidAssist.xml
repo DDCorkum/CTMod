@@ -769,12 +769,14 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 			<OnLoad>
 				self:RegisterEvent("GROUP_ROSTER_UPDATE"); -- "PARTY_MEMBERS_CHANGED"
 				self:RegisterEvent("SPELLS_CHANGED");
-				self:RegisterEvent("PLAYER_TALENT_UPDATE");
 				self:RegisterEvent("CHAT_MSG_SYSTEM");
 				self:RegisterEvent("READY_CHECK");
 				self:RegisterEvent("READY_CHECK_CONFIRM");
 				self:RegisterEvent("READY_CHECK_FINISHED");
 				self:RegisterEvent("PLAYER_REGEN_DISABLED");
+				if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+					self:RegisterEvent("PLAYER_TALENT_UPDATE");
+				end
 				CT_RA_GetClassSpells();
 				CT_RA_GetClassTalents();
 				self.update = 0;
@@ -782,6 +784,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				self.time = 6;
 				self.updateAFK = 0;
 				self.mouseOverUpdate = 0;
+
 			</OnLoad>
 			<OnEvent>
 				CT_RA_UpdateFrame_OnEvent(self, event, ...);

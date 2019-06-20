@@ -163,9 +163,9 @@ end
 -- Convert money into a string.
 
 function module:convertMoneyToString(copper)
-	local amount3 = module:getText("SEND_MAIL_MONEY_SUBJECT_GOLD");
-	local amount2 = module:getText("SEND_MAIL_MONEY_SUBJECT_SILVER");
-	local amount1 = module:getText("SEND_MAIL_MONEY_SUBJECT_COPPER");
+	local amount3 = module.text["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_GOLD"];
+	local amount2 = module.text["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_SILVER"];
+	local amount1 = module.text["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_COPPER"];
 	local gold, silver, mult;
 	if (copper < 0) then
 		copper = -copper;

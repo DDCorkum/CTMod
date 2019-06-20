@@ -489,6 +489,7 @@ local function CT_RAChanges_DisplayDialog()
 	if (not raLogAlreadyShown) then
 		raLogAlreadyShown = true;
 		DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF99CT RAID ASSIST (CTRA) RECENT CHANGES:|n");
+		DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF99- (8.1.5.5) Compatibility with WoW Classic and Retail editions");
 		DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF99- (8.1.5.2) Simplified /ralog to reduce bloat (you are seeing it now)");
 		DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF99- (8.1.5.1) Custom raid frames now mark tanks, heals and dps roles");
 		DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF99- (8.1.5.1) Custom raid frames now integrated with default Blizzard /readycheck");

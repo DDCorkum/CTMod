@@ -85,13 +85,74 @@ local function minimapResetPosition()
 	minimapFrame:SetUserPlaced(true);
 end
 
-local function minimapFrameSkeleton()
+local minimapdropdown;
+local function minimapFrameSkeleton()    -- note: one of the images is embedded in CT_Libarary/Images
 	return "button#n:CT_MinimapButton#s:32:32#mid:bl:Minimap:15:15#st:LOW", {
-		"texture#all#i:disabled#Interface\\AddOns\\CT_Core\\Images\\minimapIcon",
+		"texture#all#i:disabled#Interface\\Addons\\CT_Library\\Images\\minimapIcon",  
 		"texture#all#i:enabled#hidden#Interface\\AddOns\\CT_Core\\Images\\minimapIconHighlight",
 		
-		["onclick"] = function(self)
-			module:showControlPanel("toggle");
+		["onclick"] = function(self, button)
+			if (button == "LeftButton") then
+				module:showControlPanel("toggle");
+			end
+			if (button == "RightButton") then
+				if (not minimapdropdown) then
+					minimapdropdown = L_Create_UIDropDownMenu("CT_MinimapDropdown", CT_MinimapButton)
+					L_UIDropDownMenu_Initialize(
+						minimapdropdown,
+						function()
+							if L_UIDROPDOWNMENU_MENU_LEVEL == 1 then
+								local CT = _G["CT_Library"];
+								if (not CT) then return; end
+
+								local modules = CT:getData();
+								for i, module in ipairs(modules) do
+									if (i>2) then
+										info = {};
+										info.text = module.name;
+
+
+										info.notCheckable = 1;
+										if (module.externalDropDown_Initialize) then
+											-- shows a custom dropdown provided by the module
+											info.hasArrow = 1;
+											info.value = module.name;
+										else
+											-- opens the customOpenFunction() if it exists, or just opens the standard module options
+											info.func = module.customOpenFunction or function()
+												CT:showModuleOptions(module.name);
+											end;
+										end
+										L_UIDropDownMenu_AddButton(info);
+									end
+								end
+
+								if (CT_RA_Version and CT_RASets_Button and not CT_RASets_Button:IsShown()) then
+									local info = {};
+									info.text = "";  --creates a blank space before the CTRA menu
+									info.isTitle = 1;
+									info.justifyH = "CENTER";
+									info.notCheckable = 1;
+									L_UIDropDownMenu_AddButton(info);
+									info = {};
+									info.text = "CTRA";
+									info.hasArrow = 1;
+									info.value = "RaidAssist";
+									info.notCheckable = 1;
+									L_UIDropDownMenu_AddButton(info);
+								end
+
+							elseif L_UIDROPDOWNMENU_MENU_VALUE == "RaidAssist" then
+								CT_RASets_DropDown_Initialize()
+							elseif (_G[L_UIDROPDOWNMENU_MENU_VALUE] and _G[L_UIDROPDOWNMENU_MENU_VALUE].externalDropDown_Initialize) then
+								_G[L_UIDROPDOWNMENU_MENU_VALUE].externalDropDown_Initialize()
+							end
+						end,
+						"MENU"  --causes it to be like a context menu
+					);
+				end
+				L_ToggleDropDownMenu(1, nil, CT_MinimapDropdown, self, -100, 0);
+			end
 		end,
 		
 		["ondragstart"] = function(self)
@@ -131,6 +192,21 @@ local function minimapFrameSkeleton()
 					self:SetClampedToScreen(true);
 				end
 			end
+			self:RegisterForClicks("LeftButtonUp", "RightButtonDown");
+			self:SetScript("OnEnter",
+				function()
+					GameTooltip:SetOwner(self,"ANCHOR_LEFT");
+					GameTooltip:SetText("Left-click for CTMod Options");
+					GameTooltip:AddLine("Right-click for quick menu", .8, .8, .8);
+					GameTooltip:AddLine("Drag to move", .8, .8, .8);
+					GameTooltip:Show();
+				end
+			);
+			self:SetScript("OnLeave",
+				function()
+					GameTooltip:Hide();
+				end
+			);
 		end
 	}
 end
