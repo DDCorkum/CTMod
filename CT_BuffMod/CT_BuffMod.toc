@@ -1,4 +1,4 @@
-## Interface: 11302
+## Interface: 80100
 ## Version: 8.1.5.3
 ## Title: CT_BuffMod
 ## Notes: Customizable buff display.
