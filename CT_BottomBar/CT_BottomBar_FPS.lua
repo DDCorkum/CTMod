@@ -38,19 +38,42 @@ local function addon_Update(self)
 	
 end
 
-
 local function addon_Enable(self)
-	if (not not self.frame) then
-		FramerateLabel:ClearAllPoints();
-		FramerateLabel:SetPoint("BOTTOMLEFT",self.frame,"BOTTOMLEFT", 0,0);
+	if (FramerateLabel:IsShown()) then
+		FramerateLabel:Hide();
+		FramerateText:Hide();
+		self.fontstring:Show();
 	end
+	ToggleFramerate = function(benchmark)
+		FramerateText.benchmark = benchmark;
+		if self.fontstring:IsShown() then
+			self.fontstring:Hide();
+		else
+			self.fontstring:Show();
+		end
+		WorldFrame.fpsTime = 0;
+	end
+	
 end
 
 local function addon_Disable(self)
-	if (not not CT_BB_FPS_DefaultPoint) then
-		FramerateLabel:ClearAllPoints();
-		FramerateLabel:SetPoint(CT_BB_FPS_DefaultPoint,CT_BB_FPS_DefaultRelativeTo,CT_BB_FPS_DefaultRelativePoint, CT_BB_FPS_DefaultX, CT_BB_FPS_DefaultY);
-	end
+	if (self.fontstring:IsShown()) then
+		FramerateLabel:Show();
+		FramerateText:Show();
+		self.fontstring:Hide();
+	end	
+	-- the original code from WorldFrame.lua
+	ToggleFramerate = function(benchmark)
+		FramerateText.benchmark = benchmark;
+		if ( FramerateText:IsShown() ) then
+			FramerateLabel:Hide();
+			FramerateText:Hide();
+		else
+			FramerateLabel:Show();
+			FramerateText:Show();
+		end
+		WorldFrame.fpsTime = 0;
+	end;
 end
 
 
@@ -69,7 +92,22 @@ local function addon_Init(self)
 	local frame = CreateFrame("Frame", "CT_BottomBar_" .. self.frameName .. "_GuideFrame");
 	self.helperFrame = frame;
 	
-	CT_BB_FPS_DefaultPoint, CT_BB_FPS_DefaultRelativeTo, CT_BB_FPS_DefaultRelativePoint, CT_BB_FPS_DefaultX, CT_BB_FPS_DefaultY = FramerateLabel:GetPoint(1);
+	self.fontstring = self.frame:CreateFontString(nil, "ARTWORK", "ChatFontNormal");
+	self.fontstring:SetPoint("CENTER");
+	self.fontstring:Hide();
+	
+	local timeElapsed = 0;
+	self.frame:SetScript("OnUpdate",
+		function(__, elapsed)
+			timeElapsed = timeElapsed + elapsed;
+			if (timeElapsed < 0.25) then return; end
+			timeElapsed = 0;
+			self.fontstring:SetText("FPS: " .. floor(GetFramerate()*10)/10);
+			if (self.fontstring:GetText():sub(-2,-2) ~= ".") then
+				self.fontstring:SetText(self.fontstring:GetText() .. ".0");
+			end
+		end
+	);
 		
 	return true;
 end
@@ -93,7 +131,7 @@ local function addon_Register()
 		addon_Update,
 		nil,  -- no orientation function
 		addon_Enable,
-		nil,  -- no disable function
+		addon_Disable,  -- no disable function
 		"helperFrame",
 		FramerateLabel,
 		FramerateText
