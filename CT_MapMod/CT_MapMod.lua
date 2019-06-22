@@ -1549,9 +1549,10 @@ local function slashCommand(msg)
 	module:showModuleOptions(module.name);
 end
 
-module:setSlashCmd(slashCommand, "/ctmapmod", "/ctmap", "/mapmod", "/ctcarte");
--- enUS: /ctmapmod, /ctmap, /mapmod
+module:setSlashCmd(slashCommand, "/ctmapmod", "/ctmap", "/mapmod", "/ctcarte", "/ctkarte");
+-- Original: /ctmapmod, /ctmap, /mapmod
 -- frFR: /ctcarte
+-- deDE: /ctkarte
 
 local theOptionsFrame;
 

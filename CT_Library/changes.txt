@@ -1,5 +1,6 @@
-CT_Library (8.2.0.1) 2019-06-15
+CT_Library (8.2.0.1) 2019-06-22
 - Incorporated minimap icon from CT_Core for Titan integration
+- Added German translations provided by user taubenhaucher (Danke!)
 
 CT_Library (8.1.5.4) 2019-06-07
 - Introducing localization support
