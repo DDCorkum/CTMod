@@ -1,4 +1,5 @@
-CT_RaidAssist (8.1.5.5) 2019-06-19
+CT_RaidAssist (8.2.0.1) 2019-06-21
+- Updated now-depreciated lua functions for future compatibility
 - Compatibility with WoW Classic and WoW Retail editions
 
 CT_RaidAssist (8.1.5.2) 2019-04-20

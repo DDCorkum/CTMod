@@ -1581,6 +1581,9 @@ local function rangeUpdater()
 	local exists = UnitExists("target");
 	if exists then
 		actionButtonList:updateRange();
+	else
+		-- don't do a full range checking, but still update keybindings
+		actionButtonList:updateBinding();
 	end
 end
 

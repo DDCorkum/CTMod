@@ -1,4 +1,4 @@
-CT_Library (8.1.5.5) 2019-06-15
+CT_Library (8.2.0.1) 2019-06-15
 - Incorporated minimap icon from CT_Core for Titan integration
 
 CT_Library (8.1.5.4) 2019-06-07

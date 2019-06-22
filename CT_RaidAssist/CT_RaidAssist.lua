@@ -3938,7 +3938,7 @@ function CT_RA_UpdateFrame_OnUpdate(self, elapsed)
 		self.invite = self.invite - elapsed;
 		if ( self.invite <= 0 ) then
 			if ( not CT_RA_ConvertedRaid ) then
-				GuildRoster();
+				C_GuildInfo.GuildRoster();
 				CT_RA_ConvertedRaid = 1;
 				ConvertToRaid();
 				self.invite = 3;

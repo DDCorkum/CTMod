@@ -855,7 +855,7 @@ end
 -- Casting Bar Timer
 
 local displayTimers;
-local castingBarFrames = { "CastingBarFrame", "TargetFrameSpellBar", "FocusFrameSpellBar" };
+local castingBarFrames = { "CastingBarFrame", "TargetFrameSpellBar", "FocusFrameSpellBar", "CT_CastingBarFrame" };
 
 local function castingtimer_createFS(castBarFrame)
 	castBarFrame.countDownText = castBarFrame:CreateFontString(nil, "ARTWORK", "GameFontHighlight");
@@ -1192,210 +1192,86 @@ end
 --------------------------------------------
 -- Movable casting bar
 
-local castingbarAnchorFrame;
-local castingbarEnabled;
-local castingbarMovable;
-local castingbarAlwaysFrame;
 
-local function castingbar_Reanchor()
-	if ( PLAYER_FRAME_CASTBARS_SHOWN ) then
-		return;
-	end
-	CastingBarFrame:ClearAllPoints();
-	CastingBarFrame:SetPoint("CENTER", castingbarAnchorFrame, "CENTER", 0, -2);
-end
+-- start by creating a helper that can be moved around
+local movableCastingBarHelper = CreateFrame("StatusBar", nil, UIParent, "CastingBarFrameTemplate");
+movableCastingBarHelper:SetWidth(195);
+movableCastingBarHelper:SetHeight(13);
+movableCastingBarHelper:SetPoint("CENTER", UIParent, "CENTER", 0, 0);
+movableCastingBarHelper:SetFrameStrata("BACKGROUND");
+movableCastingBarHelper:SetScript("OnEvent", nil);
+movableCastingBarHelper:SetScript("OnUpdate", nil);
+movableCastingBarHelper:SetScript("OnShow", nil);
 
-local function CT_Core_Other_castingbar_UIParent_ManageFramePositions()
-	if (castingbarEnabled) then
-		castingbar_Reanchor();
-	end
-end
-
-local function castingbar_onMouseDownFunc(self, button)
-	if ( button == "LeftButton" ) then
-		module:moveMovable(self.movable);
-	end
-end
-
-local function castingbar_FrameSkeleton()
-	return "button#st:HIGH#tl:mid:350:-200#s:100:30", {
-		"tooltip#0:0:0:0.75",
-		"font#v:GameFontNormal#i:text",
-		["onleave"] = module.hideTooltip,
-		["onmousedown"] = castingbar_onMouseDownFunc,
-	};
-end
-
-local function castingbar_AlwaysVisibility(self)
-	if ( PLAYER_FRAME_CASTBARS_SHOWN ) then
-		return;
-	end
-	if (not self) then
-		self = CastingBarFrame;
-	end
-	if (self.channeling or self.casting) then
-		return;
-	end
-	if (not castingbarAlwaysFrame) then
-		self:Hide();
-		return;
-	end
-	if (not (castingbarEnabled and castingbarMovable)) then
-		self:Hide();
-		castingbarAlwaysFrame:Hide();
-		return;
-	end
-	self:SetAlpha(1);
-	self:SetStatusBarColor(1.0, 0.7, 0.0);
-	local selfName = self:GetName();
-	local barText = _G[selfName.."Text"];
-	if ( barText ) then
-		barText:SetText("");
-	end
-	self:Show();
-	castingbarAlwaysFrame:Show();
-end
-
-local function castingbar_CreateAnchorFrame()
-	local movable = "CASTINGBARANCHOR2";
-	castingbarAnchorFrame = module:getFrame(castingbar_FrameSkeleton, UIParent, "CT_Core_CastingBarAnchorFrame");
-
-	module:registerMovable(movable, castingbarAnchorFrame, true);
-	castingbarAnchorFrame.movable = movable;
-	castingbarAnchorFrame:SetScript("OnEnter", function(self)
-		module:displayTooltip(self, "|c00FFFFFFCasting Bar|r\nLeft-click to drag.\nRight-click to reset.");
-	end);
-	castingbarAnchorFrame:SetScript("OnMouseUp", function(self, button)
-		if ( button == "LeftButton" ) then
-			module:stopMovable(self.movable);
-		elseif ( button == "RightButton" ) then
-			CT_Core_CastingBarAnchorFrame:ClearAllPoints();
-			CT_Core_CastingBarAnchorFrame:SetPoint("BOTTOM", UIParent, "BOTTOM", 0, 124);
-		end
-	end);
-	castingbarAnchorFrame:SetScript("OnEvent", function(self, event, arg1, ...)
-		if (event == "PLAYER_LOGIN") then
-			hooksecurefunc("UIParent_ManageFramePositions", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
-			-- These are required for Blizzard xml scripts that use this syntax to
-			-- call UIParent_ManageFramePositions. This xml syntax does not call our
-			-- secure hook of UIParent_ManageFramePositions, so we have to explicitly
-			-- hook anything that calls it to ensure our function gets called.
-			-- 	<OnShow function="UIParent_ManageFramePositions"/>
-			-- 	<OnHide function="UIParent_ManageFramePositions"/>
-			StanceBarFrame:HookScript("OnShow", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
-			StanceBarFrame:HookScript("OnHide", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
-			DurabilityFrame:HookScript("OnShow", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
-			DurabilityFrame:HookScript("OnHide", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
-			PetActionBarFrame:HookScript("OnShow", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
-			PetActionBarFrame:HookScript("OnHide", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
-			if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
-				-- these don't happen in WoW Classic
-				MultiCastActionBarFrame:HookScript("OnShow", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
-				MultiCastActionBarFrame:HookScript("OnHide", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
-				PossessBarFrame:HookScript("OnShow", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
-				PossessBarFrame:HookScript("OnHide", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
-			elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-				--TODO: determine if anything needs to be here
-				-- (Removed in WoW 8.0.1, but should be here???) -- ReputationWatchBar:HookScript("OnHide", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
-				-- (Removed in WoW 8.0.1, but should be here???) -- MainMenuBarMaxLevelBar:HookScript("OnShow", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
-				-- (Removed in WoW 8.0.1, but should be here???) -- MainMenuBarMaxLevelBar:HookScript("OnHide", CT_Core_Other_castingbar_UIParent_ManageFramePositions);
-			end
-
-
-			-- By now GetCVar("uiScale") has a value, so if Blizzard_CombatLog is already loaded
-			-- then it won't cause an error when it tries to multiply by the uiScale.
-			UIParent_ManageFramePositions();
-		end
-	end);
-	castingbarAnchorFrame:SetWidth(CastingBarFrame:GetWidth() + 6);
-	castingbarAnchorFrame:SetHeight(28);
-	castingbarAnchorFrame:Hide();
-	castingbarAnchorFrame:SetParent(CastingBarFrame);
-	castingbarAnchorFrame:RegisterEvent("PLAYER_LOGIN");
-
-	castingbarAlwaysFrame = CreateFrame("Frame");
-	castingbarAlwaysFrame:SetScript("OnUpdate", function(self, elapsed)
-		castingbar_AlwaysVisibility();
-	end);
-end
-
-local function castingbar_UpdateAnchorVisibility()
-	if (not castingbarAnchorFrame) then
-		castingbar_CreateAnchorFrame();
-	end
-	if (castingbarEnabled and castingbarMovable) then
-		castingbarAnchorFrame:Show();
+local function castingbar_ToggleHelper(showHelper)
+	if (showHelper) then
+		movableCastingBarHelper:Show();
 	else
-		castingbarAnchorFrame:Hide();
+		movableCastingBarHelper:Hide();
 	end
 end
 
-local function castingbar_ToggleMovable(movable)
-	castingbarMovable = movable;
-	castingbar_UpdateAnchorVisibility();
-	castingbar_AlwaysVisibility();
-end
+castingbar_ToggleHelper(module:getOption("castingbarMovable"));
+-- deferred until ADDON_LOADED -- module:registerMovable("CASTINGBARHELPER",movableCastingBarHelper,true);
+movableCastingBarHelper:SetScript("OnMouseDown",
+	function(self, button)
+		module:moveMovable("CASTINGBARANCHOR2")
+	end
+);
+movableCastingBarHelper:SetScript("OnMouseUp",
+	function(self, button)
+		module:stopMovable("CASTINGBARANCHOR2")
+	end
+);
 
-local function castingbar_ToggleStatus(enable)
-	castingbarEnabled = enable;
-	castingbar_UpdateAnchorVisibility();
-	castingbar_AlwaysVisibility();
-	if (castingbarEnabled) then
-		castingbar_Reanchor();
+
+-- create the actual bar and attach it to the helper's current position
+local movableCastingBar = CreateFrame("StatusBar", "CT_CastingBarFrame", UIParent, "CastingBarFrameTemplate");
+movableCastingBar:SetPoint("CENTER", movableCastingBarHelper);
+movableCastingBar:SetWidth(195);
+movableCastingBar:SetHeight(13);
+movableCastingBar:Hide();
+movableCastingBar:SetFrameStrata("HIGH");
+
+local movableCastingBarIsLoaded = nil;
+
+local frameIsAttached = nil;
+local function castingbar_Update(enable)
+	if (not movableCastingBarIsLoaded) then
+		return;
+	end
+	if (enable and not frameIsAttached) then
+		CastingBarFrame_OnLoad(movableCastingBar,"player",true,false);
+		CastingBarFrame_OnLoad(CastingBarFrame,nil,true,false);
 	else
-		-- When entering the world for the FIRST time after starting the game, GetCVar("uiScale")
-		-- returns nil when CT_Core loads (ie. at ADDON_LOADED event time). The game hasn't had
-		-- time to update the setting yet. This is also the case for GetCVarBool("scriptErrors").
-		--
-		-- When the Blizzard_CombatLog addon gets loaded, it hooks the FCF_DockUpdate function
-		-- which gets called by the UIParent_ManageFramePositions function in UIParent.lua.
-		--
-		-- If there is an addon that loads before CT_Core and causes the Blizzard_CombatLog addon
-		-- to load, then we want to avoid calling UIParent_ManageFramePositions while GetCVar("uiScale")
-		-- is nil. If we do call it when the uiScale is nil, then the Blizzard_CombatLog code will cause an error
-		-- when it gets to the Blizzard_CombatLog_AdjustCombatLogHeight() function in Blizzard_CombatLog.lua.
-		-- That code tries to multiply by GetCVar("uiScale"), and since it is still nil then there will
-		-- be an error.
-		--
-		-- Blizzard's code won't display the error (see BasicControls.xml) because GetCVarBool("scriptErrors")
-		-- is still nil when CT_Core loads. The user won't see the error unless they have an addon that loads
-		-- before CT_Core and traps and displays errors.
-		--
-		-- To avoid this error we will only call UIParent_ManageFramePositions() when the uiScale has
-		-- a value. This is the place in this addon where UIParent_ManageFramePositions() may get called
-		-- at ADDON_LOADED time by CT_Libary (during the "init" options step).
-
-		if ( PLAYER_FRAME_CASTBARS_SHOWN ) then
-			return;
-		end
-		CastingBarFrame:ClearAllPoints();
-		if (GetCVar("uiScale")) then
-			UIParent_ManageFramePositions();
-		end
+	
+		CastingBarFrame_OnLoad(movableCastingBar,nil,true,false);
+		CastingBarFrame_OnLoad(CastingBarFrame,"player",true,false);
 	end
 end
+
+movableCastingBar:RegisterEvent("ADDON_LOADED")
+movableCastingBar:HookScript("OnEvent",
+	function(self, event, ...)
+		if (event == "ADDON_LOADED" and not movableCastingBarIsLoaded) then
+			module:registerMovable("CASTINGBARANCHOR2",movableCastingBarHelper,true);
+			movableCastingBar.Icon:Hide();
+			movableCastingBarIsLoaded = true;
+			castingbar_Update(module:getOption("castingbarEnabled"))
+		end
+	end	
+);
+
+
 
 local function castingbar_PlayerFrame_DetachCastBar()
-	-- hooksecurefunc of PlayerFrame_DetachCastBar in PlayerFrame.lua.
-
-	-- When the casting bar is detached from the PlayerFrame, we want
-	-- to re-attach it to our frame as needed.
-
-	castingbar_ToggleStatus( castingbarEnabled );
+	frameIsAttached = nil;
+	castingbar_Update(module:getOption("castingbarEnabled"))  -- use our bar IF APPROPRIATE
 end
 
 local function castingbar_PlayerFrame_AttachCastBar()
-	-- hooksecurefunc of PlayerFrame_AttachCastBar in PlayerFrame.lua.
-
-	-- When the casting bar is atached to the PlayerFrame, we want
-	-- to hide our frame as needed.
-
-	if (castingbarAnchorFrame) then
-		castingbarAnchorFrame:Hide();
-	end
-	if (castingbarAlwaysFrame) then
-		castingbarAlwaysFrame:Hide();
-	end
+	frameIsAttached = true;
+	castingbar_Update(false); -- no matter what, stop using our bar
 end
 
 hooksecurefunc("PlayerFrame_DetachCastBar", castingbar_PlayerFrame_DetachCastBar);
@@ -2752,9 +2628,10 @@ local modFunctions = {
 	["powerbaraltEnabled"] = powerbaralt_toggleStatus,
 	["powerbaraltMovable"] = powerbaralt_toggleMovable,
 	["powerbaraltShowAnchor"] = powerbaralt_toggleAnchor,
-	["hideGryphons"] = hide_gryphons
+	["hideGryphons"] = hide_gryphons,
+	["castingbarEnabled"] = castingbar_Update,
+	["castingbarMovable"] = castingbar_ToggleHelper,
 };
-
 
 module.modupdate = function(self, type, value)
 	if ( type == "init" ) then

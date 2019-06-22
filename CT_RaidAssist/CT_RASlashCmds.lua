@@ -98,7 +98,7 @@ function CT_RA_Invite(msg)
 		else
 			SendChatMessage("Raid invites are coming in 10 seconds for players level " .. min .. " to " .. max .. inZone .. ", leave your groups.", "GUILD");
 		end
-		GuildRoster();
+		C_GuildInfo.GuildRoster();
 		CT_RA_MinLevel = min;
 		CT_RA_MaxLevel = max;
 		CT_RA_UpdateFrame.startinviting = 10;
@@ -108,7 +108,7 @@ function CT_RA_Invite(msg)
 		if ( min ) then
 			if ( min < 1 ) then min = 1; end
 			-- if ( min > 70 ) then min = 70; end
-			GuildRoster();
+			C_GuildInfo.GuildRoster();
 			SendChatMessage("Raid invites are coming in 10 seconds for players level " .. min .. inZone .. ", leave your groups.", "GUILD");
 			CT_RA_MinLevel = min;
 			CT_RA_MaxLevel = min;
@@ -489,6 +489,7 @@ local function CT_RAChanges_DisplayDialog()
 	if (not raLogAlreadyShown) then
 		raLogAlreadyShown = true;
 		DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF99CT RAID ASSIST (CTRA) RECENT CHANGES:|n");
+		DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF99- (8.2.0.1) Changes for compatibility with future expansions");
 		DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF99- (8.1.5.5) Compatibility with WoW Classic and Retail editions");
 		DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF99- (8.1.5.2) Simplified /ralog to reduce bloat (you are seeing it now)");
 		DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF99- (8.1.5.1) Custom raid frames now mark tanks, heals and dps roles");
