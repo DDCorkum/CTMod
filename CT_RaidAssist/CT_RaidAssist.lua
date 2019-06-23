@@ -1547,7 +1547,80 @@ function CT_RA_UpdateUnitStatus(frame)
 	end
 end
 
--- Update ready / not ready / afk status
+-- Create a frame to show after ready checks, and update ready / not ready / afk status
+
+local AfterNotReadyFrame = CreateFrame("Frame", nil, UIParent);
+AfterNotReadyFrame:Hide();
+AfterNotReadyFrame:SetSize(323,97);
+AfterNotReadyFrame:SetPoint("CENTER", 0, -10);
+AfterNotReadyFrame:RegisterEvent("PLAYER_REGEN_DISABLED");
+AfterNotReadyFrame:RegisterEvent("GROUP_LEFT");
+AfterNotReadyFrame:SetScript("OnEvent",
+	function(self, event, ...)
+		if (event == "PLAYER_REGEN_DISABLED") then
+			self:Hide();
+		elseif (event == "GROUP_LEFT") then
+			self:Hide();
+		end
+	end
+);
+
+AfterNotReadyFrame.portrait = AfterNotReadyFrame:CreateTexture(nil, "BACKGROUND");
+AfterNotReadyFrame.portrait:SetSize(50,50);
+AfterNotReadyFrame.portrait:SetPoint("TOPLEFT", 7, -6);
+
+AfterNotReadyFrame.texture = AfterNotReadyFrame:CreateTexture(nil, "ARTWORK");
+AfterNotReadyFrame.texture:SetSize(323, 97);
+AfterNotReadyFrame.texture:SetTexture("Interface\\RaidFrame\\UI-ReadyCheckFrame");
+AfterNotReadyFrame.texture:SetTexCoord(0, 0.630859375, 0, 0.7578125);
+AfterNotReadyFrame.texture:SetPoint("TOPLEFT");
+
+AfterNotReadyFrame.text = AfterNotReadyFrame:CreateFontString(nil, "ARTWORK", "GameFontNormal");
+AfterNotReadyFrame.text:SetSize(240, 0);
+AfterNotReadyFrame.text:SetJustifyV("MIDDLE");
+AfterNotReadyFrame.text:SetPoint("CENTER", AfterNotReadyFrame, "TOP", 20, -35);
+
+AfterNotReadyFrame.returnedButton = CreateFrame("Button", nil, AfterNotReadyFrame, "UIPanelButtonTemplate");
+AfterNotReadyFrame.returnedButton:SetText("Ready");
+AfterNotReadyFrame.returnedButton:SetSize(119, 24);
+AfterNotReadyFrame.returnedButton:SetPoint("TOPRIGHT", AfterNotReadyFrame, "TOP", 13, -55);
+AfterNotReadyFrame.returnedButton:SetScript("OnClick",
+	function()
+		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+		AfterNotReadyFrame:Hide();
+		if (AfterNotReadyFrame.initiator and UnitInRange(AfterNotReadyFrame.initiator)) then
+			DoEmote("ready", AfterNotReadyFrame.initiator);
+		else
+			SendChatMessage("Ready", "RAID");
+		end
+	end
+);
+
+AfterNotReadyFrame.goingafkButton = CreateFrame("Button", nil, AfterNotReadyFrame, "UIPanelButtonTemplate");
+AfterNotReadyFrame.goingafkButton:SetText("Cancel");
+AfterNotReadyFrame.goingafkButton:SetSize(119, 24);
+AfterNotReadyFrame.goingafkButton:SetPoint("TOPLEFT", AfterNotReadyFrame, "TOP", 17, -55);
+AfterNotReadyFrame.goingafkButton:SetScript("OnClick",
+	function()
+		AfterNotReadyFrame:Hide();
+	end
+);
+
+function CT_RA_ToggleAfterNotReadyFrame(self)
+	local value;
+	if (type(self) == "boolean") then
+		value = self;
+	else
+		value = self:GetChecked();
+	end
+	CT_RAMenu_Options["temp"]["extendReadyCheck"] = value;
+	if (value) then
+		AfterNotReadyFrame.enable = true
+	else
+		AfterNotReadyFrame.enable = false;
+	end
+end
+
 
 function CT_RA_StartReadyStatus(startedByPlayer)
 	local numRaidMembers = GetNumGroupMembers();
@@ -1560,15 +1633,22 @@ function CT_RA_StartReadyStatus(startedByPlayer)
 			end
 		end
 	end
+	SetPortraitTexture(AfterNotReadyFrame.portrait, startedByPlayer);
+	AfterNotReadyFrame.initiator = startedByPlayer;
 end
 
 function CT_RA_UpdateReadyStatus(arg1)
 	if (arg1) then
+		if (InCombatLockdown()) then return; end
 		local stats = CT_RA_Stats[UnitName(arg1)];
 		if (stats) then
 			local readyCheckStatus = GetReadyCheckStatus(arg1);
-			if (readyCheckStatus == "notready" or readyCheckStatus == "nil") then
+			if (readyCheckStatus == "notready" or readyCheckStatus == "nil" ) then
 				stats["readycheck"] = "notready";
+				if (UnitIsUnit(arg1, "player") and AfterNotReadyFrame.enable) then
+					AfterNotReadyFrame.text:SetText("You were not ready, are you back now?");
+					AfterNotReadyFrame:Show();
+				end
 			else
 				stats["readycheck"] = "ready";
 			end
@@ -1588,17 +1668,21 @@ function CT_RA_RushReadyStatus() -- called when entering combat during a ready c
 end
 
 function CT_RA_FinishReadyStatus()
-	C_Timer.After(5,
-		function()
-			for i=1, MAX_RAID_MEMBERS do
-				local stats = CT_RA_Stats[UnitName("raid" .. i)];
-				if (stats and stats["readycheck"]) then
-					stats["readycheck"] = nil;
-				end
-			end	
-			CT_RA_UpdateRaidGroup();
+	-- Clear the board of ready statuses in ten seconds
+	-- Except, if own status was not-ready then provide a "AfterNotReadyFrame"
+	local stats;
+	stats = CT_RA_Stats[UnitName("player")];
+	if (stats and stats["readycheck"] and stats["readycheck"] == "noreply" and not InCombatLockdown() and AfterNotReadyFrame.enable) then
+		AfterNotReadyFrame.text:SetText("You were afk, are you back now?");
+		AfterNotReadyFrame:Show();
+	end
+	for i=1, MAX_RAID_MEMBERS do
+		local stats = CT_RA_Stats[UnitName("raid" .. i)];
+		if (stats and stats["readycheck"]) then
+			stats["readycheck"] = nil;
 		end
-	);
+	end	
+	CT_RA_UpdateRaidGroup();
 end
 
 function CT_RA_CanShowInfo(id)

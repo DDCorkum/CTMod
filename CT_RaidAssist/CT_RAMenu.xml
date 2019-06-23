@@ -2067,6 +2067,15 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 										</Anchor>
 									</Anchors>
 								</FontString>
+								<FontString name="$parentExtendReadyCheck" inherits="ChatFontNormal" text="Extend ready check when afk">
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="285" y="-140"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
 							</Layer>
 						</Layers>
 						<Frames>
@@ -2164,6 +2173,26 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 								<Scripts>
 									<OnClick>
 										CT_RAMenu_Misc_ShowRoleIcons(self);
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentExtendReadyCheckCB" hidden="false" id="4" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentExtendReadyCheck">
+										<Offset>
+											<AbsDimension x="0" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<HitRectInsets>
+									<AbsInset left="0" right="0" top="0" bottom="0"/>
+								</HitRectInsets>
+								<Size>
+									<AbsDimension x="24" y="24"/>
+								</Size>
+								<Scripts>
+									<OnClick>
+										CT_RA_ToggleAfterNotReadyFrame(self);
 									</OnClick>
 								</Scripts>
 							</CheckButton>

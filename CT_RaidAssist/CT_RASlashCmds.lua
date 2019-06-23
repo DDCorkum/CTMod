@@ -489,12 +489,10 @@ local function CT_RAChanges_DisplayDialog()
 	if (not raLogAlreadyShown) then
 		raLogAlreadyShown = true;
 		DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF99CT RAID ASSIST (CTRA) RECENT CHANGES:|n");
-		DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF99- (8.2.0.1) Changes for compatibility with future expansions");
-		DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF99- (8.1.5.5) Compatibility with WoW Classic and Retail editions");
-		DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF99- (8.1.5.2) Simplified /ralog to reduce bloat (you are seeing it now)");
-		DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF99- (8.1.5.1) Custom raid frames now mark tanks, heals and dps roles");
-		DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF99- (8.1.5.1) Custom raid frames now integrated with default Blizzard /readycheck");
-		DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF99- (8.1.5.1) Removed /rardy, /rarly and /ravote to reduce bloat");
+		DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF99- (8.2.0.1) Compatibility with WoW Classic and Retail editions");
+		DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF99- (8.2.0.1) Added extended ready checks when you are afk");
+		DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF99- (8.1.5.1) Added markings for tank, heal and dps roles");
+		DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF99- (8.1.5.1) Now integrated with default Blizzard /readycheck");
 		DEFAULT_CHAT_FRAME:AddMessage("|cFF999999For full changes, see changes.txt in every folder");
 		C_Timer.After(15,
 			function()

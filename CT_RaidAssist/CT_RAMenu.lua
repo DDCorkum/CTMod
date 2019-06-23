@@ -296,6 +296,8 @@ function CT_RAMenu_UpdateMenu()
 		CT_RAMenuFrameMiscDisplayHideResMonitorUntilNeeded:SetTextColor(0.3, 0.3, 0.3);
 	end
 	CT_RAMenuFrameMiscDisplayShowRoleIconsCB:SetChecked( tempOptions["showRoleIcons"] ~= false );
+	CT_RAMenuFrameMiscDisplayExtendReadyCheckCB:SetChecked( tempOptions["extendReadyCheck"] ~= false );
+	CT_RA_ToggleAfterNotReadyFrame( tempOptions["extendReadyCheck"] ~= false );
 	CT_RAMenuFrameMiscDisplayColorLeaderCB:SetChecked( ( not tempOptions["leaderColor"] or tempOptions["leaderColor"].enabled ) );
 	if ( tempOptions["leaderColor"] ) then
 		CT_RAMenuFrameMiscDisplayColorLeaderColorSwatchNormalTexture:SetVertexColor(tempOptions["leaderColor"].r, tempOptions["leaderColor"].g, tempOptions["leaderColor"].b);
