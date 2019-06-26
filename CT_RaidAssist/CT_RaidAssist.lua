@@ -416,7 +416,7 @@ function CT_RA_ParseEvent(self, event, arg1, arg2, arg3, arg4, arg5, arg6, ...)
 				for k, v in pairs(CT_RA_MainTanks) do
 					if ( v == name ) then
 						CT_RA_WarningFrame:AddMessage("TANK " .. name .. " HAS DIED!", 1, 0, 0, 1, UIERRORS_HOLD_TIME);
-						PlaySoundFile("Sound\\interface\\igQuestFailed.wav");
+						PlaySoundFile(567459) -- "Sound\\interface\\igQuestFailed.wav"
 						break;
 					end
 				end
@@ -698,7 +698,7 @@ function CT_RA_ParseMessage(nick, msg)
 	if ( strsub(msg, 1, 3) == "MS " ) then
 		if ( rank >= 1 ) then
 			if ( tempOptions["PlayRSSound"] ) then
-				PlaySoundFile("Sound\\Doodad\\BellTollNightElf.wav");
+				PlaySoundFile(566558) -- "Sound\\Doodad\\BellTollNightElf.wav"
 			end
 			CT_RAMessageFrame:AddMessage(nick .. ": " .. strsub(msg, 3), tempOptions["DefaultAlertColor"].r, tempOptions["DefaultAlertColor"].g, tempOptions["DefaultAlertColor"].b, 1.0, UIERRORS_HOLD_TIME);
 		end
@@ -2843,7 +2843,7 @@ function CT_RA_UpdateMTTTs(forceUpdate)
 							CT_RA_UpdateFrame.hasAggroAlert = 15;
 							CT_RA_WarningFrame:AddMessage("AGGRO FROM " .. UnitName(mtid .. "target") .. "!", 1, 0, 0, 1, UIERRORS_HOLD_TIME);
 							if ( tempOptions["AggroNotifierSound"] ) then
-								PlaySoundFile("Sound\\Spells\\PVPFlagTakenHorde.wav");
+								PlaySoundFile(568165) -- "Sound\\Spells\\PVPFlagTakenHorde.wav"
 							end
 						end
 					end
@@ -4896,7 +4896,7 @@ function CT_RA_CheckGroups()
 	local tempOptions = CT_RAMenu_Options["temp"];
 	if ( tempOptions["NotifyGroupChange"] and ( numjoin > 0 or numleft > 0 ) ) then
 		if ( tempOptions["NotifyGroupChangeSound"] ) then
-			PlaySoundFile("Sound\\Spells\\Thorns.wav");
+			PlaySoundFile(569022) -- "Sound\\Spells\\Thorns.wav"
 		end
 		if ( numjoin > 1 ) then
 			CT_RA_Print("<CTRaid> |c00FFFFFF" .. joined .. "|r have joined your party.", 1, 0.5, 0);

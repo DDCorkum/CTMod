@@ -1,3 +1,6 @@
+CT_BuffMod (8.2.0.1) 2019-06-25
+- PlaySoundFile() updated for 8.2.0
+
 CT_BuffMod (8.1.5.3) 2019-05-29
 - Compatibility with WoW Classic and Retail editions
 
