@@ -1635,6 +1635,7 @@ function CT_RA_StartReadyStatus(startedByPlayer)
 	end
 	SetPortraitTexture(AfterNotReadyFrame.portrait, startedByPlayer);
 	AfterNotReadyFrame.initiator = startedByPlayer;
+	AfterNotReadyFrame:Hide();  -- could happen if an earlier ready check was unanswered
 end
 
 function CT_RA_UpdateReadyStatus(arg1)
