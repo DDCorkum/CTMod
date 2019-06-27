@@ -73,6 +73,15 @@ L["CT_Library/SettingsImport/Heading"] = "Importer les configurations"
 
 
 
+elseif (GetLocale() == "deDE") then
+
+L["CT_Library/Help/About/Credits"] = [=[CTMod ist von Cide und TS seit Vanille, 
+Resike seit 2014 und Dahk seit 2017]=]
+L["CT_Library/Help/About/Heading"] = "Über CTMod"
+L["CT_Library/Help/About/Updates"] = "Updates sind verfügbar unter:"
+
+
+
 -- add other languages here using elseif statements
 
 

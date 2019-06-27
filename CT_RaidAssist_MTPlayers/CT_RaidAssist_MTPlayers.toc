@@ -1,6 +1,6 @@
-## Interface: 80100
-## Version: 8.1.5.1
-## Title: CT_RaidAssist_MTPlayers
+## Interface: 80200
+## Version: 8.2.0.1
+## Title: CT_RaidAssist_MTPlayers |cFF333333(BFA)
 ## Author: Dargen (Guild: Eternal Keggers, Server: Terenas)
 ## Notes: Adds a Main Tank Players group and a Main Tank Pets group to CT_RaidAssist's Main Tank Targets group. Right click the title of the Main Tank Targets group to configure the settings.
 ## DefaultState: Enabled

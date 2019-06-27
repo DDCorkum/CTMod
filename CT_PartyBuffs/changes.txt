@@ -1,4 +1,4 @@
-CT_PartyBuffs (8.1.5.5) 2019-06-19
+CT_PartyBuffs (8.2.0.1) 2019-06-19
 - Compatibility with WoW Classic and Retail editions
 
 CT_PartyBuffs (8.0.1.1) 2018-07-17

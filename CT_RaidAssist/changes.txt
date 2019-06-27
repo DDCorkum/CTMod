@@ -1,5 +1,8 @@
-CT_RaidAssist (8.1.5.5) 2019-06-19
+CT_RaidAssist (8.2.0.1) 2019-06-25
 - Compatibility with WoW Classic and WoW Retail editions
+- Updated now-depreciated lua functions for future compatibility
+- Ready checks now extended when you are afk during a raid
+- PlaySoundFile() updated for 8.2.0
 
 CT_RaidAssist (8.1.5.2) 2019-04-20
 - Simplifed in-game changelog (/ralog) to reduce bloat

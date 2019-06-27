@@ -1,6 +1,6 @@
-## Interface: 80100
-## Version: 8.1.5.5
-## Title: CT_PartyBuffs
+## Interface: 80200
+## Version: 8.2.0.1
+## Title: CT_PartyBuffs |cFF333333(BFA)
 ## Notes: Shows buffs at party member frames.
 ## DefaultState: Enabled
 ## SavedVariables: CT_PartyBuffsOptions
