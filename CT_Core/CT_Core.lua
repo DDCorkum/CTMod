@@ -734,26 +734,34 @@ module.frame = function()
 		optionsAddObject( -8, 2*13, "font#tl:15:%y#r#s:0:%s#This allows you to change the place where the game's default tooltip appears.#" .. textColor2 .. ":l");
 
 		optionsAddObject(-15,   15, "font#tl:15:%y#v:ChatFontNormal#Tooltip location:");
-		optionsAddObject( 14,   20, "dropdown#tl:110:%y#s:125:%s#o:tooltipRelocation#n:CTCoreDropdown3#Default#On Mouse (1)#On Anchor#On Mouse (2)");
-
-		optionsAddObject(-10,   15, "font#tl:15:%y#v:ChatFontNormal#On Mouse (1)#" .. textColor3);
-		optionsAddObject( -4, 3*13, "font#tl:33:%y#r#s:0:%s#The anchor point cannot be changed, and the tooltip immediately hides when no longer over an object.#" .. textColor2 .. ":l");
-
-		optionsAddObject(-10,   15, "font#tl:15:%y#v:ChatFontNormal#On Mouse (2)#" .. textColor3);
-		optionsAddObject( -6,   15, "font#tl:33:%y#v:ChatFontNormal#Anchor point:");
-		optionsAddObject( 14,   20, "dropdown#tl:110:%y#s:125:%s#o:tooltipMouseAnchor:7#n:CTCoreDropdownTooltipMouseAnchor#Top left#Top right#Bottom right#Bottom left#Top#Right#Bottom#Left#Automatic");
-		optionsAddObject(  0,   26, "checkbutton#tl:30:%y#o:tooltipMouseDisableFade#Hide tooltip when game starts to fade it");
-
-		optionsAddObject(-10,   15, "font#tl:15:%y#v:ChatFontNormal#On Anchor#" .. textColor3);
-		optionsAddObject( -6,   15, "font#tl:33:%y#v:ChatFontNormal#Anchor point:");
-		optionsAddObject( 14,   20, "dropdown#tl:110:%y#s:125:%s#o:tooltipFrameAnchor:1#n:CTCoreDropdownTooltipFrameAnchor#Top left#Top right#Bottom right#Bottom left#Top#Right#Bottom#Left");
-		optionsAddObject(  0,   26, "checkbutton#tl:30:%y#o:tooltipFrameDisableFade#Hide tooltip when game starts to fade it");
-		optionsAddObject(  0,   26, "checkbutton#tl:30:%y#o:tooltipRelocationAnchor#Show the anchor frame");
-		optionsAddObject( -4, 4*13, "font#tl:33:%y#r#s:0:%s#Drag the anchor frame to change where 'On Anchor' style tooltips are displayed. Right-click the anchor frame to change the tooltip's anchor point.#" .. textColor2 .. ":l");
-		optionsBeginFrame(  -5,   30, "button#t:0:%y#s:180:%s#n:CT_Core_ResetAnchorPosition_Button#v:GameMenuButtonTemplate#Reset anchor position");
-			optionsAddScript("onclick",
+		optionsAddObject( 14,   20, "dropdown#tl:110:%y#s:125:%s#o:tooltipRelocation#n:CTCoreDropdownTooltipRelocation#Default#On Mouse (stationary)#On Anchor#On Mouse (following)");
+		optionsAddObject( -6,   15, "font#tl:33:%y#v:ChatFontNormal#Direction:");
+		optionsAddObject( 14,   20, "dropdown#tl:110:%y#s:125:%s#o:tooltipAnchor:5#n:CTCoreDropdownTooltipAnchor#Top right#Top left#Bottom right#Bottom left#Top#Bottom");
+		optionsBeginFrame( 0,   26, "checkbutton#tl:30:%y#o:tooltipAnchorUnlock#n:CTCoreCheckboxTooltipAnchorUnlock#Unlock the anchor");
+			optionsAddScript("onupdate",
 				function(self)
-					CT_Core_ResetTooltipAnchor();
+					if L_UIDropDownMenu_GetSelectedValue(CTCoreDropdownTooltipRelocation) == 3 then
+						L_UIDropDownMenu_EnableDropDown(CTCoreDropdownTooltipAnchor);
+						CTCoreCheckboxTooltipAnchorUnlock:Enable();
+						CTCoreCheckboxTooltipAnchorUnlock.text:SetTextColor(1,1,1);
+					else
+						L_UIDropDownMenu_DisableDropDown(CTCoreDropdownTooltipAnchor);
+						CTCoreCheckboxTooltipAnchorUnlock:Disable();
+						CTCoreCheckboxTooltipAnchorUnlock.text:SetTextColor(.5, .5, .5);
+					end
+				end
+			);
+		optionsEndFrame();
+		optionsBeginFrame(  0,   26, "checkbutton#tl:30:%y#o:tooltipDisableFade#Hide tooltip when game starts to fade it");
+			optionsAddScript("onupdate",
+				function(self)
+					if L_UIDropDownMenu_GetSelectedValue(CTCoreDropdownTooltipRelocation) == 4 then
+						self:Disable();
+						self.text:SetTextColor(.5, .5, .5);
+					else
+						self:Enable();
+						self.text:SetTextColor(1, 1, 1);
+					end					
 				end
 			);
 		optionsEndFrame();

@@ -203,501 +203,146 @@ do
 	end
 end
 
+
+
 --------------------------------------------
 -- Tooltip Reanchoring
 
-local tooltipAnchorNumber;
-local tooltipAnchorMode = 1;  -- 1==Default, 2==On cursor, 3==On anchor frame, 4==On mouse
-local tooltipAnchorDisplay = true;
-local tooltipAnchorFrame;
-local tooltipUpdateFrame;
-local tooltipHooked;
-local tooltipUpdateTimer = 0;
-local tooltipMouseAnchor;
-local tooltipMouseDisableFade;
-local tooltipFrameDisableFade;
-local tooltipNeedUpdate;
-
-local tooltipStatusbarHooked;
-local tooltipStatusbarTimer;
-local tooltipStatusbarValue;
-local tooltipStatusbarUpdating;
-local tooltipStatusbarChanged;
-
-local tooltipText = "Left-click to drag.\nRight-click to change anchor point.";
-local tooltipsTooltipText = "|c00FFFFFFTooltip Anchor|r\n" .. tooltipText;
-
--- tooltipAnchorNumber values:
--- 1 == Top Left
--- 2 == Top Right
--- 3 == Bottom Right
--- 4 == Bottom Left
--- 5 == Top
--- 6 == Right
--- 7 == Bottom
--- 8 == Left
--- 9 == Automatic (used for mouse anchor only)
-local anchorPositions = {
-	{ seq = 1, mxoff = 20, myoff=-20, uyoff =  0, anchor = "TOPLEFT", relative = "BOTTOMLEFT", text = "Top Left" },
-	{ seq = 3, mxoff =  0, myoff=  0, uyoff =  0, anchor = "TOPRIGHT", relative = "BOTTOMRIGHT", text = "Top Right" },
-	{ seq = 5, mxoff =  0, myoff=  0, uyoff = 10, anchor = "BOTTOMRIGHT", relative = "TOPRIGHT", text = "Bottom Right" },
-	{ seq = 7, mxoff =  0, myoff=  0, uyoff = 10, anchor = "BOTTOMLEFT", relative = "TOPLEFT", text = "Bottom Left" },
-	{ seq = 2, mxoff =  0, myoff=-20, uyoff =  0, anchor = "TOP", relative = "BOTTOM", text = "Top" },
-	{ seq = 4, mxoff =  0, myoff=  0, uyoff =  0, anchor = "RIGHT", relative = "LEFT", text = "Right" },
-	{ seq = 6, mxoff =  0, myoff=  0, uyoff = 10, anchor = "BOTTOM", relative = "TOP", text = "Bottom" },
-	{ seq = 8, mxoff = 25, myoff=  0, uyoff =  0, anchor = "LEFT", relative = "RIGHT", text = "Left" },
-};
-
-local mainMenuMicroButton = MainMenuMicroButton;
-local function tooltipIsDefault(self)
-	-- Is this tooltip normally shown in the default location.
-
-	if (not self.default) then
-		-- Tooltip is not being shown in the default location.
-		return false;
+local tooltipFixedAnchor = CreateFrame("Frame", nil, UIParent);
+tooltipFixedAnchor:SetSize(10,10);
+tooltipFixedAnchor:SetPoint("CENTER", UIParent, "CENTER", 0, 0);
+tooltipFixedAnchor.texture = tooltipFixedAnchor:CreateTexture(nil, "BACKGROUND");
+tooltipFixedAnchor.texture:SetAllPoints();
+tooltipFixedAnchor.texture:SetColorTexture(1,1,0.8,0.5);
+tooltipFixedAnchor:RegisterEvent("ADDON_LOADED");
+tooltipFixedAnchor:SetScript("OnEvent",
+	function (self, event, args)
+		if event == "ADDON_LOADED" then
+			self:UnregisterEvent("ADDON_LOADED");
+			module:registerMovable("TOOLTIP-FIXED-ANCHOR", tooltipFixedAnchor, true, 50);
+		end
 	end
+);
 
-	-- Check for special cases.
-	local owner = self:GetOwner();
-	if (owner and owner == mainMenuMicroButton) then
-		-- Blizzard sometimes shows this button's tooltip in the default location,
-		-- and sometimes they don't. When they don't, they forget to set self.default
-		-- to nil.
-
-		-- The following is based on the logic in GameTooltip_AddNewbieTip in GameTooltip.lua.
-		if ( SHOW_NEWBIE_TIPS == "1" ) then
-			-- The tooltip is being shown in the default location.
-			return true;
-		else
-			-- self.tooltipText is the value passed to GameTooltip_AddNewbieTip
-			-- when it is called from MainMenuBarPerformanceBarFrame_OnEnter.
-			if (not self.tooltipText) then
-				-- In this situation, Blizzard uses :SetOwner to change the anchor so that the
-				-- tooltip gets shown at the button rather than in the default location.
-				-- However, they do not set self.default to nil, so we can't rely on that value.
-				-- Return false, since the tooltip is not being shown in the default location.
-				return false;
-			else
-				-- The tooltip is being shown in the default location.
-				return true;
+tooltipFixedAnchor:SetScript("OnMouseDown",
+	function(self, button)
+		if (button == "LeftButton") then
+			module:moveMovable("TOOLTIP-FIXED-ANCHOR");
+		elseif (button == "RightButton") then
+			local anchorSetting = 1 + (module:getOption("tooltipAnchor") or 5);
+			if (anchorSetting > 6) then
+				anchorSetting = 1;
 			end
-		end
-	end
-
-	-- The tooltip is being shown in the default location.
-	return true;
-end
-
-local function onMouseDownFunc(self, button)
-	if ( button == "LeftButton" ) then
-		module:moveMovable(self.movable);
-	end
-end
-
-local function anchorFrameSkeleton()
-	-- Updates the text
-	return "button#st:HIGH#tl:mid:350:-200#s:100:30", {
-		"backdrop#tooltip#0:0:0:0.75",
-		"font#v:GameFontNormal#i:text",
-		["onleave"] = module.hideTooltip,
-		["onmousedown"] = onMouseDownFunc
-	};
-end
-
-local function updateTooltipAnchorVisibility()
-	if ( tooltipAnchorFrame ) then
-		if ( tooltipAnchorMode == 3 and tooltipAnchorDisplay ) then
-			tooltipAnchorFrame:Show();
-		else
-			tooltipAnchorFrame:Hide();
-		end
-	end
-end
-
-local function updateTooltipText(self)
-	-- Update text shown in the movable tooltip anchor frame.
-	local data = anchorPositions[tooltipAnchorNumber];
-	if (data) then
-		self.text:SetText(data.text);
-	else
-		self.text:SetText("");
-	end
-end
-
-local function createTooltipAnchorFrame()
-	-- Create our anchor frame for the tooltip.
-	local movable = "TOOLTIPANCHOR";
-	tooltipAnchorFrame = module:getFrame(anchorFrameSkeleton);
-	updateTooltipText(tooltipAnchorFrame);
-	updateTooltipAnchorVisibility();
-
-	module:registerMovable(movable, tooltipAnchorFrame);
-	tooltipAnchorFrame.movable = movable;
-
-	tooltipAnchorFrame:SetScript("OnEnter",	function(self)
-		module:displayTooltip(self, tooltipsTooltipText, true);
-	end);
-
-	tooltipAnchorFrame:SetScript("OnMouseUp", function(self, button)
-		if ( button == "LeftButton" ) then
-			module:stopMovable(self.movable);
-		elseif ( button == "RightButton" ) then
-			-- Update anchor & text
-			local data = anchorPositions[tooltipAnchorNumber];
-			if (data) then
-				local seq = data.seq;
-				if (IsShiftKeyDown()) then
-					seq = seq - 1;
-					if (seq < 1) then
-						seq = #anchorPositions;
-					end
-				else
-					seq = seq + 1;
-					if (seq > #anchorPositions) then
-						seq = 1;
-					end
-				end
-				tooltipAnchorNumber = 1;
-				for num, data in ipairs(anchorPositions) do
-					if (data.seq == seq) then
-						tooltipAnchorNumber = num;
-						break;
-					end
-				end
+			module:setOption("tooltipAnchor", anchorSetting, true);
+			local direction = "NONE";
+			if anchorSetting == 1 then
+				direction = "TOPLEFT"
+			elseif anchorSetting == 2 then
+				direction = "TOPRIGHT"
+			elseif anchorSetting == 3 then
+				direction = "BOTTOMRIGHT"
+			elseif anchorSetting == 4 then
+				direction = "BOTTOMLEFT"
+			elseif anchorSetting == 5 then
+				direction = "TOP";
+			elseif anchorSetting == 6 then
+				direction = "BOTTOM"
 			end
-			module:setOption("tooltipFrameAnchor", tooltipAnchorNumber, true);
-			updateTooltipText(self);
-			if (CTCoreDropdownTooltipFrameAnchor) then
-				-- Update the drop down menu in the options window
-				local item = tooltipAnchorNumber;
-				local frame = CTCoreDropdownTooltipFrameAnchor;
-				local level = 1;
-				L_CloseDropDownMenus(level);
-				L_ToggleDropDownMenu(level, item, frame);
-				L_UIDropDownMenu_SetSelectedValue(frame, item);
-				L_CloseDropDownMenus(level);
+			GameTooltip:Hide();
+			GameTooltip:SetOwner(tooltipFixedAnchor,"ANCHOR_" .. direction);
+			GameTooltip:SetText("Left-click to drag the tooltip");
+			GameTooltip:AddLine("Right-click to change the direction");
+			GameTooltip:Show();
+		end
+	end
+);
+tooltipFixedAnchor:SetScript("OnMouseUp",
+	function()
+		module:stopMovable("TOOLTIP-FIXED-ANCHOR");
+	end
+);
+tooltipFixedAnchor:SetScript("OnEnter",
+	function()
+		local anchorSetting = module:getOption("tooltipAnchor") or 5;
+		local direction = "NONE";
+		if anchorSetting == 1 then
+			direction = "TOPLEFT"
+		elseif anchorSetting == 2 then
+			direction = "TOPRIGHT"
+		elseif anchorSetting == 3 then
+			direction = "BOTTOMRIGHT"
+		elseif anchorSetting == 4 then
+			direction = "BOTTOMLEFT"
+		elseif anchorSetting == 5 then
+			direction = "TOP";
+		elseif anchorSetting == 6 then
+			direction = "BOTTOM"
+		end
+		GameTooltip:SetOwner(tooltipFixedAnchor,"ANCHOR_" .. direction);
+		GameTooltip:SetText("Left-click to drag the tooltip");
+		GameTooltip:AddLine("Right-click to change the direction");
+		GameTooltip:Show();
+	end
+);
+tooltipFixedAnchor:SetScript("OnLeave",
+	function()
+		GameTooltip:Hide();
+	end
+);
+
+
+
+-- position the tooltip when it is not owned by something else
+hooksecurefunc("GameTooltip_SetDefaultAnchor",
+	function (tooltip, text, x, y, wrap)
+		local direction = "NONE";
+		local anchorSetting = module:getOption("tooltipAnchor") or 5;
+		if anchorSetting == 1 then
+			direction = "TOPLEFT"
+		elseif anchorSetting == 2 then
+			direction = "TOPRIGHT"
+		elseif anchorSetting == 3 then
+			direction = "BOTTOMRIGHT"
+		elseif anchorSetting == 4 then
+			direction = "BOTTOMLEFT"
+		elseif anchorSetting == 5 then
+			direction = "TOP";
+		elseif anchorSetting == 6 then
+			direction = "BOTTOM"
+		end
+		if (module:getOption("tooltipRelocation") == 2) then
+			-- on mouse (stationary)
+			local tooltipMouseAnchor = CreateFrame("Frame", nil, UIParent);
+			tooltipMouseAnchor:SetSize(0.00001, 0.00001);
+			local uiScale, cx, cy = UIParent:GetEffectiveScale(), GetCursorPosition();
+			tooltipMouseAnchor:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", (cx/uiScale)-(GameTooltip:GetWidth()/2), cy/uiScale);
+			if (tooltipMouseAnchor:GetPoint(1)) then
+				GameTooltip:SetOwner(tooltipMouseAnchor, "ANCHOR_TOPLEFT");
 			end
-
-			-- Display tooltip & play sound
-			self:GetScript("OnEnter")(self);
-			PlaySound(1115);
-		end
-	end);
-end
-
-local function anchorTooltipToMouse(tooltip)
-	-- Anchor the tooltip to the mouse (mouse 1)
-	local xoff, yoff, cursorX, cursorY, scale;
-	local anchor, data;
-
-	xoff = 0;
-	yoff = 0;
-	cursorX, cursorY = GetCursorPosition();
-	scale = UIParent:GetEffectiveScale();
-	if (scale == 0) then
-		cursorX = 0;
-		cursorY = 0;
-	else
-		cursorX = cursorX / scale;
-		cursorY = cursorY / scale;
-	end
-
-	if (tooltipMouseAnchor == #anchorPositions + 1) then
-		-- Automatic anchor
-		local topSide, leftSide;
-
-		topSide = (cursorY < UIParent:GetTop() / 2);
-		leftSide = (cursorX < UIParent:GetRight() / 2);
-
-		if (topSide) then
-			if (leftSide) then
-				anchor = 4; -- BOTOMLEFT
-			else
-				anchor = 3; -- BOTTOMRIGHT
-			end
-		else
-			if (leftSide) then
-				anchor = 1; -- TOPLEFT
-			else
-				anchor = 2; -- TOPRIGHT
-			end
-		end
-	else
-		anchor = tooltipMouseAnchor;
-	end
-
-	data = anchorPositions[anchor];
-	if (data) then
-		-- Prevent cursor from covering up tooltip
-		xoff = xoff + data.mxoff;
-		yoff = yoff + data.myoff;
-		-- Allow room for the unit's health bar
-		if (tooltip:GetUnit()) then
-			yoff = yoff + data.uyoff;
-		end
-		tooltip:ClearAllPoints();
-		tooltip:SetPoint(data.anchor, UIParent, "BOTTOMLEFT", cursorX + xoff, cursorY + yoff);
-	end
-end
-
-local function anchorTooltipToAnchor(tooltip)
-	-- Anchor the tooltip to the anchor frame
-	local data = anchorPositions[tooltipAnchorNumber];
-	if (data) then
-		if ( not tooltipAnchorFrame ) then
-			createTooltipAnchorFrame();
-		end
-		tooltip:ClearAllPoints();
-		if (tooltipAnchorFrame:IsShown()) then
-			tooltip:SetPoint(data.anchor, tooltipAnchorFrame, data.relative);
-		else
-			tooltip:SetPoint(data.anchor, tooltipAnchorFrame, data.anchor);
+		elseif (module:getOption("tooltipRelocation") == 3) then
+			--on anchor
+			GameTooltip:SetOwner(tooltipFixedAnchor, "ANCHOR_" .. direction);
+		
+		elseif (module:getOption("tooltipRelocation") == 4) then
+			-- on mouse (following)
+			GameTooltip:SetOwner(UIParent, "ANCHOR_CURSOR");
 		end
 	end
-end
+);
 
-local function reanchorTooltip(tooltip, parent)
-	-- Re-anchor the tooltip (and set the owner).
-	-- Note: Setting the tooltip's owner will clear the tooltip contents.
-	tooltip.ctSetOwner = true;  -- true == We are the ones setting the owner at the moment.
-	if (tooltipAnchorMode == 4) then
-		-- To the mouse (mouse 2)
-		tooltip:SetOwner(parent, "ANCHOR_NONE");
-		anchorTooltipToMouse(tooltip);
-	elseif (tooltipAnchorMode == 3) then
-		-- To the movable anchor frame
-		local data = anchorPositions[tooltipAnchorNumber];
-		if (data) then
-			tooltip:SetOwner(parent, "ANCHOR_NONE");
-			anchorTooltipToAnchor(tooltip);
-		end
-	elseif (tooltipAnchorMode == 2) then
-		-- To the cursor (mouse 1)
-		tooltip:SetOwner(parent, "ANCHOR_CURSOR");
-	end
-	tooltip.ctSetOwner = false;
-end
 
-function CT_Core_ResetTooltipAnchor()
-	-- Reset the position of the anchor frame
-	if (tooltipAnchorFrame) then
-		tooltipAnchorFrame:ClearAllPoints();
-		tooltipAnchorFrame:SetPoint("CENTER", "UIParent", "CENTER", 0, 0);
-		module:stopMovable(tooltipAnchorFrame.movable);
-	end
-end
-
-local function CT_Core_Hooked_GameTooltip_OnUpdate(self, elapsed)
-	-- Hook of GameTooltip:OnUpdate.
-	if (tooltipAnchorMode == 4 or tooltipAnchorMode == 3) then
-		-- 4 == On mouse (mouse 2)
-		-- 3 == On anchor frame
-		tooltipUpdateTimer = tooltipUpdateTimer + elapsed;
-		if (tooltipUpdateTimer > 0.01) then
-			tooltipUpdateTimer = 0;
-			if (tooltipIsDefault(self)) then
-				-- This tooltip is normally shown in the default location.
-				-- Check if more than one point has been set for the tooltip.
-				if (self:GetPoint(2)) then
-					-- There is more than one point set for the tooltip,
-					-- so assume that something else set a point without first
-					-- clearing the current points.
-					-- One place this can happen is when the mouse is over
-					-- certain game objects which continously set a point
-					-- while the mouse is over them (such as city banners at the
-					-- Argent Tournament in Icecrown).
-
-					-- Don't do any anchoring.
-					tooltipNeedUpdate = false;
-
-					-- Clear all of the current points. This should ensure that when the
-					-- game object next causes the tooltip point to be set, that there
-					-- will only be one point set for the tooltip.
-					self:ClearAllPoints();
-				else
-					-- The tooltip did not have two or more points set.
-					if  (tooltipNeedUpdate) then
-						-- CT_Core was the last one to set the owner of the tooltip.
-						if (tooltipAnchorMode == 4) then
-							-- Anchor the tooltip to the mouse (mouse 2).
-							-- We have to do this in an OnUpdate in case the player moves the mouse.
-							-- If we don't continue to reposition the tooltip so that it is at the
-							-- current mouse location, then it will appear to get stuck at the spot
-							-- where the current tooltip was first shown.
-							anchorTooltipToMouse(self);
-						--elseif (tooltipAnchorMode == 3) then
-							-- Anchor the tooltip to the anchor frame.
-							-- Shouldn't need to do this in the OnUpdate since
-							-- the tooltip is stationary (it doesn't have to
-							-- follow the mouse).
-							--anchorTooltipToAnchor(self);
-						end
-					end
-				end
-				-- Hide the anchor frame when the tooltip starts to fade.
-				if ( (tooltipAnchorMode == 4 and tooltipMouseDisableFade) or
-				     (tooltipAnchorMode == 3 and tooltipFrameDisableFade) ) then
-					if (self:GetAlpha() < 0.99) then
-						self:Hide();
-					end
-				end
-			end
+-- make the tooltip go away faster
+GameTooltip:HookScript("OnUpdate",
+	function()
+		if (GameTooltip:GetAlpha() < 0.99 and module:getOption("tooltipDisableFade")) then
+			GameTooltip:Hide();
 		end
 	end
-end
+);
 
-local function CT_Core_Hooked_GameTooltip_OnHide(self)
-	-- Hook of GameTooltip:OnHide.
 
-	-- Since the tooltip is being hidden, there is no more need to update the anchor.
-	tooltipNeedUpdate = false;
-end
 
-local function CT_Core_Hooked_GameTooltip_OnShow(self)
-	-- Hook of GameTooltip:OnShow.
-	if (tooltipAnchorMode == 4) then
-		-- On mouse (mouse 2)
-		if (tooltipIsDefault(self)) then
-			-- This tooltip is normally shown in the default location.
-			if  (tooltipNeedUpdate) then
-				-- CT_Core was the last one to set the owner of the tooltip.
-				-- Anchor the tooltip to the mouse (mouse 2).
-				anchorTooltipToMouse(self);
-			end
-		end
-	end
-end
 
-function CT_Core_Hooked_GameTooltip_SetOwner(self)
-	-- If CT_Core is the one setting the owner, then we will want to update the anchor
-	-- during the OnUpdate script.
-	tooltipNeedUpdate = self.ctSetOwner;  -- true == CT_Core is setting the owner
-end
-
-local function CT_Core_GameTooltipStatusBar_OnValueChanged(self, ...)
-	-- Hook of GameTooltipStatusBar:OnValueChanged.
-	if (not tooltipStatusbarUpdating) then
-		tooltipStatusbarValue = self:GetValue();
-		if (not tooltipStatusbarChanged) then
-			tooltipStatusbarChanged = true;
-			tooltipStatusbarTimer = 0.1;
-		end
-	end
-end
-
-local function CT_Core_GameTooltipStatusBar_OnUpdate(self, elapsed, ...)
-	-- Hook of GameTooltipStatusBar:OnUpdate.
-	if (tooltipStatusbarChanged) then
-		tooltipStatusbarTimer = tooltipStatusbarTimer - elapsed;
-		if (tooltipStatusbarTimer <= 0) then
-			local value = self:GetValue();
-			tooltipStatusbarUpdating = true;
-			self:SetValue(0);
-			self:SetValue(value);
-			tooltipStatusbarUpdating = nil;
-			if (value == tooltipStatusbarValue) then
-				tooltipStatusbarChanged = nil;
-			else
-				tooltipStatusbarTimer = 0.1;
-			end
-		end
-	end
-end
-
-function CT_Core_GameTooltip_SetDefaultAnchor(tooltip, parent, ...)
-	-- Hook of GameTooltip_SetDefaultAnchor in GameTooltip.lua.
-	if ( tooltip == GameTooltip and tooltipAnchorMode ) then
-		if ( tooltipAnchorMode == 4 or tooltipAnchorMode == 3 ) then
-			-- On mouse (mouse 2) or on anchor frame.
-			if (not tooltipHooked) then
-				-- Note: Hooks of these functions do not get called when you mouseover
-				-- certain objects in the game world (such as the city banners at the
-				-- Argent Tournament Grounds in Icecrown).
-				-- These types of objects appear to continuously call the equivalent
-				-- of :SetPoint() while the mouse is over the object, and the game
-				-- does not clear the current points before doing so. This can result
-				-- in two points being set for the tooltip (the point we set,
-				-- and the one the game sets, since the game sets its point after
-				-- we clear points and set our point).
-				tooltipHooked = true;
-				tooltip:HookScript("OnUpdate", CT_Core_Hooked_GameTooltip_OnUpdate);
-				tooltip:HookScript("OnShow", CT_Core_Hooked_GameTooltip_OnShow);
-				tooltip:HookScript("OnHide", CT_Core_Hooked_GameTooltip_OnHide);
-				hooksecurefunc(tooltip, "SetOwner", CT_Core_Hooked_GameTooltip_SetOwner);
-			end
-		end
-		if ( tooltipAnchorMode == 2 ) then
-			-- On cursor (mouse 1)
-			--
-			-- When using ANCHOR_CURSOR, the game does not always properly update the
-			-- health status bar shown below a unit's tooltip. The game does update
-			-- the status bar when the unit's health changes. However, if you hover over
-			-- a non-injured unit and then over an injured unit who's health is not
-			-- changing, the game will show a full health bar for the injured unit.
-			-- Even though the status bar shows the injured unit at full health, the
-			-- value assigned to the status bar is the unit's correct health value.
-			--
-			-- To work around this issue, we'll watch for the game to assign values to
-			-- the status bar, and then schedule an update to be done a short time
-			-- later. If we do the update too soon then the health bar won't change.
-			-- To force the game to redraw the status bar, we'll set the bar's value
-			-- to 0 and then back to its actual value.
-			if (not tooltipStatusbarHooked) then
-				tooltipStatusbarHooked = true;
-				GameTooltipStatusBar:HookScript("OnValueChanged", CT_Core_GameTooltipStatusBar_OnValueChanged);
-				GameTooltipStatusBar:HookScript("OnUpdate", CT_Core_GameTooltipStatusBar_OnUpdate);
-			end
-		end
-		if ( tooltipAnchorMode > 1 ) then
-			reanchorTooltip(tooltip, parent);
-		end
-	end
-end
-hooksecurefunc("GameTooltip_SetDefaultAnchor", CT_Core_GameTooltip_SetDefaultAnchor);
-
-local function setTooltipRelocationStyle(tooltipStyle)
-	tooltipAnchorMode = tooltipStyle;
-	updateTooltipAnchorVisibility();
-end
-
-local function toggleTooltipAnchorVisibility(show)
-	tooltipAnchorDisplay = show;
-
-	if ( not tooltipAnchorFrame and show ) then
-		createTooltipAnchorFrame();
-	else
-		updateTooltipAnchorVisibility();
-	end
-end
-
-local function setTooltipFrameAnchor(anchor)
-	tooltipAnchorNumber = (anchor or tooltipAnchorNumber) or 1;  -- default is 1 (top left)
-	if (tooltipAnchorNumber > #anchorPositions) then
-		tooltipAnchorNumber = #anchorPositions;
-	end
-
-	if ( tooltipAnchorDisplay ) then
-		if ( not tooltipAnchorFrame ) then
-			createTooltipAnchorFrame();
-		end
-		updateTooltipText(tooltipAnchorFrame);
-	end
-end
-
-local function setTooltipMouseAnchor(anchor)
-	tooltipMouseAnchor = (anchor or tooltipMouseAnchor) or 7;  -- default is 7 (bottom)
-	if (tooltipMouseAnchor > #anchorPositions + 1) then  -- +1 to handle the "automatic" option
-		tooltipMouseAnchor = #anchorPositions + 1;
-	end
-end
-
-local function setTooltipFrameDisableFade(value)
-	tooltipFrameDisableFade = value;
-end
-
-local function setTooltipMouseDisableFade(value)
-	tooltipMouseDisableFade = value;
-end
 
 --------------------------------------------
 -- Tick Mod
@@ -2585,12 +2230,7 @@ local modFunctions = {
 	["blockBankTrades"] = module.configureBlockTradesBank,
 	["tickMod"] = toggleTick,
 	["tickModFormat"] = setTickDisplayType,
-	["tooltipRelocation"] = setTooltipRelocationStyle,
-	["tooltipRelocationAnchor"] = toggleTooltipAnchorVisibility,
-	["tooltipFrameAnchor"] = setTooltipFrameAnchor,
-	["tooltipMouseAnchor"] = setTooltipMouseAnchor,
-	["tooltipFrameDisableFade"] = setTooltipFrameDisableFade,
-	["tooltipMouseDisableFade"] = setTooltipMouseDisableFade,
+
 	["hideWorldMap"] = toggleWorldMap,
 	["castingbarEnabled"] = castingbar_ToggleStatus,
 	["castingbarMovable"] = castingbar_ToggleMovable,
@@ -2633,9 +2273,31 @@ local modFunctions = {
 	["castingbarMovable"] = castingbar_ToggleHelper,
 };
 
+	--["tooltipRelocation"] = setTooltipRelocationStyle,
+	--["tooltipRelocationAnchor"] = toggleTooltipAnchorVisibility,
+	--["tooltipFrameAnchor"] = setTooltipFrameAnchor,
+	--["tooltipMouseAnchor"] = setTooltipMouseAnchor,
+	--["tooltipFrameDisableFade"] = setTooltipFrameDisableFade,
+	--["tooltipMouseDisableFade"] = setTooltipMouseDisableFade,
+
+
 module.modupdate = function(self, type, value)
 	if ( type == "init" ) then
-		module:setOption("tooltipAnchor", nil, true);  -- Remove obsolete option
+		
+		-- tooltipAnchor can no longer be 9 as of 8.2.0.1
+		if (module:getOption("tooltipAnchor") > 6) then
+			module:setOption("tooltipAnchor", 5, true, false);  -- removed several options
+		end
+		
+		-- these settings are removed as of 8.2.0.1
+		module:setOption("tooltipRelocationAnchor", nil, true, false);
+		module:setOption("tooltipFrameAnchor", nil, true, false);
+		module:setOption("tooltipMouseAnchor", nil, true, false);
+		module:setOption("tooltipFrameDisableFade", nil, true, false);
+		module:setOption("tooltipMouseDisableFade", nil, true, false);
+		
+		
+		-- load all the various settings
 		for key, value in pairs(modFunctions) do
 			value(self:getOption(key), key);
 		end

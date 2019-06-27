@@ -1,3 +1,6 @@
+CT_Core (8.2.0.2) 2019-06-26
+- Fixed custom tooltip anchor causing GameTooltip:SetPoint() errors
+
 CT_Core (8.2.0.1) 2019-06-21
 - Improved functionality of the minimap button, integrated with CTRA
 - Movable casting bar updated for WoW 8.2
