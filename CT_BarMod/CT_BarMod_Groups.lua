@@ -975,7 +975,7 @@ function group:positionButtons()
 		button = object.button;
 		button:ClearAllPoints();
 		if (key > buttons or row > rows) then
-			button:SetPoint("CENTER", UIParent, "CENTER", 0, 0);
+			-- caused errors in WoW 8.2; why was this even needed? -- button:SetPoint("CENTER", UIParent, "CENTER", 0, 0);
 			object:updateVisibility();
 		else
 			if (key == 1) then
