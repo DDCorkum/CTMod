@@ -1,3 +1,6 @@
+CT_BarMod (8.2.0.2) 2019-06-26
+- Fixed SetPoint() error when fewer than 12 buttons shown on a bar
+
 CT_BarMod (8.2.0.1) 2019-06-21
 - Fixed issues observed in WoW Classic
 - Possible fix for keybinding labels disappearing in some circumstances
