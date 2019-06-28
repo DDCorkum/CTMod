@@ -249,23 +249,23 @@ function incMail:retrieveSelectedMail(cancelProcessing)
 
 		if (self:canMassOpen()) then
 			self.logSuccess = true;
-			self.logMessage = "MAIL_OPEN_OK";
+			self.logMessage = "CT_MailMod/MAIL_OPEN_OK";
 			module:printLogMessage(self.logSuccess, self, self.logMessage);
 			self.logPrint = false;
 		else
 			local message;
 			if (self.codAmount > 0) then
 				-- Don't open COD messages.
-				message = "MAIL_OPEN_IS_COD";
+				message = "CT_MailMod/MAIL_OPEN_IS_COD";
 			elseif (self.isGM) then
 				-- Don't open GM messages.
-				message = "MAIL_OPEN_IS_GM";
+				message = "CT_MailMod/MAIL_OPEN_IS_GM";
 			elseif (self.money == 0 and self.numItems == 0) then
 				-- Don't open messages with no money or items.
-				message = "MAIL_OPEN_NO_ITEMS_MONEY";
+				message = "CT_MailMod/MAIL_OPEN_NO_ITEMS_MONEY";
 			else
 				-- Cannot open this message.
-				message = "MAIL_OPEN_CANNOT_OPEN";
+				message = "CT_MailMod/MAIL_OPEN_CANNOT_OPEN";
 			end
 			module:logIncoming(false, self, message);
 			return 3;
@@ -278,7 +278,7 @@ function incMail:retrieveSelectedMail(cancelProcessing)
 	end
 	if (GetTime() - self.lastTime > module.timeoutValue) then
 		-- It is taking too long to retrieve money or current item.
-		module:logIncoming(false, self, "MAIL_TIMEOUT");
+		module:logIncoming(false, self, "CT_MailMod/MAIL_TIMEOUT");
 		return 2;
 	end
 	if (self.mailCount ~= inboxNumItems) then
@@ -441,7 +441,7 @@ function incMail:returnSelectedMail(cancelProcessing)
 		if (self:canMassReturn()) then
 			-- Can return the mail.
 			self.logSuccess = true;
-			self.logMessage = "MAIL_RETURN_OK";
+			self.logMessage = "CT_MailMod/MAIL_RETURN_OK";
 			module:printLogMessage(self.logSuccess, self, self.logMessage);
 			self.logPrint = false;
 		else
@@ -449,22 +449,22 @@ function incMail:returnSelectedMail(cancelProcessing)
 			local message;
 			if (not self.from) then
 				-- No sender.
-				message = "MAIL_RETURN_NO_SENDER";
+				message = "CT_MailMod/MAIL_RETURN_NO_SENDER";
 			elseif (self.wasReturned) then
 				-- Message was already returned to us.
-				message = "MAIL_RETURN_IS_RETURNED";
+				message = "CT_MailMod/MAIL_RETURN_IS_RETURNED";
 			elseif (self.isGM) then
 				-- Message is from a GM.
-				message = "MAIL_RETURN_IS_GM";
+				message = "CT_MailMod/MAIL_RETURN_IS_GM";
 			elseif (self.numItems == 0 and self.money == 0 and self.codAmount == 0) then
 				-- Messages has no items, no money, and no cod amount.
-				message = "MAIL_RETURN_NO_ITEMS_MONEY";
+				message = "CT_MailMod/MAIL_RETURN_NO_ITEMS_MONEY";
 			elseif (not self.canReply) then
 				-- Message cannot be replied to.
-				message = "MAIL_RETURN_NO_REPLY";
+				message = "CT_MailMod/MAIL_RETURN_NO_REPLY";
 			else
 				-- Message is deletable (ie. not returnable).
-				message = "MAIL_RETURN_NO";
+				message = "CT_MailMod/MAIL_RETURN_NO";
 			end
 			module:logReturned(false, self, message);
 			return 3;
@@ -477,7 +477,7 @@ function incMail:returnSelectedMail(cancelProcessing)
 	end
 	if (GetTime() - self.lastTime > module.timeoutValue) then
 		-- It is taking too long to return the mail.
-		module:logIncoming(false, self, "MAIL_TIMEOUT");
+		module:logIncoming(false, self, "CT_MailMod/MAIL_TIMEOUT");
 		return 2;
 	end
 	if (self.mailCount ~= inboxNumItems) then
@@ -658,11 +658,11 @@ function incMail:deleteSelectedMail(cancelProcessing)
 		if (InboxItemCanDelete(self.id)) then
 			-- Can delete the mail.
 			self.logSuccess = true;
-			self.logMessage = "MAIL_DELETE_OK";
+			self.logMessage = "CT_MailMod/MAIL_DELETE_OK";
 			-- Don't print a log message now (in case there is a static popup).
 		else
 			-- Mail cannot be deleted.
-			module:logDeleted(false, self, "MAIL_DELETE_NO");
+			module:logDeleted(false, self, "CT_MailMod/MAIL_DELETE_NO");
 			return 3;
 		end
 	end
@@ -689,7 +689,7 @@ function incMail:deleteSelectedMail(cancelProcessing)
 		if (GetTime() - self.lastTime > module.timeoutValue) then
 			-- It is taking too long to delete the mail.
 			module:hideMailDeletePopups();
-			module:logIncoming(false, self, "MAIL_TIMEOUT");
+			module:logIncoming(false, self, "CT_MailMod/MAIL_TIMEOUT");
 			return 2;
 		end
 	end
@@ -722,15 +722,15 @@ function incMail:deleteSelectedMail(cancelProcessing)
 			if (self.money > 0) then
 				if (self.numItems > 1) then
 					-- "some money and %d items including %s"
-					itemName = format(module:getText("DELETE_POPUP3"), self.numItems, itemName);
+					itemName = format(module.text["CT_MailMod/DELETE_POPUP3"], self.numItems, itemName);
 				else
 					-- "some money and %s"
-					itemName = format(module:getText("DELETE_POPUP2"), itemName);
+					itemName = format(module.text["CT_MailMod/DELETE_POPUP2"], itemName);
 				end
 			else
 				if (self.numItems > 1) then
 					-- "%d items including %s"
-					itemName = format(module:getText("DELETE_POPUP1"), self.numItems, itemName);
+					itemName = format(module.text["CT_MailMod/DELETE_POPUP1"], self.numItems, itemName);
 				end
 			end
 			StaticPopup_Show("CT_MAILMOD_DELETE_MAIL", itemName);
@@ -826,7 +826,7 @@ StaticPopupDialogs["CT_MAILMOD_COD_CONFIRMATION"] = {
 		if (link) then
 			-- Take the item
 			mail.logSuccess = true;
-			mail.logMessage = "MAIL_TAKE_ITEM_OK";
+			mail.logMessage = "CT_MailMod/MAIL_TAKE_ITEM_OK";
 			module:printLogMessage(mail.logSuccess, mail, mail.logMessage);
 			mail.logPrint = false;
 
@@ -883,7 +883,7 @@ local function retrieveOpenItem(mail)
 			else
 				-- Take the item
 				mail.logSuccess = true;
-				mail.logMessage = "MAIL_TAKE_ITEM_OK";
+				mail.logMessage = "CT_MailMod/MAIL_TAKE_ITEM_OK";
 				module:printLogMessage(mail.logSuccess, mail, mail.logMessage);
 				mail.logPrint = false;
 
@@ -975,7 +975,7 @@ function incMail:retrieveItemFromOpenMail(cancelProcessing)
 		if (GetTime() - self.lastTime > module.timeoutValue) then
 			-- It is taking too long to retrieve the current item.
 			module:hideOpenMailTakeItemPopups();
-			module:logIncoming(false, self, "MAIL_TIMEOUT");
+			module:logIncoming(false, self, "CT_MailMod/MAIL_TIMEOUT");
 			return 2;
 		end
 	end
@@ -1064,7 +1064,7 @@ function incMail:retrieveMoneyFromOpenMail(cancelProcessing)
 	end
 	if (GetTime() - self.lastTime > module.timeoutValue) then
 		-- It is taking too long to retrieve the money attachment.
-		module:logIncoming(false, self, "MAIL_TIMEOUT");
+		module:logIncoming(false, self, "CT_MailMod/MAIL_TIMEOUT");
 		return 2;
 	end
 	if (self.mailCount ~= inboxNumItems) then
@@ -1095,7 +1095,7 @@ function incMail:retrieveMoneyFromOpenMail(cancelProcessing)
 		self.haveTakenMoney = true;
 
 		self.logSuccess = true;
-		self.logMessage = "MAIL_TAKE_MONEY_OK";
+		self.logMessage = "CT_MailMod/MAIL_TAKE_MONEY_OK";
 		module:printLogMessage(self.logSuccess, self, self.logMessage);
 		self.logPrint = false;
 
@@ -1131,7 +1131,7 @@ function module:downloadMail(cancelProcessing)
 	if (downloadNumItems == nil) then
 		-- Intialize
 		downloadNumItems = inboxNumItems;
-		print(module:getText("MAIL_DOWNLOAD_BEGIN"));
+		print(module.text["CT_MailMod/MAIL_DOWNLOAD_BEGIN"]);
 		module:inboxUnselectAll();
 		module:inboxUpdateSelection();
 	end
@@ -1143,7 +1143,7 @@ function module:downloadMail(cancelProcessing)
 	if (inboxNumItems > downloadNumItems) then
 		-- Mail has been downloaded into the inbox.
 		downloadNumItems = nil;
-		print(module:getText("MAIL_DOWNLOAD_END"));
+		print(module.text["CT_MailMod/MAIL_DOWNLOAD_END"]);
 		return 3;
 	end
 	CheckInbox();

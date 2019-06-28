@@ -284,8 +284,8 @@ do
 			end
 
 			-- Log anything pending and then log the error message.
-			module:setText("MAIL_LOOT_ERROR_WORK", arg1);
-			module:logIncoming(false, mail, "MAIL_LOOT_ERROR_WORK");
+			module:setText("CT_MailMod/MAIL_LOOT_ERROR_WORK", arg1);
+			module:logIncoming(false, mail, "CT_MailMod/MAIL_LOOT_ERROR_WORK");
 
 			if (mail) then
 				if (arg1 == ERR_ITEM_MAX_COUNT) then

@@ -132,7 +132,7 @@ local function sendmailMailSent()
 	mail.logFunc = module.logOutgoing;
 	mail.logPrint = true;
 	mail.logSuccess = true;
-	mail.logMessage = "MAIL_SEND_OK";
+	mail.logMessage = "CT_MailMod/MAIL_SEND_OK";
 	module:logOutgoing(mail.logSuccess, mail, mail.logMessage)
 
 	-- Reset values and items.
