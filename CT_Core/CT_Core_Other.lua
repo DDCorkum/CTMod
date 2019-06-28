@@ -291,6 +291,16 @@ tooltipFixedAnchor:SetScript("OnLeave",
 );
 
 
+-- show the anchor when appropriate
+tooltipFixedAnchor:Hide();
+local function tooltip_showAnchor(value)
+	if (value) then
+		tooltipFixedAnchor:Show();
+	else
+		tooltipFixedAnchor:Hide();
+	end
+end
+
 
 -- position the tooltip when it is not owned by something else
 hooksecurefunc("GameTooltip_SetDefaultAnchor",
@@ -2230,7 +2240,7 @@ local modFunctions = {
 	["blockBankTrades"] = module.configureBlockTradesBank,
 	["tickMod"] = toggleTick,
 	["tickModFormat"] = setTickDisplayType,
-
+	["tooltipAnchorUnlock"] = tooltip_showAnchor,
 	["hideWorldMap"] = toggleWorldMap,
 	["castingbarEnabled"] = castingbar_ToggleStatus,
 	["castingbarMovable"] = castingbar_ToggleMovable,
@@ -2285,7 +2295,7 @@ module.modupdate = function(self, type, value)
 	if ( type == "init" ) then
 		
 		-- tooltipAnchor can no longer be 9 as of 8.2.0.1
-		if (module:getOption("tooltipAnchor") > 6) then
+		if ((module:getOption("tooltipAnchor") or 5) > 6) then
 			module:setOption("tooltipAnchor", 5, true, false);  -- removed several options
 		end
 		
