@@ -967,7 +967,7 @@ function CT_MapMod_AddUIElements()
 				end,
 				["onenter"] = function(self)
 					GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, 15);
-					GameTooltip:SetText("CT: " .. module.text["Reset the map"]);
+					GameTooltip:SetText("CT: " .. module.text["CT_MapMod/Map/Reset the map"]);
 					GameTooltip:Show();
 				end,
 				["onleave"] = function(self)
