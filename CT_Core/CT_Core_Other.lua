@@ -219,7 +219,7 @@ tooltipFixedAnchor:SetScript("OnEvent",
 	function (self, event, args)
 		if event == "ADDON_LOADED" then
 			self:UnregisterEvent("ADDON_LOADED");
-			module:registerMovable("TOOLTIP-FIXED-ANCHOR", tooltipFixedAnchor, true, 50);
+			module:registerMovable("TOOLTIPANCHOR", tooltipFixedAnchor, true, 50);
 		end
 	end
 );
@@ -227,7 +227,7 @@ tooltipFixedAnchor:SetScript("OnEvent",
 tooltipFixedAnchor:SetScript("OnMouseDown",
 	function(self, button)
 		if (button == "LeftButton") then
-			module:moveMovable("TOOLTIP-FIXED-ANCHOR");
+			module:moveMovable("TOOLTIPANCHOR");
 		elseif (button == "RightButton") then
 			local anchorSetting = 1 + (module:getOption("tooltipAnchor") or 5);
 			if (anchorSetting > 6) then
@@ -258,7 +258,7 @@ tooltipFixedAnchor:SetScript("OnMouseDown",
 );
 tooltipFixedAnchor:SetScript("OnMouseUp",
 	function()
-		module:stopMovable("TOOLTIP-FIXED-ANCHOR");
+		module:stopMovable("TOOLTIPANCHOR");
 	end
 );
 tooltipFixedAnchor:SetScript("OnEnter",
@@ -290,6 +290,16 @@ tooltipFixedAnchor:SetScript("OnLeave",
 	end
 );
 
+
+-- show the anchor when appropriate
+tooltipFixedAnchor:Hide();
+local function tooltip_toggleAnchor(value)
+	if (value and module:getOption("tooltipRelocation") == 3) then
+		tooltipFixedAnchor:Show();
+	else
+		tooltipFixedAnchor:Hide();
+	end
+end
 
 
 -- position the tooltip when it is not owned by something else
@@ -2230,7 +2240,8 @@ local modFunctions = {
 	["blockBankTrades"] = module.configureBlockTradesBank,
 	["tickMod"] = toggleTick,
 	["tickModFormat"] = setTickDisplayType,
-
+	["tooltipAnchorUnlock"] = tooltip_toggleAnchor,
+	["tooltipRelocation"] = tooltip_toggleAnchor,
 	["hideWorldMap"] = toggleWorldMap,
 	["castingbarEnabled"] = castingbar_ToggleStatus,
 	["castingbarMovable"] = castingbar_ToggleMovable,
@@ -2273,19 +2284,12 @@ local modFunctions = {
 	["castingbarMovable"] = castingbar_ToggleHelper,
 };
 
-	--["tooltipRelocation"] = setTooltipRelocationStyle,
-	--["tooltipRelocationAnchor"] = toggleTooltipAnchorVisibility,
-	--["tooltipFrameAnchor"] = setTooltipFrameAnchor,
-	--["tooltipMouseAnchor"] = setTooltipMouseAnchor,
-	--["tooltipFrameDisableFade"] = setTooltipFrameDisableFade,
-	--["tooltipMouseDisableFade"] = setTooltipMouseDisableFade,
-
 
 module.modupdate = function(self, type, value)
 	if ( type == "init" ) then
 		
 		-- tooltipAnchor can no longer be 9 as of 8.2.0.1
-		if (module:getOption("tooltipAnchor") > 6) then
+		if ((module:getOption("tooltipAnchor") or 5) > 6) then
 			module:setOption("tooltipAnchor", 5, true, false);  -- removed several options
 		end
 		

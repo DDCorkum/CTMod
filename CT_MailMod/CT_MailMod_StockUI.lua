@@ -82,7 +82,7 @@ do
 		if (reloadmailtimer == nil) then
 			return;
 		elseif (reloadmailtimer > GetTime()) then
-			CTMailModMailboxButton:SetText(format(module.text["CT_MailMod/MAILBOX_DOWNLOAD_MORE_SOON"],round(reloadmailtimer - GetTime(), 0)));  --Download more mail in %d seconds
+			CTMailModMailboxButton:SetText(format(module.text["CT_MailMod/MAILBOX_DOWNLOAD_MORE_SOON"],floor(reloadmailtimer - GetTime())));  --Download more mail in %d seconds
 			C_Timer.After(0.5,enableReloadMailboxButton);
 		else
 			CTMailModMailboxButton:SetText(module.text["CT_MailMod/MAILBOX_DOWNLOAD_MORE_NOW"]);
