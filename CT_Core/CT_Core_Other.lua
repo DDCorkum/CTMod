@@ -219,7 +219,7 @@ tooltipFixedAnchor:SetScript("OnEvent",
 	function (self, event, args)
 		if event == "ADDON_LOADED" then
 			self:UnregisterEvent("ADDON_LOADED");
-			module:registerMovable("TOOLTIPANCHOR", tooltipFixedAnchor, true, 50);
+			module:registerMovable("TOOLTIP-FIXED-ANCHOR", tooltipFixedAnchor, true, 50);
 		end
 	end
 );
@@ -227,7 +227,7 @@ tooltipFixedAnchor:SetScript("OnEvent",
 tooltipFixedAnchor:SetScript("OnMouseDown",
 	function(self, button)
 		if (button == "LeftButton") then
-			module:moveMovable("TOOLTIPANCHOR");
+			module:moveMovable("TOOLTIP-FIXED-ANCHOR");
 		elseif (button == "RightButton") then
 			local anchorSetting = 1 + (module:getOption("tooltipAnchor") or 5);
 			if (anchorSetting > 6) then
@@ -258,7 +258,7 @@ tooltipFixedAnchor:SetScript("OnMouseDown",
 );
 tooltipFixedAnchor:SetScript("OnMouseUp",
 	function()
-		module:stopMovable("TOOLTIPANCHOR");
+		module:stopMovable("TOOLTIP-FIXED-ANCHOR");
 	end
 );
 tooltipFixedAnchor:SetScript("OnEnter",
@@ -293,8 +293,8 @@ tooltipFixedAnchor:SetScript("OnLeave",
 
 -- show the anchor when appropriate
 tooltipFixedAnchor:Hide();
-local function tooltip_toggleAnchor(value)
-	if (value and module:getOption("tooltipRelocation") == 3) then
+local function tooltip_showAnchor(value)
+	if (value) then
 		tooltipFixedAnchor:Show();
 	else
 		tooltipFixedAnchor:Hide();
@@ -2240,8 +2240,7 @@ local modFunctions = {
 	["blockBankTrades"] = module.configureBlockTradesBank,
 	["tickMod"] = toggleTick,
 	["tickModFormat"] = setTickDisplayType,
-	["tooltipAnchorUnlock"] = tooltip_toggleAnchor,
-	["tooltipRelocation"] = tooltip_toggleAnchor,
+	["tooltipAnchorUnlock"] = tooltip_showAnchor,
 	["hideWorldMap"] = toggleWorldMap,
 	["castingbarEnabled"] = castingbar_ToggleStatus,
 	["castingbarMovable"] = castingbar_ToggleMovable,
@@ -2283,6 +2282,13 @@ local modFunctions = {
 	["castingbarEnabled"] = castingbar_Update,
 	["castingbarMovable"] = castingbar_ToggleHelper,
 };
+
+	--["tooltipRelocation"] = setTooltipRelocationStyle,
+	--["tooltipRelocationAnchor"] = toggleTooltipAnchorVisibility,
+	--["tooltipFrameAnchor"] = setTooltipFrameAnchor,
+	--["tooltipMouseAnchor"] = setTooltipMouseAnchor,
+	--["tooltipFrameDisableFade"] = setTooltipFrameDisableFade,
+	--["tooltipMouseDisableFade"] = setTooltipMouseDisableFade,
 
 
 module.modupdate = function(self, type, value)
