@@ -1,2 +1,0 @@
--- This file is depreciated and will be removed in a future version.
--- See localization.lua
