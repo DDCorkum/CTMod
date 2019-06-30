@@ -293,49 +293,77 @@ tooltipFixedAnchor:SetScript("OnLeave",
 
 -- show the anchor when appropriate
 tooltipFixedAnchor:Hide();
-local function tooltip_toggleAnchor(value)
-	if (value and module:getOption("tooltipRelocation") == 3) then
+local function tooltip_toggleAnchor()
+	if (module:getOption("tooltipAnchorUnlock") and module:getOption("tooltipRelocation") == 3) then
 		tooltipFixedAnchor:Show();
 	else
 		tooltipFixedAnchor:Hide();
 	end
 end
 
+local tooltipMouseAnchor = CreateFrame("Frame", nil, UIParent);
+tooltipMouseAnchor:SetSize(0.00001, 0.00001);
+tooltipMouseAnchor:SetScript("OnUpdate",
+	function()
+		if (module:getOption("tooltipRelocation") == 4) then
+			-- the tooltip always follows the cursor
+			local uiScale, cx, cy = UIParent:GetEffectiveScale(), GetCursorPosition();
+			tooltipMouseAnchor:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", (cx/uiScale), cy/uiScale);
+		end
+	end
+);
 
 -- position the tooltip when it is not owned by something else
 hooksecurefunc("GameTooltip_SetDefaultAnchor",
 	function (tooltip, text, x, y, wrap)
 		local direction = "NONE";
-		local anchorSetting = module:getOption("tooltipAnchor") or 5;
-		if anchorSetting == 1 then
-			direction = "TOPLEFT"
-		elseif anchorSetting == 2 then
-			direction = "TOPRIGHT"
-		elseif anchorSetting == 3 then
-			direction = "BOTTOMRIGHT"
-		elseif anchorSetting == 4 then
-			direction = "BOTTOMLEFT"
-		elseif anchorSetting == 5 then
-			direction = "TOP";
-		elseif anchorSetting == 6 then
-			direction = "BOTTOM"
-		end
-		if (module:getOption("tooltipRelocation") == 2) then
+		local xsign = 1; -- offsets from cursor will be multiplied by 1 for right or -1 for left
+		local ysign = 1; -- offsets from cursor will be multiplied by 1 for up or -1 for down
+		if (module:getOption("tooltipRelocation") == 2 or module:getOption("tooltipRelocation") == 4) then
 			-- on mouse (stationary)
-			local tooltipMouseAnchor = CreateFrame("Frame", nil, UIParent);
-			tooltipMouseAnchor:SetSize(0.00001, 0.00001);
+			
 			local uiScale, cx, cy = UIParent:GetEffectiveScale(), GetCursorPosition();
-			tooltipMouseAnchor:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", (cx/uiScale)-(GameTooltip:GetWidth()/2), cy/uiScale);
+			--push the tooltip away from screen edges
+			if (cx/uiScale > UIParent:GetWidth()/2) then
+				xsign = -1;
+				if (cy/uiScale > UIParent:GetHeight()/2) then
+					direction = "BOTTOMLEFT";
+					ysign = -1;
+				else
+					direction = "TOPRIGHT";
+				end
+			else
+				if (cy/uiScale > UIParent:GetHeight()/2) then
+					direction = "BOTTOMRIGHT";
+					ysign = -1;
+				else
+					direction = "TOPLEFT";
+				end
+			end
+			
+			-- position the anchor then assign the tooltip to it
+			tooltipMouseAnchor:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", (cx/uiScale), cy/uiScale);
+
 			if (tooltipMouseAnchor:GetPoint(1)) then
-				GameTooltip:SetOwner(tooltipMouseAnchor, "ANCHOR_TOPLEFT");
+				GameTooltip:SetOwner(tooltipMouseAnchor, "ANCHOR_" .. direction, xsign * (module:getOption("tooltipDistance") or 20), ysign * (module:getOption("tooltipDistance") or 20));
 			end
 		elseif (module:getOption("tooltipRelocation") == 3) then
 			--on anchor
+			local anchorSetting = module:getOption("tooltipAnchor") or 5;
+			if anchorSetting == 1 then
+				direction = "TOPLEFT"
+			elseif anchorSetting == 2 then
+				direction = "TOPRIGHT"
+			elseif anchorSetting == 3 then
+				direction = "BOTTOMRIGHT"
+			elseif anchorSetting == 4 then
+				direction = "BOTTOMLEFT"
+			elseif anchorSetting == 5 then
+				direction = "TOP";
+			elseif anchorSetting == 6 then
+				direction = "BOTTOM"
+			end	
 			GameTooltip:SetOwner(tooltipFixedAnchor, "ANCHOR_" .. direction);
-		
-		elseif (module:getOption("tooltipRelocation") == 4) then
-			-- on mouse (following)
-			GameTooltip:SetOwner(UIParent, "ANCHOR_CURSOR");
 		end
 	end
 );
