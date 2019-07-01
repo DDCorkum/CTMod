@@ -531,6 +531,9 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 					</Anchor>
 				</Anchors>
 				<Scripts>
+					<OnLoad>
+						self:Disable();
+					</OnLoad>
 					<OnClick>
 						CT_ViewportFrameLeftEB:ClearFocus();
 						CT_ViewportFrameRightEB:ClearFocus();
@@ -541,7 +544,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 					</OnClick>
 				</Scripts>
 			</Button>
-			<Button name="$parentCancel" inherits="GameMenuButtonTemplate" text="Cancel">
+			<Button name="$parentCancel" inherits="GameMenuButtonTemplate" text="Reset / Cancel">
 				<Size>
 					<AbsDimension x="125" y="32"/>
 				</Size>
@@ -554,6 +557,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				</Anchors>
 				<Scripts>
 					<OnClick>
+						CT_Viewport_ApplyViewport(0, 0, 0, 0);
 						HideUIPanel(self:GetParent());
 					</OnClick>
 				</Scripts>
@@ -575,8 +579,25 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 						CT_ViewportFrameRightEB:ClearFocus();
 						CT_ViewportFrameTopEB:ClearFocus();
 						CT_ViewportFrameBottomEB:ClearFocus();
+						CT_Viewport_CheckKeepSettings();
 						CT_Viewport_ApplyViewport();
 					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentKeepSettings" inherits="GameMenuButtonTemplate" text="Keep Settings?" hidden="true">
+				<Size>
+					<AbsDimension x="263" y="32" />
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativePoint="BOTTOM" x="0" y="65" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CT_Viewport_KeepSettings();
+					</OnClick>
+					<OnUpdate>
+						CT_Viewport_CheckKeepSettings();
+					</OnUpdate>
 				</Scripts>
 			</Button>
 		</Frames>
