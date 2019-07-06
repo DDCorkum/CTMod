@@ -303,65 +303,101 @@ end
 
 local tooltipMouseAnchor = CreateFrame("Frame", nil, UIParent);
 tooltipMouseAnchor:SetSize(0.00001, 0.00001);
-tooltipMouseAnchor:SetScript("OnUpdate",
+tooltipMouseAnchor:SetPoint("CENTER");
+
+GameTooltip:HookScript("OnShow",
 	function()
-		if (module:getOption("tooltipRelocation") == 4) then
-			-- the tooltip always follows the cursor
-			local uiScale, cx, cy = UIParent:GetEffectiveScale(), GetCursorPosition();
-			tooltipMouseAnchor:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", (cx/uiScale), cy/uiScale);
+		-- this allows the next OnUpdate call to control the tooltip
+		if (tooltipMouseAnchor.status == 1) then
+			tooltipMouseAnchor.status = 2;
 		end
+	end
+);
+
+tooltipMouseAnchor:SetScript("OnUpdate",
+	function()	
+		local uiScale, cx, cy = UIParent:GetEffectiveScale(), GetCursorPosition();		
+		if (not uiScale or not cx or not cy) then
+			return;
+		end
+		
+		if (module:getOption("tooltipRelocation") == 4 or tooltipMouseAnchor.status == 2) then
+			-- this happens EVERY frame during mouse(following), but only ONCE during mouse(stationary)
+			if (GameTooltip:GetUnit()) then
+				tooltipMouseAnchor:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", (cx/uiScale), (cy/uiScale) + (tooltipMouseAnchor.offsetIfUnit or 0) );
+			else
+				tooltipMouseAnchor:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", (cx/uiScale), (cy/uiScale) );
+			end
+			tooltipMouseAnchor.status = nil;
+		end
+		
 	end
 );
 
 -- position the tooltip when it is not owned by something else
 hooksecurefunc("GameTooltip_SetDefaultAnchor",
 	function (tooltip, text, x, y, wrap)
-		local direction = "NONE";
-		local xsign = 1; -- offsets from cursor will be multiplied by 1 for right or -1 for left
-		local ysign = 1; -- offsets from cursor will be multiplied by 1 for up or -1 for down
 		if (module:getOption("tooltipRelocation") == 2 or module:getOption("tooltipRelocation") == 4) then
-			-- on mouse (stationary)
-			
-			local uiScale, cx, cy = UIParent:GetEffectiveScale(), GetCursorPosition();
-			--push the tooltip away from screen edges
+			local uiScale, cx, cy = UIParent:GetEffectiveScale(), GetCursorPosition();		
+			if (not uiScale or not cx or not cy) then
+				return;
+			end
+
+			-- on mouse
+			tooltipMouseAnchor.status = 1;						-- the OnShow will now trigger
 			if (cx/uiScale > UIParent:GetWidth()/2) then
-				xsign = -1;
-				if (cy/uiScale > UIParent:GetHeight()/2) then
-					direction = "BOTTOMLEFT";
-					ysign = -1;
-				else
-					direction = "TOPRIGHT";
+				if (cy/uiScale > UIParent:GetHeight()/2) then			-- mouse is in top-right quadrant
+					GameTooltip:SetOwner(
+						tooltipMouseAnchor,
+						"ANCHOR_BOTTOMLEFT",
+						-(module:getOption("tooltipDistance") or 0),
+						-(module:getOption("tooltipDistance") or 0)
+					);
+					tooltipMouseAnchor.offsetIfUnit = 0;
+				else								-- mouse is in bottom-right quadrant.
+					GameTooltip:SetOwner(
+						tooltipMouseAnchor,
+						"ANCHOR_TOPRIGHT",
+						-(module:getOption("tooltipDistance") or 0),
+						(module:getOption("tooltipDistance") or 0) 
+					);
+					tooltipMouseAnchor.offsetIfUnit = 10;
 				end
 			else
-				if (cy/uiScale > UIParent:GetHeight()/2) then
-					direction = "BOTTOMRIGHT";
-					ysign = -1;
-				else
-					direction = "TOPLEFT";
+				if (cy/uiScale > UIParent:GetHeight()/2) then			-- mouse is in top-left quadrant
+					GameTooltip:SetOwner(
+						tooltipMouseAnchor,
+						"ANCHOR_BOTTOMRIGHT",
+						 20 + (module:getOption("tooltipDistance") or 0),
+						-20 - (module:getOption("tooltipDistance") or 0)
+					);
+					tooltipMouseAnchor.offsetIfUnit = 0;
+				else								-- mouse is in bottom-left quadrant
+					GameTooltip:SetOwner(
+						tooltipMouseAnchor,
+						"ANCHOR_TOPLEFT",
+						(module:getOption("tooltipDistance") or 0),
+						(module:getOption("tooltipDistance") or 0)
+					);
+					tooltipMouseAnchor.offsetIfUnit = 10;
 				end
-			end
-			
-			-- position the anchor then assign the tooltip to it
-			tooltipMouseAnchor:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", (cx/uiScale), cy/uiScale);
-
-			if (tooltipMouseAnchor:GetPoint(1)) then
-				GameTooltip:SetOwner(tooltipMouseAnchor, "ANCHOR_" .. direction, xsign * (module:getOption("tooltipDistance") or 20), ysign * (module:getOption("tooltipDistance") or 20));
-			end
+			end	
 		elseif (module:getOption("tooltipRelocation") == 3) then
 			--on anchor
+			local direction = "NONE";
 			local anchorSetting = module:getOption("tooltipAnchor") or 5;
-			if anchorSetting == 1 then
-				direction = "TOPLEFT"
-			elseif anchorSetting == 2 then
-				direction = "TOPRIGHT"
-			elseif anchorSetting == 3 then
-				direction = "BOTTOMRIGHT"
-			elseif anchorSetting == 4 then
-				direction = "BOTTOMLEFT"
-			elseif anchorSetting == 5 then
+			if (anchorSetting == 1) then
+				direction = "TOPLEFT";
+			elseif (anchorSetting == 2) then
+				direction = "TOPRIGHT";
+			elseif (anchorSetting == 3) then
+				direction = "BOTTOMRIGHT";
+			elseif (anchorSetting == 4) then
+				direction = "BOTTOMLEFT";
+			elseif (anchorSetting == 5) then
 				direction = "TOP";
-			elseif anchorSetting == 6 then
-				direction = "BOTTOM"
+			elseif (anchorSetting == 6) then
+				direction = "BOTTOM";
 			end	
 			GameTooltip:SetOwner(tooltipFixedAnchor, "ANCHOR_" .. direction);
 		end
@@ -377,8 +413,6 @@ GameTooltip:HookScript("OnUpdate",
 		end
 	end
 );
-
-
 
 
 

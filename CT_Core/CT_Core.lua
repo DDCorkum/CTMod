@@ -799,7 +799,7 @@ module.frame = function()
 			);
 		optionsEndFrame();
 		optionsAddObject(  50,  15, "font#tl:39:%y#n:CTCoreTooltipDistanceDescript#Distance from cursor:#" .. textColor1);
-		optionsBeginFrame(-10,  17, "slider#tl:75:%y#n:CTCoreTooltipDistance#o:tooltipDistance:20#Distance = <value>:Near:Far#0:60:1");
+		optionsBeginFrame(-10,  17, "slider#tl:75:%y#n:CTCoreTooltipDistance#o:tooltipDistance:0#Distance = <value>:Near:Far#0:60:1");
 			optionsAddScript("onload",
 				function(self)
 					tinsert(tooltipOptionsObjects,
