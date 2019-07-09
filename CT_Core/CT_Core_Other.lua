@@ -305,14 +305,6 @@ local tooltipMouseAnchor = CreateFrame("Frame", nil, UIParent);
 tooltipMouseAnchor:SetSize(0.00001, 0.00001);
 tooltipMouseAnchor:SetPoint("CENTER");
 
-GameTooltip:HookScript("OnShow",
-	function()
-		-- this allows the next OnUpdate call to control the tooltip
-		if (tooltipMouseAnchor.status == 1) then
-			tooltipMouseAnchor.status = 2;
-		end
-	end
-);
 
 tooltipMouseAnchor:SetScript("OnUpdate",
 	function()	
@@ -334,20 +326,40 @@ tooltipMouseAnchor:SetScript("OnUpdate",
 	end
 );
 
+local hookedTooltips = { }
 -- position the tooltip when it is not owned by something else
 hooksecurefunc("GameTooltip_SetDefaultAnchor",
 	function (tooltip, text, x, y, wrap)
 		if (module:getOption("tooltipRelocation") == 2 or module:getOption("tooltipRelocation") == 4) then
+			--on mouse (stationary) and on mouse (following)
+			
+			-- where is the mouse cursor, anyways?
 			local uiScale, cx, cy = UIParent:GetEffectiveScale(), GetCursorPosition();		
 			if (not uiScale or not cx or not cy) then
 				return;
 			end
 
-			-- on mouse
+			-- adds a hook once to each GameTooltip only (there could be several if addons use their own versions)
+			if (not tContains(hookedTooltips, tooltip)) then
+				tinsert(hookedTooltips, tooltip);
+				tooltip:HookScript("OnShow",
+					function()
+						-- this allows the next OnUpdate call to control the tooltip
+						if (tooltipMouseAnchor.status == 1) then
+							tooltipMouseAnchor.status = 2;
+						end
+					end
+				);
+
+			end
+			
+			-- with the hook added above, this causes the next OnShow(tooltip) to trigger behaviour in OnUpdate(tooltipMouseAnchor)
 			tooltipMouseAnchor.status = 1;						-- the OnShow will now trigger
+			
+			-- anchor the tooltip itself, because it has to be done now and no later to avoid taint (if it is the GameTooltip)
 			if (cx/uiScale > UIParent:GetWidth()/2) then
 				if (cy/uiScale > UIParent:GetHeight()/2) then			-- mouse is in top-right quadrant
-					GameTooltip:SetOwner(
+					tooltip:SetOwner(
 						tooltipMouseAnchor,
 						"ANCHOR_BOTTOMLEFT",
 						-(module:getOption("tooltipDistance") or 0),
@@ -355,7 +367,7 @@ hooksecurefunc("GameTooltip_SetDefaultAnchor",
 					);
 					tooltipMouseAnchor.offsetIfUnit = 0;
 				else								-- mouse is in bottom-right quadrant.
-					GameTooltip:SetOwner(
+					tooltip:SetOwner(
 						tooltipMouseAnchor,
 						"ANCHOR_TOPRIGHT",
 						-(module:getOption("tooltipDistance") or 0),
@@ -365,7 +377,7 @@ hooksecurefunc("GameTooltip_SetDefaultAnchor",
 				end
 			else
 				if (cy/uiScale > UIParent:GetHeight()/2) then			-- mouse is in top-left quadrant
-					GameTooltip:SetOwner(
+					tooltip:SetOwner(
 						tooltipMouseAnchor,
 						"ANCHOR_BOTTOMRIGHT",
 						 20 + (module:getOption("tooltipDistance") or 0),
@@ -373,7 +385,7 @@ hooksecurefunc("GameTooltip_SetDefaultAnchor",
 					);
 					tooltipMouseAnchor.offsetIfUnit = 0;
 				else								-- mouse is in bottom-left quadrant
-					GameTooltip:SetOwner(
+					tooltip:SetOwner(
 						tooltipMouseAnchor,
 						"ANCHOR_TOPLEFT",
 						(module:getOption("tooltipDistance") or 0),
@@ -399,7 +411,7 @@ hooksecurefunc("GameTooltip_SetDefaultAnchor",
 			elseif (anchorSetting == 6) then
 				direction = "BOTTOM";
 			end	
-			GameTooltip:SetOwner(tooltipFixedAnchor, "ANCHOR_" .. direction);
+			tooltip:SetOwner(tooltipFixedAnchor, "ANCHOR_" .. direction);
 		end
 	end
 );
@@ -2305,8 +2317,6 @@ local modFunctions = {
 	["tooltipAnchorUnlock"] = tooltip_toggleAnchor,
 	["tooltipRelocation"] = tooltip_toggleAnchor,
 	["hideWorldMap"] = toggleWorldMap,
-	["castingbarEnabled"] = castingbar_ToggleStatus,
-	["castingbarMovable"] = castingbar_ToggleMovable,
 	["blockDuels"] = configureDuelBlockOption,
 	["watchframeEnabled"] = module.watchframeEnabled,
 	["watchframeLocked"] = module.watchframeLocked,
