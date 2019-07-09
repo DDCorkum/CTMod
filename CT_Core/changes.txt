@@ -1,5 +1,6 @@
-CT_Core (8.2.0.4) 2019-06-30
+CT_Core (8.2.0.4) 2019-07-08
 - More control over GameTooltip when following mouse cursor
+- Resolved conflict with item tooltips in Auctionator
 
 CT_Core (8.2.0.3) 2019-06-27
 - Oops!  Cleaning up 8.2.0.2
