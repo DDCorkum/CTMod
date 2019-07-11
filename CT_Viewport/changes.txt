@@ -1,3 +1,6 @@
+CT_Viewport (8.2.0.4) 2019-06-30
+- Added safeguards to prevent the game from becoming unusable
+
 CT_Viewport (8.0.1.7) 2018-09-26
 - Compatible with custom (non-standard) resolutions in windowed mode
 

@@ -142,6 +142,7 @@ local function CT_MapMod_Initialize()		-- called via module.update("init") from 
 				{ ["name"] = "Siren's Sting", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
 				{ ["name"] = "Star Moss", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_StarMoss" },
 				{ ["name"] = "Winter's Kiss", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_WintersKiss" },
+				{ ["name"] = "Zin'anthid", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Zinanthid" },
 			},
 		},
 		["Ore"] =
@@ -184,6 +185,7 @@ local function CT_MapMod_Initialize()		-- called via module.update("init") from 
 				-- Battle for Azeroth
 				{ ["name"] = "Monelite", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein" },
 				{ ["name"] = "Storm Silver", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_StormSilver" },
+				{ ["name"] = "Osmenite", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Elementium" },
 			},
 		},
 	};
@@ -967,7 +969,7 @@ function CT_MapMod_AddUIElements()
 				end,
 				["onenter"] = function(self)
 					GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, 15);
-					GameTooltip:SetText("CT: " .. module.text["Reset the map"]);
+					GameTooltip:SetText("CT: " .. module.text["CT_MapMod/Map/Reset the map"]);
 					GameTooltip:Show();
 				end,
 				["onleave"] = function(self)

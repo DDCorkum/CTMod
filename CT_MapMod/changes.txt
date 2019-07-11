@@ -1,3 +1,6 @@
+CT_MapMod (8.2.0.4) 2019-06-28
+- Adding new herbs and ore from WoW 8.2
+
 CT_MapMod (8.2.0.1) 2019-06-22
 - Added German translations provided by user taubenhaucher (Danke!)
 

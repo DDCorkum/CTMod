@@ -72,7 +72,18 @@ tinsert(UISpecialFrames, "CT_ViewportFrame");
 SlashCmdList["VIEWPORT"] = function(msg)
 	local iStart, iEnd, left, right, top, bottom = string.find(msg, "^(%d+) (%d+) (%d+) (%d+)$");
 	if ( left and right and top and bottom ) then
-		CT_Viewport_ApplyViewport(tonumber(left), tonumber(right), tonumber(top), tonumber(bottom));
+		local screenRes = CT_Viewport.screenRes;
+		if not screenRes then
+			screenRes = {1920, 1080}
+		end
+		left = min(tonumber(left), screenRes[1]/2 - 1);
+		right = min(tonumber(right), screenRes[1]/2 - 1);
+		top = min(tonumber(top), screenRes[2]/2 - 1);
+		bottom = min(tonumber(top), screenRes[2]/2 - 1);
+		
+		CT_Viewport_CheckKeepSettings();
+		CT_Viewport_ApplyViewport(left, right, top, bottom);
+		CT_ViewportFrame:Show();
 	else
 		ShowUIPanel(CT_ViewportFrame);
 	end
@@ -80,6 +91,7 @@ end
 SLASH_VIEWPORT1 = "/viewport";
 SLASH_VIEWPORT2 = "/ctvp";
 SLASH_VIEWPORT3 = "/ctviewport";
+
 
 -- Direct loading of the frame from other means
 module.customOpenFunction = function()
@@ -292,6 +304,24 @@ function CT_Viewport_ApplyViewport(left, right, top, bottom, r, g, b)
 end
 
 function CT_Viewport_ApplySavedViewport()
+	local screenRes = CT_Viewport.screenRes;
+	if screenRes then
+		CT_Viewport_Saved[1] = min(tonumber(CT_Viewport_Saved[1]), screenRes[1]/2 - 1);
+		CT_Viewport_Saved[2] = min(tonumber(CT_Viewport_Saved[2]), screenRes[1]/2 - 1);
+		if (CT_Viewport_Saved[1] + CT_Viewport_Saved[2] > screenRes[1] - 100) then
+			CT_Viewport_Saved[1] = screenRes[1]/2 - 50;
+			CT_Viewport_Saved[2] = screenRes[1]/2 - 50;
+		end
+		CT_Viewport_Saved[3] = min(tonumber(CT_Viewport_Saved[3]), screenRes[2]/2 - 1);
+		CT_Viewport_Saved[4] = min(tonumber(CT_Viewport_Saved[4]), screenRes[2]/2 - 1);
+		if (CT_Viewport_Saved[3] + CT_Viewport_Saved[4] > screenRes[2] - 100) then
+			CT_Viewport_Saved[3] = screenRes[2]/2 - 50;
+			CT_Viewport_Saved[4] = screenRes[2]/2 - 50;
+		end
+	end
+	if (tonumber(CT_Viewport_Saved[1]) + tonumber(CT_Viewport_Saved[2]) + tonumber(CT_Viewport_Saved[3]) + tonumber(CT_Viewport_Saved[4]) > 0) then
+		C_Timer.After(8, function() print("|cFFFFFF00CT_Viewport is currently active! |n      |r/ctvp|cFFFFFF00 to tweak settings |n      |r/ctvp 0 0 0 0|cFFFFFF00 to restore default"); end);
+	end
 	CT_Viewport_ApplyViewport(
 		CT_Viewport_Saved[1],
 		CT_Viewport_Saved[2],
@@ -301,6 +331,41 @@ function CT_Viewport_ApplySavedViewport()
 		CT_Viewport_Saved[6],
 		CT_Viewport_Saved[7]
 	);
+end
+
+-- after pressing 'apply' or 'okay' ensure the screen is visible
+local newSettingsApplied = nil;
+function CT_Viewport_CheckKeepSettings()
+	if (newSettingsApplied) then
+		-- check is already in progress; after 20 seconds revert if the user hasn't presed the button
+		if (GetTime() > newSettingsApplied + 20) then
+			CT_ViewportFrameOkay:Show();
+			CT_ViewportFrameCancel:Show();
+			CT_ViewportFrameApply:Show();
+			CT_ViewportFrameKeepSettings:Hide();
+			CT_Viewport_ApplyViewport(0, 0, 0, 0);
+			newSettingsApplied = nil;
+		else
+			CT_ViewportFrameKeepSettings:SetText("Keep Settings?  Reverting in " .. floor(newSettingsApplied +20 -GetTime()) );
+		end
+	else
+		-- start of a new check
+		newSettingsApplied = GetTime();
+		CT_ViewportFrameOkay:Hide();
+		CT_ViewportFrameCancel:Hide();
+		CT_ViewportFrameApply:Hide();
+		CT_ViewportFrameKeepSettings:Show();
+	end
+end
+
+
+function CT_Viewport_KeepSettings()
+	newSettingsApplied = nil;
+	CT_ViewportFrameOkay:Show();
+	CT_ViewportFrameOkay:Enable();
+	CT_ViewportFrameCancel:Show();
+	CT_ViewportFrameApply:Show();
+	CT_ViewportFrameKeepSettings:Hide();
 end
 
 -- Apply saved settings to the inner viewport
@@ -495,10 +560,10 @@ function CT_ViewportFrame_OnUpdate(self, elapsed)
 			local ivalues = CT_Viewport.initialValues;
 			iframe:SetMinResize(ivalues[5] / 2, ivalues[6] / 2);
 
-			CT_ViewportFrameLeftEB.limitation = screenRes[1] / 2;
-			CT_ViewportFrameRightEB.limitation = screenRes[1] / 2;
-			CT_ViewportFrameTopEB.limitation = screenRes[2] / 2;
-			CT_ViewportFrameBottomEB.limitation = screenRes[2] / 2;
+			CT_ViewportFrameLeftEB.limitation = screenRes[1] / 2 - 1;
+			CT_ViewportFrameRightEB.limitation = screenRes[1] / 2 - 1;
+			CT_ViewportFrameTopEB.limitation = screenRes[2] / 2 - 1;
+			CT_ViewportFrameBottomEB.limitation = screenRes[2] / 2 - 1;
 		end
 		CT_ViewportFrame_OnShow();
 	end

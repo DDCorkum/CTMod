@@ -729,39 +729,105 @@ module.frame = function()
 		optionsAddObject( 14,   20, "dropdown#tl:100:%y#s:125:%s#o:tickModFormat#n:CTCoreDropdown1#Health - Mana#HP/Tick - MP/Tick#HP - MP");
 
 	-- Tooltip Relocation
-		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Tooltip Relocation");
+		local tooltipOptionsObjects = {};
+		local tooltipOptionsValue = nil;
 
+		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Tooltip Relocation");
 		optionsAddObject( -8, 2*13, "font#tl:15:%y#r#s:0:%s#This allows you to change the place where the game's default tooltip appears.#" .. textColor2 .. ":l");
 
 		optionsAddObject(-15,   15, "font#tl:15:%y#v:ChatFontNormal#Tooltip location:");
-		optionsAddObject( 14,   20, "dropdown#tl:110:%y#s:125:%s#o:tooltipRelocation#n:CTCoreDropdownTooltipRelocation#Default#On Mouse (stationary)#On Anchor#On Mouse (following)");
-		optionsAddObject( -6,   15, "font#tl:33:%y#v:ChatFontNormal#Direction:");
-		optionsAddObject( 14,   20, "dropdown#tl:110:%y#s:125:%s#o:tooltipAnchor:5#n:CTCoreDropdownTooltipAnchor#Top right#Top left#Bottom right#Bottom left#Top#Bottom");
-		optionsBeginFrame( 0,   26, "checkbutton#tl:30:%y#o:tooltipAnchorUnlock#n:CTCoreCheckboxTooltipAnchorUnlock#Unlock the anchor");
+		optionsBeginFrame(14,   20, "dropdown#tl:110:%y#s:125:%s#o:tooltipRelocation#n:CTCoreDropdownTooltipRelocation#Default#On Mouse (stationary)#On Anchor#On Mouse (following)");
 			optionsAddScript("onupdate",
 				function(self)
-					if L_UIDropDownMenu_GetSelectedValue(CTCoreDropdownTooltipRelocation) == 3 then
-						L_UIDropDownMenu_EnableDropDown(CTCoreDropdownTooltipAnchor);
-						CTCoreCheckboxTooltipAnchorUnlock:Enable();
-						CTCoreCheckboxTooltipAnchorUnlock.text:SetTextColor(1,1,1);
-					else
-						L_UIDropDownMenu_DisableDropDown(CTCoreDropdownTooltipAnchor);
-						CTCoreCheckboxTooltipAnchorUnlock:Disable();
-						CTCoreCheckboxTooltipAnchorUnlock.text:SetTextColor(.5, .5, .5);
+					local value = L_UIDropDownMenu_GetSelectedValue(self);
+					if (value and value ~= tooltipOptionsValue) then
+						tooltipOptionsValue = value;
+						for key, table in pairs(tooltipOptionsObjects) do
+							if table[value] then
+				--[[				if table.dropdown then L_UIDropDownMenu_EnableDropDown(table.dropdown); end
+								if table.button then table.button:Enable(); end
+								if table.text1 then table.text1:SetTextColor(1,1,1); end
+								if table.text2 then table.text2:SetTextColor(1,1,1); end
+								if table.text3 then table.text3:SetTextColor(1,1,1); end
+								if table.text4 then table.text4:SetTextColor(1,1,1); end
+				--]]
+								if table.dropdown then table.dropdown:Show(); end
+								if table.button then table.button:Show(); end
+								if table.text1 then table.text1:Show(); end
+								if table.text2 then table.text2:Show(); end
+								if table.text3 then table.text3:Show(); end
+								if table.text4 then table.text4:Show(); end
+								
+							else
+								if table.dropdown then table.dropdown:Hide(); end
+								if table.button then table.button:Hide(); end
+								if table.text1 then table.text1:Hide(); end
+								if table.text2 then table.text2:Hide(); end
+								if table.text3 then table.text3:Hide(); end
+								if table.text4 then table.text4:Hide(); end
+							end
+						end
 					end
 				end
 			);
 		optionsEndFrame();
-		optionsBeginFrame(  0,   26, "checkbutton#tl:30:%y#o:tooltipDisableFade#Hide tooltip when game starts to fade it");
-			optionsAddScript("onupdate",
+		optionsAddObject( -6,   15, "font#tl:33:%y#v:ChatFontNormal#n:CTCoreTooltipAnchorDirectionLabel#Direction:");
+		optionsBeginFrame(14,   20, "dropdown#tl:110:%y#s:125:%s#o:tooltipAnchor:5#n:CTCoreDropdownTooltipAnchor#Top right#Top left#Bottom right#Bottom left#Top#Bottom");
+			optionsAddScript("onload",
 				function(self)
-					if L_UIDropDownMenu_GetSelectedValue(CTCoreDropdownTooltipRelocation) == 4 then
-						self:Disable();
-						self.text:SetTextColor(.5, .5, .5);
-					else
-						self:Enable();
-						self.text:SetTextColor(1, 1, 1);
-					end					
+					tinsert(tooltipOptionsObjects,
+						{
+							["dropdown"] = self;
+							["text1"] = CTCoreTooltipAnchorDirectionLabel;
+							[3] = true;
+						}
+					)
+				end
+			);
+		optionsEndFrame();
+		optionsBeginFrame( 0,   26, "checkbutton#tl:30:%y#o:tooltipAnchorUnlock#n:CTCoreCheckboxTooltipAnchorUnlock#Unlock the anchor");
+			optionsAddScript("onload",
+				function(self)
+					tinsert(tooltipOptionsObjects,
+						{
+							["button"] = self;
+							["text1"] = self.text;
+							[3] = true;
+						}
+					)
+				end
+			);
+		optionsEndFrame();
+		optionsAddObject(  50,  15, "font#tl:39:%y#n:CTCoreTooltipDistanceDescript#Distance from cursor:#" .. textColor1);
+		optionsBeginFrame(-10,  17, "slider#tl:75:%y#n:CTCoreTooltipDistance#o:tooltipDistance:0#Distance = <value>:Near:Far#0:60:1");
+			optionsAddScript("onload",
+				function(self)
+					tinsert(tooltipOptionsObjects,
+						{
+							["button"] = self;
+							["text1"] = CTCoreTooltipDistanceText;
+							["text2"] = CTCoreTooltipDistanceLow;
+							["text3"] = CTCoreTooltipDistanceHight;
+							["text4"] = CTCoreTooltipDistanceDescript;
+							[2] = true;
+							[4] = true;
+						}
+					)
+				end
+			);
+		optionsEndFrame();
+		optionsBeginFrame( -5,  26, "checkbutton#tl:30:%y#o:tooltipDisableFade#Hide tooltip when game starts to fade it");
+			optionsAddScript("onload",
+				function(self)
+					tinsert(tooltipOptionsObjects,
+						{
+							["button"] = self;
+							["text1"] = self.text;
+							[1] = true;
+							[2] = true;
+							[3] = true;
+						}
+					)
 				end
 			);
 		optionsEndFrame();
