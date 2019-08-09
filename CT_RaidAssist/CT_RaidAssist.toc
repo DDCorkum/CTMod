@@ -1,5 +1,5 @@
 ## Interface: 80200
-## Version: 8.2.0.1
+## Version: 8.2.0.5
 ## Title: CT_RaidAssist |cFF333333(BFA)
 ## Notes: Allows you to monitor Raid HP.
 ## DefaultState: Enabled
@@ -25,15 +25,18 @@
 ## SavedVariables: CT_RATab_AutoPromotions
 ## SavedVariables: CT_RATab_DefaultLootMethod
 ## SavedVariables: CT_RATarget
+## SavedVariables: CT_RaidAssistOptions
 
-CT_RACache.lua
-CT_RASlashCmds.xml
-CT_RASets.xml
-CT_RaidAssist.xml
-CT_RAOptions.xml
-CT_RAMenu.xml
-CT_RADetectSpells.xml
-CT_RATarget.xml
+CT_RaidAssist_Beta.lua
+
+#CT_RACache.lua
+#CT_RASlashCmds.xml
+#CT_RASets.xml
+#CT_RaidAssist.xml
+#CT_RAOptions.xml
+#CT_RAMenu.xml
+#CT_RADetectSpells.xml
+#CT_RATarget.xml
 # CT_RAChanges.xml  # Repaced in 8.1.5.2 with CT_RAChanges_DisplayDialog() in CT_RASlashCmds.lua
-CT_RAMeters.xml
-CT_RATab.lua
+#CT_RAMeters.xml
+#CT_RATab.lua

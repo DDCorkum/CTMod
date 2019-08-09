@@ -73,6 +73,11 @@ function CT_PartyFrame_TextStatusBar_UpdateTextString(bar)
 				textRight = CT_PartyFrame4HealthRight;
 			end
 
+			-- compatibility with WoW Classic
+			if (not bar.TextString) then
+				bar.TextString = bar:CreateFontString(nil, "ARTWORK", "GameTooltipTextSmall");
+				bar.TextString:SetPoint("CENTER");
+			end
 			bar.TextString:SetTextHeight( ( CT_UnitFramesOptions.partyTextSize or 3 ) + 7);
 			textRight:SetTextHeight( ( CT_UnitFramesOptions.partyTextSize or 3 ) + 7);
 
@@ -97,7 +102,14 @@ function CT_PartyFrame_TextStatusBar_UpdateTextString(bar)
 			elseif (bar == PartyMemberFrame4ManaBar) then
 				textRight = CT_PartyFrame4ManaRight;
 			end
-
+			
+			
+			-- compatibility with WoW Classic
+			if (not bar.TextString) then
+				bar.TextString = bar:CreateFontString(nil, "ARTWORK", "GameTooltipTextSmall");
+				bar.TextString:SetPoint("CENTER");
+			end
+			
 			bar.TextString:SetTextHeight( ( CT_UnitFramesOptions.partyTextSize or 3 ) + 7);
 			textRight:SetTextHeight( ( CT_UnitFramesOptions.partyTextSize or 3 ) + 7);
 

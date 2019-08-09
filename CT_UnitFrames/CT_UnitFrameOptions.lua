@@ -484,12 +484,21 @@ function CT_UnitFrameOptions_SetOptionsFrame(name)
 	if (module.currBoxFrame) then
 		module.currBoxFrame:Hide();
 	end
-	-- Enable all page buttons
-	CT_UnitFramesOptionsFramePlayerOptions:Enable();
-	CT_UnitFramesOptionsFramePartyOptions:Enable();
-	CT_UnitFramesOptionsFrameTargetOptions:Enable();
-	CT_UnitFramesOptionsFrameAssistOptions:Enable();
-	CT_UnitFramesOptionsFrameFocusOptions:Enable();
+	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+		-- Enable all page buttons
+		CT_UnitFramesOptionsFramePlayerOptions:Enable();
+		CT_UnitFramesOptionsFramePartyOptions:Enable();
+		CT_UnitFramesOptionsFrameTargetOptions:Enable();
+		CT_UnitFramesOptionsFrameAssistOptions:Enable();
+		CT_UnitFramesOptionsFrameFocusOptions:Enable();
+	elseif (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+		CT_UnitFramesOptionsFramePlayerOptions:Enable();
+		CT_UnitFramesOptionsFramePartyOptions:Enable();
+		CT_UnitFramesOptionsFrameTargetOptions:Enable();
+		CT_UnitFramesOptionsFrameAssistOptions:Disable();
+		CT_UnitFramesOptionsFrameFocusOptions:Disable();
+	end
+
 	-- Show chosen options box, and disable the appropriate page button.
 	if (name == "player") then
 		frame = CT_UnitFramesOptionsFrameBox1;

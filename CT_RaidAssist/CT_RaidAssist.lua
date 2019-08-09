@@ -1644,7 +1644,7 @@ function CT_RA_UpdateReadyStatus(arg1)
 		local stats = CT_RA_Stats[UnitName(arg1)];
 		if (stats) then
 			local readyCheckStatus = GetReadyCheckStatus(arg1);
-			if (readyCheckStatus == "notready" or readyCheckStatus == "nil" ) then
+			if (readyCheckStatus == "notready" or not readyCheckStatus ) then
 				stats["readycheck"] = "notready";
 				if (UnitIsUnit(arg1, "player") and AfterNotReadyFrame.enable) then
 					AfterNotReadyFrame.text:SetText("You were not ready, are you back now?");
@@ -1828,7 +1828,20 @@ function CT_RA_UpdateUnitDead(frame, didUpdateHealth)
 		frame.MPBG:Hide();
 		frame:SetAlpha(CT_RA_UnitAlpha(raidid, nil));
 		return;
-	elseif ( stats and stats["readycheck"] == "noreply" or stats["readycheck"] == "notready" ) then
+	end
+	if (not stats) then
+		if (name) then
+			CT_RA_Stats[name] = {
+				["Buffs"] = { },
+				["Debuffs"] = { },
+				["Position"] = { },
+			};
+			stats = CT_RA_Stats[name];
+		else
+			return;
+		end
+	end
+	if ( stats and stats["readycheck"] == "noreply" or stats["readycheck"] == "notready" ) then
 		frame.Status:Show();
 		if (not InCombatLockdown()) then
 			if ( tempOptions["HideBorder"] ) then

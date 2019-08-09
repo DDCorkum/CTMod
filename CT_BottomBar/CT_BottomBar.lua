@@ -710,7 +710,8 @@ module.update = function(self, optName, value)
 			module:loadAddon("Pet Bar");
 			module:loadAddon("MultiCastBar");  -- Totem bar
 			-- module:loadAddon("Vehicle Bar");
-			module:loadAddon("Framerate Bar");		
+			module:loadAddon("Framerate Bar");
+			module:loadAddon("Classic Performance Bar");
 		end
 	end
 
