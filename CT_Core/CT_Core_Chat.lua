@@ -863,8 +863,6 @@ module.chatStickyTypes = {
 	{default = 1, chatType = "YELL", label = "Yell"},
 };
 
-local chgChatStickyFlag = {};
-
 local function setChatStickyFlag(chatType, stickyMode)
 	-- stickyMode: 0 or 1
 	if (not ChatTypeInfo[chatType]) then
@@ -873,9 +871,7 @@ local function setChatStickyFlag(chatType, stickyMode)
 	if (stickyMode ~= 1) then
 		stickyMode = 0;
 	end
-	if (ChatTypeInfo[chatType].sticky ~= stickyMode) then
-		ChatTypeInfo[chatType].sticky = stickyMode;
-	end
+	ChatTypeInfo[chatType].sticky = stickyMode;
 end
 
 local function updateChatStickyFlag(stickyInfo)
@@ -886,32 +882,10 @@ local function updateChatStickyFlag(stickyInfo)
 		-- Use the default value (0 or 1) for this chat type.
 		stickyMode = stickyInfo.default;
 	end
-	if (stickyInfo.default == 1) then
-		if (stickyMode == 1) then
-			-- If we have changed this setting...
-			if (chgChatStickyFlag[chatType]) then
-				chgChatStickyFlag[chatType] = false;
-				-- Restore to game default
-				setChatStickyFlag(chatType, 1);
-			end
-		else
-			-- Disable sticky state of this chat type.
-			setChatStickyFlag(chatType, 0);
-			chgChatStickyFlag[chatType] = true;
-		end
+	if (stickyMode) then
+		setChatStickyFlag(chatType, 1);
 	else
-		if (stickyMode == 1) then
-			-- Enable sticky state of this chat type.
-			setChatStickyFlag(chatType, 1);
-			chgChatStickyFlag[chatType] = true;
-		else
-			-- If we have changed this setting...
-			if (chgChatStickyFlag[chatType]) then
-				chgChatStickyFlag[chatType] = false;
-				-- Restore to game default
-				setChatStickyFlag(chatType, 0);
-			end
-		end
+		setChatStickyFlag(chatType, 0);
 	end
 end
 

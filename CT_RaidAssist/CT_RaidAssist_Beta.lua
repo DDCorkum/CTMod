@@ -99,11 +99,63 @@ L["CTRA/Spells/Trueshot Aura"] = "Trueshot Aura"
 
 
 
-
-
 -- triggered by module.update("init")
-module.init = function()
+module.init = function()	
 	module.CTRAFrames = NewCTRAFrames();
+	-- convert from pre-BFA CTRA to 8.2.0.5
+	module:setOption("CTRA_LastConversion", 8, true);
+	if (not module:getOption("CTRA_LastConversion") or module:getOption("CTRA_LastConversion") < 8.205) then
+		module:setOption("CTRA_LastConversion", 8.205, true)
+		local currSet = CT_RAMenu_CurrSet;
+		local options = CT_RAMenu_Options;
+		if (currSet and options and options[currSet]) then
+			if (CT_Core) then
+				-- to help players find the new options, the minimap button will be forced back to on the first time they log on post-conversion
+				CT_Core:setOption("minimapIcon", nil, true);
+			end
+			C_Timer.After(20,
+				function()
+					DEFAULT_CHAT_FRAME:AddMessage("\n|cFF99FF99CT_RaidAssist has been updated!\nSome old settings were converted, but please type |r/ctra|cFF99FF99 to review the new configuration.");
+				end
+			);
+			if (options[currSet]["ShowGroups"]) then
+				for i=1, 8 do
+					module:setOption("CTRAWindow1_ShowGroup" .. i, options[currSet]["ShowGroups"][i] == 1, true);
+				end
+			end
+			if (options[currSet]["persort"]) then
+				for i=1, 8 do
+					module:setOption("CTRAWindow1_ShowGroup" .. i, options[currSet]["persort"]["group"]["ShowGroups"][i] == 1, true);
+				end
+			--[[	-- converting from the sort order in older CTRA
+				local classes = {"Warriors", "Druids", "Mages", "Warlocks", "Rogues", "Hunters", "Priests", "Paladins", "Shamans", "DeathKnights", "Monks", "DemonHunters"};
+				for i, type in ipairs(classes) do
+					if (options[currSet]["persort"]["class"]["ShowGroups"][i] == 1) then
+						module:setOption("CTRAWindow1_Show" .. type, true, true);
+					end
+				end	--]]
+			end
+			if (options[currSet]["WindowPositions"] and options[currSet]["WindowPositions"]["CT_RAGroupDrag1"]) then
+				module:setOption("MOVABLE-CTRAWindow" .. 1, {"TOPLEFT", nil, "TOPLEFT", options[currSet]["WindowPositions"]["CT_RAGroupDrag1"][1], options[currSet]["WindowPositions"]["CT_RAGroupDrag1"][2], 1}, true);
+			end
+			if (options[currSet]["DefaultColor"]) then
+				module:setOption("CTRAWindow1_ColorBackground", {options[currSet]["DefaultColor"].r, options[currSet]["DefaultColor"].g, options[currSet]["DefaultColor"].b, options[currSet]["DefaultColor"].a}, true);
+			end
+			if (options[currSet]["WindowScaling"]) then
+				module:setOption("CTRAWindow1_PlayerFrameScale", max(min(options[currSet]["WindowScaling"]*100,150),50), true);
+			end
+			if (options[currSet]["ShowHorizontal"]) then
+				module:setOption("CTRAWindow1_Orientation", 2, true);
+			else
+				module:setOption("CTRAWindow1_Orientation", nil, true);
+			end
+			if (options[currSet]["HideMP"]) then
+				module:setOption("CTRAWindow1_EnablePowerBar", false, true);
+			end
+		end
+	end
+			
+	
 end
 
 -- triggered by CT_Library whenever a setting changes, and upon initialization, to call functions associated with tailoring various functionality as required
@@ -348,6 +400,12 @@ AfterNotReadyFrame.text = AfterNotReadyFrame:CreateFontString(nil, "ARTWORK", "G
 AfterNotReadyFrame.text:SetSize(240, 0);
 AfterNotReadyFrame.text:SetJustifyV("MIDDLE");
 AfterNotReadyFrame.text:SetPoint("CENTER", AfterNotReadyFrame, "TOP", 20, -35);
+AfterNotReadyFrame.text:SetText("Are you ready now?");
+
+AfterNotReadyFrame.footnote = AfterNotReadyFrame:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall");
+AfterNotReadyFrame.footnote:SetPoint("BOTTOMRIGHT", -10, 10);
+AfterNotReadyFrame.footnote:SetTextColor(0.35, 0.35, 0.35);
+AfterNotReadyFrame.footnote:SetText("/ctra");
 
 AfterNotReadyFrame.returnedButton = CreateFrame("Button", nil, AfterNotReadyFrame, "UIPanelButtonTemplate");
 AfterNotReadyFrame.returnedButton:SetText("Ready");
@@ -373,17 +431,8 @@ AfterNotReadyFrame.goingafkButton:SetPoint("TOPLEFT", AfterNotReadyFrame, "TOP",
 AfterNotReadyFrame.goingafkButton:SetScript("OnClick",
 	function()
 		AfterNotReadyFrame:Hide();
-		if (AfterNotReadyFrame.neverShow:GetChecked()) then
-			module:setOption("CTRA_ExtendReadyChecks", false, true);
-		end
 	end
 );
-
-AfterNotReadyFrame.neverShow = CreateFrame("Checkbutton", nil, AfterNotReadyFrame);
-AfterNotReadyFrame.neverShow:SetText("Never show this");
-AfterNotReadyFrame.neverShow:SetAlpha(0.5);
-AfterNotReadyFrame.neverShow:SetScale(0.5);
-AfterNotReadyFrame.neverShow:SetPoint("TOP", AfterNotReadyFrame.goingafkButton, "BOTTOM", 0, -3);
 
 --------------------------------------------
 -- CTRAFrames
@@ -504,7 +553,7 @@ function NewCTRAFrames()
 		
 		-- General Options
 		optionsAddObject(-15, 26, "font#tl:15:%y#Enable CTRA Frames?#" .. textColor1 .. ":l"); -- Enable custom raid frames
-		optionsAddFrame( 26, 20, "dropdown#tl:130:%y#s:120:%s#n:CTRAFrames_EnableFramesDropDown#o:CTRAFrames_EnableFrames:4#Always#During Raids#During Groups#Never"); 
+		optionsAddFrame( 26, 20, "dropdown#tl:130:%y#s:120:%s#n:CTRAFrames_EnableFramesDropDown#o:CTRAFrames_EnableFrames:2 #Always#During Raids#During Groups#Never"); 
 		
 		
 		-- Everything below this line will pseudo-disable when the frames are disabled
@@ -516,7 +565,7 @@ function NewCTRAFrames()
 					settingsOverlayToStopClicks:RegisterForClicks("AnyDown", "AnyUp");
 					local tex = settingsOverlayToStopClicks:CreateTexture(nil, "OVERLAY");
 					tex:SetAllPoints();
-					tex:SetColorTexture(0,0,0,0.25);
+					tex:SetColorTexture(0,0,0,0.50);
 					settingsOverlayToStopClicks:SetFrameLevel(25);
 					settingsOverlayToStopClicks:SetScript("OnEnter",
 						function()
@@ -715,7 +764,7 @@ function NewCTRAFrames()
 							windows[selectedWindow]:Focus(); -- the options panel should now focus on this window
 							L_UIDropDownMenu_SetText(CTRAFrames_WindowSelectionDropDown, "Window " .. selectedWindow);
 							if (module:getOption("CTRAFrames_NumEnabledWindows") == 1) then
-								self:Disable();
+								button:Disable();
 								CTRAFrames_PreviousWindowButton:Disable();
 								CTRAFrames_NextWindowButton:Disable();
 							elseif (selectedWindow == module:getOption("CTRAFrames_NumEnabledWindows")) then
@@ -858,7 +907,7 @@ function NewCTRAFrames()
 					);
 				optionsEndFrame();
 				optionsAddObject(-25, 1*14, "font#tl:15:%y#s:0:%s#l:13:0#r#How big should the frames themselves be?#" .. textColor2 .. ":l");
-				optionsBeginFrame(-20, 17, "slider#tl:50:%y#s:200:%s#n:CTRAWindow_PlayerFrameScaleSlider#Scale = <value>%#50:200:10");
+				optionsBeginFrame(-20, 17, "slider#tl:50:%y#s:200:%s#n:CTRAWindow_PlayerFrameScaleSlider#Scale = <value>%#50:150:5");
 					optionsAddScript("onload",
 						function(slider)
 							slider.option = function()
@@ -874,7 +923,7 @@ function NewCTRAFrames()
 				
 				
 				-- Appearance of Player Frames
-				optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormal#Appearance of Player Frames");
+				optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormal#Appearance");
 				optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#Do you want the retro CTRA feel, or more a modern look?#" .. textColor2 .. ":l");
 				optionsBeginFrame( -5, 30, "button#tl:15:%y#s:80:%s#v:UIPanelButtonTemplate#Classic#n:CTRAWindow_ClassicSchemeButton");
 					optionsAddScript("onclick", 
@@ -1011,14 +1060,18 @@ function NewCTRAFrames()
 							end
 						);
 				optionsEndFrame();
-				optionsBeginFrame(-10, 60, "frame#tl:0:%y#br:tr:0:%b#");
-					optionsAddObject(  -5, 4*14, "font#tl:120:%y#s:0:%s#l:13:0#r#Work in progress!  \nControls will be added here to set colors");
+				optionsAddObject(-10,   17, "font#tl:5:%y#v:GameFontNormal#Colors");
+				optionsBeginFrame(-10, 0, "frame#tl:0:%y#br:tr:0:%b#");
 					optionsAddScript("onload",
 						function(frame)
 							dummyFrame = NewCTRAPlayerFrame(
 								{
 									GetProperty = function(obj, property)
-										if (property and selectedWindow) then
+										if (not selectedWindow) then
+											windows[1] = NewCTRAWindow(self);
+											selectedWindow = 1;
+										end
+										if (property) then
 											return windows[selectedWindow]:GetProperty(property);
 										--elseif (windows[1]) then
 										--	return windows[1]:GetProperty(property);
@@ -1029,9 +1082,45 @@ function NewCTRAFrames()
 								},
 								frame
 							);
-							dummyFrame:Enable("player", 10, 10);
+							if (not selectedWindow) then
+								windows[1] = NewCTRAWindow(self);
+								selectedWindow = 1;
+							end
+							dummyFrame:Enable("player", 5, 0 + 0.00001 * selectedWindow);
 						end
 					);
+					for i, item in ipairs({
+						{property = "ColorBackground", label = "Background Alive", tooltip = "Background when the unit is alive", hasAlpha = "true"},
+						{property = "ColorBackgroundDeadOrGhost", label = "Background Dead", tooltip = "Background when the unit is dead or a ghost", hasAlpha = "true"},
+						{property = "ColorBorder", label = "Border In Range", tooltip = "Border when the unit is within 30 yards"},
+						{property = "ColorBorderBeyondRange", label = "Border Too Far", tooltip = "Border when the unit is not found within 30 yards"},
+						{property = "ColorBorderTargetTarget", label = "Border Aggro", tooltip = "Border when the unit is the target's target"},
+						{property = "ColorUnitFullHealthNoCombat", label = "Full Health No Combat", tooltip = "Color of the health bar at 100% outside combat"},
+						{property = "ColorUnitZeroHealthNoCombat", label = "Near Death No Combat", tooltip = "Color of the health bar when nearly dead outside combat"},
+						-- START OF FLOAT:LEFT COLUMN
+						{property = "ColorUnitFullHealthCombat", label = "Full Health Combat", tooltip = "Color of the health bar at 100% during combat"},
+						{property = "ColorUnitZeroHealthCombat", label = "Near Death Combat", tooltip = "Color of the health bar when nearly dead during combat"},
+					}) do
+						optionsBeginFrame((i==1 and 30) or (i == 8 and 37) or -5, 16, "colorswatch#tl:" .. ((i > 7 and "5") or "145") .. ":%y#s:16:16#n:CTRAWindow_" .. item.property .. "ColorSwatch#true");  -- the final #true causes it to use alpha
+							optionsAddScript("onload",
+								function(swatch)
+									swatch.option = function() return "CTRAWindow" .. selectedWindow .. "_" .. item.property; end
+								end
+							);
+							optionsAddScript("onenter",
+								function(swatch)
+									local r, g, b, a = unpack(windows[selectedWindow]:GetProperty(item.property));
+									module:displayTooltip(swatch, {item.tooltip .. "#" .. 1 - ((1-r)/3) .. ":" .. 1 - ((1-g)/3) .. ":" .. 1 - ((1-b)/3) , "Current:  |cFFFF6666r = " .. floor(100*r) .. "%|r, |cFF66FF66g = " .. floor(100*g) .. "%|r, |cFF6666FFb = " .. floor(100*b) .. ((a and ("%|r, |cFFFFFFFFa = " .. floor(100*a) .. "%")) or "%")}, "ANCHOR_TOPLEFT");
+								end
+							);
+							optionsAddScript("onleave",
+								function(swatch)
+									module:hideTooltip();
+								end
+							);
+						optionsEndFrame();
+						optionsAddObject(16, 16, "font#tl:" .. ((i > 7 and "25") or "165") .. ":%y#s:0:%s#l:13:0#r#" .. item.label .. "#" .. textColor1 .. ":l");
+					end;
 				optionsEndFrame();
 				
 			
@@ -1072,6 +1161,7 @@ function NewCTRAFrames()
 		ToggleEnableState = toggleEnableState,
 		Update = update,
 		Frame = optionsFrameSkeleton,
+		GetDummyFrame = function() return dummyFrame; end
 		
 	}	
 	
@@ -1176,7 +1266,6 @@ function NewCTRAWindow(owningCTRAFrames)
 			anchorFrame.texture = anchorFrame:CreateTexture(nil,"BACKGROUND");
 			anchorFrame.texture:SetAllPoints(true);
 			anchorFrame.texture:SetColorTexture(1,1,0,0.5);
-			anchorFrame:Hide();
 			anchorFrame:SetScript("OnMouseDown",
 				function(frame, button)
 					if (windowID) then
@@ -1217,13 +1306,13 @@ function NewCTRAWindow(owningCTRAFrames)
 						self:Update();
 					end
 				end
-			);
-			
+			);		
 			-- background texture on the windowFrame (nearly transparent)
 			windowFrame.background = windowFrame:CreateTexture(nil, "BACKGROUND");
 			windowFrame.background:SetAllPoints();
-			windowFrame.background:SetColorTexture(0,0,0,0.1);
+			windowFrame.background:SetColorTexture(0,0,0,0.05);
 		end
+		
 		
 		-- STEP 3:
 		if (not self:IsEnabled()) then
@@ -1233,7 +1322,7 @@ function NewCTRAWindow(owningCTRAFrames)
 		end
 		
 		-- STEP 4:
-		module:registerMovable("CTRAWindow" .. asWindow, anchorFrame);
+		module:registerMovable("CTRAWindow" .. asWindow, anchorFrame, true);
 		
 		-- STEP 5:
 		windowID = asWindow;
@@ -1242,11 +1331,7 @@ function NewCTRAWindow(owningCTRAFrames)
 		self:Update();
 		
 		-- STEP 7:
-		if (CTRAFrames_SettingsFrame and CTRAFrames_SettingsFrame:IsShown()) then
-			self:ShowAnchor();
-		else
-			self:HideAnchor();
-		end
+		anchorFrame:SetShown(module:isControlPanelShown());
 		
 		-- DEBUGGING
 		for key, val in pairs(currentOptions) do
@@ -1301,13 +1386,11 @@ function NewCTRAWindow(owningCTRAFrames)
 	
 	-- returns the value associated with this window, or returns
 	local getProperty = function(self, option)
+		local id = windowID or 1;		--even if CTRAFrames are disabled and no windowID has ever been set, the options menu might still ask a sample player frame and need to configur eit.
 		if (currentOptions[option]) then
 			return currentOptions[option];
 		end
-		if (not windowID) then
-			return nil;
-		end
-		local savedValue = module:getOption("CTRAWindow" .. windowID .. "_" .. option);
+		local savedValue = module:getOption("CTRAWindow" .. id .. "_" .. option);
 		if (savedValue ~= nil) then
 			currentOptions[option] = savedValue;
 			return savedValue;
@@ -1318,10 +1401,19 @@ function NewCTRAWindow(owningCTRAFrames)
 	
 	
 	local update = function(self, option, value)
-		-- STEP 1: Outside combat, obtain a roster of self, party members and raid members to use during step 2
-		-- STEP 2: Determine which players to show in this window, and construct/configure CTRAPlayerFrames accordingly
-		-- STEP 3: Direct every CTRAPlayerFrame to update, passing along any settings changes and new assignments (the frames themselves will defer most changes until out of combat)
-			
+		-- STEP 1: Update children and local copies of saved variables
+		-- STEP 2: Outside combat, obtain a roster of self, party members and raid members to use during step 2
+		-- STEP 3: Determine which players to show in this window, and construct/configure CTRAPlayerFrames accordingly
+		
+
+		-- STEP 1:
+		if (option) then
+			currentOptions[option] = value;
+			for i, obj in ipairs(playerFrames) do
+				obj:Update(option, value);
+			end
+		end
+
 		-- STEP 2:
 		local roster = { };
 		if (IsInRaid() or UnitExists("raid2")) then
@@ -1452,6 +1544,9 @@ function NewCTRAWindow(owningCTRAFrames)
 		local w = 0;
 		local rows = 0;
 		local cols = 0;
+		for i=1, #playerFrames do
+			playerFrames[i]:Disable();
+		end
 		local playersShown = 0;
 		for i, category in pairs(categories) do  -- (from step 2)
 			if self:GetProperty(category[1]) then
@@ -1520,7 +1615,7 @@ function NewCTRAWindow(owningCTRAFrames)
 				end
 
 				-- move the anchor to the start of a new row/col if appropriate
-				if (w > 0 and self:GetProperty("Orientation") == 1 or self:GetProperty("Orientation") == 2) then
+				if (w > 0 and (self:GetProperty("Orientation") == 1 or self:GetProperty("Orientation") == 2)) then
 					w = 0;
 					if (self:GetProperty("Orientation") == 1) then
 						x = x + 90 + self:GetProperty("HorizontalSpacing");
@@ -1534,27 +1629,15 @@ function NewCTRAWindow(owningCTRAFrames)
 			end
 			if (not InCombatLockdown()) then
 				windowFrame:SetSize(
-					4 + cols * (90 + self:GetProperty("HorizontalSpacing")),
-					4 + rows * (40 + self:GetProperty("VerticalSpacing"))
+					(4 + cols * (90 + self:GetProperty("HorizontalSpacing"))) * self:GetProperty("PlayerFrameScale")/100,
+					(4 + rows * (40 + self:GetProperty("VerticalSpacing"))) * self:GetProperty("PlayerFrameScale")/100
 				);
-			end
-		end
-		for i=playersShown+1, #playerFrames do
-			playerFrames[i]:Disable();
-		end
-		
-		-- STEP 3:
-		if (option) then
-			currentOptions[option] = value;
-			for i, obj in ipairs(playerFrames) do
-				obj:Update(option, value);
 			end
 		end
 	end
 	
 	local function updateOptionsFrame(self)
 		if (not self:IsEnabled()) then
-			self:Unfocus();
 			return;
 		end
 		for key, val in pairs(defaultOptions) do
@@ -1571,7 +1654,17 @@ function NewCTRAWindow(owningCTRAFrames)
 				_G["CTRAWindow_" .. key .. "Slider"].suspend = 1;			-- hack to stop OnValueChanged from storing the value in SavedVariables
 				_G["CTRAWindow_" .. key .. "Slider"]:SetValue(self:GetProperty(key));
 				_G["CTRAWindow_" .. key .. "Slider"].suspend = nil;
+			elseif (_G["CTRAWindow_" .. key .. "ColorSwatch"]) then
+				local swatch = _G["CTRAWindow_" .. key .. "ColorSwatch"];
+				swatch:Enable();
+				local tex = swatch:GetNormalTexture();
+				tex:SetVertexColor(unpack(self:GetProperty(key)));
 			end
+		end
+		local dummyFrame = owner:GetDummyFrame();
+		if (dummyFrame) then
+			dummyFrame:Enable("player", 0, 0 + 0.00001 * windowID);
+			dummyFrame:Update("PlayerFrameScale", self:GetProperty("PlayerFrameScale"));
 		end
 	end
 	
@@ -1583,6 +1676,8 @@ function NewCTRAWindow(owningCTRAFrames)
 				L_UIDropDownMenu_DisableDropDown(_G["CTRAWindow_" .. key .. "DropDown"])
 			elseif (_G["CTRAWindow_" .. key .. "Slider"]) then
 				_G["CTRAWindow_" .. key .. "Slider"]:Disable();
+			elseif (_G["CTRAWindow_" .. key .. "ColorSwatch"]) then
+				_G["CTRAWindow_" .. key .. "ColorSwatch"]:Disable();
 			end
 		end
 	end
@@ -1597,7 +1692,9 @@ function NewCTRAWindow(owningCTRAFrames)
 	end
 	
 	local function hideAnchor(self)
-		anchorFrame:Hide();
+		if (anchorFrame) then
+			anchorFrame:Hide();
+		end
 	end
 	
 	-- public interface, used and returned by the constructor
@@ -2039,20 +2136,22 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			end
 		end
 	end
+
+	local configureReadyStatus = function()
+		visualFrame.readyIcon = visualFrame.readyIcon or visualFrame:CreateTexture(nil, "OVERLAY");
+		visualFrame.readyIcon:SetSize(10,10);
+		visualFrame.readyIcon:SetPoint("LEFT", visualFrame, 4, 0);
+		
+		visualFrame.readyText = visualFrame.readyText or visualFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall");
+		visualFrame.readyText:SetPoint("TOP", visualFrame, "CENTER");
+		
+		visualFrame.readyBackground = visualFrame.readyBackground or visualFrame:CreateTexture(nil, "ARTWORK", nil, 2);	-- the 4th param '2' draws this in front of the power bar
+		visualFrame.readyBackground:SetPoint("TOPLEFT", 4, -4);
+		visualFrame.readyBackground:SetPoint("BOTTOMRIGHT", -4, 4);
+	end
 	
 	-- creates and updates ready check indicators
 	local updateReadyStatus = function()
-		if (not visualFrame) then return; end
-		if (not visualFrame.readyIcon or not visualFrame.readyText) then
-			visualFrame.readyIcon = visualFrame:CreateTexture(nil, "OVERLAY");
-			visualFrame.readyIcon:SetSize(10,10);
-			visualFrame.readyIcon:SetPoint("LEFT", visualFrame, 4, 0);
-			visualFrame.readyText = visualFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall");
-			visualFrame.readyText:SetPoint("TOP", visualFrame, "CENTER");
-			visualFrame.readyBackground = visualFrame:CreateTexture(nil, "ARTWORK", nil, 2);	-- the 4th param '2' draws this in front of the power bar
-			visualFrame.readyBackground:SetPoint("TOPLEFT", 4, -4);
-			visualFrame.readyBackground:SetPoint("BOTTOMRIGHT", -4, 4);
-		end
 		if (shownUnit) then
 			local ready = GetReadyCheckStatus(shownUnit)
 			if (ready == "waiting") then
@@ -2164,7 +2263,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	end
 
 	-- updates macroLeft and macroRight to support secureButton
-	local updateMacros = function()
+	local configureMacros = function()
 		if (InCombatLockdown() or not secureButton or not visualFrame) then return; end
 
 		-- LeftButtonUp
@@ -2199,6 +2298,14 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				end
 			end
 		end
+	end
+	
+	-- updates secureButton macros once out of combat, based on the last call of configureMacros
+	local updateMacros = function()
+		local textL = gsub(macroLeft,"~UNIT~",shownUnit);
+		local textR = gsub(macroRight,"~UNIT~",shownUnit);
+		secureButton:SetAttribute("macrotext1", textL);
+		secureButton:SetAttribute("macrotext2", textR);
 	end
 	
 	-- PUBLIC FUNCTIONS
@@ -2254,7 +2361,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				secureButton:SetAttribute("type2", "macro");
 				secureButton:HookScript("OnEnter",
 					function()
-						GameTooltip:SetOwner(parent) --, "ANCHOR_RIGHT", 10, -50);
+						GameTooltip:SetOwner(parent, "ANCHOR_TOPLEFT");
 						local className, classFilename = UnitClass(shownUnit);
 						local r,g,b = GetClassColor(classFilename);
 						GameTooltip:AddDoubleLine(UnitName(shownUnit) or "", UnitLevel(shownUnit) or 0, r,g,b, 1,1,1);
@@ -2277,16 +2384,28 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 						if (not InCombatLockdown() and buff or remove or rezCombat or rezNoCombat) then
 							GameTooltip:AddLine("|nRight click...");
 							if buff then for modifier, spellName in pairs(buff) do GameTooltip:AddDoubleLine("|cFF33FF66nocombat" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFF33FF66" .. module.text["CTRA/Spells/" .. spellName]); end end
-							if rezCombat then for modifier, spellName in pairs(rezCombat) do GameTooltip:AddDoubleLine("|cFFCCCC66nocombat, dead" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFCCCC66" .. module.text["CTRA/Spells/" .. spellName]); end end
-							if remove then for modifier, spellName in pairs(remove) do GameTooltip:AddDoubleLine("|cFFFF6666combat" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFFF6666" .. module.text["CTRA/Spells/" .. spellName]); end end
 							if rezNoCombat then for modifier, spellName in pairs(rezNoCombat) do GameTooltip:AddDoubleLine("|cFFFF6666combat, dead" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFFF6666" .. module.text["CTRA/Spells/" .. spellName]); end end
+							if remove then for modifier, spellName in pairs(remove) do GameTooltip:AddDoubleLine("|cFFFF6666combat" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFFF6666" .. module.text["CTRA/Spells/" .. spellName]); end end
+							if rezCombat then for modifier, spellName in pairs(rezCombat) do GameTooltip:AddDoubleLine("|cFFCCCC66nocombat, dead" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFCCCC66" .. module.text["CTRA/Spells/" .. spellName]); end end
+						end
+						if (not module.GameTooltipExtraLine) then
+							module.GameTooltipExtraLine = GameTooltip:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall");
+							module.GameTooltipExtraLine:SetPoint("BOTTOM", 0, 6);
+							module.GameTooltipExtraLine:SetText("/ctra to move and configure");
+							module.GameTooltipExtraLine:SetTextColor(0.35, 0.35, 0.35);
+							module.GameTooltipExtraLine:SetScale(0.90);
 						end
 						GameTooltip:Show();
-						
+						if (not InCombatLockdown()) then
+							module.GameTooltipExtraLine:Show();
+							GameTooltip:SetHeight(GameTooltip:GetHeight()+3);
+							GameTooltip:SetWidth(max(150,GameTooltip:GetWidth()));
+						end						
 					end
 				);
 				secureButton:HookScript("OnLeave",
 					function()
+						module.GameTooltipExtraLine:Hide();
 						GameTooltip:Hide();
 					end
 				);
@@ -2338,7 +2457,6 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				shownUnit = requestedUnit;
 				shownXOff = requestedXOff;
 				shownYOff = requestedYOff;
-				updateForced = nil;
 				
 				-- register or de-register events
 				if (not listenerFrame) then
@@ -2364,7 +2482,11 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 							elseif (event == "READY_CHECK_CONFIRM") then
 								updateReadyStatus();
 							elseif (event == "READY_CHECK_FINISHED") then
-								updateReadyStatus()
+								updateReadyStatus();
+							elseif (event == "PLAYER_LEVEL_UP") then
+								configureMacros();
+							elseif (event == "PLAYER_REGEN_DISABLED") then
+								updateMacros();
 							end
 						end
 					);
@@ -2394,7 +2516,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 						end
 					);
 				end
-				if (shownUnit and shownXOff and shownYOff) then
+				if (shownUnit) then
 					visualFrame:Show(); 
 					listenerFrame:UnregisterAllEvents();  -- probably not required, but doing it to be absolute
 					listenerFrame:RegisterUnitEvent("UNIT_NAME_UPDATE", shownUnit);		-- updateName();
@@ -2406,6 +2528,8 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 					listenerFrame:RegisterEvent("READY_CHECK");				-- updateReadyStatus();
 					listenerFrame:RegisterUnitEvent("READY_CHECK_CONFIRM", shownUnit);	-- updateReadyStatus();
 					listenerFrame:RegisterEvent("READY_CHECK_FINISHED");			-- updateReadyStatus();
+					listenerFrame:RegisterEvent("PLAYER_LEVEL_UP");				-- configureMacros();
+					listenerFrame:RegisterEvent("PLAYER_REGEN_ENABLED");			-- updateMacros();
 				else
 					visualFrame:Hide();
 					listenerFrame:UnregisterAllEvents();
@@ -2414,32 +2538,33 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 
 				-- reposition the frames
 				visualFrame:SetPoint("TOPLEFT", requestedXOff, requestedYOff);
-									
+							
+				-- configure the visualFrame and its children
+				configureBackdrop();
+				configureHealthBar();
+				configureRoleTexture();
+				configureUnitNameFontString();
+				configureAuras();
+				configureReadyStatus();
+				
 				-- configure the secureButton for the new unit
 				secureButton:SetAttribute("unit", shownUnit);
 				if not (macroLeft) then
-					updateMacros();
+					configureMacros();
 				end
-				local textL = gsub(macroLeft,"~UNIT~",shownUnit);
-				local textR = gsub(macroRight,"~UNIT~",shownUnit);
-				secureButton:SetAttribute("macrotext1", textL);
-				secureButton:SetAttribute("macrotext2", textR);
+				updateMacros();
 			end
 		end
+		-- even during combat, update the VisualFrame and its children because shownUnit might now point to a different GUID if the group composition changed!
 		if (shownUnit) then
-			configureBackdrop();
 			updateBackdrop();
-			configureHealthBar();
 			updateHealthBar();
 			updatePowerBar(true);
-			configureRoleTexture();
 			updateRoleTexture();
-			configureUnitNameFontString();
 			updateUnitNameFontString();
-			configureAuras();
 			updateAuras();
 			updateReadyStatus();
-		end	
+		end
 	end
 	
 	-- PUBLIC INTERFACE

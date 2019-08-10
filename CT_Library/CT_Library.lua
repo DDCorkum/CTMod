@@ -1736,10 +1736,15 @@ local function colorSwatchCancel()
 	local r, g, b = self.r or 1, self.g or 1, self.b or 1;
 	local a = self.opacity or 1;
 	local object, option = self.object, self.option;
-
+	if (type(option) == "function") then
+		-- some addons overload 'option' with a custom function to display different windows
+		option = option();
+	end
 	local colors = object:getOption(option);
-	colors[1], colors[2], colors[3] = r, g, b;
-	colors[4] = a;
+	if (colors) then
+		colors[1], colors[2], colors[3] = r, g, b;
+		colors[4] = a;
+	end
 	object:setOption(option, colors, not self.global);
 	self.normalTexture:SetVertexColor(r, g, b);
 end
@@ -1748,9 +1753,16 @@ local function colorSwatchColor()
 	local self = ColorPickerFrame.object;
 	local r, g, b = ColorPickerFrame:GetColorRGB();
 	local object, option = self.object, self.option;
-
+	if (type(option) == "function") then
+		-- some addons overload 'option' with a custom function to display different windows
+		option = option();
+	end
 	local colors = object:getOption(option);
-	colors[1], colors[2], colors[3] = r, g, b;
+	if (colors) then
+		colors[1], colors[2], colors[3] = r, g, b;
+	else
+		colors = {r, g, b}
+	end
 	object:setOption(option, colors, not self.global);
 	self.normalTexture:SetVertexColor(r, g, b);
 end
@@ -1759,17 +1771,27 @@ local function colorSwatchOpacity()
 	local self = ColorPickerFrame.object;
 	local a = OpacitySliderFrame:GetValue();
 	local object, option = self.object, self.option;
-
-	local colors = object:getOption(option);
+	if (type(option) == "function") then
+		-- some addons overload 'option' with a custom function to display different windows
+		option = option();
+	end
+	local colors = object:getOption(option) or {self, r, self.g, self.b};
 	colors[4] = a;
 	object:setOption(option, colors, not self.global);
 end
 
 local function colorSwatchShow(self)
 	local r, g, b, a;
-	local color = self.object:getOption(self.option);
+	local object, option = self.object, self.option;
+	if (type(option) == "function") then
+		-- some addons overload 'option' with a custom function to display different windows
+		option = option();
+	end
+	local color = object:getOption(option);
 	if ( color ) then
 		r, g, b, a = unpack(color);
+	elseif (self:GetNormalTexture()) then
+		r, g, b, a = self:GetNormalTexture():GetVertexColor();
 	else
 		r, g, b, a = 1, 1, 1, 1;
 	end
@@ -2550,7 +2572,7 @@ local function controlPanelSkeleton()
 		["onclick"] = selectControlPanelModule,
 	};
 	return "frame#st:DIALOG#n:CTCONTROLPANEL#clamped#movable#t:mid:0:400#s:300:495", {
-		"backdrop#tooltip#0:0:0:0.75",
+		"backdrop#tooltip#0:0:0:0.80",
 		["onshow"] = function(self)
 			local module, obj;
 
@@ -2745,6 +2767,14 @@ function lib:showModuleOptions(modname, useCustomFunction)
 	if (button) then
 		-- Click the addon's button to open the options
 		button:Click();
+	end
+end
+
+function lib:isControlPanelShown()
+	if (controlPanelFrame and controlPanelFrame:IsVisible()) then
+		return true;
+	else
+		return false;
 	end
 end
 
