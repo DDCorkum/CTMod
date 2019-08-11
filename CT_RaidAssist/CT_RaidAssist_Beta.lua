@@ -103,7 +103,6 @@ L["CTRA/Spells/Trueshot Aura"] = "Trueshot Aura"
 module.init = function()	
 	module.CTRAFrames = NewCTRAFrames();
 	-- convert from pre-BFA CTRA to 8.2.0.5
-	module:setOption("CTRA_LastConversion", 8, true);
 	if (not module:getOption("CTRA_LastConversion") or module:getOption("CTRA_LastConversion") < 8.205) then
 		module:setOption("CTRA_LastConversion", 8.205, true)
 		local currSet = CT_RAMenu_CurrSet;
