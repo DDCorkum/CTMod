@@ -484,12 +484,11 @@ local function addon_Register()
 			"helperFrame", -- 1
 			CharacterMicroButton, -- 2
 			SpellbookMicroButton, -- 3
-			TalentMicroButton, -- 4	
-			QuestLogMicroButton, -- 5
-			SocialsMicroButton, -- 6
-			WorldMapMicroButton, -- 7
-			MainMenuMicroButton, -- 8
-			HelpMicroButton -- 9
+			QuestLogMicroButton, -- 4
+			SocialsMicroButton, --5
+			WorldMapMicroButton, --6
+			MainMenuMicroButton, --7
+			HelpMicroButton --8
 		);
 	end
 end
