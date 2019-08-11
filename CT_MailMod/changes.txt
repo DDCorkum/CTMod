@@ -1,3 +1,6 @@
+CT_MailMod (8.2.0.5) 2019-08-11
+- Added check for nil value to "SEND_MAIL_MONEY_CHANGED" handler
+
 CT_MailMod (8.2.0.3) 2019-06-27
 - Cleaning up 8.2.0.1
 
