@@ -17,7 +17,7 @@
 ------------------------------------------------
 
 --------------------------------------------
--- Performance Optimization
+-- Performance Optimization and Retail vs. Classic differences
 
 -- FrameXML api
 local GetClassColor = GetClassColor;
@@ -28,7 +28,7 @@ local InCombatLockdown = InCombatLockdown;
 local UnitAura = UnitAura;
 local UnitClass = UnitClass;
 local UnitExists = UnitExists;
-local UnitGetTotalAbsorbs = UnitGetTotalAbsorbs;
+local UnitGetTotalAbsorbs = UnitGetTotalAbsorbs or function() return 0; end -- doesn't exist in classic
 local UnitInRange = UnitInRange;
 local UnitIsDeadOrGhost = UnitIsDeadOrGhost;
 local UnitIsEnemy = UnitIsEnemy;
@@ -1261,7 +1261,8 @@ function NewCTRAWindow(owningCTRAFrames)
 			-- anchor to handle positioning, with assistance from CT_Library
 			anchorFrame = CreateFrame("Frame", nil, UIParent);
 			anchorFrame:SetSize(10,10);
-			anchorFrame:SetPoint("CENTER");
+			anchorFrame:SetPoint("CENTER", -300/asWindow, UIParent:GetHeight()/(3 + asWindow)); -- causes multiple new windows to be sort of cascading
+			anchorFrame:SetFrameLevel(4);	-- places it above windowFrame (1), and above the visualFrame (2) and secureButton (3) components of CTRAPlayerFrame
 			anchorFrame.texture = anchorFrame:CreateTexture(nil,"BACKGROUND");
 			anchorFrame.texture:SetAllPoints(true);
 			anchorFrame.texture:SetColorTexture(1,1,0,0.5);
@@ -1296,7 +1297,7 @@ function NewCTRAWindow(owningCTRAFrames)
 			
 			-- window that player frames reside in, with 2 pixel padding on all sides
 			windowFrame = CreateFrame("Frame", nil, UIParent);
-			windowFrame:SetSize(4,4);
+			windowFrame:SetSize(1,1);	-- arbitrary, just to make it exist
 			windowFrame:SetPoint("TOPLEFT", anchorFrame, "BOTTOM", -5, -10);
 			windowFrame:Show();
 			windowFrame:SetScript("OnEvent",
@@ -1306,10 +1307,6 @@ function NewCTRAWindow(owningCTRAFrames)
 					end
 				end
 			);		
-			-- background texture on the windowFrame (nearly transparent)
-			windowFrame.background = windowFrame:CreateTexture(nil, "BACKGROUND");
-			windowFrame.background:SetAllPoints();
-			windowFrame.background:SetColorTexture(0,0,0,0.05);
 		end
 		
 		
@@ -1538,8 +1535,8 @@ function NewCTRAWindow(owningCTRAFrames)
 			{"ShowWarlocks", function(rosterEntry) return rosterEntry.class == "WARLOCK"; end, "Wk",},
 			{"ShowWarriors", function(rosterEntry) return rosterEntry.class == "WARRIOR"; end, "Wr",},		
 		};
-		local x = 2;   -- essentially x=0, but with a small offset
-		local y = -2;  -- essentially y=0, but with a small offset
+		local x = 0;
+		local y = 0;
 		local w = 0;
 		local rows = 0;
 		local cols = 0;
@@ -1566,7 +1563,7 @@ function NewCTRAWindow(owningCTRAFrames)
 						if (w == self:GetProperty("Wrap")) then
 							if (self:GetProperty("Orientation") == 1 or self:GetProperty("Orientation") == 3) then
 								x = x + self:GetProperty("PlayerFrameWidth") + self:GetProperty("HorizontalSpacing");
-								y = -2;  -- essentially y=0, but with a small offset
+								y = 0;
 								if (w > rows) then
 									rows = w;
 								end
@@ -1575,7 +1572,7 @@ function NewCTRAWindow(owningCTRAFrames)
 									cols = cols + 1;
 								end
 							else
-								x = 2;  -- essentially x=0, but with a small offset
+								x = 0;
 								y = y - 40 - self:GetProperty("VerticalSpacing");
 								if (w > cols) then
 									cols = w;
@@ -1618,19 +1615,13 @@ function NewCTRAWindow(owningCTRAFrames)
 					w = 0;
 					if (self:GetProperty("Orientation") == 1) then
 						x = x + 90 + self:GetProperty("HorizontalSpacing");
-						y = -2; -- essentially y=0, but with a small offset
+						y = 0;
 					else
-						x = 2;  -- essentially x=0, but with a small offset
+						x = 0;
 						y = y - 40 - self:GetProperty("VerticalSpacing");
 					end	
 				end
 
-			end
-			if (not InCombatLockdown()) then
-				windowFrame:SetSize(
-					(4 + cols * (90 + self:GetProperty("HorizontalSpacing"))) * self:GetProperty("PlayerFrameScale")/100,
-					(4 + rows * (40 + self:GetProperty("VerticalSpacing"))) * self:GetProperty("PlayerFrameScale")/100
-				);
 			end
 		end
 	end
@@ -1863,7 +1854,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			if (UnitExists(shownUnit) and not UnitIsDeadOrGhost(shownUnit)) then
 				-- the unit is alive and should have a health bar
 				local healthRatio = UnitHealth(shownUnit) / UnitHealthMax(shownUnit);
-				local absorbRatio = (module:getGameVersion() == CT_GAME_VERSION_RETAIL and (UnitGetTotalAbsorbs(shownUnit) / UnitHealthMax(shownUnit))) or 0;  -- the actual value in WoW Retail, or 0 in WoW Classic
+				local absorbRatio = (UnitGetTotalAbsorbs(shownUnit) / UnitHealthMax(shownUnit)) or 0;  -- the actual value in WoW Retail, or 0 in WoW Classic
 				if (healthRatio > 1) then
 					healthRatio = 1;
 				elseif (healthRatio < 0.001) then
@@ -1967,8 +1958,8 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	-- creates a texture to display the tank/heal/dps role icon in top left; but visualFrame must exist already
 	local configureRoleTexture = function()
 		roleTexture = roleTexture or visualFrame:CreateTexture(nil, "OVERLAY");
-		roleTexture:SetSize(10,10);
-		roleTexture:SetPoint("TOPLEFT", visualFrame, 3, -5);	
+		roleTexture:SetSize(12,12);
+		roleTexture:SetPoint("TOPLEFT", visualFrame, 1.80, -1.80);	
 	end
 	
 	-- creates and updates the role icon in the top left
@@ -1996,13 +1987,16 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				end
 				roleTexture:Show();
 			elseif (roleAssigned == "DAMAGER") then
-				roleTexture:SetTexture("Interface\\AddOns\\CT_RaidAssist\\Images\\dpsicon");
+				roleTexture:SetTexture("Interface\\LFGFrame\\UI-LFG-ICON-PORTRAITROLES");
+				roleTexture:SetTexCoord(0.3125, 0.609375, 0.34375, 0.640625);  -- GetTexCoordsForRoleSmallCircle("DAMAGER");
 				roleTexture:Show();
 			elseif (roleAssigned == "HEALER") then
-				roleTexture:SetTexture("Interface\\AddOns\\CT_RaidAssist\\Images\\healicon");
+				roleTexture:SetTexture("Interface\\LFGFrame\\UI-LFG-ICON-PORTRAITROLES");
+				roleTexture:SetTexCoord(0.3125, 0.609375, 0.015625, 0.3125);  -- GetTexCoordsForRoleSmallCircle("HEALER");
 				roleTexture:Show();
 			elseif (roleAssigned == "TANK") then
-				roleTexture:SetTexture("Interface\\AddOns\\CT_RaidAssist\\Images\\tankicon");
+				roleTexture:SetTexture("Interface\\LFGFrame\\UI-LFG-ICON-PORTRAITROLES");
+				roleTexture:SetTexCoord(0, 0.296875, 0.34375, 0.640625);  -- GetTexCoordsForRoleSmallCircle("TANK");
 				roleTexture:Show();
 			else
 				roleTexture:Hide();
@@ -2450,111 +2444,117 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 		end
 		
 		-- STEP 3:
-		if (requestedUnit ~= shownUnit or requestedXOff ~= shownXOff or requestedYOff ~= shownYOff) then
-			if (not InCombatLockdown()) then
-				-- set the flags
-				shownUnit = requestedUnit;
-				shownXOff = requestedXOff;
-				shownYOff = requestedYOff;
-				
-				-- register or de-register events
-				if (not listenerFrame) then
-					listenerFrame = CreateFrame("Frame", nil);
-					listenerFrame:SetScript("OnEvent",
-						function(frame, event, ...)
-							local args = {...};
-							if (event == "SPELLS_CHANGED") then
-								updateMacros();
-							elseif (event == "UNIT_NAME_UPDATE") then
-								updateUnitNameFontString();
-							elseif (event == "UNIT_HEALTH" or event == "UNIT_MAXHEALTH") then
-								updateHealthBar();
-								updateBackdrop();
-							elseif (event == "UNIT_POWER_UPDATE") then
-								updatePowerBar();
-							elseif (event == "UNIT_DISPLAYPOWER") then
-								updatePowerBar(true);
-							elseif (event == "UNIT_AURA") then
-								updateAuras();
-							elseif (event == "READY_CHECK") then
-								updateReadyStatus()
-							elseif (event == "READY_CHECK_CONFIRM") then
-								updateReadyStatus();
-							elseif (event == "READY_CHECK_FINISHED") then
-								updateReadyStatus();
-							elseif (event == "PLAYER_LEVEL_UP") then
-								configureMacros();
-							elseif (event == "PLAYER_REGEN_DISABLED") then
-								updateMacros();
-							end
-						end
-					);
-					local timeElapsed = 0;
-					listenerFrame:SetScript("OnUpdate",
-						function(frame, elapsed)
-							timeElapsed = timeElapsed + elapsed;
-							if (timeElapsed < 3) then return; end
-							timeElapsed = 0;
+		if (not InCombatLockdown() and (requestedUnit ~= shownUnit or requestedXOff ~= shownXOff or requestedYOff ~= shownYOff)) then
+			-- set the flags
+			shownUnit = requestedUnit;
+			shownXOff = requestedXOff;
+			shownYOff = requestedYOff;
+
+			-- register or de-register events
+			if (not listenerFrame) then
+				listenerFrame = CreateFrame("Frame", nil);
+				listenerFrame:SetScript("OnEvent",
+					function(frame, event, ...)
+						local args = {...};
+						if (event == "SPELLS_CHANGED") then
+							updateMacros();
+						elseif (event == "UNIT_NAME_UPDATE") then
+							updateUnitNameFontString();
+						elseif (event == "UNIT_HEALTH" or event == "UNIT_MAXHEALTH" or event == "UNIT_ABSORB_AMOUNT_CHANGED") then
+							updateHealthBar();
 							updateBackdrop();
-							
-							--[[	THIS FOR LOOP IS FOR PERFORMANCE OPTIMIZATION TESTING ONLY
-								local begin = debugprofilestop();		-- ~23 modern, ~26 classic
-								print(" ");
-								for i=1, 1000 do
-									updateBackdrop()			--2.7 without target, 3.2 with target, 
-									updateHealthBar();			--4.6 without absorb, 7.8 with absorbs
-									updatePowerBar();			--3.0 modern, 5.4 classic
-									updateRoleTexture();			--1.1 solo, 2.3 skull, 2.9 dps
-									updateUnitNameFontString();		--2.3 solo, 2.9 for group member
-									updateAuras();				--2.1 no buff, 8.6 one buff, 12.0 two buffs
-									updateReadyStatus();			--1.1 solo, ?? during ready check
-								end
-								print (debugprofilestop() - begin);
-							--]]
-
+						elseif (event == "UNIT_POWER_UPDATE") then
+							updatePowerBar();
+						elseif (event == "UNIT_DISPLAYPOWER") then
+							updatePowerBar(true);
+						elseif (event == "UNIT_AURA") then
+							updateAuras();
+						elseif (event == "READY_CHECK") then
+							updateReadyStatus()
+						elseif (event == "READY_CHECK_CONFIRM") then
+							updateReadyStatus();
+						elseif (event == "READY_CHECK_FINISHED") then
+							updateReadyStatus();
+						elseif (event == "PLAYER_LEVEL_UP") then
+							configureMacros();
+						elseif (event == "PLAYER_REGEN_DISABLED") then
+							updateMacros();
 						end
-					);
-				end
-				if (shownUnit) then
-					visualFrame:Show(); 
-					listenerFrame:UnregisterAllEvents();  -- probably not required, but doing it to be absolute
-					listenerFrame:RegisterUnitEvent("UNIT_NAME_UPDATE", shownUnit);		-- updateName();
-					listenerFrame:RegisterUnitEvent("UNIT_HEALTH", shownUnit);	-- updateHealthBar(); updateBackdrop();
-					listenerFrame:RegisterUnitEvent("UNIT_MAXHEALTH", shownUnit);		-- updateHealthBar(); updateBackdrop();
-					listenerFrame:RegisterUnitEvent("UNIT_POWER_UPDATE", shownUnit);	-- updatePowerBar();
-					listenerFrame:RegisterUnitEvent("UNIT_DISPLAYPOWER", shownUnit);	-- updatePowerBar(true);
-					listenerFrame:RegisterUnitEvent("UNIT_AURA", shownUnit);		-- updateAuras();
-					listenerFrame:RegisterEvent("READY_CHECK");				-- updateReadyStatus();
-					listenerFrame:RegisterUnitEvent("READY_CHECK_CONFIRM", shownUnit);	-- updateReadyStatus();
-					listenerFrame:RegisterEvent("READY_CHECK_FINISHED");			-- updateReadyStatus();
-					listenerFrame:RegisterEvent("PLAYER_LEVEL_UP");				-- configureMacros();
-					listenerFrame:RegisterEvent("PLAYER_REGEN_ENABLED");			-- updateMacros();
-				else
-					visualFrame:Hide();
-					listenerFrame:UnregisterAllEvents();
-					return;		-- go absolutely no further if we arn't supposed to be showing anything any more!
-				end
+					end
+				);
+				local timeElapsed = 0;
+				listenerFrame:SetScript("OnUpdate",
+					function(frame, elapsed)
+						timeElapsed = timeElapsed + elapsed;
+						if (timeElapsed < 3) then return; end
+						timeElapsed = 0;
+						updateBackdrop();
 
-				-- reposition the frames
-				visualFrame:SetPoint("TOPLEFT", requestedXOff, requestedYOff);
-							
-				-- configure the visualFrame and its children
-				configureBackdrop();
+						--[[	THIS FOR LOOP IS FOR PERFORMANCE OPTIMIZATION TESTING ONLY
+							local begin = debugprofilestop();		-- ~23 modern, ~26 classic
+							print(" ");
+							for i=1, 1000 do
+								updateBackdrop()			--2.7 without target, 3.2 with target, 
+								updateHealthBar();			--4.6 without absorb, 7.8 with absorbs
+								updatePowerBar();			--3.0 modern, 5.4 classic
+								updateRoleTexture();			--1.1 solo, 2.3 skull, 2.9 dps
+								updateUnitNameFontString();		--2.3 solo, 2.9 for group member
+								updateAuras();				--2.1 no buff, 8.6 one buff, 12.0 two buffs
+								updateReadyStatus();			--1.1 solo, ?? during ready check
+							end
+							print (debugprofilestop() - begin);
+						--]]
+
+					end
+				);
+			end
+
+			-- configure the visualFrame and its children
+
+
+			if (shownUnit) then
+				visualFrame:Show(); 
+				configureBackdrop();		-- these MUST happen before the update____() funcs below
 				configureHealthBar();
 				configureRoleTexture();
 				configureUnitNameFontString();
 				configureAuras();
 				configureReadyStatus();
-				
-				-- configure the secureButton for the new unit
-				secureButton:SetAttribute("unit", shownUnit);
-				if not (macroLeft) then
-					configureMacros();
+				listenerFrame:UnregisterAllEvents();  -- probably not required, but doing it to be absolute
+				listenerFrame:RegisterUnitEvent("UNIT_NAME_UPDATE", shownUnit);		-- updateName();
+				listenerFrame:RegisterUnitEvent("UNIT_HEALTH", shownUnit);		-- updateHealthBar(); updateBackdrop();
+				listenerFrame:RegisterUnitEvent("UNIT_MAXHEALTH", shownUnit);		-- updateHealthBar(); updateBackdrop();
+				listenerFrame:RegisterUnitEvent("UNIT_POWER_UPDATE", shownUnit);	-- updatePowerBar();
+				listenerFrame:RegisterUnitEvent("UNIT_DISPLAYPOWER", shownUnit);	-- updatePowerBar();
+				listenerFrame:RegisterUnitEvent("UNIT_AURA", shownUnit);		-- updateAuras();
+				listenerFrame:RegisterEvent("READY_CHECK");				-- updateReadyStatus();
+				listenerFrame:RegisterUnitEvent("READY_CHECK_CONFIRM", shownUnit);	-- updateReadyStatus();
+				listenerFrame:RegisterEvent("READY_CHECK_FINISHED");			-- updateReadyStatus();
+				listenerFrame:RegisterEvent("PLAYER_LEVEL_UP");				-- configureMacros();
+				listenerFrame:RegisterEvent("PLAYER_REGEN_ENABLED");			-- updateMacros();
+				if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+					listenerFrame:RegisterUnitEvent("UNIT_ABSORB_AMOUNT_CHANGED");	--updateHealthBar; updateBackdrop();
 				end
-				updateMacros();
+			else
+				visualFrame:Hide();
+				listenerFrame:UnregisterAllEvents();
+				return;		-- go absolutely no further if we arn't supposed to be showing anything any more!
 			end
+
+			-- reposition the frames
+			visualFrame:SetPoint("TOPLEFT", requestedXOff, requestedYOff);
+
+
+
+			-- configure the secureButton for the new unit
+			secureButton:SetAttribute("unit", shownUnit);
+			if not (macroLeft) then
+				configureMacros();
+			end
+			updateMacros();
 		end
-		-- even during combat, update the VisualFrame and its children because shownUnit might now point to a different GUID if the group composition changed!
+		-- visualFrame's children must be updated whenever group composition changes in case the players have changed position within the group or raid.
+		-- if shownUnit exists then it can be assumed the previous conditional evaluated to true at some point and therefore the configure___() funcs have been used
 		if (shownUnit) then
 			updateBackdrop();
 			updateHealthBar();

@@ -2715,11 +2715,23 @@ local function controlPanelSkeleton()
 end
 
 local function displayControlPanel()
-	if ( not controlPanelFrame ) then
-		controlPanelFrame = lib:getFrame(controlPanelSkeleton);
-		tinsert(UISpecialFrames, controlPanelFrame:GetName());
+	if (InCombatLockdown()) then
+		print("CT options are not usable during combat");
+	else
+		if ( not controlPanelFrame ) then
+			controlPanelFrame = lib:getFrame(controlPanelSkeleton);
+			tinsert(UISpecialFrames, controlPanelFrame:GetName());
+			controlPanelFrame:HookScript("OnEvent",
+				function(__, event)
+					if (event == "PLAYER_REGEN_DISABLED") then
+						controlPanelFrame:Hide();
+					end
+				end
+			);
+			controlPanelFrame:RegisterEvent("PLAYER_REGEN_DISABLED");
+		end
+		controlPanelFrame:Show();
 	end
-	controlPanelFrame:Show();
 end
 
 function lib:showControlPanel(show)
@@ -2740,6 +2752,9 @@ end
 -- if ustCustomFunction is true then an attempt will be made to open a module's custom options function instead
 function lib:showModuleOptions(modname, useCustomFunction)
 	self:showControlPanel(true);
+	if (not lib:isControlPanelShown()) then	-- this might happen if the panel is forced off during combat
+		return;
+	end
 	local listing = CTCONTROLPANEL.listing;
 	local button;
 	local num = 700;			--700 is an offset to prevent taint affecting battleground queueing

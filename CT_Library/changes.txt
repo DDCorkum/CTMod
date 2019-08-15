@@ -1,7 +1,7 @@
-CT_Library (8.2.0.5) 2019-08-09
-- Small changes accompanying the CTRA rewrite
-- Modules may now pass a function to getOption(option) and setOption(option, ...) to dynamically set the key
-- The background of the options frame is now slightly more opaque to improve readability
+CT_Library (8.2.0.5) 2019-08-14
+- getOption(option) and setOption(option, ...) now accept "option" or option() as a parameter
+- The control panel is now slightly more opaque to improve readability
+- The control panel closes before entering combat
 
 CT_Library (8.2.0.1) 2019-06-22
 - Incorporated minimap icon from CT_Core for Titan integration

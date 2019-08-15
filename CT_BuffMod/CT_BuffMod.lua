@@ -2900,6 +2900,7 @@ function CT_BuffMod_AuraButton_OnShow(self)
 	end
 end
 
+local tooltipFooter;
 function CT_BuffMod_AuraButton_OnEnter(self)
 	-- Show tooltip for the aura/enchant.
 	local frameObject = self.frameObject;
@@ -2969,11 +2970,20 @@ function CT_BuffMod_AuraButton_OnEnter(self)
 		end
 	end
 	GameTooltip:Show();
+	if (not tooltipFooter) then
+		tooltipFooter = GameTooltip:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall");
+		tooltipFooter:SetScale(0.85);
+		tooltipFooter:SetTextColor(0.35, 0.35, 0.35);
+		tooltipFooter:SetText("/ctbuff to configure");
+		tooltipFooter:SetPoint("BOTTOMRIGHT", -6, 6);
+	end
+	tooltipFooter:Show();
 end
 
 function CT_BuffMod_AuraButton_OnLeave(self)
 	-- Hide aura/enchant tooltip.
 	GameTooltip:Hide();
+	tooltipFooter:Hide();
 end
 
 function CT_BuffMod_AuraButton_OnMouseDown(self, button)
