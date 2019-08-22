@@ -20,7 +20,29 @@
 -- Performance Optimization and Retail vs. Classic differences
 
 -- FrameXML api
-local GetClassColor = GetClassColor;
+local GetClassColor = function(fileName)		
+	if not fileName then return 0,0,0; end
+	if C_ClassColor then	-- introduced in 8.1
+		return C_ClassColor.GetClassColor(fileName):GetRGB();
+	elseif (GetClassColor) then	-- depreciated in 8.1 but still seems to work
+		return GetClassColor(fileName);
+	else
+		-- alternative for 1.13.2 (classic)
+		local colors =
+		{
+			["HUNTER"] = {0.67, 0.83, 0.45, "ffabd473"},
+			["WARLOCK"] = {0.53, 0.53, 0.93, "ff8787ed"},
+			["PRIEST"] = {1.00, 1.00, 1.00, "ffffffff"},
+			["PALADIN"] = {0.96, 0.55, 0.73, "fff58cba"},
+			["MAGE"] = {0.25, 0.78, 0.92, "ff40c7eb"},
+			["ROGUE"] = {1.00, 0.96, 0.41, "fffff569"},
+			["DRUID"] = {1.00, 0.49, 0.04, "ffff7d0a"},
+			["SHAMAN"] = {0.00, 0.44, 0.87, "ff0070de"},
+			["WARRIOR"] = {0.78, 0.61, 0.43, "ffc79c6e"},
+		}
+		return unpack(colors[fileName] or { });
+	end
+end;
 local GetInspectSpecialization = GetInspectSpecialization or function() return nil; end	-- doesn't exist in classic
 local GetSpecializationRoleByID = GetSpecializationRoleByID or function() return nil; end -- doesn't exist in classic
 local GetReadyCheckStatus = GetReadyCheckStatus;
@@ -53,8 +75,9 @@ local strsplit = strsplit;
 
 local module;			-- CTRA pseudo-extends CT using CT_Library:registerModule()
 local NewCTRAFrames;		-- Wrapper over all raid-frame portions of the addon that creates and manages windows
-local NewCTRAWindow;		-- Set of player frames sharing a common appearance and anchor point
+local NewCTRAWindow;		-- Set of player frames (and optionally labels or target frames) sharing a common appearance and anchor point
 local NewCTRAPlayerFrame;	-- A single, interactive player frame that is contained in a window
+local NewCTRATargetFrame;	-- A single, interactive target frame that is contained in a window
 
 
 --------------------------------------------
@@ -249,22 +272,22 @@ local CTRA_Configuration_Buffs =
 {
 	["PRIEST"] =
 	{
-		{name = "Power Word: Fortitude", modifier = "nomod", },
+		{["name"] = "Power Word: Fortitude", ["modifier"] = "nomod", },
 	},
 	["MAGE"] =
 	{
-		{name = "Arcane Intellect", modifier = "nomod", } ,
-		{name = "Arcane Brilliance", modifier = "mod:shift", gameVersion = CT_GAME_VERSION_CLASSIC,},
-		{name = "Amplify Magic", modifier = "mod:ctrl", gameVersion = CT_GAME_VERSION_CLASSIC,},
-		{name = "Dampen Magic", modifier = "mod:alt", gameVersion = CT_GAME_VERSION_CLASSIC,},
+		{["name"] = "Arcane Intellect", ["modifier"] = "nomod", } ,
+		{["name"] = "Arcane Brilliance", ["modifier"] = "mod:shift", ["gameVersion"] = CT_GAME_VERSION_CLASSIC,},
+		{["name"] = "Amplify Magic", ["modifier"] = "mod:ctrl", ["gameVersion"] = CT_GAME_VERSION_CLASSIC,},
+		{["name"] = "Dampen Magic", ["modifier"] = "mod:alt", ["gameVersion"] = CT_GAME_VERSION_CLASSIC,},
 	},
 	["WARRIOR"] =
 	{	
-		{name = "Battle Shout", modifier = "nomod",},
+		{["name"] = "Battle Shout", ["modifier"] = "nomod",},
 	},
 	["HUNTER"] =
 	{
-		{name = "Trueshot Aura", modifier = "nomod", gameVersion = CT_GAME_VERSION_CLASSIC,},
+		{["name"] = "Trueshot Aura", ["modifier"] = "nomod", ["gameVersion"] = CT_GAME_VERSION_CLASSIC,},
 	},
 }
 
@@ -279,37 +302,37 @@ local CTRA_Configuration_FriendlyRemoves =
 {			
 	["DRUID"] =										
 	{											
-		{name = "Nature's Cure", modifier = "nomod", magic = true, curse = true, poison = true, gameVersion == CT_GAME_VERSION_RETAIL},
-		{name = "Remove Corruption", modifier = "nomod", curse = true, poison = true, gameVersion == CT_GAME_VERSION_RETAIL},
-		{name = "Abolish Poison", modifier = "nomod", poison = true, gameVersion == CT_GAME_VERSION_CLASSIC},
-		{name = "Cure Poison", modifier = "nomod", poison = true, gameVersion == CT_GAME_VERSION_CLASSIC},  	--  the first available 'nomod' on the list has precedence, so at lvl 26 this stops being used
-		{name = "Remove Curse", modifier = "mod:shift", curse = true, gameVersion == CT_GAME_VERSION_CLASSIC},
+		{["name"] = "Nature's Cure", ["modifier"] = "nomod", ["magic"] = true, ["curse"] = true, ["poison"] = true, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
+		{["name"] = "Remove Corruption", ["modifier"] = "nomod", ["curse"] = true, ["poison"] = true, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
+		{["name"] = "Abolish Poison", ["modifier"] = "nomod", ["poison"] = true, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
+		{["name"] = "Cure Poison", ["modifier"] = "nomod", ["poison"] = true, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},  	--  the first available 'nomod' on the list has precedence, so at lvl 26 this stops being used
+		{["name"] = "Remove Curse", ["modifier"] = "mod:shift", ["curse"] = true, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
 	},
 	["MAGE"] =
 	{
-		{name = "Remove Curse", modifier = "nomod", curse = true},
+		{["name"] = "Remove Curse", ["modifier"] = "nomod", ["curse"] = true},
 	},
 	["MONK"] =
 	{
-		{name = "Detox", modifier = "nomod", spec = 270, magic = true, poison = true, disease = true},
-		{name = "Detox", modifier = "nomod", poison = true, disease = true},	-- this is superceded for mistweavers by the higher one on the list with spec=270
+		{["name"] = "Detox", ["modifier"] = "nomod", ["spec"] = 270, ["magic"] = true, ["poison"] = true, ["disease"] = true},
+		{["name"] = "Detox", ["modifier"] = "nomod", ["poison"] = true, ["disease"] = true},	-- this is superceded for mistweavers by the higher one on the list with spec=270
 	},
 	["PALADIN"] =
 	{
-		{name = "Cleanse", modifier = "nomod", magic = true, poison = true, disease = true},	-- exists (in roughly equivalent forms) in both retail and classic
-		{name = "Cleanse  Toxins", modifier = "nomod", poison = true, disease = true, gameVersion == CT_GAME_VERSION_RETAIL},	-- used by specs in retail who don't get the full cleanse
-		{name = "Purify", modifier = "nomod", poison = true, disease = true, gameVersion == CT_GAME_VERSION_CLASSIC},	--at higher levels, replaced by cleanse
+		{["name"] = "Cleanse", ["modifier"] = "nomod", ["magic"] = true, ["poison"] = true, ["disease"] = true},	-- exists (in roughly equivalent forms) in both retail and classic
+		{["name"] = "Cleanse  Toxins", ["modifier"] = "nomod", ["poison"] = true, ["disease"] = true, ["gameVersion"] = CT_GAME_VERSION_RETAIL},	-- used by specs in retail who don't get the full cleanse
+		{["name"] = "Purify", ["modifier"] = "nomod", ["poison"] = true, ["disease"] = true, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},	--at higher levels, replaced by cleanse
 	},
 	["PRIEST"] = 
 	{
-		{name = "Purify Disease", modifier = "nomod", disease = true, gameVersion == CT_GAME_VERSION_RETAIL},
-		{name = "Purify", modifier = "nomod", magic = true, disease = true, gameVersion == CT_GAME_VERSION_RETAIL},
-		{name = "Dispel Magic", modifier = "nomod", magic = true, gameVersion == CT_GAME_VERSION_CLASSIC},
+		{["name"] = "Purify Disease", ["modifier"] = "nomod", ["disease"] = true, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
+		{["name"] = "Purify", ["modifier"] = "nomod", ["magic"] = true, ["disease"] = true, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
+		{["name"] = "Dispel Magic", ["modifier"] = "nomod", ["magic"] = true, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
 	},
 	["SHAMAN"] =
 	{
-		{name = "Purify Spirit", modifier = "nomod", magic = true, curse = true},
-		{name = "Cleanse Spirit", modifier = "nomod", curse = true},
+		{["name"] = "Purify Spirit", ["modifier"] = "nomod", ["magic"] = true, ["curse"] = true},
+		{["name"] = "Cleanse Spirit", ["modifier"] = "nomod", ["curse"] = true},
 	},
 }
 
@@ -323,28 +346,28 @@ local CTRA_Configuration_RezAbilities =
 {
 	["DRUID"] =
 	{
-		{name = "Rebirth", modifier = "nomod", combat = true},
-		{name = "Revive", modifier = "nomod", nocombat = true},
+		{["name"] = "Rebirth", ["modifier"] = "nomod", ["combat"] = true},
+		{["name"] = "Revive", ["modifier"] = "nomod", ["nocombat"] = true},
 	},
 	["DEATHKNIGHT"] =
 	{
-		{name = "Raise Ally", modifier = "nomod", combat = true, nocombat = true},
+		{["name"] = "Raise Ally", ["modifier"] = "nomod", ["combat"] = true, ["nocombat"] = true},
 	},
 	["WARLOCK"] =
 	{
-		{name = "Soulstone", modifier = "nomod", combat = true, gameVersion = CT_GAME_VERSION_RETAIL},	--TO DO: Make a classic version that uses the soulstone sitting in the bags
+		{["name"] = "Soulstone", ["modifier"] = "nomod", ["combat"] = true, ["gameVersion"] = CT_GAME_VERSION_RETAIL},	--TO DO: Make a classic version that uses the soulstone sitting in the bags
 	},
 	["PALADIN"] =
 	{
-		{name = "Redemption", modifier = "nomod", nocombat = true},
+		{["name"] = "Redemption", ["modifier"] = "nomod", ["nocombat"] = true},
 	},	
 	["PRIEST"] =
 	{
-		{name = "Resurrection", modifier = "nomod", nocombat = true},
+		{["name"] = "Resurrection", ["modifier"] = "nomod", ["nocombat"] = true},
 	},	
 	["SHAMAN"] =
 	{
-		{name = "Ancestral Spirit", modifier = "nomod", nocombat = true},
+		{["name"] = "Ancestral Spirit", ["modifier"] = "nomod", ["nocombat"] = true},
 	},
 }
 
@@ -379,7 +402,7 @@ AfterNotReadyFrame:SetScript("OnEvent",
 				if (self.status == "waiting") then
 					self:Show();
 					self.text:SetText("You were afk, are you back now?")
-				elseif (self.status == "not ready") then
+				elseif (self.status == "notready") then
 					self:Show();
 					self.text:SetText("Are you ready now?")
 				elseif (not self.status) then
@@ -498,7 +521,7 @@ function NewCTRAFrames()
 		--STEP 1:
 		if (self:IsEnabled()) then
 			--STEP 2:
-			for i, window in ipairs(windows) do
+			for __, window in ipairs(windows) do
 				if (window:IsEnabled()) then
 					-- the windows are disabled and stored in windows for future use; they are not 'deleted' because WoW won't garbage collect frames
 					window:Disable();	-- the window and its assigned content deregisters from all events
@@ -826,18 +849,22 @@ function NewCTRAFrames()
 					optionsEndFrame();
 				end
 				optionsAddObject(220, 20, "font#tl:110:%y#s:0:%s#Roles#" .. textColor1 .. ":l");
-				for key, val in ipairs({"Myself", "Tanks", "Heals", "Melee", "Range"}) do
-					optionsBeginFrame( -5,  25, "checkbutton#tl:110:%y#n:CTRAWindow_Show" .. val .. "CheckButton#" .. val);
-						optionsAddScript("onload",
-							function(button)
-								button.option = function() return "CTRAWindow" .. selectedWindow .. "_Show" .. val; end
-								button:SetFrameLevel(21);
-							end
-						);
-					optionsEndFrame();
+				if (true or module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+					for __, val in ipairs({"Myself", "Tanks", "Heals", "Melee", "Range"}) do
+						optionsBeginFrame( -5,  25, "checkbutton#tl:110:%y#n:CTRAWindow_Show" .. val .. "CheckButton#" .. val);
+							optionsAddScript("onload",
+								function(button)
+									button.option = function() return "CTRAWindow" .. selectedWindow .. "_Show" .. val; end
+									button:SetFrameLevel(21);
+								end
+							);
+						optionsEndFrame();
+					end
+				else
+					optionsAddObject(-5, 170, "font#tl:110:%y#Sort by role in Retail only#" .. textColor2 .. ":l");
 				end
 				optionsAddObject(170, 20, "font#tl:205:%y#s:0:%s#Classes#" .. textColor1 .. ":l");
-				for i, class in ipairs(
+				for __, class in ipairs(
 					{
 						{"DeathKnights", "DthK"},
 						{"DemonHunters", "DemH"},
@@ -952,7 +979,7 @@ function NewCTRAFrames()
 								"HealthBarAsBackground",
 								"EnablePowerBar",
 							}
-							for i, property in ipairs(presetClassic) do
+							for __, property in ipairs(presetClassic) do
 								module:setOption("CTRAWindow" .. selectedWindow .. "_" .. property, nil, true);		--the default is to look like classic, so just nil them out
 								self:Update("CTRAWindow" .. selectedWindow .. "_" .. property, windows[selectedWindow]:GetProperty(property));	-- forces the window's update function to actually trigger with the default
 							end
@@ -1064,6 +1091,25 @@ function NewCTRAFrames()
 					optionsAddScript("onenter",
 							function(checkbox)
 								module:displayTooltip(checkbox, "Show the mana, energy, rage, etc. at the bottom", "ANCHOR_TOPLEFT");
+							end
+						);
+					optionsAddScript("onleave",
+							function()
+								module:hideTooltip();
+							end
+						);
+				optionsEndFrame();
+				optionsBeginFrame(0, 26, "checkbutton#tl:10:%y#n:CTRAWindow_EnableTargetFrameCheckButton:true#Show the target underneath?");
+					optionsAddScript("onload",
+						function(checkbox)
+							checkbox.option = function()
+								return "CTRAWindow" .. selectedWindow .. "_EnableTargetFrame";
+							end
+						end
+					);
+					optionsAddScript("onenter",
+							function(checkbox)
+								module:displayTooltip(checkbox, "Add a frame underneath with the player's target (often used for tanks)", "ANCHOR_TOPLEFT");
 							end
 						);
 					optionsAddScript("onleave",
@@ -1192,7 +1238,7 @@ function NewCTRAWindow(owningCTRAFrames)
 	local anchorFrame;		-- small movable anchor to orient the window
 	local windowFrame;		-- appearance of the window itself
 	local playerFrames = { };	-- CTRAPlayerFrame objects
-	-- (not yet implemented) local labelFrames = { };	-- CTRALabelFrame objects 
+	local targetFrames = { };	-- CTRATargetFrame objects
 	local currentOptions = { };
 	local defaultOptions = 		-- configuration data for the default options in showing a window
 	{
@@ -1241,6 +1287,7 @@ function NewCTRAWindow(owningCTRAFrames)
 		["EnablePowerBar"] = true,
 		["PlayerFrameShowGenericDebuffs"] = 1,			--auto, show only debuff types the player can remove
 		["PlayerFrameShowEncounterDebuffs"] = 1,		--auto, show only debuff types the player is concerned with based on role
+		["EnableTargetFrame"] = false,
 	};
 
 	-- private methods
@@ -1259,7 +1306,7 @@ function NewCTRAWindow(owningCTRAFrames)
 		
 		-- STEP 1:
 		if (copyFromWindow and type(copyFromWindow) == "number") then
-			for key, val in pairs(defaultOptions) do
+			for key, __ in pairs(defaultOptions) do
 				module:setOption("CTRAWindow" .. asWindow .. "_" .. key,module:getOption("CTRAWindow" .. copyFromWindow .. "_" .. key),true, false);
 			end
 		end
@@ -1337,8 +1384,7 @@ function NewCTRAWindow(owningCTRAFrames)
 		-- STEP 7:
 		anchorFrame:SetShown(module:isControlPanelShown());
 		
-		-- DEBUGGING
-		for key, val in pairs(currentOptions) do
+		for key, __ in pairs(currentOptions) do
 			currentOptions[key] = nil;
 		end
 
@@ -1367,8 +1413,11 @@ function NewCTRAWindow(owningCTRAFrames)
 		windowFrame:UnregisterEvent("PLAYER_REGEN_ENABLED");
 		
 		-- STEP 3:
-		for i, playerframe in pairs(playerFrames) do
+		for __, playerframe in pairs(playerFrames) do
 			playerframe:Disable();
+		end
+		for __, targetframe in pairs(targetFrames) do
+			targetframe:Disable();
 		end
 		
 		-- STEP 4:
@@ -1413,7 +1462,10 @@ function NewCTRAWindow(owningCTRAFrames)
 		-- STEP 1:
 		if (option) then
 			currentOptions[option] = value;
-			for i, obj in ipairs(playerFrames) do
+			for __, obj in ipairs(playerFrames) do
+				obj:Update(option, value);
+			end
+			for __, obj in ipairs(targetFrames) do
 				obj:Update(option, value);
 			end
 		end
@@ -1548,15 +1600,18 @@ function NewCTRAWindow(owningCTRAFrames)
 		local w = 0;
 		local rows = 0;
 		local cols = 0;
-		for i=1, #playerFrames do
-			playerFrames[i]:Disable();
+		for __, frame in pairs(playerFrames) do
+			frame:Disable();
+		end
+		for __, frame in pairs(targetFrames) do
+			frame:Disable();
 		end
 		local playersShown = 0;
-		for i, category in pairs(categories) do  -- (from step 2)
+		for __, category in pairs(categories) do  -- (from step 2)
 			if self:GetProperty(category[1]) then
 
 				-- this group must be shown, if there is anyone in it to show
-				for j, rosterEntry in ipairs(roster) do
+				for __, rosterEntry in ipairs(roster) do
 					if category[2](rosterEntry) then
 
 						-- show this person
@@ -1564,7 +1619,13 @@ function NewCTRAWindow(owningCTRAFrames)
 						if (not playerFrames[playersShown]) then
 							playerFrames[playersShown] = NewCTRAPlayerFrame(self, windowFrame);
 						end
-						playerFrames[playersShown]:Enable(rosterEntry.unit, x, y, rosterEntry.role);
+						playerFrames[playersShown]:Enable(rosterEntry.unit, x, y);
+						if (self:GetProperty("EnableTargetFrame")) then
+							if (not targetFrames[playersShown]) then
+								targetFrames[playersShown] = NewCTRATargetFrame(self, windowFrame);
+							end
+							targetFrames[playersShown]:Enable(rosterEntry.unit .. "target", x, y - 38);
+						end
 
 						-- move the anchor (and wrap to a new col/row if necessary) for the next person, and keep track of the max number of rows and columns in use
 						w = w + 1;
@@ -1581,7 +1642,7 @@ function NewCTRAWindow(owningCTRAFrames)
 								end
 							else
 								x = 0;
-								y = y - 40 - self:GetProperty("VerticalSpacing");
+								y = y - 40 - self:GetProperty("VerticalSpacing") - ((self:GetProperty("EnableTargetFrame") and 20) or 0);
 								if (w > cols) then
 									cols = w;
 								end
@@ -1594,7 +1655,7 @@ function NewCTRAWindow(owningCTRAFrames)
 						else
 							if (self:GetProperty("Orientation") == 1 or self:GetProperty("Orientation") == 3) then
 								-- x = x;
-								y = y - 40 - self:GetProperty("VerticalSpacing");
+								y = y - 40 - self:GetProperty("VerticalSpacing") - ((self:GetProperty("EnableTargetFrame") and 20) or 0);
 
 								if (w > rows) then
 									rows = w;
@@ -1626,7 +1687,7 @@ function NewCTRAWindow(owningCTRAFrames)
 						y = 0;
 					else
 						x = 0;
-						y = y - 40 - self:GetProperty("VerticalSpacing");
+						y = y - 40 - self:GetProperty("VerticalSpacing") - ((self:GetProperty("EnableTargetFrame") and 20) or 0);
 					end	
 				end
 
@@ -2016,7 +2077,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				statusBackground:Show();
 				if (summonStatus == 1) then		-- GetAtlasInfo("Raid-Icon-SummonPending")
 					statusTexture:SetTexCoord(0.5390625, 0.7890625, 0.015625, 0.515625);
-					statusFontString:SetText("Summon Pending");
+					statusFontString:SetText("Summoned");
 					statusBackground:SetVertexColor(unpack(owner:GetProperty("ColorReadyCheckWaiting")));
 				elseif (summonStatus == 2) then		-- GetAtlasInfo("Raid-Icon-SummonAccepted")
 					statusTexture:SetTexCoord(0.0078125, 0.2578125, 0.15625, 0.515625);
@@ -2036,7 +2097,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 					statusFontString:SetText("No Reply");
 					statusBackground:Show();
 					statusBackground:SetVertexColor(unpack(owner:GetProperty("ColorReadyCheckWaiting")));
-				elseif (readyStatus == "not ready") then
+				elseif (readyStatus == "notready") then
 					statusTexture:SetTexture(READY_CHECK_NOT_READY_TEXTURE);
 					statusFontString:Show();
 					statusFontString:SetText("Not Ready");
@@ -2192,7 +2253,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			local combatRezToCast = { };
 			local hasRez = nil;
 			for i, details in ipairs(CTRA_Configuration_RezAbilities[class]) do
-				if (GetSpellInfo(module.text["CTRA/Spells/" .. details.name]) and details.combat and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and combatRezToCast[details.modifier] == nil and (details.spec == nil or details.spec == spec)) then
+				if (GetSpellInfo(module.text["CTRA/Spells/" .. details.name]) and details.combat and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and combatRezToCast[details.modifier] == nil) then
 					combatRezToCast[details.modifier] = module.text["CTRA/Spells/" .. details.name];
 					hasRez = true;
 				end
@@ -2211,7 +2272,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			local nocombatRezToCast = { };
 			local hasRez = nil;
 			for i, details in ipairs(CTRA_Configuration_RezAbilities[class]) do
-				if (GetSpellInfo(module.text["CTRA/Spells/" .. details.name]) and details.nocombat and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and nocombatRezToCast[details.modifier] == nil and (details.spec == nil or details.spec == spec)) then
+				if (GetSpellInfo(module.text["CTRA/Spells/" .. details.name]) and details.nocombat and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and nocombatRezToCast[details.modifier] == nil) then
 					nocombatRezToCast[details.modifier] = module.text["CTRA/Spells/" .. details.name];
 					hasRez = true;
 				end
@@ -2233,7 +2294,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			local friendlyRemovesToCast = { };
 			local hasFriendlyRemoves = nil;
 			for i, details in ipairs(CTRA_Configuration_FriendlyRemoves[class]) do
-				if (GetSpellInfo(module.text["CTRA/Spells/" .. details.name]) and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and friendlyRemovesToCast[details.modifier] == nil and (details.spec == nil or details.spec == spec)) then
+				if (GetSpellInfo(module.text["CTRA/Spells/" .. details.name]) and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and friendlyRemovesToCast[details.modifier] == nil and (details.spec == nil or spec == nil or details.spec == spec)) then
 					friendlyRemovesToCast[details.modifier] = module.text["CTRA/Spells/" .. details.name];
 					hasFriendlyRemoves = true;
 				end
@@ -2320,8 +2381,8 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			return;
 		end
 		requestedUnit = unit;
-		requestedXOff = xOff or 2;
-		requestedYOff = yOff or 2;
+		requestedXOff = xOff;
+		requestedYOff = yOff;
 		self:Update();
 	end
 	
@@ -2353,7 +2414,6 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			else
 				-- overall dimensions
 				visualFrame = CreateFrame("Frame", nil, parent, nil);
-				visualFrame:Hide();
 				visualFrame:SetSize(90, 40);
 				visualFrame:SetScale(owner:GetProperty("PlayerFrameScale")/100);
 								
@@ -2365,46 +2425,47 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				secureButton:SetAttribute("type2", "macro");
 				secureButton:HookScript("OnEnter",
 					function()
-						GameTooltip:SetOwner(parent, "ANCHOR_TOPLEFT");
-						local className, classFilename = UnitClass(shownUnit);
-						local r,g,b = GetClassColor(classFilename);
-						GameTooltip:AddDoubleLine(UnitName(shownUnit) or "", UnitLevel(shownUnit) or 0, r,g,b, 1,1,1);
-						if ( UnitRace(shownUnit) and className ) then
-							GameTooltip:AddLine(UnitRace(shownUnit) .. " " .. className, 1, 1, 1);
-						end
-						if (aura1Texture:IsShown()) then
-							GameTooltip:AddLine("|T" .. aura1Texture:GetTexture() .. ":0|t  " .. (aura1Texture.name or ""));
-							if (aura2Texture:IsShown()) then
-								GameTooltip:AddLine("|T" .. aura2Texture:GetTexture() .. ":0|t  " .. (aura2Texture.name or ""));
-								if (aura3Texture:IsShown()) then
-									GameTooltip:AddLine("|T" .. aura3Texture:GetTexture() .. ":0|t  " .. (aura3Texture.name or ""));
+						if (UnitExists(shownUnit)) then
+							GameTooltip:SetOwner(parent, "ANCHOR_TOPLEFT");
+							local className, classFilename = UnitClass(shownUnit);
+							local r,g,b = GetClassColor(classFilename);
+							GameTooltip:AddDoubleLine(UnitName(shownUnit) or "", UnitLevel(shownUnit) or "", r,g,b, 1,1,1);
+							local mapid = C_Map.GetBestMapForUnit(shownUnit);
+							GameTooltip:AddDoubleLine((UnitRace(shownUnit) or "") .. " " .. (className or ""), (not UnitInRange(shownUnit) and mapid and C_Map.GetMapInfo(mapid).name) or "", 1, 1, 1, 0.5, 0.5, 0.5);
+							if (aura1Texture:IsShown()) then
+								GameTooltip:AddLine("|T" .. aura1Texture:GetTexture() .. ":0|t  " .. (aura1Texture.name or ""));
+								if (aura2Texture:IsShown()) then
+									GameTooltip:AddLine("|T" .. aura2Texture:GetTexture() .. ":0|t  " .. (aura2Texture.name or ""));
+									if (aura3Texture:IsShown()) then
+										GameTooltip:AddLine("|T" .. aura3Texture:GetTexture() .. ":0|t  " .. (aura3Texture.name or ""));
+									end
 								end
 							end
+							local buff = canBuff();
+							local remove = canRemoveDebuff();
+							local rezCombat = canRezCombat();
+							local rezNoCombat = canRezNoCombat();
+							if (not InCombatLockdown() and buff or remove or rezCombat or rezNoCombat) then
+								GameTooltip:AddLine("|nRight click...");
+								if buff then for modifier, spellName in pairs(buff) do GameTooltip:AddDoubleLine("|cFF33FF66nocombat" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFF33FF66" .. module.text["CTRA/Spells/" .. spellName]); end end
+								if rezNoCombat then for modifier, spellName in pairs(rezNoCombat) do GameTooltip:AddDoubleLine("|cFFFF6666combat, dead" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFFF6666" .. module.text["CTRA/Spells/" .. spellName]); end end
+								if remove then for modifier, spellName in pairs(remove) do GameTooltip:AddDoubleLine("|cFFFF6666combat" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFFF6666" .. module.text["CTRA/Spells/" .. spellName]); end end
+								if rezCombat then for modifier, spellName in pairs(rezCombat) do GameTooltip:AddDoubleLine("|cFFCCCC66nocombat, dead" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFCCCC66" .. module.text["CTRA/Spells/" .. spellName]); end end
+							end
+							if (not module.GameTooltipExtraLine) then
+								module.GameTooltipExtraLine = GameTooltip:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall");
+								module.GameTooltipExtraLine:SetPoint("BOTTOM", 0, 6);
+								module.GameTooltipExtraLine:SetText("/ctra to move and configure");
+								module.GameTooltipExtraLine:SetTextColor(0.35, 0.35, 0.35);
+								module.GameTooltipExtraLine:SetScale(0.90);
+							end
+							GameTooltip:Show();
+							if (not InCombatLockdown()) then
+								module.GameTooltipExtraLine:Show();
+								GameTooltip:SetHeight(GameTooltip:GetHeight()+3);
+								GameTooltip:SetWidth(max(150,GameTooltip:GetWidth()));
+							end
 						end
-						local buff = canBuff();
-						local remove = canRemoveDebuff();
-						local rezCombat = canRezCombat();
-						local rezNoCombat = canRezNoCombat();
-						if (not InCombatLockdown() and buff or remove or rezCombat or rezNoCombat) then
-							GameTooltip:AddLine("|nRight click...");
-							if buff then for modifier, spellName in pairs(buff) do GameTooltip:AddDoubleLine("|cFF33FF66nocombat" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFF33FF66" .. module.text["CTRA/Spells/" .. spellName]); end end
-							if rezNoCombat then for modifier, spellName in pairs(rezNoCombat) do GameTooltip:AddDoubleLine("|cFFFF6666combat, dead" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFFF6666" .. module.text["CTRA/Spells/" .. spellName]); end end
-							if remove then for modifier, spellName in pairs(remove) do GameTooltip:AddDoubleLine("|cFFFF6666combat" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFFF6666" .. module.text["CTRA/Spells/" .. spellName]); end end
-							if rezCombat then for modifier, spellName in pairs(rezCombat) do GameTooltip:AddDoubleLine("|cFFCCCC66nocombat, dead" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFCCCC66" .. module.text["CTRA/Spells/" .. spellName]); end end
-						end
-						if (not module.GameTooltipExtraLine) then
-							module.GameTooltipExtraLine = GameTooltip:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall");
-							module.GameTooltipExtraLine:SetPoint("BOTTOM", 0, 6);
-							module.GameTooltipExtraLine:SetText("/ctra to move and configure");
-							module.GameTooltipExtraLine:SetTextColor(0.35, 0.35, 0.35);
-							module.GameTooltipExtraLine:SetScale(0.90);
-						end
-						GameTooltip:Show();
-						if (not InCombatLockdown()) then
-							module.GameTooltipExtraLine:Show();
-							GameTooltip:SetHeight(GameTooltip:GetHeight()+3);
-							GameTooltip:SetWidth(max(150,GameTooltip:GetWidth()));
-						end						
 					end
 				);
 				secureButton:HookScript("OnLeave",
@@ -2510,7 +2571,8 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 
 			-- configure the visualFrame and its children
 			if (shownUnit) then
-				visualFrame:Show(); 
+				RegisterStateDriver(visualFrame, "visibility", "[@" .. shownUnit .. ", exists] show, hide");
+				visualFrame:Show();
 				configureBackdrop();		-- these MUST happen before the update____() funcs below
 				configureHealthBar();
 				configurePowerBar();
@@ -2530,14 +2592,15 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				listenerFrame:RegisterEvent("READY_CHECK_FINISHED");			-- updateReadyStatus();
 				listenerFrame:RegisterEvent("PLAYER_LEVEL_UP");				-- configureMacros();
 				listenerFrame:RegisterEvent("PLAYER_REGEN_ENABLED");			-- updateMacros();
-				listenerFrame:RegisterUnitEvent("INCOMING_SUMMON_CHANGED");		-- updateRoleTexture();
 				listenerFrame:RegisterUnitEvent("CANCEL_SUMMON");			-- updateRoleTexture();
 				listenerFrame:RegisterUnitEvent("CONFIRM_SUMMON");			-- updateRoleTexture();
 				listenerFrame:RegisterUnitEvent("RAID_TARGET_UPDATE");			-- updateRoleTexture();
 				if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+					listenerFrame:RegisterUnitEvent("INCOMING_SUMMON_CHANGED");	-- updateRoleTexture();
 					listenerFrame:RegisterUnitEvent("UNIT_ABSORB_AMOUNT_CHANGED");	--updateHealthBar; updateBackdrop();
 				end
 			else
+				UnregisterStateDriver(visualFrame, "visibility");
 				visualFrame:Hide();
 				listenerFrame:UnregisterAllEvents();
 				return;		-- go absolutely no further if we arn't supposed to be showing anything any more!
@@ -2576,3 +2639,265 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	end
 	
 end	-- end CTRAPlayerFrame
+
+--------------------------------------------
+-- CTRATargetFrame
+
+function NewCTRATargetFrame(parentInterface, parentFrame)
+	
+	-- PUBLIC INTERFACE
+	
+	local obj = { };
+	
+	-- PRIVATE PROPERTIES
+	
+	local owner;			-- pointer to the CTRAWindow interface for calling functions like :GetProperty()
+	local parent;			-- pointer to the CTRAWindow's frame object that is a parent for the visualFrame
+	local visualFrame;		-- generic frame that shows various textures
+	local secureButton;		-- SecureUnitActionButton that sits in front and responds to mouseclicks
+	local listenerFrame;		-- generic frame that listens to various events
+	local requestedUnit;		-- the unit that this object is requested to display at the next opportunity
+	local requestedXOff;		-- the x coordinate to position this object's frames at the next opportunity (relative to parent's left)w
+	local requestedYOff;		-- the y coordinate to position this object's frames at the next opportunity (relative to parent's top)
+	local shownUnit;		-- the unit that this object is currently showing (which cannot change during combat)
+	local shownXOff;		-- the x coordinate this frame is currently showing
+	local shownYOff;		-- the y coordinate this frame is currently showing
+	local optionsWaiting = { };	-- a list of options that need to be triggered once combat ends
+	local macroLeft;		-- the macro used by secureButton during LeftButtonUp, except ~UNIT~ must be changed to shownUnit
+	local macroRight;		-- the macro used by secureButton during RightButtonUp, except ~UNIT~ must be changed to shownUnit
+	
+	-- graphical textures and fontstrings of visualFrame
+	local background;
+	local unitNameFontStringSmall;
+	
+	
+	-- PRIVATE FUNCTIONS
+
+	-- creates (if necessary) and configures all the settings for background and borders, but must not be run until visualFrame exists using self:Update()
+	local function configureBackdrop()
+		background = background or visualFrame:CreateTexture(nil, "BACKGROUND");
+		background:SetPoint("TOPLEFT", visualFrame, 3, -3);
+		background:SetPoint("BOTTOMRIGHT", visualFrame, -3, 3);
+		background:SetColorTexture(unpack(owner:GetProperty("ColorBackground")));
+		visualFrame:SetBackdrop({["edgeFile"] = "Interface\\Tooltips\\UI-Tooltip-Border",["edgeSize"] = 16,});
+		visualFrame:SetBackdropBorderColor(unpack(owner:GetProperty("ColorBorder")));
+	end
+	
+	-- creates the font strings to dislay the unit's name, with customization to counter the ugly side effects of SetScale()
+	local configureUnitNameFontString = function()
+
+		-- limit memory usage by using the same FontObject for the whole module
+		-- this intended to simulate the use of "static" keyword in other programming languages
+		if (not module.GetUnitNameFontSmall) then
+			module.unitNameFontSmall = { }
+			module.GetUnitNameFontSmall = function(__, scale)
+				if (not module.unitNameFontSmall[scale]) then
+					module.unitNameFontSmall[scale] = CreateFont("CTRA_UnitNameSmallWithScale" .. scale);
+					module.unitNameFontSmall[scale]:SetFont("Fonts\\FRIZQT__.TTF", 7 * scale);
+				end
+				return module.unitNameFontSmall[scale];
+			end
+		end
+		
+		local scale = owner:GetProperty("PlayerFrameScale") / 100;
+	
+		unitNameFontStringSmall = unitNameFontStringSmall or visualFrame:CreateFontString(nil, "OVERLAY");
+		unitNameFontStringSmall:SetIgnoreParentScale(true);
+		unitNameFontStringSmall:SetFontObject(module:GetUnitNameFontSmall(scale));
+		unitNameFontStringSmall:SetPoint("LEFT", visualFrame, "LEFT", 4 * scale, 0);		-- leave room for roleTexture
+		unitNameFontStringSmall:SetPoint("RIGHT", visualFrame, "RIGHT", -4 * scale, 0);	-- leave room for aura icons
+		unitNameFontStringSmall:SetHeight(7 * scale);	-- prevents a shift when the name is truncated
+		
+		unitNameFontStringSmall:SetTextColor(1,1,1,1);	-- done here just once, because mobs don't have a class!
+	end
+	
+	-- creates and updates the player's name
+	local updateUnitNameFontString = function()
+		if (shownUnit) then
+			if (UnitExists(shownUnit)) then
+				unitNameFontStringSmall:Show();
+				unitNameFontStringSmall:SetText(UnitName(shownUnit));
+			else
+				unitNameFontStringSmall:Hide();
+			end
+		end
+	end
+
+	-- updates macroLeft and macroRight to support secureButton
+	local configureMacros = function()
+		if (InCombatLockdown() or not secureButton or not visualFrame) then return; end
+
+		-- LeftButtonUp
+		macroLeft = "/target ~UNIT~";	
+		
+		-- RightButtonUp
+		macroRight = "";		-- TODO: Add functionality for taunting mobs or polymorphing mind-controlled players?
+	end
+	
+	-- updates secureButton macros once out of combat, based on the last call of configureMacros
+	local updateMacros = function()
+		local textL = gsub(macroLeft,"~UNIT~",shownUnit);
+		local textR = gsub(macroRight,"~UNIT~",shownUnit);
+		secureButton:SetAttribute("macrotext1", textL);
+		secureButton:SetAttribute("macrotext2", textR);
+	end
+	
+	-- PUBLIC FUNCTIONS
+	
+	function obj:Enable(unit, xOff, yOff)
+		if (not unit) then
+			self:Disable();
+			return;
+		end
+		requestedUnit = unit;
+		requestedXOff = xOff;
+		requestedYOff = yOff;
+		self:Update();
+	end
+	
+	function obj:Disable()
+		requestedUnit = nil;
+		requestedXOff = nil;
+		requestedYOff = nil;
+		self:Update();
+	end
+	
+	function obj:IsEnabled()
+		return requestedUnit ~= nil
+	end
+	
+	function obj:IsShown()
+		return shownUnit ~= nil
+	end
+	
+	function obj:Update(option, value)
+		-- STEP 1: Construct the secureButton and visualFrame if required, but only while out of combat, before proceeding to any of the following steps
+		-- STEP 2: Respond to changes in the CTRA options affecting how the frames should appear and behaive, but only while out of combat
+		-- STEP 3: Respond to changes directed by the parent window (requestedUnit, requestedXOff, requestedYOff) while respecting combat limitations
+
+
+		-- STEP 1
+		if not visualFrame or not secureButton then
+			if InCombatLockdown() then
+				return;
+			else
+				-- overall dimensions
+				visualFrame = CreateFrame("Frame", nil, parent, nil);
+				visualFrame:SetSize(90, 20);
+				visualFrame:SetScale(owner:GetProperty("PlayerFrameScale")/100);
+								
+				-- overlay button that can be clicked to do stuff in combat (the secure configuration is made later in step 3)
+				secureButton = CreateFrame("Button", nil, visualFrame, "SecureUnitButtonTemplate");
+				secureButton:SetAllPoints();
+				secureButton:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+				secureButton:SetAttribute("type1", "macro");
+				secureButton:SetAttribute("type2", "macro");
+				secureButton:HookScript("OnEnter",
+					function()
+						if (UnitExists(shownUnit)) then
+							GameTooltip:SetOwner(parent, "ANCHOR_TOPLEFT");
+							GameTooltip:AddDoubleLine(UnitName(shownUnit) or "", UnitLevel(shownUnit) or "", 1,1,1, 1,1,1);
+							if (not module.GameTooltipExtraLine) then
+								module.GameTooltipExtraLine = GameTooltip:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall");
+								module.GameTooltipExtraLine:SetPoint("BOTTOM", 0, 6);
+								module.GameTooltipExtraLine:SetText("/ctra to move and configure");
+								module.GameTooltipExtraLine:SetTextColor(0.35, 0.35, 0.35);
+								module.GameTooltipExtraLine:SetScale(0.90);
+							end
+							GameTooltip:Show();
+							if (not InCombatLockdown()) then
+								module.GameTooltipExtraLine:Show();
+								GameTooltip:SetHeight(GameTooltip:GetHeight()+3);
+								GameTooltip:SetWidth(max(150,GameTooltip:GetWidth()));
+							end
+						end
+					end
+				);
+				secureButton:HookScript("OnLeave",
+					function()
+						GameTooltip:Hide();
+						module.GameTooltipExtraLine:Hide();
+					end
+				);
+			end
+		end
+		
+		-- STEP 2:
+		if (option) then
+			optionsWaiting[option] = value;
+		end
+		if (not InCombatLockdown()) then
+			for key, val in pairs(optionsWaiting) do
+				if (key == "PlayerFrameScale") then
+					visualFrame:SetScale((value or 100)/100);
+					configureUnitNameFontString();
+				elseif (
+					key == "ColorTargetFrameBackground"
+					or key == "ColorTargetFrameBorder"
+				) then
+					configureBackdrop();
+				end
+			end
+			optionsWaiting = { };
+		end
+		
+		-- STEP 3:
+		if (not InCombatLockdown() and (requestedUnit ~= shownUnit or requestedXOff ~= shownXOff or requestedYOff ~= shownYOff)) then
+			-- set the flags
+			shownUnit = requestedUnit;
+			shownXOff = requestedXOff;
+			shownYOff = requestedYOff;
+
+			-- register or de-register events
+			if (not listenerFrame) then
+				listenerFrame = CreateFrame("Frame", nil);
+				listenerFrame:SetScript("OnEvent",
+					function(__, event)
+						if (event == "UNIT_NAME_UPDATE" or event == "UNIT_TARGET") then
+							updateUnitNameFontString();
+						end
+					end
+				);
+			end
+
+			-- configure the visualFrame and its children
+			if (shownUnit) then
+				RegisterStateDriver(visualFrame, "visibility", "[@" .. strsub(shownUnit, 1, -7) .. ", dead] hide; [@" .. shownUnit .. ", harm, nodead] show; hide");	-- [@raid1, dead] hide; [@raid1target, harm nodead] show; hide
+				visualFrame:Show();
+				configureBackdrop();		-- these MUST happen before the update____() funcs below
+				configureUnitNameFontString();
+				listenerFrame:UnregisterAllEvents();  -- probably not required, but doing it to be absolute
+				listenerFrame:RegisterUnitEvent("UNIT_NAME_UPDATE", shownUnit);			-- updateUnitNameFontString();
+				listenerFrame:RegisterUnitEvent("UNIT_TARGET", strsub(shownUnit, 1, -7));	-- updateUnitNameFontString()
+			else
+				UnregisterStateDriver(visualFrame, "visibility");
+				visualFrame:Hide();
+				listenerFrame:UnregisterAllEvents();
+				return;		-- go absolutely no further if we arn't supposed to be showing anything any more!
+			end
+
+			-- reposition the frames
+			visualFrame:SetPoint("TOPLEFT", requestedXOff, requestedYOff);
+
+			-- configure the secureButton for the new unit
+			secureButton:SetAttribute("unit", shownUnit);
+			if not (macroLeft) then
+				configureMacros();
+			end
+			updateMacros();
+		end
+		
+		-- visualFrame's children must be updated whenever group composition changes in case the players have changed position within the group or raid.
+		-- if shownUnit exists then it can be assumed the previous conditional evaluated to true at some point and therefore the configure___() funcs have been used
+		if (shownUnit) then
+			updateUnitNameFontString();
+		end
+	end
+	
+	-- PUBLIC CONSTRUCTOR
+	do
+		owner = parentInterface;	
+		parent = parentFrame;
+		return obj;			-- that's it!  nothing else is done until obj:Enable()
+	end
+end  -- end CTRATargetFrame

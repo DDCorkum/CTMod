@@ -558,14 +558,16 @@ module.frame = function()
 		optionsBeginFrame( -15,   17, "slider#tl:75:%y#n:CTCore_CameraMaxDistanceSlider#Default 1.9:1.0:2.6#1:2.6:0.1")
 			optionsAddScript("onload",
 				function(slider)
-					local value = tonumber(C_CVar.GetCVar("cameraDistanceMaxZoomFactor"));
+					local GetCVar = (C_CVar and C_CVar.GetCVar) or GetCVar;		-- retail vs. classic
+					local SetCVar = (C_CVar and C_CVar.SetCVar) or SetCVar;
+					local value = tonumber(GetCVar("cameraDistanceMaxZoomFactor"));
 					if (value and value >= 1 and value <= 2.6) then
 						slider:SetValue(value);
 						_G[slider:GetName() .. "Text"]:SetText("Current: " .. round(value,1));
 					end
 					slider:SetScript("OnValueChanged",
 						function()
-							C_CVar.SetCVar("cameraDistanceMaxZoomFactor", slider:GetValue());
+							SetCVar("cameraDistanceMaxZoomFactor", slider:GetValue());
 							_G[slider:GetName() .. "Text"]:SetText("Current: " .. round(slider:GetValue(),1));
 						end
 					);
