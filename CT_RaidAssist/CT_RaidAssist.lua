@@ -2069,7 +2069,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	
 	local function updateStatusIndicators()
 		if (shownUnit and UnitExists(shownUnit)) then
-			local summonStatus, readyStatus = IncomingSummonStatus(shownUnit), GetReadyCheckStatus(shownUnit);	-- at the top of the file, IncomingSummonStatus is defined as C_IncomingSummon.IncomingSummonStatus or it just returns zero in classic
+			local summonStatus, readyStatus, afkStatus = IncomingSummonStatus(shownUnit), GetReadyCheckStatus(shownUnit), UnitIsAFK(shownUnit);	-- at the top of the file, IncomingSummonStatus is defined as C_IncomingSummon.IncomingSummonStatus or it just returns zero in classic
 			if (summonStatus > 0) then
 				statusTexture:SetTexture(2470702);
 				statusTexture:Show();
@@ -2108,6 +2108,12 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 					statusFontString:Hide();
 					statusBackground:Hide();
 				end
+			elseif (afkStatus) then
+				statusTexture:Hide();
+				statusFontString:Show();
+				statusFontString:SetText("AFK");
+				statusBackground:Show();
+				statusBackground:SetVertexColor(unpack(owner:GetProperty("ColorReadyCheckWaiting")));
 			else
 				statusTexture:Hide();
 				statusFontString:Hide();
@@ -2551,6 +2557,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 							or event == "READY_CHECK"
 							or event == "READY_CHECK_CONFIRM"
 							or event == "READY_CHECK_FINISHED"
+							or event == "PLAYER_FLAGS_CHANGED"
 						) then
 							updateStatusIndicators();
 						elseif (event == "RAID_TARGET_UPDATE") then
@@ -2587,17 +2594,18 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				listenerFrame:RegisterUnitEvent("UNIT_POWER_UPDATE", shownUnit);	-- updatePowerBar();
 				listenerFrame:RegisterUnitEvent("UNIT_DISPLAYPOWER", shownUnit);	-- configurePowerBar();
 				listenerFrame:RegisterUnitEvent("UNIT_AURA", shownUnit);		-- updateAuras();
-				listenerFrame:RegisterEvent("READY_CHECK");				-- updateReadyStatus();
-				listenerFrame:RegisterUnitEvent("READY_CHECK_CONFIRM", shownUnit);	-- updateReadyStatus();
-				listenerFrame:RegisterEvent("READY_CHECK_FINISHED");			-- updateReadyStatus();
+				listenerFrame:RegisterEvent("READY_CHECK");				-- updateStatusIndicators();
+				listenerFrame:RegisterUnitEvent("READY_CHECK_CONFIRM", shownUnit);	-- updateStatusIndicators();
+				listenerFrame:RegisterEvent("READY_CHECK_FINISHED");			-- updateStatusIndicators();
+				listenerFrame:RegisterUnitEvent("PLAYER_FLAGS_CHANGED");		-- updateStatusIndicators();
 				listenerFrame:RegisterEvent("PLAYER_LEVEL_UP");				-- configureMacros();
 				listenerFrame:RegisterEvent("PLAYER_REGEN_ENABLED");			-- updateMacros();
 				listenerFrame:RegisterUnitEvent("CANCEL_SUMMON");			-- updateRoleTexture();
 				listenerFrame:RegisterUnitEvent("CONFIRM_SUMMON");			-- updateRoleTexture();
 				listenerFrame:RegisterUnitEvent("RAID_TARGET_UPDATE");			-- updateRoleTexture();
 				if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
-					listenerFrame:RegisterUnitEvent("INCOMING_SUMMON_CHANGED");	-- updateRoleTexture();
-					listenerFrame:RegisterUnitEvent("UNIT_ABSORB_AMOUNT_CHANGED");	--updateHealthBar; updateBackdrop();
+					listenerFrame:RegisterUnitEvent("INCOMING_SUMMON_CHANGED");	-- updateStatusIndicators();
+					listenerFrame:RegisterUnitEvent("UNIT_ABSORB_AMOUNT_CHANGED");	-- updateHealthBar; updateBackdrop();
 				end
 			else
 				UnregisterStateDriver(visualFrame, "visibility");
