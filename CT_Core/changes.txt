@@ -1,6 +1,7 @@
-CT_Core (8.2.0.5) 2019-08-21
+CT_Core (8.2.0.5) 2019-08-25
 - Fixed sticky chat types
 - Added slider to change max camera zoom distance
+- Retail-only fix for displaying quest levels in the quest log
 
 CT_Core (8.2.0.4) 2019-07-08
 - More control over GameTooltip when following mouse cursor

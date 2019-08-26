@@ -745,7 +745,18 @@ module.frame = function()
 
 	-- Quests
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Quests");
-		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:questLevels#Display quest levels in the Quest Log");
+		optionsBeginFrame(-5,   26, "checkbutton#tl:10:%y#o:questLevels#Display quest levels in the Quest Log");
+			optionsAddScript("onenter",
+				function(button)
+					module:displayTooltip(button, {"|cFFCCCCCCAdds |r[1] |cFFCCCCCCor |r[60+] |cFFCCCCCCin front of the quest title","|cFF999999May not take effect until you close and open the quest log"}, "ANCHOR_RIGHT",30,0);
+				end
+			);
+			optionsAddScript("onleave",
+				function(button)
+					module:hideTooltip();
+				end
+			);
+		optionsEndFrame();
 
 	-- Regen Rates
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Regen Rates");
