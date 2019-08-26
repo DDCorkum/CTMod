@@ -32,100 +32,20 @@ end
 
 if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
 
-	-- Originally this was pre-hooking GetQuestLogTitle() but that was resulting
-	-- in some taint in WoW 3.3 which caused action blocked messages during combat
-	-- if you opend the World Map while the "Show quest objectives" option was enabled
-	-- (or if you enabled it after opening the World Map).
 
-	-- Display quest levels in the left panel of the quest log frame.
-	do
-		local setText;
-		if (QuestLogScrollFrameButton1) then
-			setText = QuestLogScrollFrameButton1.SetText;
+	local old_GetQuestLogTitle = GetQuestLogTitle;
+	
+	local new_GetQuestLogTitle = function(questIndex)
+		local args = {old_GetQuestLogTitle(questIndex)};
+		if (displayLevels and not args[4] and args[2] and args[2] > 0) then
+			args[1] = "[" .. args[2] .. "] " .. args[1];
 		end
-		local allowSetText = true;
-
-		local function questLogScrollFrameButton_SetText(self, text)
-			-- Refer to QuestLog_Update() in FrameXML\QuestLogFrame.lua
-			if (not displayLevels or not allowSetText or not self or not setText) then
-				return;
-			end
-			if ( not QuestLogFrame:IsShown() ) then
-				return;
-			end
-			local numEntries, numQuests = GetNumQuestLogEntries();
-			local questLogTitle = self;
-			local questIndex = questLogTitle:GetID();
-			if ( questIndex and numEntries and questIndex <= numEntries ) then
-				local title, level, questTag, suggestedGroup, isHeader, isCollapsed, isComplete, isDaily = GetQuestLogTitle(questIndex);
-				if ( title and level and not isHeader ) then
-					local prefix = questLogPrefixes[questTag or ""] or "";
-					title = "[" .. level .. prefix .. "] " .. title;
-					setText(questLogTitle, "  " .. title);
-					allowSetText = false;
-					QuestLogTitleButton_Resize(questLogTitle);
-					allowSetText = true;
-				end
-			end
-		end
-
-		if (QuestLogScrollFrame) then
-			local buttons = QuestLogScrollFrame.buttons;
-			if (buttons) then
-				local numButtons = #buttons;
-				for i = 1, numButtons do
-					local button = _G["QuestLogScrollFrameButton" .. i];
-					if (button) then
-						hooksecurefunc(button, "SetText", questLogScrollFrameButton_SetText);
-					end
-				end
-			end
-		end
+		return unpack(args);
 	end
 	
-	-- Display quest levels in the title of the quest detail frame (quest log and bottom of world map).
-	do
-		local setText;
-		if (QuestInfoTitleHeader) then
-			setText = QuestInfoTitleHeader.SetText;
-		end
-
-		local function questInfoTitleHeader_SetText(self, text)
-			-- Refer to QuestInfo_ShowTitle() in FrameXML\QuestInfo.lua.
-			if (not displayLevels or not setText or not QuestInfoFrame) then
-				return;
-			end
-			local questTitle;
-			local level, questTag;
-			if ( QuestInfoFrame.questLog ) then
-				questTitle, level, questTag = GetQuestLogTitle(GetQuestLogSelection());
-				if ( not questTitle ) then
-					questTitle = "";
-				end
-				if ( IsCurrentQuestFailed() ) then
-					questTitle = questTitle.." - ("..FAILED..")";
-				end
-				local prefix = questLogPrefixes[questTag or ""] or "";
-				questTitle = "[" .. level .. prefix .. "] " .. questTitle;
-			else
-				questTitle = GetTitleText();
-			end
-			setText(self, questTitle);
-		end
-
-		hooksecurefunc(QuestInfoTitleHeader, "SetText", function(...)
-			questInfoTitleHeader_SetText(...);
-		end);
-	end
-	
+	GetQuestLogTitle = new_GetQuestLogTitle;		
 	
 elseif (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
-
-	-- It isn't clear when the earlier code stopped working, but in 8.2 onwards the map and side quest panel are designed around mixins and multithreading
-	-- so the original methods don't work any more.  This is a very quick solution that accomplishes most of what the previous code did by modifying the
-	-- "title" parameter before it is sent to QuestLogQuests_AddQuestButton(...);
-	
-	-- TODO: When WoW Classic launches, see if this simpler solution also works for Classic.  For now, leaving it out to avoid causing a bug on launch day.
 
 	local old_QuestLogQuests_AddQuestButton = QuestLogQuests_AddQuestButton;
 

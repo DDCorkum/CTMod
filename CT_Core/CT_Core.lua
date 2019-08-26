@@ -561,6 +561,26 @@ module.frame = function()
 					local GetCVar = (C_CVar and C_CVar.GetCVar) or GetCVar;		-- retail vs. classic
 					local SetCVar = (C_CVar and C_CVar.SetCVar) or SetCVar;
 					local value = tonumber(GetCVar("cameraDistanceMaxZoomFactor"));
+					local round =
+					(
+						round 
+						or function(value, decimalPlaces)
+							for i=1, decimalPlaces, 1 do
+								value = value * 10;
+							end
+							local base = floor(value);
+							local trim = value - base;
+							if trim > 0.5 then
+								value = base + 1;
+							else
+								value = base;
+							end
+							for i=1, decimalPlaces, 1 do
+								value = value / 10;
+							end
+							return value;
+						end
+					);
 					if (value and value >= 1 and value <= 2.6) then
 						slider:SetValue(value);
 						_G[slider:GetName() .. "Text"]:SetText("Current: " .. round(value,1));
