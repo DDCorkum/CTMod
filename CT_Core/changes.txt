@@ -1,3 +1,10 @@
+CT_Core (8.2.0.7) 2019-08-28
+- CT_Core can also now hide the chat channels button on the chat frame
+
+CT_Core (8.2.0.6) 2019-08-26
+- Classic-only fix at launch to access the options menu
+- Displaying quest levels in the quest log now also works in Classic
+
 CT_Core (8.2.0.5) 2019-08-25
 - Fixed sticky chat types
 - Added slider to change max camera zoom distance

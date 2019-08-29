@@ -2069,7 +2069,11 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	
 	local function updateStatusIndicators()
 		if (shownUnit and UnitExists(shownUnit)) then
-			local summonStatus, readyStatus, afkStatus = IncomingSummonStatus(shownUnit), GetReadyCheckStatus(shownUnit), UnitIsAFK(shownUnit);	-- at the top of the file, IncomingSummonStatus is defined as C_IncomingSummon.IncomingSummonStatus or it just returns zero in classic
+			local summonStatus, readyStatus, afkStatus, connectionStatus = 
+				IncomingSummonStatus(shownUnit), 		 -- at the top of the file, IncomingSummonStatus is defined as C_IncomingSummon.IncomingSummonStatus or it just returns zero in classic
+				GetReadyCheckStatus(shownUnit),
+				UnitIsAFK(shownUnit),
+				UnitIsConnected(shownUnit);
 			if (summonStatus > 0) then
 				statusTexture:SetTexture(2470702);
 				statusTexture:Show();
@@ -2114,6 +2118,12 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				statusFontString:SetText("AFK");
 				statusBackground:Show();
 				statusBackground:SetVertexColor(unpack(owner:GetProperty("ColorReadyCheckWaiting")));
+			elseif (connectionStatus == false) then
+				statusTexture:Hide();
+				statusFontString:Show();
+				statusFontString:SetText("DC");
+				statusBackground:Show();
+				statusBackground:SetVertexColor(unpack(owner:GetProperty("ColorReadyCheckNotReady")));
 			else
 				statusTexture:Hide();
 				statusFontString:Hide();
@@ -2558,6 +2568,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 							or event == "READY_CHECK_CONFIRM"
 							or event == "READY_CHECK_FINISHED"
 							or event == "PLAYER_FLAGS_CHANGED"
+							or event == "UNIT_CONNECTION"
 						) then
 							updateStatusIndicators();
 						elseif (event == "RAID_TARGET_UPDATE") then
@@ -2598,6 +2609,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				listenerFrame:RegisterUnitEvent("READY_CHECK_CONFIRM", shownUnit);	-- updateStatusIndicators();
 				listenerFrame:RegisterEvent("READY_CHECK_FINISHED");			-- updateStatusIndicators();
 				listenerFrame:RegisterUnitEvent("PLAYER_FLAGS_CHANGED");		-- updateStatusIndicators();
+				listenerFrame:RegisterUnitEvent("UNIT_CONNECTION");
 				listenerFrame:RegisterEvent("PLAYER_LEVEL_UP");				-- configureMacros();
 				listenerFrame:RegisterEvent("PLAYER_REGEN_ENABLED");			-- updateMacros();
 				listenerFrame:RegisterUnitEvent("CANCEL_SUMMON");			-- updateRoleTexture();

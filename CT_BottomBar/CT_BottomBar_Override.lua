@@ -146,7 +146,7 @@ local function override_HideFrames()
 
 	for i, name in ipairs(overrideFrames) do
 		frame = _G[name];
-		if (frame.ctInUse) then
+		if (frame and frame.ctInUse) then
 			-- We are using the frame in CT_BottomBar.
 			-- Set the values to the ones being used.
 			alpha = frame.ctUseAlpha;

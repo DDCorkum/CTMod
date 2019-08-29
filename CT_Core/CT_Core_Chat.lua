@@ -18,10 +18,12 @@ local chgFriendsButtonHide;
 
 local function setFriendsButton(showButton)
 	local button = QuickJoinToastButton;
-	if (showButton) then
-		button:Show();
-	else
-		button:Hide();
+	if (button) then
+		if (showButton) then
+			button:Show();
+		else
+			button:Hide();
+		end
 	end
 end
 
@@ -59,16 +61,34 @@ local function setChatFrameButtons(chatFrame, showButtons)
 		--   ChatFrame?ButtonFrameDownButton
 		--   ChatFrame?ButtonFrameBottomButton
 		local buttonFrame = _G[chatFrameName .. "ButtonFrame"];
+		local channelButton = ChatFrameChannelButton;
 		if (buttonFrame) then
 			if (showButtons) then
 				buttonFrame:Show();
+				if (channelButton) then
+					channelButton:Show();
+				end
 			else
 				buttonFrame:Hide();
+				if (channelButton) then
+					channelButton:Hide();
+				end
 			end
 			if (not buttonFrame.ctOnShow) then
 				buttonFrame.ctOnShow = true;
 				buttonFrame:HookScript("OnShow", func_updateChatButtonsHide);
 			end
+		end
+		if (channelButton) then
+			if (showButtons) then
+				channelButton:Show();
+			else
+				channelButton:Hide();
+			end
+			if (not channelButton.ctOnShow) then
+				channelButton.ctOnShow = true;
+				channelButton:HookScript("OnShow", func_updateChatButtonsHide);
+			end		
 		end
 	end
 end

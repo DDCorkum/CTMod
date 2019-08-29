@@ -612,7 +612,9 @@ module.frame = function()
 
 		-- Chat frame buttons
 		optionsAddObject( -2,   26, "checkbutton#tl:10:%y#o:chatArrows#Hide the chat buttons");
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:friendsMicroButton#Hide the friends (social) button");
+		if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+			optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:friendsMicroButton#Hide the friends (social) button");
+		end
 
 		-- Chat frame moving
 		optionsAddObject(-15,   15, "font#tl:13:%y#v:ChatFontNormal#Chat frame clamping:");
