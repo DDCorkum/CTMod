@@ -551,6 +551,51 @@ module.frame = function()
 		end
 		optionsAddObject( -18, 1*13, "font#tl:25:%y#s:0:%s#l:13:0#r#Also see CT_MailMod for bag settings#" .. textColor2 .. ":l");	
 
+	-- Camera Max Distance
+		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Camera Max Distance");
+		optionsAddObject(  0, 4*13, "font#t:0:%y#s:0:%s#l:40:0#r#Since Legion (7.0.3) you can type \n/console cameraDistanceMaxZoomFactor\n to zoom the camera further out.#" .. textColor2 .. ":l");
+		optionsAddObject(  0, 4*13, "font#t:0:%y#s:0:%s#l:40:0#r#The game default is 1.9, but players often increase it to 2.6 for better situational awareness in raid fights.#" .. textColor2 .. ":l");
+		optionsBeginFrame( -15,   17, "slider#tl:75:%y#n:CTCore_CameraMaxDistanceSlider#Default 1.9:1.0:2.6#1:2.6:0.1")
+			optionsAddScript("onload",
+				function(slider)
+					local GetCVar = (C_CVar and C_CVar.GetCVar) or GetCVar;		-- retail vs. classic
+					local SetCVar = (C_CVar and C_CVar.SetCVar) or SetCVar;
+					local value = tonumber(GetCVar("cameraDistanceMaxZoomFactor"));
+					local round =
+					(
+						round 
+						or function(value, decimalPlaces)
+							for i=1, decimalPlaces, 1 do
+								value = value * 10;
+							end
+							local base = floor(value);
+							local trim = value - base;
+							if trim > 0.5 then
+								value = base + 1;
+							else
+								value = base;
+							end
+							for i=1, decimalPlaces, 1 do
+								value = value / 10;
+							end
+							return value;
+						end
+					);
+					if (value and value >= 1 and value <= 2.6) then
+						slider:SetValue(value);
+						_G[slider:GetName() .. "Text"]:SetText("Current: " .. round(value,1));
+					end
+					slider:SetScript("OnValueChanged",
+						function()
+							SetCVar("cameraDistanceMaxZoomFactor", slider:GetValue());
+							_G[slider:GetName() .. "Text"]:SetText("Current: " .. round(slider:GetValue(),1));
+						end
+					);
+				end
+			);
+		optionsEndFrame();
+			
+
 	-- Casting Bar options
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Casting Bar");
 		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:castingTimers#Display casting bar timers");
@@ -720,7 +765,18 @@ module.frame = function()
 
 	-- Quests
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Quests");
-		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:questLevels#Display quest levels in the Quest Log");
+		optionsBeginFrame(-5,   26, "checkbutton#tl:10:%y#o:questLevels#Display quest levels in the Quest Log");
+			optionsAddScript("onenter",
+				function(button)
+					module:displayTooltip(button, {"|cFFCCCCCCAdds |r[1] |cFFCCCCCCor |r[60+] |cFFCCCCCCin front of the quest title","|cFF999999May not take effect until you close and open the quest log"}, "ANCHOR_RIGHT",30,0);
+				end
+			);
+			optionsAddScript("onleave",
+				function(button)
+					module:hideTooltip();
+				end
+			);
+		optionsEndFrame();
 
 	-- Regen Rates
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Regen Rates");

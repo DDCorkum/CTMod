@@ -88,7 +88,7 @@ local function sendmailGetMoney()
 	-- Get money amount
 	local value = GetSendMailMoney();
 	-- Remember the largest amount before we see the MAIL_SEND_SUCCESS event.
-	if (value > moneyAmount) then
+	if (value and moneyAmount and value > moneyAmount) then
 		moneyAmount = value;
 	end
 end

@@ -486,7 +486,9 @@
 						CT_AssistHealthCheck(self, value);
 					</OnValueChanged>
 					<OnSizeChanged>
-						UnitFrameHealPredictionBars_UpdateSize(self:GetParent());
+						if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+							UnitFrameHealPredictionBars_UpdateSize(self:GetParent());
+						end						
 					</OnSizeChanged>
 				</Scripts>
 				<BarTexture urgency="5" file="Interface\TargetingFrame\UI-StatusBar"/>

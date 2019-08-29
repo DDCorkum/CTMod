@@ -1,4 +1,4 @@
-CT_UnitFrames (8.2.0.1) 2019-01-19
+CT_UnitFrames (8.2.0.5) 2019-08-08
 - Compatibility for both WoW Classic and Retail editions
 
 CT_UnitFrames (8.1.0.3) 2019-01-11

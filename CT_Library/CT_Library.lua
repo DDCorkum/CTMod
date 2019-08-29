@@ -19,7 +19,7 @@
 -----------------------------------------------
 -- Initialization
 
-local LIBRARY_VERSION = 8.201;
+local LIBRARY_VERSION = 8.205;
 local LIBRARY_NAME = "CT_Library";
 
 local _G = getfenv(0);
@@ -206,15 +206,59 @@ function lib:printcolorformat(r, g, b, ...)
 	printText(ChatFrame1, r, g, b, format(...));
 end
 
--- Display a tooltip at cursor
-function lib:displayTooltip(obj, text, defaultAnchor)
+-- Display a tooltip
+-- if text is a string, it will simply display the text
+-- if text is a table of strings, it will AddLine() each string and optionally set r,g,b,a and wrap by checking for '#' delimiters, or AddDoubleLine() if sufficient content is provided
+function lib:displayTooltip(obj, text, anchor, offx, offy)
 	local tooltip = GameTooltip;
-	if ( defaultAnchor ) then
+	if ( not anchor ) then
 		GameTooltip_SetDefaultAnchor(tooltip, obj);
 	else
-		tooltip:SetOwner(obj, "ANCHOR_CURSOR");
+		tooltip:SetOwner(obj, anchor, offx or 0, offy or 0);
 	end
-	tooltip:SetText(text);
+	if (type(text) == "string") then
+		tooltip:SetText(text);
+	elseif (type(text) == "table") then
+		for i, row in ipairs(text) do
+			local splitrow = {strsplit("#", row)}
+			local leftR,leftG,leftB,rightR,rightG,rightB,alpha,wrap,leftText,rightText;
+			for j=1, #splitrow do
+				local pieces = {strsplit(":", splitrow[j])}
+				if(not leftR and #pieces >= 3) then
+					local isvalid = true;
+					for k, piece in ipairs(pieces) do
+						if (not tonumber(piece) or tonumber(piece) < 0 or tonumber(piece) > 1) then
+							isvalid = false;
+						end
+					end
+					if (isvalid) then
+						leftR = pieces[1];
+						leftG = pieces[2];
+						leftB = pieces[3];
+						if (pieces[6]) then
+							rightR = pieces[4];
+							rightG = pieces[5];
+							rightB = pieces[6];
+						elseif (pieces[4]) then
+							alpha = pieces[4];
+						end
+					end
+				elseif (not wrap and #pieces == 1 and pieces[1] == "w") then
+					wrap = true;
+				elseif (not leftText) then
+					leftText = splitrow[j];
+				elseif (not rightText) then
+					rightText = splitrow[j];
+				end
+			end
+			if (rightText) then
+				GameTooltip:AddDoubleLine(leftText, rightText, leftR, leftG, leftB, rightR, rightG, rightB);
+			elseif (leftText) then
+				GameTooltip:AddLine(leftText, leftR, leftG, leftB, alpha, wrap);
+			end
+		end
+	end
+	tooltip:Show();
 end
 
 -- Hide the tooltip
@@ -838,11 +882,17 @@ function lib:setOption(option, value, charSpecific, callUpdate)
 	-- callUpdate
 	--	false: Do not call the update function.
 	--	true, nil: Call the update function.
+	
+	if (type(option) == "function") then
+		-- some addons overload option so the same object can manipulate different tasks simultaneously
+		option = option();
+	end
 	if (not option) then
+		-- either option was nil, or option() returned nil
 		return;
 	end
 	local options = self.options;
-	if ( not options or not option ) then
+	if ( not options ) then
 		options = { };
 		self.options = options;
 		local optionKey = self.name.."Options";
@@ -900,9 +950,15 @@ function lib:getOption(option, useDefault)
 	--	false: Do not return default value if option is nil.
 	--	true, nil: Return default value if option is nil.
 	local options = self.options;
-	if ( not option ) then
+	if (type(option) == "function") then
+		-- some addons overload option so the same object can manipulate different tasks simultaneously
+		option = option();
+	end
+	if (not option) then
+		-- either option was nil, or option() returned nil
 		return;
-	elseif ( not options ) then
+	end
+	if ( not options ) then
 		if (useDefault ~= false) then
 			return defaultValues[self.name.."-"..option];
 		end
@@ -1025,6 +1081,10 @@ end
 
 function lib:resetMovable(id)
 	self:setOption("MOVABLE-"..id, nil, true);
+end
+
+function lib:UnregisterMovable(id)
+	movables["MOVABLE-"..id] = nil;
 end
 
 -- End Movable Handling
@@ -1676,10 +1736,15 @@ local function colorSwatchCancel()
 	local r, g, b = self.r or 1, self.g or 1, self.b or 1;
 	local a = self.opacity or 1;
 	local object, option = self.object, self.option;
-
+	if (type(option) == "function") then
+		-- some addons overload 'option' with a custom function to display different windows
+		option = option();
+	end
 	local colors = object:getOption(option);
-	colors[1], colors[2], colors[3] = r, g, b;
-	colors[4] = a;
+	if (colors) then
+		colors[1], colors[2], colors[3] = r, g, b;
+		colors[4] = a;
+	end
 	object:setOption(option, colors, not self.global);
 	self.normalTexture:SetVertexColor(r, g, b);
 end
@@ -1688,9 +1753,16 @@ local function colorSwatchColor()
 	local self = ColorPickerFrame.object;
 	local r, g, b = ColorPickerFrame:GetColorRGB();
 	local object, option = self.object, self.option;
-
+	if (type(option) == "function") then
+		-- some addons overload 'option' with a custom function to display different windows
+		option = option();
+	end
 	local colors = object:getOption(option);
-	colors[1], colors[2], colors[3] = r, g, b;
+	if (colors) then
+		colors[1], colors[2], colors[3] = r, g, b;
+	else
+		colors = {r, g, b}
+	end
 	object:setOption(option, colors, not self.global);
 	self.normalTexture:SetVertexColor(r, g, b);
 end
@@ -1699,17 +1771,27 @@ local function colorSwatchOpacity()
 	local self = ColorPickerFrame.object;
 	local a = OpacitySliderFrame:GetValue();
 	local object, option = self.object, self.option;
-
-	local colors = object:getOption(option);
+	if (type(option) == "function") then
+		-- some addons overload 'option' with a custom function to display different windows
+		option = option();
+	end
+	local colors = object:getOption(option) or {self, r, self.g, self.b};
 	colors[4] = a;
 	object:setOption(option, colors, not self.global);
 end
 
 local function colorSwatchShow(self)
 	local r, g, b, a;
-	local color = self.object:getOption(self.option);
+	local object, option = self.object, self.option;
+	if (type(option) == "function") then
+		-- some addons overload 'option' with a custom function to display different windows
+		option = option();
+	end
+	local color = object:getOption(option);
 	if ( color ) then
 		r, g, b, a = unpack(color);
+	elseif (self:GetNormalTexture()) then
+		r, g, b, a = self:GetNormalTexture():GetVertexColor();
 	else
 		r, g, b, a = 1, 1, 1, 1;
 	end
@@ -2490,7 +2572,7 @@ local function controlPanelSkeleton()
 		["onclick"] = selectControlPanelModule,
 	};
 	return "frame#st:DIALOG#n:CTCONTROLPANEL#clamped#movable#t:mid:0:400#s:300:495", {
-		"backdrop#tooltip#0:0:0:0.75",
+		"backdrop#tooltip#0:0:0:0.80",
 		["onshow"] = function(self)
 			local module, obj;
 
@@ -2633,11 +2715,23 @@ local function controlPanelSkeleton()
 end
 
 local function displayControlPanel()
-	if ( not controlPanelFrame ) then
-		controlPanelFrame = lib:getFrame(controlPanelSkeleton);
-		tinsert(UISpecialFrames, controlPanelFrame:GetName());
+	if (InCombatLockdown()) then
+		print("CT options are not usable during combat");
+	else
+		if ( not controlPanelFrame ) then
+			controlPanelFrame = lib:getFrame(controlPanelSkeleton);
+			tinsert(UISpecialFrames, controlPanelFrame:GetName());
+			controlPanelFrame:HookScript("OnEvent",
+				function(__, event)
+					if (event == "PLAYER_REGEN_DISABLED") then
+						controlPanelFrame:Hide();
+					end
+				end
+			);
+			controlPanelFrame:RegisterEvent("PLAYER_REGEN_DISABLED");
+		end
+		controlPanelFrame:Show();
 	end
-	controlPanelFrame:Show();
 end
 
 function lib:showControlPanel(show)
@@ -2658,6 +2752,9 @@ end
 -- if ustCustomFunction is true then an attempt will be made to open a module's custom options function instead
 function lib:showModuleOptions(modname, useCustomFunction)
 	self:showControlPanel(true);
+	if (not lib:isControlPanelShown()) then	-- this might happen if the panel is forced off during combat
+		return;
+	end
 	local listing = CTCONTROLPANEL.listing;
 	local button;
 	local num = 700;			--700 is an offset to prevent taint affecting battleground queueing
@@ -2685,6 +2782,14 @@ function lib:showModuleOptions(modname, useCustomFunction)
 	if (button) then
 		-- Click the addon's button to open the options
 		button:Click();
+	end
+end
+
+function lib:isControlPanelShown()
+	if (controlPanelFrame and controlPanelFrame:IsVisible()) then
+		return true;
+	else
+		return false;
 	end
 end
 

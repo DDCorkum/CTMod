@@ -4,7 +4,9 @@ function CT_TargetFrameOnEvent(self, event, arg1, ...)
 	if ( event == "PLAYER_ENTERING_WORLD" ) then
 		if (inworld == nil) then
 			inworld = 1;
-			hooksecurefunc("UnitFrame_UpdateThreatIndicator", CT_TargetFrame_UpdateThreatIndicator);
+			if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+				hooksecurefunc("UnitFrame_UpdateThreatIndicator", CT_TargetFrame_UpdateThreatIndicator);
+			end
 			CT_TargetFrame_SetClassPosition(true);
 
 			TargetFrameHealthBar:SetScript("OnLeave", function() GameTooltip:Hide(); end);
