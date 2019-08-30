@@ -1,5 +1,7 @@
-CT_Core (8.2.0.7) 2019-08-28
-- CT_Core can also now hide the chat channels button on the chat frame
+CT_Core (8.2.0.7) 2019-08-30
+- Hiding chat buttons now also hides the chat channels button
+- Added option to increase/decrease font size (via scale attribute) of the objective tracker
+- Improved the behaviour of the objective tracker settings
 
 CT_Core (8.2.0.6) 2019-08-26
 - Classic-only fix at launch to access the options menu
