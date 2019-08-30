@@ -711,6 +711,7 @@ module.update = function(self, optName, value)
 			module:loadAddon("MultiCastBar");  -- Totem bar
 			module:loadAddon("Framerate Bar");
 			module:loadAddon("Classic Performance Bar");
+			module:loadAddon("Stance Bar");
 		end
 	end
 
