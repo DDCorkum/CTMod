@@ -28,6 +28,17 @@ local CT_BB_StanceBar_IsEnabled = nil;
 --------------------------------------------
 -- Action bar arrows and page number
 
+local function moveStanceBar()
+	if (not StanceBarFrame or InCombatLockdown()) then return; end
+	if (CT_BB_StanceBar_IsEnabled) then
+		StanceButton1:ClearAllPoints();
+		StanceButton1:SetPoint("BOTTOMLEFT",CT_BottomBar_CTStanceBarFrame_Frame);	
+	else
+		StanceButton1:ClearAllPoints();
+		StanceButton1:SetPoint("BOTTOMLEFT",StanceBarFrame);	
+	end
+end
+
 local function addon_Update(self)
 	-- Update the frame
 	-- self == talking head object
@@ -37,25 +48,14 @@ local function addon_Update(self)
 	self.helperFrame:SetPoint("BOTTOMRIGHT", self.frame, "BOTTOMRIGHT", 5, -5);
 end
 
-local function moveStanceBar()
-	if (not StanceBarFrame) then return; end
-	if (CT_BB_StanceBar_IsEnabled) then
-		StanceBarFrame:ClearAllPoints();
-		StanceBarFrame:SetPoint("BOTTOM",CT_BottomBar_CTStanceBarFrame_Frame,"BOTTOM", 0,0);	
-	else
-		StanceBarFrame:ClearAllPoints();
-		StanceBarFrame:SetPoint("BOTTOMLEFT",MainMenuBar,"TOPLEFT", 30, 9);	
-	end
-end
-
 local function addon_Enable(self)
 	CT_BB_StanceBar_IsEnabled = true;
-	moveStanceBar()
+	moveStanceBar();
 end
 
 local function addon_Disable(self)
 	CT_BB_StanceBar_IsEnabled = false;
-	moveStanceBar()
+	moveStanceBar();
 end
 
 local function addon_Init(self)
