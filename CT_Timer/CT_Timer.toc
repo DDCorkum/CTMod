@@ -1,6 +1,6 @@
-## Interface: 80200
+## Interface: 11302
 ## Version: 8.2.0.1
-## Title: CT_Timer |cFF333333(BFA)
+## Title: CT_Timer |cFF333333(Classic)
 ## Notes: Shows a timer that counts both up and down.
 ## DefaultState: Enabled
 ## SavedVariables: CT_TimerOptions

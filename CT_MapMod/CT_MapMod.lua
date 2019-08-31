@@ -979,7 +979,9 @@ function CT_MapMod_AddUIElements()
 			["button#n:CT_MapMod_CreateNoteButton#s:75:16#tr:tr:-125:-3#v:UIPanelButtonTemplate#" .. module.text["CT_MapMod/Map/New Pin"]] = {
 				["onload"] = function(self)
 					if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-						self:SetFrameStrata("FULLSCREEN_DIALOG");
+						self:HookScript("OnShow", function()	
+							self:SetFrameStrata("FULLSCREEN_DIALOG");
+						end);
 					end
 					WorldMapFrame:AddCanvasClickHandler(function(canvas, button)
 						if (not module.isCreatingNote) then return; end
@@ -1129,7 +1131,9 @@ function CT_MapMod_AddUIElements()
 				end,
 				["onload"] = function(self)
 					if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-						self:SetFrameStrata("FULLSCREEN_DIALOG");
+						self:HookScript("OnShow", function()	
+							self:SetFrameStrata("FULLSCREEN_DIALOG");
+						end);
 					end
 					self:RegisterForDrag("RightButton");
 					local positionset = nil;

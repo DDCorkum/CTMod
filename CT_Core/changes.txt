@@ -1,3 +1,12 @@
+CT_Core (8.2.0.7) 2019-08-30
+- Hiding chat buttons now also hides the chat channels button
+- Added option to increase/decrease font size (via scale attribute) of the objective tracker
+- Improved the behaviour of the objective tracker settings
+
+CT_Core (8.2.0.6) 2019-08-26
+- Classic-only fix at launch to access the options menu
+- Displaying quest levels in the quest log now also works in Classic
+
 CT_Core (8.2.0.5) 2019-08-25
 - Fixed sticky chat types
 - Added slider to change max camera zoom distance
