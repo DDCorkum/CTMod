@@ -872,6 +872,9 @@ do
 		end
 	end
 
+	-- this is a "dummy" tooltip that doesn't ever get displayed.  It is just to make hidden use of the :SetInboxItem(...) function of GameTooltip.
+	local BattlePetProcessingTooltip = CreateFrame("GameTooltip", nil);
+
 	-- Extra lines for mail icon button tooltip
 	local function CT_MailMod_InboxFrameItem_OnEnter(self, ...)
 		-- This is a post hook routine for Blizzard's InboxFrameItem_OnEnter
@@ -889,9 +892,28 @@ do
 				local name, itemID, itemTexture, count, quality, canUse = GetInboxItem(mailIndex, i);
 				if (name) then
 					local itemLink = GetInboxItemLink(mailIndex, i);
-					if (not itemLink) then
+					local __, speciesID, level, breedQuality, maxHealth, power, speed, petname = BattlePetProcessingTooltip:SetInboxItem(mailIndex, i);
+					if (itemLink and speciesID and speciesID > 0) then
+						if (breedQuality == 1) then
+							itemLink = "|cffffffff";
+						elseif (breedQuality == 2) then
+							itemLink = "|cff1eff00";
+						elseif (breedQuality == 3) then
+							itemLink = "|cff0070dd";
+						elseif (breedQuality == 4) then
+							itemLink = "|cffa335ee";
+						else
+							itemLink = "|cff9d9d9d";
+						end
+						if (level > 1) then
+							itemLink = itemLink .. "|Hitem:" .. speciesID .. ":0:0:0:0:0:0:0:0:0|h[" .. petname .. "]|h (level " .. level .. ")|r";
+						else
+							itemLink = itemLink .. "|Hitem:" .. speciesID .. ":0:0:0:0:0:0:0:0:0|h[" .. petname .. "]|h|r";
+						end
+					elseif (not itemLink) then
 						itemLink = "[" .. name .. "]";
 					end
+					
 					if (count == 1) then
 --						GameTooltip:AddLine(itemLink);
 						GameTooltip:AddLine("|T" .. itemTexture .. ":0|t" .. itemLink)
@@ -1137,5 +1159,3 @@ do
 		GameTooltip:Hide();
 	end);
 end
-
-

@@ -953,6 +953,9 @@ function CT_MapMod_AddUIElements()
 			["button#n:CT_MapMod_WhereAmIButton#s:100:20#b:b:0:3#v:UIPanelButtonTemplate#" .. module.text["CT_MapMod/Map/Where am I?"]] = {
 				["onload"] = function (self)
 					self:HookScript("OnShow",function()
+						if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+							self:SetFrameStrata("FULLSCREEN_DIALOG");
+						end
 						self:ClearAllPoints();
 						local option = module:getOption("CT_MapMod_MapResetButtonPlacement") or 1;
 						if (option == 1) then
