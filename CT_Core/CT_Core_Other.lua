@@ -1265,22 +1265,7 @@ end
 -- Objectives window
 
 do
-	-- Altering Blizzard's WATCHFRAME_MAXLINEWIDTH variable,
-	-- or calling WatchFrame_Update / WatchFrame_Collapse / WatchFrame_Expand / etc,
-	-- or creating a menu using Blizzard's L_UIDropDownMenu_AddButton system,
-	-- can cause taint.
-	--
-	-- That taint could lead to an "Action blocked by an addon" message if the user is
-	-- in combat, and has some quests tracked, and opens / minimizes / maximizes the
-	-- World Map while the 'show quest objectives' option is enabled.
-	--
-	-- Toggling that option while in combat may also result in the error.
-	--
-	-- This addon's options which require changing Blizzard's variable, or calling
-	-- their functions, are disabled by default. The user is told in the options
-	-- window that enabling the options may result in an action blocked error under
-	-- the described conditions.
-
+	local initDone;
 	local watchFrame;
 	local playerLoggedIn;
 	local resizedWidth;
@@ -1289,7 +1274,6 @@ do
 	local isResizing;
 	local isEnabled;
 	local anchorTopLeft;
-	local forceCollapse;
 
 	local frameSetPoint;
 	local frameSetParent;
@@ -1622,26 +1606,6 @@ do
 			end
 		end);
 
-		--[[hooksecurefunc("WatchFrame_Update", function()
-			if (opt_watchframeEnabled) then
-				watchFrame_Update();
-			end
-		end);]]
-
-		--[[hooksecurefunc("WatchFrame_SetWidth", function()
-			if (opt_watchframeEnabled) then
-				watchFrame_Update();
-			end
-		end);]]
-
-		--[[hooksecurefunc("WatchFrame_Expand", function()
-			module:setOption("watchframeIsCollapsed", WatchFrame.collapsed, true);
-		end);]]
-
-		--[[hooksecurefunc("WatchFrame_Collapse", function()
-			module:setOption("watchframeIsCollapsed", WatchFrame.collapsed, true);
-		end);]]
-
 		hookedFunctions = true;
 	end
 
@@ -1655,12 +1619,7 @@ do
 			if (isEnabled) then
 				watchFrame:Hide();
 				-- Restore Blizzard's WatchFrame
-				if (WatchFrame.collapsed) then
-					width = WATCHFRAME_COLLAPSEDWIDTH;
-				else
-					width = getBlizzardExpandedWidth();
-				end
-				WatchFrame:SetWidth(width);
+				WatchFrame:SetWidth(getBlizzardExpandedWidth());
 				frameSetParent(WatchFrame, "UIParent");
 				WatchFrame:ClearAllPoints();
 				WatchFrame:SetPoint("TOPRIGHT", MiniMapCluster, "BOTTOMRIGHT", ((MultiBarRight:IsShown() and -52) and MultiBarLeft:IsShown() and -95) or 0);	-- this is probably not even required because of UIParent_ManageFramePositions()
@@ -1668,12 +1627,12 @@ do
 				UIParent_ManageFramePositions();
 			end
 		end
-		module:setOption("watchframeIsCollapsed", WatchFrame.collapsed, true);
 	end
 
 	local pointText = {"BOTTOMLEFT", "BOTTOMRIGHT", "TOPLEFT", "TOPRIGHT", "LEFT"};
 
-	local function anchorOurFrame(topLeft)
+	local function anchorOurFrame(topLeft, noSave)
+	
 		-- Set the anchor point of our frame
 		local frame = CT_WatchFrame;
 		local oldScale = frame:GetScale() or 1;
@@ -1726,10 +1685,15 @@ do
 			xOffset = anchorX - uiparentvalue;
 			relativeP = relativeP + 1;
 		end
-
+		
 		frame:ClearAllPoints();
 		frame:SetPoint(pointText[anchorP], "UIParent", pointText[relativeP], xOffset, yOffset);
-		module:stopMovable("WATCHFRAME");  -- stops moving and saves the current anchor point
+		if (not noSave) then
+			-- setting the scale to 1 during the save is a hack to change how CT_Library behaves
+			frame:SetScale(1);
+			module:stopMovable("WATCHFRAME");  -- stops moving and saves the current anchor point; except when noSave flag is set which only happens when starting up the game
+			frame:SetScale((module:getOption("CTCore_WatchFrameScale")/100) or 1);
+		end
 	end
 
 	module.resetWatchFramePosition = function()
@@ -1768,7 +1732,7 @@ do
 					self.background:SetVertexColor(1, 0.82, 0);
 				end,
 				["onmousedown"] = function(self)
-					anchorOurFrame(false);
+					anchorOurFrame(false, true);
 					startResizing(self);
 				end,
 				["onmouseup"] = function(self)
@@ -1797,7 +1761,7 @@ do
 					self.background:SetVertexColor(1, 0.82, 0);
 				end,
 				["onmousedown"] = function(self)
-					anchorOurFrame(true);
+					anchorOurFrame(true, true);
 					startResizing(self);
 				end,
 				["onmouseup"] = function(self)
@@ -1836,7 +1800,7 @@ do
 			end,
 
 			["onevent"] = function(self, event)
-				if (event == "PLAYER_LOGIN") then
+				if (event == "PLAYER_ENTERING_WORLD") then
 					playerLoggedIn = 1;
 					-- We've delayed the enabling of the options until PLAYER_LOGIN time
 					-- to allow enough time for the UIParent scale to be set by Blizzard,
@@ -1848,15 +1812,7 @@ do
 					end
 					updateEnabled();
 				elseif (event == "PLAYER_ENTERING_WORLD") then
-					if (forceCollapse) then
-						forceCollapse = nil;
-						if (not WatchFrame.collapsed) then
-							-- taint
-							WatchFrame_Collapse(WatchFrame);
-							-- taint
-							WatchFrame.userCollapsed = true;
-						end
-					end
+					-- previously this did the forcecollapse()
 				end
 			end,
 		};
@@ -1880,7 +1836,6 @@ do
 	watchFrame:RegisterEvent("PLAYER_ENTERING_WORLD");
 
 	-- Initialize
-	local initDone;
 	module.watchframeInit = function()
 		if (initDone) then
 			return;
@@ -1924,20 +1879,12 @@ do
 
 		-- Make frame movable.
 		module:registerMovable("WATCHFRAME", watchFrame, true);
-
+		
 		-- Ensure our frame is anchored using a top right anchor point.
-		anchorOurFrame(false);
+		anchorOurFrame(false, true);
 
 		resizedWidth = watchFrame:GetWidth();
 		resizedHeight = watchFrame:GetHeight();
-
-		if (module:getOption("watchframeRestoreState")) then
-			-- Restore the last known collapsed/expanded state.
-			-- By default, the game starts with the WatchFrame in an expanded state.
-			if (module:getOption("watchframeIsCollapsed")) then
-				forceCollapse = true;
-			end
-		end
 	end
 
 	-- Option functions
@@ -2007,9 +1954,7 @@ do
 			value = 100
 		end
 		opt_watchframeScale = value;
-		if (not opt_watchframeEnabled) then
-			return;
-		end
+		-- do this even when not enabled!
 		updateScale();
 	end
 end
