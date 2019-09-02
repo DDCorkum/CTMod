@@ -1444,7 +1444,7 @@ do
 			-- when the WatchFrameHeader is shown.
 			-- Also show our watchFrame if at least one auto quest pop up frame is shown, even if
 			-- there are no objectives being tracked. These pop up frames have a height of 82.
-			if (WatchFrame:IsShown() or (GetNumAutoQuestPopUps() or 0) > 0) then
+			if (WatchFrame:IsShown() or ((GetNumAutoQuestPopUps and GetNumAutoQuestPopUps()) or 0) > 0) then	-- nil check because there are no auto-popups in Classic
 				watchFrame:Show();
 			else
 				-- Blizzard hid their WatchFrame, so hide ours also.
