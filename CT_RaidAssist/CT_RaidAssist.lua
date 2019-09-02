@@ -2758,8 +2758,8 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 	local updateMacros = function()
 		local textL = gsub(macroLeft,"~UNIT~",shownUnit);
 		local textR = gsub(macroRight,"~UNIT~",shownUnit);
-		secureButton:SetAttribute("macrotext1", textL);
-		secureButton:SetAttribute("macrotext2", textR);
+		secureButton:SetAttribute("*macrotext1", textL);
+		secureButton:SetAttribute("*macrotext2", textR);
 	end
 	
 	-- PUBLIC FUNCTIONS
