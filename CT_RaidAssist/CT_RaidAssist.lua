@@ -2810,8 +2810,8 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 				secureButton = CreateFrame("Button", nil, visualFrame, "SecureUnitButtonTemplate");
 				secureButton:SetAllPoints();
 				secureButton:RegisterForClicks("LeftButtonUp", "RightButtonUp");
-				secureButton:SetAttribute("type1", "macro");
-				secureButton:SetAttribute("type2", "macro");
+				secureButton:SetAttribute("*type1", "macro");
+				secureButton:SetAttribute("*type2", "macro");
 				secureButton:HookScript("OnEnter",
 					function()
 						if (UnitExists(shownUnit)) then
