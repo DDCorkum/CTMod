@@ -1,4 +1,4 @@
-## Interface: 82000
+## Interface: 80200
 ## Version: 8.2.0.7
 ## Title: CT_BottomBar |cFF333333(BFA)
 ## Notes: Breaks up the main menu bar into movable pieces.
