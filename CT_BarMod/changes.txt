@@ -1,6 +1,3 @@
-CT_BarMod (8.2.0.7) 2019-08-28
-- Fixed saving custom keybindings in Classic
-
 CT_BarMod (8.2.0.2) 2019-06-26
 - Fixed SetPoint() error when fewer than 12 buttons shown on a bar
 

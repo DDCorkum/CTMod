@@ -21,7 +21,7 @@ local module = _G.CT_BarMod;
 --------------------------------------------
 
 --------------------------------------------
--- Local Copies and Retail/Classic API differences
+-- Local Copies
 
 local format = format;
 local ipairs = ipairs;
@@ -44,7 +44,7 @@ local InCombatLockdown = InCombatLockdown;
 local IsAltKeyDown = IsAltKeyDown;
 local IsControlKeyDown = IsControlKeyDown;
 local IsShiftKeyDown = IsShiftKeyDown;
-local SaveBindings = SaveBindings or AttemptToSaveBindings;   -- Retail vs Classic
+local SaveBindings = SaveBindings;
 local SetOverrideBinding = SetOverrideBinding;
 local SetOverrideBindingClick = SetOverrideBindingClick;
 

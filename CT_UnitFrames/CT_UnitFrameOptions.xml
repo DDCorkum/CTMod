@@ -803,48 +803,6 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</Layer>
 						</Layers>
 					</CheckButton>
-					<CheckButton name="$parentShowToTCB" id="64" hidden="false" inherits="OptionsCheckButtonTemplate">
-						<HitRectInsets>
-							<AbsInset left="0" right="0" top="0" bottom="0"/>
-						</HitRectInsets>
-						<Size>
-							<AbsDimension x="24" y="24"/>
-						</Size>
-						<Anchors>
-							<Anchor point="TOPLEFT">
-								<Offset>
-									<AbsDimension x="6" y="-130"/>
-								</Offset>
-							</Anchor>
-						</Anchors>
-						<Scripts>
-							<OnClick>
-								CT_UnitFramesOptions_Box_CB_OnClick(self);
-							</OnClick>
-							<OnEnter>
-								GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT");
-								GameTooltip:SetText("Requires |cFFFF9999/console reloadui |rto take effect");
-								GameTooltip:Show();
-							</OnEnter>
-							<OnLeave>
-								GameTooltip:Hide();
-							</OnLeave>
-						</Scripts>
-						<Layers>
-							<Layer level="ARTWORK">
-								<FontString name="$parentName" inherits="GameFontNormalSmall">
-									<Anchors>
-										<Anchor point="LEFT" relativePoint="RIGHT">
-											<Offset>
-												<AbsDimension x="4" y="0"/>
-											</Offset>
-										</Anchor>
-									</Anchors>
-									<Color r="1" g="1" b="1"/>
-								</FontString>
-							</Layer>
-						</Layers>
-					</CheckButton>
 					<Slider name="$parentTextSpacing" inherits="OptionsSliderTemplate">
 						<Size>
 							<AbsDimension x="400" y="17"/>

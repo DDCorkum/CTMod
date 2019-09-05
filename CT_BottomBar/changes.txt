@@ -1,7 +1,3 @@
-CT_Bottombar (8.2.0.7) 2019-08-28
-- Disabled custom OverrideBar code (a retail thing) from causing errors in Classic
-- Added a movable stance bar to Classic
-
 CT_BottomBar (8.2.0.5) 2019-08-08
 - Added the latency meter in Wow Classic
 

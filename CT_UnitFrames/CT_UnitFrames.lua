@@ -68,11 +68,6 @@ end
 
 function CT_UnitFrames_TextStatusBar_UpdateTextString(textStatusBar, settings, lockShow)
 	local textString = textStatusBar.TextString;
-	if (not textString and module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		textString = textStatusBar:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall");
-		textString:SetAllPoints();
-		textStatusBar.TextString = textString;
-	end
 	if(textString) then
 		if (lockShow == nil) then lockShow = textStatusBar.lockShow; end
 		local value = textStatusBar:GetValue();

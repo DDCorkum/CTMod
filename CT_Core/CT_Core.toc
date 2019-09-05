@@ -1,5 +1,5 @@
 ## Interface: 80200
-## Version: 8.2.0.7
+## Version: 8.2.0.5
 ## Title: CT_Core |cFF333333(BFA)
 ## Notes: General nifty features for CTMod.
 ## DefaultState: Enabled

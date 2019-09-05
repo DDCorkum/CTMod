@@ -4,7 +4,6 @@ CT_UFO_SELECTION = { "On Health Bar:", "Beside Health Bar:", "On Mana Bar:", "Be
 CT_UFO_SELECTION2 = { "On Health Bar:", "Beside Health Bar:", "On Mana Bar:", "Beside Mana Bar:", "Enemy Health Bar:" };
 CT_UFO_BOX = { "Player Frame", "Party Frames", "Target Frame", "Assist (Target of Target) Frame", "Focus Frame" };
 CT_UFO_TARGETCLASS = "Show the class";
-CT_UFO_TARGETOFTARGET = "Show target of target";
 CT_UFO_PARTYTEXTSIZE = "Text Size";
 CT_UFO_PARTYTEXTSIZE_LARGE = "Large";
 CT_UFO_PARTYTEXTSIZE_SMALL = "Small";

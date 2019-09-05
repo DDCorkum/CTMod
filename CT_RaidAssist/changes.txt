@@ -1,6 +1,3 @@
-CT_RaidAssist (8.2.0.7) 2019-08-29
-- Added check for disconnected raid members
-
 CT_RaidAssist (8.2.0.5) 2019-08-21
 - Complete re-write of CTRA, using modern WoW API to simplify the code
 - Added configurable "windows" similar to CT_BuffMod

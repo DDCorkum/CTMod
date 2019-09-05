@@ -10,8 +10,6 @@
 -- the CTMod Team. Thank you.                 --
 ------------------------------------------------
 
-
-
 --------------------------------------------
 -- Initialization
 
@@ -21,7 +19,6 @@ local module = _G.CT_BottomBar;
 local appliedOptions;
 local frame_SetAlpha;
 local frame_EnableMouse;
-
 
 --------------------------------------------
 -- Miscellaneous
@@ -95,7 +92,6 @@ local overrideFrames = {
 };
 
 local function override_Hooked_SetAlpha(self, alpha)
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return false; end
 	-- Hook of the SetAlpha function for the override bar frames.
 	-- Something other than CT_BottomBar is calling the frame's :SetAlpha().
 
@@ -119,7 +115,6 @@ local function override_Hooked_SetAlpha(self, alpha)
 end
 
 local function override_Hooked_EnableMouse(self, enable)
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return false; end
 	-- Hook of the EnableMouse function for the override bar frames.
 	-- Something other than CT_BottomBar is calling the frame's :EnableMouse().
 
@@ -145,14 +140,13 @@ local function override_Hooked_EnableMouse(self, enable)
 end
 
 local function override_HideFrames()
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return false; end
 	-- Hide the override bar frames.
 	local frame, alpha, mouse;
 	local inCombatLockdown = InCombatLockdown();
 
 	for i, name in ipairs(overrideFrames) do
 		frame = _G[name];
-		if (frame and frame.ctInUse) then
+		if (frame.ctInUse) then
 			-- We are using the frame in CT_BottomBar.
 			-- Set the values to the ones being used.
 			alpha = frame.ctUseAlpha;
@@ -170,7 +164,6 @@ local function override_HideFrames()
 end
 
 local function override_ShowFrames()
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return false; end
 	-- Show the override bar frames.
 	local frame, alpha, mouse;
 	local inCombatLockdown = InCombatLockdown();
@@ -197,7 +190,6 @@ local function override_ShowFrames()
 end
 
 function module:showOverrideActionBar()
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return false; end
 	-- We have not shown it yet, or it is hidden.
 	if (InCombatLockdown()) then
 		-- Don't do anything while in combat lockdown.
@@ -220,7 +212,6 @@ function module:showOverrideActionBar()
 end
 
 function module:hideOverrideActionBar()
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return false; end
 	-- Hide the override action bar.
 	-- Returns: true if the bar was successfully hidden.
 	--         false if the bar failed to be hidden.
@@ -247,7 +238,6 @@ function module:hideOverrideActionBar()
 end
 
 function module:override_OnUpdate(value)
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return false; end
 	-- Called by CT_BottomBar_OnUpdateFunc when we need to update the override bar
 	-- because we were previously unable to do so.
 	if (value == 1) then
@@ -263,7 +253,6 @@ end
 -- Initialize
 
 function module:initOverrideActionBar()
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return false; end
 	-- Initialize the override action bar
 	frame_SetAlpha = module.frame_SetAlpha;
 	frame_EnableMouse = module.frame_EnableMouse;
@@ -283,7 +272,6 @@ function module:initOverrideActionBar()
 end
 
 function module:overrideInit()
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return false; end
 	-- Initialize this lua file.
 	appliedOptions = module.appliedOptions;
 end

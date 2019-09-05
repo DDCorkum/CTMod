@@ -1,6 +1,3 @@
-CT_UnitFrames (8.2.0.7) 2019-08-28
-- Classic fix to target health and mana values
-
 CT_UnitFrames (8.2.0.5) 2019-08-08
 - Compatibility for both WoW Classic and Retail editions
 

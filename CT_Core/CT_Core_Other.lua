@@ -1265,7 +1265,22 @@ end
 -- Objectives window
 
 do
-	local initDone;
+	-- Altering Blizzard's WATCHFRAME_MAXLINEWIDTH variable,
+	-- or calling WatchFrame_Update / WatchFrame_Collapse / WatchFrame_Expand / etc,
+	-- or creating a menu using Blizzard's L_UIDropDownMenu_AddButton system,
+	-- can cause taint.
+	--
+	-- That taint could lead to an "Action blocked by an addon" message if the user is
+	-- in combat, and has some quests tracked, and opens / minimizes / maximizes the
+	-- World Map while the 'show quest objectives' option is enabled.
+	--
+	-- Toggling that option while in combat may also result in the error.
+	--
+	-- This addon's options which require changing Blizzard's variable, or calling
+	-- their functions, are disabled by default. The user is told in the options
+	-- window that enabling the options may result in an action blocked error under
+	-- the described conditions.
+
 	local watchFrame;
 	local playerLoggedIn;
 	local resizedWidth;
@@ -1274,6 +1289,7 @@ do
 	local isResizing;
 	local isEnabled;
 	local anchorTopLeft;
+	local forceCollapse;
 
 	local frameSetPoint;
 	local frameSetParent;
@@ -1281,8 +1297,10 @@ do
 	local frameSetAllPoints;
 
 	-- Blizzard values (refer to WatchFrame.lua)
+	local blizzard_MaxLineWidth1 = 192;
 	local blizzard_ExpandedWidth1 = 204;
 
+	local blizzard_MaxLineWidth2 = 294;
 	local blizzard_ExpandedWidth2 = 306;
 
 	-- Space on left and right sides of the game's WatchFrame (between us and them)
@@ -1300,14 +1318,23 @@ do
 	local opt_watchframeBackground;
 	local opt_watchframeClamped;
 	local opt_watchframeChangeWidth;
-	local opt_watchframeScale;
 
 	local function getBlizzardExpandedWidth()
 		local width;
-		if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
-			width = 235;
+		if (GetCVar("watchFrameWidth") == "0") then
+			width = blizzard_ExpandedWidth1;
 		else
-			width = 170.6;
+			width = blizzard_ExpandedWidth2;
+		end
+		return width;
+	end
+
+	local function getBlizzardMaxLineWidth()
+		local width;
+		if (GetCVar("watchFrameWidth") == "0") then
+			width = blizzard_MaxLineWidth1;
+		else
+			width = blizzard_MaxLineWidth2;
 		end
 		return width;
 	end
@@ -1338,6 +1365,16 @@ do
 			end
 		else
 			width = resizedWidth;
+		end
+		return width;
+	end
+
+	local function getMaxLineWidth()
+		local width;
+		if (not opt_watchframeChangeWidth) then
+			width = getBlizzardMaxLineWidth();
+		else
+			width = getInnerWidth() - 12;
 		end
 		return width;
 	end
@@ -1385,15 +1422,6 @@ do
 		end
 		watchFrame:EnableMouse(not opt_watchframeLocked);
 	end
-	
-	local function updateScale()
-		-- make the font bigger or smaller
-		if (opt_watchframeEnabled and opt_watchframeScale) then
-			watchFrame:SetScale(opt_watchframeScale / 100);
-		else
-			watchFrame:SetScale(1);
-		end
-	end
 
 	local function watchFrame_Update()
 		if (opt_watchframeEnabled) then
@@ -1427,6 +1455,10 @@ do
 				bwidth = getInnerWidth();
 			end
 
+			if (opt_watchframeChangeWidth) then
+				-- taint
+				WATCHFRAME_MAXLINEWIDTH = getMaxLineWidth();
+			end
 			WatchFrame:SetWidth(bwidth);
 
 			watchFrame:SetWidth(width);
@@ -1455,7 +1487,6 @@ do
 			updateBorder();
 			updateClamping();
 			updateLocked();
-			updateScale();
 		end
 	end
 
@@ -1606,6 +1637,26 @@ do
 			end
 		end);
 
+		--[[hooksecurefunc("WatchFrame_Update", function()
+			if (opt_watchframeEnabled) then
+				watchFrame_Update();
+			end
+		end);]]
+
+		--[[hooksecurefunc("WatchFrame_SetWidth", function()
+			if (opt_watchframeEnabled) then
+				watchFrame_Update();
+			end
+		end);]]
+
+		--[[hooksecurefunc("WatchFrame_Expand", function()
+			module:setOption("watchframeIsCollapsed", WatchFrame.collapsed, true);
+		end);]]
+
+		--[[hooksecurefunc("WatchFrame_Collapse", function()
+			module:setOption("watchframeIsCollapsed", WatchFrame.collapsed, true);
+		end);]]
+
 		hookedFunctions = true;
 	end
 
@@ -1619,20 +1670,27 @@ do
 			if (isEnabled) then
 				watchFrame:Hide();
 				-- Restore Blizzard's WatchFrame
-				WatchFrame:SetWidth(getBlizzardExpandedWidth());
+				if (opt_watchframeChangeWidth) then
+					-- taint
+					WATCHFRAME_MAXLINEWIDTH = getBlizzardMaxLineWidth();
+				end
+				if (WatchFrame.collapsed) then
+					width = WATCHFRAME_COLLAPSEDWIDTH;
+				else
+					width = getBlizzardExpandedWidth();
+				end
+				WatchFrame:SetWidth(width);
 				frameSetParent(WatchFrame, "UIParent");
-				WatchFrame:ClearAllPoints();
-				WatchFrame:SetPoint("TOPRIGHT", MiniMapCluster, "BOTTOMRIGHT", ((MultiBarRight:IsShown() and -52) and MultiBarLeft:IsShown() and -95) or 0);	-- this is probably not even required because of UIParent_ManageFramePositions()
 				WatchFrame:SetClampedToScreen(true);
 				UIParent_ManageFramePositions();
 			end
 		end
+		module:setOption("watchframeIsCollapsed", WatchFrame.collapsed, true);
 	end
 
 	local pointText = {"BOTTOMLEFT", "BOTTOMRIGHT", "TOPLEFT", "TOPRIGHT", "LEFT"};
 
-	local function anchorOurFrame(topLeft, noSave)
-	
+	local function anchorOurFrame(topLeft)
 		-- Set the anchor point of our frame
 		local frame = CT_WatchFrame;
 		local oldScale = frame:GetScale() or 1;
@@ -1685,15 +1743,10 @@ do
 			xOffset = anchorX - uiparentvalue;
 			relativeP = relativeP + 1;
 		end
-		
+
 		frame:ClearAllPoints();
 		frame:SetPoint(pointText[anchorP], "UIParent", pointText[relativeP], xOffset, yOffset);
-		if (not noSave) then
-			-- setting the scale to 1 during the save is a hack to change how CT_Library behaves
-			frame:SetScale(1);
-			module:stopMovable("WATCHFRAME");  -- stops moving and saves the current anchor point; except when noSave flag is set which only happens when starting up the game
-			frame:SetScale((module:getOption("CTCore_WatchFrameScale")/100) or 1);
-		end
+		module:stopMovable("WATCHFRAME");  -- stops moving and saves the current anchor point
 	end
 
 	module.resetWatchFramePosition = function()
@@ -1732,7 +1785,7 @@ do
 					self.background:SetVertexColor(1, 0.82, 0);
 				end,
 				["onmousedown"] = function(self)
-					anchorOurFrame(false, true);
+					anchorOurFrame(false);
 					startResizing(self);
 				end,
 				["onmouseup"] = function(self)
@@ -1761,7 +1814,7 @@ do
 					self.background:SetVertexColor(1, 0.82, 0);
 				end,
 				["onmousedown"] = function(self)
-					anchorOurFrame(true, true);
+					anchorOurFrame(true);
 					startResizing(self);
 				end,
 				["onmouseup"] = function(self)
@@ -1800,7 +1853,7 @@ do
 			end,
 
 			["onevent"] = function(self, event)
-				if (event == "PLAYER_ENTERING_WORLD") then
+				if (event == "PLAYER_LOGIN") then
 					playerLoggedIn = 1;
 					-- We've delayed the enabling of the options until PLAYER_LOGIN time
 					-- to allow enough time for the UIParent scale to be set by Blizzard,
@@ -1812,7 +1865,15 @@ do
 					end
 					updateEnabled();
 				elseif (event == "PLAYER_ENTERING_WORLD") then
-					-- previously this did the forcecollapse()
+					if (forceCollapse) then
+						forceCollapse = nil;
+						if (not WatchFrame.collapsed) then
+							-- taint
+							WatchFrame_Collapse(WatchFrame);
+							-- taint
+							WatchFrame.userCollapsed = true;
+						end
+					end
 				end
 			end,
 		};
@@ -1836,6 +1897,7 @@ do
 	watchFrame:RegisterEvent("PLAYER_ENTERING_WORLD");
 
 	-- Initialize
+	local initDone;
 	module.watchframeInit = function()
 		if (initDone) then
 			return;
@@ -1879,12 +1941,20 @@ do
 
 		-- Make frame movable.
 		module:registerMovable("WATCHFRAME", watchFrame, true);
-		
+
 		-- Ensure our frame is anchored using a top right anchor point.
-		anchorOurFrame(false, true);
+		anchorOurFrame(false);
 
 		resizedWidth = watchFrame:GetWidth();
 		resizedHeight = watchFrame:GetHeight();
+
+		if (module:getOption("watchframeRestoreState")) then
+			-- Restore the last known collapsed/expanded state.
+			-- By default, the game starts with the WatchFrame in an expanded state.
+			if (module:getOption("watchframeIsCollapsed")) then
+				forceCollapse = true;
+			end
+		end
 	end
 
 	-- Option functions
@@ -1946,16 +2016,13 @@ do
 		if (not opt_watchframeEnabled) then
 			return;
 		end
-		watchFrame_Update();
-	end
-	
-	module.watchframeChangeScale = function(value)
-		if (not value) then
-			value = 100
+		if (opt_watchframeChangeWidth or (oldValue and not opt_watchframeChangeWidth)) then
+			-- Option is enabled, or
+			-- Option was previously enabled but has now been disabled.
+			-- taint
+			WATCHFRAME_MAXLINEWIDTH = getMaxLineWidth();
 		end
-		opt_watchframeScale = value;
-		-- do this even when not enabled!
-		updateScale();
+		watchFrame_Update();
 	end
 end
 
@@ -2202,7 +2269,6 @@ local modFunctions = {
 	["watchframeClamped"] = module.watchframeClamped,
 	["watchframeBackground"] = module.watchframeBackground,
 	["watchframeChangeWidth"] = module.watchframeChangeWidth,
-	["CTCore_WatchFrameScale"] = module.watchframeChangeScale,
 	["auctionOpenNoBags"] = setBagOption,
 	["auctionOpenBackpack"] = setBagOption,
 	["auctionOpenBags"] = setBagOption,

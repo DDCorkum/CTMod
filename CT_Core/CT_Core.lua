@@ -612,9 +612,7 @@ module.frame = function()
 
 		-- Chat frame buttons
 		optionsAddObject( -2,   26, "checkbutton#tl:10:%y#o:chatArrows#Hide the chat buttons");
-		if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
-			optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:friendsMicroButton#Hide the friends (social) button");
-		end
+		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:friendsMicroButton#Hide the friends (social) button");
 
 		-- Chat frame moving
 		optionsAddObject(-15,   15, "font#tl:13:%y#v:ChatFontNormal#Chat frame clamping:");
@@ -748,17 +746,22 @@ module.frame = function()
 		optionsAddObject(  6,   26, "checkbutton#tl:40:%y#i:watchframeShowBorder#o:watchframeShowBorder#Show the border");
 		optionsAddObject(  0,   16, "colorswatch#tl:45:%y#s:16:%s#o:watchframeBackground:0,0,0,0#true");
 		optionsAddObject( 14,   14, "font#tl:69:%y#v:ChatFontNormal#Background color and opacity");
-		optionsBeginFrame( -10,   30, "button#t:0:%y#s:180:%s#n:CT_Core_ResetObjectivesPosition_Button#v:GameMenuButtonTemplate#Reset window position");
+		optionsBeginFrame( -14,   30, "button#t:0:%y#s:180:%s#n:CT_Core_ResetObjectivesPosition_Button#v:GameMenuButtonTemplate#Reset window position");
 			optionsAddScript("onclick",
 				function(self)
 					module.resetWatchFramePosition();
 				end
 			);
 		optionsEndFrame();
-		optionsAddFrame( -14,   17, "slider#tl:75:%y#n:CTCoreWatchFrameScaleSlider#o:CTCore_WatchFrameScale:100#Font Size = <value>%:90%:110%#90:110:5");
-		optionsAddObject( -10,  26, "checkbutton#tl:40:%y#i:watchframeChangeWidth#o:watchframeChangeWidth#Can change width of window");
+		optionsAddObject(-10,10*13, "font#t:0:%y#s:0:%s#l:40:0#r#NOTE: Enabling the following Objectives options may result in 'action blocked by an addon' errors. This can occur while in combat if you have some quests tracked and you open / minimize / maximize the World Map when the 'show quest objectives' option is enabled. To prevent the following options from causing an error, disable them and then reload your UI (/reload).#" .. textColor3 .. ":l");
+		optionsAddObject(  0,   26, "checkbutton#tl:40:%y#i:watchframeRestoreState#o:watchframeRestoreState#Remember collapsed/expanded state");
+		optionsAddObject(  6,   26, "checkbutton#tl:40:%y#i:watchframeChangeWidth#o:watchframeChangeWidth#Can change width of window");
 
 		optionsAddObject(  5, 5*13, "font#t:0:%y#s:0:%s#l:70:0#r#Note: To use a wider objectives window without enabling this option, you can enable the 'Wider objectives tracker' option in the game's Interface options.#" .. textColor2 .. ":l");
+
+	-- Player Notes
+		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Player Notes#" .. textColor2 .. ":1");
+		optionsAddObject( -5,   26, "font#tl:0:%y#v:GameFontNormal#Blizzard's default UI has replaced CT notes#" .. textColor2 .. ":1");
 
 	-- Quests
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Quests");
