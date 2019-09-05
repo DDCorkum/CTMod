@@ -33,7 +33,12 @@ local function CT_TargetFrame_ResetUserPlacedPosition()
 end
 hooksecurefunc("TargetFrame_ResetUserPlacedPosition", CT_TargetFrame_ResetUserPlacedPosition);
 
+
+-- Adapting code by github user shoestare, this function now performs two tasks:
+--   STEP 1 (original): Displays the unit class or creature type in the target class frame
+--   STEP 2 (new in 8.2.0.8): Changes the color of the target class frame to indicate friend, hostile, pvp, etc.
 function CT_SetTargetClass()
+	-- STEP 1:
 	if ( not CT_UnitFramesOptions.displayTargetClass ) then
 		return;
 	end
@@ -46,6 +51,39 @@ function CT_SetTargetClass()
 	else
 		CT_TargetFrameClassFrameText:SetText(UnitCreatureType("target") or "");
 	end
+
+	-- STEP 2:
+	local r, g, b = 0, 0, 0;
+	if (UnitIsFriend("target", "player")) then
+		if (UnitIsPlayer("target")) then
+			-- set the overall shade
+			if (UnitInParty("target") or UnitInRaid("target")) then
+				g,b = 0.5, 0.5;
+			elseif (UnitIsInMyGuild("target")) then
+				g,b = 0.25, 0.25;
+			end
+			-- set the primary color
+			if (UnitIsPVP("target")) then
+				g = 1;
+			else
+				b = 1;
+			end
+		else
+			-- friendly, but not a player
+			b = 1;
+		end
+	elseif ( UnitIsEnemy("target", "player") or UnitIsPVP("target") or UnitIsPVPFreeForAll("target")) then
+		r = 1;
+	else
+		if (UnitIsPlayer("target")) then
+			-- non-hostile player of the other faction
+			r, g = 0.75, 0.25
+		else
+			-- non-hostile mob
+			r, g = 0.5, 0.5
+		end
+	end
+	CT_TargetFrameClassFrame:SetBackdropColor(r, g, b, 0.5);
 end
 
 function CT_TargetofTargetHealthCheck ()

@@ -2069,7 +2069,11 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	
 	local function updateStatusIndicators()
 		if (shownUnit and UnitExists(shownUnit)) then
-			local summonStatus, readyStatus, afkStatus = IncomingSummonStatus(shownUnit), GetReadyCheckStatus(shownUnit), UnitIsAFK(shownUnit);	-- at the top of the file, IncomingSummonStatus is defined as C_IncomingSummon.IncomingSummonStatus or it just returns zero in classic
+			local summonStatus, readyStatus, afkStatus, connectionStatus = 
+				IncomingSummonStatus(shownUnit), 		 -- at the top of the file, IncomingSummonStatus is defined as C_IncomingSummon.IncomingSummonStatus or it just returns zero in classic
+				GetReadyCheckStatus(shownUnit),
+				UnitIsAFK(shownUnit),
+				UnitIsConnected(shownUnit);
 			if (summonStatus > 0) then
 				statusTexture:SetTexture(2470702);
 				statusTexture:Show();
@@ -2114,6 +2118,12 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				statusFontString:SetText("AFK");
 				statusBackground:Show();
 				statusBackground:SetVertexColor(unpack(owner:GetProperty("ColorReadyCheckWaiting")));
+			elseif (connectionStatus == false) then
+				statusTexture:Hide();
+				statusFontString:Show();
+				statusFontString:SetText("DC");
+				statusBackground:Show();
+				statusBackground:SetVertexColor(unpack(owner:GetProperty("ColorReadyCheckNotReady")));
 			else
 				statusTexture:Hide();
 				statusFontString:Hide();
@@ -2375,8 +2385,8 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	local updateMacros = function()
 		local textL = gsub(macroLeft,"~UNIT~",shownUnit);
 		local textR = gsub(macroRight,"~UNIT~",shownUnit);
-		secureButton:SetAttribute("macrotext1", textL);
-		secureButton:SetAttribute("macrotext2", textR);
+		secureButton:SetAttribute("*macrotext1", textL);
+		secureButton:SetAttribute("*macrotext2", textR);
 	end
 	
 	-- PUBLIC FUNCTIONS
@@ -2426,9 +2436,9 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				-- overlay button that can be clicked to do stuff in combat (the secure configuration is made later in step 3)
 				secureButton = CreateFrame("Button", nil, visualFrame, "SecureUnitButtonTemplate");
 				secureButton:SetAllPoints();
-				secureButton:RegisterForClicks("LeftButtonUp", "RightButtonUp");
-				secureButton:SetAttribute("type1", "macro");
-				secureButton:SetAttribute("type2", "macro");
+				secureButton:RegisterForClicks("AnyDown");
+				secureButton:SetAttribute("*type1", "macro");
+				secureButton:SetAttribute("*type2", "macro");
 				secureButton:HookScript("OnEnter",
 					function()
 						if (UnitExists(shownUnit)) then
@@ -2451,7 +2461,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 							local remove = canRemoveDebuff();
 							local rezCombat = canRezCombat();
 							local rezNoCombat = canRezNoCombat();
-							if (not InCombatLockdown() and buff or remove or rezCombat or rezNoCombat) then
+							if (not InCombatLockdown() and (buff or remove or rezCombat or rezNoCombat)) then
 								GameTooltip:AddLine("|nRight click...");
 								if buff then for modifier, spellName in pairs(buff) do GameTooltip:AddDoubleLine("|cFF33FF66nocombat" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFF33FF66" .. module.text["CTRA/Spells/" .. spellName]); end end
 								if rezNoCombat then for modifier, spellName in pairs(rezNoCombat) do GameTooltip:AddDoubleLine("|cFFFF6666combat, dead" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFFF6666" .. module.text["CTRA/Spells/" .. spellName]); end end
@@ -2558,6 +2568,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 							or event == "READY_CHECK_CONFIRM"
 							or event == "READY_CHECK_FINISHED"
 							or event == "PLAYER_FLAGS_CHANGED"
+							or event == "UNIT_CONNECTION"
 						) then
 							updateStatusIndicators();
 						elseif (event == "RAID_TARGET_UPDATE") then
@@ -2598,6 +2609,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				listenerFrame:RegisterUnitEvent("READY_CHECK_CONFIRM", shownUnit);	-- updateStatusIndicators();
 				listenerFrame:RegisterEvent("READY_CHECK_FINISHED");			-- updateStatusIndicators();
 				listenerFrame:RegisterUnitEvent("PLAYER_FLAGS_CHANGED");		-- updateStatusIndicators();
+				listenerFrame:RegisterUnitEvent("UNIT_CONNECTION");
 				listenerFrame:RegisterEvent("PLAYER_LEVEL_UP");				-- configureMacros();
 				listenerFrame:RegisterEvent("PLAYER_REGEN_ENABLED");			-- updateMacros();
 				listenerFrame:RegisterUnitEvent("CANCEL_SUMMON");			-- updateRoleTexture();
@@ -2746,8 +2758,8 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 	local updateMacros = function()
 		local textL = gsub(macroLeft,"~UNIT~",shownUnit);
 		local textR = gsub(macroRight,"~UNIT~",shownUnit);
-		secureButton:SetAttribute("macrotext1", textL);
-		secureButton:SetAttribute("macrotext2", textR);
+		secureButton:SetAttribute("*macrotext1", textL);
+		secureButton:SetAttribute("*macrotext2", textR);
 	end
 	
 	-- PUBLIC FUNCTIONS
@@ -2798,8 +2810,8 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 				secureButton = CreateFrame("Button", nil, visualFrame, "SecureUnitButtonTemplate");
 				secureButton:SetAllPoints();
 				secureButton:RegisterForClicks("LeftButtonUp", "RightButtonUp");
-				secureButton:SetAttribute("type1", "macro");
-				secureButton:SetAttribute("type2", "macro");
+				secureButton:SetAttribute("*type1", "macro");
+				secureButton:SetAttribute("*type2", "macro");
 				secureButton:HookScript("OnEnter",
 					function()
 						if (UnitExists(shownUnit)) then

@@ -94,6 +94,7 @@ function CT_UnitFramesOptions_Box_OnLoad(self)
 	elseif ( self:GetID() == 3 ) then
 		_G[self:GetName() .. "ClassFrameCBName"]:SetText(CT_UFO_TARGETCLASS);
 		_G[self:GetName() .. "TargetTextRightCBName"]:SetText(CT_UFO_TEXTRIGHT);
+		_G[self:GetName() .. "ShowToTCBName"]:SetText(CT_UFO_TARGETOFTARGET);
 	elseif ( self:GetID() == 4 ) then
 		_G[self:GetName() .. "TargetofAssistCBName"]:SetText(CT_UFO_TARGETOFASSIST);
 		_G[self:GetName() .. "AssistCastbarCBName"]:SetText(CT_UFO_ASSISTCASTBAR);
@@ -242,6 +243,7 @@ function CT_UnitFramesOptions_Radio_Update()
 	CT_UnitFramesOptionsFrameBox1PlayerCoordsRightCB:SetChecked(CT_UnitFramesOptions.playerCoordsRight);
 	CT_UnitFramesOptionsFrameBox3ClassFrameCB:SetChecked(CT_UnitFramesOptions.displayTargetClass);
 	CT_UnitFramesOptionsFrameBox3TargetTextRightCB:SetChecked(CT_UnitFramesOptions.targetTextRight);
+	CT_UnitFramesOptionsFrameBox3ShowToTCB:SetChecked(GetCVar("showTargetOfTarget") == "1");
 	CT_UnitFramesOptionsFrameBox4DisplayCB:SetChecked(CT_UnitFramesOptions.shallDisplayAssist);
 	CT_UnitFramesOptionsFrameBox4TargetofAssistCB:SetChecked(CT_UnitFramesOptions.shallDisplayTargetofAssist);
 	CT_UnitFramesOptionsFrameBox4AssistCastbarCB:SetChecked(CT_UnitFramesOptions.showAssistCastbar);
@@ -347,6 +349,13 @@ function CT_UnitFramesOptions_Box_CB_OnClick(self)
 			-- "Show health/mana on right"
 			CT_UnitFramesOptions.targetTextRight = self:GetChecked();
 			CT_TargetFrame_AnchorSideText();
+		elseif (self:GetID() == 64) then
+			if (self:GetChecked()) then
+				SetCVar("showTargetOfTarget", 1);
+			else
+				SetCVar("showTargetOfTarget",0);
+			end
+			ConsoleExec("RELOADUI");
 		end
 	elseif ( self:GetParent():GetID() == 4 ) then
 		-- Box4

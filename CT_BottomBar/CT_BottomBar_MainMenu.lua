@@ -130,6 +130,9 @@ function module:hideTexturesBackground(hide)
 			MainMenuBarArtFrameBackground:Hide();
 		elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
 			MainMenuBarArtFrame:Hide();
+			StanceBarLeft:SetAlpha(0);
+			StanceBarMiddle:SetAlpha(0);
+			StanceBarRight:SetAlpha(0);
 		end
 		hidMainBackground = true;
 	else
@@ -141,6 +144,9 @@ function module:hideTexturesBackground(hide)
 			MainMenuBarArtFrameBackground:Show();
 		elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
 			MainMenuBarArtFrame:Show();
+			StanceBarLeft:SetAlpha(1);
+			StanceBarMiddle:SetAlpha(1);
+			StanceBarRight:SetAlpha(1);
 		end
 		hidMainBackground = false;
 	end
