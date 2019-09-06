@@ -1,5 +1,5 @@
 ## Interface: 80200
-## Version: 8.2.0.8
+## Version: 8.2.0.9
 ## Title: CT_RaidAssist |cFF333333(BFA)
 ## Notes: Allows you to monitor Raid HP.
 ## DefaultState: Enabled

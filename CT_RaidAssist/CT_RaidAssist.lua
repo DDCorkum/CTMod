@@ -2556,7 +2556,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 							configurePowerBar();
 						elseif (event == "UNIT_AURA") then
 							updateAuras();
-						elseif (event == "PLAYER_LEVEL_UP") then
+						elseif (event == "PLAYER_LEVEL_UP" or event == "PLAYER_LOGIN") then
 							configureMacros();
 						elseif (event == "PLAYER_REGEN_DISABLED") then
 							updateMacros();
@@ -2611,6 +2611,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				listenerFrame:RegisterUnitEvent("PLAYER_FLAGS_CHANGED");		-- updateStatusIndicators();
 				listenerFrame:RegisterUnitEvent("UNIT_CONNECTION");
 				listenerFrame:RegisterEvent("PLAYER_LEVEL_UP");				-- configureMacros();
+				listenerFrame:RegisterEvent("PLAYER_LOGIN");				-- configureMacros();
 				listenerFrame:RegisterEvent("PLAYER_REGEN_ENABLED");			-- updateMacros();
 				listenerFrame:RegisterUnitEvent("CANCEL_SUMMON");			-- updateRoleTexture();
 				listenerFrame:RegisterUnitEvent("CONFIRM_SUMMON");			-- updateRoleTexture();
