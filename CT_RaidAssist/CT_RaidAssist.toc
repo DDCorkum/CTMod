@@ -28,6 +28,7 @@
 ## SavedVariables: CT_RaidAssistOptions
 
 CT_RaidAssist.lua
+localization.lua
 
 
 # REPLACED IN 8.2.0.5 with a rewrite that uses the modern WoW API to **significantly** reduce memory consumption and lines of code
