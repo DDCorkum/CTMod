@@ -2460,7 +2460,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 								module.GameTooltipExtraLine:Show();
 								GameTooltip:SetHeight(GameTooltip:GetHeight()+5);
 								GameTooltip:SetWidth(max(150,GameTooltip:GetWidth()));
-								if (module:getOption("MOVABLE-CTRAWindow" .. owner:GetWindowID())) then
+								if (owner.GetWindowID and module:getOption("MOVABLE-CTRAWindow" .. owner:GetWindowID())) then
 									module.GameTooltipExtraLine:SetTextColor(0.50, 0.50, 0.50);
 								else
 									module.GameTooltipExtraLine:SetTextColor(1,1,1);
