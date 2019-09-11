@@ -32,10 +32,14 @@ local function moveStanceBar()
 	if (not StanceBarFrame or InCombatLockdown()) then return; end
 	if (CT_BB_StanceBar_IsEnabled) then
 		StanceButton1:ClearAllPoints();
-		StanceButton1:SetPoint("BOTTOMLEFT",CT_BottomBar_CTStanceBarFrame_Frame);	
+		StanceButton1:SetPoint("BOTTOMLEFT",CT_BottomBar_CTStanceBarFrame_Frame);
+		MainMenuBarVehicleLeaveButton:ClearAllPoints();
+		MainMenuBarVehicleLeaveButton:SetPoint("RIGHT", StanceButton1, "LEFT", -10, 0);
 	else
 		StanceButton1:ClearAllPoints();
-		StanceButton1:SetPoint("BOTTOMLEFT",StanceBarFrame);	
+		StanceButton1:SetPoint("BOTTOMLEFT",StanceBarFrame);
+		MainMenuBarVehicleLeaveButton:ClearAllPoints();
+		MainMenuBarVehicleLeaveButton:SetPoint("RIGHT", StanceBarFrame, "LEFT", -10, 0);
 	end
 end
 
@@ -97,7 +101,17 @@ local function addon_Register()
 		addon_Enable,
 		addon_Disable,  -- no disable function
 		"helperFrame",
-		StanceBarFrame
+		StanceButton1,
+		StanceButton2,
+		StanceButton3,
+		StanceButton4,
+		StanceButton5,
+		StanceButton6,
+		StanceButton7,
+		StanceButton8,
+		StanceButton9,
+		StanceButton10,
+		MainMenuBarVehicleLeaveButton
 	);
 end
 

@@ -38,7 +38,11 @@ if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
 	local new_GetQuestLogTitle = function(questIndex)
 		local args = {old_GetQuestLogTitle(questIndex)};
 		if (displayLevels and not args[4] and args[2] and args[2] > 0) then
-			args[1] = "[" .. args[2] .. "] " .. args[1];
+			if (args[3]) then
+				args[1] = "[" .. args[2] .. "+] " .. args[1];
+			else
+				args[1] = "[" .. args[2] .. "] " .. args[1];
+			end
 		end
 		return unpack(args);
 	end
