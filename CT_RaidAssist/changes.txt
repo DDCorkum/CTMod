@@ -1,3 +1,8 @@
+CT_RaidAssist (8.2.0.9) 2019-09-10
+- Small fix for some classes in Clasic to cast buffs shortly after login
+- Small adjustments to make it easier to see how to move raid frames
+- Integrating localization via CurseForge
+
 CT_RaidAssist (8.2.0.8) 2019-09-01
 - Fixed the use of modifier keys for buffing and decursing
 

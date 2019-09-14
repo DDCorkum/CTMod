@@ -3,7 +3,7 @@
 --                                            --
 -- Provides features to assist raiders incl.  --
 -- customizable raid frames.  CTRA was the    --
--- original raid frame in Vanilla (pre 1.12?) --
+-- original raid frame in Vanilla (pre 1.11)  --
 -- but has since been re-written completely   --
 -- to integrate with the more modern UI.      --
 --                                            --
@@ -12,6 +12,7 @@
 -- the CTMod Team. Thank you.                 --
 --					      --
 -- Original credits to Cide and TS            --
+-- Improved by Dargen circa late Vanilla      --
 -- Maintained by Resike from 2014 to 2017     --
 -- Rebuilt by Dahk Celes (ddc) in 2019        --
 ------------------------------------------------
@@ -94,43 +95,6 @@ module.version = MODULE_VERSION;
 
 _G[MODULE_NAME] = module;
 CT_Library:registerModule(module);
-
-
--- THIS IS A PLACEHOLDER UNTIL LOCALIZATION CAN BE DONE FOR IMPORTANT SPELL NAMES
-module.text = { }
-local L = module.text
-L["CTRA/Spells/Revive"] = "Revive"
-L["CTRA/Spells/Raise Ally"] = "Raise Ally"
-L["CTRA/Spells/Soulstone"] = "Soulstone"
-L["CTRA/Spells/Redemption"] = "Redemption"
-L["CTRA/Spells/Resurrection"] = "Resurrection"
-L["CTRA/Spells/Ancestral Spirit"] = "Ancestral Spirit"
-L["CTRA/Spells/Rebirth"] = "Rebirth"
-L["CTRA/Spells/Nature's Cure"] = "Nature's Cure"
-L["CTRA/Spells/Remove Corruption"] = "Remove Corruption"
-L["CTRA/Spells/Abolish Poison"] = "Abolish Poison"
-L["CTRA/Spells/Cure Poison"] = "Cure Poison"
-L["CTRA/Spells/Remove Curse"] = "Remove Curse"
-L["CTRA/Spells/Revival"] = "Revival"
-L["CTRA/Spells/Detox"] = "Detox"
-L["CTRA/Spells/Cleanse"] = "Cleanse"
-L["CTRA/Spells/Purify"] = "Purify"
-L["CTRA/Spells/Cleanse Toxins"] = "Cleanse Toxins"
-L["CTRA/Spells/Purify Disease"] = "Purify Disease"
-L["CTRA/Spells/Dispel Magic"] = "Dispel Magic"
-L["CTRA/Spells/Purify Spirit"] = "Purify Spirit"
-L["CTRA/Spells/Cleanse Spirit"] = "Cleanse Spirit"
-L["CTRA/Spells/Arcane Intellect"] = "Arcane Intellect"
-L["CTRA/Spells/Arcane Brilliance"] = "Arcane Brilliance"
-L["CTRA/Spells/Amplify Magic"] = "Amplify Magic"
-L["CTRA/Spells/Dampen Magic"] = "Dampen Magic"
-L["CTRA/Spells/Battle Shout"] = "Battle Shout"
-L["CTRA/Spells/Power Word: Fortitude"] = "Power Word: Fortitude"
-L["CTRA/Spells/Prayer of Fortitude"] = "Prayer of Fortitude"
-L["CTRA/Spells/Trueshot Aura"] = "Trueshot Aura"
-
-
-
 
 -- triggered by module.update("init")
 function module:init()	
@@ -232,11 +196,11 @@ function module:frame()
 		optionsAddObject( -10, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#Please provide feedback to make it better!#0.8:0.4:0:l");
 				
 		-- General Features
-		optionsAddObject(-20, 17, "font#tl:5:%y#v:GameFontNormalLarge#General Features"); -- Custom Raid Frames
-		optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#These general features are separate from the custom raid frames.#" .. textColor2 .. ":l");
-		optionsBeginFrame(-15, 26, "checkbutton#tl:10:%y#n:CTRA_ExtendReadyChecksCheckButton#o:CTRA_ExtendReadyChecks:1#Show extended ready checks");
+		optionsAddObject(-20, 17, "font#tl:5:%y#v:GameFontNormalLarge#" .. module.text["CT_RaidAssist/Options/GeneralFeatures/Heading"]);
+		optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. module.text["CT_RaidAssist/Options/GeneralFeatures/Line1"] .. "#" .. textColor2 .. ":l");
+		optionsBeginFrame(-15, 26, "checkbutton#tl:10:%y#n:CTRA_ExtendReadyChecksCheckButton#o:CTRA_ExtendReadyChecks:1#" .. module.text["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksCheckButton"]);
 			optionsAddScript("onenter", function(button)
-					module:displayTooltip(button, "If you miss a /readycheck, \nprovide a button to say you returned", "ANCHOR_TOPLEFT");
+					module:displayTooltip(button, module.text["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksTooltip"], "ANCHOR_TOPLEFT");
 				end
 			);
 			optionsAddScript("onleave", function()
@@ -262,7 +226,7 @@ end
 module:setSlashCmd(slashCommand, "/ctra", "/ctraid", "/ctraidassist");
 
 --------------------------------------------
--- General Configuration Data  (update these tables every expansion to reflect class changes)
+-- General Configuration Data  (update these tables every expansion to reflect class changes, and also make changes to localization.lua)
 
 -- Which buffs should be applied out of combat when right-clicking the player frame?  Used by CTRAPlayerFrame.  If multiple abilities have the same modifier, the first one takes precedence.
 -- name: 	name of the spell to be cast 			(mandatory)
@@ -311,6 +275,7 @@ local CTRA_Configuration_FriendlyRemoves =
 	["MAGE"] =
 	{
 		{["name"] = "Remove Curse", ["modifier"] = "nomod", ["curse"] = true},
+		{["name"] = "Remove Lesser Curse", ["modifier"] = "nomod", ["curse"] = true},
 	},
 	["MONK"] =
 	{
@@ -401,14 +366,14 @@ AfterNotReadyFrame:SetScript("OnEvent",
 			if (module:getOption("CTRA_ExtendReadyChecks") ~= false) then
 				if (self.status == "waiting") then
 					self:Show();
-					self.text:SetText("You were afk, are you back now?")
+					self.text:SetText(module.text["CT_RaidAssist/AfterNotReadyFrame/WasAFK"]);
 				elseif (self.status == "notready") then
 					self:Show();
-					self.text:SetText("Are you ready now?")
+					self.text:SetText(module.text["CT_RaidAssist/AfterNotReadyFrame/WasNotReady"]);
 				elseif (not self.status) then
 					self:Show();
-					SetPortraitTexture(AfterNotReadyFrame.portrait, "player")
-					self.text:SetText("You might have missed a ready check!")
+					SetPortraitTexture(AfterNotReadyFrame.portrait, "player");
+					self.text:SetText(module.text["CT_RaidAssist/AfterNotReadyFrame/MissedCheck"]);
 					self.initiator = nil;
 				end
 			else
@@ -558,11 +523,15 @@ function NewCTRAFrames()
 			self:ToggleEnableState(value);
 		end
 		for i, window in ipairs(windows) do
-			if (strfind(option, "CTRAWindow" .. i .. "_") == 1) then
-				window:Update(strsub(option,strfind(option, "_")+1), value);
+			if (option) then
+				if (strfind(option, "CTRAWindow" .. i .. "_") == 1) then
+					window:Update(strsub(option,strfind(option, "_")+1), value);
+				end
+			else
+				window:Update();
 			end
 		end
-		if (dummyFrame and strfind(option, "CTRAWindow" .. (selectedWindow or 1) .. "_") == 1) then
+		if (dummyFrame and option and strfind(option, "CTRAWindow" .. (selectedWindow or 1) .. "_") == 1) then
 			dummyFrame:Update(strsub(option,strfind(option, "_")+1), value);
 		end
 	end
@@ -1218,7 +1187,16 @@ function NewCTRAFrames()
 	listener = CreateFrame("Frame", nil);
 	listener:RegisterEvent("PLAYER_ENTERING_WORLD");		-- defers creating the frames until the player is in the game
 	listener:RegisterEvent("GROUP_ROSTER_UPDATE");			-- the frames might enable only during raids, groups, or always!
-	listener:HookScript("OnEvent", function() obj:ToggleEnableState(); end);
+	listener:HookScript("OnEvent",
+		function(self, event)
+			obj:ToggleEnableState();
+			if (event == "PLAYER_ENTERING_WORLD") then
+				-- a hack because SpellInfo() isn't quite ready at PLAYER_ENTERING_WORLD in Classic
+				C_Timer.After(1, function() obj:Update(); end);		-- in case SpellInfo() is a split second late loading
+				C_Timer.After(10, function() obj:Update(); end);	-- in case SpellInfo() is a few seconds late loading
+			end
+		end
+	);	
 	return obj;
 
 end
@@ -1315,7 +1293,7 @@ function NewCTRAWindow(owningCTRAFrames)
 		if (not anchorFrame or not windowFrame) then
 			-- anchor to handle positioning, with assistance from CT_Library
 			anchorFrame = CreateFrame("Frame", nil, UIParent);
-			anchorFrame:SetSize(10,10);
+			anchorFrame:SetSize(80,20);
 			anchorFrame:SetPoint("CENTER", -300/asWindow, UIParent:GetHeight()/(3 + asWindow)); -- causes multiple new windows to be sort of cascading
 			anchorFrame:SetFrameLevel(4);	-- places it above windowFrame (1), and above the visualFrame (2) and secureButton (3) components of CTRAPlayerFrame
 			anchorFrame.texture = anchorFrame:CreateTexture(nil,"BACKGROUND");
@@ -1347,13 +1325,13 @@ function NewCTRAWindow(owningCTRAFrames)
 			);
 			-- indicator which window this is
 			anchorFrame.text = anchorFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-			anchorFrame.text:SetPoint("LEFT", anchorFrame, "RIGHT", 10, 0);
+			anchorFrame.text:SetPoint("LEFT", anchorFrame, "LEFT", 10, 0);
 			anchorFrame.text:SetTextColor(1,1,1,1);
 			
 			-- window that player frames reside in, with 2 pixel padding on all sides
 			windowFrame = CreateFrame("Frame", nil, UIParent);
 			windowFrame:SetSize(1,1);	-- arbitrary, just to make it exist
-			windowFrame:SetPoint("TOPLEFT", anchorFrame, "BOTTOM", -5, -10);
+			windowFrame:SetPoint("TOPLEFT", anchorFrame, "TOPLEFT", 0, -20);
 			windowFrame:Show();
 			windowFrame:SetScript("OnEvent",
 				function(__, event)
@@ -1435,6 +1413,10 @@ function NewCTRAWindow(owningCTRAFrames)
 	
 	function obj:IsEnabled()
 		return windowID ~= nil;
+	end
+	
+	function obj:GetWindowID()
+		return windowID;
 	end
 	
 	-- returns the value associated with this window, or returns
@@ -1769,8 +1751,6 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	local shownXOff;		-- the x coordinate this frame is currently showing
 	local shownYOff;		-- the y coordinate this frame is currently showing
 	local optionsWaiting = { };	-- a list of options that need to be triggered once combat ends
-	local macroLeft;		-- the macro used by secureButton during LeftButtonUp, except ~UNIT~ must be changed to shownUnit
-	local macroRight;		-- the macro used by secureButton during RightButtonUp, except ~UNIT~ must be changed to shownUnit
 	
 	-- graphical textures and fontstrings of visualFrame
 	local background;
@@ -2269,8 +2249,8 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			local combatRezToCast = { };
 			local hasRez = nil;
 			for i, details in ipairs(CTRA_Configuration_RezAbilities[class]) do
-				if (GetSpellInfo(module.text["CTRA/Spells/" .. details.name]) and details.combat and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and combatRezToCast[details.modifier] == nil) then
-					combatRezToCast[details.modifier] = module.text["CTRA/Spells/" .. details.name];
+				if (GetSpellInfo(module.text["CT_RaidAssist/Spells/" .. details.name]) and details.combat and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and combatRezToCast[details.modifier] == nil) then
+					combatRezToCast[details.modifier] = module.text["CT_RaidAssist/Spells/" .. details.name];
 					hasRez = true;
 				end
 			end
@@ -2288,8 +2268,8 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			local nocombatRezToCast = { };
 			local hasRez = nil;
 			for i, details in ipairs(CTRA_Configuration_RezAbilities[class]) do
-				if (GetSpellInfo(module.text["CTRA/Spells/" .. details.name]) and details.nocombat and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and nocombatRezToCast[details.modifier] == nil) then
-					nocombatRezToCast[details.modifier] = module.text["CTRA/Spells/" .. details.name];
+				if (GetSpellInfo(module.text["CT_RaidAssist/Spells/" .. details.name]) and details.nocombat and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and nocombatRezToCast[details.modifier] == nil) then
+					nocombatRezToCast[details.modifier] = module.text["CT_RaidAssist/Spells/" .. details.name];
 					hasRez = true;
 				end
 			end
@@ -2310,8 +2290,8 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			local friendlyRemovesToCast = { };
 			local hasFriendlyRemoves = nil;
 			for i, details in ipairs(CTRA_Configuration_FriendlyRemoves[class]) do
-				if (GetSpellInfo(module.text["CTRA/Spells/" .. details.name]) and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and friendlyRemovesToCast[details.modifier] == nil and (details.spec == nil or spec == nil or details.spec == spec)) then
-					friendlyRemovesToCast[details.modifier] = module.text["CTRA/Spells/" .. details.name];
+				if (GetSpellInfo(module.text["CT_RaidAssist/Spells/" .. details.name]) and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and friendlyRemovesToCast[details.modifier] == nil and (details.spec == nil or spec == nil or details.spec == spec)) then
+					friendlyRemovesToCast[details.modifier] = module.text["CT_RaidAssist/Spells/" .. details.name];
 					hasFriendlyRemoves = true;
 				end
 			end
@@ -2331,8 +2311,8 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			local buffsToCast = { };
 			local hasBuffs = nil;
 			for i, details in ipairs(CTRA_Configuration_Buffs[class]) do
-				if (GetSpellInfo(module.text["CTRA/Spells/" .. details.name]) and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and (buffsToCast[details.modifier] == nil)) then
-					buffsToCast[details.modifier] = module.text["CTRA/Spells/" .. details.name];
+				if (GetSpellInfo(module.text["CT_RaidAssist/Spells/" .. details.name]) and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and (buffsToCast[details.modifier] == nil)) then
+					buffsToCast[details.modifier] = module.text["CT_RaidAssist/Spells/" .. details.name];
 					hasBuffs = true;
 				end
 			end
@@ -2342,16 +2322,16 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 		end
 		return nil;
 	end
-
-	-- updates macroLeft and macroRight to support secureButton
-	local configureMacros = function()
-		if (InCombatLockdown() or not secureButton or not visualFrame) then return; end
-
-		-- LeftButtonUp
-		macroLeft = "/target ~UNIT~";	
+	
+	-- updates secureButton macros once out of combat
+	local updateMacros = function()
+		if (InCombatLockdown()) then return; end
 		
-		-- RightButtonUp
-		macroRight = "";
+		-- left click just targets
+		secureButton:SetAttribute("*macrotext1", "/target " .. shownUnit);
+		
+		-- right click does several things
+		local macroRight = ""
 		local rezCombat = canRezCombat();
 		local rezNoCombat = canRezNoCombat();
 		local removeDebuff = canRemoveDebuff();
@@ -2360,33 +2340,26 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			macroRight = macroRight .. "/cast";
 			if (rezCombat) then						-- [@party1, exists, dead, combat, nomod] Rebirth;
 				for modifier, spellName in pairs(rezCombat) do
-					macroRight = macroRight .. " [@~UNIT~, exists, dead, combat, " .. modifier .. "] " .. spellName .. ";";
+					macroRight = macroRight .. " [@" .. shownUnit .. ", exists, dead, combat, " .. modifier .. "] " .. spellName .. ";";
 				end
 			end			
 			if (rezNoCombat) then						-- [@party1, exists, dead, nocombat, nomod] Resurrection;
 				for modifier, spellName in pairs(rezNoCombat) do
-					macroRight = macroRight .. " [@~UNIT~, exists, dead, nocombat, " .. modifier .. "] " .. spellName .. ";";
+					macroRight = macroRight .. " [@" .. shownUnit .. ", exists, dead, nocombat, " .. modifier .. "] " .. spellName .. ";";
 				end
 			end
 			if (removeDebuff) then						-- [@party1, exists, nodead, combat, nomod] Abolish Poison; [@party1, nodead, combat, mod:shift] Remove Curse;
 				for modifier, spellName in pairs(removeDebuff) do
-					macroRight = macroRight .. " [@~UNIT~, exists, nodead, combat, " .. modifier .. "] " .. spellName .. ";";
+					macroRight = macroRight .. " [@" .. shownUnit .. ", exists, nodead, combat, " .. modifier .. "] " .. spellName .. ";";
 				end
 			end	
 			if (applyBuff) then						-- [@party1, exists, nodead, nocombat, nomod] Arcane Intellect; [@party1, nodead, nocombat, mod:shift] Arcane Brilliance;
 				for modifier, spellName in pairs(applyBuff) do
-					macroRight = macroRight .. " [@~UNIT~, exists, nodead, nocombat, " .. modifier .. "] " .. spellName .. ";";
+					macroRight = macroRight .. " [@" .. shownUnit .. ", exists, nodead, nocombat, " .. modifier .. "] " .. spellName .. ";";
 				end
 			end
 		end
-	end
-	
-	-- updates secureButton macros once out of combat, based on the last call of configureMacros
-	local updateMacros = function()
-		local textL = gsub(macroLeft,"~UNIT~",shownUnit);
-		local textR = gsub(macroRight,"~UNIT~",shownUnit);
-		secureButton:SetAttribute("*macrotext1", textL);
-		secureButton:SetAttribute("*macrotext2", textR);
+		secureButton:SetAttribute("*macrotext2", macroRight);
 	end
 	
 	-- PUBLIC FUNCTIONS
@@ -2463,23 +2436,35 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 							local rezNoCombat = canRezNoCombat();
 							if (not InCombatLockdown() and (buff or remove or rezCombat or rezNoCombat)) then
 								GameTooltip:AddLine("|nRight click...");
-								if buff then for modifier, spellName in pairs(buff) do GameTooltip:AddDoubleLine("|cFF33FF66nocombat" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFF33FF66" .. module.text["CTRA/Spells/" .. spellName]); end end
-								if rezNoCombat then for modifier, spellName in pairs(rezNoCombat) do GameTooltip:AddDoubleLine("|cFFFF6666combat, dead" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFFF6666" .. module.text["CTRA/Spells/" .. spellName]); end end
-								if remove then for modifier, spellName in pairs(remove) do GameTooltip:AddDoubleLine("|cFFFF6666combat" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFFF6666" .. module.text["CTRA/Spells/" .. spellName]); end end
-								if rezCombat then for modifier, spellName in pairs(rezCombat) do GameTooltip:AddDoubleLine("|cFFCCCC66nocombat, dead" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFCCCC66" .. module.text["CTRA/Spells/" .. spellName]); end end
+								if buff then for modifier, spellName in pairs(buff) do
+									GameTooltip:AddDoubleLine("|cFF33CC66nocombat" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFF33CC66" .. module.text["CT_RaidAssist/Spells/" .. spellName]);
+								end end
+								if remove then for modifier, spellName in pairs(remove) do
+									GameTooltip:AddDoubleLine("|cFFCC6666combat" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFCC6666" .. module.text["CT_RaidAssist/Spells/" .. spellName]);
+								end end
+								if rezNoCombat then for modifier, spellName in pairs(rezNoCombat) do 
+									GameTooltip:AddDoubleLine("|cFFCC6666combat, dead" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFCC6666" .. module.text["CT_RaidAssist/Spells/" .. spellName]);
+								end end
+								if rezCombat then for modifier, spellName in pairs(rezCombat) do 
+									GameTooltip:AddDoubleLine("|cFFCCCC66nocombat, dead" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFCCCC66" .. module.text["CT_RaidAssist/Spells/" .. spellName]);
+								end end
 							end
 							if (not module.GameTooltipExtraLine) then
 								module.GameTooltipExtraLine = GameTooltip:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall");
 								module.GameTooltipExtraLine:SetPoint("BOTTOM", 0, 6);
-								module.GameTooltipExtraLine:SetText("/ctra to move and configure");
-								module.GameTooltipExtraLine:SetTextColor(0.35, 0.35, 0.35);
+								module.GameTooltipExtraLine:SetText(module.text["CT_RaidAssist/PlayerFrame/TooltipFooter"]);
 								module.GameTooltipExtraLine:SetScale(0.90);
 							end
 							GameTooltip:Show();
 							if (not InCombatLockdown()) then
 								module.GameTooltipExtraLine:Show();
-								GameTooltip:SetHeight(GameTooltip:GetHeight()+3);
+								GameTooltip:SetHeight(GameTooltip:GetHeight()+5);
 								GameTooltip:SetWidth(max(150,GameTooltip:GetWidth()));
+								if (owner.GetWindowID and module:getOption("MOVABLE-CTRAWindow" .. owner:GetWindowID())) then
+									module.GameTooltipExtraLine:SetTextColor(0.50, 0.50, 0.50);
+								else
+									module.GameTooltipExtraLine:SetTextColor(1,1,1);
+								end
 							end
 						end
 					end
@@ -2556,8 +2541,6 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 							configurePowerBar();
 						elseif (event == "UNIT_AURA") then
 							updateAuras();
-						elseif (event == "PLAYER_LEVEL_UP") then
-							configureMacros();
 						elseif (event == "PLAYER_REGEN_DISABLED") then
 							updateMacros();
 						elseif (
@@ -2609,9 +2592,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				listenerFrame:RegisterUnitEvent("READY_CHECK_CONFIRM", shownUnit);	-- updateStatusIndicators();
 				listenerFrame:RegisterEvent("READY_CHECK_FINISHED");			-- updateStatusIndicators();
 				listenerFrame:RegisterUnitEvent("PLAYER_FLAGS_CHANGED");		-- updateStatusIndicators();
-				listenerFrame:RegisterUnitEvent("UNIT_CONNECTION");
-				listenerFrame:RegisterEvent("PLAYER_LEVEL_UP");				-- configureMacros();
-				listenerFrame:RegisterEvent("PLAYER_REGEN_ENABLED");			-- updateMacros();
+				listenerFrame:RegisterUnitEvent("UNIT_CONNECTION");			-- updateStatusIndicators();
 				listenerFrame:RegisterUnitEvent("CANCEL_SUMMON");			-- updateRoleTexture();
 				listenerFrame:RegisterUnitEvent("CONFIRM_SUMMON");			-- updateRoleTexture();
 				listenerFrame:RegisterUnitEvent("RAID_TARGET_UPDATE");			-- updateRoleTexture();
@@ -2633,9 +2614,6 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 
 			-- configure the secureButton for the new unit
 			secureButton:SetAttribute("unit", shownUnit);
-			if not (macroLeft) then
-				configureMacros();
-			end
 			updateMacros();
 		end
 		-- visualFrame's children must be updated whenever group composition changes in case the players have changed position within the group or raid.
@@ -2648,6 +2626,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			updateUnitNameFontString();
 			updateAuras();
 			updateStatusIndicators();
+			updateMacros();
 		end
 	end
 	
@@ -2683,8 +2662,6 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 	local shownXOff;		-- the x coordinate this frame is currently showing
 	local shownYOff;		-- the y coordinate this frame is currently showing
 	local optionsWaiting = { };	-- a list of options that need to be triggered once combat ends
-	local macroLeft;		-- the macro used by secureButton during LeftButtonUp, except ~UNIT~ must be changed to shownUnit
-	local macroRight;		-- the macro used by secureButton during RightButtonUp, except ~UNIT~ must be changed to shownUnit
 	
 	-- graphical textures and fontstrings of visualFrame
 	local background;
@@ -2743,23 +2720,10 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 		end
 	end
 
-	-- updates macroLeft and macroRight to support secureButton
-	local configureMacros = function()
-		if (InCombatLockdown() or not secureButton or not visualFrame) then return; end
-
-		-- LeftButtonUp
-		macroLeft = "/target ~UNIT~";	
-		
-		-- RightButtonUp
-		macroRight = "";		-- TODO: Add functionality for taunting mobs or polymorphing mind-controlled players?
-	end
-	
 	-- updates secureButton macros once out of combat, based on the last call of configureMacros
 	local updateMacros = function()
-		local textL = gsub(macroLeft,"~UNIT~",shownUnit);
-		local textR = gsub(macroRight,"~UNIT~",shownUnit);
-		secureButton:SetAttribute("*macrotext1", textL);
-		secureButton:SetAttribute("*macrotext2", textR);
+		if (InCombatLockdown()) then return; end
+		secureButton:SetAttribute("*macrotext1", "/target " .. shownUnit);
 	end
 	
 	-- PUBLIC FUNCTIONS
@@ -2809,9 +2773,8 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 				-- overlay button that can be clicked to do stuff in combat (the secure configuration is made later in step 3)
 				secureButton = CreateFrame("Button", nil, visualFrame, "SecureUnitButtonTemplate");
 				secureButton:SetAllPoints();
-				secureButton:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+				secureButton:RegisterForClicks("LeftButtonDown");
 				secureButton:SetAttribute("*type1", "macro");
-				secureButton:SetAttribute("*type2", "macro");
 				secureButton:HookScript("OnEnter",
 					function()
 						if (UnitExists(shownUnit)) then
@@ -2901,9 +2864,6 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 
 			-- configure the secureButton for the new unit
 			secureButton:SetAttribute("unit", shownUnit);
-			if not (macroLeft) then
-				configureMacros();
-			end
 			updateMacros();
 		end
 		

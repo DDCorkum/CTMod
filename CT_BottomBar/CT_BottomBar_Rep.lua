@@ -795,12 +795,6 @@ local function addon_Init(self)
 
 	-- (from ReputationFrame.lua)
 	hooksecurefunc("ReputationWatchBar_UpdateMaxLevel", addon_Hooked_ReputationWatchBar_Update);
-
-	-- (from OverrideActionBar.lua)
-	-- hooksecurefunc("OverrideActionBar_UpdateXpBar", addon_Hooked_OverrideActionBar_UpdateXpBar);
-
-	-- (from Blizzard_PetBattleUI.lua)
-	-- hooksecurefunc("PetBattleFrame_UpdateXpBar", addon_Hooked_PetBattleFrame_UpdateXpBar);
 	
 --	hooksecurefunc("VehicleMenuBar_MoveMicroButtons", addon_Hooked_VehicleMenuBar_MoveMicroButtons);
 --	hooksecurefunc("ActionBar_AnimTransitionFinished", addon_Hooked_AnimTransitionFinished);

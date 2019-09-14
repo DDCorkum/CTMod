@@ -1,3 +1,6 @@
+CT_Core (8.2.0.9) 2019-09-10
+- When showing levels in the Classic quest log, elite/group/dungeon quests now appear as [60+]
+
 CT_Core (8.2.0.8) 2019-09-01
 - Fix to objectives tracker in Classic when there are zero quests being tracked
 

@@ -1,3 +1,7 @@
+CT_Bottombar (8.2.0.9) 2019-09-12
+- The cancel-flying button now follows the movable stance bar in Classic
+- The classic xp and rep bars are once again configurable like pre-Legion
+
 CT_Bottombar (8.2.0.7) 2019-08-29
 - Disabled custom OverrideBar code (a retail thing) from causing errors in Classic
 - Added a movable stance bar to Classic
