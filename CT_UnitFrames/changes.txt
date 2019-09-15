@@ -1,3 +1,6 @@
+CT_UnitFrames (8.2.0.10) 2019-09-14
+- More control over fonts on player, target and party frames
+
 CT_UnitFrames (8.2.0.8) 2019-09-01
 - Added pvp and hostile colors to target-class frame (credit to GitHub user shoestare)
 
