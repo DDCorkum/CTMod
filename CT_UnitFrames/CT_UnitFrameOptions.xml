@@ -360,6 +360,46 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 					</Layer>
 				</Layers>
 			</CheckButton>
+			<CheckButton name="$parentMakeFontLikeRetailCB" hidden="false" inherits="OptionsCheckButtonTemplate">
+				<HitRectInsets>
+					<AbsInset left="0" right="0" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="270" y="9"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CT_UnitFramesOptions_MakeFontLikeRetail_CB_OnClick(self, self:GetChecked());
+					</OnClick>
+					<OnLoad>
+						if (CT_UnitFrames:getGameVersion() ~= CT_GAME_VERSION_CLASSIC) then
+							self:Hide();
+						end
+					</OnLoad>
+
+				</Scripts>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentName" inherits="GameFontNormalSmall" text="|cFFFFFF00New! |rUse retail font on bars">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="4" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1" g="1" b="1"/>
+						</FontString>
+					</Layer>
+				</Layers>
+			</CheckButton>
 			<Button name="$parentPlayerOptions" inherits="UIPanelButtonTemplate" text="Player">
 				<Size>
 					<AbsDimension x="89" y="21"/>
@@ -642,7 +682,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</OnShow>
 							<OnValueChanged>
 								CT_UnitFramesOptions.partyTextSize = self:GetValue();
-								_G[self:GetName().."Text"]:SetText(CT_UFO_PARTYTEXTSIZE .. " = "..self:GetValue());
+								_G[self:GetName().."Text"]:SetText(CT_UFO_PARTYTEXTSIZE .. " = "..self:GetValue()+7);
 								CT_UnitFramesOptions_Radio_Update();
 							</OnValueChanged>
 						</Scripts>
@@ -708,16 +748,8 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 					</Layer>
 				</Layers>
 				<Frames>
+					<!-- Box3Selection5, then Box3Selection3, then Box3Selection4.  Change made in 8.2.5.1 -->
 					<Frame name="$parentSelection3" id="3" inherits="CT_UnitFramesOptionsFrameSelectionTemplate">
-						<Anchors>
-							<Anchor point="TOPLEFT">
-								<Offset>
-									<AbsDimension x="10" y="-45"/>
-								</Offset>
-							</Anchor>
-						</Anchors>
-					</Frame>
-					<Frame name="$parentSelection4" id="4" inherits="CT_UnitFramesOptionsFrameSelectionTemplate">
 						<Anchors>
 							<Anchor point="TOPLEFT">
 								<Offset>
@@ -726,11 +758,20 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</Anchor>
 						</Anchors>
 					</Frame>
-					<Frame name="$parentSelection5" id="5" inherits="CT_UnitFramesOptionsFrameSelectionTemplate">
+					<Frame name="$parentSelection4" id="4" inherits="CT_UnitFramesOptionsFrameSelectionTemplate">
 						<Anchors>
 							<Anchor point="TOPLEFT">
 								<Offset>
 									<AbsDimension x="10" y="-85"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentSelection5" id="5" inherits="CT_UnitFramesOptionsFrameSelectionTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="10" y="-45"/>
 								</Offset>
 							</Anchor>
 						</Anchors>

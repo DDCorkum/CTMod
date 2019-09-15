@@ -259,6 +259,7 @@ function CT_UnitFramesOptions_Radio_Update()
 	CT_UnitFramesOptionsFrameOneColorHealthCB:SetChecked(CT_UnitFramesOptions.oneColorHealth);
 	CT_UnitFramesOptionsFrameLargeBreakUpCB:SetChecked(CT_UnitFramesOptions.largeBreakUp ~= false);
 	CT_UnitFramesOptionsFrameLargeAbbreviateCB:SetChecked(CT_UnitFramesOptions.largeAbbreviate ~= false);
+	CT_UnitFramesOptionsFrameMakeFontLikeRetailCB:SetChecked(CT_UnitFramesOptions.makeFontLikeRetail ~= false);
 
 	if ( CT_UnitFramesOptions.displayTargetClass ) then
 		CT_TargetFrameClassFrame:Show();
@@ -551,6 +552,15 @@ end
 
 function CT_UnitFramesOptions_LargeAbbreviate_CB_OnClick(self, checked)
 	CT_UnitFramesOptions.largeAbbreviate = (not not checked); -- false if checked == nil, true if 1
+	CT_PlayerFrame_ShowBarText();
+	CT_PartyFrame_ShowBarText();
+	CT_TargetFrame_ShowBarText();
+	CT_AssistFrame_ShowBarText();
+	CT_FocusFrame_ShowBarText();
+end
+
+function CT_UnitFramesOptions_MakeFontLikeRetail_CB_OnClick(self, checked)
+	CT_UnitFramesOptions.makeFontLikeRetail = (not not checked); -- false if checked == nil, true if 1
 	CT_PlayerFrame_ShowBarText();
 	CT_PartyFrame_ShowBarText();
 	CT_TargetFrame_ShowBarText();
