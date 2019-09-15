@@ -74,18 +74,22 @@ function CT_PartyFrame_TextStatusBar_UpdateTextString(bar)
 			end
 
 			-- compatibility with WoW Classic
-			if (not bar.TextString) then
+			local barTextString = bar.TextString or bar.ctTextString;
+			if (not barTextString) then
 				local intermediateFrame = CreateFrame("Frame", nil, bar);
 				intermediateFrame:SetFrameLevel(5);
 				intermediateFrame:SetAllPoints();
-				bar.TextString = intermediateFrame:CreateFontString(nil, "ARTWORK", "GameTooltipTextSmall");
-				bar.TextString:SetPoint("CENTER", bar);
-				bar.TextString.ctControlled = "Party";
+				barTextString = intermediateFrame:CreateFontString(nil, "ARTWORK", "GameTooltipTextSmall");
+				barTextString:SetPoint("CENTER", bar);
+				barTextString.ctControlled = "Party";
+				bar.ctTextString = barTextString;
 			end
-			if (bar.TextString.ctSize ~= (CT_UnitFramesOptions.partyTextSize or 3)) then
-				bar.TextString.ctSize = CT_UnitFramesOptions.partyTextSize or 3
-				bar.TextString:SetFont("Fonts\\FRIZQT__.TTF", bar.TextString.ctSize + 7, "OUTLINE");
-				textRight:SetFont("Fonts\\FRIZQT__.TTF", bar.TextString.ctSize + 7);
+			
+			-- font
+			if (barTextString.ctSize ~= (CT_UnitFramesOptions.partyTextSize or 3)) then
+				barTextString.ctSize = CT_UnitFramesOptions.partyTextSize or 3
+				barTextString:SetFont("Fonts\\FRIZQT__.TTF", barTextString.ctSize + 7, "OUTLINE");
+				textRight:SetFont("Fonts\\FRIZQT__.TTF", barTextString.ctSize + 7);
 			end
 			
 			CT_UnitFrames_TextStatusBar_UpdateTextString(bar, CT_UnitFramesOptions.styles[2][1])
@@ -112,19 +116,22 @@ function CT_PartyFrame_TextStatusBar_UpdateTextString(bar)
 			
 			
 			-- compatibility with WoW Classic
-			if (not bar.TextString) then
+			local barTextString = bar.TextString or bar.ctTextString;
+			if (not barTextString) then
 				local intermediateFrame = CreateFrame("Frame", nil, bar);
 				intermediateFrame:SetFrameLevel(5);
 				intermediateFrame:SetAllPoints();
-				bar.TextString = intermediateFrame:CreateFontString(nil, "ARTWORK", "GameTooltipTextSmall");
-				bar.TextString:SetPoint("CENTER", bar);
-				bar.TextString.ctControlled = "Party";
+				barTextString = intermediateFrame:CreateFontString(nil, "ARTWORK", "GameTooltipTextSmall");
+				barTextString:SetPoint("CENTER", bar);
+				barTextString.ctControlled = "Party";
+				bar.ctTextString = barTextString;
 			end
 			
-			if (bar.TextString.ctSize ~= CT_UnitFramesOptions.partyTextSize or 3) then
-				bar.TextString.ctSize = CT_UnitFramesOptions.partyTextSize or 3
-				bar.TextString:SetFont("Fonts\\FRIZQT__.TTF", bar.TextString.ctSize + 7, "OUTLINE");
-				textRight:SetFont("Fonts\\FRIZQT__.TTF", bar.TextString.ctSize + 7);
+			-- font
+			if (barTextString.ctSize ~= (CT_UnitFramesOptions.partyTextSize or 3)) then
+				barTextString.ctSize = CT_UnitFramesOptions.partyTextSize or 3
+				barTextString:SetFont("Fonts\\FRIZQT__.TTF", barTextString.ctSize + 7, "OUTLINE");
+				textRight:SetFont("Fonts\\FRIZQT__.TTF", barTextString.ctSize + 7);
 			end
 
 			CT_UnitFrames_TextStatusBar_UpdateTextString(bar, CT_UnitFramesOptions.styles[2][3])

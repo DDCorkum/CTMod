@@ -68,7 +68,7 @@ function CT_UnitFrames_ResetDragLink(name)
 end
 
 function CT_UnitFrames_TextStatusBar_UpdateTextString(textStatusBar, settings, lockShow)
-	local textString = textStatusBar.TextString;
+	local textString = textStatusBar.TextString or textStatusBar.ctTextString;	--ctTextString is used to avoid creating taint
 	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
 		if (not textString) then
 			local intermediateFrame = CreateFrame("Frame", nil, textStatusBar);
@@ -76,7 +76,7 @@ function CT_UnitFrames_TextStatusBar_UpdateTextString(textStatusBar, settings, l
 			intermediateFrame:SetAllPoints();
 			textString = intermediateFrame:CreateFontString(nil, "OVERLAY", "TextStatusBarText");
 			textString:SetPoint("CENTER", textStatusBar);
-			textStatusBar.TextString = textString;
+			textStatusBar.ctTextString = textString;
 		end
 		if ((textString.ctControlled == "Classic" or textString.ctControlled == nil) and CT_UnitFramesOptions.makeFontLikeRetail) then
 			-- set or change it to retail font, but do it just once
