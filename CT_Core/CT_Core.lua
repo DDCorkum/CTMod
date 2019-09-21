@@ -126,24 +126,6 @@ local function minimapFrameSkeleton()    -- note: one of the images is embedded 
 										L_UIDropDownMenu_AddButton(info);
 									end
 								end
-
-								if (CT_RA_Version and CT_RASets_Button and not CT_RASets_Button:IsShown()) then
-									local info = {};
-									info.text = "";  --creates a blank space before the CTRA menu
-									info.isTitle = 1;
-									info.justifyH = "CENTER";
-									info.notCheckable = 1;
-									L_UIDropDownMenu_AddButton(info);
-									info = {};
-									info.text = "CTRA";
-									info.hasArrow = 1;
-									info.value = "RaidAssist";
-									info.notCheckable = 1;
-									L_UIDropDownMenu_AddButton(info);
-								end
-
-							elseif L_UIDROPDOWNMENU_MENU_VALUE == "RaidAssist" then
-								CT_RASets_DropDown_Initialize()
 							elseif (_G[L_UIDROPDOWNMENU_MENU_VALUE] and _G[L_UIDROPDOWNMENU_MENU_VALUE].externalDropDown_Initialize) then
 								_G[L_UIDROPDOWNMENU_MENU_VALUE].externalDropDown_Initialize()
 							end
@@ -273,8 +255,10 @@ end
 
 -- Options frame
 local optionsFrameList;
+local sectionYOffsets;	--used to move the scroll bar to each section for convenience
 local function optionsInit()
 	optionsFrameList = module:framesInit();
+	sectionYOffsets = { };
 end
 local function optionsGetData()
 	return module:framesGetData(optionsFrameList);
@@ -293,6 +277,9 @@ local function optionsBeginFrame(offset, size, details, data)
 end
 local function optionsEndFrame()
 	module:framesEndFrame(optionsFrameList);
+end
+local function optionsAddBookmark(title)
+	tinsert(sectionYOffsets, {name = title, offset = -floor(module:framesGetYOffset(optionsFrameList))});
 end
 
 local function humanizeTime(timeValue)
@@ -365,8 +352,22 @@ module.frame = function()
 		optionsAddObject( -2, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#You can use /ctcore to open this options window directly.#" .. textColor2 .. ":l");
 		optionsAddObject( -2, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#You can use /hail to hail your current target. A key binding is also available for this.#" .. textColor2 .. ":l");
 
+	-- Quick Navigation
+		optionsBeginFrame(-20, 60, "frame#tl:0:%y#s:0:%s#r");
+			optionsAddScript("onload",
+				function(frame)
+					local dropdown = L_Create_UIDropDownMenu("", frame);
+					dropdown:SetPoint("CENTER");
+					L_UIDropDownMenu_SetWidth(dropdown, 120);
+					L_UIDropDownMenu_SetText(dropdown, "Skip to section...");
+					L_UIDropDownMenu_Initialize(dropdown, module.externalDropDown_Initialize);
+				end
+			);
+		optionsEndFrame();
+
 	-- Alternate Power Bar
 		if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+			optionsAddBookmark("Alternate Power Bar");
 			optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Alternate Power Bar");
 			optionsAddObject( -2, 5*14, "font#t:0:%y#s:0:%s#l:13:0#r#The game sometimes uses this bar to show the status of a quest, or your status in a fight, etc. The bar can vary in size, and its default position is centered near the bottom of the screen.#" .. textColor2 .. ":l");
 			optionsAddObject( -2, 3*14, "font#t:0:%y#s:0:%s#l:13:0#r#When the bar is unlocked, use left-click to move it, and right-click to reset its position.#" .. textColor2 .. ":l");
@@ -388,10 +389,12 @@ module.frame = function()
 		end
 
 	-- Auction house options
+		optionsAddBookmark("Auction House");
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Auction House");
 		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:auctionAltClickItem#Alt left-click to add an item to the Auctions tab");
 
 	-- Bag automation
+		optionsAddBookmark("Bag Automation");
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Bag automation options");
 		optionsAddObject( -8, 2*13, "font#t:0:%y#s:0:%s#l:13:0#r#Disable bag automation if you have other bag management addons#" .. textColor2 .. ":l");	
 		optionsBeginFrame( -3, 15, "checkbutton#tl:60:%y#o:disableBagAutomation#i:disableBagAutomation#|cFFFF6666Disable bag automation");
@@ -552,6 +555,7 @@ module.frame = function()
 		optionsAddObject( -18, 1*13, "font#tl:25:%y#s:0:%s#l:13:0#r#Also see CT_MailMod for bag settings#" .. textColor2 .. ":l");	
 
 	-- Camera Max Distance
+		optionsAddBookmark("Camera Max Distance");
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Camera Max Distance");
 		optionsAddObject(  0, 4*13, "font#t:0:%y#s:0:%s#l:40:0#r#Since Legion (7.0.3) you can type \n/console cameraDistanceMaxZoomFactor\n to zoom the camera further out.#" .. textColor2 .. ":l");
 		optionsAddObject(  0, 4*13, "font#t:0:%y#s:0:%s#l:40:0#r#The game default is 1.9, but players often increase it to 2.6 for better situational awareness in raid fights.#" .. textColor2 .. ":l");
@@ -597,12 +601,14 @@ module.frame = function()
 			
 
 	-- Casting Bar options
+		optionsAddBookmark("Casting Bar");
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Casting Bar");
 		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:castingTimers#Display casting bar timers");
 		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:castingbarEnabled#Use custom casting bar position");
 		optionsAddObject(  6,   26, "checkbutton#tl:40:%y#o:castingbarMovable#Unlock the casting bar");
 
 	-- Chat options
+		optionsAddBookmark("Chat Features");
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Chat");
 
 		-- Chat frame timestamps
@@ -710,23 +716,28 @@ module.frame = function()
 		end
 
 	-- Duel options
+		optionsAddBookmark("Duels");
 		optionsAddObject(-25,   17, "font#tl:5:%y#v:GameFontNormalLarge#Duels");
 		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:blockDuels#Block all duels");
 		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:blockDuelsMessage#Show message when a duel is blocked");
 
 	-- Hide Gryphons
-		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Hide Gryphons");
 		if (not CT_BottomBar) then
+			optionsAddBookmark("Hide Gryphons");
+			optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Hide Gryphons");
 			optionsAddObject( -5,   26, "checkbutton#tl:10:%y#i:hideGryphons#o:hideGryphons#Hide the Main Bar gryphons");
 		else
-			optionsAddObject( -5,   26, "font#tl:0:%y#v:GameFontNormal#This feature is now in CT_BottomBar#" .. textColor2 .. ":1");
+			optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Hide Gryphons#" .. textColor2 .. ":l");
+			optionsAddObject( -5,   26, "font#tl:0:%y#v:GameFontNormal#This feature is now in CT_BottomBar#" .. textColor2 .. ":l");
 		end
 
 	-- Merchant options
+		optionsAddBookmark("Merchant");
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Merchant");
 		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:merchantAltClickItem:true#Alt click a merchant's item to buy a stack");
 
 	-- Minimap Options
+		optionsAddBookmark("Minimap");
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Minimap "); -- Need the blank after "Minimap" otherwise the word won't appear on screen.
 		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:hideWorldMap#Hide the World Map minimap button");
 		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:minimapIcon:true#Show the CTMod minimap button");
@@ -739,8 +750,12 @@ module.frame = function()
 		optionsEndFrame();
 		optionsAddObject(-5, 3*13, "font#t:0:%y#s:0:%s#l#r#Note: This will place the CTMod minimap button at the center of your screen. From there it can dragged anywhere on the screen.#" .. textColor2);
 
-	-- Objectives
-		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Objectives");
+	-- Quests
+		optionsAddBookmark("Quests");
+		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Quests");
+		
+		-- Movable Objectives Tracker
+		optionsAddObject(-20, 1*13, "font#tl:15:%y#Movable Objectives Tracker");
 		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#i:watchframeEnabled#o:watchframeEnabled#Enable these options");
 		optionsAddObject(  4,   26, "checkbutton#tl:40:%y#i:watchframeLocked#o:watchframeLocked:true#Lock the game's Objectives window");
 		optionsAddObject(  6,   26, "checkbutton#tl:40:%y#i:watchframeShowTooltip#o:watchframeShowTooltip:true#Show drag and resize tooltips");
@@ -760,8 +775,8 @@ module.frame = function()
 
 		optionsAddObject(  5, 5*13, "font#t:0:%y#s:0:%s#l:70:0#r#Note: To use a wider objectives window without enabling this option, you can enable the 'Wider objectives tracker' option in the game's Interface options.#" .. textColor2 .. ":l");
 
-	-- Quests
-		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Quests");
+		--Quest Log
+		optionsAddObject(-20, 1*13, "font#tl:15:%y#Quest Log");
 		optionsBeginFrame(-5,   26, "checkbutton#tl:10:%y#o:questLevels#Display quest levels in the Quest Log");
 			optionsAddScript("onenter",
 				function(button)
@@ -776,7 +791,8 @@ module.frame = function()
 		optionsEndFrame();
 
 	-- Regen Rates
-		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Regen Rates");
+		optionsAddBookmark("Regen Tracker");
+		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Regen Rate Tracker");
 		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:tickMod#Display health/mana regeneration rates");
 		optionsAddObject( -2,   14, "font#tl:60:%y#v:ChatFontNormal#Format:");
 		optionsAddObject( 14,   20, "dropdown#tl:100:%y#s:125:%s#o:tickModFormat#n:CTCoreDropdown1#Health - Mana#HP/Tick - MP/Tick#HP - MP");
@@ -785,7 +801,8 @@ module.frame = function()
 		local tooltipOptionsObjects = {};
 		local tooltipOptionsValue = nil;
 
-		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Tooltip Relocation");
+		optionsAddBookmark("Tooltip");
+		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Custom Tooltip Position");
 		optionsAddObject( -8, 2*13, "font#tl:15:%y#r#s:0:%s#This allows you to change the place where the game's default tooltip appears.#" .. textColor2 .. ":l");
 
 		optionsAddObject(-15,   15, "font#tl:15:%y#v:ChatFontNormal#Tooltip location:");
@@ -886,6 +903,7 @@ module.frame = function()
 		optionsEndFrame();
 
 	-- Trading options
+		optionsAddBookmark("Trading");
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Trading");
 		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:tradeAltClickOpen#Alt left-click an item to open trade with target");
 		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:tradeAltClickAdd#Alt left-click to add an item to the trade window");
@@ -893,6 +911,7 @@ module.frame = function()
 	optionsEndFrame();
 
 	-- Reset Options
+	optionsAddBookmark("Reset All");
 	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Reset Options");
 		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:resetAll#Reset options for all of your characters");
@@ -916,4 +935,37 @@ module.frame = function()
 	optionsEndFrame();
 
 	return "frame#all", optionsGetData();
+end
+
+
+--------------------------------------------
+-- Options
+
+-- used by the minimap and titan-panel plugins
+module.externalDropDown_Initialize = function()
+
+	local info = { };
+	info.text = "CT_Core";
+	info.isTitle = 1;
+	info.justifyH = "CENTER";
+	info.notCheckable = 1;
+	L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL);
+	
+	if (not sectionYOffsets) then
+		module:frame();
+	end
+	
+	for __, item in ipairs(sectionYOffsets) do
+		info = { };
+		info.text = item.name;
+		info.notCheckable = 1;
+		info.func = function()
+			module:showModuleOptions(module.name);
+			if (not InCombatLockdown()) then
+				CT_LibraryOptionsScrollFrameScrollBar:SetValue(item.offset);
+			end
+		end
+		L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL);
+	end
+	
 end
