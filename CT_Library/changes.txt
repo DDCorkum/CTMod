@@ -1,3 +1,6 @@
+CT_Library (8.2.5.1) 2019-09-21
+- Library updates
+
 CT_Library (8.2.0.5) 2019-08-14
 - getOption(option) and setOption(option, ...) now accept "option" or option() as a parameter
 - The control panel is now slightly more opaque to improve readability
