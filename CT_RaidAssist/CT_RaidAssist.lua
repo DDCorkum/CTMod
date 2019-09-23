@@ -2437,16 +2437,16 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 							if (not InCombatLockdown() and (buff or remove or rezCombat or rezNoCombat)) then
 								GameTooltip:AddLine("|nRight click...");
 								if buff then for modifier, spellName in pairs(buff) do
-									GameTooltip:AddDoubleLine("|cFF33CC66nocombat" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFF33CC66" .. module.text["CT_RaidAssist/Spells/" .. spellName]);
+									GameTooltip:AddDoubleLine("|cFF33CC66nocombat" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFF33CC66"  .. spellName);
 								end end
 								if remove then for modifier, spellName in pairs(remove) do
-									GameTooltip:AddDoubleLine("|cFFCC6666combat" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFCC6666" .. module.text["CT_RaidAssist/Spells/" .. spellName]);
+									GameTooltip:AddDoubleLine("|cFFCC6666combat" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFCC6666" .. spellName);
 								end end
 								if rezNoCombat then for modifier, spellName in pairs(rezNoCombat) do 
-									GameTooltip:AddDoubleLine("|cFFCC6666combat, dead" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFCC6666" .. module.text["CT_RaidAssist/Spells/" .. spellName]);
+									GameTooltip:AddDoubleLine("|cFFCC6666combat, dead" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFCC6666" .. spellName);
 								end end
 								if rezCombat then for modifier, spellName in pairs(rezCombat) do 
-									GameTooltip:AddDoubleLine("|cFFCCCC66nocombat, dead" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFCCCC66" .. module.text["CT_RaidAssist/Spells/" .. spellName]);
+									GameTooltip:AddDoubleLine("|cFFCCCC66nocombat, dead" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFCCCC66" .. spellName);
 								end end
 							end
 							if (not module.GameTooltipExtraLine) then
