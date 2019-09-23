@@ -76,6 +76,7 @@ L["CT_Library/SettingsImport/Heading"] = "Importer les configurations"
 elseif (GetLocale() == "deDE") then
 
 L["CT_Library/Introduction"] = [=[Danke für die Nutzung von CTMod!
+
 Dieses Fenster kann mit /ct oder /ctmod geöffnet werden. Unten klicken um Optionen des jeweiligen Moduls anzuzeigen]=]
 L["CT_Library/ModListing"] = "Liste der Module:"
 L["CT_Library/Help/About/Credits"] = [=[CTMod ist von Cide und TS seit Vanille, 
