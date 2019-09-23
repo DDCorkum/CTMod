@@ -8,6 +8,13 @@
 -- the CTMod Team. Thank you.                 --
 ------------------------------------------------
 
+
+-- IMPORTANT NOTE:  Consolidation appears no longer to be part of the game,
+--                  but the code has been left in the game just in case it returns.
+--                  
+--                  The options are commented-out and can be restored quickly in module:frame
+
+
 ---------------------------------------------
 -- Initialization
 
@@ -1264,16 +1271,20 @@ function auraClass:checkExpiration()
 
 				-- Display the expiration message
 				if (canRecastKeyBind) then
-					module:printformat(module:getText("PRE_EXPIRATION_WARNING_KEYBINDING"),
+					module:printformat(module.text["CT_BuffMod/PRE_EXPIRATION_WARNING_KEYBINDING"],
 						name, timeFormat1(timeRemaining), canRecastKeyBind);
 				else
-					module:printformat(module:getText("PRE_EXPIRATION_WARNING"),
+					module:printformat(module.text["CT_BuffMod/PRE_EXPIRATION_WARNING"],
 						name, timeFormat1(timeRemaining));
 				end
 
 				-- Play a sound
 				if (globalObject.expirationSound) then
-					PlaySoundFile(569634); -- "Sound\\Spells\\misdirection_impact_head.wav"
+					if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+						PlaySoundFile(569634); -- "Sound\\Spells\\misdirection_impact_head.wav"
+					elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+						PlaySound(3081); -- "TellMessage"
+					end
 				end
 			end
 
@@ -7601,7 +7612,7 @@ function windowClass:setCurrentWindow(isCurrent, showTitle)
 		else
 			fsWindowTitle:SetTextColor(1, 0.82, 0);
 		end
-		if (showTitle and globalObject.showWindowTitles) then
+		if (showTitle) then
 			fsWindowTitle:Show();
 		else
 			fsWindowTitle:Hide();
@@ -7995,7 +8006,6 @@ end
 --	.showItemDetails -- Show item enchant details in the icon tooltip (1 == yes, false == no, default == yes)
 --	.showSpellNumber -- Show spell number in the icon tooltip (1 == yes, false == no, default == no)
 --	.showTooltips -- Show icon tooltip (1 == yes, false == no, default == yes)
---	.showWindowTitles -- Show window titles when the options window is open (1=yes, false=no, default=yes)
 --	.showWindowTooltips -- Show window number tooltips when the options window is open (1=yes, false=no, default=yes)
 --
 -- Methods and functions:
@@ -8119,9 +8129,6 @@ function globalClass:applyGlobalOptions(initFlag)
 	-- Flash icons when about to fade
 	self.flashIcons = module:getOption("flashIcons") ~= false;
 	self.flashTime = module:getOption("flashTime") or constants.DEFAULT_FLASH_TIME;
-
-	-- Show window titles
-	self.showWindowTitles = module:getOption("showWindowTitles") ~= false;
 
 	-- Show window tooltips
 	self.showWindowTooltips = module:getOption("showWindowTooltips") ~= false;
@@ -8865,7 +8872,7 @@ local function options_updateWindowWidgets(windowId)
 	----------
 	-- Consolidation
 	----------
-
+--[[ CONSOLIDATION REMOVED FROM GAME
 	-- Minimum total duration
 	frame.consolidateDurationMinutes:SetValue( frameOptions.consolidateDurationMinutes or 0 );
 	frame.consolidateDurationSeconds:SetValue( frameOptions.consolidateDurationSeconds or 30 );
@@ -8876,7 +8883,7 @@ local function options_updateWindowWidgets(windowId)
 
 	-- Total duration percentage
 	frame.consolidateFractionPercent:SetValue( frameOptions.consolidateFractionPercent or 10 );
-
+--]]
 	----------
 	-- Background
 	----------
@@ -9193,9 +9200,6 @@ local function options_updateGlobal(optName, value)
 
 	elseif (optName == "consolidatedHideTimer") then
 		globalObject.windowListObject:setSpecialAttributes();
-
-	elseif (optName == "showWindowTitles") then
-		globalObject.windowListObject:setCurrentWindow( currentWindowId, value );
 
 	end
 end
@@ -9529,7 +9533,6 @@ module.optionUpdate = function(self, optName, value)
 		optName == "showItemDetails" or
 		optName == "showSpellNumber" or
 		optName == "showTooltips" or
-		optName == "showWindowTitles" or
 		optName == "showWindowTooltips"
 	) then
 		options_updateGlobal(optName, value);
@@ -9610,29 +9613,27 @@ module.frame = function()
 
 	-- Tips
 	optionsBeginFrame(-5, 0, "frame#tl:0:%y#r");
-		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Tips");
-		optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#You can use /ctbuff or /ctbuffmod to open this options window directly.#" .. textColor2 .. ":l");
-		optionsAddObject( -5, 3*14, "font#t:0:%y#s:0:%s#l:13:0#r#You can use Alt Left-click on a CT_BuffMod window to select it and open this options window.#" .. textColor2 .. ":l");
-		optionsAddObject( -5, 4*14, "font#t:0:%y#s:0:%s#l:13:0#r#NOTE: Due to the use of secure buff buttons, there are a number of options which if changed will not have any effect until you are out of combat.#" .. textColor1 .. ":l");
+		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. module.text["CT_BuffMod/Options/Tips/Heading"]);
+		optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. module.text["CT_BuffMod/Options/Tips/Line 1"] .. "#" .. textColor2 .. ":l");  -- You can use /ctbuff or /ctbuffmod to open this options window directly.
+		optionsAddObject( -5, 3*14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. module.text["CT_BuffMod/Options/Tips/Line 2"] .. "#" .. textColor2 .. ":l");  -- You can use Alt Left-click on a CT_BuffMod window to select it and open this options window.
+		optionsAddObject( -5, 3*14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. module.text["CT_BuffMod/Options/Tips/Line 3"] .. "#" .. textColor2 .. ":l");  -- NOTE: Most options have no effect until you are out of combat.
 	optionsEndFrame();
 
 	-- Blizzard's frames
 	optionsBeginFrame(-20, 0, "frame#tl:0:%y#r#i:blizzardFrames");
-		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Blizzard's Frames");
+		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. module.text["CT_BuffMod/Options/Blizzard Frames/Heading"]);
 
 		-- Hide the buffs frame
 		-- Hide the consolidated buffs frame
 		-- Hide the weapon buffs frame
-		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:hideBlizzardBuffs:true#Hide the buffs frame");
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:hideBlizzardConsolidated:true#Hide the consolidated buffs frame");
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:hideBlizzardEnchants:true#Hide the weapon buffs frame");
+		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:hideBlizzardBuffs:true#" .. module.text["CT_BuffMod/Options/Blizzard Frames/Hide Buffs"]);
+--noConsolidatedBuffs--		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:hideBlizzardConsolidated:true#" .. module.text["CT_BuffMod/Options/Blizzard Frames/Hide Consolidated"]);
+		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:hideBlizzardEnchants:true#" .. module.text["CT_BuffMod/Options/Blizzard Frames/Hide Enchants"]);
 	optionsEndFrame();
 
 	-- General Options
 	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#General");
-
-		optionsAddObject(-10,   26, "checkbutton#tl:10:%y#o:showWindowTitles:true#Show window titles when options are shown");
 
 		optionsAddObject(-20, 1*13, "font#tl:15:%y#Colors");
 
@@ -9640,8 +9641,8 @@ module.frame = function()
 		optionsAddObject(-10,   16, "colorswatch#tl:35:%y#s:16:16#o:backgroundColor:" .. defaultWindowColor[1] .. "," .. defaultWindowColor[2] .. "," .. defaultWindowColor[3] .. "," .. defaultWindowColor[4] .. "#true");
 		optionsAddObject( 14,   15, "font#tl:60:%y#v:ChatFontNormal#Buff window background color");
 
-		optionsAddObject( -2,   16, "colorswatch#tl:35:%y#s:16:16#o:consolidatedColor:" .. defaultConsolidatedColor[1] .. "," .. defaultConsolidatedColor[2] .. "," .. defaultConsolidatedColor[3] .. "," .. defaultConsolidatedColor[4] .. "#true");
-		optionsAddObject( 14,   15, "font#tl:60:%y#v:ChatFontNormal#Consolidated window background color");
+--noConsolidatedBuffs--		optionsAddObject( -2,   16, "colorswatch#tl:35:%y#s:16:16#o:consolidatedColor:" .. defaultConsolidatedColor[1] .. "," .. defaultConsolidatedColor[2] .. "," .. defaultConsolidatedColor[3] .. "," .. defaultConsolidatedColor[4] .. "#true");
+--noConsolidatedBuffs--		optionsAddObject( 14,   15, "font#tl:60:%y#v:ChatFontNormal#Consolidated window background color");
 
 		-- Aura color
 		-- Buff color
@@ -9659,8 +9660,8 @@ module.frame = function()
 		optionsAddObject( -2,   16, "colorswatch#tl:35:%y#s:16:16#i:bgColorITEM#o:bgColorITEM:0.75,0.25,1,0.75#true");
 		optionsAddObject( 14,   15, "font#tl:60:%y#v:ChatFontNormal#Weapon bar color");
 
-		optionsAddObject( -2,   16, "colorswatch#tl:35:%y#s:16:16#i:bgColorCONSOLIDATED#o:bgColorCONSOLIDATED:0.97,0.97,0.95,0.66#true");
-		optionsAddObject( 14,   15, "font#tl:60:%y#v:ChatFontNormal#Consolidated bar color");
+--noConsolidatedBuffs--		optionsAddObject( -2,   16, "colorswatch#tl:35:%y#s:16:16#i:bgColorCONSOLIDATED#o:bgColorCONSOLIDATED:0.97,0.97,0.95,0.66#true");
+--noConsolidatedBuffs--		optionsAddObject( 14,   15, "font#tl:60:%y#v:ChatFontNormal#Consolidated bar color");
 
 		optionsAddObject(-20, 1*13, "font#tl:15:%y#Tooltips");
 		-- Show spell tooltips
@@ -9674,6 +9675,7 @@ module.frame = function()
 
 		optionsAddObject(-10,   26, "checkbutton#tl:30:%y#o:showWindowTooltips:true#Show window tooltips when options shown");
 
+--[[ NO CONSOLIDATED BUFFS
 		-- Consolidated window
 		optionsAddObject(-20, 1*13, "font#tl:15:%y#Consolidated window");
 
@@ -9697,6 +9699,7 @@ module.frame = function()
 
 		optionsAddObject(-20,   14, "font#tl:30:%y#v:ChatFontNormal#Auto hide timer:");
 		optionsAddObject( 15,   17, "slider#tl:150:%y#s:140:%s#i:consolidatedHideTimer#o:consolidatedHideTimer:" .. constants.DEFAULT_CONSOLIDATE_HIDE_TIMER .. "#<value> seconds#0.05:2:0.05");
+NO CONSOLIDATED BUFFS --]]
 
 	optionsEndFrame();
 
@@ -9734,6 +9737,7 @@ module.frame = function()
 		optionsEndFrame();
 	optionsEndFrame();
 
+	-- Adding and Removing Windows
 	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b#i:frameOptions");
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Windows");
 
@@ -10110,7 +10114,7 @@ module.frame = function()
 		-- Sorting
 		----------
 
-		optionsAddObject(-20, 1*13, "font#tl:15:%y#Sorting");
+		optionsAddObject(-20, 1*13, "font#tl:15:%y#Buff Sorting");
 
 		-- Sort method
 		optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#Sort method:");
@@ -10136,7 +10140,7 @@ module.frame = function()
 
 		-- Group by
 		do
-			local menu = "#None#Debuffs#Cancelable buffs#Uncancelable buffs#All buffs#Weapons#Consolidated";
+			local menu = "#None#Debuffs#Cancelable buffs#Uncancelable buffs#All buffs#Weapons#Consolidated (no longer used)"; -- #Consolidated doesn't do anything any more
 
 			optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#Group the buffs as follows:");
 
@@ -10159,6 +10163,7 @@ module.frame = function()
 		----------
 		-- Consolidation
 		----------
+--[[ CONSOLIDATION REMOVED FROM GAME
 		optionsAddObject(-20, 1*13, "font#tl:15:%y#Consolidation");
 
 		optionsBeginFrame(  15,   20, "button#tl:250:%y#s:40:%s#i:consHelp#v:UIPanelButtonTemplate#?");
@@ -10191,11 +10196,12 @@ module.frame = function()
 
 		optionsAddObject(-25,   14, "font#tl:30:%y#v:ChatFontNormal#Total duration percentage (default 10):");
 		optionsAddObject(-20,   17, "slider#tl:50:%y#s:240:%s#i:consolidateFractionPercent#o:consolidateFractionPercent:10#<value> %#0:100:0.1");
+CONSOLIDATION REMOVED FROM GAME--]]
 
 		----------
 		-- Background
 		----------
-		optionsAddObject(-25, 1*13, "font#tl:15:%y#Background");
+		optionsAddObject(-25, 1*13, "font#tl:15:%y#Window Background");
 
 		-- Backdrop
 		optionsAddObject(-10,   26, "checkbutton#tl:30:%y#i:showBackground#o:showBackground:true#Show background");
@@ -10385,7 +10391,7 @@ module.frame = function()
 
 
 		-- Style 1
-		optionsAddObject(-25, 1*13, "font#tl:22:%y#n:CT_BuffMod_Style1Label#Style 1 (icon and bar)");
+		optionsAddObject(-20, 1*13, "font#tl:22:%y#n:CT_BuffMod_Style1Label#Style 1 (icon and bar)");
 
 		
 		-- Size of the icon
@@ -10741,4 +10747,6 @@ local function slashCommand(msg)
 	module:showModuleOptions(module.name);
 end
 
-module:setSlashCmd(slashCommand, "/ctbuff", "/ctbuffmod");
+module:setSlashCmd(slashCommand, "/ctbuff", "/ctbuffmod", "/ctaura");
+-- enUS: /ctbuff, /ctbuffmod
+-- frFR: /ctaura

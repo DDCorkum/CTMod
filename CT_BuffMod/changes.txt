@@ -1,3 +1,9 @@
+CT_BuffMod (8.2.5.1) 2019-08-23
+- Restored original Vanilla PlaySound() for Classic edition
+- Removed files that were unused (empty) for several years
+- Cleaned up redundant options for easier configuration
+- Integrating with CurseForge localization to support different languages
+
 CT_BuffMod (8.2.0.5) 2019-08-14
 - Tooltip footer directs users to type /ctbuff for configuring the addon
 

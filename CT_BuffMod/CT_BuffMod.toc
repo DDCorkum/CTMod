@@ -1,5 +1,5 @@
 ## Interface: 80205
-## Version: 8.2.0.5
+## Version: 8.2.5.1
 ## Title: CT_BuffMod |cFF333333(BFA)
 ## Notes: Customizable buff display.
 ## DefaultState: Enabled
@@ -8,7 +8,5 @@
 
 CT_BuffMod.xml
 CT_BuffMod.lua
-CT_BuffMod_Parsing.lua
-CT_BuffMod_Options.lua
 localization.lua
 Bindings.xml
