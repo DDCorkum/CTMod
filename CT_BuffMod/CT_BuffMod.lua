@@ -9608,7 +9608,7 @@ module.frame = function()
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. module.text["CT_BuffMod/Options/Tips/Heading"]);
 		optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. module.text["CT_BuffMod/Options/Tips/Line 1"] .. "#" .. textColor2 .. ":l");  -- You can use /ctbuff or /ctbuffmod to open this options window directly.
 		optionsAddObject( -5, 3*14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. module.text["CT_BuffMod/Options/Tips/Line 2"] .. "#" .. textColor2 .. ":l");  -- You can use Alt Left-click on a CT_BuffMod window to select it and open this options window.
-		optionsAddObject( -5, 3*14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. module.text["CT_BuffMod/Options/Tips/Line 3"] .. "#" .. textColor2 .. ":l");  -- NOTE: Most options have no effect until you are out of combat.
+		optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. module.text["CT_BuffMod/Options/Tips/Line 3"] .. "#" .. textColor2 .. ":l");  -- NOTE: Most options have no effect until you are out of combat.
 	optionsEndFrame();
 
 	-- Blizzard's frames
@@ -9620,9 +9620,9 @@ module.frame = function()
 		-- Hide the weapon buffs frame
 		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:hideBlizzardBuffs:true#" .. module.text["CT_BuffMod/Options/Blizzard Frames/Hide Buffs"]);
 		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:hideBlizzardEnchants:true#" .. module.text["CT_BuffMod/Options/Blizzard Frames/Hide Enchants"]);
---[[ NO CONSOLIDATED BUFFS
+--[[ CONSOLIDATION REMOVED FROM GAME
 		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:hideBlizzardConsolidated:true#" .. module.text["CT_BuffMod/Options/Blizzard Frames/Hide Consolidated"]);
-NO CONSOLIDATED BUFFS --]]
+CONSOLIDATION REMOVED FROM GAME --]]
 	optionsEndFrame();
 
 	-- General Options
@@ -10452,7 +10452,7 @@ CONSOLIDATION REMOVED FROM GAME--]]
 
 
 		-- Style 2
-		optionsAddObject(552, 1*13, "font#tl:22:%y#n:CT_BuffMod_Style2Label#Style 2 (icon and time)");
+		optionsAddObject(517, 1*13, "font#tl:22:%y#n:CT_BuffMod_Style2Label#Style 2 (icon and time)");
 
 		-- Icon size
 		optionsAddObject(-20,   14, "font#tl:35:%y#n:CT_BuffMod_Style2SizeLabel#v:ChatFontNormal#Size of the icon:");
@@ -10494,7 +10494,7 @@ CONSOLIDATION REMOVED FROM GAME--]]
 			);
 		optionsEndFrame();
 		
-		optionsAddObject( -85, 2*14, "font#t:0:%y#s:0:%s#l:13:0#n:CT_BuffMod_Style2ContinueLabel#r#Continue scrolling for further options#" .. textColor2 .. ":l");
+		optionsAddObject( -80, 2*14, "font#t:0:%y#s:0:%s#l:13:0#n:CT_BuffMod_Style2ContinueLabel#r#Continue scrolling for further options#" .. textColor2 .. ":l");
 
 
 		----------
@@ -10525,7 +10525,7 @@ CONSOLIDATION REMOVED FROM GAME--]]
 		);
 	optionsEndFrame();
 
-	optionsBeginFrame(-244	, 0, "frame#tl:0:%y#br:tr:0:%b");
+	optionsBeginFrame(-200	, 0, "frame#tl:0:%y#br:tr:0:%b");
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Reset Options");
 		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:resetAll#Reset options for all of your characters");
 		optionsBeginFrame(  -5,   30, "button#t:0:%y#s:120:%s#v:UIPanelButtonTemplate#Reset options");
