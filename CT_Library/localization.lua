@@ -26,7 +26,7 @@ local L = lib.text
 
 -----------------------------------------------
 -- enUS (Default) Unlocalized Strings
--- DO NOT INTENT because some strings are multi-line!
+-- DO NOT INDENT because some strings are multi-line!
 
 
 L["CT_Library/Introduction"] = [=[Thank you for using CTMod!
@@ -42,7 +42,7 @@ L["CT_Library/Help/About/Updates"] = "Updates are available at:"
 L["CT_Library/Help/Heading"] = "Help"
 L["CT_Library/Help/WhatIs/Heading"] = "What is CTMod?"
 L["CT_Library/Help/WhatIs/Line1"] = "CTMod contains several modules:"
-L["CT_Library/Help/WhatIs/NotInstalled"] = "Not Installed"
+L["CT_Library/Help/WhatIs/NotInstalled"] = "not installed"
 L["CT_Library/SettingsImport/Heading"] = "Settings Import"
 
 
@@ -75,10 +75,20 @@ L["CT_Library/SettingsImport/Heading"] = "Importer les configurations"
 
 elseif (GetLocale() == "deDE") then
 
+L["CT_Library/Introduction"] = [=[Danke für die Nutzung von CTMod!
+
+Dieses Fenster kann mit /ct oder /ctmod geöffnet werden. Unten klicken um Optionen des jeweiligen Moduls anzuzeigen]=]
+L["CT_Library/ModListing"] = "Liste der Module:"
 L["CT_Library/Help/About/Credits"] = [=[CTMod ist von Cide und TS seit Vanille, 
 Resike seit 2014 und Dahk seit 2017]=]
 L["CT_Library/Help/About/Heading"] = "Über CTMod"
 L["CT_Library/Help/About/Updates"] = "Updates sind verfügbar unter:"
+L["CT_Library/Help/Heading"] = "Hilfe"
+L["CT_Library/Help/WhatIs/Heading"] = "Was ist CTMod?"
+L["CT_Library/Help/WhatIs/Line1"] = "CTMod beinhaltet verschiedene Module:"
+L["CT_Library/Help/WhatIs/NotInstalled"] = "nicht installiert"
+L["CT_Library/SettingsImport/Heading"] = "Einstellungen importieren"
+
 
 
 

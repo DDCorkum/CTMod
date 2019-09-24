@@ -118,23 +118,11 @@ For this example plugin, we show the standard Titan buttons plus options to dete
 			end
 		end
 		
-		if (CT_RA_Version) then
-			TitanPanelRightClickMenu_AddSpacer();
-			info = {};
-			info.text = "CTRA";
-			info.hasArrow = 1;
-			info.value = "RaidAssist";
-			info.notCheckable = 1;
-			L_UIDropDownMenu_AddButton(info);
-		end
-
 		-- SDK : "TitanPanelRightClickMenu_AddSpacer" is used to put a blank line in the menu
 		TitanPanelRightClickMenu_AddSpacer();     
 		TitanPanelRightClickMenu_AddCommand("Hide", TS.id, TITAN_PANEL_MENU_FUNC_HIDE);
 		-- SDK : The routine above is used to put a "Hide" (localized) in the menu.
 	
-	elseif L_UIDROPDOWNMENU_MENU_VALUE == "RaidAssist" then
-		CT_RASets_DropDown_Initialize()
 	elseif (_G[L_UIDROPDOWNMENU_MENU_VALUE] and _G[L_UIDROPDOWNMENU_MENU_VALUE].externalDropDown_Initialize) then
 		_G[L_UIDROPDOWNMENU_MENU_VALUE].externalDropDown_Initialize()
 	end

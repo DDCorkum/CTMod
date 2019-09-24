@@ -66,6 +66,8 @@ L["CT_RaidAssist/Spells/Soulstone"] = "Soulstone"
 L["CT_RaidAssist/Spells/Trueshot Aura"] = "Trueshot Aura"
 
 
+-- frFR (Credits: ddc)
+
 if (GetLocale() == "frFR") then
 
 L["CT_RaidAssist/AfterNotReadyFrame/MissedCheck"] = "Vous pourriez manquer un appel; êtes-vous prêt?"
@@ -84,14 +86,51 @@ L["CT_RaidAssist/Spells/Remove Corruption"] = "Délivrance de la corruption"
 L["CT_RaidAssist/Spells/Remove Curse"] = "Délivrance de la malédiction"
 L["CT_RaidAssist/Spells/Remove Lesser Curse"] = "Délivrance de la malédiction mineure"
 L["CT_RaidAssist/Spells/Trueshot Aura"] = "Aura de précision"
-	
+
+
+-- deDE (credits: dynaletik)
+
 elseif (GetLocale() == "deDE") then
 
+L["CT_RaidAssist/AfterNotReadyFrame/MissedCheck"] = "Ggf. hast Du einen Bereitschaftscheck verpasst!"
+L["CT_RaidAssist/AfterNotReadyFrame/WasAFK"] = "Du warst AFK, bist Du zurück?"
+L["CT_RaidAssist/AfterNotReadyFrame/WasNotReady"] = "Bist Du jetzt bereit?"
+L["CT_RaidAssist/PlayerFrame/TooltipFooter"] = "/ctra zum Verschieben und Konfigurieren"
+L["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksCheckButton"] = "Erweiterte Bereitschaftschecks anzeigen"
+L["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksTooltip"] = "Zeigt nach Verpassen eines Bereitschaftschecks eine Schaltfläche an um mitzuteilen, dass man wieder da ist"
+L["CT_RaidAssist/Options/GeneralFeatures/Heading"] = "Allgemeine Funktionen"
+L["CT_RaidAssist/Options/GeneralFeatures/Line1"] = "Diese allgemeinen Funktionen sind getrennt von den benutzerdefinierten Schlachtzugsfenstern."
 L["CT_RaidAssist/Spells/Abolish Poison"] = "Vergiftung aufheben"
 L["CT_RaidAssist/Spells/Amplify Magic"] = "Magie verstärken"
+L["CT_RaidAssist/Spells/Ancestral Spirit"] = "Geist der Ahnen"
+L["CT_RaidAssist/Spells/Arcane Brilliance"] = "Arkane Brillanz"
 L["CT_RaidAssist/Spells/Arcane Intellect"] = "Arkane Intelligenz"
+L["CT_RaidAssist/Spells/Battle Shout"] = "Schlachtruf"
 L["CT_RaidAssist/Spells/Cleanse"] = "Reinigung des Glaubens"
+L["CT_RaidAssist/Spells/Cleanse Spirit"] = "Geist reinigen"
+L["CT_RaidAssist/Spells/Cleanse Toxins"] = "Gifte reinigen"
+L["CT_RaidAssist/Spells/Cure Poison"] = "Vergiftung heilen"
+L["CT_RaidAssist/Spells/Dampen Magic"] = "Magie dämpfen"
+L["CT_RaidAssist/Spells/Detox"] = "Entgiftung"
+L["CT_RaidAssist/Spells/Dispel Magic"] = "Magiebannung"
+L["CT_RaidAssist/Spells/Nature's Cure"] = "Heilung der Natur"
 L["CT_RaidAssist/Spells/Power Word: Fortitude"] = "Machtwort: Seelenstärke"
+L["CT_RaidAssist/Spells/Prayer of Fortitude"] = "Gebet der Seelenstärke"
+L["CT_RaidAssist/Spells/Purify"] = "Läutern"
+L["CT_RaidAssist/Spells/Purify Disease"] = "Krankheit läutern"
+L["CT_RaidAssist/Spells/Purify Spirit"] = "Geistreinigung"
+L["CT_RaidAssist/Spells/Raise Ally"] = "Verbündeten erwecken"
+L["CT_RaidAssist/Spells/Rebirth"] = "Wiedergeburt"
+L["CT_RaidAssist/Spells/Redemption"] = "Erlösung"
+L["CT_RaidAssist/Spells/Remove Corruption"] = "Verderbnis entfernen"
+L["CT_RaidAssist/Spells/Remove Curse"] = "Fluch aufheben"
+L["CT_RaidAssist/Spells/Remove Lesser Curse"] = "Geringen Fluch aufheben"
+L["CT_RaidAssist/Spells/Resurrection"] = "Auferstehung"
+L["CT_RaidAssist/Spells/Revival"] = "Wiederbelebung"
+L["CT_RaidAssist/Spells/Revive"] = "Wiederbeleben"
+L["CT_RaidAssist/Spells/Soulstone"] = "Seelenstein"
+L["CT_RaidAssist/Spells/Trueshot Aura"] = "Aura des Volltreffers"
+
 
 elseif (GetLocale() == "esES") then
 

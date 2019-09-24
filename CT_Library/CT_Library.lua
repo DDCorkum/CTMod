@@ -19,7 +19,7 @@
 -----------------------------------------------
 -- Initialization
 
-local LIBRARY_VERSION = 8.205;
+local LIBRARY_VERSION = 8.251;
 local LIBRARY_NAME = "CT_Library";
 
 local _G = getfenv(0);
@@ -2425,6 +2425,11 @@ function lib:framesEndFrame(framesList)
 	prevFrame.data[details] = frame.data;
 end
 
+function lib:framesGetYOffset(framesList)
+	local frame = framesList[#framesList];
+	return frame.yoffset;
+end
+
 -- End Frame Creation
 -----------------------------------------------
 
@@ -2665,7 +2670,7 @@ local function controlPanelSkeleton()
 			end,
 		},
 		["frame#s:300:0#tl:15:-30#b:0:15#i:listing"] = {
-			"font#tl:-6:0#s:285:60#" .. lib.text["CT_Library/Introduction"] .. "#t",
+			"font#tl:-5:0#s:285:64#" .. lib.text["CT_Library/Introduction"] .. "#t",
 			"texture#tl:0:-64#br:tr:-25:-65#1:1:1",
 			"font#tl:-3:-69#v:GameFontNormalLarge#" .. lib.text["CT_Library/ModListing"],
 			"texture#i:hover#l:5:0#s:290:25#hidden#1:1:1:0.125",
@@ -2749,7 +2754,7 @@ function lib:showControlPanel(show)
 end
 
 -- Show the CTMod control panel options for the specified addon name.
--- if ustCustomFunction is true then an attempt will be made to open a module's custom options function instead
+-- if useCustomFunction is true then an attempt will be made to open a module's custom options function instead
 function lib:showModuleOptions(modname, useCustomFunction)
 	self:showControlPanel(true);
 	if (not lib:isControlPanelShown()) then	-- this might happen if the panel is forced off during combat
@@ -3290,20 +3295,20 @@ module.frame = function()
 		helpAddObject( -5,   14, "font#tl:10:%y#s:0:%s#r#" .. lib.text["CT_Library/Help/WhatIs/Line1"] .. "#" .. textColor1 .. ":l"); -- CTMod contains several modules
 		if (CT_BarMod and CT_BottomBar) then
 			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#BarMod (/ctbar) and BottomBar (/ctbb)#" .. textColor0 .. ":l");
-			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Changes the appearance of action bars and other UI elements#" .. textColor2 .. ":l");
+			helpAddObject(  5, 5*14, "font#tl:30:%y#s:0:%s#r#Changes the appearance of action bars and other UI elements.  Open BarMod to move numbered bars, and open BottomBar to move everything else.#" .. textColor2 .. ":l");
 		elseif (CT_BarMod) then
 			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#BarMod (/ctbar)#" .. textColor0 .. ":l");
-			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Changes the appearance of action bars#" .. textColor2 .. ":l");
+			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Changes the appearance of action bars.  Open BarMod to move the numbered bars.#" .. textColor2 .. ":l");
 			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#BottomBar (" .. sNotInstalled .. ")#" .. textColor3 .. ":l");
-			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Changes the appearance of other UI elements#" .. textColor2 .. ":l");
+			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Changes the appearance of other UI elements like the Pet, Menu and Bag bars.#" .. textColor2 .. ":l");
 		elseif (CT_BottomBar) then
 			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#BarMod (" .. sNotInstalled .. ")#" .. textColor3 .. ":l");
-			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Changes the appearance of action bars#" .. textColor2 .. ":l");
+			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Changes the appearance of numbered appearance bars.#" .. textColor2 .. ":l");
 			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#BottomBar (/ctbb)#" .. textColor0 .. ":l");
-			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Changes the appearance of other UI elements#" .. textColor2 .. ":l");
+			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Changes the appearance of other UI elements.  Open BarMod to move the Pet, Menu and Bag bars#" .. textColor2 .. ":l");
 		else
 			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#BarMod and BottomBar (" .. sNotInstalled .. ")#" .. textColor3 .. ":l");
-			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Changes the appearance of action bars and other UI elements#" .. textColor2 .. ":l");		
+			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Changes the appearance of action bars and other UI elements like the Pet, Menu and Bag bars#" .. textColor2 .. ":l");		
 		end
 		if (CT_BuffMod) then
 			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#BuffMod (/ctbuff)#" .. textColor0 .. ":l");
@@ -3360,20 +3365,20 @@ module.frame = function()
 			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#UnitFrames (" .. sNotInstalled .. ")#" .. textColor3 .. ":l");
 			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Changes the appearance of self, focus and assist frames#" .. textColor2 .. ":l");
 		end
+		if (CT_RaidAssist) then
+			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#RaidAssist (/ctra)#" .. textColor0 .. ":l");
+			helpAddObject(  5, 5*14, "font#tl:30:%y#s:0:%s#r#Custom raid frames, merging the Vanilla (pre-1.11) experience with modern features.  Type /ctra and drag the yellow box to move frames around.#" .. textColor2 .. ":l");				
+		else
+			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#RaidAssist (" .. sNotInstalled .. ")#" .. textColor3 .. ":l");
+			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Custom raid frames, merging the Vanilla (pre-1.11) experience with modern features.#" .. textColor2 .. ":l");
+		end
 		if (CT_Viewport) then
 			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#Viewport (/ctvp)#" .. textColor0 .. ":l");
-			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Changes the rendering of the world on the screen#" .. textColor2 .. ":l");				
+			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Changes the size of the screen viewport where the world is rendered.#" .. textColor2 .. ":l");				
 		else
 			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#Viewport (" .. sNotInstalled .. ")#" .. textColor3 .. ":l");
-			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Changes the rendering of the world on the screen#" .. textColor2 .. ":l");
-		end
-
-		if (CT_RA_Version) then
-		helpAddObject(-15, 4*14, "font#tl:10:%y#s:0:%s#r#CTMod is also associated with CT Raid Assist\nType /ctra to access those options#" .. textColor1 .. ":l");
-		else
-		helpAddObject(-15, 4*14, "font#tl:10:%y#s:0:%s#r#CTMod is also associated with CT Raid Assist\n(" .. sNotInstalled .. ")#" .. textColor1 .. ":l");
-		end
-		
+			helpAddObject(  5, 3*14, "font#tl:30:%y#s:0:%s#r#Changes the size of the screen viewport where the world is rendered.#" .. textColor2 .. ":l");
+		end		
 	
 	helpEndFrame();
 	

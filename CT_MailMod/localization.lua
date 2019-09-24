@@ -105,4 +105,67 @@ L["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_SILVER"] = "%d argent %d cuivre"
 L["CT_MailMod/STOP_SELECTED"] = "Annuler"
 
 
+elseif (GetLocale() == "deDE") then
+
+L["CT_MailMod/DELETE_POPUP1"] = "%d Gegenstände enthalten %s"
+L["CT_MailMod/DELETE_POPUP2"] = "etwas Geld und %s"
+L["CT_MailMod/DELETE_POPUP3"] = "etwas Geld und %d Gegenstände enthalten %s"
+L["CT_MailMod/MAIL_DELETE_NO"] = "Nicht gelöscht."
+L["CT_MailMod/MAIL_DELETE_OK"] = "Lösche Post."
+L["CT_MailMod/MAIL_DOWNLOAD_BEGIN"] = "Post wird in Eingang heruntergeladen."
+L["CT_MailMod/MAIL_DOWNLOAD_END"] = "Post wurde in Eingang heruntergeladen."
+L["CT_MailMod/MAIL_LOG"] = "Protokoll"
+L["CT_MailMod/MAIL_LOOT_ERROR"] = "Gegenstand nicht entnommen:"
+L["CT_MailMod/MAIL_OPEN_CLICK"] = "Drücke |c0080A0FFAlt-Klick|r um Anhänge zu entnehmen."
+L["CT_MailMod/MAIL_OPEN_IS_COD"] = "Post besitzt Nachnahme-Gebühr."
+L["CT_MailMod/MAIL_OPEN_IS_GM"] = "Post von Blizzard"
+L["CT_MailMod/MAIL_OPEN_NO"] = "Nicht geöffnet"
+L["CT_MailMod/MAIL_OPEN_NO_ITEMS_MONEY"] = "Post enthält keine Gegenstände oder Geld."
+L["CT_MailMod/MAIL_OPEN_OK"] = "Öffne Post."
+L["CT_MailMod/MAIL_RETURN_CLICK"] = "Drücke |c0080A0FFStrg-Klick|r um den Brief zurückzusenden."
+L["CT_MailMod/MAIL_RETURN_IS_GM"] = "Post von Blizzard."
+L["CT_MailMod/MAIL_RETURN_IS_RETURNED"] = "Post wird zu Dir zurückgesendet."
+L["CT_MailMod/MAIL_RETURN_NO"] = "Nicht zurückgesendet."
+L["CT_MailMod/MAIL_RETURN_NO_ITEMS_MONEY"] = "Post enthält keine Gegenstände oder Geld."
+L["CT_MailMod/MAIL_RETURN_NO_REPLY"] = "Post kann nicht beantwortet werden."
+L["CT_MailMod/MAIL_RETURN_NO_SENDER"] = "Post hat keinen Absender."
+L["CT_MailMod/MAIL_RETURN_OK"] = "Sende Post zurück."
+L["CT_MailMod/MAIL_SEND_OK"] = "Post verschickt."
+L["CT_MailMod/MAIL_TAKE_ITEM_OK"] = "Entnehme Anhang."
+L["CT_MailMod/MAIL_TAKE_MONEY_OK"] = "Entnehme Geld."
+L["CT_MailMod/MAIL_TIMEOUT"] = "Zeitüberschreitung bei Aktion."
+L["CT_MailMod/MAILBOX_BUTTON_TIP1"] = "Post herunterladen"
+L["CT_MailMod/MAILBOX_DOWNLOAD_MORE_NOW"] = "Weitere Post herunterladen"
+L["CT_MailMod/MAILBOX_DOWNLOAD_MORE_SOON"] = "Weitere Post in %d Sekunden herunterladen"
+L["CT_MailMod/MAILBOX_OPTIONS_TIP1"] = "Klicke diese Schaltfläche oder gebe /ctmail ein, um CTMailMod Optionen oder Hinweise anzuzeigen. Rechtsklick oder /maillog eingeben um Protokollfenster ein-/auszublenden."
+L["CT_MailMod/MAILBOX_OVERFLOW_COUNT"] = "Überlauf: %d"
+L["CT_MailMod/MONEY_DECREASED"] = "Geld verringert um: %s"
+L["CT_MailMod/MONEY_INCREASED"] = "Geld erhöht um: %s"
+L["CT_MailMod/NOTHING_SELECTED"] = "Es sind keine Briefe ausgewählt."
+L["CT_MailMod/NUMBER_SELECTED_PLURAL"] = "%d gewählt"
+L["CT_MailMod/NUMBER_SELECTED_SINGLE"] = "%d gewählt"
+L["CT_MailMod/NUMBER_SELECTED_ZERO"] = "%d gewählt"
+L["CT_MailMod/OPEN_SELECTED"] = "Öffnen"
+L["CT_MailMod/PROCESSING_CANCELLED"] = "Briefkasten Bearbeitung abgebrochen."
+L["CT_MailMod/QUICK_DELETE_TIP1"] = "Brief jetzt löschen"
+L["CT_MailMod/QUICK_RETURN_TIP1"] = "Brief jetzt zurücksenden"
+L["CT_MailMod/RETURN_SELECTED"] = "Zurücksenden"
+L["CT_MailMod/SELECT_ALL"] = "Alle wählen"
+L["CT_MailMod/SELECT_MESSAGE_TIP1"] = "Briefwahl aktualisieren"
+L["CT_MailMod/SELECT_MESSAGE_TIP2"] = [=[|c0080A0FFKlick:|r Einzeln auswählen oder abwählen
+ 
+ |c0080A0FFAlt Linksklick:|r Gleichen Betreff auswählen
+ |c0080A0FFAlt Rechtsklick:|r Gleichen Betreff abwählen
+ 
+ |c0080A0FFStrg Linksklick:|r Gleichen Absender auswählen
+ |c0080A0FFStrg Rechtsklick:|r Gleichen Absender abwählen
+ 
+ |c0080A0FFShift Klick:|r Anfang der Auswahl markieren
+ |c0080A0FFShift Linksklick:|r Ende der Auswahl markieren und auswählen
+ |c0080A0FFShift Rechtsklick:|r Ende der Auswahl markieren und Abwählen]=]
+L["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_COPPER"] = "%d Kupfer"
+L["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_GOLD"] = "%d Gold %d Silber %d Kupfer"
+L["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_SILVER"] = "%d Silber %d Kupfer"
+L["CT_MailMod/STOP_SELECTED"] = "Abbrechen"
+
 end

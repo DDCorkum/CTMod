@@ -24,6 +24,7 @@ module.version = MODULE_VERSION;
 _G[MODULE_NAME] = module;
 CT_Library:registerModule(module);
 
+
 --------------------------------------------
 -- Common functions
 
@@ -67,11 +68,25 @@ function CT_UnitFrames_ResetDragLink(name)
 end
 
 function CT_UnitFrames_TextStatusBar_UpdateTextString(textStatusBar, settings, lockShow)
-	local textString = textStatusBar.TextString;
-	if (not textString and module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		textString = textStatusBar:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall");
-		textString:SetAllPoints();
-		textStatusBar.TextString = textString;
+	local textString = textStatusBar.TextString or textStatusBar.ctTextString;	--ctTextString is used to avoid creating taint
+	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+		if (not textString) then
+			local intermediateFrame = CreateFrame("Frame", nil, textStatusBar);
+			intermediateFrame:SetFrameLevel(5);
+			intermediateFrame:SetAllPoints();
+			textString = intermediateFrame:CreateFontString(nil, "OVERLAY", "TextStatusBarText");
+			textString:SetPoint("CENTER", textStatusBar);
+			textStatusBar.ctTextString = textString;
+		end
+		if ((textString.ctControlled == "Classic" or textString.ctControlled == nil) and CT_UnitFramesOptions.makeFontLikeRetail) then
+			-- set or change it to retail font, but do it just once
+			textString:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE");
+			textString.ctControlled = "Retail";
+		elseif ((textString.ctControlled == "Retail" or textString.ctControlled == nil) and not CT_UnitFramesOptions.makeFontLikeRetail) then
+			-- set or change it to classic font, but do it just once
+			textString:SetFont("Fonts\\ARIALN.TTF", 14, "OUTLINE");
+			textString.ctControlled = "Classic";	
+		end
 	end
 	if(textString) then
 		if (lockShow == nil) then lockShow = textStatusBar.lockShow; end

@@ -1,3 +1,8 @@
+CT_Library (8.2.5.1) 2019-09-23
+- Library updates
+- Added support for bookmarks in module options (see CT_Core 8.2.5.1)
+- Added German translations provided by user dynaletik (Danke!)
+
 CT_Library (8.2.0.5) 2019-08-14
 - getOption(option) and setOption(option, ...) now accept "option" or option() as a parameter
 - The control panel is now slightly more opaque to improve readability

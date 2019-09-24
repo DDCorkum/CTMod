@@ -1,4 +1,4 @@
-## Interface: 80200
+## Interface: 80205
 ## Version: 8.2.0.5
 ## Title: CT_RaidAssist_MTPlayers |cFF333333(Depreciated)
 ## Author: Dargen (Guild: Eternal Keggers, Server: Terenas)
@@ -7,4 +7,4 @@
 ## RequiredDeps: CT_RaidAssist
 ## SavedVariables: CT_RA_MTPlayers_Status
 
-#CT_RaidAssist_MTPlayers.xml		#this module is depreciated since the 8.2.0.5 CTRA rewrite
+#CT_RaidAssist_MTPlayers.xml		#this module is depreciated since the 8.2.0.5 CTRA rewrite, and will be removed in 9.0
