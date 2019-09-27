@@ -180,9 +180,6 @@ local frame_Hide;
 -- EndBugfix
 
 do
--- BeginMod
-CT_BuffMod_xoptUnsecure = true;
--- EndMod
 
 local function getFrameHandle(frame)
 	return frame;
@@ -2095,7 +2092,7 @@ local function auraButton_updateFlashing(button)
 
 	local timeRemaining = auraObject.expirationTime - GetTime();
 
-	if (timeRemaining <= globalObject.flashTime and auraObject.duration > 0 and globalObject.flashIcons) then
+	if (timeRemaining <= globalObject.flashTime and auraObject.duration > 0) then
 		auraObject.isFlashing = true;
 
 		-- If you target someone and then run a distance away, you will still know they have buffs,
@@ -5426,11 +5423,6 @@ function primaryClass:applyProtectedOptions(initFlag)
 		useUnsecure = true;
 	end
 
-	if (not CT_BuffMod_xoptUnsecure) then
-		playerUnsecure = false;
-		useUnsecure = false;
-	end
-
 	local deleteFrame;
 	local createFrame;
 
@@ -6976,18 +6968,15 @@ function primaryClass:registerAuraFrameEvents()
 
 	auraFrame:RegisterEvent("PLAYER_REGEN_DISABLED");
 	auraFrame:RegisterEvent("PLAYER_REGEN_ENABLED");
+	auraFrame:RegisterEvent("PLAYER_TARGET_CHANGED");
+	auraFrame:RegisterEvent("UNIT_PET");
+	auraFrame:RegisterEvent("UNIT_AURA");				-- Reminder: The secure aura routines also register UNIT_AURA
 	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
-		-- WoW 3.0 and later, but not WoW Classic
-		auraFrame:RegisterEvent("UNIT_ENTERED_VEHICLE");
-		auraFrame:RegisterEvent("UNIT_EXITED_VEHICLE");
+		auraFrame:RegisterEvent("UNIT_ENTERED_VEHICLE");	-- WotLK and later
+		auraFrame:RegisterEvent("UNIT_EXITED_VEHICLE");		-- WotLK and later
+		auraFrame:RegisterEvent("PLAYER_FOCUS_CHANGED");	-- BC and later
 	end
-	if (CT_BuffMod_xoptUnits) then
-		auraFrame:RegisterEvent("PLAYER_TARGET_CHANGED");
-		auraFrame:RegisterEvent("PLAYER_FOCUS_CHANGED");
-		auraFrame:RegisterEvent("UNIT_PET");
-	end
-	-- Reminder: The secure aura routines also register UNIT_AURA
-	auraFrame:RegisterEvent("UNIT_AURA");
+
 end
 
 function primaryClass:unregisterAuraFrameEvents()
@@ -6999,17 +6988,14 @@ function primaryClass:unregisterAuraFrameEvents()
 
 	auraFrame:UnregisterEvent("PLAYER_REGEN_DISABLED");
 	auraFrame:UnregisterEvent("PLAYER_REGEN_ENABLED");
-	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
-		-- WoW 3.0 and later, but not WoW Classic
-		auraFrame:UnregisterEvent("UNIT_ENTERED_VEHICLE");
-		auraFrame:UnregisterEvent("UNIT_EXITED_VEHICLE");
-	end
-	if (CT_BuffMod_xoptUnits) then
-		auraFrame:UnregisterEvent("PLAYER_TARGET_CHANGED");
-		auraFrame:UnregisterEvent("PLAYER_FOCUS_CHANGED");
-		auraFrame:UnregisterEvent("UNIT_PET");
-	end
+	auraFrame:UnregisterEvent("PLAYER_TARGET_CHANGED");
+	auraFrame:UnregisterEvent("UNIT_PET");
 	auraFrame:UnregisterEvent("UNIT_AURA");
+	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+		auraFrame:UnregisterEvent("UNIT_ENTERED_VEHICLE");	-- WotLK and later
+		auraFrame:UnregisterEvent("UNIT_EXITED_VEHICLE");	-- WotLK and later
+		auraFrame:UnregisterEvent("PLAYER_FOCUS_CHANGED");	-- BC and later
+	end
 end
 
 function primaryClass:registerStateDrivers()
@@ -7994,8 +7980,7 @@ end
 --	.expirationWarningTime1 -- Expiration warning time for buffs with a 2:00 to 10:00 minute duration (number, default == 15)
 --	.expirationWarningTime2 -- Expiration warning time for buffs with a 10:01 to 30:00 minute duration (number, default == 60)
 --	.expirationWarningTime3 -- Expiration warning time for buffs with a 30:01 or greater minute duration (number, default == 180)
---	.flashIcons -- Flash icons (1 == flash icon when aura about to fade, false == no flashing, default == flash)
---	.flashTime -- Time to flash icons before expiring (number, default == constants.DEFAULT_FLASH_TIME seconds)
+--	.flashTime -- Time to flash icons before expiring (number, default == constants.DEFAULT_FLASH_TIME seconds, zero means no flashing at all)
 --	.hideBlizzardBuffs -- Hide Blizzard's buff frame (1==yes, false==no, default == yes)
 --	.hideBlizzardConsolidated -- Hide Blizzard's consolidated buff button (1==yes, false==no, default == yes)
 --	.hideBlizzardEnchants -- Hide Blizzards temporary weapon enchants window (1==yes, false==no, default == yes)
@@ -8123,7 +8108,10 @@ function globalClass:applyGlobalOptions(initFlag)
 	self.expirationWarningTime3 = module:getOption("expirationTime3") or 180;
 
 	-- Flash icons when about to fade
-	self.flashIcons = module:getOption("flashIcons") ~= false;
+	if (module:getOption("flashIcons") == false) then		-- this option is depreciated in 8.2.5.2; now the duration flashTime is just set to zero
+		module:setOption("flashIcons", nil, true);
+		module:setOption("flashTime", 0, true);
+	end
 	self.flashTime = module:getOption("flashTime") or constants.DEFAULT_FLASH_TIME;
 end
 
@@ -8288,7 +8276,6 @@ ConsolidatedBuffs:HookScript("OnShow",
 	t durationCenter					F timeJustifyNoName1:1 (1==Default, 2==Left, 3==Right, 4==Center)
 	n showBuffTimer:true					F showBuffTimer1
 	n showTimerBackground:true				F showTimerBackground1
-	= flashIcons:true					G
 	= enableExpiration:true					G
 	= expirationCastOnly					G
 	= expirationSound:true					G
@@ -8770,14 +8757,12 @@ local function options_updateWindowWidgets(windowId)
 	L_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
 	L_UIDropDownMenu_SetSelectedValue( dropdown, unitType );
 
-	if (CT_BuffMod_xoptUnsecure) then
-		-- Use unsecure buttons
-		frame.playerUnsecure:SetChecked( playerUnsecure );
-		if (unitType == constants.UNIT_TYPE_PLAYER or unitType == constants.UNIT_TYPE_VEHICLE) then
-			frame.playerUnsecure:Show();
-		else
-			frame.playerUnsecure:Hide();
-		end
+	-- Use unsecure buttons
+	frame.playerUnsecure:SetChecked( playerUnsecure );
+	if (unitType == constants.UNIT_TYPE_PLAYER or unitType == constants.UNIT_TYPE_VEHICLE) then
+		frame.playerUnsecure:Show();
+	else
+		frame.playerUnsecure:Hide();
 	end
 
 	-- Show vehicle buffs when in a vehicle
@@ -8817,17 +8802,15 @@ local function options_updateWindowWidgets(windowId)
 	L_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
 	L_UIDropDownMenu_SetSelectedValue( dropdown, sortMethod );
 
-	if (CT_BuffMod_xoptUnsecure) then
-		dropdown = CT_BuffModDropdown_separateZero;
-		L_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-		L_UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.separateZero or constants.SEPARATE_ZERO_WITH );
-		if (playerUnsecure) then
-			frame.separateZeroText:Show();
-			frame.separateZero:Show();
-		else
-			frame.separateZeroText:Hide();
-			frame.separateZero:Hide();
-		end
+	dropdown = CT_BuffModDropdown_separateZero;
+	L_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	L_UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.separateZero or constants.SEPARATE_ZERO_WITH );
+	if (playerUnsecure) then
+		frame.separateZeroText:Show();
+		frame.separateZero:Show();
+	else
+		frame.separateZeroText:Hide();
+		frame.separateZero:Hide();
 	end
 
 	frame.sortDirection:SetChecked( not not frameOptions.sortDirection );
@@ -9517,7 +9500,6 @@ module.optionUpdate = function(self, optName, value)
 		optName == "expirationTime1" or
 		optName == "expirationTime2" or
 		optName == "expirationTime3" or
-		optName == "flashIcons" or
 		optName == "flashTime" or
 		optName == "hideBlizzardBuffs" or
 		optName == "hideBlizzardConsolidated" or
@@ -9700,32 +9682,34 @@ CONSOLIDATION REMOVED FROM GAME --]]
 	-- Expiration options
 	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
 		optionsAddObject( -0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Expiration");
-		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:flashIcons:true#Flash icon before expiring");
 
-		optionsAddObject(-15,   14, "font#tl:49:%y#v:ChatFontNormal#Flash time:");
-		optionsAddObject( 15,   17, "slider#tl:150:%y#i:flashTime#o:flashTime:" .. constants.DEFAULT_FLASH_TIME .. "#<value> seconds#1:60:1");
+		optionsAddObject(-15,   14, "font#tl:10:%y#v:ChatFontNormal#Flash icon before expiry:");
+		optionsBeginFrame(15,   17, "slider#tl:155:%y#tr:-15:%y#i:flashTime#o:flashTime:" .. constants.DEFAULT_FLASH_TIME .. "#<value> seconds:Off:1 min.#0:60:1");
+			optionsAddScript("onvaluechanged", updateFunc);
+			optionsAddScript("onload", updateFunc);
+		optionsEndFrame();
 
-		optionsAddObject(-10,   26, "checkbutton#tl:10:%y#o:enableExpiration:true#Enable expiration warning message");
-		optionsAddObject(  6,   26, "checkbutton#tl:46:%y#o:expirationCastOnly#Ignore buffs you cannot cast");
-		optionsAddObject(  6,   26, "checkbutton#tl:46:%y#o:expirationSound:true#Play sound when warning is shown");
+		optionsAddObject(-15,   26, "checkbutton#tl:10:%y#o:enableExpiration:true#Enable chat warning message");
+		optionsAddObject(  5,   26, "checkbutton#tl:46:%y#o:expirationCastOnly#Ignore buffs you cannot cast");
+		optionsAddObject(  5,   26, "checkbutton#tl:46:%y#o:expirationSound:true#Play sound when warning is shown");
 
 		optionsAddObject( -5,   15, "font#tl:49:%y#v:ChatFontNormal#Duration");
 		optionsAddObject( 15,   15, "font#tl:150:%y#v:ChatFontNormal#Expiration Warning Time");
 
 		optionsAddObject(-23,   15, "font#tl:49:%y#2:00  -  10:00");
-		optionsBeginFrame(  18,   17, "slider#tl:150:%y#o:expirationTime1:15#:Off:1 min.#0:60:5");
+		optionsBeginFrame(  18,   17, "slider#tl:155:%y#tr:-15:%y#o:expirationTime1:15#:Off:1 min.#0:60:5");
 			optionsAddScript("onvaluechanged", updateFunc);
 			optionsAddScript("onload", updateFunc);
 		optionsEndFrame();
 
 		optionsAddObject(-27,   15, "font#tl:49:%y#10:01  -  30:00");
-		optionsBeginFrame(  18,   17, "slider#tl:150:%y#o:expirationTime2:60#:Off:3 min.#0:180:5");
+		optionsBeginFrame(  18,   17, "slider#tl:155:%y#tr:-15:%y#o:expirationTime2:60#:Off:3 min.#0:180:5");
 			optionsAddScript("onvaluechanged", updateFunc);
 			optionsAddScript("onload", updateFunc);
 		optionsEndFrame();
 
 		optionsAddObject(-27,   15, "font#tl:49:%y#30:01  +");
-		optionsBeginFrame(  18,   17, "slider#tl:150:%y#o:expirationTime3:180#:Off:5 min.#0:300:5");
+		optionsBeginFrame(  18,   17, "slider#tl:155:%y#tr:-15:%y#o:expirationTime3:180#:Off:5 min.#0:300:5");
 			optionsAddScript("onvaluechanged", updateFunc);
 			optionsAddScript("onload", updateFunc);
 		optionsEndFrame();
@@ -9854,18 +9838,16 @@ CONSOLIDATION REMOVED FROM GAME --]]
 
 		optionsAddObject(-20, 1*13, "font#tl:15:%y#Unit");
 		do
-			local unitMenu = "#Player#Vehicle";
-			if (CT_BuffMod_xoptUnits) then
-				unitMenu = unitMenu .. "#Pet#Target#Focus";
+			local unitMenu = "#Player#Vehicle#Pet#Target";
+			if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+				unitMenu = unitMenu .. "#Focus";
 			end
 			-- Show buffs for
 			-- Show vehicle buffs when in a vehicle
 			-- Use unsecure buttons (refer to tooltip)
 			optionsAddObject(-10,   14, "font#tl:34:%y#v:ChatFontNormal#Show buffs for:");
 			optionsAddObject( 15,   20, "dropdown#tl:120:%y#s:120:%s#n:CT_BuffModDropdown_unitType#i:unitType#o:unitType:" .. constants.UNIT_TYPE_PLAYER .. unitMenu);
-			if (CT_BuffMod_xoptUnsecure) then
-				optionsAddObject(  0,   26, "checkbutton#tl:30:%y#i:playerUnsecure#o:playerUnsecure#Use unsecure buff buttons");
-			end
+			optionsAddObject(  0,   26, "checkbutton#tl:30:%y#i:playerUnsecure#o:playerUnsecure#Use unsecure buff buttons");
 			optionsAddObject(  0,   26, "checkbutton#tl:30:%y#i:vehicleBuffs#o:vehicleBuffs:true#Show vehicle buffs when in a vehicle");
 		end
 
@@ -10126,11 +10108,9 @@ CONSOLIDATION REMOVED FROM GAME --]]
 		--
 		optionsAddObject( 15,   20, "dropdown#tl:140:%y#s:130:%s#n:CT_BuffModDropdown_separateOwn#i:separateOwn#o:separateOwn:" .. constants.SEPARATE_OWN_WITH .. "#Before other players#After other players#With other players");
 
-		if (CT_BuffMod_xoptUnsecure) then
-			-- Sort zero duration buffs
-			optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#i:separateZeroText#Non-expiring buffs:");
-			optionsAddObject( 15,   20, "dropdown#tl:140:%y#s:130:%s#n:CT_BuffModDropdown_separateZero#i:separateZero#o:separateZero:" .. constants.SEPARATE_ZERO_WITH .. "#Before other buffs#After other buffs#With other buffs");
-		end
+		-- Sort zero duration buffs
+		optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#i:separateZeroText#Non-expiring buffs:");
+		optionsAddObject( 15,   20, "dropdown#tl:140:%y#s:130:%s#n:CT_BuffModDropdown_separateZero#i:separateZero#o:separateZero:" .. constants.SEPARATE_ZERO_WITH .. "#Before other buffs#After other buffs#With other buffs");
 
 		-- Group by
 		do
@@ -10518,9 +10498,7 @@ CONSOLIDATION REMOVED FROM GAME--]]
 				end
 				options_setCurrentWindow( windowId, true );
 
-				if (CT_BuffMod_xoptUnsecure) then
-					self.playerUnsecure:SetScript("OnEnter", enablePlayerUnsecureTooltip);
-				end
+				self.playerUnsecure:SetScript("OnEnter", enablePlayerUnsecureTooltip);
 			end
 		);
 	optionsEndFrame();
@@ -10656,8 +10634,8 @@ local function globalFrame_Init(self)
 
 	-- Register events
 	self:RegisterEvent("UNIT_AURA");
-	if (CT_BuffMod_xoptUnits) then
-		self:RegisterEvent("PLAYER_TARGET_CHANGED");
+	self:RegisterEvent("PLAYER_TARGET_CHANGED");
+	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
 		self:RegisterEvent("PLAYER_FOCUS_CHANGED");
 	end
 
