@@ -1,3 +1,6 @@
+CT_RaidAssist (8.2.5.2) 2019-09-26
+- Raid frames may now grow upward or left
+
 CT_RaidAssist (8.2.5.1) 2019-09-23
 - Small fix to tooltip when using languages other than enUS
 - Added German localization, courtesy of CurseForge user dynaletik
