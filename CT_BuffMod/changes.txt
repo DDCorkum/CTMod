@@ -1,6 +1,6 @@
-CT_BuffMod (8.2.5.1) 2019-09-26
+CT_BuffMod (8.2.5.2) 2019-09-28
 - Show buffs for target, pet or focus
-- Further cleanup of the options menu
+- Further cleanup and localization of the options menu
 
 CT_BuffMod (8.2.5.1) 2019-09-23
 - Restored original Vanilla expiring-buff sound for Classic edition
