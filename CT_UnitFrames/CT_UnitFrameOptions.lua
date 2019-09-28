@@ -259,7 +259,7 @@ function CT_UnitFramesOptions_Radio_Update()
 	CT_UnitFramesOptionsFrameOneColorHealthCB:SetChecked(CT_UnitFramesOptions.oneColorHealth);
 	CT_UnitFramesOptionsFrameLargeBreakUpCB:SetChecked(CT_UnitFramesOptions.largeBreakUp ~= false);
 	CT_UnitFramesOptionsFrameLargeAbbreviateCB:SetChecked(CT_UnitFramesOptions.largeAbbreviate ~= false);
-	CT_UnitFramesOptionsFrameMakeFontLikeRetailCB:SetChecked(CT_UnitFramesOptions.makeFontLikeRetail ~= false);
+	CT_UnitFramesOptionsFrameMakeFontLikeRetailCB:SetChecked(CT_UnitFramesOptions.makeFontLikeRetail);
 
 	if ( CT_UnitFramesOptions.displayTargetClass ) then
 		CT_TargetFrameClassFrame:Show();

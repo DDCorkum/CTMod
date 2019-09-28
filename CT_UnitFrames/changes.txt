@@ -1,3 +1,6 @@
+CT_UnitFrames (8.2.5.2) 2019-09-28
+- Classic font toggle correctly shows as disabled by default for first-time users
+
 CT_UnitFrames (8.2.5.1) 2019-09-14
 - More control over fonts on player, target and party frames
 - Removed taint from party frames to avoid framexml textstatusbar.lua:33 combat error
