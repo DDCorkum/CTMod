@@ -9638,31 +9638,26 @@ CONSOLIDATION REMOVED FROM GAME --]]
 			optionsAddScript("onload", updateFunc);
 		optionsEndFrame();
 
+		local function enableExpirationChildren()
+			expirationCastOnly:SetEnabled(enableExpiration:GetChecked());
+			expirationCastOnly:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
+			expirationSound:SetEnabled(enableExpiration:GetChecked());
+			expirationSound:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
+			expirationDurationHeading:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
+			expirationWarningTimeHeading:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
+			expirationTime1Label:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
+			CT_BuffMod_ExpirationTime1Slider:SetEnabled(enableExpiration:GetChecked());
+			CT_BuffMod_ExpirationTime1Slider:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
+			expirationTime2Label:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
+			CT_BuffMod_ExpirationTime2Slider:SetEnabled(enableExpiration:GetChecked());
+			CT_BuffMod_ExpirationTime2Slider:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
+			expirationTime3Label:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
+			CT_BuffMod_ExpirationTime3Slider:SetEnabled(enableExpiration:GetChecked());
+			CT_BuffMod_ExpirationTime3Slider:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
+		end
+
 		optionsBeginFrame(-15,   26, "checkbutton#tl:30:%y#o:enableExpiration:true#" .. module.text["CT_BuffMod/Options/General/Expiration/ChatMessageCheckbox"]);
-			optionsAddScript("onload",
-				function(checkbox)
-					local function enableChildren()
-						expirationCastOnly:SetEnabled(checkbox:GetChecked());
-						expirationCastOnly:SetAlpha((checkbox:GetChecked() and 1) or 0.5)
-						expirationSound:SetEnabled(checkbox:GetChecked());
-						expirationSound:SetAlpha((checkbox:GetChecked() and 1) or 0.5)
-						expirationDurationHeading:SetAlpha((checkbox:GetChecked() and 1) or 0.5)
-						expirationWarningTimeHeading:SetAlpha((checkbox:GetChecked() and 1) or 0.5)
-						expirationTime1Label:SetAlpha((checkbox:GetChecked() and 1) or 0.5)
-						expirationTime1:SetEnabled(checkbox:GetChecked());
-						expirationTime1:SetAlpha((checkbox:GetChecked() and 1) or 0.5)
-						expirationTime2Label:SetAlpha((checkbox:GetChecked() and 1) or 0.5)
-						expirationTime2:SetEnabled(checkbox:GetChecked());
-						expirationTime2:SetAlpha((checkbox:GetChecked() and 1) or 0.5)
-						expirationTime3Label:SetAlpha((checkbox:GetChecked() and 1) or 0.5)
-						expirationTime3:SetEnabled(checkbox:GetChecked());
-						expirationTime3:SetAlpha((checkbox:GetChecked() and 1) or 0.5)
-						
-					end
-					checkbox:HookScript("OnClick", enableChildren)
-					checkbox:HookScript("OnShow", enableChildren)
-				end
-			);
+			optionsAddScript("onload", function() enableExpiration:HookScript("OnClick", enableExpirationChildren) end);
 		optionsEndFrame();
 		optionsAddObject(  5,   26, "checkbutton#tl:50:%y#o:expirationCastOnly#" .. module.text["CT_BuffMod/Options/General/Expiration/PlayerBuffsOnlyCheckbox"]);
 		optionsAddObject(  5,   26, "checkbutton#tl:50:%y#o:expirationSound:true#" .. module.text["CT_BuffMod/Options/General/Expiration/PlaySoundCheckbox"]);
@@ -9671,21 +9666,22 @@ CONSOLIDATION REMOVED FROM GAME --]]
 		optionsAddObject( 15,   15, "font#tl:175:%y#n:expirationWarningTimeHeading#" .. module.text["CT_BuffMod/Options/General/Expiration/WarningTimeHeading"]);
 
 		optionsAddObject(-23,   15, "font#tl:55:%y#n:expirationTime1Label#v:ChatFontNormal#  2:00  -  10:00");
-		optionsBeginFrame(  18,   17, "slider#tl:175:%y#tr:-5:%y#o:expirationTime1:15#:" .. module.text["CT_BuffMod/TimeFormat/Off"] .. ":" .. format(module.text["CT_BuffMod/TimeFormat/Minutes Smaller"],1) .. "#0:60:5");
+		optionsBeginFrame(  18,   17, "slider#tl:175:%y#tr:-5:%y#n:CT_BuffMod_ExpirationTime1Slider#o:expirationTime1:15#:" .. module.text["CT_BuffMod/TimeFormat/Off"] .. ":" .. format(module.text["CT_BuffMod/TimeFormat/Minutes Smaller"],1) .. "#0:60:5");
 			optionsAddScript("onvaluechanged", updateFunc);
 			optionsAddScript("onload", updateFunc);
 		optionsEndFrame();
 
 		optionsAddObject(-27,   15, "font#tl:55:%y#n:expirationTime2Label#v:ChatFontNormal#10:01  -  30:00");
-		optionsBeginFrame(  18,   17, "slider#tl:175:%y#tr:-5:%y#o:expirationTime2:60#:" .. module.text["CT_BuffMod/TimeFormat/Off"] .. ":" .. format(module.text["CT_BuffMod/TimeFormat/Minutes Smaller"],3) .. "#0:180:5");
+		optionsBeginFrame(  18,   17, "slider#tl:175:%y#tr:-5:%y#n:CT_BuffMod_ExpirationTime2Slider#o:expirationTime2:60#:" .. module.text["CT_BuffMod/TimeFormat/Off"] .. ":" .. format(module.text["CT_BuffMod/TimeFormat/Minutes Smaller"],3) .. "#0:180:5");
 			optionsAddScript("onvaluechanged", updateFunc);
 			optionsAddScript("onload", updateFunc);
 		optionsEndFrame();
 
 		optionsAddObject(-27,   15, "font#tl:55:%y#n:expirationTime3Label#v:ChatFontNormal#30:01  +");
-		optionsBeginFrame(  18,   17, "slider#tl:175:%y#tr:-5:%y#o:expirationTime3:180#:" .. module.text["CT_BuffMod/TimeFormat/Off"] .. ":" .. format(module.text["CT_BuffMod/TimeFormat/Minutes Smaller"],5) .. "#0:300:5");
+		optionsBeginFrame(  18,   17, "slider#tl:175:%y#tr:-5:%y#n:CT_BuffMod_ExpirationTime3Slider#o:expirationTime3:180#:" .. module.text["CT_BuffMod/TimeFormat/Off"] .. ":" .. format(module.text["CT_BuffMod/TimeFormat/Minutes Smaller"],5) .. "#0:300:5");
 			optionsAddScript("onvaluechanged", updateFunc);
 			optionsAddScript("onload", updateFunc);
+			optionsAddScript("onshow", enableExpirationChildren);
 		optionsEndFrame();
 	optionsEndFrame();
 

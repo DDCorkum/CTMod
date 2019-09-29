@@ -439,6 +439,7 @@ local function CT_BarMod_Shift_Pet_UpdateTextures()
 	end
 
 	local shift = CT_BarMod_Shift_Pet_GetShiftOption();
+	
 	if (shift) then
 		SlidingActionBarTexture0:Hide();
 		SlidingActionBarTexture1:Hide();
@@ -462,7 +463,6 @@ local function CT_BarMod_Shift_Pet_UpdateTextures()
 	end
 end
 
-local PetPoint, PetRelativeTo, PetRelativePoint, PetX, PetY;
 function CT_BarMod_Shift_Pet_UpdatePositions()
 	if (not CT_BarMod_Shift_Pet_areWeShifting()) then
 		return;
@@ -475,83 +475,37 @@ function CT_BarMod_Shift_Pet_UpdatePositions()
 	end
 
 	local frame, yoffset;
-	frame = PetActionBarFrame;	
+	frame = CT_BarMod_PetActionBarFrame;	
 	local shift = CT_BarMod_Shift_Pet_GetShiftOption();
 	
-	if (not PetPoint) then
-		PetPoint, PetRelativeTo, PetRelativePoint, PetX, PetY = frame:GetPoint(1);
-	end
-
 	if (shift) then
-			yoffset = 2 + frame:GetHeight();
-			if (PetActionBarFrame_IsAboveStance and PetActionBarFrame_IsAboveStance()) then
-				yoffset = 0;
-			end
-			frame:ClearAllPoints();
-			frame:SetPoint(PetPoint, PetRelativeTo, PetRelativePoint, PetX, PetY + yoffset)
-			
+			CT_BarMod_PetActionBarFrame:ClearAllPoints();
+			CT_BarMod_PetActionBarFrame:SetPoint("BOTTOM", UIParent, "BOTTOM", 0, module:getOption("shiftPetOffset") or 113);
+			CT_BarMod_PetActionBarFrame:SetPoint("LEFT", PetActionBarFrame);
+			PetActionBarFrame:EnableMouse(false);
 			petIsShifted = true;
 
 	else
-			yoffset = 0
-			frame:ClearAllPoints();
-			frame:SetPoint(PetPoint, PetRelativeTo, PetRelativePoint, PetX, PetY + yoffset)
-			
+			CT_BarMod_PetActionBarFrame:ClearAllPoints();
+			CT_BarMod_PetActionBarFrame:SetPoint("BOTTOMLEFT", PetActionBarFrame, "BOTTOMLEFT", 0, 0);
+			PetActionBarFrame:EnableMouse(true);
 			petIsShifted = false;
-
-	end
-end
-
-local function CT_BarMod_Shift_Pet_SetPoint(self, ap, rt, rp, x, y)
-	-- (hook) This is a post hook of the .SetPoint and .SetAllPoints functions
-	CT_BarMod_Shift_Pet_UpdatePositions();
-end
-
-local function CT_BarMod_Shift_Pet_OnUpdate()
-	-- (hook) This is a post hook of the PetActionBarFrame_OnUpdate function in PetActionBarFrame.lua
-	--
-	-- Blizzard calls PetActionBarFrame_OnUpdate from PetActionBarFrame.xml using
-	-- the <OnUpdate function="PetActionBarFrame_OnUpdate"/> syntax,
-	-- so we have to hook the OnUpdate script in order for our function
-	-- to get called.
-	--
-	if (not PetActionBarFrame.completed) then
-		-- Pet bar is sliding into place.
-		petNeedToMove = 1;
-	else
-		-- Pet bar has finished sliding into place.
-		if (petNeedToMove) then
-			CT_BarMod_Shift_Pet_UpdatePositions();
-			petNeedToMove = nil;
-		end
 	end
 end
 
 local function CT_BarMod_Shift_Pet_Init()
-	local frame1, frame2;
+	local frame;
 
 	-- Our frame for the pet action buttons
-	frame1 = CreateFrame("Frame", "CT_BarMod_PetActionBarFrame");
-	frame2 = PetActionBarFrame;
-
-	frame1:SetParent(UIParent);
-	frame1:EnableMouse(false);
-	frame1:SetHeight(frame2:GetHeight());
-	frame1:SetWidth(frame2:GetWidth());
-	frame1:SetPoint("BOTTOMLEFT", frame2, "TOPLEFT", 0, 0)
-	frame1:SetAlpha(1);
-	frame1:Hide();
-
-	for i = 1, 10 do
-		hooksecurefunc(_G["PetActionButton" .. i], "SetPoint", CT_BarMod_Shift_Pet_SetPoint);
-		hooksecurefunc(_G["PetActionButton" .. i], "SetAllPoints", CT_BarMod_Shift_Pet_SetPoint);
-	end
-
-	-- Hook the function and any xml script handler using the function= syntax to call it.
-	hooksecurefunc("PetActionBarFrame_OnUpdate", CT_BarMod_Shift_Pet_OnUpdate);
-	frame2:HookScript("OnUpdate", CT_BarMod_Shift_Pet_OnUpdate);
+	frame = CreateFrame("Frame", "CT_BarMod_PetActionBarFrame");
+	frame:SetSize(0.0001, 0.0001);
+	frame:Hide();
 
 	CT_BarMod_Shift_Pet_UpdatePositions();
+
+	PetActionButton1:ClearAllPoints();
+	PetActionButton1:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 36, 2);
+	
 end
 
 -------------------------------
