@@ -33,6 +33,7 @@ L["CT_BuffMod/TimeFormat/Seconds Abbreviated"] = "%ds"
 L["CT_BuffMod/TimeFormat/Seconds Plural"] = "%d seconds"
 L["CT_BuffMod/TimeFormat/Seconds Smaller"] = "%d sec"
 L["CT_BuffMod/TimeFormat/Seconds Two Digits"] = "%.2ds"
+L["CT_BuffMod/WindowTitle"] = "Window %d"
 L["CT_BuffMod/Options/Blizzard Frames/Heading"] = "Blizzard's Default Frames"
 L["CT_BuffMod/Options/Blizzard Frames/Hide Buffs"] = "Hide the default buffs frame"
 L["CT_BuffMod/Options/Blizzard Frames/Hide Consolidated"] = "Hide the default consolidated buffs frame"
@@ -43,6 +44,13 @@ L["CT_BuffMod/Options/General/Colors/Buff"] = "Buff"
 L["CT_BuffMod/Options/General/Colors/Debuff"] = "Debuff"
 L["CT_BuffMod/Options/General/Colors/Heading"] = "Colors"
 L["CT_BuffMod/Options/General/Colors/Weapon"] = "Weapon"
+L["CT_BuffMod/Options/General/Expiration/ChatMessageCheckbox"] = "Enable chat warning message"
+L["CT_BuffMod/Options/General/Expiration/DurationHeading"] = "Buff Duration"
+L["CT_BuffMod/Options/General/Expiration/Heading"] = "Expiration"
+L["CT_BuffMod/Options/General/Expiration/PlayerBuffsOnlyCheckbox"] = "Only buffs you can cast"
+L["CT_BuffMod/Options/General/Expiration/PlaySoundCheckbox"] = "Play sound when warning appears"
+L["CT_BuffMod/Options/General/Expiration/WarningTimeHeading"] = "Show Warning At"
+L["CT_BuffMod/Options/General/Expiration/FlashSliderLabel"] = "Flash icon before expiry:"
 L["CT_BuffMod/Options/General/Heading"] = "General Settings"
 L["CT_BuffMod/Options/Tips/Heading"] = "Tips"
 L["CT_BuffMod/Options/Tips/Line 1"] = "You can use /ctbuff or /ctbuffmod to open this options window directly."
@@ -64,17 +72,23 @@ L["CT_BuffMod/Options/Window/Unit/SecureTooltip/Heading"] = "Secure and Non-secu
 L["CT_BuffMod/Options/Window/Unit/UnitDropdownLabel"] = "Show buffs for:"
 L["CT_BuffMod/Options/Window/Unit/UnitDropdownOptions"] = "#Player#Vehicle#Pet#Target#Focus"
 L["CT_BuffMod/Options/Window/Unit/VehicleCheckbox"] = "Show vehicle buffs when in a vehicle"
+L["CT_BuffMod/Options/WindowControls/AddButton"] = "Add"
+L["CT_BuffMod/Options/WindowControls/AddTooltip"] = "Add a new window with default settings."
+L["CT_BuffMod/Options/WindowControls/AltClickHint"] = "Alt click to select."
+L["CT_BuffMod/Options/WindowControls/CloneButton"] = "Clone"
+L["CT_BuffMod/Options/WindowControls/CloneTooltip"] = "Add a new window with settings that duplicate those of the currently selected window."
+L["CT_BuffMod/Options/WindowControls/DeleteButton"] = "Delete"
+L["CT_BuffMod/Options/WindowControls/DeleteTooltip"] = "|cFFFFFF00Shift-click|r this button to delete the currently selected window."
+L["CT_BuffMod/Options/WindowControls/SelectionLabel"] = "Select window:"
+L["CT_BuffMod/Options/WindowControls/Tip"] = "Options below this point only affect the selected window."
+L["CT_BuffMod/Options/WindowControls/WindowAddedMessage"] = "Window %d added."
+L["CT_BuffMod/Options/WindowControls/WindowClonedMessage"] = "Window %d added, copying settings from window %d."
+L["CT_BuffMod/Options/WindowControls/WindowDeletedMessage"] = "Window %d deleted."
+L["CT_BuffMod/Options/WindowControls/WindowSelectedMessage"] = "Window %d selected."
 
-L["CT_BuffMod/Options/General/Expiration/Heading"] = "Expiration"
-L["CT_BuffMod/Options/General/Expiration/ChatMessageCheckbox"] = "Enable chat warning message"
-L["CT_BuffMod/Options/General/Expiration/PlayerBuffsOnlyCheckbox"] = "Only buffs you can cast"
-L["CT_BuffMod/Options/General/Expiration/PlaySoundCheckbox"] = "Play sound when warning appears"
-L["CT_BuffMod/Options/General/Expiration/DurationHeading"] = "Buff Duration"
-L["CT_BuffMod/Options/General/Expiration/WarningTimeHeading"] = "Show Warning At"
-
--- frFR (missing translations will just use the default enUS one at the top)
 
 if (GetLocale() == "frFR") then
+
 
 L["CT_BuffMod/PRE_EXPIRATION_WARNING"] = "L'aura |cFFFFFFFF%s|r expire dans |cFFFFFFFF%s|r."
 L["CT_BuffMod/PRE_EXPIRATION_WARNING_KEYBINDING"] = "L'aura |cFFFFFFFF%s|r expire dans |cFFFFFFFF%s|r.  Appuyer sur |cFFFFFFFF%s|r pour le réappliquer"
@@ -99,6 +113,7 @@ L["CT_BuffMod/TimeFormat/Seconds Abbreviated"] = "%ds"
 L["CT_BuffMod/TimeFormat/Seconds Plural"] = "%d secondes"
 L["CT_BuffMod/TimeFormat/Seconds Smaller"] = "%d sec"
 L["CT_BuffMod/TimeFormat/Seconds Two Digits"] = "%.2ds"
+L["CT_BuffMod/WindowTitle"] = "Fenêtre %d"
 L["CT_BuffMod/Options/Blizzard Frames/Hide Buffs"] = "Cacher le cadre défaut des auras"
 L["CT_BuffMod/Options/Blizzard Frames/Hide Consolidated"] = "Cacher le cadre défaut des auras consolidés"
 L["CT_BuffMod/Options/Blizzard Frames/Hide Enchants"] = "Cacher le cadre défaut des auras d'armes"
@@ -108,6 +123,12 @@ L["CT_BuffMod/Options/General/Colors/Buff"] = "Aura utile"
 L["CT_BuffMod/Options/General/Colors/Debuff"] = "Aura nocive"
 L["CT_BuffMod/Options/General/Colors/Heading"] = "Des couleurs "
 L["CT_BuffMod/Options/General/Colors/Weapon"] = "Aura d'arme"
+L["CT_BuffMod/Options/General/Expiration/ChatMessageCheckbox"] = "Annoncer les auras avant leurs expirations"
+L["CT_BuffMod/Options/General/Expiration/DurationHeading"] = "Duration de l'aura"
+L["CT_BuffMod/Options/General/Expiration/Heading"] = "L'expiration des auras"
+L["CT_BuffMod/Options/General/Expiration/PlayerBuffsOnlyCheckbox"] = "Seulement les auras que vous renouvelez."
+L["CT_BuffMod/Options/General/Expiration/PlaySoundCheckbox"] = "Jouer un son avec l'annonce"
+L["CT_BuffMod/Options/General/Expiration/WarningTimeHeading"] = "Temps de l'annonce"
 L["CT_BuffMod/Options/General/Heading"] = "Options générales"
 L["CT_BuffMod/Options/Tips/Heading"] = "Des conseils"
 L["CT_BuffMod/Options/Tips/Line 1"] = "Vous pouvez taper /cbuff ou /ctaura pour accéder ces options."
@@ -129,11 +150,23 @@ L["CT_BuffMod/Options/Window/Unit/SecureTooltip/Heading"] = "Les boutons sécuri
 L["CT_BuffMod/Options/Window/Unit/UnitDropdownLabel"] = "Montrer les auras de :"
 L["CT_BuffMod/Options/Window/Unit/UnitDropdownOptions"] = "#Jouer#Véhicule#Pet#Cible#Cible focalisé"
 L["CT_BuffMod/Options/Window/Unit/VehicleCheckbox"] = "Changer au véhicule lors de la conduit"
-
-
+L["CT_BuffMod/Options/WindowControls/AddButton"] = "Ajouter"
+L["CT_BuffMod/Options/WindowControls/AddTooltip"] = "Ajouter une fenêtre avec les options defauts."
+L["CT_BuffMod/Options/WindowControls/AltClickHint"] = "Alt-clic pour sélectionner"
+L["CT_BuffMod/Options/WindowControls/CloneButton"] = "Copier"
+L["CT_BuffMod/Options/WindowControls/CloneTooltip"] = "Ajouter une fenêtre qui copie les options de celle-ci."
+L["CT_BuffMod/Options/WindowControls/DeleteButton"] = "Supprimer"
+L["CT_BuffMod/Options/WindowControls/DeleteTooltip"] = "|cFFFFFF00Maj-clic|r ce bouton pour supprimer la fênetre sélectionnée"
+L["CT_BuffMod/Options/WindowControls/SelectionLabel"] = "Sélecter :"
+L["CT_BuffMod/Options/WindowControls/Tip"] = "Les options ci-dessous ne contrôlent que la fenêtre sélectionnée"
+L["CT_BuffMod/Options/WindowControls/WindowAddedMessage"] = "Fenêtre %d ajoutée."
+L["CT_BuffMod/Options/WindowControls/WindowSelectedMessage"] = "Fenêtre %d sélectionnée."
+L["CT_BuffMod/Options/General/Expiration/FlashSliderLabel"] = [=[Clignoter l'icône 
+avant l'expiration :]=]
 
 
 elseif (GetLocale() == "deDE") then
+
 
 L["CT_BuffMod/PRE_EXPIRATION_WARNING"] = "Der Zauber |cFFFFFFFF%s|r wird in |cFFFFFFFF%s|r ablaufen."
 L["CT_BuffMod/PRE_EXPIRATION_WARNING_KEYBINDING"] = "Der Zauber |cFFFFFFFF%s|r wird in |cFFFFFFFF%s|r ablaufen. Drücke außerhalb des Kampfes |cFFFFFFFF%s|r zum Erneuern."
@@ -181,5 +214,6 @@ L["CT_BuffMod/Options/Window/Unit/SecureTooltip/Heading"] = "Sichere und unsiche
 L["CT_BuffMod/Options/Window/Unit/UnitDropdownLabel"] = "Zauber zeigen für:"
 L["CT_BuffMod/Options/Window/Unit/UnitDropdownOptions"] = "#Spieler#Fahrzeug#Begleiter#Ziel#Fokus"
 L["CT_BuffMod/Options/Window/Unit/VehicleCheckbox"] = "In einem Fahrzeug Fahrzeugzauber anzeigen"
+
 
 end

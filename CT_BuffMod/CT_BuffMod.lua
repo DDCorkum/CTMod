@@ -2932,8 +2932,8 @@ function CT_BuffMod_AuraButton_OnEnter(self)
 		if ( (isOptionsFrameShown() or isControlPanelShown()) and frameObject:getWindowId() ) then
 			-- See also the auraFrame OnEnter script.
 			GameTooltip:SetOwner(self, "ANCHOR_CURSOR");
-			GameTooltip:SetText("Window " .. frameObject:getWindowId());
-			GameTooltip:AddLine("Alt click to select.");
+			GameTooltip:SetText(format(module.text["CT_BuffMod/WindowTitle"],frameObject:getWindowId()));
+			GameTooltip:AddLine(module.text["CT_BuffMod/Options/WindowControls/AltClickHint"]);
 			GameTooltip:Show();
 		end
 		return;
@@ -2961,7 +2961,7 @@ function CT_BuffMod_AuraButton_OnEnter(self)
 		end
 	end
 	if (isOptionsFrameShown() or isControlPanelShown()) then
-		GameTooltip:AddLine("Window " .. frameObject:getWindowId() .. " (Alt click to select)");
+		GameTooltip:AddLine(format(module.text["CT_BuffMod/WindowTitle"],frameObject:getWindowId()) .. " (" .. module.text["CT_BuffMod/Options/WindowControls/AltClickHint"] .. ")");
 		GameTooltip:Show();
 	else
 		GameTooltip:Show();
@@ -4340,7 +4340,7 @@ function frameClass:createAltFrame()
 
 	-- Return if the alt frame has already been created.
 	if (auraFrame.altFrame) then
-		auraFrame.altFrame.fsWindowTitle:SetText("Window " .. self:getWindowId());
+		auraFrame.altFrame.fsWindowTitle:SetText(format(module.text["CT_BuffMod/WindowTitle"],self:getWindowId()));
 		return;
 	end
 
@@ -4372,7 +4372,7 @@ function frameClass:createAltFrame()
 	-- Create window title
 	altFrame.fsWindowTitle = altFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
 	altFrame.fsWindowTitle:SetWordWrap(false)
-	altFrame.fsWindowTitle:SetText("Window " .. self:getWindowId());
+	altFrame.fsWindowTitle:SetText(format(module.text["CT_BuffMod/WindowTitle"],self:getWindowId()));
 	altFrame.fsWindowTitle:SetPoint("BOTTOM", altFrame, "TOP");
 	altFrame.fsWindowTitle:Hide();
 end
@@ -6580,8 +6580,8 @@ local function primaryAltFrame_OnEnter(altFrame)
 	if ( (isOptionsFrameShown() or isControlPanelShown()) and windowId ) then
 		-- See also the auraFrame OnEnter script.
 		GameTooltip:SetOwner(altFrame, "ANCHOR_CURSOR");
-		GameTooltip:SetText("Window " .. windowId);
-		GameTooltip:AddLine("Alt click to select.");
+		GameTooltip:SetText(format(module.text["CT_BuffMod/WindowTitle"],windowId));
+		GameTooltip:AddLine(module.text["CT_BuffMod/Options/WindowControls/AltClickHint"]);
 		GameTooltip:Show();
 	end
 end
@@ -8697,7 +8697,7 @@ local function options_updateWindowWidgets(windowId)
 				local windowListObject = globalObject.windowListObject;
 				local count = windowListObject:getWindowCount();
 				for windowNum = 1, count do
-					dropdownEntry.text = "Window " .. windowListObject:windowNumToId(i) or "";
+					dropdownEntry.text = format(module.text["CT_BuffMod/WindowTitle"],windowListObject:windowNumToId(i));
 					dropdownEntry.value = i;
 					dropdownEntry.checked = nil;
 					dropdownEntry.func = dropdown.ctDropdownClick;
@@ -9176,7 +9176,7 @@ function module:options_editWindow(windowId)
 		module:showModuleOptions(module.name);
 	end
 
-	ctprint("Window " .. windowId .. " selected.");
+	ctprint(format(module.text["CT_BuffMod/Options/WindowControls/WindowSelectedMessage"],windowId));
 
 	local windowListObject = globalObject.windowListObject;
 	local windowNum = windowListObject:windowIdToNum(windowId);
@@ -9236,7 +9236,7 @@ local function options_addWindow()
 	windowObject:resetPosition();
 
 	local windowId = windowObject:getWindowId();
-	ctprint("Window " .. windowId .. " added.");
+	ctprint(format(module.text["CT_BuffMod/Options/WindowControls/WindowAddedMessage"], windowId));
 
 	-- Switch to the window.
 	options_setCurrentWindow( windowId, true );
@@ -9257,7 +9257,7 @@ local function options_deleteWindow()
 
 	-- Delete the current window from the list.
 	windowListObject:deleteWindow(currentWindowId);
-	ctprint("Window " .. currentWindowId .. " deleted.");
+	ctprint(format(module.text["CT_BuffMod/Options/WindowControls/WindowDeletedMessage"], windowNum));
 
 	-- If there are no windows left then create a new one so we have at least 1 window.
 	if (windowListObject:getWindowCount() == 0) then
@@ -9311,7 +9311,7 @@ local function options_cloneWindow()
 	-- location as the original. The :resetPosition() does nothing since the
 	-- disabled window does not have an auraFrame that can be repositioned.
 
-	ctprint("Window " .. windowObject2:getWindowId() .. " added using the settings from window " .. windowObject1:getWindowId() .. ".");
+	ctprint(format(module.text["CT_BuffMod/Options/WindowControls/WindowClonedMessage"], windowObject2:getWindowId(), windowObject1:getWindowId()));
 
 	-- Switch to the window.
 	options_setCurrentWindow( windowObject2:getWindowId(), true );
@@ -9632,7 +9632,7 @@ CONSOLIDATION REMOVED FROM GAME --]]
 	optionsBeginFrame(-15, 0, "frame#tl:0:%y#br:tr:0:%b");
 		optionsAddObject( -0,   13, "font#tl:15:%y#v:GameFontNormal#" .. module.text["CT_BuffMod/Options/General/Expiration/Heading"]);
 
-		optionsAddObject(-15,   14, "font#tl:30:%y#v:ChatFontNormal#Flash icon before expiry:");
+		optionsAddObject(-15,   14, "font#tl:30:%y#v:ChatFontNormal#" .. module.text["CT_BuffMod/Options/General/Expiration/FlashSliderLabel"]);
 		optionsBeginFrame(15,   17, "slider#tl:175:%y#tr:-5:%y#i:flashTime#o:flashTime:" .. constants.DEFAULT_FLASH_TIME .. "#<value> seconds:" .. module.text["CT_BuffMod/TimeFormat/Off"] .. ":" .. format(module.text["CT_BuffMod/TimeFormat/Minutes Smaller"],1) .. "#0:60:1");
 			optionsAddScript("onvaluechanged", updateFunc);
 			optionsAddScript("onload", updateFunc);
@@ -9656,11 +9656,11 @@ CONSOLIDATION REMOVED FROM GAME --]]
 			CT_BuffMod_ExpirationTime3Slider:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
 		end
 
-		optionsBeginFrame(-15,   26, "checkbutton#tl:30:%y#o:enableExpiration:true#" .. module.text["CT_BuffMod/Options/General/Expiration/ChatMessageCheckbox"]);
+		optionsBeginFrame(-18,   26, "checkbutton#tl:30:%y#o:enableExpiration:true#" .. module.text["CT_BuffMod/Options/General/Expiration/ChatMessageCheckbox"]);
 			optionsAddScript("onload", function() enableExpiration:HookScript("OnClick", enableExpirationChildren) end);
 		optionsEndFrame();
-		optionsAddObject(  5,   26, "checkbutton#tl:50:%y#o:expirationCastOnly#" .. module.text["CT_BuffMod/Options/General/Expiration/PlayerBuffsOnlyCheckbox"]);
-		optionsAddObject(  5,   26, "checkbutton#tl:50:%y#o:expirationSound:true#" .. module.text["CT_BuffMod/Options/General/Expiration/PlaySoundCheckbox"]);
+		optionsAddObject(  5,   26, "checkbutton#tl:48:%y#o:expirationCastOnly#" .. module.text["CT_BuffMod/Options/General/Expiration/PlayerBuffsOnlyCheckbox"]);
+		optionsAddObject(  5,   26, "checkbutton#tl:48:%y#o:expirationSound:true#" .. module.text["CT_BuffMod/Options/General/Expiration/PlaySoundCheckbox"]);
 
 		optionsAddObject(-10,   15, "font#tl:55:%y#n:expirationDurationHeading#" .. module.text["CT_BuffMod/Options/General/Expiration/DurationHeading"]);
 		optionsAddObject( 15,   15, "font#tl:175:%y#n:expirationWarningTimeHeading#" .. module.text["CT_BuffMod/Options/General/Expiration/WarningTimeHeading"]);
@@ -9689,43 +9689,43 @@ CONSOLIDATION REMOVED FROM GAME --]]
 	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b#i:frameOptions");
 		optionsAddObject(-10,   17, "font#tl:5:%y#v:GameFontNormalLarge#Windows");
 
-		optionsBeginFrame( -10,   30, "button#tl:15:%y#s:80:%s#v:UIPanelButtonTemplate#Add");
+		optionsBeginFrame( -10,   30, "button#tl:15:%y#s:80:%s#v:UIPanelButtonTemplate#" .. module.text["CT_BuffMod/Options/WindowControls/AddButton"]);
 			optionsAddScript("onclick", function(self)
 				options_addWindow();
 			end);
 			optionsAddScript("onenter", function(self)
 				GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT");
-				GameTooltip:SetText("Add a new window with default settings.", 1, 0.82, 0, 1, true);
+				GameTooltip:SetText(module.text["CT_BuffMod/Options/WindowControls/AddTooltip"], 1, 0.82, 0, 1, true);
 				GameTooltip:Show();
 			end);
 			optionsAddScript("onleave", function(self)
 				GameTooltip:Hide();
 			end);
 		optionsEndFrame();
-		optionsBeginFrame(  30,   30, "button#tl:110:%y#s:80:%s#v:UIPanelButtonTemplate#Clone");
+		optionsBeginFrame(  30,   30, "button#tl:110:%y#s:80:%s#v:UIPanelButtonTemplate#" .. module.text["CT_BuffMod/Options/WindowControls/CloneButton"]);
 			optionsAddScript("onclick", function(self)
 				options_cloneWindow();
 			end);
 			optionsAddScript("onenter", function(self)
 				GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT");
-				GameTooltip:SetText("Add a new window with settings that duplicate those of the currently selected window.", 1, 0.82, 0, 1, true);
+				GameTooltip:SetText(module.text["CT_BuffMod/Options/WindowControls/CloneTooltip"], 1, 0.82, 0, 1, true);
 				GameTooltip:Show();
 			end);
 			optionsAddScript("onleave", function(self)
 				GameTooltip:Hide();
 			end);
 		optionsEndFrame();
-		optionsBeginFrame(  30,   30, "button#tl:205:%y#s:80:%s#v:UIPanelButtonTemplate#Delete");
+		optionsBeginFrame(  30,   30, "button#tl:205:%y#s:80:%s#v:UIPanelButtonTemplate#" .. module.text["CT_BuffMod/Options/WindowControls/DeleteButton"]);
 			optionsAddScript("onclick", function(self)
 				if (IsShiftKeyDown()) then
 					options_deleteWindow();
 				else
-					ctprint("Shift-click the 'Delete' button to delete the selected window.");
+					ctprint(module.text["CT_BuffMod/Options/WindowControls/DeleteTooltip"]);
 				end
 			end);
 			optionsAddScript("onenter", function(self)
 				GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT");
-				GameTooltip:SetText("Shift-click this button to delete the currently selected window.", 1, 0.82, 0, 1, true);
+				GameTooltip:SetText(module.text["CT_BuffMod/Options/WindowControls/DeleteTooltip"], 1, 0.82, 0, 1, true);
 				GameTooltip:Show();
 			end);
 			optionsAddScript("onleave", function(self)
@@ -9733,7 +9733,7 @@ CONSOLIDATION REMOVED FROM GAME --]]
 			end);
 		optionsEndFrame();
 
-		optionsAddObject(-20,   14, "font#tl:15:%y#v:ChatFontNormal#Select window:");
+		optionsAddObject(-20,   14, "font#tl:15:%y#v:ChatFontNormal#" .. module.text["CT_BuffMod/Options/WindowControls/SelectionLabel"]);
 
 		optionsBeginFrame( 19,   24, "button#tl:105:%y#s:24:%s");
 			optionsAddScript("onclick",
@@ -9769,7 +9769,7 @@ CONSOLIDATION REMOVED FROM GAME --]]
 
 		optionsAddObject( 20,   20, "dropdown#tl:140:%y#n:CT_BuffModDropdown_editWindow#o:editWindow#Window 1");
 
-		optionsAddObject( -5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#All options below this point will only affect the currently selected window.#" .. textColor2 .. ":l");
+		optionsAddObject( -5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. module.text["CT_BuffMod/Options/WindowControls/Tip"] .. "#" .. textColor2 .. ":l");
 
 		----------
 		-- Window
@@ -9841,12 +9841,37 @@ CONSOLIDATION REMOVED FROM GAME --]]
 
 		-- Basic conditions
 		optionsAddObject( -2,   20, "checkbutton#tl:25:%y#s:%s:%s#i:visBasic#o:visBasic#Use basic conditions");
-
-		optionsAddObject( -2,   26, "checkbutton#tl:44:%y#i:visHideInVehicle#o:visHideInVehicle#Hide when in a vehicle");
-		optionsAddObject(  6,   26, "checkbutton#tl:44:%y#i:visHideNotVehicle#o:visHideNotVehicle#Hide when not in a vehicle");
-		optionsAddObject(  6,   26, "checkbutton#tl:44:%y#i:visHideInCombat#o:visHideInCombat#Hide when in combat");
-		optionsAddObject(  6,   26, "checkbutton#tl:44:%y#i:visHideNotCombat#o:visHideNotCombat#Hide when not in combat");
-
+		
+		local function toggleBasicConditions(checkbutton)
+			checkbutton:HookScript("OnClick",
+				function()
+					if (
+						visHideInVehicle:GetChecked() 
+						or visHideNotVehicle:GetChecked()
+						or visHideInCombat:GetChecked() 
+						or visHideNotCombat:GetChecked()
+					) then
+						visBasic:Click();
+					else
+						visShow:Click();
+					end
+				end
+			);
+		end
+		
+		optionsBeginFrame( -2,   26, "checkbutton#tl:44:%y#i:visHideInVehicle#o:visHideInVehicle#Hide when in a vehicle");
+			optionsAddScript("onload", toggleBasicConditions);
+		optionsEndFrame();
+		optionsBeginFrame(  6,   26, "checkbutton#tl:44:%y#i:visHideNotVehicle#o:visHideNotVehicle#Hide when not in a vehicle");
+			optionsAddScript("onload", toggleBasicConditions);
+		optionsEndFrame();
+		optionsBeginFrame(  6,   26, "checkbutton#tl:44:%y#i:visHideInCombat#o:visHideInCombat#Hide when in combat");
+			optionsAddScript("onload", toggleBasicConditions);
+		optionsEndFrame();
+		optionsBeginFrame(  6,   26, "checkbutton#tl:44:%y#i:visHideNotCombat#o:visHideNotCombat#Hide when not in combat");
+			optionsAddScript("onload", toggleBasicConditions);
+		optionsEndFrame();
+		
 		-- Advanced conditions
 		optionsAddObject( -2,   20, "checkbutton#tl:25:%y#s:%s:%s#i:visAdvanced#o:visAdvanced#Use advanced conditions");
 
@@ -9977,8 +10002,14 @@ CONSOLIDATION REMOVED FROM GAME --]]
 					if (target) then
 						print("Target used: ", target);
 					end
-					if (action) then
-						print("Result: ", action);
+					if (action == "show") then
+						print("Valid Result: |cFF66FF66show");
+					elseif (action == "hide") then
+						print("Valid Result: |cFFFFFF00hide");
+					elseif (action == "" or not action) then
+						print("Invalid Result: |cFFFF3333[nil!]");
+					else
+						print("Invalid Result: |cFFFF3333" .. action);
 					end
 				end
 			);
@@ -10015,6 +10046,11 @@ CONSOLIDATION REMOVED FROM GAME --]]
 					windowOptionsFrame.visUndo:Disable();
 					if (IsShiftKeyDown()) then
 						print(buildCondition(cond));
+					end
+					if editBox:GetText() ~= "" then
+						visAdvanced:Click();
+					else
+						visShow:Click();
 					end
 				end
 			);
