@@ -46,11 +46,11 @@ L["CT_BuffMod/Options/General/Colors/Heading"] = "Colors"
 L["CT_BuffMod/Options/General/Colors/Weapon"] = "Weapon"
 L["CT_BuffMod/Options/General/Expiration/ChatMessageCheckbox"] = "Enable chat warning message"
 L["CT_BuffMod/Options/General/Expiration/DurationHeading"] = "Buff Duration"
+L["CT_BuffMod/Options/General/Expiration/FlashSliderLabel"] = "Flash icon before expiry:"
 L["CT_BuffMod/Options/General/Expiration/Heading"] = "Expiration"
 L["CT_BuffMod/Options/General/Expiration/PlayerBuffsOnlyCheckbox"] = "Only buffs you can cast"
 L["CT_BuffMod/Options/General/Expiration/PlaySoundCheckbox"] = "Play sound when warning appears"
 L["CT_BuffMod/Options/General/Expiration/WarningTimeHeading"] = "Show Warning At"
-L["CT_BuffMod/Options/General/Expiration/FlashSliderLabel"] = "Flash icon before expiry:"
 L["CT_BuffMod/Options/General/Heading"] = "General Settings"
 L["CT_BuffMod/Options/Tips/Heading"] = "Tips"
 L["CT_BuffMod/Options/Tips/Line 1"] = "You can use /ctbuff or /ctbuffmod to open this options window directly."
@@ -125,6 +125,8 @@ L["CT_BuffMod/Options/General/Colors/Heading"] = "Des couleurs "
 L["CT_BuffMod/Options/General/Colors/Weapon"] = "Aura d'arme"
 L["CT_BuffMod/Options/General/Expiration/ChatMessageCheckbox"] = "Annoncer les auras avant leurs expirations"
 L["CT_BuffMod/Options/General/Expiration/DurationHeading"] = "Duration de l'aura"
+L["CT_BuffMod/Options/General/Expiration/FlashSliderLabel"] = [=[Clignoter l'icône 
+avant l'expiration :]=]
 L["CT_BuffMod/Options/General/Expiration/Heading"] = "L'expiration des auras"
 L["CT_BuffMod/Options/General/Expiration/PlayerBuffsOnlyCheckbox"] = "Seulement les auras que vous renouvelez."
 L["CT_BuffMod/Options/General/Expiration/PlaySoundCheckbox"] = "Jouer un son avec l'annonce"
@@ -148,7 +150,7 @@ L["CT_BuffMod/Options/Window/Unit/SecureTooltip/Content"] = [=[|cFFFFAA00Les bou
 |cFFFFFFFF- Mode de compatibilité avec autre addons]=]
 L["CT_BuffMod/Options/Window/Unit/SecureTooltip/Heading"] = "Les boutons sécurisé et non sécurisé"
 L["CT_BuffMod/Options/Window/Unit/UnitDropdownLabel"] = "Montrer les auras de :"
-L["CT_BuffMod/Options/Window/Unit/UnitDropdownOptions"] = "#Jouer#Véhicule#Pet#Cible#Cible focalisé"
+L["CT_BuffMod/Options/Window/Unit/UnitDropdownOptions"] = "#Jouer#Véhicule#Compagnon#Cible#Cible focalisé"
 L["CT_BuffMod/Options/Window/Unit/VehicleCheckbox"] = "Changer au véhicule lors de la conduit"
 L["CT_BuffMod/Options/WindowControls/AddButton"] = "Ajouter"
 L["CT_BuffMod/Options/WindowControls/AddTooltip"] = "Ajouter une fenêtre avec les options defauts."
@@ -160,9 +162,10 @@ L["CT_BuffMod/Options/WindowControls/DeleteTooltip"] = "|cFFFFFF00Maj-clic|r ce 
 L["CT_BuffMod/Options/WindowControls/SelectionLabel"] = "Sélecter :"
 L["CT_BuffMod/Options/WindowControls/Tip"] = "Les options ci-dessous ne contrôlent que la fenêtre sélectionnée"
 L["CT_BuffMod/Options/WindowControls/WindowAddedMessage"] = "Fenêtre %d ajoutée."
+L["CT_BuffMod/Options/WindowControls/WindowClonedMessage"] = "La fenêtre %d ajoutée, comme un copier de la fenêtre %d."
+L["CT_BuffMod/Options/WindowControls/WindowDeletedMessage"] = "La fenêtre %d supprimée."
 L["CT_BuffMod/Options/WindowControls/WindowSelectedMessage"] = "Fenêtre %d sélectionnée."
-L["CT_BuffMod/Options/General/Expiration/FlashSliderLabel"] = [=[Clignoter l'icône 
-avant l'expiration :]=]
+
 
 
 elseif (GetLocale() == "deDE") then
