@@ -9638,22 +9638,42 @@ CONSOLIDATION REMOVED FROM GAME --]]
 			optionsAddScript("onload", updateFunc);
 		optionsEndFrame();
 
+		local delayAttempted;
 		local function enableExpirationChildren()
-			expirationCastOnly:SetEnabled(enableExpiration:GetChecked());
-			expirationCastOnly:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
-			expirationSound:SetEnabled(enableExpiration:GetChecked());
-			expirationSound:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
-			expirationDurationHeading:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
-			expirationWarningTimeHeading:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
-			expirationTime1Label:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
-			CT_BuffMod_ExpirationTime1Slider:SetEnabled(enableExpiration:GetChecked());
-			CT_BuffMod_ExpirationTime1Slider:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
-			expirationTime2Label:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
-			CT_BuffMod_ExpirationTime2Slider:SetEnabled(enableExpiration:GetChecked());
-			CT_BuffMod_ExpirationTime2Slider:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
-			expirationTime3Label:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
-			CT_BuffMod_ExpirationTime3Slider:SetEnabled(enableExpiration:GetChecked());
-			CT_BuffMod_ExpirationTime3Slider:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
+			if (
+				enableExpiration
+				and expirationCastOnly 
+				and expirationSound 
+				and expirationDurationHeading 
+				and expirationWarningTimeHeading 
+				and expirationTime1Label 
+				and CT_BuffMod_ExpirationTime1Slider
+				and expirationTime2Label 
+				and CT_BuffMod_ExpirationTime2Slider
+				and expirationTime3Label 
+				and CT_BuffMod_ExpirationTime3Slider
+			) then
+				expirationCastOnly:SetEnabled(enableExpiration:GetChecked());
+				expirationCastOnly:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
+				expirationSound:SetEnabled(enableExpiration:GetChecked());
+				expirationSound:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
+				expirationDurationHeading:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
+				expirationWarningTimeHeading:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
+				expirationTime1Label:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
+				CT_BuffMod_ExpirationTime1Slider:SetEnabled(enableExpiration:GetChecked());
+				CT_BuffMod_ExpirationTime1Slider:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
+				expirationTime2Label:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
+				CT_BuffMod_ExpirationTime2Slider:SetEnabled(enableExpiration:GetChecked());
+				CT_BuffMod_ExpirationTime2Slider:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
+				expirationTime3Label:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
+				CT_BuffMod_ExpirationTime3Slider:SetEnabled(enableExpiration:GetChecked());
+				CT_BuffMod_ExpirationTime3Slider:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
+			elseif (not delayAttempted) then
+				-- one of the frames wasn't created yet?  Try again in five seconds (but attempt this delay once only)
+				-- [this is a very ugly hack to resolve a possible race condition when the frames are being built]
+				delayAttempted = true;
+				C_Timer.After(5, enableExpirationChildren)
+			end
 		end
 
 		optionsBeginFrame(-18,   26, "checkbutton#tl:30:%y#o:enableExpiration:true#" .. module.text["CT_BuffMod/Options/General/Expiration/ChatMessageCheckbox"]);
