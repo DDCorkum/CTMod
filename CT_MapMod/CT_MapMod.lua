@@ -258,9 +258,9 @@ function CT_MapMod_DataProviderMixin:RefreshAllData(fromOnShow)
 		local tabName, tabTexture, tabOffset, numEntries = GetSpellTabInfo(1);
 		for i=tabOffset + 1, tabOffset + numEntries, 1 do
 			local spellName, spellSubName = GetSpellBookItemName(i, BOOKTYPE_SPELL)
-		 	if (spellName == "Find Herbs") then
+		 	if (spellName == module.text["CT_MapMod/Map/ClassicHerbalist"]) then
 		 		module.isHerbalist = true;
-		 	elseif (spellName == "Find Ore") then
+		 	elseif (spellName == module.text["CT_MapMod/Map/ClassicMiner"]) then
 		 		module.isMiner = true;
 		 	end
 		end
