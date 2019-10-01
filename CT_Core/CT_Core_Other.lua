@@ -1718,60 +1718,72 @@ do
 			"backdrop#tooltip",
 
 			["button#s:16:16#i:resizeBL#bl"] = {
-				"texture#s:12:12#br:0:5#i:background#Interface\\AddOns\\CT_Core\\Images\\resizeBL",
+				"texture#s:18:18#br:0:5#i:background#n:CT_Core_QuestFrame_resizeBL#Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up",
 				["onenter"] = function(self)
 					if ( isResizing ) then return; end
-					self.background:SetVertexColor(1, 1, 1);
 					if (module:getOption("watchframeShowTooltip") ~= false) then
 						module:displayPredefinedTooltip(self, "RESIZE");
 					end
+					self.background:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight");
+					self.background:SetVertexColor(1,1,1);
 				end,
 				["onleave"] = function(self)
 					module:hideTooltip();
 					if ( isResizing ) then return; end
-					self.background:SetVertexColor(1, 0.82, 0);
+					self.background:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up");
+					self.background:SetVertexColor(1,1,1);
 				end,
 				["onload"] = function(self)
 					self:SetFrameLevel(self:GetFrameLevel() + 2);
-					self.background:SetVertexColor(1, 0.82, 0);
+					SetClampedTextureRotation(self.background, 90);
+					self.background:SetVertexColor(1,1,1);
 				end,
 				["onmousedown"] = function(self)
 					anchorOurFrame(false, true);
 					startResizing(self);
+					self.background:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down");
+					self.background:SetVertexColor(1,1,1);
 				end,
 				["onmouseup"] = function(self)
 					stopResizing(self);
 					anchorOurFrame(false);
-					self.background:SetVertexColor(1, 0.82, 0);
+					self.background:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up");
+					self.background:SetVertexColor(1,1,1);
 				end,
 			},
 
 			["button#s:16:16#i:resizeBR#br"] = {
-				"texture#s:12:12#br:-5:5#i:background#Interface\\AddOns\\CT_Core\\Images\\resize",
+				"texture#s:18:18#br:-5:5#i:background#Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up",
 				["onenter"] = function(self)
 					if ( isResizing ) then return; end
-					self.background:SetVertexColor(1, 1, 1);
 					if (module:getOption("watchframeShowTooltip") ~= false) then
 						module:displayPredefinedTooltip(self, "RESIZE");
 					end
+					self.background:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight");
+					self.background:SetVertexColor(1,1,1);
 				end,
 				["onleave"] = function(self)
 					module:hideTooltip();
 					if ( isResizing ) then return; end
-					self.background:SetVertexColor(1, 0.82, 0);
+					self.background:SetVertexColor(1, 1, 1);
+					self.background:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up");
+					self.background:SetVertexColor(1,1,1);
 				end,
 				["onload"] = function(self)
 					self:SetFrameLevel(self:GetFrameLevel() + 2);
-					self.background:SetVertexColor(1, 0.82, 0);
+					self.background:SetVertexColor(1, 1, 1);
 				end,
 				["onmousedown"] = function(self)
 					anchorOurFrame(true, true);
 					startResizing(self);
+					self.background:SetVertexColor(1, 1, 1);
+					self.background:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down");
 				end,
 				["onmouseup"] = function(self)
 					stopResizing(self);
 					anchorOurFrame(false);
-					self.background:SetVertexColor(1, 0.82, 0);
+					self.background:SetVertexColor(1, 1, 1);
+					self.background:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up");
 				end,
 			},
 

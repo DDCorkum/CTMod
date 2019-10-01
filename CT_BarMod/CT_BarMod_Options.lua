@@ -1073,7 +1073,8 @@ module.frame = function()
 				end
 			);
 		optionsEndFrame();
-		optionsBeginFrame(  6,   26, "checkbutton#tl:20:%y#i:ctbar_shiftPossess#o:shiftPossess:true#Shift default possess bar up");
+		optionsAddFrame( -10,   17, "slider#tl:50:%y#s:220:%s#o:shiftPetOffset:113#Position = <value>#0:200:1");
+		optionsBeginFrame( -5,   26, "checkbutton#tl:20:%y#i:ctbar_shiftPossess#o:shiftPossess:true#Shift default possess bar up");
 					optionsAddScript("onshow",
 						function(self)
 							if ((CT_BottomBar and CT_BottomBar.ctPossess and not CT_BottomBar.ctPossess.isDisabled) or (CT_BottomBar and not CT_BottomBar.ctPossess)) then
@@ -2420,7 +2421,7 @@ module.optionUpdate = function(self, optName, value)
 	--elseif ( optName == "shiftMultiCast" ) then   --removed from the game in 2012
 	--	CT_BarMod_Shift_MultiCast_UpdatePositions();
 
-	elseif ( optName == "shiftPet" ) then
+	elseif ( optName == "shiftPet" or optName == "shiftPetOffset") then
 		CT_BarMod_Shift_Pet_UpdatePositions();
 
 	elseif ( optName == "shiftPossess" ) then

@@ -863,7 +863,7 @@ function NewCTRAFrames()
 				optionsAddObject(-5,   17, "font#tl:5:%y#v:GameFontNormal#Layout");
 				optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#Layout each group in its own column/row, or merge them into a single grid?#" .. textColor2 .. ":l");
 				optionsAddObject(-15, 26, "font#tl:15:%y#Rows/Cols Per Group:#" .. textColor1 .. ":l");
-				optionsBeginFrame(26,   20, "dropdown#tl:140:%y#s:100:%s#n:CTRAWindow_OrientationDropDown#New Column#New Row#Merge Down#Merge Across");
+				optionsBeginFrame(26,   20, "dropdown#tl:140:%y#s:100:%s#n:CTRAWindow_OrientationDropDown#New Column (to right)#New Row (underneath)#Merge Down (same column)#Merge Across (same row)");
 					optionsAddScript("onload",
 						function(dropdown)
 							dropdown.option = function() return "CTRAWindow" .. selectedWindow .. "_Orientation"; end
@@ -884,7 +884,20 @@ function NewCTRAFrames()
 						end
 					);
 				optionsEndFrame();
-
+				optionsBeginFrame(-10, 15, "checkbutton#tl:40:%y#n:CTRAWindow_GrowUpwardCheckButton#Grow Upward");
+					optionsAddScript("onload",
+						function(button)
+							button.option = function() return "CTRAWindow" .. selectedWindow .. "_GrowUpward"; end
+						end
+					);
+				optionsEndFrame();
+				optionsBeginFrame(15, 15, "checkbutton#tl:160:%y#n:CTRAWindow_GrowLeftCheckButton#Grow Left");
+					optionsAddScript("onload",
+						function(button)
+							button.option = function() return "CTRAWindow" .. selectedWindow .. "_GrowLeft"; end
+						end
+					);
+				optionsEndFrame();				
 				-- Size and Spacing
 				optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormal#Size and Spacing");
 				optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#Should frames touch each other, or be spaced apart vertically and horizontally?#" .. textColor2 .. ":l");
@@ -1246,6 +1259,8 @@ function NewCTRAWindow(owningCTRAFrames)
 		["ShowWarlocks"] = false,
 		["ShowWarriors"] = false,
 		["Orientation"] = 1,		-- columns
+		["GrowUpward"] = false,
+		["GrowLeft"] = false,
 		["WrapAfter"] = 5,
 		["HorizontalSpacing"] = 1,
 		["VerticalSpacing"] = 1,
@@ -1328,10 +1343,10 @@ function NewCTRAWindow(owningCTRAFrames)
 			anchorFrame.text:SetPoint("LEFT", anchorFrame, "LEFT", 10, 0);
 			anchorFrame.text:SetTextColor(1,1,1,1);
 			
-			-- window that player frames reside in, with 2 pixel padding on all sides
+			-- window that player frames reside in
 			windowFrame = CreateFrame("Frame", nil, UIParent);
 			windowFrame:SetSize(1,1);	-- arbitrary, just to make it exist
-			windowFrame:SetPoint("TOPLEFT", anchorFrame, "TOPLEFT", 0, -20);
+			windowFrame:SetPoint("LEFT", anchorFrame, "LEFT");
 			windowFrame:Show();
 			windowFrame:SetScript("OnEvent",
 				function(__, event)
@@ -1601,12 +1616,12 @@ function NewCTRAWindow(owningCTRAFrames)
 						if (not playerFrames[playersShown]) then
 							playerFrames[playersShown] = NewCTRAPlayerFrame(self, windowFrame);
 						end
-						playerFrames[playersShown]:Enable(rosterEntry.unit, x, y);
+						playerFrames[playersShown]:Enable(rosterEntry.unit, (self:GetProperty("GrowLeft") and -x) or x, (self:GetProperty("GrowUpward") and -y + 50) or y - 10);
 						if (self:GetProperty("EnableTargetFrame")) then
 							if (not targetFrames[playersShown]) then
 								targetFrames[playersShown] = NewCTRATargetFrame(self, windowFrame);
 							end
-							targetFrames[playersShown]:Enable(rosterEntry.unit .. "target", x, y - 38);
+							targetFrames[playersShown]:Enable(rosterEntry.unit .. "target", (self:GetProperty("GrowLeft") and -x) or x, (self:GetProperty("GrowUpward") and -y + 12) or y - 48);	-- 38 lower than the associated playerFrame
 						end
 
 						-- move the anchor (and wrap to a new col/row if necessary) for the next person, and keep track of the max number of rows and columns in use
