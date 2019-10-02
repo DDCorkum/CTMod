@@ -9573,7 +9573,7 @@ CONSOLIDATION REMOVED FROM GAME --]]
 	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. module.text["CT_BuffMod/Options/General/Heading"]);
 
-		optionsAddObject(-15, 1*13, "font#tl:15:%y#Colors#" .. module.text["CT_BuffMod/Options/General/Colors/Heading"]);
+		optionsAddObject(-15, 1*13, "font#tl:15:%y#" .. module.text["CT_BuffMod/Options/General/Colors/Heading"]);
 
 		-- Window background color
 		optionsAddObject(-10,   16, "colorswatch#tl:35:%y#s:16:16#o:backgroundColor:" .. defaultWindowColor[1] .. "," .. defaultWindowColor[2] .. "," .. defaultWindowColor[3] .. "," .. defaultWindowColor[4] .. "#true");

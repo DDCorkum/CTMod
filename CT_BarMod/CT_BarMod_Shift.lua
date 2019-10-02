@@ -477,6 +477,9 @@ function CT_BarMod_Shift_Pet_UpdatePositions()
 	local frame, yoffset;
 	frame = CT_BarMod_PetActionBarFrame;	
 	local shift = CT_BarMod_Shift_Pet_GetShiftOption();
+
+	PetActionButton1:ClearAllPoints();
+	PetActionButton1:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 36, 2);
 	
 	if (shift) then
 			CT_BarMod_PetActionBarFrame:ClearAllPoints();
@@ -502,9 +505,6 @@ local function CT_BarMod_Shift_Pet_Init()
 	frame:Hide();
 
 	CT_BarMod_Shift_Pet_UpdatePositions();
-
-	PetActionButton1:ClearAllPoints();
-	PetActionButton1:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 36, 2);
 	
 end
 

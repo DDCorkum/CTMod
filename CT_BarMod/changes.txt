@@ -1,3 +1,6 @@
+CT_BarMod (8.2.5.3) 2019-10-01
+- Correction to interactions between CT_BarMod and CT_BottomBar after 8.2.5.2
+
 CT_BarMod (8.2.5.2) 2019-09-28
 - Reengineered the pet shifting to give more control and eliminate buggy behaviour
 
