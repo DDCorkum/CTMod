@@ -32,23 +32,344 @@ end
 
 if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
 
-
-	local old_GetQuestLogTitle = GetQuestLogTitle;
 	
-	local new_GetQuestLogTitle = function(questIndex)
-		local args = {old_GetQuestLogTitle(questIndex)};
-		if (displayLevels and not args[4] and args[2] and args[2] > 0) then
-			if (args[3]) then
-				args[1] = "[" .. args[2] .. "+] " .. args[1];
+	--[[
+		-- THIS WAS A SIMPLE METHOD USED FROM 8.2.0.5 THROUGH 8.2.5.3
+		-- IT OVERLOADED THE GLOBAL API GetQuestLogTitle
+		-- BUT DOING SO CAN NEGATIVELY AFFECT OTHER ADDONS
+		
+		local old_GetQuestLogTitle = GetQuestLogTitle;
+		GetQuestLogTitle = function(index)
+			local args = {old_GetQuestLogTitle(questIndex)};
+			if (displayLevels and not args[4] and args[2] and args[2] > 0) then
+				if (args[3]) then
+					args[1] = "[" .. args[2] .. "+] " .. args[1];
+				else
+					args[1] = "[" .. args[2] .. "] " .. args[1];
+				end
+			end
+			return unpack(args);
+		end	
+		GetQuestLogTitle = new_GetQuestLogTitle;
+		
+	--]]
+
+	
+	
+	-- THIS IS IS A HARDER BUT MORE ELEGANT APPROACH STARTING IN 8.2.5.4
+	-- IT OVERLOADS QuestLog_Update(self) ON LINE 111 AND QuesWatch_Update() ON LINE 616 OF QuestLogFrame.lua
+	-- DOING SO LIMITS THE SCOPE TO THE DISPLAY OF QUESTS IN THE QUEST TRACKER, FOR BETTER COMPATIBILITY TO OTHER ADDONS
+
+	QuestLog_Update = function(self)
+		local numEntries, numQuests = GetNumQuestLogEntries();
+		if ( numEntries == 0 ) then
+			EmptyQuestLogFrame:Show();
+			QuestLogFrameAbandonButton:Disable();
+			QuestLogFrame.hasTimer = nil;
+			QuestLogDetailScrollFrame:Hide();
+			QuestLogExpandButtonFrame:Hide();
+		else
+			EmptyQuestLogFrame:Hide();
+			QuestLogFrameAbandonButton:Enable();
+			QuestLogDetailScrollFrame:Show();
+			QuestLogExpandButtonFrame:Show();
+		end
+
+		-- Update Quest Count
+		QuestLogQuestCount:SetText(format(QUEST_LOG_COUNT_TEMPLATE, numQuests, MAX_QUESTLOG_QUESTS));
+		QuestLogCountMiddle:SetWidth(QuestLogQuestCount:GetWidth());
+
+		-- ScrollFrame update
+		FauxScrollFrame_Update(QuestLogListScrollFrame, numEntries, QUESTS_DISPLAYED, QUESTLOG_QUEST_HEIGHT, nil, nil, nil, QuestLogHighlightFrame, 293, 316 )
+
+		-- Update the quest listing
+		QuestLogHighlightFrame:Hide();
+
+		local questIndex, questLogTitle, questTitleTag, questNumGroupMates, questNormalText, questHighlight, questCheck;
+		local questLogTitleText, level, questTag, isHeader, isCollapsed, isComplete, color;
+		local numPartyMembers, partyMembersOnQuest, tempWidth, textWidth;
+		for i=1, QUESTS_DISPLAYED, 1 do
+			questIndex = i + FauxScrollFrame_GetOffset(QuestLogListScrollFrame);
+			questLogTitle = _G["QuestLogTitle"..i];
+			questTitleTag = _G["QuestLogTitle"..i.."Tag"];
+			questNumGroupMates = _G["QuestLogTitle"..i.."GroupMates"];
+			questCheck = _G["QuestLogTitle"..i.."Check"];
+			questNormalText = _G["QuestLogTitle"..i.."NormalText"];
+			questHighlight = _G["QuestLogTitle"..i.."Highlight"];
+			if ( questIndex <= numEntries ) then
+				questLogTitleText, level, questTag, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isBounty, isStory, isHidden, isScaling = GetQuestLogTitle(questIndex);
+-- CT_CORE MODIFICATION STARTS HERE
+				if (displayLevels and questLogTitleText and level and level > 0) then
+					if (questTag) then
+						questLogTitleText = "[" .. level .. "+] " .. questLogTitleText;
+					else
+						questLogTitleText = "[" .. level .. "] " .. questLogTitleText;
+					end
+				end
+-- CT_CORE MODIFICATION ENDS HERE
+				if ( isHeader ) then
+					if ( questLogTitleText ) then
+						questLogTitle:SetText(questLogTitleText);
+					else
+						questLogTitle:SetText("");
+					end
+
+					if ( isCollapsed ) then
+						questLogTitle:SetNormalTexture("Interface\\Buttons\\UI-PlusButton-Up");
+					else
+						questLogTitle:SetNormalTexture("Interface\\Buttons\\UI-MinusButton-Up"); 
+					end
+					questHighlight:SetTexture("Interface\\Buttons\\UI-PlusButton-Hilight");
+					questNumGroupMates:SetText("");
+					questCheck:Hide();
+				else
+					questLogTitle:SetText("  "..questLogTitleText);
+					--Set Dummy text to get text width *SUPER HACK*
+					QuestLogDummyText:SetText("  "..questLogTitleText);
+
+					questLogTitle:SetNormalTexture("");
+					questHighlight:SetTexture("");
+
+					-- If not a header see if any nearby group mates are on this quest
+					partyMembersOnQuest = 0;
+					for j=1, GetNumSubgroupMembers() do
+						if ( IsUnitOnQuest(questIndex, "party"..j) ) then
+							partyMembersOnQuest = partyMembersOnQuest + 1;
+						end
+					end
+					if ( partyMembersOnQuest > 0 ) then
+						questNumGroupMates:SetText("["..partyMembersOnQuest.."]");
+					else
+						questNumGroupMates:SetText("");
+					end
+				end
+				-- Save if its a header or not
+				questLogTitle.isHeader = isHeader;
+
+				-- Set the quest tag
+				if ( isComplete and isComplete < 0 ) then
+					questTag = FAILED;
+				elseif ( isComplete and isComplete > 0 ) then
+					questTag = COMPLETE;
+				end
+				if ( questTag ) then
+					questTitleTag:SetText("("..questTag..")");
+					-- Shrink text to accomdate quest tags without wrapping
+					tempWidth = 275 - 15 - questTitleTag:GetWidth();
+
+					if ( QuestLogDummyText:GetWidth() > tempWidth ) then
+						textWidth = tempWidth;
+					else
+						textWidth = QuestLogDummyText:GetWidth();
+					end
+
+					questNormalText:SetWidth(tempWidth);
+
+					-- If there's quest tag position check accordingly
+					questCheck:Hide();
+					if ( IsQuestWatched(questIndex) ) then
+						if ( questNormalText:GetWidth() + 24 < 275 ) then
+							questCheck:SetPoint("LEFT", questLogTitle, "LEFT", textWidth+24, 0);
+						else
+							questCheck:SetPoint("LEFT", questLogTitle, "LEFT", textWidth+10, 0);
+						end
+						questCheck:Show();
+					end
+				else
+					questTitleTag:SetText("");
+					-- Reset to max text width
+					if ( questNormalText:GetWidth() > 275 ) then
+						questNormalText:SetWidth(260);
+					end
+
+					-- Show check if quest is being watched
+					questCheck:Hide();
+					if ( IsQuestWatched(questIndex) ) then
+						if ( questNormalText:GetWidth() + 24 < 275 ) then
+							questCheck:SetPoint("LEFT", questLogTitle, "LEFT", QuestLogDummyText:GetWidth()+24, 0);
+						else
+							questCheck:SetPoint("LEFT", questNormalText, "LEFT", questNormalText:GetWidth(), 0);
+						end
+						questCheck:Show();
+					end
+				end
+
+				-- Color the quest title and highlight according to the difficulty level
+				local playerLevel = UnitLevel("player");
+				if ( isHeader ) then
+					color = QuestDifficultyColors["header"];
+				else
+					color = GetQuestDifficultyColor(level);
+				end
+				questLogTitle:SetNormalFontObject(color.font);
+				questTitleTag:SetTextColor(color.r, color.g, color.b);
+				questNumGroupMates:SetTextColor(color.r, color.g, color.b);
+				questLogTitle.r = color.r;
+				questLogTitle.g = color.g;
+				questLogTitle.b = color.b;
+				questLogTitle:Show();
+
+				-- Place the highlight and lock the highlight state
+				if ( QuestLogFrame.selectedButtonID and GetQuestLogSelection() == questIndex ) then
+					QuestLogSkillHighlight:SetVertexColor(questLogTitle.r, questLogTitle.g, questLogTitle.b);
+					QuestLogHighlightFrame:SetPoint("TOPLEFT", "QuestLogTitle"..i, "TOPLEFT", 0, 0);
+					QuestLogHighlightFrame:Show();
+					questTitleTag:SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+					questNumGroupMates:SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+					questLogTitle:LockHighlight();
+				else
+					questLogTitle:UnlockHighlight();
+				end
+
 			else
-				args[1] = "[" .. args[2] .. "] " .. args[1];
+				questLogTitle:Hide();
 			end
 		end
-		return unpack(args);
+
+		-- Set the expand/collapse all button texture
+		local numHeaders = 0;
+		local notExpanded = 0;
+		-- Somewhat redundant loop, but cleaner than the alternatives
+		for i=1, numEntries, 1 do
+			local index = i;
+			local questLogTitleText, level, questTag, isHeader, isCollapsed = GetQuestLogTitle(i);
+			if ( questLogTitleText and isHeader ) then
+				numHeaders = numHeaders + 1;
+				if ( isCollapsed ) then
+					notExpanded = notExpanded + 1;
+				end
+			end
+		end
+		-- If all headers are not expanded then show collapse button, otherwise show the expand button
+		if ( notExpanded ~= numHeaders ) then
+			QuestLogCollapseAllButton.collapsed = nil;
+			QuestLogCollapseAllButton:SetNormalTexture("Interface\\Buttons\\UI-MinusButton-Up");
+		else
+			QuestLogCollapseAllButton.collapsed = 1;
+			QuestLogCollapseAllButton:SetNormalTexture("Interface\\Buttons\\UI-PlusButton-Up");
+		end
+
+		-- Update Quest Count
+		QuestLogQuestCount:SetText(format(QUEST_LOG_COUNT_TEMPLATE, numQuests, MAX_QUESTLOG_QUESTS));
+		QuestLogCountMiddle:SetWidth(QuestLogQuestCount:GetWidth());
+
+		-- If no selection then set it to the first available quest
+		if ( GetQuestLogSelection() == 0 ) then
+			QuestLog_SetFirstValidSelection();
+		end
+
+		-- Determine whether the selected quest is pushable or not
+		if ( numEntries == 0 ) then
+			QuestFramePushQuestButton:Disable();
+		elseif ( GetQuestLogPushable() and IsInGroup() ) then
+			QuestFramePushQuestButton:Enable();
+		else
+			QuestFramePushQuestButton:Disable();
+		end
 	end
 	
-	GetQuestLogTitle = new_GetQuestLogTitle;		
 	
+	
+	QuestWatch_Update = function()
+		local numObjectives;
+		local questWatchMaxWidth = 0;
+		local tempWidth;
+		local watchText;
+		local text, type, finished;
+		local questTitle
+		local watchTextIndex = 1;
+		local questIndex;
+		local objectivesCompleted;
+	
+		for i=1, GetNumQuestWatches() do
+			questIndex = GetQuestIndexForWatch(i);
+			if ( questIndex ) then
+				numObjectives = GetNumQuestLeaderBoards(questIndex);
+			
+				--If there are objectives set the title
+				if ( numObjectives > 0 ) then
+					-- Set title
+					watchText = _G["QuestWatchLine"..watchTextIndex];
+-- CT_CORE MODIFICATION STARTS HERE
+					-- watchText:SetText(GetQuestLogTitle(questIndex));
+					local questLogTitleText, level, questTag = GetQuestLogTitle(questIndex);
+					if (displayLevels and questLogTitleText and level and level > 0) then
+						if (questTag) then
+							questLogTitleText = "[" .. level .. "+] " .. questLogTitleText;
+						else
+							questLogTitleText = "[" .. level .. "] " .. questLogTitleText;
+						end
+					end
+					watchText:SetText(questLogTitleText);
+-- CT_CORE MODIFICATION ENDS HERE
+					tempWidth = watchText:GetWidth();
+					-- Set the anchor of the title line a little lower
+					if ( watchTextIndex > 1 ) then
+						watchText:SetPoint("TOPLEFT", "QuestWatchLine"..(watchTextIndex - 1), "BOTTOMLEFT", 0, -4);
+					end
+					watchText:Show();
+					if ( tempWidth > questWatchMaxWidth ) then
+						questWatchMaxWidth = tempWidth;
+					end
+					watchTextIndex = watchTextIndex + 1;
+					objectivesCompleted = 0;
+					for j=1, numObjectives do
+						text, type, finished = GetQuestLogLeaderBoard(j, questIndex);
+
+						watchText = _G["QuestWatchLine"..watchTextIndex];
+						-- Set Objective text
+						watchText:SetText(" - "..text);
+						-- Color the objectives
+						if ( finished ) then
+							watchText:SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+							objectivesCompleted = objectivesCompleted + 1;
+						else
+							watchText:SetTextColor(0.8, 0.8, 0.8);
+						end
+						tempWidth = watchText:GetWidth();
+						if ( tempWidth > questWatchMaxWidth ) then
+							questWatchMaxWidth = tempWidth;
+						end
+						watchText:SetPoint("TOPLEFT", "QuestWatchLine"..(watchTextIndex - 1), "BOTTOMLEFT", 0, 0);
+						watchText:Show();
+						watchTextIndex = watchTextIndex + 1;
+					end
+					-- Brighten the quest title if all the quest objectives were met
+					watchText = _G["QuestWatchLine"..watchTextIndex-numObjectives-1];
+					if ( objectivesCompleted == numObjectives ) then
+						watchText:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b);
+					else
+						watchText:SetTextColor(0.75, 0.61, 0);
+					end
+				end
+			end
+		end
+	
+		-- Set tracking indicator
+		if ( GetNumQuestWatches() > 0 ) then
+			QuestLogTrackTracking:SetVertexColor(0, 1.0, 0);
+		else
+			QuestLogTrackTracking:SetVertexColor(1.0, 0, 0);
+		end
+		
+		-- If no watch lines used then hide the frame and return
+		if ( watchTextIndex == 1 ) then
+			QuestWatchFrame:Hide();
+			return;
+		else
+			QuestWatchFrame:Show();
+			QuestWatchFrame:SetHeight(watchTextIndex * 13);
+			QuestWatchFrame:SetWidth(questWatchMaxWidth + 10);
+		end
+	
+		-- Hide unused watch lines
+		for i=watchTextIndex, MAX_QUESTWATCH_LINES do
+			_G["QuestWatchLine"..i]:Hide();
+		end
+	
+		UIParent_ManageFramePositions();
+	end
+
 elseif (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
 
 	local old_QuestLogQuests_AddQuestButton = QuestLogQuests_AddQuestButton;
