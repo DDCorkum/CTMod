@@ -1,3 +1,6 @@
+CT_BuffMod (8.2.5.4) 2019-10-05
+- Corrected the "recast" key binding that stopped working during WoW 8.x
+
 CT_BuffMod (8.2.5.2) 2019-09-29
 - Show buffs for target, pet or focus
 - Further cleanup and localization of the options menu

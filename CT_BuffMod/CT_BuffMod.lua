@@ -1013,6 +1013,7 @@ local function updateKeyBind()
 end
 
 module:regEvent("UPDATE_BINDINGS", updateKeyBind);
+module:regEvent("PLAYER_ENTERING_WORLD", updateKeyBind);
 
 --------------------------------------------
 -- Routines to autohide an unsecure frame
@@ -9707,7 +9708,7 @@ CONSOLIDATION REMOVED FROM GAME --]]
 
 	-- Adding and Removing Windows
 	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b#i:frameOptions");
-		optionsAddObject(-10,   17, "font#tl:5:%y#v:GameFontNormalLarge#Windows");
+		optionsAddObject(-10,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. module.text["CT_BuffMod/Options/WindowControls/Heading"]);
 
 		optionsBeginFrame( -10,   30, "button#tl:15:%y#s:80:%s#v:UIPanelButtonTemplate#" .. module.text["CT_BuffMod/Options/WindowControls/AddButton"]);
 			optionsAddScript("onclick", function(self)
@@ -9795,16 +9796,16 @@ CONSOLIDATION REMOVED FROM GAME --]]
 		-- Window
 		----------
 
-		optionsAddObject(-15, 1*13, "font#tl:15:%y#Window Placement");
+		optionsAddObject(-15, 1*13, "font#tl:15:%y#" .. module.text["CT_BuffMod/Options/Window/General/Heading"]);
 
 		-- Unlock window
 		-- Window cannot be moved off screen
-		optionsAddObject( -5,   26, "checkbutton#tl:30:%y#i:disableWindow#o:disableWindow#Disable window");
-		optionsAddObject(  6,   26, "checkbutton#tl:30:%y#i:disableTooltips#o:disableTooltips#Disable icon tooltips");
-		optionsAddObject(  6,   26, "checkbutton#tl:30:%y#i:lockWindow#o:lockWindow#Lock window so that it cannot be moved");
-		optionsAddObject(  6,   26, "checkbutton#tl:30:%y#i:clampWindow#o:clampWindow:true#Window cannot be moved off screen");
+		optionsAddObject( -5,   26, "checkbutton#tl:30:%y#i:disableWindow#o:disableWindow#" .. module.text["CT_BuffMod/Options/Window/General/DisableWindowCheckbox"]);
+		optionsAddObject(  6,   26, "checkbutton#tl:30:%y#i:disableTooltips#o:disableTooltips#" .. module.text["CT_BuffMod/Options/Window/General/DisableTooltipsCheckbox"]);
+		optionsAddObject(  6,   26, "checkbutton#tl:30:%y#i:lockWindow#o:lockWindow#" .. module.text["CT_BuffMod/Options/Window/General/PositionLockedCheckbox"]);
+		optionsAddObject(  6,   26, "checkbutton#tl:30:%y#i:clampWindow#o:clampWindow:true#" .. module.text["CT_BuffMod/Options/Window/General/PositionClampedCheckbox"]);
 
-		optionsBeginFrame( -5,   30, "button#t:0:%y#s:180:%s#n:CT_BuffMod_ResetPosition_Button#v:GameMenuButtonTemplate#Reset window position");
+		optionsBeginFrame( -5,   30, "button#t:0:%y#s:180:%s#n:CT_BuffMod_ResetPosition_Button#v:GameMenuButtonTemplate#" .. module.text["CT_BuffMod/Options/Window/General/PositionResetButton"]);
 			optionsAddScript("onclick",
 				function(self)
 					local windowObject = globalObject.windowListObject:findWindow(currentWindowId);
@@ -9820,7 +9821,7 @@ CONSOLIDATION REMOVED FROM GAME --]]
 				end
 			);
 		optionsEndFrame();
-		optionsAddObject( -5, 2*13, "font#t:0:%y#s:0:%s#l#r#This will place the window at\nthe center of the screen.#" .. textColor2);
+		optionsAddObject( -5, 2*13, "font#t:0:%y#s:0:%s#l#r#".. module.text["CT_BuffMod/Options/Window/General/PositionResetTip"] .. "#" .. textColor2);
 
 		----------
 		-- Unit
@@ -9854,13 +9855,13 @@ CONSOLIDATION REMOVED FROM GAME --]]
 		----------
 		-- Visibility
 		----------
-		optionsAddObject(-20, 1*13, "font#tl:15:%y#Visibility");
+		optionsAddObject(-20, 1*13, "font#tl:15:%y#" .. module.text["CT_BuffMod/Options/Window/Visibility/Heading"]);
 
 		-- Always show window
-		optionsAddObject( -5,   20, "checkbutton#tl:25:%y#s:%s:%s#i:visShow#o:visShow#Always show the window");
+		optionsAddObject( -5,   20, "checkbutton#tl:25:%y#s:%s:%s#i:visShow#o:visShow#" .. module.text["CT_BuffMod/Options/Window/Visibility/AlwaysRadio"]);
 
 		-- Basic conditions
-		optionsAddObject( -2,   20, "checkbutton#tl:25:%y#s:%s:%s#i:visBasic#o:visBasic#Use basic conditions");
+		optionsAddObject( -2,   20, "checkbutton#tl:25:%y#s:%s:%s#i:visBasic#o:visBasic#" .. module.text["CT_BuffMod/Options/Window/Visibility/BasicRadio"]);
 		
 		local function toggleBasicConditions(checkbutton)
 			checkbutton:HookScript("OnClick",
@@ -9879,21 +9880,21 @@ CONSOLIDATION REMOVED FROM GAME --]]
 			);
 		end
 		
-		optionsBeginFrame( -2,   26, "checkbutton#tl:44:%y#i:visHideInVehicle#o:visHideInVehicle#Hide when in a vehicle");
+		optionsBeginFrame( -2,   26, "checkbutton#tl:44:%y#i:visHideInVehicle#o:visHideInVehicle#" .. module.text["CT_BuffMod/Options/Window/Visibility/HideVehicleCheckbox"]);
 			optionsAddScript("onload", toggleBasicConditions);
 		optionsEndFrame();
-		optionsBeginFrame(  6,   26, "checkbutton#tl:44:%y#i:visHideNotVehicle#o:visHideNotVehicle#Hide when not in a vehicle");
+		optionsBeginFrame(  6,   26, "checkbutton#tl:44:%y#i:visHideNotVehicle#o:visHideNotVehicle#" .. module.text["CT_BuffMod/Options/Window/Visibility/HideNotVehicleCheckbox"]);
 			optionsAddScript("onload", toggleBasicConditions);
 		optionsEndFrame();
-		optionsBeginFrame(  6,   26, "checkbutton#tl:44:%y#i:visHideInCombat#o:visHideInCombat#Hide when in combat");
+		optionsBeginFrame(  6,   26, "checkbutton#tl:44:%y#i:visHideInCombat#o:visHideInCombat#" .. module.text["CT_BuffMod/Options/Window/Visibility/HideCombatCheckbox"]);
 			optionsAddScript("onload", toggleBasicConditions);
 		optionsEndFrame();
-		optionsBeginFrame(  6,   26, "checkbutton#tl:44:%y#i:visHideNotCombat#o:visHideNotCombat#Hide when not in combat");
+		optionsBeginFrame(  6,   26, "checkbutton#tl:44:%y#i:visHideNotCombat#o:visHideNotCombat#" .. module.text["CT_BuffMod/Options/Window/Visibility/HideNotCombatCheckbox"]);
 			optionsAddScript("onload", toggleBasicConditions);
 		optionsEndFrame();
 		
 		-- Advanced conditions
-		optionsAddObject( -2,   20, "checkbutton#tl:25:%y#s:%s:%s#i:visAdvanced#o:visAdvanced#Use advanced conditions");
+		optionsAddObject( -2,   20, "checkbutton#tl:25:%y#s:%s:%s#i:visAdvanced#o:visAdvanced#" .. module.text["CT_BuffMod/Options/Window/Visibility/AdvancedRadio"]);
 
 		optionsBeginFrame(  20,   20, "button#tl:222:%y#s:20:%s#i:visHelp0#v:UIPanelButtonTemplate#?");
 			optionsAddScript("onenter",
@@ -10012,7 +10013,7 @@ CONSOLIDATION REMOVED FROM GAME --]]
 			);
 		optionsEndFrame();
 
-		optionsBeginFrame(  -2,   22, "button#tl:60:%y#s:60:%s#i:visTest#v:UIPanelButtonTemplate#Test");
+		optionsBeginFrame(  -2,   22, "button#tl:60:%y#s:60:%s#i:visTest#v:UIPanelButtonTemplate#" .. module.text["CT_BuffMod/Options/Window/Visibility/TestButton"]);
 			optionsAddScript("onclick",
 				function(self)
 					local editBox = windowOptionsFrame.conditionEB;
@@ -10048,7 +10049,7 @@ CONSOLIDATION REMOVED FROM GAME --]]
 			);
 		optionsEndFrame();
 
-		optionsBeginFrame(  23,   22, "button#tl:140:%y#s:60:%s#i:visSave#v:UIPanelButtonTemplate#Save");
+		optionsBeginFrame(  23,   22, "button#tl:140:%y#s:60:%s#i:visSave#v:UIPanelButtonTemplate#" .. module.text["CT_BuffMod/Options/Window/Visibility/SaveButton"]);
 			optionsAddScript("onload",
 				function(self)
 					self:Disable();
@@ -10089,7 +10090,7 @@ CONSOLIDATION REMOVED FROM GAME --]]
 			);
 		optionsEndFrame();
 
-		optionsBeginFrame(  23,   22, "button#tl:220:%y#s:60:%s#i:visUndo#v:UIPanelButtonTemplate#Undo");
+		optionsBeginFrame(  23,   22, "button#tl:220:%y#s:60:%s#i:visUndo#v:UIPanelButtonTemplate#" .. module.text["CT_BuffMod/Options/Window/Visibility/UndoButton"]);
 			optionsAddScript("onload",
 				function(self)
 					self:Disable();
@@ -10126,47 +10127,47 @@ CONSOLIDATION REMOVED FROM GAME --]]
 		-- Sorting
 		----------
 
-		optionsAddObject(-20, 1*13, "font#tl:15:%y#Buff Sorting");
+		optionsAddObject(-20, 1*13, "font#tl:15:%y#" .. module.text["CT_BuffMod/Options/Window/Sorting/Heading"]);
 
 		-- Sort method
-		optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#Sort method:");
-		optionsAddObject( 15,   20, "dropdown#tl:100:%y#s:100:%s#n:CT_BuffModDropdown_sortMethod#i:sortMethod#o:sortMethod:" .. constants.SORT_METHOD_NAME .. "#Name#Time#Order");
+		optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#" .. module.text["CT_BuffMod/Options/Window/Sorting/SortMethodLabel"]);
+		optionsAddObject( 15,   20, "dropdown#tl:140:%y#s:100:%s#n:CT_BuffModDropdown_sortMethod#i:sortMethod#o:sortMethod:" .. constants.SORT_METHOD_NAME .. module.text["CT_BuffMod/Options/Window/Sorting/SortMethodDropdown"]);
 
 		-- Sort direction
-		optionsAddObject(  0,   26, "checkbutton#tl:33:%y#i:sortDirection#o:sortDirection#Reverse the direction of the sort");
+		optionsAddObject(  0,   26, "checkbutton#tl:33:%y#i:sortDirection#o:sortDirection#" .. module.text["CT_BuffMod/Options/Window/Sorting/ReverseCheckbox"]);
 
 		-- Buffs you cast
-		optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#Buffs that you cast:");
+		optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#" .. module.text["CT_BuffMod/Options/Window/Sorting/PlayerBuffsLabel"]);
 		-- Bug: Omit 3rd menu item while waiting for Blizzard to fix the "Sort with others" bug
 		--
 		--      Note: As of WoW 4.3 they have fixed the bug related to this attribute.
 		--	      I've added the third option and made SEPARATE_OWN_WITH the default instead of SEPARATE_OWN_BEFORE.
 		--
-		optionsAddObject( 15,   20, "dropdown#tl:140:%y#s:130:%s#n:CT_BuffModDropdown_separateOwn#i:separateOwn#o:separateOwn:" .. constants.SEPARATE_OWN_WITH .. "#Before other players#After other players#With other players");
+		optionsAddObject( 15,   20, "dropdown#tl:140:%y#s:130:%s#n:CT_BuffModDropdown_separateOwn#i:separateOwn#o:separateOwn:" .. constants.SEPARATE_OWN_WITH .. module.text["CT_BuffMod/Options/Window/Sorting/PlayerBuffsDropdown"]);
 
 		-- Sort zero duration buffs
-		optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#i:separateZeroText#Non-expiring buffs:");
-		optionsAddObject( 15,   20, "dropdown#tl:140:%y#s:130:%s#n:CT_BuffModDropdown_separateZero#i:separateZero#o:separateZero:" .. constants.SEPARATE_ZERO_WITH .. "#Before other buffs#After other buffs#With other buffs");
+		optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#i:separateZeroText#" .. module.text["CT_BuffMod/Options/Window/Sorting/NonExpiringBuffsLabel"]);
+		optionsAddObject( 15,   20, "dropdown#tl:140:%y#s:130:%s#n:CT_BuffModDropdown_separateZero#i:separateZero#o:separateZero:" .. constants.SEPARATE_ZERO_WITH .. module.text["CT_BuffMod/Options/Window/Sorting/NonExpiringBuffsDropdown"]);
 
 		-- Group by
 		do
-			local menu = "#None#Debuffs#Cancelable buffs#Uncancelable buffs#All buffs#Weapons#Consolidated (no longer used)"; -- #Consolidated doesn't do anything any more
+			local menu = module.text["CT_BuffMod/Options/Window/Sorting/OrderDropdown"]; -- "#None#Debuffs#Cancelable buffs#Uncancelable buffs#All buffs#Weapons" -- the 7th option was previously #Consolidated, but that does nothing any more
 
-			optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#Group the buffs as follows:");
+			optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#" .. module.text["CT_BuffMod/Options/Window/Sorting/OrderLabel"]);
 
-			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#First:");
+			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#" .. module.text["CT_BuffMod/Options/Window/Sorting/Order1Label"]);
 			optionsAddObject( 15,   20, "dropdown#tl:110:%y#s:140:%s#n:CT_BuffModDropdown_sortSeq1#i:sortSeq1#o:sortSeq1:" .. constants.FILTER_TYPE_DEBUFF .. menu);
 
-			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#Second:");
+			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#" .. module.text["CT_BuffMod/Options/Window/Sorting/Order2Label"]);
 			optionsAddObject( 15,   20, "dropdown#tl:110:%y#s:140:%s#n:CT_BuffModDropdown_sortSeq2#i:sortSeq2#o:sortSeq2:" .. constants.FILTER_TYPE_WEAPON .. menu);
 
-			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#Third:");
+			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#" .. module.text["CT_BuffMod/Options/Window/Sorting/Order3Label"]);
 			optionsAddObject( 15,   20, "dropdown#tl:110:%y#s:140:%s#n:CT_BuffModDropdown_sortSeq3#i:sortSeq3#o:sortSeq3:" .. constants.FILTER_TYPE_BUFF_CANCELABLE .. menu);
 
-			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#Fourth:");
+			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#" .. module.text["CT_BuffMod/Options/Window/Sorting/Order4Label"]);
 			optionsAddObject( 15,   20, "dropdown#tl:110:%y#s:140:%s#n:CT_BuffModDropdown_sortSeq4#i:sortSeq4#o:sortSeq4:" .. constants.FILTER_TYPE_BUFF_UNCANCELABLE .. menu);
 
-			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#Fifth:");
+			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#" .. module.text["CT_BuffMod/Options/Window/Sorting/Order5Label"]);
 			optionsAddObject( 15,   20, "dropdown#tl:110:%y#s:140:%s#n:CT_BuffModDropdown_sortSeq5#i:sortSeq5#o:sortSeq5:" .. constants.FILTER_TYPE_NONE .. menu);
 		end
 
