@@ -5,7 +5,7 @@ BINDING_NAME_CT_BUFFMOD_RECASTBUFFS = "Recast Buffs";
 
 module:setText("BUFFNAME_CHARGES", "%s (%d charges)");
 
-module.text = { };
+module.text = module.text or { };
 local L = module.text;
 
 -- enUS (used as the default in all languages if there is no localized alternative)
@@ -56,6 +56,41 @@ L["CT_BuffMod/Options/Tips/Heading"] = "Tips"
 L["CT_BuffMod/Options/Tips/Line 1"] = "You can use /ctbuff or /ctbuffmod to open this options window directly."
 L["CT_BuffMod/Options/Tips/Line 2"] = "You can set and configure different windows to show the auras. Alt-click left on a window to select it."
 L["CT_BuffMod/Options/Tips/Line 3"] = "NOTE: Most options have no effect until you are out of combat."
+L["CT_BuffMod/Options/Window/Background/CustomColorCheckbox"] = "Use unique color for this window"
+L["CT_BuffMod/Options/Window/Background/CustomColorLabel"] = "Background color for this window only"
+L["CT_BuffMod/Options/Window/Background/Heading"] = "Window Background"
+L["CT_BuffMod/Options/Window/Background/ShowBackgroundCheckbox"] = "Show background"
+L["CT_BuffMod/Options/Window/Border/BottomSliderValue"] = "Bottom border = <value>"
+L["CT_BuffMod/Options/Window/Border/Heading"] = "Window Border"
+L["CT_BuffMod/Options/Window/Border/LeftSliderValue"] = "Left border = <value>"
+L["CT_BuffMod/Options/Window/Border/RightSliderValue"] = "Right border = <value>"
+L["CT_BuffMod/Options/Window/Border/ShowBorderCheckbox"] = "Show border edge texture"
+L["CT_BuffMod/Options/Window/Border/TopSliderValue"] = "Top border = <value>"
+L["CT_BuffMod/Options/Window/Button/General/DebuffBorderColorCheckbox"] = "Color code the border of debuff icons"
+L["CT_BuffMod/Options/Window/Button/General/DebuffColorTooltip"] = "Legend: |cFF9600FFcurse|r, |cFF966400disease|r,|cFF3296FFmagic|r, |cFF009600poison|r, and |cFFc80000others (ie, physical)|r."
+L["CT_BuffMod/Options/Window/Button/General/IconSizeSliderLabel"] = "Size of the icon:"
+L["CT_BuffMod/Options/Window/Button/General/ShowDaysCheckbox"] = "Show days if >24 hours"
+L["CT_BuffMod/Options/Window/Button/General/TimeFormatLabel"] = "Format:"
+L["CT_BuffMod/Options/Window/Button/General/TimeLocationLabel"] = "Location:"
+L["CT_BuffMod/Options/Window/Button/General/TimeRemainingCheckbox"] = "Show time remaining text"
+L["CT_BuffMod/Options/Window/Button/Style1/BarBackgroundCheckbox"] = "Color the background of the bar"
+L["CT_BuffMod/Options/Window/Button/Style1/DebuffBarBackgroundCheckbox"] = "Color code debuff bars"
+L["CT_BuffMod/Options/Window/Button/Style1/DebuffNameCheckbox"] = "Color code debuff names"
+L["CT_BuffMod/Options/Window/Button/Style1/Heading"] = "Style 1 (icon and bar)"
+L["CT_BuffMod/Options/Window/Button/Style1/IconPositionDropdown"] = "#Default#Left side#Right side"
+L["CT_BuffMod/Options/Window/Button/Style1/IconPositionLabel"] = "Icon position:"
+L["CT_BuffMod/Options/Window/Button/Style1/JustifyAloneLabel"] = "Justify (when alone):"
+L["CT_BuffMod/Options/Window/Button/Style1/JustifyDropdown"] = "#Default#Left#Right#Center"
+L["CT_BuffMod/Options/Window/Button/Style1/JustifyNotAloneLabel"] = "Justify (beside time):"
+L["CT_BuffMod/Options/Window/Button/Style1/LeftOffsetLabel"] = "Text offset (left side):"
+L["CT_BuffMod/Options/Window/Button/Style1/RightOffsetLabel"] = "Text offset (right side):"
+L["CT_BuffMod/Options/Window/Button/Style1/ShowNameCheckbox"] = "Show name"
+L["CT_BuffMod/Options/Window/Button/Style1/TimeLocationDropdown"] = "#Default#Left of the Name#Right of the name#Above the name#Below the name"
+L["CT_BuffMod/Options/Window/Button/Style1/TimeRemainingBarBackgroundCheckbox"] = "Show the bar's background"
+L["CT_BuffMod/Options/Window/Button/Style1/TimeRemainingBarCheckbox"] = "Show time remaining bar"
+L["CT_BuffMod/Options/Window/Button/Style2/Heading"] = "Style 2 (icon only)"
+L["CT_BuffMod/Options/Window/Button/Style2/OffsetLabel"] = "Offset from icon:"
+L["CT_BuffMod/Options/Window/Button/Style2/TimeLocationDropdown"] = "#Left#Right#Above#Below#Center"
 L["CT_BuffMod/Options/Window/General/DisableTooltipsCheckbox"] = "Disable icon tooltips"
 L["CT_BuffMod/Options/Window/General/DisableWindowCheckbox"] = "Disable window"
 L["CT_BuffMod/Options/Window/General/Heading"] = "General Window Settings"
@@ -64,6 +99,26 @@ L["CT_BuffMod/Options/Window/General/PositionLockedCheckbox"] = "Lock window so 
 L["CT_BuffMod/Options/Window/General/PositionResetButton"] = "Reset window position"
 L["CT_BuffMod/Options/Window/General/PositionResetTip"] = [=[This will place the window at
 the center of the screen.]=]
+L["CT_BuffMod/Options/Window/Layout/Heading"] = "Layout"
+L["CT_BuffMod/Options/Window/Layout/HorizontalLayoutTip"] = "For this type of layout, setting the number of rows to zero will result in a variable number of rows."
+L["CT_BuffMod/Options/Window/Layout/HorizontalMaxWrapsSlider"] = "Number of rows = <value>"
+L["CT_BuffMod/Options/Window/Layout/HorizontalWrapAfterSlider"] = "Buffs per row = <value>"
+L["CT_BuffMod/Options/Window/Layout/HorizontalWrapSpacingSlider"] = "Row spacing = <value>"
+L["CT_BuffMod/Options/Window/Layout/LayoutDropdownLabel"] = "Direction:"
+L["CT_BuffMod/Options/Window/Layout/MaxWrapsSliderAuto"] = "0 (auto-expand)"
+L["CT_BuffMod/Options/Window/Layout/Tooltip"] = [=[|cFFFFFFFFLayout settings arrange buff buttons within the window.
+|cFFFFFFFFThe 'Top to bottom' and 'Bottom to top' layouts arrange the buffs vertically but may wrap to additional columns
+|cFFFFFFFFThe 'Left to right' and 'Right to left' layouts arrange the buffs horizontally but may wrap to additional rows
+|cFFFFFFFF
+
+|cFFFFCC00Default: a single column that auto-expands downward
+|cFFFFFFFF 1) Left to right, wrap down
+|cFFFFFFFF 2) Buffs per row = 1
+|cFFFFFFFF 3) Number of rows = auto-expand]=]
+L["CT_BuffMod/Options/Window/Layout/VerticalLayoutTip"] = "For this type of layout, setting the number of columns to zero will result in a variable number of columns."
+L["CT_BuffMod/Options/Window/Layout/VerticalMaxWrapsSlider"] = "Number of column = <value>"
+L["CT_BuffMod/Options/Window/Layout/VerticalWrapAfterSlider"] = "Buffs per column = <value>"
+L["CT_BuffMod/Options/Window/Layout/VerticalWrapSpacingSlider"] = "Column spacing = <value>"
 L["CT_BuffMod/Options/Window/Sorting/Heading"] = "Buff Sorting"
 L["CT_BuffMod/Options/Window/Sorting/NonExpiringBuffsDropdown"] = "#Before other buffs#After other buffs#With other buffs"
 L["CT_BuffMod/Options/Window/Sorting/NonExpiringBuffsLabel"] = "Non-expiring buffs:"
@@ -164,7 +219,7 @@ L["CT_BuffMod/Options/General/Expiration/DurationHeading"] = "Duration de l'aura
 L["CT_BuffMod/Options/General/Expiration/FlashSliderLabel"] = [=[Clignoter l'icône 
 avant l'expiration :]=]
 L["CT_BuffMod/Options/General/Expiration/Heading"] = "L'expiration des auras"
-L["CT_BuffMod/Options/General/Expiration/PlayerBuffsOnlyCheckbox"] = "Seulement les auras que vous renouvelez."
+L["CT_BuffMod/Options/General/Expiration/PlayerBuffsOnlyCheckbox"] = "Limiter aux auras que vous renouvelez."
 L["CT_BuffMod/Options/General/Expiration/PlaySoundCheckbox"] = "Jouer un son avec l'annonce"
 L["CT_BuffMod/Options/General/Expiration/WarningTimeHeading"] = "Temps de l'annonce"
 L["CT_BuffMod/Options/General/Heading"] = "Des options générales"
@@ -172,6 +227,40 @@ L["CT_BuffMod/Options/Tips/Heading"] = "Des conseils"
 L["CT_BuffMod/Options/Tips/Line 1"] = "Vous pouvez taper /cbuff ou /ctaura pour accéder ces options."
 L["CT_BuffMod/Options/Tips/Line 2"] = "Vous pouvez placer et configurer des fenêtres différents pour montrer les auras.  Alt-clic gauche sur une fenêtre pour le sélectionner."
 L["CT_BuffMod/Options/Tips/Line 3"] = "Le plupart des options ne fonctionne que hors combat."
+L["CT_BuffMod/Options/Window/Background/CustomColorCheckbox"] = "Colorer différemment ce fenêtre"
+L["CT_BuffMod/Options/Window/Background/CustomColorLabel"] = "Couleur de fond pour cette fenêtre"
+L["CT_BuffMod/Options/Window/Background/Heading"] = "La couleur de fond de cette fenêtre"
+L["CT_BuffMod/Options/Window/Background/ShowBackgroundCheckbox"] = "Montrer le fond"
+L["CT_BuffMod/Options/Window/Border/BottomSliderValue"] = "La bordure inférieure = <value>"
+L["CT_BuffMod/Options/Window/Border/Heading"] = "La bordure de fenêtre"
+L["CT_BuffMod/Options/Window/Border/LeftSliderValue"] = "La bordure gauche = <value>"
+L["CT_BuffMod/Options/Window/Border/RightSliderValue"] = "La bordure droite = <value>"
+L["CT_BuffMod/Options/Window/Border/ShowBorderCheckbox"] = "Montrer les bordures"
+L["CT_BuffMod/Options/Window/Border/TopSliderValue"] = "La bordure supérieure = <value>"
+L["CT_BuffMod/Options/Window/Button/General/DebuffBorderColorCheckbox"] = "Changer la bordure des auras nocives"
+L["CT_BuffMod/Options/Window/Button/General/IconSizeSliderLabel"] = "Le grandeur de l'icône :"
+L["CT_BuffMod/Options/Window/Button/General/ShowDaysCheckbox"] = "Montrer des jours si plus de 24 heures"
+L["CT_BuffMod/Options/Window/Button/General/TimeFormatLabel"] = "Le format :"
+L["CT_BuffMod/Options/Window/Button/General/TimeLocationLabel"] = "L'emplacement :"
+L["CT_BuffMod/Options/Window/Button/General/TimeRemainingCheckbox"] = "Écrire le temps restant"
+L["CT_BuffMod/Options/Window/Button/Style1/BarBackgroundCheckbox"] = "Colorer le fond de la barre"
+L["CT_BuffMod/Options/Window/Button/Style1/DebuffBarBackgroundCheckbox"] = "Colorer différemment les auras nocives"
+L["CT_BuffMod/Options/Window/Button/Style1/DebuffNameCheckbox"] = "Colorer différemment les auras nocives"
+L["CT_BuffMod/Options/Window/Button/Style1/Heading"] = "Le style 1 (Ajouter une barre à l'icône)"
+L["CT_BuffMod/Options/Window/Button/Style1/IconPositionDropdown"] = "#Défaut#Coté gauche#Coté droite"
+L["CT_BuffMod/Options/Window/Button/Style1/IconPositionLabel"] = "Position de l'icône :"
+L["CT_BuffMod/Options/Window/Button/Style1/JustifyAloneLabel"] = "Justifier (quand seule) :"
+L["CT_BuffMod/Options/Window/Button/Style1/JustifyDropdown"] = "#Défaut#A gauche#A droite#Au milieu"
+L["CT_BuffMod/Options/Window/Button/Style1/JustifyNotAloneLabel"] = "Justifier (à coté du temps) :"
+L["CT_BuffMod/Options/Window/Button/Style1/LeftOffsetLabel"] = "Marge gauche de la texte"
+L["CT_BuffMod/Options/Window/Button/Style1/RightOffsetLabel"] = "Marge droite de la texte"
+L["CT_BuffMod/Options/Window/Button/Style1/ShowNameCheckbox"] = "Montrer le nom"
+L["CT_BuffMod/Options/Window/Button/Style1/TimeLocationDropdown"] = "#Défaut#Vers la gauche du nom#Vers la droite du nom#Supérieure du nom#Inférieure du nom"
+L["CT_BuffMod/Options/Window/Button/Style1/TimeRemainingBarBackgroundCheckbox"] = "Montrer le fond de la barre"
+L["CT_BuffMod/Options/Window/Button/Style1/TimeRemainingBarCheckbox"] = "Montrer la barre de temps restant"
+L["CT_BuffMod/Options/Window/Button/Style2/Heading"] = "Le style 2 (Laisser l'icône seule)"
+L["CT_BuffMod/Options/Window/Button/Style2/OffsetLabel"] = "Décaler de l'icône :"
+L["CT_BuffMod/Options/Window/Button/Style2/TimeLocationDropdown"] = "#A gauche#A droite#Supérieure#Inférieure#Au milieu"
 L["CT_BuffMod/Options/Window/General/DisableTooltipsCheckbox"] = "Désactiver les info-bulles d'icônes"
 L["CT_BuffMod/Options/Window/General/DisableWindowCheckbox"] = "Désactiver la fenêtre"
 L["CT_BuffMod/Options/Window/General/Heading"] = "Des options générales de fenêtre"
@@ -189,36 +278,36 @@ L["CT_BuffMod/Options/Window/Sorting/Order3Label"] = "3e :"
 L["CT_BuffMod/Options/Window/Sorting/Order4Label"] = "4e :"
 L["CT_BuffMod/Options/Window/Sorting/Order5Label"] = "5e :"
 L["CT_BuffMod/Options/Window/Sorting/OrderDropdown"] = "#Rien#Des auras nocives#Des auras annulables#Des auras non annulables#Tous les auras utiles#Des auras d'arme"
-L["CT_BuffMod/Options/Window/Sorting/OrderLabel"] = "Trier les auras en ordre suivant :"
-L["CT_BuffMod/Options/Window/Sorting/PlayerBuffsDropdown"] = "#Avant des autre joueurs#Après des autre joueurs#Avec des autre joueurs"
-L["CT_BuffMod/Options/Window/Sorting/PlayerBuffsLabel"] = "Les auras par vous :"
+L["CT_BuffMod/Options/Window/Sorting/OrderLabel"] = "Trier les auras selon l'ordre suivant :"
+L["CT_BuffMod/Options/Window/Sorting/PlayerBuffsDropdown"] = "#Avant d'autres joueurs#Après d'autres joueurs#Avec d'autres joueurs"
+L["CT_BuffMod/Options/Window/Sorting/PlayerBuffsLabel"] = "Vos auras :"
 L["CT_BuffMod/Options/Window/Sorting/ReverseCheckbox"] = "Trier renversement"
-L["CT_BuffMod/Options/Window/Sorting/SortMethodDropdown"] = "#Nom#Temps#Ordre"
+L["CT_BuffMod/Options/Window/Sorting/SortMethodDropdown"] = "#Le nom#Le temps#L'ordre"
 L["CT_BuffMod/Options/Window/Sorting/SortMethodLabel"] = "Méthode de trier :"
 L["CT_BuffMod/Options/Window/Time Remaining/Duration Format Dropdown"] = "1 heure  -  22 minutes#1 heure  -  22 min#1h  -  22m#1h 11m  -  22m 22s#1:11h  -  22:22"
-L["CT_BuffMod/Options/Window/Unit/Heading"] = "Unité"
-L["CT_BuffMod/Options/Window/Unit/NonSecureCheckbox"] = "Utilise des boutons non sécurisé"
-L["CT_BuffMod/Options/Window/Unit/SecureTooltip/Content"] = [=[|cFFFFAA00Les boutons sécurisé: 
-|cFFFFFFFF- Les sorts utiles peut être annulés |cFFFFFF00n'importe quand|cFFFFFFFF.
-|cFFFFFFFF- Les auras d'arme peut être annulés |cFFFFFF00n'importe quand|cFFFFFFFF.
+L["CT_BuffMod/Options/Window/Unit/Heading"] = "L'unité"
+L["CT_BuffMod/Options/Window/Unit/NonSecureCheckbox"] = "Utiliser des boutons non sécurisé"
+L["CT_BuffMod/Options/Window/Unit/SecureTooltip/Content"] = [=[|cFFFFAA00Les boutons sécurisés: 
+|cFFFFFFFF- Les sorts utiles peuvent être annulés |cFFFFFF00n'importe quand|cFFFFFFFF.
+|cFFFFFFFF- Les auras d'arme peuvent être annulés |cFFFFFF00n'importe quand|cFFFFFFFF.
 
 |cFFFFAA00Les boutons non sécurisé: 
-|cFFFFFFFF- Les sorts utiles peut être annulés |cFFFFFF00 hors combat|cFFFFFFFF.
-|cFFFFFFFF- Les auras d'arme |cFFFF3333ne peut pas |cFFFFFFFFêtre annulés. 
-|cFFFFFFFF- Additionnel méthode de trier: 'des auras non éxpirant' 
-|cFFFFFFFF- Mode de compatibilité avec autre addons]=]
-L["CT_BuffMod/Options/Window/Unit/SecureTooltip/Heading"] = "Les boutons sécurisé et non sécurisé"
+|cFFFFFFFF- Les sorts utiles peuvent être annulés |cFFFFFF00 hors combat|cFFFFFFFF.
+|cFFFFFFFF- Les auras d'arme |cFFFF3333ne peuvent pas |cFFFFFFFFêtre annulés. 
+|cFFFFFFFF- Méthode additionnel de trier les auras: 'non éxpirant' 
+|cFFFFFFFF- Mode de compatibilité, si nécessaire, avec autre addons]=]
+L["CT_BuffMod/Options/Window/Unit/SecureTooltip/Heading"] = "Les boutons sécurisés et non sécurisé"
 L["CT_BuffMod/Options/Window/Unit/UnitDropdownLabel"] = "Montrer les auras de :"
-L["CT_BuffMod/Options/Window/Unit/UnitDropdownOptions"] = "#Jouer#Véhicule#Compagnon#Cible#Cible focalisé"
+L["CT_BuffMod/Options/Window/Unit/UnitDropdownOptions"] = "#Le joueur#Le véhicule#Le compagnon#Le cible#Le cible focalisé"
 L["CT_BuffMod/Options/Window/Unit/VehicleCheckbox"] = "Changer au véhicule lors de la conduit"
 L["CT_BuffMod/Options/Window/Visibility/AdvancedRadio"] = "Utiliser des conditions avancés"
-L["CT_BuffMod/Options/Window/Visibility/AlwaysRadio"] = "Montre le fenêtre à tout temps"
+L["CT_BuffMod/Options/Window/Visibility/AlwaysRadio"] = "Montrer le fenêtre en tout temps"
 L["CT_BuffMod/Options/Window/Visibility/BasicRadio"] = "Utiliser des conditions simples"
 L["CT_BuffMod/Options/Window/Visibility/Heading"] = "La visibilité"
 L["CT_BuffMod/Options/Window/Visibility/HideCombatCheckbox"] = "Cacher pendant le combat"
 L["CT_BuffMod/Options/Window/Visibility/HideNotCombatCheckbox"] = "Cacher hors combat"
-L["CT_BuffMod/Options/Window/Visibility/HideNotVehicleCheckbox"] = "Cacher lorsqu'on ne conduit pas un véhicule"
-L["CT_BuffMod/Options/Window/Visibility/HideVehicleCheckbox"] = "Cacher lorsqu'on conduit un véhicule"
+L["CT_BuffMod/Options/Window/Visibility/HideNotVehicleCheckbox"] = "Cacher quand on est hors d'un véhicule"
+L["CT_BuffMod/Options/Window/Visibility/HideVehicleCheckbox"] = "Cacher quand on est dans un véhicule"
 L["CT_BuffMod/Options/Window/Visibility/SaveButton"] = "Enreg."
 L["CT_BuffMod/Options/Window/Visibility/TestButton"] = "Tester"
 L["CT_BuffMod/Options/Window/Visibility/UndoButton"] = "Annul."
@@ -230,14 +319,12 @@ L["CT_BuffMod/Options/WindowControls/CloneTooltip"] = "Ajouter une fenêtre qui 
 L["CT_BuffMod/Options/WindowControls/DeleteButton"] = "Supprimer"
 L["CT_BuffMod/Options/WindowControls/DeleteTooltip"] = "|cFFFFFF00Maj-clic|r ce bouton pour supprimer la fênetre sélectionnée"
 L["CT_BuffMod/Options/WindowControls/Heading"] = "Des fenêtres"
-L["CT_BuffMod/Options/WindowControls/SelectionLabel"] = "Sélecter :"
+L["CT_BuffMod/Options/WindowControls/SelectionLabel"] = "Sélectionner :"
 L["CT_BuffMod/Options/WindowControls/Tip"] = "Les options ci-dessous ne contrôlent que la fenêtre sélectionnée"
 L["CT_BuffMod/Options/WindowControls/WindowAddedMessage"] = "Fenêtre %d ajoutée."
 L["CT_BuffMod/Options/WindowControls/WindowClonedMessage"] = "La fenêtre %d ajoutée, comme un copier de la fenêtre %d."
 L["CT_BuffMod/Options/WindowControls/WindowDeletedMessage"] = "La fenêtre %d supprimée."
 L["CT_BuffMod/Options/WindowControls/WindowSelectedMessage"] = "Fenêtre %d sélectionnée."
-
-
 
 
 elseif (GetLocale() == "deDE") then
@@ -344,7 +431,6 @@ L["CT_BuffMod/Options/WindowControls/WindowAddedMessage"] = "Fenster %d hinzugef
 L["CT_BuffMod/Options/WindowControls/WindowClonedMessage"] = "Fenster %d mit Einstellungen von Fenster %d hinzugefügt."
 L["CT_BuffMod/Options/WindowControls/WindowDeletedMessage"] = "Fenster %d entfernt."
 L["CT_BuffMod/Options/WindowControls/WindowSelectedMessage"] = "Fenster %d ausgewählt."
-
 
 
 end

@@ -30,6 +30,9 @@ module.version = MODULE_VERSION;
 _G[MODULE_NAME] = module;
 CT_Library:registerModule(module);
 
+module.text = module.text or { };		-- see localization.lua
+local L = module.text;
+
 --------------------------------------------
 -- Variables & Constants
 
@@ -807,32 +810,32 @@ local function timeFormat1(timeValue, showDays)
 		-- Days
 		local days = ceil(timeValue / 86400);
 		if ( days ~= 1 ) then
-			return format(module.text["CT_BuffMod/TimeFormat/Days Plural"], days);
+			return format(L["CT_BuffMod/TimeFormat/Days Plural"], days);
 		else
-			return module.text["CT_BuffMod/TimeFormat/Day Singular"];
+			return L["CT_BuffMod/TimeFormat/Day Singular"];
 		end
 	elseif ( timeValue > 3540 ) then
 		-- Hours
 		local hours = ceil(timeValue / 3600);
 		if ( hours ~= 1 ) then
-			return format(module.text["CT_BuffMod/TimeFormat/Hours Plural"], hours);
+			return format(L["CT_BuffMod/TimeFormat/Hours Plural"], hours);
 		else
-			return module.text["CT_BuffMod/TimeFormat/Hour Singular"];
+			return L["CT_BuffMod/TimeFormat/Hour Singular"];
 		end
 	elseif ( timeValue > 60 ) then
 		-- Minutes
 		local minutes = ceil(timeValue / 60);
 		if ( minutes ~= 1 ) then
-			return format(module.text["CT_BuffMod/TimeFormat/Minutes Plural"], minutes);
+			return format(L["CT_BuffMod/TimeFormat/Minutes Plural"], minutes);
 		else
-			return module.text["CT_BuffMod/TimeFormat/Minute Singular"];
+			return L["CT_BuffMod/TimeFormat/Minute Singular"];
 		end
 	else
 		-- Seconds
 		if ( timeValue ~= 1 ) then
-			return format(module.text["CT_BuffMod/TimeFormat/Seconds Plural"], timeValue);
+			return format(L["CT_BuffMod/TimeFormat/Seconds Plural"], timeValue);
 		else
-			return module.text["CT_BuffMod/TimeFormat/Second Singular"];
+			return L["CT_BuffMod/TimeFormat/Second Singular"];
 		end
 	end
 end
@@ -842,16 +845,16 @@ local function timeFormat2(timeValue, showDays)
 	timeValue = ceil(timeValue);
 	if ( timeValue > 86340 and showDays) then
 		-- Days
-		return format(module.text["CT_BuffMod/TimeFormat/Days Smaller"], ceil(timeValue / 86400));
+		return format(L["CT_BuffMod/TimeFormat/Days Smaller"], ceil(timeValue / 86400));
 	elseif ( timeValue > 3540 ) then
 		-- Hours
-		return format(module.text["CT_BuffMod/TimeFormat/Hours Smaller"], ceil(timeValue / 3600));
+		return format(L["CT_BuffMod/TimeFormat/Hours Smaller"], ceil(timeValue / 3600));
 	elseif ( timeValue > 60 ) then
 		-- Minutes
-		return format(module.text["CT_BuffMod/TimeFormat/Minutes Smaller"], ceil(timeValue / 60));
+		return format(L["CT_BuffMod/TimeFormat/Minutes Smaller"], ceil(timeValue / 60));
 	else
 		-- Seconds
-		return format(module.text["CT_BuffMod/TimeFormat/Seconds Smaller"], timeValue);
+		return format(L["CT_BuffMod/TimeFormat/Seconds Smaller"], timeValue);
 	end
 end
 
@@ -860,16 +863,16 @@ local function timeFormat3(timeValue, showDays)
 	timeValue = ceil(timeValue);
 	if ( timeValue > 86340 and showDays) then
 		-- Days
-		return format(module.text["CT_BuffMod/TimeFormat/Days Abbreviated"], ceil(timeValue / 86400));
+		return format(L["CT_BuffMod/TimeFormat/Days Abbreviated"], ceil(timeValue / 86400));
 	elseif ( timeValue > 3540 ) then
 		-- Hours
-		return format(module.text["CT_BuffMod/TimeFormat/Hours Abbreviated"], ceil(timeValue / 3600));
+		return format(L["CT_BuffMod/TimeFormat/Hours Abbreviated"], ceil(timeValue / 3600));
 	elseif ( timeValue > 60 ) then
 		-- Minutes
-		return format(module.text["CT_BuffMod/TimeFormat/Minutes Abbreviated"], ceil(timeValue / 60));
+		return format(L["CT_BuffMod/TimeFormat/Minutes Abbreviated"], ceil(timeValue / 60));
 	else
 		-- Seconds
-		return format(module.text["CT_BuffMod/TimeFormat/Seconds Abbreviated"], timeValue);
+		return format(L["CT_BuffMod/TimeFormat/Seconds Abbreviated"], timeValue);
 	end
 end
 
@@ -879,17 +882,17 @@ local function timeFormat4(timeValue, showDays)
 	if ( timeValue > 86400 and showDays) then
 		-- Days & Hours
 		local days = floor(timeValue / 86400);
-		return format(module.text["CT_BuffMod/TimeFormat/Days Abbreviated"] .. " " ..  module.text["CT_BuffMod/TimeFormat/Hours Abbreviated"], days, floor((timeValue - days * 86400) / 3600 ));
+		return format(L["CT_BuffMod/TimeFormat/Days Abbreviated"] .. " " ..  L["CT_BuffMod/TimeFormat/Hours Abbreviated"], days, floor((timeValue - days * 86400) / 3600 ));
 	elseif ( timeValue >= 3600 ) then
 		-- Hours & Minutes
 		local hours = floor(timeValue / 3600);
-		return format(module.text["CT_BuffMod/TimeFormat/Hours Abbreviated"] .. " " ..  module.text["CT_BuffMod/TimeFormat/Minutes Two Digits"], hours, floor((timeValue - hours * 3600) / 60));
+		return format(L["CT_BuffMod/TimeFormat/Hours Abbreviated"] .. " " ..  L["CT_BuffMod/TimeFormat/Minutes Two Digits"], hours, floor((timeValue - hours * 3600) / 60));
 	elseif ( timeValue > 60 ) then
 		-- Minutes & Seconds
-		return format(module.text["CT_BuffMod/TimeFormat/Minutes Abbreviated"] .. " " ..  module.text["CT_BuffMod/TimeFormat/Seconds Two Digits"], floor(timeValue / 60), timeValue % 60);
+		return format(L["CT_BuffMod/TimeFormat/Minutes Abbreviated"] .. " " ..  L["CT_BuffMod/TimeFormat/Seconds Two Digits"], floor(timeValue / 60), timeValue % 60);
 	else
 		-- Seconds
-		return format(module.text["CT_BuffMod/TimeFormat/Seconds Abbreviated"], timeValue);
+		return format(L["CT_BuffMod/TimeFormat/Seconds Abbreviated"], timeValue);
 	end
 end
 
@@ -899,14 +902,14 @@ local function timeFormat5(timeValue, showDays)
 	if ( timeValue > 86400 and showDays) then
 		-- Days & Hours
 		local days = floor(timeValue / 86400);
-		return format(module.text["CT_BuffMod/TimeFormat/Days Digital"], days, floor((timeValue % 86400) / 3600 ), floor((timeValue % 3600) / 60 ));
+		return format(L["CT_BuffMod/TimeFormat/Days Digital"], days, floor((timeValue % 86400) / 3600 ), floor((timeValue % 3600) / 60 ));
 	elseif ( timeValue >= 3600 ) then
 		-- Hours & Minutes
 		local hours = floor(timeValue / 3600);
-		return format(module.text["CT_BuffMod/TimeFormat/Hours Digital"], hours, floor((timeValue - hours * 3600) / 60));
+		return format(L["CT_BuffMod/TimeFormat/Hours Digital"], hours, floor((timeValue - hours * 3600) / 60));
 	else
 		-- Minutes & Seconds
-		return format(module.text["CT_BuffMod/TimeFormat/Minutes Digital"], floor(timeValue / 60), timeValue % 60);
+		return format(L["CT_BuffMod/TimeFormat/Minutes Digital"], floor(timeValue / 60), timeValue % 60);
 	end
 end
 
@@ -1258,10 +1261,10 @@ function auraClass:checkExpiration()
 
 				-- Display the expiration message
 				if (canRecastKeyBind) then
-					module:printformat(module.text["CT_BuffMod/PRE_EXPIRATION_WARNING_KEYBINDING"],
+					module:printformat(L["CT_BuffMod/PRE_EXPIRATION_WARNING_KEYBINDING"],
 						name, timeFormat1(timeRemaining), canRecastKeyBind);
 				else
-					module:printformat(module.text["CT_BuffMod/PRE_EXPIRATION_WARNING"],
+					module:printformat(L["CT_BuffMod/PRE_EXPIRATION_WARNING"],
 						name, timeFormat1(timeRemaining));
 				end
 
@@ -2933,8 +2936,8 @@ function CT_BuffMod_AuraButton_OnEnter(self)
 		if ( (isOptionsFrameShown() or isControlPanelShown()) and frameObject:getWindowId() ) then
 			-- See also the auraFrame OnEnter script.
 			GameTooltip:SetOwner(self, "ANCHOR_CURSOR");
-			GameTooltip:SetText(format(module.text["CT_BuffMod/WindowTitle"],frameObject:getWindowId()));
-			GameTooltip:AddLine(module.text["CT_BuffMod/Options/WindowControls/AltClickHint"]);
+			GameTooltip:SetText(format(L["CT_BuffMod/WindowTitle"],frameObject:getWindowId()));
+			GameTooltip:AddLine(L["CT_BuffMod/Options/WindowControls/AltClickHint"]);
 			GameTooltip:Show();
 		end
 		return;
@@ -2962,7 +2965,7 @@ function CT_BuffMod_AuraButton_OnEnter(self)
 		end
 	end
 	if (isOptionsFrameShown() or isControlPanelShown()) then
-		GameTooltip:AddLine(format(module.text["CT_BuffMod/WindowTitle"],frameObject:getWindowId()) .. " (" .. module.text["CT_BuffMod/Options/WindowControls/AltClickHint"] .. ")");
+		GameTooltip:AddLine(format(L["CT_BuffMod/WindowTitle"],frameObject:getWindowId()) .. " (" .. L["CT_BuffMod/Options/WindowControls/AltClickHint"] .. ")");
 		GameTooltip:Show();
 	else
 		GameTooltip:Show();
@@ -2971,7 +2974,7 @@ function CT_BuffMod_AuraButton_OnEnter(self)
 			tooltipFooterLeft:Show();
 			tooltipFooterLeft:SetText("Spell ID: " .. auraObject.spellId);
 		end
-		GameTooltip:SetHeight(GameTooltip:GetHeight()+5);
+		GameTooltip:SetSize(max(GameTooltip:GetWidth(),180),GameTooltip:GetHeight()+5);
 	end
 end
 
@@ -4341,7 +4344,7 @@ function frameClass:createAltFrame()
 
 	-- Return if the alt frame has already been created.
 	if (auraFrame.altFrame) then
-		auraFrame.altFrame.fsWindowTitle:SetText(format(module.text["CT_BuffMod/WindowTitle"],self:getWindowId()));
+		auraFrame.altFrame.fsWindowTitle:SetText(format(L["CT_BuffMod/WindowTitle"],self:getWindowId()));
 		return;
 	end
 
@@ -4373,7 +4376,7 @@ function frameClass:createAltFrame()
 	-- Create window title
 	altFrame.fsWindowTitle = altFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
 	altFrame.fsWindowTitle:SetWordWrap(false)
-	altFrame.fsWindowTitle:SetText(format(module.text["CT_BuffMod/WindowTitle"],self:getWindowId()));
+	altFrame.fsWindowTitle:SetText(format(L["CT_BuffMod/WindowTitle"],self:getWindowId()));
 	altFrame.fsWindowTitle:SetPoint("BOTTOM", altFrame, "TOP");
 	altFrame.fsWindowTitle:Hide();
 end
@@ -6581,8 +6584,8 @@ local function primaryAltFrame_OnEnter(altFrame)
 	if ( (isOptionsFrameShown() or isControlPanelShown()) and windowId ) then
 		-- See also the auraFrame OnEnter script.
 		GameTooltip:SetOwner(altFrame, "ANCHOR_CURSOR");
-		GameTooltip:SetText(format(module.text["CT_BuffMod/WindowTitle"],windowId));
-		GameTooltip:AddLine(module.text["CT_BuffMod/Options/WindowControls/AltClickHint"]);
+		GameTooltip:SetText(format(L["CT_BuffMod/WindowTitle"],windowId));
+		GameTooltip:AddLine(L["CT_BuffMod/Options/WindowControls/AltClickHint"]);
 		GameTooltip:Show();
 	end
 end
@@ -8698,7 +8701,7 @@ local function options_updateWindowWidgets(windowId)
 				local windowListObject = globalObject.windowListObject;
 				local count = windowListObject:getWindowCount();
 				for windowNum = 1, count do
-					dropdownEntry.text = format(module.text["CT_BuffMod/WindowTitle"],windowListObject:windowNumToId(i));
+					dropdownEntry.text = format(L["CT_BuffMod/WindowTitle"],windowListObject:windowNumToId(i));
 					dropdownEntry.value = i;
 					dropdownEntry.checked = nil;
 					dropdownEntry.func = dropdown.ctDropdownClick;
@@ -8909,15 +8912,15 @@ local function options_updateWindowWidgets(windowId)
 		layoutType == constants.LAYOUT_GROW_UP_WRAP_LEFT
 	) then
 
-		frame.layoutTypeText:SetText("For this type of layout, setting the number of columns to zero will result in a variable number of columns.");
-		frame.wrapAfter.titleText = "Buffs per column = <value>";
-		frame.maxWraps.titleText = "Number of columns = <value>";
-		frame.wrapSpacing.titleText = "Column spacing = <value>";
+		frame.layoutTypeText:SetText(L["CT_BuffMod/Options/Window/Layout/VerticalLayoutTip"]);
+		frame.wrapAfter.titleText = L["CT_BuffMod/Options/Window/Layout/VerticalWrapAfterSlider"];
+		frame.maxWraps.titleText = L["CT_BuffMod/Options/Window/Layout/VerticalMaxWrapsSlider"];
+		frame.wrapSpacing.titleText = L["CT_BuffMod/Options/Window/Layout/VerticalWrapSpacingSlider"];
 	else
-		frame.layoutTypeText:SetText("For this type of layout, setting the number of rows to zero will result in a variable number of rows.");
-		frame.wrapAfter.titleText = "Buffs per row = <value>";
-		frame.maxWraps.titleText = "Number of rows = <value>";
-		frame.wrapSpacing.titleText = "Row spacing = <value>";
+		frame.layoutTypeText:SetText(L["CT_BuffMod/Options/Window/Layout/HorizontalLayoutTip"]);
+		frame.wrapAfter.titleText = L["CT_BuffMod/Options/Window/Layout/HorizontalWrapAfterSlider"];
+		frame.maxWraps.titleText = L["CT_BuffMod/Options/Window/Layout/HorizontalMaxWrapsSlider"];
+		frame.wrapSpacing.titleText = L["CT_BuffMod/Options/Window/Layout/HorizontalWrapSpacingSlider"];
 	end
 
 	value = frameOptions.wrapAfter or constants.DEFAULT_WRAP_AFTER;
@@ -9177,7 +9180,7 @@ function module:options_editWindow(windowId)
 		module:showModuleOptions(module.name);
 	end
 
-	ctprint(format(module.text["CT_BuffMod/Options/WindowControls/WindowSelectedMessage"],windowId));
+	ctprint(format(L["CT_BuffMod/Options/WindowControls/WindowSelectedMessage"],windowId));
 
 	local windowListObject = globalObject.windowListObject;
 	local windowNum = windowListObject:windowIdToNum(windowId);
@@ -9237,7 +9240,7 @@ local function options_addWindow()
 	windowObject:resetPosition();
 
 	local windowId = windowObject:getWindowId();
-	ctprint(format(module.text["CT_BuffMod/Options/WindowControls/WindowAddedMessage"], windowId));
+	ctprint(format(L["CT_BuffMod/Options/WindowControls/WindowAddedMessage"], windowId));
 
 	-- Switch to the window.
 	options_setCurrentWindow( windowId, true );
@@ -9258,7 +9261,7 @@ local function options_deleteWindow()
 
 	-- Delete the current window from the list.
 	windowListObject:deleteWindow(currentWindowId);
-	ctprint(format(module.text["CT_BuffMod/Options/WindowControls/WindowDeletedMessage"], windowNum));
+	ctprint(format(L["CT_BuffMod/Options/WindowControls/WindowDeletedMessage"], windowNum));
 
 	-- If there are no windows left then create a new one so we have at least 1 window.
 	if (windowListObject:getWindowCount() == 0) then
@@ -9312,7 +9315,7 @@ local function options_cloneWindow()
 	-- location as the original. The :resetPosition() does nothing since the
 	-- disabled window does not have an auraFrame that can be repositioned.
 
-	ctprint(format(module.text["CT_BuffMod/Options/WindowControls/WindowClonedMessage"], windowObject2:getWindowId(), windowObject1:getWindowId()));
+	ctprint(format(L["CT_BuffMod/Options/WindowControls/WindowClonedMessage"], windowObject2:getWindowId(), windowObject1:getWindowId()));
 
 	-- Switch to the window.
 	options_setCurrentWindow( windowObject2:getWindowId(), true );
@@ -9530,7 +9533,7 @@ module.frame = function()
 		value = floor((value or self:GetValue())/self:GetValueStep())*self:GetValueStep();
 		local timeLeft = floor( value * 10 + 0.5 ) / 10;
 		if ( timeLeft == 0 ) then
-			self.title:SetText(module.text["CT_BuffMod/TimeFormat/Off"]);
+			self.title:SetText(L["CT_BuffMod/TimeFormat/Off"]);
 		else
 			self.title:SetText(humanizeTime(timeLeft));
 		end
@@ -9550,51 +9553,51 @@ module.frame = function()
 
 	-- Tips
 	optionsBeginFrame(-5, 0, "frame#tl:0:%y#r");
-		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. module.text["CT_BuffMod/Options/Tips/Heading"]);
-		optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. module.text["CT_BuffMod/Options/Tips/Line 1"] .. "#" .. textColor2 .. ":l");  -- You can use /ctbuff or /ctbuffmod to open this options window directly.
-		optionsAddObject( -5, 3*14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. module.text["CT_BuffMod/Options/Tips/Line 2"] .. "#" .. textColor2 .. ":l");  -- You can use Alt Left-click on a CT_BuffMod window to select it and open this options window.
-		optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. module.text["CT_BuffMod/Options/Tips/Line 3"] .. "#" .. textColor2 .. ":l");  -- NOTE: Most options have no effect until you are out of combat.
+		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_BuffMod/Options/Tips/Heading"]);
+		optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_BuffMod/Options/Tips/Line 1"] .. "#" .. textColor2 .. ":l");  -- You can use /ctbuff or /ctbuffmod to open this options window directly.
+		optionsAddObject( -5, 3*14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_BuffMod/Options/Tips/Line 2"] .. "#" .. textColor2 .. ":l");  -- You can use Alt Left-click on a CT_BuffMod window to select it and open this options window.
+		optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_BuffMod/Options/Tips/Line 3"] .. "#" .. textColor2 .. ":l");  -- NOTE: Most options have no effect until you are out of combat.
 	optionsEndFrame();
 
 	-- Blizzard's frames
 	optionsBeginFrame(-20, 0, "frame#tl:0:%y#r#i:blizzardFrames");
-		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. module.text["CT_BuffMod/Options/Blizzard Frames/Heading"]);
+		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_BuffMod/Options/Blizzard Frames/Heading"]);
 
 		-- Hide the buffs frame
 		-- Hide the consolidated buffs frame
 		-- Hide the weapon buffs frame
-		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:hideBlizzardBuffs:true#" .. module.text["CT_BuffMod/Options/Blizzard Frames/Hide Buffs"]);
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:hideBlizzardEnchants:true#" .. module.text["CT_BuffMod/Options/Blizzard Frames/Hide Enchants"]);
+		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:hideBlizzardBuffs:true#" .. L["CT_BuffMod/Options/Blizzard Frames/Hide Buffs"]);
+		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:hideBlizzardEnchants:true#" .. L["CT_BuffMod/Options/Blizzard Frames/Hide Enchants"]);
 --[[ CONSOLIDATION REMOVED FROM GAME
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:hideBlizzardConsolidated:true#" .. module.text["CT_BuffMod/Options/Blizzard Frames/Hide Consolidated"]);
+		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:hideBlizzardConsolidated:true#" .. L["CT_BuffMod/Options/Blizzard Frames/Hide Consolidated"]);
 CONSOLIDATION REMOVED FROM GAME --]]
 	optionsEndFrame();
 
 	-- General Options
 	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
-		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. module.text["CT_BuffMod/Options/General/Heading"]);
+		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_BuffMod/Options/General/Heading"]);
 
-		optionsAddObject(-15, 1*13, "font#tl:15:%y#" .. module.text["CT_BuffMod/Options/General/Colors/Heading"]);
+		optionsAddObject(-15, 1*13, "font#tl:15:%y#" .. L["CT_BuffMod/Options/General/Colors/Heading"]);
 
 		-- Window background color
 		optionsAddObject(-10,   16, "colorswatch#tl:35:%y#s:16:16#o:backgroundColor:" .. defaultWindowColor[1] .. "," .. defaultWindowColor[2] .. "," .. defaultWindowColor[3] .. "," .. defaultWindowColor[4] .. "#true");
-		optionsAddObject( 14,   15, "font#tl:60:%y#v:ChatFontNormal#" .. module.text["CT_BuffMod/Options/General/Colors/Background"]);
+		optionsAddObject( 14,   15, "font#tl:60:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/General/Colors/Background"]);
 
 		-- Aura color
 		-- Buff color
 		-- Debuff color
 		-- Weapon buff color
 		optionsAddObject(-15,   16, "colorswatch#tl:35:%y#s:16:16#i:bgColorAURA#o:bgColorAURA:0.35,0.8,0.15,0.5#true");
-		optionsAddObject( 14,   15, "font#tl:60:%y#v:ChatFontNormal#" .. module.text["CT_BuffMod/Options/General/Colors/Aura"]);
+		optionsAddObject( 14,   15, "font#tl:60:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/General/Colors/Aura"]);
 
 		optionsAddObject( 15,   16, "colorswatch#tl:175:%y#s:16:16#i:bgColorBUFF#o:bgColorBUFF:0.1,0.4,0.85,0.5#true");
-		optionsAddObject( 14,   15, "font#tl:200:%y#v:ChatFontNormal#" .. module.text["CT_BuffMod/Options/General/Colors/Buff"]);
+		optionsAddObject( 14,   15, "font#tl:200:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/General/Colors/Buff"]);
 
 		optionsAddObject( -2,   16, "colorswatch#tl:35:%y#s:16:16#i:bgColorDEBUFF#o:bgColorDEBUFF:1,0,0,0.85#true");
-		optionsAddObject( 14,   15, "font#tl:60:%y#v:ChatFontNormal#" .. module.text["CT_BuffMod/Options/General/Colors/Debuff"]);
+		optionsAddObject( 14,   15, "font#tl:60:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/General/Colors/Debuff"]);
 
 		optionsAddObject( 15,   16, "colorswatch#tl:175:%y#s:16:16#i:bgColorITEM#o:bgColorITEM:0.75,0.25,1,0.75#true");
-		optionsAddObject( 14,   15, "font#tl:200:%y#v:ChatFontNormal#" .. module.text["CT_BuffMod/Options/General/Colors/Weapon"]);
+		optionsAddObject( 14,   15, "font#tl:200:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/General/Colors/Weapon"]);
 
 --[[ CONSOLIDATION REMOVED FROM GAME
 		optionsAddObject( -15,   16, "colorswatch#tl:35:%y#s:16:16#o:consolidatedColor:" .. defaultConsolidatedColor[1] .. "," .. defaultConsolidatedColor[2] .. "," .. defaultConsolidatedColor[3] .. "," .. defaultConsolidatedColor[4] .. "#true");
@@ -9631,10 +9634,10 @@ CONSOLIDATION REMOVED FROM GAME --]]
 
 	-- Expiration options
 	optionsBeginFrame(-15, 0, "frame#tl:0:%y#br:tr:0:%b");
-		optionsAddObject( -0,   13, "font#tl:15:%y#v:GameFontNormal#" .. module.text["CT_BuffMod/Options/General/Expiration/Heading"]);
+		optionsAddObject( -0,   13, "font#tl:15:%y#v:GameFontNormal#" .. L["CT_BuffMod/Options/General/Expiration/Heading"]);
 
-		optionsAddObject(-15,   14, "font#tl:30:%y#v:ChatFontNormal#" .. module.text["CT_BuffMod/Options/General/Expiration/FlashSliderLabel"]);
-		optionsBeginFrame(15,   17, "slider#tl:175:%y#tr:-5:%y#i:flashTime#o:flashTime:" .. constants.DEFAULT_FLASH_TIME .. "#<value> seconds:" .. module.text["CT_BuffMod/TimeFormat/Off"] .. ":" .. format(module.text["CT_BuffMod/TimeFormat/Minutes Smaller"],1) .. "#0:60:1");
+		optionsAddObject(-15,   14, "font#tl:30:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/General/Expiration/FlashSliderLabel"]);
+		optionsBeginFrame(15,   17, "slider#tl:175:%y#tr:-5:%y#i:flashTime#o:flashTime:" .. constants.DEFAULT_FLASH_TIME .. "#<value> seconds:" .. L["CT_BuffMod/TimeFormat/Off"] .. ":" .. format(L["CT_BuffMod/TimeFormat/Minutes Smaller"],1) .. "#0:60:1");
 			optionsAddScript("onvaluechanged", updateFunc);
 			optionsAddScript("onload", updateFunc);
 		optionsEndFrame();
@@ -9677,29 +9680,29 @@ CONSOLIDATION REMOVED FROM GAME --]]
 			end
 		end
 
-		optionsBeginFrame(-18,   26, "checkbutton#tl:30:%y#o:enableExpiration:true#" .. module.text["CT_BuffMod/Options/General/Expiration/ChatMessageCheckbox"]);
+		optionsBeginFrame(-18,   26, "checkbutton#tl:30:%y#o:enableExpiration:true#" .. L["CT_BuffMod/Options/General/Expiration/ChatMessageCheckbox"]);
 			optionsAddScript("onload", function() enableExpiration:HookScript("OnClick", enableExpirationChildren) end);
 		optionsEndFrame();
-		optionsAddObject(  5,   26, "checkbutton#tl:48:%y#o:expirationCastOnly#" .. module.text["CT_BuffMod/Options/General/Expiration/PlayerBuffsOnlyCheckbox"]);
-		optionsAddObject(  5,   26, "checkbutton#tl:48:%y#o:expirationSound:true#" .. module.text["CT_BuffMod/Options/General/Expiration/PlaySoundCheckbox"]);
+		optionsAddObject(  5,   26, "checkbutton#tl:48:%y#o:expirationCastOnly#" .. L["CT_BuffMod/Options/General/Expiration/PlayerBuffsOnlyCheckbox"]);
+		optionsAddObject(  5,   26, "checkbutton#tl:48:%y#o:expirationSound:true#" .. L["CT_BuffMod/Options/General/Expiration/PlaySoundCheckbox"]);
 
-		optionsAddObject(-10,   15, "font#tl:55:%y#n:expirationDurationHeading#" .. module.text["CT_BuffMod/Options/General/Expiration/DurationHeading"]);
-		optionsAddObject( 15,   15, "font#tl:175:%y#n:expirationWarningTimeHeading#" .. module.text["CT_BuffMod/Options/General/Expiration/WarningTimeHeading"]);
+		optionsAddObject(-10,   15, "font#tl:55:%y#n:expirationDurationHeading#" .. L["CT_BuffMod/Options/General/Expiration/DurationHeading"]);
+		optionsAddObject( 15,   15, "font#tl:175:%y#n:expirationWarningTimeHeading#" .. L["CT_BuffMod/Options/General/Expiration/WarningTimeHeading"]);
 
 		optionsAddObject(-23,   15, "font#tl:55:%y#n:expirationTime1Label#v:ChatFontNormal#  2:00  -  10:00");
-		optionsBeginFrame(  18,   17, "slider#tl:175:%y#tr:-5:%y#n:CT_BuffMod_ExpirationTime1Slider#o:expirationTime1:15#:" .. module.text["CT_BuffMod/TimeFormat/Off"] .. ":" .. format(module.text["CT_BuffMod/TimeFormat/Minutes Smaller"],1) .. "#0:60:5");
+		optionsBeginFrame(  18,   17, "slider#tl:175:%y#tr:-5:%y#n:CT_BuffMod_ExpirationTime1Slider#o:expirationTime1:15#:" .. L["CT_BuffMod/TimeFormat/Off"] .. ":" .. format(L["CT_BuffMod/TimeFormat/Minutes Smaller"],1) .. "#0:60:5");
 			optionsAddScript("onvaluechanged", updateFunc);
 			optionsAddScript("onload", updateFunc);
 		optionsEndFrame();
 
 		optionsAddObject(-27,   15, "font#tl:55:%y#n:expirationTime2Label#v:ChatFontNormal#10:01  -  30:00");
-		optionsBeginFrame(  18,   17, "slider#tl:175:%y#tr:-5:%y#n:CT_BuffMod_ExpirationTime2Slider#o:expirationTime2:60#:" .. module.text["CT_BuffMod/TimeFormat/Off"] .. ":" .. format(module.text["CT_BuffMod/TimeFormat/Minutes Smaller"],3) .. "#0:180:5");
+		optionsBeginFrame(  18,   17, "slider#tl:175:%y#tr:-5:%y#n:CT_BuffMod_ExpirationTime2Slider#o:expirationTime2:60#:" .. L["CT_BuffMod/TimeFormat/Off"] .. ":" .. format(L["CT_BuffMod/TimeFormat/Minutes Smaller"],3) .. "#0:180:5");
 			optionsAddScript("onvaluechanged", updateFunc);
 			optionsAddScript("onload", updateFunc);
 		optionsEndFrame();
 
 		optionsAddObject(-27,   15, "font#tl:55:%y#n:expirationTime3Label#v:ChatFontNormal#30:01  +");
-		optionsBeginFrame(  18,   17, "slider#tl:175:%y#tr:-5:%y#n:CT_BuffMod_ExpirationTime3Slider#o:expirationTime3:180#:" .. module.text["CT_BuffMod/TimeFormat/Off"] .. ":" .. format(module.text["CT_BuffMod/TimeFormat/Minutes Smaller"],5) .. "#0:300:5");
+		optionsBeginFrame(  18,   17, "slider#tl:175:%y#tr:-5:%y#n:CT_BuffMod_ExpirationTime3Slider#o:expirationTime3:180#:" .. L["CT_BuffMod/TimeFormat/Off"] .. ":" .. format(L["CT_BuffMod/TimeFormat/Minutes Smaller"],5) .. "#0:300:5");
 			optionsAddScript("onvaluechanged", updateFunc);
 			optionsAddScript("onload", updateFunc);
 			optionsAddScript("onshow", enableExpirationChildren);
@@ -9708,45 +9711,45 @@ CONSOLIDATION REMOVED FROM GAME --]]
 
 	-- Adding and Removing Windows
 	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b#i:frameOptions");
-		optionsAddObject(-10,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. module.text["CT_BuffMod/Options/WindowControls/Heading"]);
+		optionsAddObject(-10,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_BuffMod/Options/WindowControls/Heading"]);
 
-		optionsBeginFrame( -10,   30, "button#tl:15:%y#s:80:%s#v:UIPanelButtonTemplate#" .. module.text["CT_BuffMod/Options/WindowControls/AddButton"]);
+		optionsBeginFrame( -10,   30, "button#tl:15:%y#s:80:%s#v:UIPanelButtonTemplate#" .. L["CT_BuffMod/Options/WindowControls/AddButton"]);
 			optionsAddScript("onclick", function(self)
 				options_addWindow();
 			end);
 			optionsAddScript("onenter", function(self)
 				GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT");
-				GameTooltip:SetText(module.text["CT_BuffMod/Options/WindowControls/AddTooltip"], 1, 0.82, 0, 1, true);
+				GameTooltip:SetText(L["CT_BuffMod/Options/WindowControls/AddTooltip"], 1, 0.82, 0, 1, true);
 				GameTooltip:Show();
 			end);
 			optionsAddScript("onleave", function(self)
 				GameTooltip:Hide();
 			end);
 		optionsEndFrame();
-		optionsBeginFrame(  30,   30, "button#tl:110:%y#s:80:%s#v:UIPanelButtonTemplate#" .. module.text["CT_BuffMod/Options/WindowControls/CloneButton"]);
+		optionsBeginFrame(  30,   30, "button#tl:110:%y#s:80:%s#v:UIPanelButtonTemplate#" .. L["CT_BuffMod/Options/WindowControls/CloneButton"]);
 			optionsAddScript("onclick", function(self)
 				options_cloneWindow();
 			end);
 			optionsAddScript("onenter", function(self)
 				GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT");
-				GameTooltip:SetText(module.text["CT_BuffMod/Options/WindowControls/CloneTooltip"], 1, 0.82, 0, 1, true);
+				GameTooltip:SetText(L["CT_BuffMod/Options/WindowControls/CloneTooltip"], 1, 0.82, 0, 1, true);
 				GameTooltip:Show();
 			end);
 			optionsAddScript("onleave", function(self)
 				GameTooltip:Hide();
 			end);
 		optionsEndFrame();
-		optionsBeginFrame(  30,   30, "button#tl:205:%y#s:80:%s#v:UIPanelButtonTemplate#" .. module.text["CT_BuffMod/Options/WindowControls/DeleteButton"]);
+		optionsBeginFrame(  30,   30, "button#tl:205:%y#s:80:%s#v:UIPanelButtonTemplate#" .. L["CT_BuffMod/Options/WindowControls/DeleteButton"]);
 			optionsAddScript("onclick", function(self)
 				if (IsShiftKeyDown()) then
 					options_deleteWindow();
 				else
-					ctprint(module.text["CT_BuffMod/Options/WindowControls/DeleteTooltip"]);
+					ctprint(L["CT_BuffMod/Options/WindowControls/DeleteTooltip"]);
 				end
 			end);
 			optionsAddScript("onenter", function(self)
 				GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT");
-				GameTooltip:SetText(module.text["CT_BuffMod/Options/WindowControls/DeleteTooltip"], 1, 0.82, 0, 1, true);
+				GameTooltip:SetText(L["CT_BuffMod/Options/WindowControls/DeleteTooltip"], 1, 0.82, 0, 1, true);
 				GameTooltip:Show();
 			end);
 			optionsAddScript("onleave", function(self)
@@ -9754,7 +9757,7 @@ CONSOLIDATION REMOVED FROM GAME --]]
 			end);
 		optionsEndFrame();
 
-		optionsAddObject(-20,   14, "font#tl:15:%y#v:ChatFontNormal#" .. module.text["CT_BuffMod/Options/WindowControls/SelectionLabel"]);
+		optionsAddObject(-20,   14, "font#tl:15:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/WindowControls/SelectionLabel"]);
 
 		optionsBeginFrame( 19,   24, "button#tl:105:%y#s:24:%s");
 			optionsAddScript("onclick",
@@ -9790,22 +9793,22 @@ CONSOLIDATION REMOVED FROM GAME --]]
 
 		optionsAddObject( 20,   20, "dropdown#tl:140:%y#n:CT_BuffModDropdown_editWindow#o:editWindow#Window 1");
 
-		optionsAddObject( -5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. module.text["CT_BuffMod/Options/WindowControls/Tip"] .. "#" .. textColor2 .. ":l");
+		optionsAddObject( -5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. L["CT_BuffMod/Options/WindowControls/Tip"] .. "#" .. textColor2 .. ":l");
 
 		----------
 		-- Window
 		----------
 
-		optionsAddObject(-15, 1*13, "font#tl:15:%y#" .. module.text["CT_BuffMod/Options/Window/General/Heading"]);
+		optionsAddObject(-15, 1*13, "font#tl:15:%y#" .. L["CT_BuffMod/Options/Window/General/Heading"]);
 
 		-- Unlock window
 		-- Window cannot be moved off screen
-		optionsAddObject( -5,   26, "checkbutton#tl:30:%y#i:disableWindow#o:disableWindow#" .. module.text["CT_BuffMod/Options/Window/General/DisableWindowCheckbox"]);
-		optionsAddObject(  6,   26, "checkbutton#tl:30:%y#i:disableTooltips#o:disableTooltips#" .. module.text["CT_BuffMod/Options/Window/General/DisableTooltipsCheckbox"]);
-		optionsAddObject(  6,   26, "checkbutton#tl:30:%y#i:lockWindow#o:lockWindow#" .. module.text["CT_BuffMod/Options/Window/General/PositionLockedCheckbox"]);
-		optionsAddObject(  6,   26, "checkbutton#tl:30:%y#i:clampWindow#o:clampWindow:true#" .. module.text["CT_BuffMod/Options/Window/General/PositionClampedCheckbox"]);
+		optionsAddObject( -5,   26, "checkbutton#tl:30:%y#i:disableWindow#o:disableWindow#" .. L["CT_BuffMod/Options/Window/General/DisableWindowCheckbox"]);
+		optionsAddObject(  6,   26, "checkbutton#tl:30:%y#i:disableTooltips#o:disableTooltips#" .. L["CT_BuffMod/Options/Window/General/DisableTooltipsCheckbox"]);
+		optionsAddObject(  6,   26, "checkbutton#tl:30:%y#i:lockWindow#o:lockWindow#" .. L["CT_BuffMod/Options/Window/General/PositionLockedCheckbox"]);
+		optionsAddObject(  6,   26, "checkbutton#tl:30:%y#i:clampWindow#o:clampWindow:true#" .. L["CT_BuffMod/Options/Window/General/PositionClampedCheckbox"]);
 
-		optionsBeginFrame( -5,   30, "button#t:0:%y#s:180:%s#n:CT_BuffMod_ResetPosition_Button#v:GameMenuButtonTemplate#" .. module.text["CT_BuffMod/Options/Window/General/PositionResetButton"]);
+		optionsBeginFrame( -5,   30, "button#t:0:%y#s:180:%s#n:CT_BuffMod_ResetPosition_Button#v:GameMenuButtonTemplate#" .. L["CT_BuffMod/Options/Window/General/PositionResetButton"]);
 			optionsAddScript("onclick",
 				function(self)
 					local windowObject = globalObject.windowListObject:findWindow(currentWindowId);
@@ -9821,25 +9824,25 @@ CONSOLIDATION REMOVED FROM GAME --]]
 				end
 			);
 		optionsEndFrame();
-		optionsAddObject( -5, 2*13, "font#t:0:%y#s:0:%s#l#r#".. module.text["CT_BuffMod/Options/Window/General/PositionResetTip"] .. "#" .. textColor2);
+		optionsAddObject( -5, 2*13, "font#t:0:%y#s:0:%s#l#r#".. L["CT_BuffMod/Options/Window/General/PositionResetTip"] .. "#" .. textColor2);
 
 		----------
 		-- Unit
 		----------
 
-		optionsAddObject(-20, 1*13, "font#tl:15:%y#" .. module.text["CT_BuffMod/Options/Window/Unit/Heading"]);
+		optionsAddObject(-20, 1*13, "font#tl:15:%y#" .. L["CT_BuffMod/Options/Window/Unit/Heading"]);
 		do
 			-- Show buffs for Player|Vehicle|Pet|Target|Focus
 			-- Use unsecure buttons (refer to tooltip)
 			-- Show vehicle buffs when in a vehicle
-			optionsAddObject(-10,   14, "font#tl:34:%y#v:ChatFontNormal#" .. module.text["CT_BuffMod/Options/Window/Unit/UnitDropdownLabel"]);
-			optionsAddObject( 15,   20, "dropdown#tl:140:%y#s:100:%s#n:CT_BuffModDropdown_unitType#i:unitType#o:unitType:" .. constants.UNIT_TYPE_PLAYER .. module.text["CT_BuffMod/Options/Window/Unit/UnitDropdownOptions"]);
-			optionsBeginFrame(  0,   26, "checkbutton#tl:30:%y#i:playerUnsecure#o:playerUnsecure#" .. module.text["CT_BuffMod/Options/Window/Unit/NonSecureCheckbox"]);
+			optionsAddObject(-10,   14, "font#tl:34:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Unit/UnitDropdownLabel"]);
+			optionsAddObject( 15,   20, "dropdown#tl:140:%y#s:100:%s#n:CT_BuffModDropdown_unitType#i:unitType#o:unitType:" .. constants.UNIT_TYPE_PLAYER .. L["CT_BuffMod/Options/Window/Unit/UnitDropdownOptions"]);
+			optionsBeginFrame(  0,   26, "checkbutton#tl:30:%y#i:playerUnsecure#o:playerUnsecure#" .. L["CT_BuffMod/Options/Window/Unit/NonSecureCheckbox"]);
 				optionsAddScript("onenter",
 					function(button)
 						GameTooltip:SetOwner(button, "ANCHOR_RIGHT", 275, 0);
-						GameTooltip:SetText(module.text["CT_BuffMod/Options/Window/Unit/SecureTooltip/Heading"]);
-						GameTooltip:AddLine(module.text["CT_BuffMod/Options/Window/Unit/SecureTooltip/Content"]);
+						GameTooltip:SetText(L["CT_BuffMod/Options/Window/Unit/SecureTooltip/Heading"]);
+						GameTooltip:AddLine(L["CT_BuffMod/Options/Window/Unit/SecureTooltip/Content"]);
 						GameTooltip:Show();
 					end
 				);
@@ -9849,19 +9852,19 @@ CONSOLIDATION REMOVED FROM GAME --]]
 					end
 				);
 			optionsEndFrame();
-			optionsAddObject(  0,   26, "checkbutton#tl:30:%y#i:vehicleBuffs#o:vehicleBuffs:true#" .. module.text["CT_BuffMod/Options/Window/Unit/VehicleCheckbox"]);
+			optionsAddObject(  0,   26, "checkbutton#tl:30:%y#i:vehicleBuffs#o:vehicleBuffs:true#" .. L["CT_BuffMod/Options/Window/Unit/VehicleCheckbox"]);
 		end
 
 		----------
 		-- Visibility
 		----------
-		optionsAddObject(-20, 1*13, "font#tl:15:%y#" .. module.text["CT_BuffMod/Options/Window/Visibility/Heading"]);
+		optionsAddObject(-20, 1*13, "font#tl:15:%y#" .. L["CT_BuffMod/Options/Window/Visibility/Heading"]);
 
 		-- Always show window
-		optionsAddObject( -5,   20, "checkbutton#tl:25:%y#s:%s:%s#i:visShow#o:visShow#" .. module.text["CT_BuffMod/Options/Window/Visibility/AlwaysRadio"]);
+		optionsAddObject( -5,   20, "checkbutton#tl:25:%y#s:%s:%s#i:visShow#o:visShow#" .. L["CT_BuffMod/Options/Window/Visibility/AlwaysRadio"]);
 
 		-- Basic conditions
-		optionsAddObject( -2,   20, "checkbutton#tl:25:%y#s:%s:%s#i:visBasic#o:visBasic#" .. module.text["CT_BuffMod/Options/Window/Visibility/BasicRadio"]);
+		optionsAddObject( -2,   20, "checkbutton#tl:25:%y#s:%s:%s#i:visBasic#o:visBasic#" .. L["CT_BuffMod/Options/Window/Visibility/BasicRadio"]);
 		
 		local function toggleBasicConditions(checkbutton)
 			checkbutton:HookScript("OnClick",
@@ -9880,21 +9883,21 @@ CONSOLIDATION REMOVED FROM GAME --]]
 			);
 		end
 		
-		optionsBeginFrame( -2,   26, "checkbutton#tl:44:%y#i:visHideInVehicle#o:visHideInVehicle#" .. module.text["CT_BuffMod/Options/Window/Visibility/HideVehicleCheckbox"]);
+		optionsBeginFrame( -2,   26, "checkbutton#tl:44:%y#i:visHideInVehicle#o:visHideInVehicle#" .. L["CT_BuffMod/Options/Window/Visibility/HideVehicleCheckbox"]);
 			optionsAddScript("onload", toggleBasicConditions);
 		optionsEndFrame();
-		optionsBeginFrame(  6,   26, "checkbutton#tl:44:%y#i:visHideNotVehicle#o:visHideNotVehicle#" .. module.text["CT_BuffMod/Options/Window/Visibility/HideNotVehicleCheckbox"]);
+		optionsBeginFrame(  6,   26, "checkbutton#tl:44:%y#i:visHideNotVehicle#o:visHideNotVehicle#" .. L["CT_BuffMod/Options/Window/Visibility/HideNotVehicleCheckbox"]);
 			optionsAddScript("onload", toggleBasicConditions);
 		optionsEndFrame();
-		optionsBeginFrame(  6,   26, "checkbutton#tl:44:%y#i:visHideInCombat#o:visHideInCombat#" .. module.text["CT_BuffMod/Options/Window/Visibility/HideCombatCheckbox"]);
+		optionsBeginFrame(  6,   26, "checkbutton#tl:44:%y#i:visHideInCombat#o:visHideInCombat#" .. L["CT_BuffMod/Options/Window/Visibility/HideCombatCheckbox"]);
 			optionsAddScript("onload", toggleBasicConditions);
 		optionsEndFrame();
-		optionsBeginFrame(  6,   26, "checkbutton#tl:44:%y#i:visHideNotCombat#o:visHideNotCombat#" .. module.text["CT_BuffMod/Options/Window/Visibility/HideNotCombatCheckbox"]);
+		optionsBeginFrame(  6,   26, "checkbutton#tl:44:%y#i:visHideNotCombat#o:visHideNotCombat#" .. L["CT_BuffMod/Options/Window/Visibility/HideNotCombatCheckbox"]);
 			optionsAddScript("onload", toggleBasicConditions);
 		optionsEndFrame();
 		
 		-- Advanced conditions
-		optionsAddObject( -2,   20, "checkbutton#tl:25:%y#s:%s:%s#i:visAdvanced#o:visAdvanced#" .. module.text["CT_BuffMod/Options/Window/Visibility/AdvancedRadio"]);
+		optionsAddObject( -2,   20, "checkbutton#tl:25:%y#s:%s:%s#i:visAdvanced#o:visAdvanced#" .. L["CT_BuffMod/Options/Window/Visibility/AdvancedRadio"]);
 
 		optionsBeginFrame(  20,   20, "button#tl:222:%y#s:20:%s#i:visHelp0#v:UIPanelButtonTemplate#?");
 			optionsAddScript("onenter",
@@ -10013,7 +10016,7 @@ CONSOLIDATION REMOVED FROM GAME --]]
 			);
 		optionsEndFrame();
 
-		optionsBeginFrame(  -2,   22, "button#tl:60:%y#s:60:%s#i:visTest#v:UIPanelButtonTemplate#" .. module.text["CT_BuffMod/Options/Window/Visibility/TestButton"]);
+		optionsBeginFrame(  -2,   22, "button#tl:60:%y#s:60:%s#i:visTest#v:UIPanelButtonTemplate#" .. L["CT_BuffMod/Options/Window/Visibility/TestButton"]);
 			optionsAddScript("onclick",
 				function(self)
 					local editBox = windowOptionsFrame.conditionEB;
@@ -10049,7 +10052,7 @@ CONSOLIDATION REMOVED FROM GAME --]]
 			);
 		optionsEndFrame();
 
-		optionsBeginFrame(  23,   22, "button#tl:140:%y#s:60:%s#i:visSave#v:UIPanelButtonTemplate#" .. module.text["CT_BuffMod/Options/Window/Visibility/SaveButton"]);
+		optionsBeginFrame(  23,   22, "button#tl:140:%y#s:60:%s#i:visSave#v:UIPanelButtonTemplate#" .. L["CT_BuffMod/Options/Window/Visibility/SaveButton"]);
 			optionsAddScript("onload",
 				function(self)
 					self:Disable();
@@ -10090,7 +10093,7 @@ CONSOLIDATION REMOVED FROM GAME --]]
 			);
 		optionsEndFrame();
 
-		optionsBeginFrame(  23,   22, "button#tl:220:%y#s:60:%s#i:visUndo#v:UIPanelButtonTemplate#" .. module.text["CT_BuffMod/Options/Window/Visibility/UndoButton"]);
+		optionsBeginFrame(  23,   22, "button#tl:220:%y#s:60:%s#i:visUndo#v:UIPanelButtonTemplate#" .. L["CT_BuffMod/Options/Window/Visibility/UndoButton"]);
 			optionsAddScript("onload",
 				function(self)
 					self:Disable();
@@ -10127,47 +10130,47 @@ CONSOLIDATION REMOVED FROM GAME --]]
 		-- Sorting
 		----------
 
-		optionsAddObject(-20, 1*13, "font#tl:15:%y#" .. module.text["CT_BuffMod/Options/Window/Sorting/Heading"]);
+		optionsAddObject(-20, 1*13, "font#tl:15:%y#" .. L["CT_BuffMod/Options/Window/Sorting/Heading"]);
 
 		-- Sort method
-		optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#" .. module.text["CT_BuffMod/Options/Window/Sorting/SortMethodLabel"]);
-		optionsAddObject( 15,   20, "dropdown#tl:140:%y#s:100:%s#n:CT_BuffModDropdown_sortMethod#i:sortMethod#o:sortMethod:" .. constants.SORT_METHOD_NAME .. module.text["CT_BuffMod/Options/Window/Sorting/SortMethodDropdown"]);
+		optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Sorting/SortMethodLabel"]);
+		optionsAddObject( 15,   20, "dropdown#tl:140:%y#s:100:%s#n:CT_BuffModDropdown_sortMethod#i:sortMethod#o:sortMethod:" .. constants.SORT_METHOD_NAME .. L["CT_BuffMod/Options/Window/Sorting/SortMethodDropdown"]);
 
 		-- Sort direction
-		optionsAddObject(  0,   26, "checkbutton#tl:33:%y#i:sortDirection#o:sortDirection#" .. module.text["CT_BuffMod/Options/Window/Sorting/ReverseCheckbox"]);
+		optionsAddObject(  0,   26, "checkbutton#tl:33:%y#i:sortDirection#o:sortDirection#" .. L["CT_BuffMod/Options/Window/Sorting/ReverseCheckbox"]);
 
 		-- Buffs you cast
-		optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#" .. module.text["CT_BuffMod/Options/Window/Sorting/PlayerBuffsLabel"]);
+		optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Sorting/PlayerBuffsLabel"]);
 		-- Bug: Omit 3rd menu item while waiting for Blizzard to fix the "Sort with others" bug
 		--
 		--      Note: As of WoW 4.3 they have fixed the bug related to this attribute.
 		--	      I've added the third option and made SEPARATE_OWN_WITH the default instead of SEPARATE_OWN_BEFORE.
 		--
-		optionsAddObject( 15,   20, "dropdown#tl:140:%y#s:130:%s#n:CT_BuffModDropdown_separateOwn#i:separateOwn#o:separateOwn:" .. constants.SEPARATE_OWN_WITH .. module.text["CT_BuffMod/Options/Window/Sorting/PlayerBuffsDropdown"]);
+		optionsAddObject( 15,   20, "dropdown#tl:140:%y#s:130:%s#n:CT_BuffModDropdown_separateOwn#i:separateOwn#o:separateOwn:" .. constants.SEPARATE_OWN_WITH .. L["CT_BuffMod/Options/Window/Sorting/PlayerBuffsDropdown"]);
 
 		-- Sort zero duration buffs
-		optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#i:separateZeroText#" .. module.text["CT_BuffMod/Options/Window/Sorting/NonExpiringBuffsLabel"]);
-		optionsAddObject( 15,   20, "dropdown#tl:140:%y#s:130:%s#n:CT_BuffModDropdown_separateZero#i:separateZero#o:separateZero:" .. constants.SEPARATE_ZERO_WITH .. module.text["CT_BuffMod/Options/Window/Sorting/NonExpiringBuffsDropdown"]);
+		optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#i:separateZeroText#" .. L["CT_BuffMod/Options/Window/Sorting/NonExpiringBuffsLabel"]);
+		optionsAddObject( 15,   20, "dropdown#tl:140:%y#s:130:%s#n:CT_BuffModDropdown_separateZero#i:separateZero#o:separateZero:" .. constants.SEPARATE_ZERO_WITH .. L["CT_BuffMod/Options/Window/Sorting/NonExpiringBuffsDropdown"]);
 
 		-- Group by
 		do
-			local menu = module.text["CT_BuffMod/Options/Window/Sorting/OrderDropdown"]; -- "#None#Debuffs#Cancelable buffs#Uncancelable buffs#All buffs#Weapons" -- the 7th option was previously #Consolidated, but that does nothing any more
+			local menu = L["CT_BuffMod/Options/Window/Sorting/OrderDropdown"]; -- "#None#Debuffs#Cancelable buffs#Uncancelable buffs#All buffs#Weapons" -- the 7th option was previously #Consolidated, but that does nothing any more
 
-			optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#" .. module.text["CT_BuffMod/Options/Window/Sorting/OrderLabel"]);
+			optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Sorting/OrderLabel"]);
 
-			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#" .. module.text["CT_BuffMod/Options/Window/Sorting/Order1Label"]);
+			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Sorting/Order1Label"]);
 			optionsAddObject( 15,   20, "dropdown#tl:110:%y#s:140:%s#n:CT_BuffModDropdown_sortSeq1#i:sortSeq1#o:sortSeq1:" .. constants.FILTER_TYPE_DEBUFF .. menu);
 
-			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#" .. module.text["CT_BuffMod/Options/Window/Sorting/Order2Label"]);
+			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Sorting/Order2Label"]);
 			optionsAddObject( 15,   20, "dropdown#tl:110:%y#s:140:%s#n:CT_BuffModDropdown_sortSeq2#i:sortSeq2#o:sortSeq2:" .. constants.FILTER_TYPE_WEAPON .. menu);
 
-			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#" .. module.text["CT_BuffMod/Options/Window/Sorting/Order3Label"]);
+			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Sorting/Order3Label"]);
 			optionsAddObject( 15,   20, "dropdown#tl:110:%y#s:140:%s#n:CT_BuffModDropdown_sortSeq3#i:sortSeq3#o:sortSeq3:" .. constants.FILTER_TYPE_BUFF_CANCELABLE .. menu);
 
-			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#" .. module.text["CT_BuffMod/Options/Window/Sorting/Order4Label"]);
+			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Sorting/Order4Label"]);
 			optionsAddObject( 15,   20, "dropdown#tl:110:%y#s:140:%s#n:CT_BuffModDropdown_sortSeq4#i:sortSeq4#o:sortSeq4:" .. constants.FILTER_TYPE_BUFF_UNCANCELABLE .. menu);
 
-			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#" .. module.text["CT_BuffMod/Options/Window/Sorting/Order5Label"]);
+			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Sorting/Order5Label"]);
 			optionsAddObject( 15,   20, "dropdown#tl:110:%y#s:140:%s#n:CT_BuffModDropdown_sortSeq5#i:sortSeq5#o:sortSeq5:" .. constants.FILTER_TYPE_NONE .. menu);
 		end
 
@@ -10212,49 +10215,37 @@ CONSOLIDATION REMOVED FROM GAME--]]
 		----------
 		-- Background
 		----------
-		optionsAddObject(-25, 1*13, "font#tl:15:%y#Window Background");
+		optionsAddObject(-25, 1*13, "font#tl:15:%y#" .. L["CT_BuffMod/Options/Window/Background/Heading"]);
 
 		-- Backdrop
-		optionsAddObject(-10,   26, "checkbutton#tl:30:%y#i:showBackground#o:showBackground:true#Show background");
-		optionsAddObject(  6,   26, "checkbutton#tl:30:%y#i:useCustomBackgroundColor#o:useCustomBackgroundColor#Use a custom background color");
+		optionsAddObject(-10,   26, "checkbutton#tl:30:%y#i:showBackground#o:showBackground:true#" .. L["CT_BuffMod/Options/Window/Background/ShowBackgroundCheckbox"]);
+		optionsAddObject(  6,   26, "checkbutton#tl:30:%y#i:useCustomBackgroundColor#o:useCustomBackgroundColor#" .. L["CT_BuffMod/Options/Window/Background/CustomColorCheckbox"]);
 		optionsAddObject( -2,   16, "colorswatch#tl:65:%y#s:16:16#i:windowBackgroundColor#o:windowBackgroundColor:" .. defaultWindowColor[1] .. "," .. defaultWindowColor[2] .. "," .. defaultWindowColor[3] .. "," .. defaultWindowColor[4] .. "#true");
-		optionsAddObject( 14,   15, "font#tl:90:%y#v:ChatFontNormal#Background color for this window");
+		optionsAddObject( 14,   15, "font#tl:90:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Background/CustomColorLabel"]);
 
 		----------
 		-- Border
 		----------
-		optionsAddObject(-15, 1*13, "font#tl:15:%y#Border");
+		optionsAddObject(-15, 1*13, "font#tl:15:%y#" .. L["CT_BuffMod/Options/Window/Border/Heading"]);
 
-		optionsAddObject(-10,   26, "checkbutton#tl:35:%y#i:showBorder#o:showBorder#Show border edge texture");
-		optionsAddObject(-15,   17, "slider#tl:40:%y#s:250:%s#i:userEdgeLeft#o:userEdgeLeft:0#Left border = <value>#0:100:1");
-		optionsAddObject(-20,   17, "slider#tl:40:%y#s:250:%s#i:userEdgeRight#o:userEdgeRight:0#Right border = <value>#0:100:1");
-		optionsAddObject(-20,   17, "slider#tl:40:%y#s:250:%s#i:userEdgeTop#o:userEdgeTop:0#Top border = <value>#0:100:1");
-		optionsAddObject(-20,   17, "slider#tl:40:%y#s:250:%s#i:userEdgeBottom#o:userEdgeBottom:0#Bottom border = <value>#0:100:1");
+		optionsAddObject(-10,   26, "checkbutton#tl:35:%y#i:showBorder#o:showBorder#" .. L["CT_BuffMod/Options/Window/Border/ShowBorderCheckbox"]);
+		optionsAddObject(-15,   17, "slider#tl:40:%y#s:250:%s#i:userEdgeLeft#o:userEdgeLeft:0#" .. L["CT_BuffMod/Options/Window/Border/LeftSliderValue"] .. "#0:100:1");
+		optionsAddObject(-20,   17, "slider#tl:40:%y#s:250:%s#i:userEdgeRight#o:userEdgeRight:0#" .. L["CT_BuffMod/Options/Window/Border/RightSliderValue"] .. "#0:100:1");
+		optionsAddObject(-20,   17, "slider#tl:40:%y#s:250:%s#i:userEdgeTop#o:userEdgeTop:0#" .. L["CT_BuffMod/Options/Window/Border/TopSliderValue"] .. "#0:100:1");
+		optionsAddObject(-20,   17, "slider#tl:40:%y#s:250:%s#i:userEdgeBottom#o:userEdgeBottom:0#" .. L["CT_BuffMod/Options/Window/Border/BottomSliderValue"] .. "#0:100:1");
 
 		----------
 		-- Layout
 		----------
 
-		optionsAddObject(-25, 1*13, "font#tl:15:%y#Layout");
+		optionsAddObject(-25, 1*13, "font#tl:15:%y#" .. L["CT_BuffMod/Options/Window/Layout/Heading"]);
 
 		optionsBeginFrame(  15,   20, "button#tl:250:%y#s:40:%s#i:layoutHelp1#v:UIPanelButtonTemplate#?");
 			optionsAddScript("onenter",
 				function(self)
 					GameTooltip:SetOwner(self, "ANCHOR_RIGHT", 35, 0);
-					GameTooltip:SetText("Layout");
-					GameTooltip:AddLine("The layout determines how the buff buttons will be arranged within the window.", 1, 1, 1, true);
-					GameTooltip:AddLine("\nThe name of each layout type describes the direction that the buffs are arranged, and where the next buff will appear when a wrap occurs.", 1, 1, 1, true);
-					GameTooltip:AddLine("\nA wrap will occur when there is no more room to display buffs in the current row or column.", 1, 1, 1, true);
-					GameTooltip:AddLine("\nThe 'Top to bottom' and 'Bottom to top' layouts arrange the buffs vertically in fixed height columns. These types of layouts allow for a fixed or variable number of columns.", 1, 1, 1, true);
-					GameTooltip:AddLine("\nThe 'Left to right' and 'Right to left' layouts arrange the buffs horizontally in fixed width rows. These types of layouts allow for a fixed or variable number of rows.", 1, 1, 1, true);
-					GameTooltip:AddLine("\nTo create a single column window that automatically changes height:", 1, 0.82, 0, true);
-					GameTooltip:AddLine("\n1) Select one of the 'Left to right' or 'Right to left' layouts.", 1, 1, 1, true);
-					GameTooltip:AddLine("\n2) Set the number of buffs per row to 1.", 1, 1, 1, true);
-					GameTooltip:AddLine("\n3) Set the number of rows to 0.", 1, 1, 1, true);
-					GameTooltip:AddLine("\nTo create a single column window with a height that does not change:", 1, 0.82, 0, true);
-					GameTooltip:AddLine("\n1) Select one of the 'Top to bottom' or 'Bottom to top' layouts.", 1, 1, 1, true);
-					GameTooltip:AddLine("\n2) Set the number of buffs per column to your desired maximum.", 1, 1, 1, true);
-					GameTooltip:AddLine("\n3) Set the number of columns to 1.", 1, 1, 1, true);
+					GameTooltip:SetText(L["CT_BuffMod/Options/Window/Layout/Heading"]);
+					GameTooltip:AddLine(L["CT_BuffMod/Options/Window/Layout/Tooltip"]);
 					GameTooltip:Show();
 				end
 			);
@@ -10271,7 +10262,7 @@ CONSOLIDATION REMOVED FROM GAME--]]
 			for i, text in ipairs(constants.LAYOUT_MENU_TEXT) do
 				temp = temp .. "#" .. text;
 			end
-			optionsAddObject(-20,   14, "font#tl:35:%y#v:ChatFontNormal#Layout:");
+			optionsAddObject(-20,   14, "font#tl:35:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Layout/LayoutDropdownLabel"]);
 			optionsAddObject( 15,   20, "dropdown#tl:80:%y#s:180:%s#n:CT_BuffModDropdown_layoutType#i:layoutType#o:layoutType:" .. constants.DEFAULT_LAYOUT .. temp);
 		end
 
@@ -10281,7 +10272,7 @@ CONSOLIDATION REMOVED FROM GAME--]]
 		optionsAddObject(-25,   17, "slider#tl:40:%y#s:250:%s#i:wrapAfter#o:wrapAfter:" .. constants.DEFAULT_WRAP_AFTER .. "#<value>#1:50:1");
 
 		-- Number of wraps
-		optionsAddObject(-25,   17, "slider#tl:40:%y#s:250:%s#i:maxWraps#o:maxWraps:" .. constants.DEFAULT_MAX_WRAPS .. "#<value>#0:50:1");
+		optionsAddObject(-25,   17, "slider#tl:40:%y#s:250:%s#i:maxWraps#o:maxWraps:" .. constants.DEFAULT_MAX_WRAPS .. "#<value>:" .. L["CT_BuffMod/Options/Window/Layout/MaxWrapsSliderAuto"] .. ":50#0:50:1");
 
 		-- Buff spacing
 		optionsAddObject(-25,   17, "slider#tl:40:%y#s:250:%s#i:buffSpacing#o:buffSpacing:0#Buff spacing = <value>#0:200:1");
@@ -10298,7 +10289,7 @@ CONSOLIDATION REMOVED FROM GAME--]]
 
 		-- Button style
 		optionsAddObject(-20,   14, "font#tl:28:%y#v:ChatFontNormal#Use style:");
-		optionsBeginFrame( 15,   20, "dropdown#tl:80:%y#s:170:%s#n:CT_BuffModDropdown_buttonStyle#i:buttonStyle#o:buttonStyle:1#Style 1 (icon and bar)#Style 2 (icon and time)");
+		optionsBeginFrame( 15,   20, "dropdown#tl:80:%y#s:170:%s#n:CT_BuffModDropdown_buttonStyle#i:buttonStyle#o:buttonStyle:1#" .. L["CT_BuffMod/Options/Window/Button/Style1/Heading"] .. "#" .. L["CT_BuffMod/Options/Window/Button/Style2/Heading"]);
 			local elapsedbuttonstyle = 0;
 			optionsAddScript("onupdate",
 				function(self, elapsed)
@@ -10402,97 +10393,141 @@ CONSOLIDATION REMOVED FROM GAME--]]
 
 
 		-- Style 1
-		optionsAddObject(-20, 1*13, "font#tl:22:%y#n:CT_BuffMod_Style1Label#Style 1 (icon and bar)");
+		optionsAddObject(-20, 1*13, "font#tl:22:%y#n:CT_BuffMod_Style1Label#" .. L["CT_BuffMod/Options/Window/Button/Style1/Heading"]);
 
 		
 		-- Size of the icon
-		optionsAddObject(-20,   14, "font#tl:35:%y#v:ChatFontNormal#n:CT_BuffMod_Style1SizeLabel#Size of the icon:");
+		optionsAddObject(-20,   14, "font#tl:35:%y#v:ChatFontNormal#n:CT_BuffMod_Style1SizeLabel#" .. L["CT_BuffMod/Options/Window/Button/General/IconSizeSliderLabel"]);
 		optionsAddObject( 15,   17, "slider#tl:165:%y#s:120:%s#i:buffSize1#o:buffSize1:" .. constants.BUFF_SIZE_DEFAULT .. "#<value>#" .. constants.BUFF_SIZE_MINIMUM ..":" .. constants.BUFF_SIZE_MAXIMUM .. ":1");
 
 		-- Icon position
-		optionsAddObject(-20,   15, "font#tl:35:%y#n:CT_BuffMod_Style1PositionLabel#v:ChatFontNormal#Icon position:");
-		optionsAddObject( 15,   20, "dropdown#tl:140:%y#s:120:%s#n:CT_BuffModDropdown_rightAlign1#i:rightAlign1#o:rightAlign1:" .. constants.RIGHT_ALIGN_DEFAULT .. "#Default#Left side#Right side");
+		optionsAddObject(-20,   15, "font#tl:35:%y#n:CT_BuffMod_Style1PositionLabel#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Button/Style1/IconPositionLabel"]);
+		optionsAddObject( 15,   20, "dropdown#tl:140:%y#s:120:%s#n:CT_BuffModDropdown_rightAlign1#i:rightAlign1#o:rightAlign1:" .. constants.RIGHT_ALIGN_DEFAULT .. L["CT_BuffMod/Options/Window/Button/Style1/IconPositionDropdown"]);
 
 		-- Color code border of debuff icons
-		optionsAddObject( -5,   26, "checkbutton#tl:30:%y#i:colorCodeIcons1#o:colorCodeIcons1#Color code the border of debuff icons");
+		optionsBeginFrame( -5,   26, "checkbutton#tl:30:%y#i:colorCodeIcons1#o:colorCodeIcons1#" .. L["CT_BuffMod/Options/Window/Button/General/DebuffBorderColorCheckbox"]);
+			optionsAddScript("onenter",
+				function(button)
+					module:displayTooltip(button, {L["CT_BuffMod/Options/Window/Button/General/DebuffBorderColorCheckbox"],L["CT_BuffMod/Options/Window/Button/General/DebuffColorTooltip"]}, "ANCHOR_TOPLEFTw");
+				end
+			);
+			optionsAddScript("onleave",
+				function()
+					module:hideTooltip();
+				end
+			);
+		optionsEndFrame();
 
 		-- Detail frame width
 		optionsAddObject(-20,   17, "slider#tl:40:%y#s:250:%s#i:detailWidth1#o:detailWidth1:" .. constants.DEFAULT_DETAIL_WIDTH .. "#Bar width = <value>#0:400:1");
 
 		-- Color the background of the bar
 		-- 	Color code debuff backgrounds
-		optionsAddObject(-15,   26, "checkbutton#tl:30:%y#i:colorBuffs1#o:colorBuffs1:true#Color the background of the bar");
-		optionsAddObject(  6,   26, "checkbutton#tl:66:%y#i:colorCodeBackground1#o:colorCodeBackground1#Color code debuff bars");
+		optionsAddObject(-15,   26, "checkbutton#tl:30:%y#i:colorBuffs1#o:colorBuffs1:true#" .. L["CT_BuffMod/Options/Window/Button/Style1/BarBackgroundCheckbox"]);
+		optionsBeginFrame(  6,   26, "checkbutton#tl:44:%y#i:colorCodeBackground1#o:colorCodeBackground1#" .. L["CT_BuffMod/Options/Window/Button/Style1/DebuffBarBackgroundCheckbox"]);
+			optionsAddScript("onenter",
+				function(button)
+					module:displayTooltip(button, {L["CT_BuffMod/Options/Window/Button/Style1/DebuffBarBackgroundCheckbox"],L["CT_BuffMod/Options/Window/Button/General/DebuffColorTooltip"]}, "ANCHOR_TOPLEFTw");
+				end
+			);
+			optionsAddScript("onleave",
+				function()
+					module:hideTooltip();
+				end
+			);
+		optionsEndFrame();
+
 
 		-- Show name
 		--	Color code debuff names
 		--	Justify (beside time)
 		-- 	Justify (when alone)
-		optionsAddObject( -5,   26, "checkbutton#tl:30:%y#i:showNames1#o:showNames1:true#Show name");
-		optionsAddObject(  6,   26, "checkbutton#tl:66:%y#i:colorCodeDebuffs1#o:colorCodeDebuffs1#Color code debuff names");
+		optionsAddObject( -5,   26, "checkbutton#tl:30:%y#i:showNames1#o:showNames1:true#" .. L["CT_BuffMod/Options/Window/Button/Style1/ShowNameCheckbox"]);
+		optionsBeginFrame(  6,   26, "checkbutton#tl:44:%y#i:colorCodeDebuffs1#o:colorCodeDebuffs1#" .. L["CT_BuffMod/Options/Window/Button/Style1/DebuffNameCheckbox"]);
+			optionsAddScript("onenter",
+				function(button)
+					module:displayTooltip(button, {L["CT_BuffMod/Options/Window/Button/Style1/DebuffNameCheckbox"],L["CT_BuffMod/Options/Window/Button/General/DebuffColorTooltip"]}, "ANCHOR_TOPLEFTw");
+				end
+			);
+			optionsAddScript("onleave",
+				function()
+					module:hideTooltip();
+				end
+			);
+		optionsEndFrame();
+		optionsAddObject( -3,   15, "font#tl:48:%y#v:ChatFontNormal#n:CT_BuffMod_Style1JustifyLabel1#" .. L["CT_BuffMod/Options/Window/Button/Style1/JustifyNotAloneLabel"]);
+		optionsAddObject( 15,   20, "dropdown#tl:180:%y#s:80:%s#n:CT_BuffModDropdown_nameJustifyWithTime1#i:nameJustifyWithTime1#o:nameJustifyWithTime1:" .. constants.JUSTIFY_DEFAULT .. L["CT_BuffMod/Options/Window/Button/Style1/JustifyDropdown"]);
 
-		optionsAddObject( -3,   15, "font#tl:70:%y#v:ChatFontNormal#n:CT_BuffMod_Style1JustifyLabel1#Justify (beside time):");
-		optionsAddObject( 15,   20, "dropdown#tl:180:%y#s:80:%s#n:CT_BuffModDropdown_nameJustifyWithTime1#i:nameJustifyWithTime1#o:nameJustifyWithTime1:" .. constants.JUSTIFY_DEFAULT .. "#Default#Left#Right#Center");
-
-		optionsAddObject( -5,   15, "font#tl:70:%y#v:ChatFontNormal#n:CT_BuffMod_Style1JustifyLabel2#Justify (when alone):");
-		optionsAddObject( 15,   20, "dropdown#tl:180:%y#s:80:%s#n:CT_BuffModDropdown_nameJustifyNoTime1#i:nameJustifyNoTime1#o:nameJustifyNoTime1:" .. constants.JUSTIFY_DEFAULT .. "#Default#Left#Right#Center");
+		optionsAddObject( -5,   15, "font#tl:48:%y#v:ChatFontNormal#n:CT_BuffMod_Style1JustifyLabel2#" .. L["CT_BuffMod/Options/Window/Button/Style1/JustifyAloneLabel"]);
+		optionsAddObject( 15,   20, "dropdown#tl:180:%y#s:80:%s#n:CT_BuffModDropdown_nameJustifyNoTime1#i:nameJustifyNoTime1#o:nameJustifyNoTime1:" .. constants.JUSTIFY_DEFAULT .. L["CT_BuffMod/Options/Window/Button/Style1/JustifyDropdown"]);
 
 		-- Show time remaining text
 		--	Format
 		--	Location
 		--	Justify (when alone)
-		optionsAddObject( -5,   26, "checkbutton#tl:30:%y#i:showTimers1#o:showTimers1:true#Show time remaining text");
+		optionsAddObject( -5,   26, "checkbutton#tl:30:%y#i:showTimers1#o:showTimers1:true#" .. L["CT_BuffMod/Options/Window/Button/General/TimeRemainingCheckbox"]);
 
-		optionsAddObject( -3,   15, "font#tl:70:%y#v:ChatFontNormal#n:CT_BuffMod_Style1FormatLabel#Format:");
-		optionsAddObject( 15,   20, "dropdown#tl:115:%y#s:145:%s#n:CT_BuffModDropdown_durationFormat1#i:durationFormat1#o:durationFormat1:1#" .. module.text["CT_BuffMod/Options/Window/Time Remaining/Duration Format Dropdown"]);
+		optionsAddObject( -3,   15, "font#tl:48:%y#v:ChatFontNormal#n:CT_BuffMod_Style1FormatLabel#Format:");
+		optionsAddObject( 15,   20, "dropdown#tl:115:%y#s:145:%s#n:CT_BuffModDropdown_durationFormat1#i:durationFormat1#o:durationFormat1:1#" .. L["CT_BuffMod/Options/Window/Time Remaining/Duration Format Dropdown"]);
 		
-		optionsAddObject(  6,   26, "checkbutton#tl:66:%y#i:CTBuffMod_showDaysFormat1#o:showDays1:true#Show days if >24 hours");
+		optionsAddObject(  6,   26, "checkbutton#tl:44:%y#i:CTBuffMod_showDaysFormat1#o:showDays1:true#" .. L["CT_BuffMod/Options/Window/Button/General/ShowDaysCheckbox"]);
 		
-		optionsAddObject( -5,   15, "font#tl:70:%y#v:ChatFontNormal#n:CT_BuffMod_Style1LocationLabel#Location:");
+		optionsAddObject( -5,   15, "font#tl:48:%y#v:ChatFontNormal#n:CT_BuffMod_Style1LocationLabel#" .. L["CT_BuffMod/Options/Window/Button/General/TimeLocationLabel"]);
 		optionsAddObject( 15,   20, "dropdown#tl:115:%y#s:145:%s#n:CT_BuffModDropdown_durationLocation1#i:durationLocation1#o:durationLocation1:" .. constants.DURATION_LOCATION_DEFAULT .. "#Default#Left of the name#Right of the name#Above the name#Below the name");
 
-		optionsAddObject( -5,   15, "font#tl:70:%y#v:ChatFontNormal#n:CT_BuffMod_Style1JustifyLabel3#Justify (when alone):");
-		optionsAddObject( 15,   20, "dropdown#tl:180:%y#s:80:%s#n:CT_BuffModDropdown_timeJustifyNoName1#i:timeJustifyNoName1#o:timeJustifyNoName1:" .. constants.JUSTIFY_DEFAULT .. "#Default#Left#Right#Center");
+		optionsAddObject( -5,   15, "font#tl:48:%y#v:ChatFontNormal#n:CT_BuffMod_Style1JustifyLabel3#" .. L["CT_BuffMod/Options/Window/Button/Style1/JustifyAloneLabel"]);
+		optionsAddObject( 15,   20, "dropdown#tl:180:%y#s:80:%s#n:CT_BuffModDropdown_timeJustifyNoName1#i:timeJustifyNoName1#o:timeJustifyNoName1:" .. constants.JUSTIFY_DEFAULT .. L["CT_BuffMod/Options/Window/Button/Style1/JustifyDropdown"]);
 
 		-- Show time remaining bar
 		-- 	Show the bar's background
-		optionsAddObject( -5,   26, "checkbutton#tl:30:%y#i:showBuffTimer1#o:showBuffTimer1:true#Show time remaining bar");
-		optionsAddObject(  6,   26, "checkbutton#tl:66:%y#i:showTimerBackground1#o:showTimerBackground1:true#Show the bar's background");
+		optionsAddObject( -5,   26, "checkbutton#tl:30:%y#i:showBuffTimer1#o:showBuffTimer1:true#" .. L["CT_BuffMod/Options/Window/Button/Style1/TimeRemainingBarCheckbox"]);
+		optionsAddObject(  6,   26, "checkbutton#tl:44:%y#i:showTimerBackground1#o:showTimerBackground1:true#" .. L["CT_BuffMod/Options/Window/Button/Style1/TimeRemainingBarBackgroundCheckbox"]);
 
 		-- Spacing between left side of detail frame and text
-		optionsAddObject(-15,   14, "font#tl:35:%y#v:ChatFontNormal#n:CT_BuffMod_Style1OffsetLabel1#Text offset (left side):");
+		optionsAddObject(-15,   14, "font#tl:48:%y#v:ChatFontNormal#n:CT_BuffMod_Style1OffsetLabel1#" .. L["CT_BuffMod/Options/Window/Button/Style1/LeftOffsetLabel"]);
 		optionsAddObject( 15,   17, "slider#tl:190:%y#s:100:%s#i:spacingOnLeft1#o:spacingOnLeft1:0#<value>#0:50:1");
 
 		-- Spacing between right side of detail frame and text
-		optionsAddObject(-20,   14, "font#tl:35:%y#v:ChatFontNormal#n:CT_BuffMod_Style1OffsetLabel2#Text offset (right side):");
+		optionsAddObject(-20,   14, "font#tl:48:%y#v:ChatFontNormal#n:CT_BuffMod_Style1OffsetLabel2#" .. L["CT_BuffMod/Options/Window/Button/Style1/RightOffsetLabel"]);
 		optionsAddObject( 15,   17, "slider#tl:190:%y#s:100:%s#i:spacingOnRight1#o:spacingOnRight1:0#<value>#0:50:1");
 
 
 		-- Style 2
-		optionsAddObject(517, 1*13, "font#tl:22:%y#n:CT_BuffMod_Style2Label#Style 2 (icon and time)");
+		optionsAddObject(517, 1*13, "font#tl:22:%y#n:CT_BuffMod_Style2Label#" .. L["CT_BuffMod/Options/Window/Button/Style2/Heading"]);
 
 		-- Icon size
-		optionsAddObject(-20,   14, "font#tl:35:%y#n:CT_BuffMod_Style2SizeLabel#v:ChatFontNormal#Size of the icon:");
+		optionsAddObject(-20,   14, "font#tl:35:%y#n:CT_BuffMod_Style2SizeLabel#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Button/General/IconSizeSliderLabel"]);
 		optionsAddObject( 15,   17, "slider#tl:165:%y#s:120:%s#i:buffSize2#o:buffSize2:" .. constants.BUFF_SIZE_DEFAULT .. "#<value>#" .. constants.BUFF_SIZE_MINIMUM ..":" .. constants.BUFF_SIZE_MAXIMUM .. ":1");
 
 		-- Color code border of debuff icons
-		optionsAddObject(-15,   26, "checkbutton#tl:30:%y#i:colorCodeIcons2#o:colorCodeIcons2#Color code the border of debuff icons");
-
+		optionsBeginFrame(-15,   26, "checkbutton#tl:30:%y#i:colorCodeIcons2#o:colorCodeIcons2#" .. L["CT_BuffMod/Options/Window/Button/General/DebuffBorderColorCheckbox"]);
+			optionsAddScript("onenter",
+				function(button)
+					module:displayTooltip(button, {L["CT_BuffMod/Options/Window/Button/General/DebuffBorderColorCheckbox"],L["CT_BuffMod/Options/Window/Button/General/DebuffColorTooltip"]}, "ANCHOR_TOPLEFTw");
+				end
+			);
+			optionsAddScript("onleave",
+				function()
+					module:hideTooltip();
+				end
+			);
+		optionsEndFrame();
+		
 		-- Show time remaining text
 		--	Format
 		--	Location
-		optionsAddObject( -6,   26, "checkbutton#tl:30:%y#i:showTimers2#o:showTimers2:true#Show time remaining text");
+		optionsAddObject( -6,   26, "checkbutton#tl:30:%y#i:showTimers2#o:showTimers2:true#" .. L["CT_BuffMod/Options/Window/Button/General/TimeRemainingCheckbox"]);
 
-		optionsAddObject( -2,   15, "font#tl:70:%y#n:CT_BuffMod_Style2FormatLabel#v:ChatFontNormal#Format:");
-		optionsAddObject( 12,   20, "dropdown#tl:115:%y#s:145:%s#n:CT_BuffModDropdown_durationFormat2#i:durationFormat2#o:durationFormat2:1#" .. module.text["CT_BuffMod/Options/Window/Time Remaining/Duration Format Dropdown"]);
+		optionsAddObject( -2,   15, "font#tl:70:%y#n:CT_BuffMod_Style2FormatLabel#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Button/General/TimeFormatLabel"]);
+		optionsAddObject( 12,   20, "dropdown#tl:115:%y#s:145:%s#n:CT_BuffModDropdown_durationFormat2#i:durationFormat2#o:durationFormat2:1#" .. L["CT_BuffMod/Options/Window/Time Remaining/Duration Format Dropdown"]);
 		
-		optionsAddObject(  6,   26, "checkbutton#tl:66:%y#i:CTBuffMod_showDaysFormat2#o:showDays2:true#Show days if >24 hours");
+		optionsAddObject(  6,   26, "checkbutton#tl:44:%y#i:CTBuffMod_showDaysFormat2#o:showDays2:true#" .. L["CT_BuffMod/Options/Window/Button/General/ShowDaysCheckbox"]);
 		
-		optionsAddObject( -6,   15, "font#tl:70:%y#n:CT_BuffMod_Style2LocationLabel#v:ChatFontNormal#Location:");
-		optionsAddObject( 12,   20, "dropdown#tl:115:%y#s:145:%s#n:CT_BuffModDropdown_dataSide2#i:dataSide2#o:dataSide2:" .. constants.DATA_SIDE_BOTTOM .. "#Left#Right#Above#Below#Center");
+		optionsAddObject( -6,   15, "font#tl:48:%y#n:CT_BuffMod_Style2LocationLabel#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Button/General/TimeLocationLabel"]);
+		optionsAddObject( 12,   20, "dropdown#tl:115:%y#s:145:%s#n:CT_BuffModDropdown_dataSide2#i:dataSide2#o:dataSide2:" .. constants.DATA_SIDE_BOTTOM .. L["CT_BuffMod/Options/Window/Button/Style2/TimeLocationDropdown"]);
 
 		-- Spacing between icon and text
-		optionsAddObject(-17,   14, "font#tl:70:%y#n:CT_BuffMod_Style2OffsetLabel#v:ChatFontNormal#Offset from icon:");
+		optionsAddObject(-17,   14, "font#tl:48:%y#n:CT_BuffMod_Style2OffsetLabel#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Button/Style2/OffsetLabel"]);
 		optionsBeginFrame(15,   17, "slider#tl:190:%y#s:100:%s#i:spacingFromIcon2#o:spacingFromIcon2:0#<value>#0:50:1");
 			optionsAddScript("onupdate",
 				function(self)
