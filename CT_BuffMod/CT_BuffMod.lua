@@ -9636,7 +9636,7 @@ CONSOLIDATION REMOVED FROM GAME --]]
 	optionsBeginFrame(-15, 0, "frame#tl:0:%y#br:tr:0:%b");
 		optionsAddObject( -0,   13, "font#tl:15:%y#v:GameFontNormal#" .. L["CT_BuffMod/Options/General/Expiration/Heading"]);
 
-		optionsAddObject(-15,   14, "font#tl:30:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/General/Expiration/FlashSliderLabel"]);
+		optionsAddObject(-22,   7, "font#l:tl:30:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/General/Expiration/FlashSliderLabel"]);
 		optionsBeginFrame(15,   17, "slider#tl:175:%y#tr:-5:%y#i:flashTime#o:flashTime:" .. constants.DEFAULT_FLASH_TIME .. "#<value> seconds:" .. L["CT_BuffMod/TimeFormat/Off"] .. ":" .. format(L["CT_BuffMod/TimeFormat/Minutes Smaller"],1) .. "#0:60:1");
 			optionsAddScript("onvaluechanged", updateFunc);
 			optionsAddScript("onload", updateFunc);
