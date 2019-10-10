@@ -138,17 +138,6 @@ constants.LAYOUT_GROW_RIGHT_WRAP_UP = 6;
 constants.LAYOUT_GROW_LEFT_WRAP_DOWN = 7;
 constants.LAYOUT_GROW_LEFT_WRAP_UP = 8;
 
-constants.LAYOUT_MENU_TEXT = {
-	"Top to bottom. Wrap right.",
-	"Top to bottom. Wrap left.",
-	"Bottom to top. Wrap right.",
-	"Bottom to top. Wrap left.",
-	"Left to right. Wrap down.",
-	"Left to right. Wrap up.",
-	"Right to left. Wrap down.",
-	"Right to left. Wrap up.",
-};
-
 constants.BUFF_SIZE_MINIMUM = 15;
 constants.BUFF_SIZE_MAXIMUM = 45;
 constants.BUFF_SIZE_DEFAULT = 20;
@@ -10258,12 +10247,8 @@ CONSOLIDATION REMOVED FROM GAME--]]
 
 		-- Layout type
 		do
-			local temp = "";
-			for i, text in ipairs(constants.LAYOUT_MENU_TEXT) do
-				temp = temp .. "#" .. text;
-			end
 			optionsAddObject(-20,   14, "font#tl:35:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Layout/LayoutDropdownLabel"]);
-			optionsAddObject( 15,   20, "dropdown#tl:80:%y#s:180:%s#n:CT_BuffModDropdown_layoutType#i:layoutType#o:layoutType:" .. constants.DEFAULT_LAYOUT .. temp);
+			optionsAddObject( 15,   20, "dropdown#tl:80:%y#s:180:%s#n:CT_BuffModDropdown_layoutType#i:layoutType#o:layoutType:" .. constants.DEFAULT_LAYOUT .. L["CT_BuffMod/Options/Window/Layout/LayoutDropdown"]);
 		end
 
 		optionsAddObject( -5, 4*14, "font#tl:35:%y#s:0:%s#i:layoutTypeText#l:13:0#r#place holder text#" .. textColor2 .. ":l");
@@ -10275,7 +10260,7 @@ CONSOLIDATION REMOVED FROM GAME--]]
 		optionsAddObject(-25,   17, "slider#tl:40:%y#s:250:%s#i:maxWraps#o:maxWraps:" .. constants.DEFAULT_MAX_WRAPS .. "#<value>:" .. L["CT_BuffMod/Options/Window/Layout/MaxWrapsSliderAuto"] .. ":50#0:50:1");
 
 		-- Buff spacing
-		optionsAddObject(-25,   17, "slider#tl:40:%y#s:250:%s#i:buffSpacing#o:buffSpacing:0#Buff spacing = <value>#0:200:1");
+		optionsAddObject(-25,   17, "slider#tl:40:%y#s:250:%s#i:buffSpacing#o:buffSpacing:0#".. L["CT_BuffMod/Options/Window/Layout/BuffSpacingSlider"] .. "#0:200:1");
 
 		-- Wrap spacing
 		optionsAddObject(-25,   17, "slider#tl:40:%y#s:250:%s#i:wrapSpacing#o:wrapSpacing:0#<value>#0:200:1");
@@ -10573,10 +10558,12 @@ CONSOLIDATION REMOVED FROM GAME--]]
 		);
 	optionsEndFrame();
 
+	
+	-- Reset Options
 	optionsBeginFrame(-200	, 0, "frame#tl:0:%y#br:tr:0:%b");
-		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Reset Options");
-		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:resetAll#Reset options for all of your characters");
-		optionsBeginFrame(  -5,   30, "button#t:0:%y#s:120:%s#v:UIPanelButtonTemplate#Reset options");
+		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_BuffMod/Options/Reset/Heading"]);
+		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:resetAll#" .. L["CT_BuffMod/Options/Reset/ResetAllCheckbox"]);
+		optionsBeginFrame(  -5,   30, "button#t:0:%y#s:120:%s#v:UIPanelButtonTemplate#" .. L["CT_BuffMod/Options/Reset/ResetButton"]);
 			optionsAddScript("onclick", function(self)
 				if (module:getOption("resetAll")) then
 					CT_BuffModOptions = {};
@@ -10590,7 +10577,7 @@ CONSOLIDATION REMOVED FROM GAME--]]
 				ConsoleExec("RELOADUI");
 			end);
 		optionsEndFrame();
-		optionsAddObject( -7, 2*15, "font#t:0:%y#s:0:%s#l#r#Note: Resetting the options to their default values will reload your UI.#" .. textColor2);
+		optionsAddObject( -7, 2*15, "font#t:0:%y#s:0:%s#l#r#" .. L["CT_BuffMod/Options/Reset/Line 1"] .. "#" .. textColor2);
 	optionsEndFrame();
 
 	optionsAddScript("onload",

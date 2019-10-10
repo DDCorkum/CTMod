@@ -52,6 +52,10 @@ L["CT_BuffMod/Options/General/Expiration/PlayerBuffsOnlyCheckbox"] = "Only buffs
 L["CT_BuffMod/Options/General/Expiration/PlaySoundCheckbox"] = "Play sound when warning appears"
 L["CT_BuffMod/Options/General/Expiration/WarningTimeHeading"] = "Show Warning At"
 L["CT_BuffMod/Options/General/Heading"] = "General Settings"
+L["CT_BuffMod/Options/Reset/Heading"] = "Reset Options"
+L["CT_BuffMod/Options/Reset/Line 1"] = "Note: This will reset the options to default and then reload your UI."
+L["CT_BuffMod/Options/Reset/ResetAllCheckbox"] = "Reset options for all of your characters"
+L["CT_BuffMod/Options/Reset/ResetButton"] = "Reset Options"
 L["CT_BuffMod/Options/Tips/Heading"] = "Tips"
 L["CT_BuffMod/Options/Tips/Line 1"] = "You can use /ctbuff or /ctbuffmod to open this options window directly."
 L["CT_BuffMod/Options/Tips/Line 2"] = "You can set and configure different windows to show the auras. Alt-click left on a window to select it."
@@ -99,11 +103,13 @@ L["CT_BuffMod/Options/Window/General/PositionLockedCheckbox"] = "Lock window so 
 L["CT_BuffMod/Options/Window/General/PositionResetButton"] = "Reset window position"
 L["CT_BuffMod/Options/Window/General/PositionResetTip"] = [=[This will place the window at
 the center of the screen.]=]
+L["CT_BuffMod/Options/Window/Layout/BuffSpacingSlider"] = "Buff spacing = <value>"
 L["CT_BuffMod/Options/Window/Layout/Heading"] = "Layout"
 L["CT_BuffMod/Options/Window/Layout/HorizontalLayoutTip"] = "For this type of layout, setting the number of rows to zero will result in a variable number of rows."
 L["CT_BuffMod/Options/Window/Layout/HorizontalMaxWrapsSlider"] = "Number of rows = <value>"
 L["CT_BuffMod/Options/Window/Layout/HorizontalWrapAfterSlider"] = "Buffs per row = <value>"
 L["CT_BuffMod/Options/Window/Layout/HorizontalWrapSpacingSlider"] = "Row spacing = <value>"
+L["CT_BuffMod/Options/Window/Layout/LayoutDropdown"] = "#Top to bottom. Wrap right.#Top to bottom. Wrap left.#Bottom to top. Wrap right.#Bottom to top. Wrap left.#Left to right. Wrap down.#Left to right. Wrap up.#Right to left. Wrap down.#Right to left. Wrap up."
 L["CT_BuffMod/Options/Window/Layout/LayoutDropdownLabel"] = "Direction:"
 L["CT_BuffMod/Options/Window/Layout/MaxWrapsSliderAuto"] = "0 (auto-expand)"
 L["CT_BuffMod/Options/Window/Layout/Tooltip"] = [=[|cFFFFFFFFLayout settings arrange buff buttons within the window.
@@ -219,15 +225,19 @@ L["CT_BuffMod/Options/General/Expiration/DurationHeading"] = "Duration de l'aura
 L["CT_BuffMod/Options/General/Expiration/FlashSliderLabel"] = [=[Clignoter l'icône 
 avant l'expiration :]=]
 L["CT_BuffMod/Options/General/Expiration/Heading"] = "L'expiration des auras"
-L["CT_BuffMod/Options/General/Expiration/PlayerBuffsOnlyCheckbox"] = "Limiter aux auras que vous renouvelez."
+L["CT_BuffMod/Options/General/Expiration/PlayerBuffsOnlyCheckbox"] = "Limiter aux auras que vous renouvelez"
 L["CT_BuffMod/Options/General/Expiration/PlaySoundCheckbox"] = "Jouer un son avec l'annonce"
 L["CT_BuffMod/Options/General/Expiration/WarningTimeHeading"] = "Temps de l'annonce"
 L["CT_BuffMod/Options/General/Heading"] = "Des options générales"
+L["CT_BuffMod/Options/Reset/Heading"] = "Réinitialiser les options"
+L["CT_BuffMod/Options/Reset/Line 1"] = "Note: Ce bouton va réinitialiser les options aux valeurs défauts et recharger l'interface"
+L["CT_BuffMod/Options/Reset/ResetAllCheckbox"] = "Réinitialiser les options pour tous les personnages"
+L["CT_BuffMod/Options/Reset/ResetButton"] = "Réinitialiser"
 L["CT_BuffMod/Options/Tips/Heading"] = "Des conseils"
 L["CT_BuffMod/Options/Tips/Line 1"] = "Vous pouvez taper /cbuff ou /ctaura pour accéder ces options."
 L["CT_BuffMod/Options/Tips/Line 2"] = "Vous pouvez placer et configurer des fenêtres différents pour montrer les auras.  Alt-clic gauche sur une fenêtre pour le sélectionner."
 L["CT_BuffMod/Options/Tips/Line 3"] = "Le plupart des options ne fonctionne que hors combat."
-L["CT_BuffMod/Options/Window/Background/CustomColorCheckbox"] = "Colorer différemment ce fenêtre"
+L["CT_BuffMod/Options/Window/Background/CustomColorCheckbox"] = "Colorer différemment cette fenêtre"
 L["CT_BuffMod/Options/Window/Background/CustomColorLabel"] = "Couleur de fond pour cette fenêtre"
 L["CT_BuffMod/Options/Window/Background/Heading"] = "La couleur de fond de cette fenêtre"
 L["CT_BuffMod/Options/Window/Background/ShowBackgroundCheckbox"] = "Montrer le fond"
@@ -373,6 +383,10 @@ L["CT_BuffMod/Options/General/Expiration/PlayerBuffsOnlyCheckbox"] = "Nur Zauber
 L["CT_BuffMod/Options/General/Expiration/PlaySoundCheckbox"] = "Sound abspielen wenn Warnung erscheint"
 L["CT_BuffMod/Options/General/Expiration/WarningTimeHeading"] = "Warnung zeigen bei"
 L["CT_BuffMod/Options/General/Heading"] = "Allgemeine Einstellungen"
+L["CT_BuffMod/Options/Reset/Heading"] = "Optionen zurücksetzen"
+L["CT_BuffMod/Options/Reset/Line 1"] = "Hinweis: Setzt Optionen auf Standardwerte zurück und lädt das Interface neu."
+L["CT_BuffMod/Options/Reset/ResetAllCheckbox"] = "Optionen für alle Charaktere zurücksetzen"
+L["CT_BuffMod/Options/Reset/ResetButton"] = "Zurücksetzen"
 L["CT_BuffMod/Options/Tips/Heading"] = "Hinweise"
 L["CT_BuffMod/Options/Tips/Line 1"] = "Durch Eingabe von  /ctbuff oder /ctbuffmod wird dieses Optionsfenster direkt geöffnet."
 L["CT_BuffMod/Options/Tips/Line 2"] = "Es können verschiedene Fenster zum Anzeigen der Auren eingestellt werden. Alt-Linksklick auf ein Fenster um es auszuwählen."
@@ -426,7 +440,14 @@ L["CT_BuffMod/Options/Window/Layout/HorizontalWrapAfterSlider"] = "Zauber pro Ze
 L["CT_BuffMod/Options/Window/Layout/HorizontalWrapSpacingSlider"] = "Zeilenabstand = <value>"
 L["CT_BuffMod/Options/Window/Layout/LayoutDropdownLabel"] = "Richtung:"
 L["CT_BuffMod/Options/Window/Layout/MaxWrapsSliderAuto"] = "0 (automatisch erweitern)"
-L["CT_BuffMod/Options/Window/Layout/Tooltip"] = "|cFFFFFFFFLegt die Anordnung der Zaubersymbole im Fenster fest. |cFFFFFFFFDie Optionen 'Oben nach unten' und 'Unten nach oben' stellen die Zauber vertikal dar, können jedoch zu weiteren Spalten führen |cFFFFFFFFDie Optionen 'Links nach rechts' und 'Rechts nach links' stellen die Zauber horizontal dar, können jedoch zu weiteren Zeilen führen |cFFFFFFFF |cFFFFCC00Standard: Eine einzelne Spalte, welche automatisch nach unten erweitert wird |cFFFFFFFF 1) Links nach rechts, abwärts sortieren |cFFFFFFFF 2) Zauber pro Zeile = 1 |cFFFFFFFF 3) Zeilenanzahl = automatisch erweitern"
+L["CT_BuffMod/Options/Window/Layout/Tooltip"] = [=[|cFFFFFFFFLegt die Anordnung der Zaubersymbole im Fenster fest. 
+|cFFFFFFFFDie Optionen 'Oben nach unten' und 'Unten nach oben' stellen die Zauber vertikal dar, können jedoch zu weiteren Spalten führen 
+|cFFFFFFFFDie Optionen 'Links nach rechts' und 'Rechts nach links' stellen die Zauber horizontal dar, können jedoch zu weiteren Zeilen führen 
+
+|cFFFFCC00Standard: Eine einzelne Spalte, welche automatisch nach unten erweitert wird 
+|cFFFFFFFF 1) Links nach rechts, abwärts sortieren 
+|cFFFFFFFF 2) Zauber pro Zeile = 1 
+|cFFFFFFFF 3) Zeilenanzahl = automatisch erweitern]=]
 L["CT_BuffMod/Options/Window/Layout/VerticalLayoutTip"] = "Für diese Anordnung resultiert das Festlegen der Spaltenanzahl auf 0 in einer variablen Anzahl von Spalten."
 L["CT_BuffMod/Options/Window/Layout/VerticalMaxWrapsSlider"] = "Spaltenanzahl = <value>"
 L["CT_BuffMod/Options/Window/Layout/VerticalWrapAfterSlider"] = "Zauber pro Spalte = <value>"
@@ -449,7 +470,15 @@ L["CT_BuffMod/Options/Window/Sorting/SortMethodLabel"] = "Sortierungsmethode:"
 L["CT_BuffMod/Options/Window/Time Remaining/Duration Format Dropdown"] = "1 Stunde - 22 Minuten#1 Stunde - 22 Min#1h - 22m#1h 11m - 22m 22s#1:11h - 22:22"
 L["CT_BuffMod/Options/Window/Unit/Heading"] = "Einheit"
 L["CT_BuffMod/Options/Window/Unit/NonSecureCheckbox"] = "Unsichere Zaubersymbole verwenden"
-L["CT_BuffMod/Options/Window/Unit/SecureTooltip/Content"] = "|cFFFFAA00Sichere Zaubersymbole: |cFFFFFFFF- Gewirkte Zauber können |cFFFFFF00jederzeit |cFFFFFFFFentfernt werden. |cFFFFFFFF- Waffenzauber können |cFFFFFF00jederzeit |cFFFFFFFFentfernt werden. |cFFFFAA00Unsichere Zaubersymbole: |cFFFFFFFF- Gewirkte Zauber können |cFFFF3333außerhalb des Kampfes |cFFFFFFFFentfernt werden. |cFFFFFFFF- Waffenzauber können |cFFFF3333NICHT |cFFFFFFFFentfernt werden. |cFFFFFFFF- Zusätzliche Sortieroptionen: 'nicht-ablaufende Zauber' |cFFFFFFFF- Kompatibilitätsmodus zum Beheben von Addon Konflikten"
+L["CT_BuffMod/Options/Window/Unit/SecureTooltip/Content"] = [=[|cFFFFAA00Sichere Zaubersymbole: 
+|cFFFFFFFF- Gewirkte Zauber können |cFFFFFF00jederzeit |cFFFFFFFFentfernt werden. 
+|cFFFFFFFF- Waffenzauber können |cFFFFFF00jederzeit |cFFFFFFFFentfernt werden. 
+
+|cFFFFAA00Unsichere Zaubersymbole: 
+|cFFFFFFFF- Gewirkte Zauber können |cFFFF3333außerhalb des Kampfes |cFFFFFFFFentfernt werden. 
+|cFFFFFFFF- Waffenzauber können |cFFFF3333NICHT |cFFFFFFFFentfernt werden. 
+|cFFFFFFFF- Zusätzliche Sortieroptionen: 'nicht-ablaufende Zauber' 
+|cFFFFFFFF- Kompatibilitätsmodus zum Beheben von Addon Konflikten]=]
 L["CT_BuffMod/Options/Window/Unit/SecureTooltip/Heading"] = "Sichere und unsichere Symbole"
 L["CT_BuffMod/Options/Window/Unit/UnitDropdownLabel"] = "Zauber zeigen für:"
 L["CT_BuffMod/Options/Window/Unit/UnitDropdownOptions"] = "#Spieler#Fahrzeug#Begleiter#Ziel#Fokus"
@@ -479,6 +508,7 @@ L["CT_BuffMod/Options/WindowControls/WindowAddedMessage"] = "Fenster %d hinzugef
 L["CT_BuffMod/Options/WindowControls/WindowClonedMessage"] = "Fenster %d mit Einstellungen von Fenster %d hinzugefügt."
 L["CT_BuffMod/Options/WindowControls/WindowDeletedMessage"] = "Fenster %d entfernt."
 L["CT_BuffMod/Options/WindowControls/WindowSelectedMessage"] = "Fenster %d ausgewählt."
+
 
 
 end
