@@ -96,6 +96,9 @@ module.version = MODULE_VERSION;
 _G[MODULE_NAME] = module;
 CT_Library:registerModule(module);
 
+module.text = module.text or { };	-- see localization.lua
+local L = module.text
+
 -- triggered by module.update("init")
 function module:init()	
 	module.CTRAFrames = NewCTRAFrames();
@@ -123,13 +126,6 @@ function module:init()
 				for i=1, 8 do
 					module:setOption("CTRAWindow1_ShowGroup" .. i, options[currSet]["persort"]["group"]["ShowGroups"][i] == 1, true);
 				end
-			--[[	-- converting from the sort order in older CTRA
-				local classes = {"Warriors", "Druids", "Mages", "Warlocks", "Rogues", "Hunters", "Priests", "Paladins", "Shamans", "DeathKnights", "Monks", "DemonHunters"};
-				for i, type in ipairs(classes) do
-					if (options[currSet]["persort"]["class"]["ShowGroups"][i] == 1) then
-						module:setOption("CTRAWindow1_Show" .. type, true, true);
-					end
-				end	--]]
 			end
 			if (options[currSet]["WindowPositions"] and options[currSet]["WindowPositions"]["CT_RAGroupDrag1"]) then
 				module:setOption("MOVABLE-CTRAWindow" .. 1, {"TOPLEFT", nil, "TOPLEFT", options[currSet]["WindowPositions"]["CT_RAGroupDrag1"][1], options[currSet]["WindowPositions"]["CT_RAGroupDrag1"][2], 1}, true);
@@ -150,8 +146,6 @@ function module:init()
 			end
 		end
 	end
-			
-	
 end
 
 -- triggered by CT_Library whenever a setting changes, and upon initialization, to call functions associated with tailoring various functionality as required
@@ -186,21 +180,13 @@ function module:frame()
 	
 	-- actual start of the options objects, ended by optionsGetData()
 	optionsInit();
-		-- Beta Test Warning
-		optionsAddObject(  -5, 1*14, "font#tl:15:%y#s:0:%s#l:13:0#r#CTRA was recently rebuilt from scratch!#1:0.8:0:l");
-		optionsAddObject(   0, 1*14, "font#tl:15:%y#s:0:%s#l:13:0#r#- Configure windows like CT_BuffMod#.8:0.4:0:l");
-		optionsAddObject(   0, 1*14, "font#tl:15:%y#s:0:%s#l:13:0#r#- Right click to apply buffs or remove debuffs#0.8:0.4:0:l");
-		optionsAddObject(   0, 1*14, "font#tl:15:%y#s:0:%s#l:13:0#r#- Removed legacy features because its 2019#0.8:0.4:0:l");
-		optionsAddObject(   0, 1*14, "font#tl:15:%y#s:0:%s#l:13:0#r#- Simpler code using modern WoW API#0.8:0.4:0:l");
-		optionsAddObject(   0, 1*14, "font#tl:15:%y#s:0:%s#l:13:0#r#- Optional use outside raids#0.8:0.4:0:l");
-		optionsAddObject( -10, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#Please provide feedback to make it better!#0.8:0.4:0:l");
-				
+		
 		-- General Features
-		optionsAddObject(-20, 17, "font#tl:5:%y#v:GameFontNormalLarge#" .. module.text["CT_RaidAssist/Options/GeneralFeatures/Heading"]);
-		optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. module.text["CT_RaidAssist/Options/GeneralFeatures/Line1"] .. "#" .. textColor2 .. ":l");
-		optionsBeginFrame(-15, 26, "checkbutton#tl:10:%y#n:CTRA_ExtendReadyChecksCheckButton#o:CTRA_ExtendReadyChecks:1#" .. module.text["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksCheckButton"]);
+		optionsAddObject(-20, 17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_RaidAssist/Options/GeneralFeatures/Heading"]);
+		optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. L["CT_RaidAssist/Options/GeneralFeatures/Line1"] .. "#" .. textColor2 .. ":l");
+		optionsBeginFrame(-15, 26, "checkbutton#tl:10:%y#n:CTRA_ExtendReadyChecksCheckButton#o:CTRA_ExtendReadyChecks:1#" .. L["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksCheckButton"]);
 			optionsAddScript("onenter", function(button)
-					module:displayTooltip(button, module.text["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksTooltip"], "ANCHOR_TOPLEFT");
+					module:displayTooltip(button, L["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksTooltip"], "ANCHOR_TOPLEFT");
 				end
 			);
 			optionsAddScript("onleave", function()
@@ -253,6 +239,12 @@ local CTRA_Configuration_Buffs =
 	{
 		{["name"] = "Trueshot Aura", ["modifier"] = "nomod", ["gameVersion"] = CT_GAME_VERSION_CLASSIC,},
 	},
+	["PALADIN"] = 
+	{
+		{["name"] = "Blessing of Kings", ["modifier"] = "nomod", ["gameVersion"] = CT_GAME_VERSION_CLASSIC,},
+		{["name"] = "Blessing of Wisdom", ["modifier"] = "mod:shift", ["gameVersion"] = CT_GAME_VERSION_CLASSIC,},
+		{["name"] = "Blessing of Might", ["modifier"] = "mod:ctrl", ["gameVersion"] = CT_GAME_VERSION_CLASSIC,},
+	}
 }
 
 -- Which spells should be cast in combat when right-clicking the player frame?  Used by CTRAPlayerFrame.  If multiple abilities have the same modifier, the first one takes precedence.
@@ -366,14 +358,14 @@ AfterNotReadyFrame:SetScript("OnEvent",
 			if (module:getOption("CTRA_ExtendReadyChecks") ~= false) then
 				if (self.status == "waiting") then
 					self:Show();
-					self.text:SetText(module.text["CT_RaidAssist/AfterNotReadyFrame/WasAFK"]);
+					self.text:SetText(L["CT_RaidAssist/AfterNotReadyFrame/WasAFK"]);
 				elseif (self.status == "notready") then
 					self:Show();
-					self.text:SetText(module.text["CT_RaidAssist/AfterNotReadyFrame/WasNotReady"]);
+					self.text:SetText(L["CT_RaidAssist/AfterNotReadyFrame/WasNotReady"]);
 				elseif (not self.status) then
 					self:Show();
 					SetPortraitTexture(AfterNotReadyFrame.portrait, "player");
-					self.text:SetText(module.text["CT_RaidAssist/AfterNotReadyFrame/MissedCheck"]);
+					self.text:SetText(L["CT_RaidAssist/AfterNotReadyFrame/MissedCheck"]);
 					self.initiator = nil;
 				end
 			else
@@ -588,18 +580,18 @@ function NewCTRAFrames()
 			optionsBeginFrame(0, 0, "frame#tl:0:%y#br:tr:0:%b");
 
 				-- Heading
-				optionsAddObject(-15,  17, "font#tl:5:%y#v:GameFontNormal#n:CTRAFrames_SelectedWindowHeading#Windows");
-				optionsAddObject(-5, 1*14, "font#tl:15:%y#s:0:%s#l:13:0#r#Each window has its own appearance.#" .. textColor2 .. ":l");
+				optionsAddObject(-15,  17, "font#tl:5:%y#v:GameFontNormal#n:CTRAFrames_SelectedWindowHeading#" .. L["CT_RaidAssist/Options/WindowControls/Heading"]);
+				optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. L["CT_RaidAssist/Options/WindowControls/Line1"] .. "#" .. textColor2 .. ":l");
 				
 				-- select which window to configure
-				optionsAddObject(-10, 14, "font#tl:15:%y#v:ChatFontNormal#Select window:");
+				optionsAddObject(-10, 14, "font#tl:15:%y#v:ChatFontNormal#" .. L["CT_RaidAssist/Options/WindowControls/SelectionLabel"]);
 				optionsBeginFrame(19, 24, "button#tl:105:%y#s:24:%s#n:CTRAFrames_PreviousWindowButton");
 					optionsAddScript("onclick",
 						function(button)
 							if (selectedWindow > 1) then
 								selectedWindow = selectedWindow - 1;
 								windows[selectedWindow]:Focus();
-								L_UIDropDownMenu_SetText(CTRAFrames_WindowSelectionDropDown, "Window " .. selectedWindow);
+								L_UIDropDownMenu_SetText(CTRAFrames_WindowSelectionDropDown, format(L["CT_RaidAssist/WindowTitle"],selectedWindow));
 								if (selectedWindow == 1) then
 									button:Disable();
 								end
@@ -623,7 +615,7 @@ function NewCTRAFrames()
 							if (selectedWindow < (module:getOption("CTRAFrames_NumEnabledWindows") or 1)) then
 								selectedWindow = selectedWindow + 1;
 								windows[selectedWindow]:Focus();
-								L_UIDropDownMenu_SetText(CTRAFrames_WindowSelectionDropDown, "Window " .. selectedWindow);
+								L_UIDropDownMenu_SetText(CTRAFrames_WindowSelectionDropDown, format(L["CT_RaidAssist/WindowTitle"],selectedWindow));
 								if (selectedWindow == (module:getOption("CTRAFrames_NumEnabledWindows") or 1)) then
 									button:Disable();
 								end
@@ -651,10 +643,11 @@ function NewCTRAFrames()
 								function(frame, level)
 									for i=1, (module:getOption("CTRAFrames_NumEnabledWindows") or 1) do
 										local dropdownEntry = { }
-										dropdownEntry.text = "Window " .. i;
+										dropdownEntry.text = format(L["CT_RaidAssist/WindowTitle"],i);
 										dropdownEntry.value = i;
 										dropdownEntry.func = function()
 											selectedWindow = i;
+											print(format(L["CT_RaidAssist/Options/WindowControls/WindowSelectedMessage"],i));
 											if ((module:getOption("CTRAFrames_NumEnabledWindows") or 1) == 1) then
 												CTRAFrames_PreviousWindowButton:Disable();
 												CTRAFrames_NextWindowButton:Disable();
@@ -669,7 +662,7 @@ function NewCTRAFrames()
 												CTRAFrames_NextWindowButton:Enable();
 											end
 											windows[i]:Focus();
-											L_UIDropDownMenu_SetText(frame, "Window " .. i);
+											L_UIDropDownMenu_SetText(frame, format(L["CT_RaidAssist/WindowTitle"],i));
 										end
 										L_UIDropDownMenu_AddButton(dropdownEntry, level);
 									end
@@ -680,7 +673,7 @@ function NewCTRAFrames()
 				optionsEndFrame();
 
 				-- create a new window
-				optionsBeginFrame(-5, 30, "button#tl:15:%y#s:80:%s#v:UIPanelButtonTemplate#Add");
+				optionsBeginFrame(-5, 30, "button#tl:15:%y#s:80:%s#v:UIPanelButtonTemplate#" .. L["CT_RaidAssist/Options/WindowControls/AddButton"]);
 					optionsAddScript("onclick", 
 						function()
 							selectedWindow = (module:getOption("CTRAFrames_NumEnabledWindows") or 1) + 1;
@@ -690,15 +683,16 @@ function NewCTRAFrames()
 							end
 							windows[selectedWindow]:Enable(selectedWindow);
 							windows[selectedWindow]:Focus();
-							L_UIDropDownMenu_SetText(CTRAFrames_WindowSelectionDropDown, "Window " .. selectedWindow);
+							L_UIDropDownMenu_SetText(CTRAFrames_WindowSelectionDropDown, format(L["CT_RaidAssist/WindowTitle"],selectedWindow));
 							CTRAFrames_DeleteWindowButton:Enable(); -- the delete button may have been previously disabled if there was only one window available
 							CTRAFrames_PreviousWindowButton:Enable();
 							CTRAFrames_NextWindowButton:Disable();
+							print(format(L["CT_RaidAssist/Options/WindowControls/WindowAddedMessage"],selectedWindow));
 						end
 					);
 					optionsAddScript("onenter",
 						function(button)
-							module:displayTooltip(button, {"Add a new window with default settings#1:0.82:1"}, "ANCHOR_TOPLEFT")
+							module:displayTooltip(button, {L["CT_RaidAssist/Options/WindowControls/AddTooltip"] .. "#1:0.82:1"}, "ANCHOR_TOPLEFT")
 						end
 					);
 					optionsAddScript("onleave",
@@ -709,7 +703,7 @@ function NewCTRAFrames()
 				optionsEndFrame();
 				
 				-- clone an existing window
-				optionsBeginFrame( 30, 30, "button#tl:110:%y#s:80:%s#v:UIPanelButtonTemplate#Clone");
+				optionsBeginFrame( 30, 30, "button#tl:110:%y#s:80:%s#v:UIPanelButtonTemplate#" .. L["CT_RaidAssist/Options/WindowControls/CloneButton"]);
 					optionsAddScript("onclick", 
 						function()
 							local windowToClone = selectedWindow;
@@ -720,15 +714,16 @@ function NewCTRAFrames()
 							end
 							windows[selectedWindow]:Enable(selectedWindow, windowToClone);
 							windows[selectedWindow]:Focus();
-							L_UIDropDownMenu_SetText(CTRAFrames_WindowSelectionDropDown, "Window " .. selectedWindow);
+							L_UIDropDownMenu_SetText(CTRAFrames_WindowSelectionDropDown, format(L["CT_RaidAssist/WindowTitle"],selectedWindow));
 							CTRAFrames_DeleteWindowButton:Enable(); -- the delete button may have been previously disabled if there was only one window available
 							CTRAFrames_PreviousWindowButton:Enable();
 							CTRAFrames_NextWindowButton:Disable();
+							print(format(L["CT_RaidAssist/Options/WindowControls/WindowClonedMessage"],selectedWindow));
 						end
 					);
 					optionsAddScript("onenter",
 						function(button)
-							module:displayTooltip(button, {"Add a new window with settings that duplicate those of the currently selected window.#1:0.82:1#w"}, "ANCHOR_TOPLEFT")
+							module:displayTooltip(button, {L["CT_RaidAssist/Options/WindowControls/CloneTooltip"] .. "#1:0.82:1#w"}, "ANCHOR_TOPLEFT")
 						end
 					);
 					optionsAddScript("onleave",
@@ -739,11 +734,16 @@ function NewCTRAFrames()
 				optionsEndFrame();
 				
 				-- delete a window
-				optionsBeginFrame( 30, 30, "button#tl:205:%y#s:80:%s#v:UIPanelButtonTemplate#Delete#n:CTRAFrames_DeleteWindowButton");
+				optionsBeginFrame( 30, 30, "button#tl:205:%y#s:80:%s#v:UIPanelButtonTemplate#" .. L["CT_RaidAssist/Options/WindowControls/DeleteButton"] .. "#n:CTRAFrames_DeleteWindowButton");
 					optionsAddScript("onclick", 
 						function(button)
 							-- make sure the user really means it, and that this isn't the very last window
-							if ((module:getOption("CTRAFrames_NumEnabledWindows") or 1) == 1 or not IsShiftKeyDown()) then
+							if ((module:getOption("CTRAFrames_NumEnabledWindows") or 1) == 1) then
+								return;
+							end
+							
+							if (not IsShiftKeyDown()) then
+								print(L["CT_RaidAssist/Options/WindowControls/DeleteTooltip"]);
 								return;
 							end
 							
@@ -766,7 +766,7 @@ function NewCTRAFrames()
 							
 							-- update the appearance of the options frame
 							windows[selectedWindow]:Focus(); -- the options panel should now focus on this window
-							L_UIDropDownMenu_SetText(CTRAFrames_WindowSelectionDropDown, "Window " .. selectedWindow);
+							L_UIDropDownMenu_SetText(CTRAFrames_WindowSelectionDropDown, format(L["CT_RaidAssist/WindowTitle"],selectedWindow));
 							if (module:getOption("CTRAFrames_NumEnabledWindows") == 1) then
 								button:Disable();
 								CTRAFrames_PreviousWindowButton:Disable();
@@ -776,11 +776,12 @@ function NewCTRAFrames()
 							elseif (selectedWindow == 1) then
 								CTRAFrames_PreviousWindowButton:Disable();
 							end
+							print(format(L["CT_RaidAssist/Options/WindowControls/WindowDeletedMessage"],windowToDelete));
 						end
 					);
 					optionsAddScript("onenter",
 						function(button)
-							module:displayTooltip(button, {"Shift-click the 'Delete' button to delete the selected window.#1:0.82:1#w"}, "ANCHOR_TOPLEFT")
+							module:displayTooltip(button, {L["CT_RaidAssist/Options/WindowControls/DeleteTooltip"] .. "#1:0.82:1#w"}, "ANCHOR_TOPLEFT")
 						end
 					);
 					optionsAddScript("onleave",
@@ -800,12 +801,12 @@ function NewCTRAFrames()
 			optionsEndFrame();
 		
 			-- Settings for the current window
-			optionsBeginFrame(0, 0, "frame#tl:0:%y#br:tr:0:%b#");
-					
+			optionsBeginFrame(0, 0, "frame#tl:10:%y#br:tr:0:%b#");
+				
 				-- Groups, Roles, Classes
-				optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormal#Group and Class Selections");
-				optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#Which groups, roles or classes should this window show?#" .. textColor2 .. ":l");
-				optionsAddObject(-10,  20, "font#tl:15:%y#s:0:%s#Groups#" .. textColor1 .. ":l");
+				optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormal#" .. L["CT_RaidAssist/Options/Window/Groups/Header"]);
+				optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. L["CT_RaidAssist/Options/Window/Groups/Line1"] .. "#" .. textColor2 .. ":l");
+				optionsAddObject(-10,  20, "font#tl:15:%y#s:0:%s#" .. L["CT_RaidAssist/Options/Window/Groups/GroupHeader"] .. "#" .. textColor1 .. ":l");
 				for i=1, 8 do
 					optionsBeginFrame( -5,  20, "checkbutton#tl:15:%y#n:CTRAWindow_ShowGroup" .. i .. "CheckButton#Gp " .. i);
 						optionsAddScript("onload",
@@ -815,41 +816,65 @@ function NewCTRAFrames()
 							end
 							
 						);
+					optionsAddScript("onenter",
+						function(slider)
+							module:displayTooltip(CTCONTROLPANEL or slider, {L["CT_RaidAssist/Options/Window/Groups/GroupTooltipHeader"],L["CT_RaidAssist/Options/Window/Groups/GroupTooltipContent"]}, "CT_ABOVEBELOW");
+						end
+					);
+					optionsAddScript("onleave",
+						function()
+							module:hideTooltip();
+						end
+					);
 					optionsEndFrame();
 				end
-				optionsAddObject(220, 20, "font#tl:110:%y#s:0:%s#Roles#" .. textColor1 .. ":l");
-				if (true or module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
-					for __, val in ipairs({"Myself", "Tanks", "Heals", "Melee", "Range"}) do
-						optionsBeginFrame( -5,  25, "checkbutton#tl:110:%y#n:CTRAWindow_Show" .. val .. "CheckButton#" .. val);
-							optionsAddScript("onload",
-								function(button)
-									button.option = function() return "CTRAWindow" .. selectedWindow .. "_Show" .. val; end
-									button:SetFrameLevel(21);
-								end
-							);
-						optionsEndFrame();
-					end
-				else
-					optionsAddObject(-5, 170, "font#tl:110:%y#Sort by role in Retail only#" .. textColor2 .. ":l");
+				optionsAddObject(220, 20, "font#tl:110:%y#s:0:%s#" .. L["CT_RaidAssist/Options/Window/Groups/RoleHeader"] .. "#" .. textColor1 .. ":l");
+				for __, val in ipairs((module:getGameVersion() == CT_GAME_VERSION_RETAIL and {"Myself", "Tanks", "Heals", "Melee", "Range"}) or {"Myself"}) do
+					optionsBeginFrame( -5,  25, "checkbutton#tl:110:%y#n:CTRAWindow_Show" .. val .. "CheckButton#" .. val);
+						optionsAddScript("onload",
+							function(button)
+								button.option = function() return "CTRAWindow" .. selectedWindow .. "_Show" .. val; end
+								button:SetFrameLevel(21);
+							end
+						);
+					optionsEndFrame();
 				end
-				optionsAddObject(170, 20, "font#tl:205:%y#s:0:%s#Classes#" .. textColor1 .. ":l");
+				if(module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+					optionsAddObject(-5, 115, "font#tl:110:%y#Sort by tank, \nheals, and dps \nunavailable \nin Classic#" .. textColor2 .. ":l");
+				end
+				optionsAddObject(170, 20, "font#tl:205:%y#s:0:%s#" .. L["CT_RaidAssist/Options/Window/Groups/ClassHeader"] .. "#" .. textColor1 .. ":l");
 				for __, class in ipairs(
-					{
-						{"DeathKnights", "DthK"},
-						{"DemonHunters", "DemH"},
-						{"Druids", "Drui"},
-						{"Hunters", "Hunt"},
-						{"Mages", "Mage"},
-						{"Monks", "Monk"},
-						{"Paladins", "Pali"},
-						{"Priests", "Prst"},
-						{"Rogues", "Roug"},
-						{"Shamans", "Sham"},
-						{"Warlocks", "Wrlk"},
-						{"Warriors", "Warr"},
-					}
+					(module:getGameVersion() == CT_GAME_VERSION_RETAIL and 
+						{
+							{"DeathKnights", "DthK"},
+							{"DemonHunters", "DemH"},
+							{"Druids", "Drui"},
+							{"Hunters", "Hunt"},
+							{"Mages", "Mage"},
+							{"Monks", "Monk"},
+							{"Paladins", "Pali"},
+							{"Priests", "Prst"},
+							{"Rogues", "Roug"},
+							{"Shamans", "Sham"},
+							{"Warlocks", "Wrlk"},
+							{"Warriors", "Warr"},
+						}
+					)
+					or
+						{
+							{"Druids", "Drui"},
+							{"Hunters", "Hunt"},
+							{"Mages", "Mage"},
+							{"Monks", "Monk"},
+							{"Paladins", "Pali"},
+							{"Priests", "Prst"},
+							{"Rogues", "Roug"},
+							{"Shamans", "Sham"},
+							{"Warlocks", "Wrlk"},
+							{"Warriors", "Warr"},
+						}
 				) do
-					optionsBeginFrame(-5, 15, "checkbutton#tl:205:%y#n:CTRAWindow_Show" .. class[1] .. "CheckButton#" .. class[2]);
+					optionsBeginFrame((module:getGameVersion() == CT_GAME_VERSION_RETAIL and -5) or -6, 15, "checkbutton#tl:205:%y#n:CTRAWindow_Show" .. class[1] .. "CheckButton#" .. class[2]);
 						optionsAddScript("onload",
 							function(button)
 								button.option = function() return "CTRAWindow" .. selectedWindow .. "_Show" .. class[1]; end
@@ -860,18 +885,18 @@ function NewCTRAFrames()
 				end								
 				
 				-- Orientation and Wrapping
-				optionsAddObject(-5,   17, "font#tl:5:%y#v:GameFontNormal#Layout");
-				optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#Layout each group in its own column/row, or merge them into a single grid?#" .. textColor2 .. ":l");
-				optionsAddObject(-15, 26, "font#tl:15:%y#Rows/Cols Per Group:#" .. textColor1 .. ":l");
-				optionsBeginFrame(26,   20, "dropdown#tl:140:%y#s:100:%s#n:CTRAWindow_OrientationDropDown#New Column (to right)#New Row (underneath)#Merge Down (same column)#Merge Across (same row)");
+				optionsAddObject(-5,   17, "font#tl:5:%y#v:GameFontNormal#" .. L["CT_RaidAssist/Options/Window/Layout/Heading"]);
+				optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. L["CT_RaidAssist/Options/Window/Layout/Tip"] .. "#" .. textColor2 .. ":l");
+				optionsAddObject(-15, 26, "font#tl:15:%y#" .. L["CT_RaidAssist/Options/Window/Layout/OrientationLabel"] .. "#" .. textColor1 .. ":l");
+				optionsBeginFrame(26,   20, "dropdown#tl:140:%y#s:100:%s#n:CTRAWindow_OrientationDropDown" .. L["CT_RaidAssist/Options/Window/Layout/OrientationDropdown"]);
 					optionsAddScript("onload",
 						function(dropdown)
 							dropdown.option = function() return "CTRAWindow" .. selectedWindow .. "_Orientation"; end
 						end
 					);
 				optionsEndFrame();
-				optionsAddObject(-20, 26, "font#tl:15:%y#Large Groups:#" .. textColor1 .. ":l");
-				optionsBeginFrame(26, 17, "slider#tl:160:%y#s:110:%s#n:CTRAWindow_WrapSlider#Wrap after <value>:5:40#5:40:5");
+				optionsAddObject(-20, 26, "font#tl:15:%y#" .. L["CT_RaidAssist/Options/Window/Layout/WrapLabel"] .. "#" .. textColor1 .. ":l");
+				optionsBeginFrame(26, 17, "slider#tl:160:%y#s:110:%s#n:CTRAWindow_WrapAfterSlider#" .. L["CT_RaidAssist/Options/Window/Layout/WrapSlider"] .. ":2:40#2:40:1");
 					optionsAddScript("onload",
 						function(slider)
 							slider.option = function()
@@ -881,6 +906,16 @@ function NewCTRAFrames()
 									return "CTRAWindow" .. selectedWindow .. "_WrapAfter";
 								end
 							end
+						end
+					);
+					optionsAddScript("onenter",
+						function(slider)
+							module:displayTooltip(CTCONTROLPANEL or slider, {L["CT_RaidAssist/Options/Window/Layout/WrapTooltipHeader"],L["CT_RaidAssist/Options/Window/Layout/WrapTooltipContent"]}, "CT_ABOVEBELOW");
+						end
+					);
+					optionsAddScript("onleave",
+						function()
+							module:hideTooltip();
 						end
 					);
 				optionsEndFrame();
@@ -928,7 +963,7 @@ function NewCTRAFrames()
 					);
 				optionsEndFrame();
 				optionsAddObject(-25, 1*14, "font#tl:15:%y#s:0:%s#l:13:0#r#How big should the frames themselves be?#" .. textColor2 .. ":l");
-				optionsBeginFrame(-20, 17, "slider#tl:50:%y#s:200:%s#n:CTRAWindow_PlayerFrameScaleSlider#Scale = <value>%#50:150:5");
+				optionsBeginFrame(-20, 17, "slider#tl:50:%y#s:200:%s#n:CTRAWindow_PlayerFrameScaleSlider#Scale = <value>%:50%:150%#50:150:5");
 					optionsAddScript("onload",
 						function(slider)
 							slider.option = function()
@@ -1141,7 +1176,7 @@ function NewCTRAFrames()
 						{property = "ColorUnitFullHealthCombat", label = "Full Health Combat", tooltip = "Color of the health bar at 100% during combat"},
 						{property = "ColorUnitZeroHealthCombat", label = "Near Death Combat", tooltip = "Color of the health bar when nearly dead during combat"},
 					}) do
-						optionsBeginFrame((i==1 and 30) or (i == 8 and 37) or -5, 16, "colorswatch#tl:" .. ((i > 7 and "5") or "145") .. ":%y#s:16:16#n:CTRAWindow_" .. item.property .. "ColorSwatch#true");  -- the final #true causes it to use alpha
+						optionsBeginFrame((i==1 and 30) or (i == 8 and 37) or -5, 16, "colorswatch#tl:" .. ((i > 7 and "-10") or "130") .. ":%y#s:16:16#n:CTRAWindow_" .. item.property .. "ColorSwatch#true");  -- the final #true causes it to use alpha
 							optionsAddScript("onload",
 								function(swatch)
 									swatch.option = function() return "CTRAWindow" .. selectedWindow .. "_" .. item.property; end
@@ -1159,7 +1194,7 @@ function NewCTRAFrames()
 								end
 							);
 						optionsEndFrame();
-						optionsAddObject(16, 16, "font#tl:" .. ((i > 7 and "25") or "165") .. ":%y#s:0:%s#l:13:0#r#" .. item.label .. "#" .. textColor1 .. ":l");
+						optionsAddObject(16, 16, "font#tl:" .. ((i > 7 and "10") or "150") .. ":%y#s:0:%s#l:13:0#r#" .. item.label .. "#" .. textColor1 .. ":l");
 					end;
 				optionsEndFrame();
 				
@@ -1626,9 +1661,9 @@ function NewCTRAWindow(owningCTRAFrames)
 
 						-- move the anchor (and wrap to a new col/row if necessary) for the next person, and keep track of the max number of rows and columns in use
 						w = w + 1;
-						if (w == self:GetProperty("Wrap")) then
+						if (w == self:GetProperty("WrapAfter")) then
 							if (self:GetProperty("Orientation") == 1 or self:GetProperty("Orientation") == 3) then
-								x = x + self:GetProperty("PlayerFrameWidth") + self:GetProperty("HorizontalSpacing");
+								x = x + 90 + self:GetProperty("HorizontalSpacing");
 								y = 0;
 								if (w > rows) then
 									rows = w;
@@ -2264,8 +2299,8 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			local combatRezToCast = { };
 			local hasRez = nil;
 			for i, details in ipairs(CTRA_Configuration_RezAbilities[class]) do
-				if (GetSpellInfo(module.text["CT_RaidAssist/Spells/" .. details.name]) and details.combat and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and combatRezToCast[details.modifier] == nil) then
-					combatRezToCast[details.modifier] = module.text["CT_RaidAssist/Spells/" .. details.name];
+				if (GetSpellInfo(L["CT_RaidAssist/Spells/" .. details.name]) and details.combat and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and combatRezToCast[details.modifier] == nil) then
+					combatRezToCast[details.modifier] = L["CT_RaidAssist/Spells/" .. details.name];
 					hasRez = true;
 				end
 			end
@@ -2283,8 +2318,8 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			local nocombatRezToCast = { };
 			local hasRez = nil;
 			for i, details in ipairs(CTRA_Configuration_RezAbilities[class]) do
-				if (GetSpellInfo(module.text["CT_RaidAssist/Spells/" .. details.name]) and details.nocombat and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and nocombatRezToCast[details.modifier] == nil) then
-					nocombatRezToCast[details.modifier] = module.text["CT_RaidAssist/Spells/" .. details.name];
+				if (GetSpellInfo(L["CT_RaidAssist/Spells/" .. details.name]) and details.nocombat and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and nocombatRezToCast[details.modifier] == nil) then
+					nocombatRezToCast[details.modifier] = L["CT_RaidAssist/Spells/" .. details.name];
 					hasRez = true;
 				end
 			end
@@ -2305,8 +2340,8 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			local friendlyRemovesToCast = { };
 			local hasFriendlyRemoves = nil;
 			for i, details in ipairs(CTRA_Configuration_FriendlyRemoves[class]) do
-				if (GetSpellInfo(module.text["CT_RaidAssist/Spells/" .. details.name]) and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and friendlyRemovesToCast[details.modifier] == nil and (details.spec == nil or spec == nil or details.spec == spec)) then
-					friendlyRemovesToCast[details.modifier] = module.text["CT_RaidAssist/Spells/" .. details.name];
+				if (GetSpellInfo(L["CT_RaidAssist/Spells/" .. details.name]) and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and friendlyRemovesToCast[details.modifier] == nil and (details.spec == nil or spec == nil or details.spec == spec)) then
+					friendlyRemovesToCast[details.modifier] = L["CT_RaidAssist/Spells/" .. details.name];
 					hasFriendlyRemoves = true;
 				end
 			end
@@ -2326,8 +2361,8 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			local buffsToCast = { };
 			local hasBuffs = nil;
 			for i, details in ipairs(CTRA_Configuration_Buffs[class]) do
-				if (GetSpellInfo(module.text["CT_RaidAssist/Spells/" .. details.name]) and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and (buffsToCast[details.modifier] == nil)) then
-					buffsToCast[details.modifier] = module.text["CT_RaidAssist/Spells/" .. details.name];
+				if (GetSpellInfo(L["CT_RaidAssist/Spells/" .. details.name]) and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and (buffsToCast[details.modifier] == nil)) then
+					buffsToCast[details.modifier] = L["CT_RaidAssist/Spells/" .. details.name];
 					hasBuffs = true;
 				end
 			end
@@ -2457,17 +2492,17 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 								if remove then for modifier, spellName in pairs(remove) do
 									GameTooltip:AddDoubleLine("|cFFCC6666combat" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFCC6666" .. spellName);
 								end end
-								if rezNoCombat then for modifier, spellName in pairs(rezNoCombat) do 
-									GameTooltip:AddDoubleLine("|cFFCC6666combat, dead" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFCC6666" .. spellName);
-								end end
 								if rezCombat then for modifier, spellName in pairs(rezCombat) do 
-									GameTooltip:AddDoubleLine("|cFFCCCC66nocombat, dead" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFCCCC66" .. spellName);
+									GameTooltip:AddDoubleLine("|cFFCC6666combat, dead" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFCCCC66" .. spellName);
+								end end
+								if rezNoCombat then for modifier, spellName in pairs(rezNoCombat) do 
+									GameTooltip:AddDoubleLine("|cFF999999nocombat, dead" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFCC6666" .. spellName);
 								end end
 							end
 							if (not module.GameTooltipExtraLine) then
 								module.GameTooltipExtraLine = GameTooltip:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall");
 								module.GameTooltipExtraLine:SetPoint("BOTTOM", 0, 6);
-								module.GameTooltipExtraLine:SetText(module.text["CT_RaidAssist/PlayerFrame/TooltipFooter"]);
+								module.GameTooltipExtraLine:SetText(L["CT_RaidAssist/PlayerFrame/TooltipFooter"]);
 								module.GameTooltipExtraLine:SetScale(0.90);
 							end
 							GameTooltip:Show();
