@@ -321,4 +321,6 @@ local function slashCommand(msg)
 	module:showModuleOptions(module.name);
 end
 
-module:setSlashCmd(slashCommand, "/ctmail", "/ctmm", "/ctmailmod");
+module:setSlashCmd(slashCommand, "/ctmail", "/ctmm", "/ctmailmod", "/ctcourrier");
+-- enUS: /ctmail, /ctmm, /ctmailmod
+-- frFR: /ctcourrier

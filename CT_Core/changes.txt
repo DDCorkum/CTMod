@@ -1,3 +1,6 @@
+CT_Core (8.2.5.3) 2019-10-03
+- Added compatibility with "Questie", a popular classic quest tracking addon
+
 CT_Core (8.2.5.2) 2019-09-29
 - Replaced resize handles with Blizzard's default textures
 

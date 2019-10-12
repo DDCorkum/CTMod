@@ -1,3 +1,6 @@
+CT_MailMod (8.2.5.4) 2019-10-12
+- Adding more French localization
+
 CT_MailMod (8.2.0.8) 2019-08-31
 - Improved tooltip when receiving battle pets in the inbox
 
