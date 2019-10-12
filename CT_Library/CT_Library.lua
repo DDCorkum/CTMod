@@ -19,7 +19,7 @@
 -----------------------------------------------
 -- Initialization
 
-local LIBRARY_VERSION = 8.251;
+local LIBRARY_VERSION = 8.254;
 local LIBRARY_NAME = "CT_Library";
 
 local _G = getfenv(0);
@@ -213,6 +213,18 @@ function lib:displayTooltip(obj, text, anchor, offx, offy)
 	local tooltip = GameTooltip;
 	if ( not anchor ) then
 		GameTooltip_SetDefaultAnchor(tooltip, obj);
+	elseif (anchor == "CT_ABOVEBELOW") then
+		if (obj:GetBottom() <= UIParent:GetTop() - obj:GetTop()) then
+			tooltip:SetOwner(obj, "ANCHOR_TOP", offx or 0, offy or 0);
+		else
+			tooltip:SetOwner(obj, "ANCHOR_BOTTOM", offx or 0, -(offy or 0));
+		end
+	elseif (anchor == "CT_BESIDE") then
+		if (obj:GetLeft() <= UIParent:GetRight() - obj:GetRight()) then
+			tooltip:SetOwner(obj, "ANCHOR_BOTTOMRIGHT", -(offx or 0), (offy or 0) + obj:GetHeight() / 2);
+		else
+			tooltip:SetOwner(obj, "ANCHOR_BOTTOMLEFT", offx or 0, -(offy or 0) + obj:GetHeight() / 2);
+		end	
 	else
 		tooltip:SetOwner(obj, anchor, offx or 0, offy or 0);
 	end
@@ -224,24 +236,22 @@ function lib:displayTooltip(obj, text, anchor, offx, offy)
 			local leftR,leftG,leftB,rightR,rightG,rightB,alpha,wrap,leftText,rightText;
 			for j=1, #splitrow do
 				local pieces = {strsplit(":", splitrow[j])}
-				if(not leftR and #pieces >= 3) then
-					local isvalid = true;
-					for k, piece in ipairs(pieces) do
-						if (not tonumber(piece) or tonumber(piece) < 0 or tonumber(piece) > 1) then
-							isvalid = false;
-						end
+				local isAllNums = true;
+				for k, piece in ipairs(pieces) do
+					if (not tonumber(piece) or tonumber(piece) < 0 or tonumber(piece) > 1) then
+						isAllNums = false;
 					end
-					if (isvalid) then
-						leftR = pieces[1];
-						leftG = pieces[2];
-						leftB = pieces[3];
-						if (pieces[6]) then
-							rightR = pieces[4];
-							rightG = pieces[5];
-							rightB = pieces[6];
-						elseif (pieces[4]) then
-							alpha = pieces[4];
-						end
+				end						
+				if (not leftR and #pieces >= 3 and isAllNums) then
+					leftR = pieces[1];
+					leftG = pieces[2];
+					leftB = pieces[3];
+					if (pieces[6]) then
+						rightR = pieces[4];
+						rightG = pieces[5];
+						rightB = pieces[6];
+					elseif (pieces[4]) then
+						alpha = pieces[4];
 					end
 				elseif (not wrap and #pieces == 1 and pieces[1] == "w") then
 					wrap = true;

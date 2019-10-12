@@ -446,7 +446,7 @@ function NewCTRAFrames()
 		-- STEP 4: focus the options menu if it is created already (otherwise, this step will occur when it is created)
 		
 		--STEP 1:
-		if (not self:IsEnabled()) then
+		if (not self:IsEnabled() and not InCombatLockdown()) then
 			
 			--STEP 2:
 			for i = 1, (module:getOption("CTRAFrames_NumEnabledWindows") or 1) do
@@ -476,7 +476,7 @@ function NewCTRAFrames()
 		-- STEP 3: set a flag to respond negatively to IsEnabled() queries
 		
 		--STEP 1:
-		if (self:IsEnabled()) then
+		if (self:IsEnabled() and not InCombatLockdown()) then
 			--STEP 2:
 			for __, window in ipairs(windows) do
 				if (window:IsEnabled()) then
@@ -1235,6 +1235,7 @@ function NewCTRAFrames()
 	listener = CreateFrame("Frame", nil);
 	listener:RegisterEvent("PLAYER_ENTERING_WORLD");		-- defers creating the frames until the player is in the game
 	listener:RegisterEvent("GROUP_ROSTER_UPDATE");			-- the frames might enable only during raids, groups, or always!
+	listener:RegisterEvent("PLAYER_REGEN_ENABLED");			-- in case the player's membership in a group/raid changed during combat
 	listener:HookScript("OnEvent",
 		function(self, event)
 			obj:ToggleEnableState();
@@ -1321,6 +1322,8 @@ function NewCTRAWindow(owningCTRAFrames)
 	-- private methods
 	function obj:Enable(asWindow, copyFromWindow)
 		assert(type(asWindow) == "number" and asWindow > 0, "CTRA Window being enabled without a valid number");
+		if (InCombatLockdown()) then return; end
+		
 		
 		-- STEP 1: If copyFromWindow then this window should clone the settings from something else before proceeding further
 		-- STEP 2: If this window has never been enabled, then create its component windowFrame and anchorFrame
@@ -1410,7 +1413,11 @@ function NewCTRAWindow(owningCTRAFrames)
 		self:Update();
 		
 		-- STEP 7:
-		anchorFrame:SetShown(module:isControlPanelShown());
+		if (module:isControlPanelShown()) then
+			self:ShowAnchor();
+		else
+			self:HideAnchor();
+		end
 		
 		for key, __ in pairs(currentOptions) do
 			currentOptions[key] = nil;
@@ -1420,12 +1427,13 @@ function NewCTRAWindow(owningCTRAFrames)
 	end
 	
 	function obj:Disable(deletePermanently)
+		
 		-- STEP 1: If deletePermanently then the settings for this window must be eliminated
 		-- STEP 2: Deregister from all events
 		-- STEP 3: Disable all child frames
-		-- STEP 4: Clear out the anchor via module:UnregisterMovable
+		-- STEP 4: Disappear the anchor via module:UnregisterMovable
 		-- STEP 5: Set flags to track the frame's disabled state
-		-- STEP 6: Hide the anchor (which might already be hidden)
+		-- STEP 6: Remove the anchor (which might already be hidden)
 		
 		-- STEP 1:
 		if (deletePermanently and windowID) then
@@ -1450,15 +1458,10 @@ function NewCTRAWindow(owningCTRAFrames)
 		
 		-- STEP 4:
 		module:UnregisterMovable("CTRAWindow" .. windowID);
-		anchorFrame:Hide();
-		
-		
-		-- STEP 5:
-		windowID = nil;
-		
-		-- STEP 6:
 		self:HideAnchor();
 		
+		-- STEP 5:
+		windowID = nil;		
 	end
 	
 	function obj:IsEnabled()
@@ -1490,7 +1493,6 @@ function NewCTRAWindow(owningCTRAFrames)
 		-- STEP 2: Outside combat, obtain a roster of self, party members and raid members to use during step 2
 		-- STEP 3: Determine which players to show in this window, and construct/configure CTRAPlayerFrames accordingly
 		
-
 		-- STEP 1:
 		if (option) then
 			currentOptions[option] = value;
@@ -1500,6 +1502,12 @@ function NewCTRAWindow(owningCTRAFrames)
 			for __, obj in ipairs(targetFrames) do
 				obj:Update(option, value);
 			end
+		end
+
+		-- this forces the object to dispose itself and go no further
+		if (not obj:IsEnabled()) then
+			obj:Disable();
+			return;
 		end
 
 		-- STEP 2:
@@ -1760,16 +1768,16 @@ function NewCTRAWindow(owningCTRAFrames)
 	end
 	
 	function obj:ShowAnchor()
-		if (self:IsEnabled()) then
+		if (self:IsEnabled() and not InCombatLockdown()) then
 			anchorFrame:Show();
-			anchorFrame.text:SetText("Window " .. windowID);
+			anchorFrame.text:SetText(format(L["CT_RaidAssist/WindowTitle"],windowID));
 		else
 			self:HideAnchor();
 		end
 	end
 	
 	function obj:HideAnchor()
-		if (anchorFrame) then
+		if (anchorFrame and not InCombatLockdown()) then
 			anchorFrame:Hide();
 		end
 	end
