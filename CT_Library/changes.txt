@@ -1,5 +1,5 @@
 CT_Library (8.2.5.4) 2019-10-11
-- Added more tooltip functionality
+- Added more tooltip functionality, corresponding with CTRA changes
 
 CT_Library (8.2.5.1) 2019-09-23
 - Library updates
