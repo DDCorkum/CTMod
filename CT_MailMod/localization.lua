@@ -19,6 +19,8 @@ local module = _G["CT_MailMod"];
 module.text = module.text or { }
 local L = module.text
 
+-- enUS (default)
+
 L["CT_MailMod/AutoCompleteFilter/Account"] = "Own toons on this account"
 L["CT_MailMod/AutoCompleteFilter/Friends"] = "Friends list (including offline)"
 L["CT_MailMod/AutoCompleteFilter/Group"] = "Current Group"
@@ -92,6 +94,29 @@ L["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_COPPER"] = "%d copper"
 L["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_GOLD"] = "%d gold %d silver %d copper"
 L["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_SILVER"] = "%d silver %d copper"
 L["CT_MailMod/STOP_SELECTED"] = "Cancel"
+L["CT_MailMod/Options/Bags/CloseAllCheckButton"] = "Close all bags"
+L["CT_MailMod/Options/Bags/CloseLabel"] = "When the mailbox closes:"
+L["CT_MailMod/Options/Bags/Heading"] = "Inventory Bags"
+L["CT_MailMod/Options/Bags/Line1"] = "Disabling these options may be necessary for compatability with other bag management addons"
+L["CT_MailMod/Options/Bags/OpenAllCheckButton"] = "Open all bags"
+L["CT_MailMod/Options/Bags/OpenBackpackCheckButton"] = "Open the backpack"
+L["CT_MailMod/Options/Bags/OpenLabel"] = "When the mailbox opens:"
+L["CT_MailMod/Options/General/BlockTradesCheckButton"] = "Block trades while using the mailbox"
+L["CT_MailMod/Options/General/Heading"] = "General Options"
+L["CT_MailMod/Options/General/NetIncomeCheckButton"] = "Show net income when the mailbox closes"
+L["CT_MailMod/Options/Inbox/Heading"] = "Inbox"
+L["CT_MailMod/Options/Inbox/HideLogCheckButton"] = "|cFFFF9999Hide|r the 'Mail Log' button"
+L["CT_MailMod/Options/Inbox/HideOpenCloseFeatureCheckButton"] = "|cFFFF9999Hide|r checkboxes and open/close buttons"
+L["CT_MailMod/Options/Inbox/MouseWheelCheckButton"] = "Enable mouse wheel scrolling"
+L["CT_MailMod/Options/Inbox/MultipleItemsCheckButton"] = "Show all attachments in message tooltips"
+L["CT_MailMod/Options/Inbox/SelectMsgCheckButton"] = "Show tooltip for message checkboxes"
+L["CT_MailMod/Options/Inbox/ShowExpiryCheckButton"] = "Show message expiry buttons"
+L["CT_MailMod/Options/Inbox/ShowInboxCheckButton"] = "Show number of messages in the inbox"
+L["CT_MailMod/Options/Inbox/ShowLongCheckButton"] = "Show long subjects on two lines"
+L["CT_MailMod/Options/Inbox/ShowMailboxCheckButton"] = "Show number of messages not in the inbox"
+L["CT_MailMod/Options/Inbox/ShowNumbersCheckButton"] = "Show message numbers on checkboxes"
+L["CT_MailMod/Options/Tips/Heading"] = "Tips"
+L["CT_MailMod/Options/Tips/Line1"] = "You can write /ctmail or /ctmailmod to open this options window directly."
 
 
 --frFR (credits: ddc)
@@ -167,17 +192,48 @@ L["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_COPPER"] = "%d cuivre"
 L["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_GOLD"] = "%d or %d argent %d cuivre"
 L["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_SILVER"] = "%d argent %d cuivre"
 L["CT_MailMod/STOP_SELECTED"] = "Annuler"
+L["CT_MailMod/Options/Bags/CloseAllCheckButton"] = "Fermer tous les sacs"
+L["CT_MailMod/Options/Bags/CloseLabel"] = "Quand la boîte ferme :"
+L["CT_MailMod/Options/Bags/Heading"] = "Les sacs d'inventaire"
+L["CT_MailMod/Options/Bags/Line1"] = "Désactivant ces options peut être nécessaire pour compatabilité aux autres addons de gestion des sacs"
+L["CT_MailMod/Options/Bags/OpenAllCheckButton"] = "Ouvrir tous les sacs"
+L["CT_MailMod/Options/Bags/OpenBackpackCheckButton"] = "Ouvrir le sac à dos"
+L["CT_MailMod/Options/Bags/OpenLabel"] = "Quand la boîte ouvre :"
+L["CT_MailMod/Options/General/BlockTradesCheckButton"] = "Bloquer les échanges en lisant le courrier"
+L["CT_MailMod/Options/General/Heading"] = "Les options génerales"
+L["CT_MailMod/Options/General/NetIncomeCheckButton"] = "Imprimer le revenu net quand le courrier ferme"
+L["CT_MailMod/Options/Inbox/Heading"] = "Boîte de réception"
+L["CT_MailMod/Options/Inbox/HideLogCheckButton"] = "|cFFFF9999Cacher|r le bouton 'Log' (journal)"
+L["CT_MailMod/Options/Inbox/HideOpenCloseFeatureCheckButton"] = "|cFFFF9999Cacher|r les cases à cocher et boutons d'ouv./fer."
+L["CT_MailMod/Options/Inbox/MouseWheelCheckButton"] = "Activer le défilement de la souris"
+L["CT_MailMod/Options/Inbox/MultipleItemsCheckButton"] = "Montrer les attaches dans les info-bulles"
+L["CT_MailMod/Options/Inbox/SelectMsgCheckButton"] = "Montrer l'info-bulle des cases à cocher"
+L["CT_MailMod/Options/Inbox/ShowExpiryCheckButton"] = "Montrer les boutons d'éxpiration de courrier"
+L["CT_MailMod/Options/Inbox/ShowInboxCheckButton"] = "Montrer combien de courrier est arrivé"
+L["CT_MailMod/Options/Inbox/ShowLongCheckButton"] = "Diviser des sujets longs en deux lignes"
+L["CT_MailMod/Options/Inbox/ShowMailboxCheckButton"] = "Montrer combien de courrier ne peut pas arriver"
+L["CT_MailMod/Options/Inbox/ShowNumbersCheckButton"] = "Numérer les courriers à coté des cases à cocher"
+L["CT_MailMod/Options/Tips/Heading"] = "Des conseils"
+L["CT_MailMod/Options/Tips/Line1"] = "Vous pouvez écrire /ctcourrier or /ctmailmod pour ouvrir ces options."
 
 
 --deDE (credits: dynaletik)
 
 elseif (GetLocale() == "deDE") then
 
+L["CT_MailMod/AutoCompleteFilter/Account"] = "Eigene Twinks auf diesem Account"
+L["CT_MailMod/AutoCompleteFilter/Friends"] = "Kontaktliste (inklusive offline)"
+L["CT_MailMod/AutoCompleteFilter/Group"] = "Aktuelle Gruppe"
+L["CT_MailMod/AutoCompleteFilter/Guild"] = "Gildenliste (inklusive offline)"
+L["CT_MailMod/AutoCompleteFilter/Online"] = "Online und/oder Twinks in der Nähe"
+L["CT_MailMod/AutoCompleteFilter/Recent"] = "Zuletzt interagiert"
 L["CT_MailMod/DELETE_POPUP1"] = "%d Gegenstände enthalten %s"
 L["CT_MailMod/DELETE_POPUP2"] = "etwas Geld und %s"
 L["CT_MailMod/DELETE_POPUP3"] = "etwas Geld und %d Gegenstände enthalten %s"
 L["CT_MailMod/Inbox/OpenSelectedButton"] = "Öffnen"
+L["CT_MailMod/Inbox/OpenSelectedTip"] = "Gewählte Nachrichten öffnen"
 L["CT_MailMod/Inbox/ReturnSelectedButton"] = "Zurücksenden"
+L["CT_MailMod/Inbox/ReturnSelectedTip"] = "Gewählte Nachrichten zurücksenden"
 L["CT_MailMod/MAIL_DELETE_NO"] = "Nicht gelöscht."
 L["CT_MailMod/MAIL_DELETE_OK"] = "Lösche Post."
 L["CT_MailMod/MAIL_DOWNLOAD_BEGIN"] = "Post wird in Eingang heruntergeladen."
@@ -229,6 +285,8 @@ L["CT_MailMod/SELECT_MESSAGE_TIP2"] = [=[|c0080A0FFKlick:|r Einzeln auswählen o
  |c0080A0FFShift Klick:|r Anfang der Auswahl markieren
  |c0080A0FFShift Linksklick:|r Ende der Auswahl markieren und auswählen
  |c0080A0FFShift Rechtsklick:|r Ende der Auswahl markieren und Abwählen]=]
+L["CT_MailMod/Send/AutoComplete/Heading"] = "Auto-Vervollständigung Einstellungen"
+L["CT_MailMod/Send/AutoComplete/Tip"] = "Abwärts-Pfeil zum Ändern der Filter wählen"
 L["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_COPPER"] = "%d Kupfer"
 L["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_GOLD"] = "%d Gold %d Silber %d Kupfer"
 L["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_SILVER"] = "%d Silber %d Kupfer"

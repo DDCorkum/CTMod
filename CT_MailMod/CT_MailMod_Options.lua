@@ -14,6 +14,9 @@
 local _G = getfenv(0);
 local module = _G["CT_MailMod"];
 
+module.text = module.text or { };	-- see localization.lua
+L = module.text;
+
 --------------------------------------------
 
 local defaultLogColor = { 0, 0, 0, 0.75 };
@@ -55,29 +58,29 @@ module.frame = function()
 
 	optionsBeginFrame(-5, 0, "frame#tl:0:%y#r");
 		-- Tips
-		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Tips");
-		optionsAddObject( -2, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#You can use /ctmail, /ctmm, or /ctmailmod to open this options window directly.#" .. textColor2 .. ":l");
+		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_MailMod/Options/Tips/Heading"]);
+		optionsAddObject( -2, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MailMod/Options/Tips/Line1"] .. "#" .. textColor2 .. ":l");
 
 		-- General Options
-		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#General");
-		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:blockTrades#Block trades while using the mailbox");
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:showMoneyChange#Show net income when the mailbox closes");
+		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_MailMod/Options/General/Heading"]);
+		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:blockTrades#" .. L["CT_MailMod/Options/General/BlockTradesCheckButton"]);
+		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:showMoneyChange#" .. L["CT_MailMod/Options/General/NetIncomeCheckButton"]);
 
-		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Bags");
-		optionsAddObject( -8, 4*13, "font#t:0:%y#s:0:%s#l:13:0#r#CT_MailMod will not open or close any bags when the following bag options are disabled. You may need to disable these options if you are using a separate bag addon.#" .. textColor2 .. ":l");
+		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_MailMod/Options/Bags/Heading"]);
+		optionsAddObject( -8, 4*13, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MailMod/Options/Bags/Line1"] .. "#" .. textColor2 .. ":l");
 
-		optionsAddObject( -6,   15, "font#tl:15:%y#v:ChatFontNormal#When the mailbox opens:");
-		optionsAddObject( -3,   26, "checkbutton#tl:35:%y#o:openAllBags#i:openAllBags#Open all bags");
-		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:openBackpack#i:openBackpack#Open only the backpack");
-		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:openNoBags#i:openNoBags#Close all bags");
+		optionsAddObject( -6,   15, "font#tl:15:%y#v:ChatFontNormal#" .. L["CT_MailMod/Options/Bags/OpenLabel"]);
+		optionsAddObject( -3,   26, "checkbutton#tl:35:%y#o:openAllBags#i:openAllBags#" .. L["CT_MailMod/Options/Bags/OpenAllCheckButton"]);
+		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:openBackpack#i:openBackpack#" .. L["CT_MailMod/Options/Bags/OpenBackpackCheckButton"]);
+		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:openNoBags#i:openNoBags#" .. L["CT_MailMod/Options/Bags/CloseAllCheckButton"]);
 
-		optionsAddObject( -6,   15, "font#tl:15:%y#v:ChatFontNormal#When the mailbox closes:");
-		optionsAddObject( -3,   26, "checkbutton#tl:35:%y#o:closeAllBags#Close all bags");
+		optionsAddObject( -6,   15, "font#tl:15:%y#v:ChatFontNormal#" .. L["CT_MailMod/Options/Bags/CloseLabel"]);
+		optionsAddObject( -3,   26, "checkbutton#tl:35:%y#o:closeAllBags#" .. L["CT_MailMod/Options/Bags/CloseAllCheckButton"]);
 
 		-- Inbox Options
-		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Inbox");
-		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:inboxMouseWheel:true#Enable mouse wheel scrolling");
-		optionsBeginFrame( 6,   26, "checkbutton#tl:10:%y#o:inboxShowNumbers:true#Show message numbers on checkboxes");
+		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_MailMod/Options/Inbox/Heading"]);
+		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:inboxMouseWheel:true#" .. L["CT_MailMod/Options/Inbox/MouseWheelCheckButton"]);
+		optionsBeginFrame( 6,   26, "checkbutton#tl:10:%y#o:inboxShowNumbers:true#" .. L["CT_MailMod/Options/Inbox/ShowNumbersCheckButton"]);
 			optionsAddScript("onenter",
 				function(self)
 					if (module:getOption("hideOpenCloseFeature")) then
@@ -104,13 +107,13 @@ module.frame = function()
 				end
 			);
 		optionsEndFrame();
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:inboxShowLong:true#Show long subjects on two lines");
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:inboxShowExpiry:true#Show message expiry buttons");
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:inboxShowInbox:true#Show number of messages in the inbox");
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:inboxShowMailbox:true#Show number of messages not in the inbox");
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:toolMultipleItems:true#Show all attachments in message tooltips");
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:toolSelectMsg:true#Show tooltip for message checkboxes");
-		optionsBeginFrame( 6,   26, "checkbutton#tl:10:%y#o:hideLogButton#|cFFFF9999Hide|r the 'Mail Log' button");
+		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:inboxShowLong:true#" .. L["CT_MailMod/Options/Inbox/ShowLongCheckButton"]);
+		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:inboxShowExpiry:true#" .. L["CT_MailMod/Options/Inbox/ShowExpiryCheckButton"]);
+		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:inboxShowInbox:true#" .. L["CT_MailMod/Options/Inbox/ShowInboxCheckButton"]);
+		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:inboxShowMailbox:true#" .. L["CT_MailMod/Options/Inbox/ShowMailboxCheckButton"]);
+		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:toolMultipleItems:true#" .. L["CT_MailMod/Options/Inbox/MultipleItemsCheckButton"]);
+		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:toolSelectMsg:true#" .. L["CT_MailMod/Options/Inbox/SelectMsgCheckButton"]);
+		optionsBeginFrame( 6,   26, "checkbutton#tl:10:%y#o:hideLogButton#" .. L["CT_MailMod/Options/Inbox/HideLogCheckButton"]);
 			optionsAddScript("onenter",
 				function(self)
 					GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 15, -25);
@@ -125,7 +128,7 @@ module.frame = function()
 				end
 			);
 		optionsEndFrame();
-		optionsBeginFrame( 6,   26, "checkbutton#tl:10:%y#o:hideOpenCloseFeature#|cFFFF9999Hide|r checkboxes and open/close buttons");
+		optionsBeginFrame( 6,   26, "checkbutton#tl:10:%y#o:hideOpenCloseFeature#" .. L["CT_MailMod/Options/Inbox/HideOpenCloseFeatureCheckButton"]);
 			optionsAddScript("onenter",
 				function(self)
 					GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 15, -25);
@@ -155,6 +158,13 @@ module.frame = function()
 		optionsAddObject( -8, 3*13, "font#t:0:%y#s:0:%s#l:13:0#r#To unselect all messages from the same sender, Ctrl right-click the message's checkbox.#" .. textColor1 .. ":l");
 		optionsAddObject( -8, 3*13, "font#t:0:%y#s:0:%s#l:13:0#r#To select a range of messages, Shift click one message's checkbox and then Shift left-click a second one.#" .. textColor2 .. ":l");
 		optionsAddObject( -8, 3*13, "font#t:0:%y#s:0:%s#l:13:0#r#To unselect a range of messages, Shift click one message's checkbox and then Shift right-click a second one.#" .. textColor1 .. ":l");
+
+		-- Send Mail Options
+		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Send Mail");
+		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:sendmailAltClickItem#Alt left-click adds items to the Send Mail tab");
+		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:sendmailMoneySubject:true#Replace blank subject with money amount");
+		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:sendmailAutoCompleteUse#Filter auto-completion of Send To field");
+		optionsAddObject(  6,   40, "font#t:0:%y#s:0:%s#l:13:0#r#Choose filters via the arrow next to Send To field#" .. textColor1 .. ":l");
 
 		-- Mail Log Options
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Mail Log");
@@ -189,18 +199,7 @@ module.frame = function()
 			);
 		optionsEndFrame();
 
-		-- Send Mail Options
-		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Send Mail");
-		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:sendmailAltClickItem#Alt left-click adds items to the Send Mail tab");
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:sendmailMoneySubject:true#Replace blank subject with money amount");
-		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:sendmailAutoCompleteUse#Filter auto-completion of Send To name");
-		optionsAddObject(  6,   40, "font#t:0:%y#s:0:%s#l:13:0#r#New: Select filters right inside the mail window!#" .. textColor1 .. ":l");
-		--optionsAddObject(  6,   26, "checkbutton#tl:40:%y#o:sendmailAutoCompleteOnline#Online and nearby toons");
-		--optionsAddObject(  6,   26, "checkbutton#tl:40:%y#o:sendmailAutoCompleteFriends#Friends list");
-		--optionsAddObject(  6,   26, "checkbutton#tl:40:%y#o:sendmailAutoCompleteGuild#Guild members");
-		--optionsAddObject(  6,   26, "checkbutton#tl:40:%y#o:sendmailAutoCompleteGroup#Group members (party or raid)");
-		--optionsAddObject(  6,   26, "checkbutton#tl:40:%y#o:sendmailAutoCompleteInteracted#Players interacted with (whispers, etc)");
-		--optionsAddObject(  6,   26, "checkbutton#tl:40:%y#o:sendmailAutoCompleteAccount#Own characters");
+
 
 		optionsAddScript("onload",
 			function (self)
