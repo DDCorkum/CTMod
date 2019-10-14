@@ -1,3 +1,6 @@
+CT_MailMod (8.2.5.5) 2019-10-13
+- Fix to text on the open/return buttons after actions performed
+
 CT_MailMod (8.2.5.4) 2019-10-12
 - Adding more French localization
 

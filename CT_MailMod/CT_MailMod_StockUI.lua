@@ -229,9 +229,9 @@ do
 
 		elseif (event == "INCOMING_STOP") then
 			-- Restore everything
-			CTMailModOpenSelected:SetText(module.text["CT_MailMod/OPEN_SELECTED"]);
+			CTMailModOpenSelected:SetText(module.text["CT_MailMod/Inbox/OpenSelectedButton"]);
 			CTMailModOpenSelected:Enable();
-			CTMailModReturnSelected:SetText(module.text["CT_MailMod/RETURN_SELECTED"]);
+			CTMailModReturnSelected:SetText(module.text["CT_MailMod/Inbox/ReturnSelectedButton"]);
 			CTMailModReturnSelected:Enable();
 		end
 	end
