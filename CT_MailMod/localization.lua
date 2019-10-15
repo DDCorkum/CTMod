@@ -104,9 +104,16 @@ L["CT_MailMod/Options/Bags/OpenLabel"] = "When the mailbox opens:"
 L["CT_MailMod/Options/General/BlockTradesCheckButton"] = "Block trades while using the mailbox"
 L["CT_MailMod/Options/General/Heading"] = "General Options"
 L["CT_MailMod/Options/General/NetIncomeCheckButton"] = "Show net income when the mailbox closes"
+L["CT_MailMod/Options/Inbox/Checkboxes/Heading"] = "Message Checkboxes"
+L["CT_MailMod/Options/Inbox/Checkboxes/Line1"] = "Mouseover the '?' for additional info"
+L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewCheckButton"] = "Clear selection when shift-clicking a range"
+L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewTip"] = "Choose a range by shift-clicking twice, or remove a range by shift-right-clicking the second time.  This option clears prior selections when doing so."
+L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewCheckButton"] = "Clear selection when ctrl-clicking a sender"
+L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewTip"] = "Shift-click to choose all messages from the same sender; or shift-right-click to choose all messages from other senders.   This option clears your prior selections before doing so."
+L["CT_MailMod/Options/Inbox/Checkboxes/ShowCheckboxesCheckButton"] = "Show checkboxes and open/close buttons"
+L["CT_MailMod/Options/Inbox/Checkboxes/ShowNumbersCheckButton"] = "Show message numbers"
 L["CT_MailMod/Options/Inbox/Heading"] = "Inbox"
 L["CT_MailMod/Options/Inbox/HideLogCheckButton"] = "|cFFFF9999Hide|r the 'Mail Log' button"
-L["CT_MailMod/Options/Inbox/HideOpenCloseFeatureCheckButton"] = "|cFFFF9999Hide|r checkboxes and open/close buttons"
 L["CT_MailMod/Options/Inbox/MouseWheelCheckButton"] = "Enable mouse wheel scrolling"
 L["CT_MailMod/Options/Inbox/MultipleItemsCheckButton"] = "Show all attachments in message tooltips"
 L["CT_MailMod/Options/Inbox/SelectMsgCheckButton"] = "Show tooltip for message checkboxes"
@@ -114,7 +121,6 @@ L["CT_MailMod/Options/Inbox/ShowExpiryCheckButton"] = "Show message expiry butto
 L["CT_MailMod/Options/Inbox/ShowInboxCheckButton"] = "Show number of messages in the inbox"
 L["CT_MailMod/Options/Inbox/ShowLongCheckButton"] = "Show long subjects on two lines"
 L["CT_MailMod/Options/Inbox/ShowMailboxCheckButton"] = "Show number of messages not in the inbox"
-L["CT_MailMod/Options/Inbox/ShowNumbersCheckButton"] = "Show message numbers on checkboxes"
 L["CT_MailMod/Options/Tips/Heading"] = "Tips"
 L["CT_MailMod/Options/Tips/Line1"] = "You can write /ctmail or /ctmailmod to open this options window directly."
 
@@ -177,7 +183,7 @@ L["CT_MailMod/QUICK_DELETE_TIP1"] = "Supprimer ce courrier maintenant"
 L["CT_MailMod/QUICK_RETURN_TIP1"] = "Renvoyer ce courrier maintenant"
 L["CT_MailMod/SELECT_ALL"] = "Tous"
 L["CT_MailMod/SELECT_MESSAGE_TIP1"] = "Mettre à jour la sélection des courriers"
-L["CT_MailMod/SELECT_MESSAGE_TIP2"] = [=[|c0080A0FFClic:|r Sélecter un courrier seule
+L["CT_MailMod/SELECT_MESSAGE_TIP2"] = [=[|c0080A0FFClic:|r Sélecter un seul courrier
 
 |c0080A0FFAlt-click-gauche:|r Sélectionner tous ayant le même sujet
 |c0080A0FFAlt-clic-droite:|r Sélectionner tous ayant un sujet différent
@@ -185,9 +191,9 @@ L["CT_MailMod/SELECT_MESSAGE_TIP2"] = [=[|c0080A0FFClic:|r Sélecter un courrier
 |c0080A0FFCtrl-clic-gauche:|r Sélectionner tous de cet envoyeur
 |c0080A0FFCtrl-clic-droite:|r Sélectionner tous d'autres envoyeurs
 
-|c0080A0FFMaj-clic:|r Commencer un range
-|c0080A0FFMaj-clic-gauche:|r Finir le range et sélectionner les courriers
-|c0080A0FFMaj-clic-droite:|r Finir le range et désélectionner les courriers]=]
+|c0080A0FFMaj-clic:|r Commencer une gamme
+|c0080A0FFMaj-clic-gauche:|r Finir la gamme et sélectionner les courriers
+|c0080A0FFMaj-clic-droite:|r Finir la gamme et désélectionner les courriers]=]
 L["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_COPPER"] = "%d cuivre"
 L["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_GOLD"] = "%d or %d argent %d cuivre"
 L["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_SILVER"] = "%d argent %d cuivre"
@@ -202,9 +208,16 @@ L["CT_MailMod/Options/Bags/OpenLabel"] = "Quand la boîte ouvre :"
 L["CT_MailMod/Options/General/BlockTradesCheckButton"] = "Bloquer les échanges en lisant le courrier"
 L["CT_MailMod/Options/General/Heading"] = "Les options génerales"
 L["CT_MailMod/Options/General/NetIncomeCheckButton"] = "Imprimer le revenu net quand le courrier ferme"
+L["CT_MailMod/Options/Inbox/Checkboxes/Heading"] = "Les cases à cocher"
+L["CT_MailMod/Options/Inbox/Checkboxes/Line1"] = "Passez la souris sur le bouton '?' pour plus d'info"
+L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewCheckButton"] = "Réinitialiser avant faire une gamme (Maj)"
+L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewTip"] = "Choisir une gamme en appuyant Maj-click deux fois, ou réduire une gamme en appuyant Maj-clic-droite la deuxième fois.  Cet option efface les sélections antérieures."
+L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewCheckButton"] = "Réinitialiser avant choisir une éxp. (ctrl)"
+L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewTip"] = "Choisir chaque courrier du même éxpéditeur (ctrl-clic-gauche), ou des autres éxpéditeurs (ctrl-clic-droite).  Cet option efface les sélections antérieures."
+L["CT_MailMod/Options/Inbox/Checkboxes/ShowCheckboxesCheckButton"] = "Montrer les cases à cocher et boutons d'ouv./fer."
+L["CT_MailMod/Options/Inbox/Checkboxes/ShowNumbersCheckButton"] = "Numérer les courriers"
 L["CT_MailMod/Options/Inbox/Heading"] = "Boîte de réception"
 L["CT_MailMod/Options/Inbox/HideLogCheckButton"] = "|cFFFF9999Cacher|r le bouton 'Log' (journal)"
-L["CT_MailMod/Options/Inbox/HideOpenCloseFeatureCheckButton"] = "|cFFFF9999Cacher|r les cases à cocher et boutons d'ouv./fer."
 L["CT_MailMod/Options/Inbox/MouseWheelCheckButton"] = "Activer le défilement de la souris"
 L["CT_MailMod/Options/Inbox/MultipleItemsCheckButton"] = "Montrer les attaches dans les info-bulles"
 L["CT_MailMod/Options/Inbox/SelectMsgCheckButton"] = "Montrer l'info-bulle des cases à cocher"
@@ -212,7 +225,6 @@ L["CT_MailMod/Options/Inbox/ShowExpiryCheckButton"] = "Montrer les boutons d'éx
 L["CT_MailMod/Options/Inbox/ShowInboxCheckButton"] = "Montrer combien de courrier est arrivé"
 L["CT_MailMod/Options/Inbox/ShowLongCheckButton"] = "Diviser des sujets longs en deux lignes"
 L["CT_MailMod/Options/Inbox/ShowMailboxCheckButton"] = "Montrer combien de courrier ne peut pas arriver"
-L["CT_MailMod/Options/Inbox/ShowNumbersCheckButton"] = "Numérer les courriers à coté des cases à cocher"
 L["CT_MailMod/Options/Tips/Heading"] = "Des conseils"
 L["CT_MailMod/Options/Tips/Line1"] = "Vous pouvez écrire /ctcourrier or /ctmailmod pour ouvrir ces options."
 

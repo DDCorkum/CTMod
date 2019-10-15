@@ -2049,7 +2049,6 @@ do
 					self.background:SetVertexColor(1,1,1);
 				end,
 				["onleave"] = function(self)
-					module:hideTooltip();
 					if ( isResizing ) then return; end
 					self.background:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up");
 					self.background:SetVertexColor(1,1,1);
@@ -2084,7 +2083,6 @@ do
 					self.background:SetVertexColor(1,1,1);
 				end,
 				["onleave"] = function(self)
-					module:hideTooltip();
 					if ( isResizing ) then return; end
 					self.background:SetVertexColor(1, 1, 1);
 					self.background:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up");

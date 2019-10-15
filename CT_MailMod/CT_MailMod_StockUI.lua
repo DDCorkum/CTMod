@@ -211,12 +211,12 @@ do
 	}, InboxFrame);
 
 	function module:updateOpenCloseButtons()
-		if (module.opt.hideOpenCloseFeature) then
-			CTMailModOpenSelected:Hide();
-			CTMailModReturnSelected:Hide();
-		else
+		if (module.opt.showCheckboxes) then
 			CTMailModOpenSelected:Show();
 			CTMailModReturnSelected:Show();
+		else
+			CTMailModOpenSelected:Hide();
+			CTMailModReturnSelected:Hide();
 		end
 	end
 
@@ -272,12 +272,12 @@ do
 	}, InboxFrame);
 
 	function module:updateSelectAllCheckbox()
-		if (module.opt.hideOpenCloseFeature) then
-			CTMailModSelectAll:Hide();
-			fsNumSelected:Hide();
-		else
+		if (module.opt.showCheckboxes) then
 			CTMailModSelectAll:Show();
 			fsNumSelected:Show();
+		else
+			CTMailModSelectAll:Hide();
+			fsNumSelected:Hide();
 		end
 	end
 
@@ -543,7 +543,7 @@ do
 				end
 				
 				-- Show the checkbox ONLY if the feature isn't disabled (since CT_MailMod v8.1.0.2)
-				if (not module.opt.hideOpenCloseFeature) then
+				if (module.opt.showCheckboxes) then
 					chbox:Show();
 				else
 					chbox:Hide();

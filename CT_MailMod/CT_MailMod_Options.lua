@@ -80,39 +80,11 @@ module.frame = function()
 		-- Inbox Options
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_MailMod/Options/Inbox/Heading"]);
 		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:inboxMouseWheel:true#" .. L["CT_MailMod/Options/Inbox/MouseWheelCheckButton"]);
-		optionsBeginFrame( 6,   26, "checkbutton#tl:10:%y#o:inboxShowNumbers:true#" .. L["CT_MailMod/Options/Inbox/ShowNumbersCheckButton"]);
-			optionsAddScript("onenter",
-				function(self)
-					if (module:getOption("hideOpenCloseFeature")) then
-						GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 15, -25);
-						GameTooltip:SetText("Disabled while checkboxes and open/close buttons hidden");
-						GameTooltip:Show();
-					end
-				end
-			);
-			optionsAddScript("onleave",
-				function(self)
-					GameTooltip:Hide();
-				end
-			);
-			optionsAddScript("onupdate",
-				function(self)
-					if (module:getOption("hideOpenCloseFeature")) then
-						--self.text:SetTextColor(0.5, 0.5, 0.5, 1);
-						self:SetAlpha(0.5);
-					else
-						--self.text:SetTextColor(1,1,1,1);
-						self:SetAlpha(1);
-					end
-				end
-			);
-		optionsEndFrame();
 		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:inboxShowLong:true#" .. L["CT_MailMod/Options/Inbox/ShowLongCheckButton"]);
 		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:inboxShowExpiry:true#" .. L["CT_MailMod/Options/Inbox/ShowExpiryCheckButton"]);
 		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:inboxShowInbox:true#" .. L["CT_MailMod/Options/Inbox/ShowInboxCheckButton"]);
 		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:inboxShowMailbox:true#" .. L["CT_MailMod/Options/Inbox/ShowMailboxCheckButton"]);
 		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:toolMultipleItems:true#" .. L["CT_MailMod/Options/Inbox/MultipleItemsCheckButton"]);
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:toolSelectMsg:true#" .. L["CT_MailMod/Options/Inbox/SelectMsgCheckButton"]);
 		optionsBeginFrame( 6,   26, "checkbutton#tl:10:%y#o:hideLogButton#" .. L["CT_MailMod/Options/Inbox/HideLogCheckButton"]);
 			optionsAddScript("onenter",
 				function(self)
@@ -128,11 +100,15 @@ module.frame = function()
 				end
 			);
 		optionsEndFrame();
-		optionsBeginFrame( 6,   26, "checkbutton#tl:10:%y#o:hideOpenCloseFeature#" .. L["CT_MailMod/Options/Inbox/HideOpenCloseFeatureCheckButton"]);
+
+		-- Inbox Checkboxes
+		optionsAddObject(-10,   17, "font#tl:13:%y#v:GameFontNormal#" .. L["CT_MailMod/Options/Inbox/Checkboxes/Heading"] .. "#" .. textColor3 .. ":l");
+		optionsBeginFrame(  17,   17, "button#tl:250:%y#s:40:%s#v:UIPanelButtonTemplate#?");
 			optionsAddScript("onenter",
 				function(self)
-					GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 15, -25);
-					GameTooltip:SetText("This disables some custom CT features; leaving default UI intact");
+					GameTooltip:SetOwner(self, "ANCHOR_RIGHT", 35, 0);
+					GameTooltip:SetText(L["CT_MailMod/Options/Inbox/Checkboxes/Heading"]);
+					GameTooltip:AddLine(L["CT_MailMod/SELECT_MESSAGE_TIP2"]);
 					GameTooltip:Show();
 				end
 			);
@@ -142,23 +118,40 @@ module.frame = function()
 				end
 			);
 		optionsEndFrame();
-		optionsAddObject(-10, 1*13, "font#t:0:%y#s:0:%s#l:13:0#r#Tips#" .. textColor3 .. ":l");
-		optionsAddObject(-10, 2*13, "font#t:0:%y#s:0:%s#l:13:0#r#Right-click the Prev/Next buttons to jump to the first/last page of the inbox.#" .. textColor1 .. ":l");
-
-		-- Selecting Messages
-		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Message Selection");
-		optionsAddObject(-10, 4*13, "font#t:0:%y#s:0:%s#l:13:0#r#Selecting messages will add them to the selection list.  Unselecting messages will remove them from the selection list.#" .. textColor3 .. ":l");
-		optionsAddObject(  0,   26, "checkbutton#tl:10:%y#o:inboxSenderNew:true#Clear selection list before selecting a sender");
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:inboxRangeNew:true#Clear selection list before selecting a range");
-		optionsAddObject(-10, 1*13, "font#t:0:%y#s:0:%s#l:13:0#r#Tips#" .. textColor3 .. ":l");
-		optionsAddObject(-10, 2*13, "font#t:0:%y#s:0:%s#l:13:0#r#To select or unselect a message, click the message's checkbox.#" .. textColor1 .. ":l");
-		optionsAddObject( -8, 2*13, "font#t:0:%y#s:0:%s#l:13:0#r#To select messages with similar subjects, Alt left-click the message's checkbox.#" .. textColor2 .. ":l");
-		optionsAddObject( -8, 2*13, "font#t:0:%y#s:0:%s#l:13:0#r#To unselect messages with similar subjects, Alt right-click the message's checkbox.#" .. textColor1 .. ":l");
-		optionsAddObject( -8, 2*13, "font#t:0:%y#s:0:%s#l:13:0#r#To select all messages from the same sender, Ctrl left-click the message's checkbox.#" .. textColor2 .. ":l");
-		optionsAddObject( -8, 3*13, "font#t:0:%y#s:0:%s#l:13:0#r#To unselect all messages from the same sender, Ctrl right-click the message's checkbox.#" .. textColor1 .. ":l");
-		optionsAddObject( -8, 3*13, "font#t:0:%y#s:0:%s#l:13:0#r#To select a range of messages, Shift click one message's checkbox and then Shift left-click a second one.#" .. textColor2 .. ":l");
-		optionsAddObject( -8, 3*13, "font#t:0:%y#s:0:%s#l:13:0#r#To unselect a range of messages, Shift click one message's checkbox and then Shift right-click a second one.#" .. textColor1 .. ":l");
-
+		optionsAddObject(  0, 2*13, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MailMod/Options/Inbox/Checkboxes/Line1"] .. "#" .. textColor2 .. ":l");
+		optionsAddObject(  0,   26, "checkbutton#tl:10:%y#o:showCheckboxes:true#" .. L["CT_MailMod/Options/Inbox/Checkboxes/ShowCheckboxesCheckButton"]);
+		optionsBeginFrame( 0, 0, "frame#tl:0:%y#br:tr:0:%b");
+			optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:toolSelectMsg:true#" .. L["CT_MailMod/Options/Inbox/SelectMsgCheckButton"]);
+			optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:inboxShowNumbers:true#" .. L["CT_MailMod/Options/Inbox/Checkboxes/ShowNumbersCheckButton"]);
+			optionsBeginFrame( 6,   26, "checkbutton#tl:20:%y#o:inboxSenderNew:true#" .. L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewCheckButton"])
+			optionsAddScript("onenter",
+				function(button)
+					module:displayTooltip(button, {L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewCheckButton"],L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewTip"] .. "#0.9:0.9:0.9"}, "ANCHOR_RIGHT", 35, 0)
+				end
+			);
+		optionsEndFrame();
+			optionsBeginFrame( 6,   26, "checkbutton#tl:20:%y#o:inboxRangeNew:true#" .. L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewCheckButton"])
+			optionsAddScript("onenter",
+				function(self)
+					GameTooltip:SetOwner(self, "ANCHOR_RIGHT", 35, 0);
+					GameTooltip:SetText(L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewCheckButton"]);
+					GameTooltip:AddLine(L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewTip"]);
+					GameTooltip:Show();
+				end
+			);
+			optionsAddScript("onleave",
+				function(self)
+					GameTooltip:Hide();
+				end
+			);
+		optionsEndFrame();
+			optionsAddScript( "onupdate",
+				function (frame)
+					frame:SetAlpha((module.opt.showCheckboxes and 1) or 0.5);
+				end
+			);
+		optionsEndFrame();
+		
 		-- Send Mail Options
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Send Mail");
 		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:sendmailAltClickItem#Alt left-click adds items to the Send Mail tab");
@@ -263,7 +256,12 @@ module.update = function(self, optName, value)
 		opt.logColor = getoption("logColor", defaultLogColor);
 		opt.hideLogButton = getoption("hideLogButton", false);
 		module:updateMailLogButton();
-		opt.hideOpenCloseFeature = getoption("hideOpenCloseFeature", false);
+		if (getoption("hideOpenCloseFeature") ~= nil) then
+			-- converting to 8.2.5.5
+			module:setOption("showCheckboxes", not getoption("hideOpenCloseFeature"), true, false);
+			module:setOption("hideOpenCloseFeature", nil, true, false);
+		end
+		opt.showCheckboxes = getoption("showCheckboxes", true);
 		module:updateOpenCloseButtons();
 		module:updateSelectAllCheckbox();
 
@@ -306,7 +304,7 @@ module.update = function(self, optName, value)
 		elseif (optName == "hideLogButton") then
 			module:updateMailLogButton();
 			
-		elseif (optName == "hideOpenCloseFeature") then
+		elseif (optName == "showCheckboxes") then
 			module:updateOpenCloseButtons();  -- hide the open/close buttons
 			module:updateSelectAllCheckbox(); -- hide the select all checkbox
 			module:inboxUpdateSelection();    -- hide any currently open checkboxes

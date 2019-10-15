@@ -206,28 +206,45 @@ function lib:printcolorformat(r, g, b, ...)
 	printText(ChatFrame1, r, g, b, format(...));
 end
 
--- Display a tooltip
+-- Displays a tooltip, then hides it when the mouse cursor leaves the object
 -- if text is a string, it will simply display the text
 -- if text is a table of strings, it will AddLine() each string and optionally set r,g,b,a and wrap by checking for '#' delimiters, or AddDoubleLine() if sufficient content is provided
-function lib:displayTooltip(obj, text, anchor, offx, offy)
+-- setting anchor to CT_ABOVEBELOW or CT_BESIDE will position the tooltip wherever there is more room on the screen
+function lib:displayTooltip(obj, text, anchor, offx, offy, owner)
 	local tooltip = GameTooltip;
+	if not obj or not tooltip then return; end
+	
+	-- when the mouse leaves this object, make the tooltip go away (using HookScript if possible to avoid overriding any other behaviour)
+	if not (obj.ct_displayTooltip_Hooked) then
+		if (obj.HookScript) then
+			obj:HookScript("OnLeave", function() tooltip:Hide(); end);
+		else
+			obj:SetScript("OnLeave", function() tooltip:Hide(); end);
+		end
+		obj.ct_displayTooltip_Hooked = true
+	end
+	
+	-- anchor the tooltip
+	owner = owner or obj;
 	if ( not anchor ) then
-		GameTooltip_SetDefaultAnchor(tooltip, obj);
+		GameTooltip_SetDefaultAnchor(tooltip, owner);
 	elseif (anchor == "CT_ABOVEBELOW") then
 		if (obj:GetBottom() <= UIParent:GetTop() - obj:GetTop()) then
-			tooltip:SetOwner(obj, "ANCHOR_TOP", offx or 0, offy or 0);
+			tooltip:SetOwner(owner, "ANCHOR_TOP", offx or 0, offy or 0);
 		else
-			tooltip:SetOwner(obj, "ANCHOR_BOTTOM", offx or 0, -(offy or 0));
+			tooltip:SetOwner(owner, "ANCHOR_BOTTOM", offx or 0, -(offy or 0));
 		end
 	elseif (anchor == "CT_BESIDE") then
 		if (obj:GetLeft() <= UIParent:GetRight() - obj:GetRight()) then
-			tooltip:SetOwner(obj, "ANCHOR_BOTTOMRIGHT", -(offx or 0), (offy or 0) + obj:GetHeight() / 2);
+			tooltip:SetOwner(owner, "ANCHOR_BOTTOMRIGHT", offx or 0, (offy or 0) + obj:GetHeight() / 2);
 		else
-			tooltip:SetOwner(obj, "ANCHOR_BOTTOMLEFT", offx or 0, -(offy or 0) + obj:GetHeight() / 2);
+			tooltip:SetOwner(owner, "ANCHOR_BOTTOMLEFT", -(offx or 0), (offy or 0) + obj:GetHeight() / 2);
 		end	
 	else
-		tooltip:SetOwner(obj, anchor, offx or 0, offy or 0);
+		tooltip:SetOwner(owner, anchor, offx or 0, offy or 0);
 	end
+	
+	-- generate the tooltip content
 	if (type(text) == "string") then
 		tooltip:SetText(text);
 	elseif (type(text) == "table") then
@@ -268,12 +285,9 @@ function lib:displayTooltip(obj, text, anchor, offx, offy)
 			end
 		end
 	end
+	
+	-- make the tooltip finally appear!
 	tooltip:Show();
-end
-
--- Hide the tooltip
-function lib:hideTooltip()
-	GameTooltip:Hide();
 end
 
 -- Display a tooltip using predefined text
@@ -1530,7 +1544,6 @@ end
 -- Option Frame
 local optionFrameOnMouseUp = function(self) self:GetParent():StopMovingOrSizing(); end
 local optionFrameOnEnter = function(self) lib:displayPredefinedTooltip(self, "DRAG"); end
-local optionFrameOnLeave = function(self) lib:hideTooltip(); end
 local optionFrameOnMouseDown = function(self, button)
 	if ( button == "LeftButton" ) then
 		self:GetParent():StartMoving();
@@ -2661,7 +2674,6 @@ local function controlPanelSkeleton()
 				self.bg:SetVertexColor(1, 0.9, 0.5);
 			end,
 			["onleave"] = function(self)
-				lib:hideTooltip();
 				self.bg:SetVertexColor(1, 1, 1);
 			end,
 			["onmousedown"] = function(self, button)

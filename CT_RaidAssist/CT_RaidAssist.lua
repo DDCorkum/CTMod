@@ -189,10 +189,6 @@ function module:frame()
 					module:displayTooltip(button, L["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksTooltip"], "ANCHOR_TOPLEFT");
 				end
 			);
-			optionsAddScript("onleave", function()
-					module:hideTooltip();
-				end
-			);
 		optionsEndFrame();
 		
 
@@ -569,11 +565,6 @@ function NewCTRAFrames()
 							module:displayTooltip(settingsOverlayToStopClicks, "Raid frames are currently disabled!\nYou must enable them using the dropdown above.", "ANCHOR_CURSOR");
 						end
 					);
-					settingsOverlayToStopClicks:SetScript("OnLeave",
-						function()
-							module:hideTooltip()
-						end
-					);
 				end
 			);
 		
@@ -696,11 +687,6 @@ function NewCTRAFrames()
 							module:displayTooltip(button, {L["CT_RaidAssist/Options/WindowControls/AddTooltip"] .. "#1:0.82:1"}, "ANCHOR_TOPLEFT")
 						end
 					);
-					optionsAddScript("onleave",
-						function()
-							module:hideTooltip();
-						end
-					);
 				optionsEndFrame();
 				
 				-- clone an existing window
@@ -725,11 +711,6 @@ function NewCTRAFrames()
 					optionsAddScript("onenter",
 						function(button)
 							module:displayTooltip(button, {L["CT_RaidAssist/Options/WindowControls/CloneTooltip"] .. "#1:0.82:1#w"}, "ANCHOR_TOPLEFT")
-						end
-					);
-					optionsAddScript("onleave",
-						function()
-							module:hideTooltip();
 						end
 					);
 				optionsEndFrame();
@@ -785,11 +766,6 @@ function NewCTRAFrames()
 							module:displayTooltip(button, {L["CT_RaidAssist/Options/WindowControls/DeleteTooltip"] .. "#1:0.82:1#w"}, "ANCHOR_TOPLEFT")
 						end
 					);
-					optionsAddScript("onleave",
-						function()
-							module:hideTooltip();
-						end
-					);
 					optionsAddScript("onshow",
 						function(button)
 							if ((module:getOption("CTRAFrames_NumEnabledWindows") or 1) == 1) then
@@ -819,12 +795,7 @@ function NewCTRAFrames()
 						);
 					optionsAddScript("onenter",
 						function(slider)
-							module:displayTooltip(CTCONTROLPANEL or slider, {L["CT_RaidAssist/Options/Window/Groups/GroupTooltipHeader"],L["CT_RaidAssist/Options/Window/Groups/GroupTooltipContent"]}, "CT_ABOVEBELOW");
-						end
-					);
-					optionsAddScript("onleave",
-						function()
-							module:hideTooltip();
+							module:displayTooltip(slider, {L["CT_RaidAssist/Options/Window/Groups/GroupTooltipHeader"],L["CT_RaidAssist/Options/Window/Groups/GroupTooltipContent"]}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
 						end
 					);
 					optionsEndFrame();
@@ -911,12 +882,7 @@ function NewCTRAFrames()
 					);
 					optionsAddScript("onenter",
 						function(slider)
-							module:displayTooltip(CTCONTROLPANEL or slider, {L["CT_RaidAssist/Options/Window/Layout/WrapTooltipHeader"],L["CT_RaidAssist/Options/Window/Layout/WrapTooltipContent"]}, "CT_ABOVEBELOW");
-						end
-					);
-					optionsAddScript("onleave",
-						function()
-							module:hideTooltip();
+							module:displayTooltip(slider, {L["CT_RaidAssist/Options/Window/Layout/WrapTooltipHeader"],L["CT_RaidAssist/Options/Window/Layout/WrapTooltipContent"]}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
 						end
 					);
 				optionsEndFrame();
@@ -1009,11 +975,6 @@ function NewCTRAFrames()
 								module:displayTooltip(button, "Keep the retro look from CTRA in Vanilla", "ANCHOR_TOPLEFT");
 							end
 						);
-					optionsAddScript("onleave",
-							function()
-								module:hideTooltip();
-							end
-						);
 				optionsEndFrame();
 				optionsBeginFrame( 30, 30, "button#tl:110:%y#s:80:%s#v:UIPanelButtonTemplate#Hybrid#n:CTRAWindow_HybridSchemeButton");
 					optionsAddScript("onclick", 
@@ -1039,11 +1000,6 @@ function NewCTRAFrames()
 					optionsAddScript("onenter",
 							function(button)
 								module:displayTooltip(button, "In-between the classic and modern looks", "ANCHOR_TOPLEFT");
-							end
-						);
-					optionsAddScript("onleave",
-							function()
-								module:hideTooltip();
 							end
 						);
 				optionsEndFrame();
@@ -1073,11 +1029,6 @@ function NewCTRAFrames()
 								module:displayTooltip(button, "Adopt a modern feel like many other addons", "ANCHOR_TOPLEFT");
 							end
 						);
-					optionsAddScript("onleave",
-							function()
-								module:hideTooltip();
-							end
-						);
 				optionsEndFrame();
 				optionsBeginFrame(-10, 26, "checkbutton#tl:10:%y#n:CTRAWindow_HealthBarAsBackgroundCheckButton:false#Show health as full-size background");
 					optionsAddScript("onload",
@@ -1090,11 +1041,6 @@ function NewCTRAFrames()
 					optionsAddScript("onenter",
 							function(checkbox)
 								module:displayTooltip(checkbox, "Fill the entire background instead of a small bar", "ANCHOR_TOPLEFT");
-							end
-						);
-					optionsAddScript("onleave",
-							function()
-								module:hideTooltip();
 							end
 						);
 				optionsEndFrame();
@@ -1111,11 +1057,6 @@ function NewCTRAFrames()
 								module:displayTooltip(checkbox, "Show the mana, energy, rage, etc. at the bottom", "ANCHOR_TOPLEFT");
 							end
 						);
-					optionsAddScript("onleave",
-							function()
-								module:hideTooltip();
-							end
-						);
 				optionsEndFrame();
 				optionsBeginFrame(0, 26, "checkbutton#tl:10:%y#n:CTRAWindow_EnableTargetFrameCheckButton:true#Show the target underneath?");
 					optionsAddScript("onload",
@@ -1128,11 +1069,6 @@ function NewCTRAFrames()
 					optionsAddScript("onenter",
 							function(checkbox)
 								module:displayTooltip(checkbox, "Add a frame underneath with the player's target (often used for tanks)", "ANCHOR_TOPLEFT");
-							end
-						);
-					optionsAddScript("onleave",
-							function()
-								module:hideTooltip();
 							end
 						);
 				optionsEndFrame();
@@ -1187,11 +1123,6 @@ function NewCTRAFrames()
 								function(swatch)
 									local r, g, b, a = unpack(windows[selectedWindow]:GetProperty(item.property));
 									module:displayTooltip(swatch, {item.tooltip .. "#" .. 1 - ((1-r)/3) .. ":" .. 1 - ((1-g)/3) .. ":" .. 1 - ((1-b)/3) , "Current:  |cFFFF6666r = " .. floor(100*r) .. "%|r, |cFF66FF66g = " .. floor(100*g) .. "%|r, |cFF6666FFb = " .. floor(100*b) .. ((a and ("%|r, |cFFFFFFFFa = " .. floor(100*a) .. "%")) or "%")}, "ANCHOR_TOPLEFT");
-								end
-							);
-							optionsAddScript("onleave",
-								function()
-									module:hideTooltip();
 								end
 							);
 						optionsEndFrame();
@@ -1370,11 +1301,6 @@ function NewCTRAWindow(owningCTRAFrames)
 			anchorFrame:SetScript("OnEnter",
 				function()
 					module:displayTooltip(anchorFrame, {"Left-click to drag this window"}, "ANCHOR_TOPRIGHT");
-				end
-			);
-			anchorFrame:SetScript("OnLeave",
-				function()
-					module:hideTooltip();
 				end
 			);
 			-- indicator which window this is
