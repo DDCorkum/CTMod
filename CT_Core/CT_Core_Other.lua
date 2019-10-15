@@ -784,7 +784,6 @@ local function tickFrameSkeleton()
 		["onenter"] = function(self)
 			module:displayPredefinedTooltip(self, "DRAG");
 		end,
-		["onleave"] = module.hideTooltip,
 		["onmousedown"] = function(self, button)
 			if ( button == "LeftButton" ) then
 				module:moveMovable("TICKMOD");
@@ -2113,8 +2112,6 @@ do
 				end
 			end,
 
-			["onleave"] = module.hideTooltip,
-
 			["onmousedown"] = function(self, button)
 				if ( button == "LeftButton" ) then
 					module:moveMovable("WATCHFRAME");
@@ -2382,11 +2379,6 @@ local function powerbaralt_onMouseUp(self, button)
 	end
 end
 
-local function powerbaralt_onEnter(self)
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return; end
-	-- module:displayTooltip(self, "|c00FFFFFFAlternate Power Bar Anchor|r\nShift-click to drag.\nRight-click to reset.");
-end
-
 local function powerbaralt_UIParent_ManageFramePositions()
 	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return; end
 	if (powerbaraltEnabled) then
@@ -2452,8 +2444,6 @@ local function powerbaralt_createAnchorFrame()
 	tex:SetTexture("Interface\\Tooltips\\UI-Tooltip-Background");
 	tex:SetVertexColor(0.7, 0.7, 0.7, 0.8);
 
-	self:SetScript("OnEnter", powerbaralt_onEnter);
-	self:SetScript("OnLeave", module.hideTooltip);
 	self:SetScript("OnMouseDown", powerbaralt_onMouseDown);
 	self:SetScript("OnMouseUp", powerbaralt_onMouseUp);
 	self:SetScript("OnEvent", powerbaralt_onEvent);

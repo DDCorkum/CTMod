@@ -236,10 +236,10 @@ function lib:displayTooltip(obj, text, anchor, offx, offy, owner)
 		end
 	elseif (anchor == "CT_BESIDE") then
 		if (obj:GetLeft() <= UIParent:GetRight() - obj:GetRight()) then
-			tooltip:SetOwner(owner, "ANCHOR_BOTTOMRIGHT", offx or 0, (offy or 0) + obj:GetHeight() / 2);
+			tooltip:SetOwner(owner, "ANCHOR_BOTTOMRIGHT", offx or 0, (offy or 0) + owner:GetHeight());
 		else
-			tooltip:SetOwner(owner, "ANCHOR_BOTTOMLEFT", -(offx or 0), (offy or 0) + obj:GetHeight() / 2);
-		end	
+			tooltip:SetOwner(owner, "ANCHOR_BOTTOMLEFT", -(offx or 0), (offy or 0) + owner:GetHeight());
+		end
 	else
 		tooltip:SetOwner(owner, anchor, offx or 0, offy or 0);
 	end

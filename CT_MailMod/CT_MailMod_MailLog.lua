@@ -394,7 +394,6 @@ do
 					self:SetScript("OnUpdate", onUpdate);
 				end;
 				local onLeave = function(self, ...)
-					module:hideTooltip();
 					self:SetScript("OnUpdate", nil);
 				end;
 				local onMouseDown = function(self, button, ...)
@@ -480,10 +479,6 @@ do
 			["onenter"] = function(self)
 				module:displayPredefinedTooltip(self, "DRAG");
 			end,
-
-			["onleave"] = function(self)
-				module:hideTooltip();
-			end
 		};
 	end
 
