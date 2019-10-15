@@ -107,9 +107,11 @@ L["CT_MailMod/Options/General/NetIncomeCheckButton"] = "Show net income when the
 L["CT_MailMod/Options/Inbox/Checkboxes/Heading"] = "Message Checkboxes"
 L["CT_MailMod/Options/Inbox/Checkboxes/Line1"] = "Mouseover the '?' for additional info"
 L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewCheckButton"] = "Clear selection when shift-clicking a range"
-L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewTip"] = "Choose a range by shift-clicking twice, or remove a range by shift-right-clicking the second time.  This option clears prior selections when doing so."
+L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewTip"] = [=[Choose a range by shift-clicking twice, or remove a range by shift-right-clicking the second time. 
+This option clears prior selections when doing so.]=]
 L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewCheckButton"] = "Clear selection when ctrl-clicking a sender"
-L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewTip"] = "Shift-click to choose all messages from the same sender; or shift-right-click to choose all messages from other senders.   This option clears your prior selections before doing so."
+L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewTip"] = [=[Shift-click to choose all messages from the same sender; or shift-right-click to choose all messages from other senders. 
+This option clears your prior selections before doing so.]=]
 L["CT_MailMod/Options/Inbox/Checkboxes/ShowCheckboxesCheckButton"] = "Show checkboxes and open/close buttons"
 L["CT_MailMod/Options/Inbox/Checkboxes/ShowNumbersCheckButton"] = "Show message numbers"
 L["CT_MailMod/Options/Inbox/Heading"] = "Inbox"
@@ -211,9 +213,11 @@ L["CT_MailMod/Options/General/NetIncomeCheckButton"] = "Imprimer le revenu net q
 L["CT_MailMod/Options/Inbox/Checkboxes/Heading"] = "Les cases à cocher"
 L["CT_MailMod/Options/Inbox/Checkboxes/Line1"] = "Passez la souris sur le bouton '?' pour plus d'info"
 L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewCheckButton"] = "Réinitialiser avant faire une gamme (Maj)"
-L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewTip"] = "Choisir une gamme en appuyant Maj-click deux fois, ou réduire une gamme en appuyant Maj-clic-droite la deuxième fois.  Cet option efface les sélections antérieures."
+L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewTip"] = [=[Choisir une gamme en appuyant Maj-click deux fois, ou réduire une gamme en appuyant Maj-clic-droite la deuxième fois. 
+Cet option efface les sélections antérieures.]=]
 L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewCheckButton"] = "Réinitialiser avant choisir une éxp. (ctrl)"
-L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewTip"] = "Choisir chaque courrier du même éxpéditeur (ctrl-clic-gauche), ou des autres éxpéditeurs (ctrl-clic-droite).  Cet option efface les sélections antérieures."
+L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewTip"] = [=[Choisir chaque courrier du même éxpéditeur (ctrl-clic-gauche), ou des autres éxpéditeurs (ctrl-clic-droite). 
+Cet option efface les sélections antérieures.]=]
 L["CT_MailMod/Options/Inbox/Checkboxes/ShowCheckboxesCheckButton"] = "Montrer les cases à cocher et boutons d'ouv./fer."
 L["CT_MailMod/Options/Inbox/Checkboxes/ShowNumbersCheckButton"] = "Numérer les courriers"
 L["CT_MailMod/Options/Inbox/Heading"] = "Boîte de réception"
@@ -273,7 +277,9 @@ L["CT_MailMod/MAIL_TIMEOUT"] = "Zeitüberschreitung bei Aktion."
 L["CT_MailMod/MAILBOX_BUTTON_TIP1"] = "Post herunterladen"
 L["CT_MailMod/MAILBOX_DOWNLOAD_MORE_NOW"] = "Weitere Post herunterladen"
 L["CT_MailMod/MAILBOX_DOWNLOAD_MORE_SOON"] = "Weitere Post in %d Sekunden herunterladen"
-L["CT_MailMod/MAILBOX_OPTIONS_TIP1"] = "Klicke diese Schaltfläche oder gebe /ctmail ein, um CTMailMod Optionen oder Hinweise anzuzeigen. Rechtsklick oder /maillog eingeben um Protokollfenster ein-/auszublenden."
+L["CT_MailMod/MAILBOX_OPTIONS_TIP1"] = [=[Klicke diese Schaltfläche oder gebe /ctmail ein, um CTMailMod Optionen oder Hinweise anzuzeigen. 
+
+Rechtsklick oder /maillog eingeben um Protokollfenster ein-/auszublenden.]=]
 L["CT_MailMod/MAILBOX_OVERFLOW_COUNT"] = "Überlauf: %d"
 L["CT_MailMod/MONEY_DECREASED"] = "Geld verringert um: %s"
 L["CT_MailMod/MONEY_INCREASED"] = "Geld erhöht um: %s"

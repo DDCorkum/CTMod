@@ -47,6 +47,10 @@ local function optionsEndFrame()
 	module:framesEndFrame(optionsFrameList);
 end
 
+local function optionsAddTooltip(text, anchor, offx, offy, owner)
+	module:framesAddScript(optionsFrameList, "onenter", function(obj) module:displayTooltip(obj, text, anchor, offx, offy, owner); end);
+end
+
 local optionsFrame;
 
 module.frame = function()
@@ -86,37 +90,13 @@ module.frame = function()
 		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:inboxShowMailbox:true#" .. L["CT_MailMod/Options/Inbox/ShowMailboxCheckButton"]);
 		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:toolMultipleItems:true#" .. L["CT_MailMod/Options/Inbox/MultipleItemsCheckButton"]);
 		optionsBeginFrame( 6,   26, "checkbutton#tl:10:%y#o:hideLogButton#" .. L["CT_MailMod/Options/Inbox/HideLogCheckButton"]);
-			optionsAddScript("onenter",
-				function(self)
-					GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 15, -25);
-					GameTooltip:SetText("This only hides the button; options further below control logging");
-					GameTooltip:AddLine("|c999999FFWhile hidden, right-click on the 'globe' or type /maillog");
-					GameTooltip:Show();
-				end
-			);
-			optionsAddScript("onleave",
-				function(self)
-					GameTooltip:Hide();
-				end
-			);
+			optionsAddTooltip({"This only hides the button; options further below control logging","While hidden, right-click on the 'globe' or type /maillog#0.9:0.9:0.9"}, "ANCHOR_BOTTOMRIGHT", 15, -25);
 		optionsEndFrame();
 
 		-- Inbox Checkboxes
 		optionsAddObject(-10,   17, "font#tl:13:%y#v:GameFontNormal#" .. L["CT_MailMod/Options/Inbox/Checkboxes/Heading"] .. "#" .. textColor3 .. ":l");
 		optionsBeginFrame(  17,   17, "button#tl:250:%y#s:40:%s#v:UIPanelButtonTemplate#?");
-			optionsAddScript("onenter",
-				function(self)
-					GameTooltip:SetOwner(self, "ANCHOR_RIGHT", 35, 0);
-					GameTooltip:SetText(L["CT_MailMod/Options/Inbox/Checkboxes/Heading"]);
-					GameTooltip:AddLine(L["CT_MailMod/SELECT_MESSAGE_TIP2"]);
-					GameTooltip:Show();
-				end
-			);
-			optionsAddScript("onleave",
-				function(self)
-					GameTooltip:Hide();
-				end
-			);
+			optionsAddTooltip({L["CT_MailMod/Options/Inbox/Checkboxes/Heading"],L["CT_MailMod/SELECT_MESSAGE_TIP2"]}, "ANCHOR_RIGHT", 35, 0);
 		optionsEndFrame();
 		optionsAddObject(  0, 2*13, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MailMod/Options/Inbox/Checkboxes/Line1"] .. "#" .. textColor2 .. ":l");
 		optionsAddObject(  0,   26, "checkbutton#tl:10:%y#o:showCheckboxes:true#" .. L["CT_MailMod/Options/Inbox/Checkboxes/ShowCheckboxesCheckButton"]);
@@ -124,27 +104,11 @@ module.frame = function()
 			optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:toolSelectMsg:true#" .. L["CT_MailMod/Options/Inbox/SelectMsgCheckButton"]);
 			optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:inboxShowNumbers:true#" .. L["CT_MailMod/Options/Inbox/Checkboxes/ShowNumbersCheckButton"]);
 			optionsBeginFrame( 6,   26, "checkbutton#tl:20:%y#o:inboxSenderNew:true#" .. L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewCheckButton"])
-			optionsAddScript("onenter",
-				function(button)
-					module:displayTooltip(button, {L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewCheckButton"],L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewTip"] .. "#0.9:0.9:0.9"}, "ANCHOR_RIGHT", 35, 0)
-				end
-			);
-		optionsEndFrame();
+				optionsAddTooltip({L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewCheckButton"],L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewTip"] .. "#0.9:0.9:0.9"}, "ANCHOR_RIGHT", 35, 0);
+			optionsEndFrame();
 			optionsBeginFrame( 6,   26, "checkbutton#tl:20:%y#o:inboxRangeNew:true#" .. L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewCheckButton"])
-			optionsAddScript("onenter",
-				function(self)
-					GameTooltip:SetOwner(self, "ANCHOR_RIGHT", 35, 0);
-					GameTooltip:SetText(L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewCheckButton"]);
-					GameTooltip:AddLine(L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewTip"]);
-					GameTooltip:Show();
-				end
-			);
-			optionsAddScript("onleave",
-				function(self)
-					GameTooltip:Hide();
-				end
-			);
-		optionsEndFrame();
+				optionsAddTooltip({L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewCheckButton"],L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewTip"] .. "#0.9:0.9:0.9"}, "ANCHOR_RIGHT", 35, 0);
+			optionsEndFrame();
 			optionsAddScript( "onupdate",
 				function (frame)
 					frame:SetAlpha((module.opt.showCheckboxes and 1) or 0.5);

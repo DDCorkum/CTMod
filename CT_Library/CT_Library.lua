@@ -19,7 +19,7 @@
 -----------------------------------------------
 -- Initialization
 
-local LIBRARY_VERSION = 8.254;
+local LIBRARY_VERSION = 8.255;
 local LIBRARY_NAME = "CT_Library";
 
 local _G = getfenv(0);
@@ -290,14 +290,9 @@ function lib:displayTooltip(obj, text, anchor, offx, offy, owner)
 	tooltip:Show();
 end
 
--- Display a tooltip using predefined text
-local predefinedTexts = {
-	DRAG = "Left click to drag\nRight click to reset",
-	RESIZE = "Click and drag to resize"
-};
-
-function lib:displayPredefinedTooltip(obj, text)
-	self:displayTooltip(obj, predefinedTexts[text]);
+-- Display a tooltip using predefined, localized text
+function lib:displayPredefinedTooltip(obj, text, ...)
+	self:displayTooltip(obj, lib.text["CT_Library/Tooltip/" .. text], ...);
 end
 
 -- Register a slash command
