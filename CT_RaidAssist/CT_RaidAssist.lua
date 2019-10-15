@@ -170,13 +170,14 @@ function module:frame()
 	local optionsAddFrame = function(offset, size, details, data) module:framesAddFrame(optionsFrameList, offset, size, details, data); end
 	local optionsAddObject = function(offset, size, details) module:framesAddObject(optionsFrameList, offset, size, details); end
 	local optionsAddScript = function(name, func) module:framesAddScript(optionsFrameList, name, func); end
+	local optionsAddTooltip = function(text, anchor, offx, offy, owner) module:framesAddScript(optionsFrameList, "onenter", function(obj) module:displayTooltip(obj, text, anchor, offx, offy, owner); end); end
 	local optionsBeginFrame = function(offset, size, details, data) module:framesBeginFrame(optionsFrameList, offset, size, details, data); end
 	local optionsEndFrame = function() module:framesEndFrame(optionsFrameList); end
+
 
 	-- commonly used colors
 	local textColor1 = "0.9:0.9:0.9";
 	local textColor2 = "0.7:0.7:0.7";
-	local textColor3 = "0.9:0.72:0.0";
 	
 	-- actual start of the options objects, ended by optionsGetData()
 	optionsInit();
@@ -185,10 +186,7 @@ function module:frame()
 		optionsAddObject(-20, 17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_RaidAssist/Options/GeneralFeatures/Heading"]);
 		optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. L["CT_RaidAssist/Options/GeneralFeatures/Line1"] .. "#" .. textColor2 .. ":l");
 		optionsBeginFrame(-15, 26, "checkbutton#tl:10:%y#n:CTRA_ExtendReadyChecksCheckButton#o:CTRA_ExtendReadyChecks:1#" .. L["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksCheckButton"]);
-			optionsAddScript("onenter", function(button)
-					module:displayTooltip(button, L["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksTooltip"], "ANCHOR_TOPLEFT");
-				end
-			);
+			optionsAddTooltip(L["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksTooltip"], "ANCHOR_TOPLEFT");
 		optionsEndFrame();
 		
 
@@ -532,13 +530,37 @@ function NewCTRAFrames()
 		local optionsAddFrame = function(offset, size, details, data) module:framesAddFrame(optionsFrameList, offset, size, details, data); end
 		local optionsAddObject = function(offset, size, details) module:framesAddObject(optionsFrameList, offset, size, details); end
 		local optionsAddScript = function(name, func) module:framesAddScript(optionsFrameList, name, func); end
+		local optionsAddTooltip = function(text, anchor, offx, offy, owner) module:framesAddScript(optionsFrameList, "onenter", function(obj) module:displayTooltip(obj, text, anchor, offx, offy, owner); end); end
 		local optionsBeginFrame = function(offset, size, details, data) module:framesBeginFrame(optionsFrameList, offset, size, details, data); end
 		local optionsEndFrame = function() module:framesEndFrame(optionsFrameList); end
 		
+		local optionsWindowizeObject = function(property) 
+			-- overloads the traditional CT_Library behaviour
+			optionsAddScript("onload",
+				function(obj)
+					obj.option = function() return "CTRAWindow" .. selectedWindow .. "_" .. property; end
+				end
+			);
+		end
+
+		local optionsWindowizeSlider = function(property) 
+			-- overloads the traditional CT_Library behaviour; same as above but with .suspend property
+			optionsAddScript("onload",
+				function(slider)
+					slider.option = function()
+						if (slider.suspend) then
+							return nil;
+						else
+							return "CTRAWindow" .. selectedWindow .. "_" .. property;
+						end
+					end
+				end
+			);
+		end		
+						
 		-- commonly used colors
 		local textColor1 = "0.9:0.9:0.9";
 		local textColor2 = "0.7:0.7:0.7";
-		local textColor3 = "0.9:0.72:0.0";
 		
 		
 		-- Heading
@@ -682,11 +704,7 @@ function NewCTRAFrames()
 							print(format(L["CT_RaidAssist/Options/WindowControls/WindowAddedMessage"],selectedWindow));
 						end
 					);
-					optionsAddScript("onenter",
-						function(button)
-							module:displayTooltip(button, {L["CT_RaidAssist/Options/WindowControls/AddTooltip"] .. "#1:0.82:1"}, "ANCHOR_TOPLEFT")
-						end
-					);
+					optionsAddTooltip({L["CT_RaidAssist/Options/WindowControls/AddTooltip"] .. "#1:0.82:1"}, "ANCHOR_TOPLEFT");
 				optionsEndFrame();
 				
 				-- clone an existing window
@@ -708,11 +726,7 @@ function NewCTRAFrames()
 							print(format(L["CT_RaidAssist/Options/WindowControls/WindowClonedMessage"],selectedWindow));
 						end
 					);
-					optionsAddScript("onenter",
-						function(button)
-							module:displayTooltip(button, {L["CT_RaidAssist/Options/WindowControls/CloneTooltip"] .. "#1:0.82:1#w"}, "ANCHOR_TOPLEFT")
-						end
-					);
+					optionsAddTooltip({L["CT_RaidAssist/Options/WindowControls/CloneTooltip"] .. "#1:0.82:1#w"}, "ANCHOR_TOPLEFT");
 				optionsEndFrame();
 				
 				-- delete a window
@@ -761,11 +775,7 @@ function NewCTRAFrames()
 							print(format(L["CT_RaidAssist/Options/WindowControls/WindowDeletedMessage"],windowToDelete));
 						end
 					);
-					optionsAddScript("onenter",
-						function(button)
-							module:displayTooltip(button, {L["CT_RaidAssist/Options/WindowControls/DeleteTooltip"] .. "#1:0.82:1#w"}, "ANCHOR_TOPLEFT")
-						end
-					);
+					optionsAddTooltip({L["CT_RaidAssist/Options/WindowControls/DeleteTooltip"] .. "#1:0.82:1#w"}, "ANCHOR_TOPLEFT");
 					optionsAddScript("onshow",
 						function(button)
 							if ((module:getOption("CTRAFrames_NumEnabledWindows") or 1) == 1) then
@@ -793,11 +803,7 @@ function NewCTRAFrames()
 							end
 							
 						);
-					optionsAddScript("onenter",
-						function(slider)
-							module:displayTooltip(slider, {L["CT_RaidAssist/Options/Window/Groups/GroupTooltipHeader"],L["CT_RaidAssist/Options/Window/Groups/GroupTooltipContent"]}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
-						end
-					);
+						optionsAddTooltip({L["CT_RaidAssist/Options/Window/Groups/GroupTooltipHeader"],L["CT_RaidAssist/Options/Window/Groups/GroupTooltipContent"]}, "CT_BESIDE", 0, 0, CTCONTROLPANEL);
 					optionsEndFrame();
 				end
 				optionsAddObject(220, 20, "font#tl:110:%y#s:0:%s#" .. L["CT_RaidAssist/Options/Window/Groups/RoleHeader"] .. "#" .. textColor1 .. ":l");
@@ -861,87 +867,31 @@ function NewCTRAFrames()
 				optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. L["CT_RaidAssist/Options/Window/Layout/Tip"] .. "#" .. textColor2 .. ":l");
 				optionsAddObject(-15, 26, "font#tl:15:%y#" .. L["CT_RaidAssist/Options/Window/Layout/OrientationLabel"] .. "#" .. textColor1 .. ":l");
 				optionsBeginFrame(26,   20, "dropdown#tl:140:%y#s:100:%s#n:CTRAWindow_OrientationDropDown" .. L["CT_RaidAssist/Options/Window/Layout/OrientationDropdown"]);
-					optionsAddScript("onload",
-						function(dropdown)
-							dropdown.option = function() return "CTRAWindow" .. selectedWindow .. "_Orientation"; end
-						end
-					);
+					optionsWindowizeObject("Orientation");
 				optionsEndFrame();
 				optionsAddObject(-20, 26, "font#tl:15:%y#" .. L["CT_RaidAssist/Options/Window/Layout/WrapLabel"] .. "#" .. textColor1 .. ":l");
 				optionsBeginFrame(26, 17, "slider#tl:160:%y#s:110:%s#n:CTRAWindow_WrapAfterSlider#" .. L["CT_RaidAssist/Options/Window/Layout/WrapSlider"] .. ":2:40#2:40:1");
-					optionsAddScript("onload",
-						function(slider)
-							slider.option = function()
-								if (slider.suspend) then
-									return nil;
-								else
-									return "CTRAWindow" .. selectedWindow .. "_WrapAfter";
-								end
-							end
-						end
-					);
-					optionsAddScript("onenter",
-						function(slider)
-							module:displayTooltip(slider, {L["CT_RaidAssist/Options/Window/Layout/WrapTooltipHeader"],L["CT_RaidAssist/Options/Window/Layout/WrapTooltipContent"]}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
-						end
-					);
+					optionsWindowizeSlider("WrapAfter");
+					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Layout/WrapTooltipHeader"],L["CT_RaidAssist/Options/Window/Layout/WrapTooltipContent"]}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
 				optionsEndFrame();
 				optionsBeginFrame(-10, 15, "checkbutton#tl:40:%y#n:CTRAWindow_GrowUpwardCheckButton#Grow Upward");
-					optionsAddScript("onload",
-						function(button)
-							button.option = function() return "CTRAWindow" .. selectedWindow .. "_GrowUpward"; end
-						end
-					);
+					optionsWindowizeObject("GrowUpward");
 				optionsEndFrame();
 				optionsBeginFrame(15, 15, "checkbutton#tl:160:%y#n:CTRAWindow_GrowLeftCheckButton#Grow Left");
-					optionsAddScript("onload",
-						function(button)
-							button.option = function() return "CTRAWindow" .. selectedWindow .. "_GrowLeft"; end
-						end
-					);
+					optionsWindowizeObject("GrowLeft");
 				optionsEndFrame();				
 				-- Size and Spacing
 				optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormal#Size and Spacing");
 				optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#Should frames touch each other, or be spaced apart vertically and horizontally?#" .. textColor2 .. ":l");
 				optionsBeginFrame(-20, 17, "slider#tl:15:%y#s:110:%s#n:CTRAWindow_HorizontalSpacingSlider#HSpacing = <value>:Touching:Far#0:100:1");
-					optionsAddScript("onload",
-						function(slider)
-							slider.option = function()
-								if (slider.suspend) then
-									return nil;
-								else
-									return "CTRAWindow" .. selectedWindow .. "_HorizontalSpacing";
-								end
-							end
-						end
-					);
+					optionsWindowizeSlider("HorizontalSpacing");
 				optionsEndFrame();
 				optionsBeginFrame( 20, 17, "slider#tl:150:%y#s:110:%s#n:CTRAWindow_VerticalSpacingSlider#VSpacing = <value>:Touching:Far#0:100:1");
-					optionsAddScript("onload",
-						function(slider)
-							slider.option = function()
-								if (slider.suspend) then
-									return nil;
-								else
-									return "CTRAWindow" .. selectedWindow .. "_VerticalSpacing";
-								end
-							end
-						end
-					);
+					optionsWindowizeSlider("VerticalSpacing");
 				optionsEndFrame();
 				optionsAddObject(-25, 1*14, "font#tl:15:%y#s:0:%s#l:13:0#r#How big should the frames themselves be?#" .. textColor2 .. ":l");
 				optionsBeginFrame(-20, 17, "slider#tl:50:%y#s:200:%s#n:CTRAWindow_PlayerFrameScaleSlider#Scale = <value>%:50%:150%#50:150:5");
-					optionsAddScript("onload",
-						function(slider)
-							slider.option = function()
-								if (slider.suspend) then
-									return nil;
-								else
-									return "CTRAWindow" .. selectedWindow .. "_PlayerFrameScale";
-								end
-							end
-						end
-					);
+					optionsWindowizeSlider("PlayerFrameScale");
 				optionsEndFrame();
 				
 				
@@ -970,11 +920,7 @@ function NewCTRAFrames()
 							windows[selectedWindow]:Focus();
 						end
 					);
-					optionsAddScript("onenter",
-							function(button)
-								module:displayTooltip(button, "Keep the retro look from CTRA in Vanilla", "ANCHOR_TOPLEFT");
-							end
-						);
+					optionsAddTooltip("Keep the retro look from CTRA in Vanilla", "ANCHOR_TOPLEFT");
 				optionsEndFrame();
 				optionsBeginFrame( 30, 30, "button#tl:110:%y#s:80:%s#v:UIPanelButtonTemplate#Hybrid#n:CTRAWindow_HybridSchemeButton");
 					optionsAddScript("onclick", 
@@ -997,11 +943,7 @@ function NewCTRAFrames()
 							windows[selectedWindow]:Focus();
 						end
 					);
-					optionsAddScript("onenter",
-							function(button)
-								module:displayTooltip(button, "In-between the classic and modern looks", "ANCHOR_TOPLEFT");
-							end
-						);
+					optionsAddTooltip("In-between the classic and modern looks", "ANCHOR_TOPLEFT");
 				optionsEndFrame();
 				optionsBeginFrame( 30, 30, "button#tl:205:%y#s:80:%s#v:UIPanelButtonTemplate#Modern#n:CTRAWindow_ModernSchemeButton");
 					optionsAddScript("onclick", 
@@ -1024,25 +966,11 @@ function NewCTRAFrames()
 							windows[selectedWindow]:Focus();
 						end
 					);
-					optionsAddScript("onenter",
-							function(button)
-								module:displayTooltip(button, "Adopt a modern feel like many other addons", "ANCHOR_TOPLEFT");
-							end
-						);
+					optionsAddTooltip("Adopt a modern feel like many other addons", "ANCHOR_TOPLEFT");
 				optionsEndFrame();
 				optionsBeginFrame(-10, 26, "checkbutton#tl:10:%y#n:CTRAWindow_HealthBarAsBackgroundCheckButton:false#Show health as full-size background");
-					optionsAddScript("onload",
-						function(checkbox)
-							checkbox.option = function()
-								return "CTRAWindow" .. selectedWindow .. "_HealthBarAsBackground";
-							end
-						end
-					);
-					optionsAddScript("onenter",
-							function(checkbox)
-								module:displayTooltip(checkbox, "Fill the entire background instead of a small bar", "ANCHOR_TOPLEFT");
-							end
-						);
+					optionsWindowizeObject("HealthBarAsBackground");
+					optionsAddTooltip("Fill the entire background instead of a small bar", "ANCHOR_TOPLEFT");
 				optionsEndFrame();
 				optionsBeginFrame(0, 26, "checkbutton#tl:10:%y#n:CTRAWindow_EnablePowerBarCheckButton:true#Show power bar?");
 					optionsAddScript("onload",
@@ -1052,25 +980,11 @@ function NewCTRAFrames()
 							end
 						end
 					);
-					optionsAddScript("onenter",
-							function(checkbox)
-								module:displayTooltip(checkbox, "Show the mana, energy, rage, etc. at the bottom", "ANCHOR_TOPLEFT");
-							end
-						);
+					optionsAddTooltip("Show the mana, energy, rage, etc. at the bottom", "ANCHOR_TOPLEFT");
 				optionsEndFrame();
 				optionsBeginFrame(0, 26, "checkbutton#tl:10:%y#n:CTRAWindow_EnableTargetFrameCheckButton:true#Show the target underneath?");
-					optionsAddScript("onload",
-						function(checkbox)
-							checkbox.option = function()
-								return "CTRAWindow" .. selectedWindow .. "_EnableTargetFrame";
-							end
-						end
-					);
-					optionsAddScript("onenter",
-							function(checkbox)
-								module:displayTooltip(checkbox, "Add a frame underneath with the player's target (often used for tanks)", "ANCHOR_TOPLEFT");
-							end
-						);
+					optionsWindowizeObject("EnableTargetFrame");
+					optionsAddTooltip("Add a frame underneath with the player's target (often used for tanks)", "ANCHOR_TOPLEFT");
 				optionsEndFrame();
 				optionsAddObject(-10,   17, "font#tl:5:%y#v:GameFontNormal#Colors");
 				optionsBeginFrame(-10, 0, "frame#tl:0:%y#br:tr:0:%b#");
@@ -1114,11 +1028,7 @@ function NewCTRAFrames()
 						{property = "ColorUnitZeroHealthCombat", label = "Near Death Combat", tooltip = "Color of the health bar when nearly dead during combat"},
 					}) do
 						optionsBeginFrame((i==1 and 30) or (i == 8 and 37) or -5, 16, "colorswatch#tl:" .. ((i > 7 and "-10") or "130") .. ":%y#s:16:16#n:CTRAWindow_" .. item.property .. "ColorSwatch#true");  -- the final #true causes it to use alpha
-							optionsAddScript("onload",
-								function(swatch)
-									swatch.option = function() return "CTRAWindow" .. selectedWindow .. "_" .. item.property; end
-								end
-							);
+							optionsWindowizeObject(item.property);
 							optionsAddScript("onenter",
 								function(swatch)
 									local r, g, b, a = unpack(windows[selectedWindow]:GetProperty(item.property));
