@@ -1327,8 +1327,9 @@ function NewCTRAWindow(owningCTRAFrames)
 	
 	function obj:Update(option, value)
 		-- STEP 1: Update children and local copies of saved variables
-		-- STEP 2: Outside combat, obtain a roster of self, party members and raid members to use during step 2
-		-- STEP 3: Determine which players to show in this window, and construct/configure CTRAPlayerFrames accordingly
+		-- STEP 2: If enabled, continue to steps 3 and 4.
+		-- STEP 3: Outside combat, obtain a roster of self, party members and raid members to use during step 2
+		-- STEP 4: Determine which players to show in this window, and construct/configure CTRAPlayerFrames accordingly
 		
 		-- STEP 1:
 		if (option) then
@@ -1341,13 +1342,12 @@ function NewCTRAWindow(owningCTRAFrames)
 			end
 		end
 
-		-- this forces the object to dispose itself and go no further
+		-- STEP 2:
 		if (not obj:IsEnabled()) then
-			obj:Disable();
 			return;
 		end
 
-		-- STEP 2:
+		-- STEP 3:
 		local roster = { };
 		if (IsInRaid() or UnitExists("raid2")) then
 			for i=1, min(MAX_RAID_MEMBERS, GetNumGroupMembers()) do
@@ -1397,7 +1397,7 @@ function NewCTRAWindow(owningCTRAFrames)
 			end
 		end
 
-		-- STEP 3:
+		-- STEP 4:
 		local categories =
 		{
 			-- {
