@@ -229,13 +229,13 @@ function lib:displayTooltip(obj, text, anchor, offx, offy, owner)
 	if ( not anchor ) then
 		GameTooltip_SetDefaultAnchor(tooltip, owner);
 	elseif (anchor == "CT_ABOVEBELOW") then
-		if (obj:GetBottom() <= UIParent:GetTop() - obj:GetTop()) then
+		if (owner:GetBottom() <= UIParent:GetTop() - owner:GetTop()) then
 			tooltip:SetOwner(owner, "ANCHOR_TOP", offx or 0, offy or 0);
 		else
 			tooltip:SetOwner(owner, "ANCHOR_BOTTOM", offx or 0, -(offy or 0));
 		end
 	elseif (anchor == "CT_BESIDE") then
-		if (obj:GetLeft() <= UIParent:GetRight() - obj:GetRight()) then
+		if (owner:GetLeft() <= UIParent:GetRight() - owner:GetRight()) then
 			tooltip:SetOwner(owner, "ANCHOR_BOTTOMRIGHT", offx or 0, (offy or 0) + owner:GetHeight());
 		else
 			tooltip:SetOwner(owner, "ANCHOR_BOTTOMLEFT", -(offx or 0), (offy or 0) + owner:GetHeight());

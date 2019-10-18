@@ -90,7 +90,7 @@ module.frame = function()
 		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:inboxShowMailbox:true#" .. L["CT_MailMod/Options/Inbox/ShowMailboxCheckButton"]);
 		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:toolMultipleItems:true#" .. L["CT_MailMod/Options/Inbox/MultipleItemsCheckButton"]);
 		optionsBeginFrame( 6,   26, "checkbutton#tl:10:%y#o:hideLogButton#" .. L["CT_MailMod/Options/Inbox/HideLogCheckButton"]);
-			optionsAddTooltip({"This only hides the button; options further below control logging","While hidden, right-click on the 'globe' or type /maillog#0.9:0.9:0.9"}, "ANCHOR_BOTTOMRIGHT", 15, -25);
+			optionsAddTooltip({"This only hides the button; options further below control logging","While hidden, right-click on the 'globe' or type /maillog#" .. textColor1}, "ANCHOR_BOTTOMRIGHT", 15, -25);
 		optionsEndFrame();
 
 		-- Inbox Checkboxes
@@ -104,10 +104,10 @@ module.frame = function()
 			optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:toolSelectMsg:true#" .. L["CT_MailMod/Options/Inbox/SelectMsgCheckButton"]);
 			optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:inboxShowNumbers:true#" .. L["CT_MailMod/Options/Inbox/Checkboxes/ShowNumbersCheckButton"]);
 			optionsBeginFrame( 6,   26, "checkbutton#tl:20:%y#o:inboxSenderNew:true#" .. L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewCheckButton"])
-				optionsAddTooltip({L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewCheckButton"],L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewTip"] .. "#0.9:0.9:0.9"}, "ANCHOR_RIGHT", 35, 0);
+				optionsAddTooltip({L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewCheckButton"],L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewTip"] .. "#" .. textColor1}, "ANCHOR_RIGHT", 35, 0);
 			optionsEndFrame();
 			optionsBeginFrame( 6,   26, "checkbutton#tl:20:%y#o:inboxRangeNew:true#" .. L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewCheckButton"])
-				optionsAddTooltip({L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewCheckButton"],L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewTip"] .. "#0.9:0.9:0.9"}, "ANCHOR_RIGHT", 35, 0);
+				optionsAddTooltip({L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewCheckButton"],L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewTip"] .. "#" .. textColor1}, "ANCHOR_RIGHT", 35, 0);
 			optionsEndFrame();
 			optionsAddScript( "onupdate",
 				function (frame)
@@ -117,34 +117,42 @@ module.frame = function()
 		optionsEndFrame();
 		
 		-- Send Mail Options
-		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Send Mail");
-		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:sendmailAltClickItem#Alt left-click adds items to the Send Mail tab");
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:sendmailMoneySubject:true#Replace blank subject with money amount");
-		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:sendmailAutoCompleteUse#Filter auto-completion of Send To field");
-		optionsAddObject(  6,   40, "font#t:0:%y#s:0:%s#l:13:0#r#Choose filters via the arrow next to Send To field#" .. textColor1 .. ":l");
+		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_MailMod/Options/SendMail/Heading"]);
+		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:sendmailAltClickItem#" .. L["CT_MailMod/Options/SendMail/AltClickCheckButton"]);
+		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:sendmailMoneySubject:true#" .. L["CT_MailMod/Options/SendMail/ReplaceSubjectCheckButton"]);
+		optionsBeginFrame(6,   26, "checkbutton#tl:10:%y#o:sendmailAutoCompleteUse#" .. L["CT_MailMod/Options/SendMail/FilterAutoCompleteCheckButton"]);
+			optionsAddTooltip({
+				L["CT_MailMod/Options/SendMail/FilterAutoCompleteCheckButton"],
+				L["CT_MailMod/Options/SendMail/FilterAutoCompleteTip"] .. "#" .. textColor1,
+				" - " .. L["CT_MailMod/AutoCompleteFilter/Account"] .. "#" .. textColor2,
+				" - " .. L["CT_MailMod/AutoCompleteFilter/Friends"] .. "#" .. textColor2,
+				" - " .. L["CT_MailMod/AutoCompleteFilter/Group"] .. "#" .. textColor2,
+				" - " .. L["CT_MailMod/AutoCompleteFilter/Guild"] .. "#" .. textColor2,
+				" - " .. L["CT_MailMod/AutoCompleteFilter/Online"] .. "#" .. textColor2,
+				" - " .. L["CT_MailMod/AutoCompleteFilter/Recent"] .. "#" .. textColor2,				
+			}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
+		optionsEndFrame();
 
 		-- Mail Log Options
-		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Mail Log");
-		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:printLog#Print log messages to chat");
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:saveLog:true#Save log messages in the mail log");
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:logOpenedMail:true#Log opened mail");
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:logReturnedMail:true#Log returned mail");
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:logDeletedMail:true#Log deleted mail");
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:logSentMail:true#Log sent mail");
+		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_MailMod/Options/MailLog/Heading"]);
+		optionsBeginFrame(  17,   17, "button#tl:250:%y#s:40:%s#v:UIPanelButtonTemplate#?");
+			optionsAddTooltip({L["CT_MailMod/Options/MailLog/Heading"],L["CT_MailMod/Options/MailLog/Tip"] .. "#" .. textColor2}, "ANCHOR_RIGHT", 35, 0);
+		optionsEndFrame();
+		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:printLog#" .. L["CT_MailMod/Options/MailLog/PrintCheckButton"]);
+		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:saveLog:true#" .. L["CT_MailMod/Options/MailLog/SaveCheckButton"]);
+		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:logOpenedMail:true#" .. L["CT_MailMod/Options/MailLog/LogOpennedCheckButton"]);
+		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:logReturnedMail:true#" .. L["CT_MailMod/Options/MailLog/LogReturnedCheckButton"]);
+		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:logDeletedMail:true#" .. L["CT_MailMod/Options/MailLog/LogDeletedButton"]);
+		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:logSentMail:true#" .. L["CT_MailMod/Options/MailLog/LogSentCheckButton"]);
 
 		optionsAddObject(-10,   16, "colorswatch#tl:15:%y#s:16:16#o:logColor:" .. defaultLogColor[1] .. "," .. defaultLogColor[2] .. "," .. defaultLogColor[3] .. "," .. defaultLogColor[4] .. "#true");
-		optionsAddObject( 14,   15, "font#tl:40:%y#v:ChatFontNormal#Background color");
+		optionsAddObject( 14,   15, "font#tl:40:%y#v:ChatFontNormal#" .. L["CT_MailMod/Options/MailLog/BackgroundLabel"]);
 
-		optionsAddObject(-25,   17, "slider#t:0:%y#o:logWindowScale:1#s:175:%s#Mail Log Scale - <value>#0.20:2:0.01");
+		optionsAddObject(-25,   17, "slider#t:0:%y#o:logWindowScale:1#s:175:%s#" .. L["CT_MailMod/Options/MailLog/ScaleSliderLabel"] .. "#0.20:2:0.01");
 
-		optionsAddObject(-25, 1*13, "font#t:0:%y#s:0:%s#l:13:0#r#Tips#" .. textColor3 .. ":l");
-		optionsAddObject(-10, 2*13, "font#t:0:%y#s:0:%s#l:13:0#r#Type /maillog to open the mail log when you are not at a mailbox.#" .. textColor1 .. ":l");
-		optionsAddObject(-10, 2*13, "font#t:0:%y#s:0:%s#l:13:0#r#You can adjust the size of the subject column by resizing the mail log window.#" .. textColor1 .. ":l");
-		optionsAddObject(-10, 3*13, "font#t:0:%y#s:0:%s#l:13:0#r#The mail log window can be resized by dragging the left or right edges of the window.#" .. textColor1 .. ":l");
-
-		optionsAddObject(-20, 1*13, "font#t:0:%y#s:0:%s#l:13:0#r#Delete Log Entries#" .. textColor3 .. ":l");
-		optionsAddObject(-10,   26, "checkbutton#tl:10:%y#o:resetLog#i:resetLog#I want to delete all of the log entries");
-		optionsBeginFrame(  -5,   30, "button#t:0:%y#s:120:%s#v:UIPanelButtonTemplate#i:deleteLogButton#Delete log");
+		optionsAddObject(-20, 1*13, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MailMod/Options/MailLog/Delete/Heading"] .. "#" .. textColor3 .. ":l");
+		optionsAddObject(-10,   26, "checkbutton#tl:10:%y#o:resetLog#i:resetLog#" .. L["CT_MailMod/Options/MailLog/Delete/ConfirmationCheckButton"]);
+		optionsBeginFrame(  -5,   30, "button#t:0:%y#s:120:%s#v:UIPanelButtonTemplate#i:deleteLogButton#" .. L["CT_MailMod/Options/MailLog/Delete/Button"]);
 			optionsAddScript("onclick",
 				function(self)
 					if (module:getOption("resetLog")) then
@@ -154,6 +162,29 @@ module.frame = function()
 					end
 				end
 			);
+		optionsEndFrame();
+		
+		-- Reset Options
+		optionsBeginFrame(-20	, 0, "frame#tl:0:%y#br:tr:0:%b");
+			optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_MailMod/Options/Reset/Heading"]);
+			optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:resetAll#" .. L["CT_MailMod/Options/Reset/ResetAllCheckbox"]);
+			optionsBeginFrame(  -5,   30, "button#t:0:%y#s:120:%s#v:UIPanelButtonTemplate#" .. L["CT_MailMod/Options/Reset/ResetButton"]);
+				optionsAddScript("onclick", function(self)
+					if (module:getOption("resetAll")) then
+						local copyOfMailLog = {CT_MailModOptions["mailLog"]}
+						CT_MailModOptions = {};
+						CT_MailModOptions["mailLog"] = copyOfMailLog[1];
+					else
+						if (not CT_MailModOptions or not type(CT_MailModOptions) == "table") then
+							CT_MailModOptions = {};
+						else
+							CT_MailModOptions[module:getCharKey()] = nil;
+						end
+					end
+					ConsoleExec("RELOADUI");
+				end);
+			optionsEndFrame();
+			optionsAddObject( -7, 2*15, "font#t:0:%y#s:0:%s#l#r#" .. L["CT_MailMod/Options/Reset/Line 1"] .. "#" .. textColor2);
 		optionsEndFrame();
 
 
