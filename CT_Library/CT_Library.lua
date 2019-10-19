@@ -2661,8 +2661,15 @@ local function controlPanelSkeleton()
 		["button#tl:4:-5#br:tr:-4:-25"] = {
 			"font#tl#br:bl:296:0#CTMod Control Panel v"..LIBRARY_VERSION,
 			"texture#i:bg#all#1:1:1:0.25#BACKGROUND",
-			["button#tr:3:6#v:UIPanelCloseButton"] = {
-				["onclick"] = function(self) HideUIPanel(self.parent.parent); end
+			["button#tr:3:6#s:32:32#v:SecureHandlerClickTemplate"] = {
+				["onload"] = function(button)
+					button:SetNormalTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Up");
+					button:SetDisabledTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Up");
+					button:SetPushedTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Down");
+					button:SetHighlightTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight");
+					button:SetAttribute("_onclick", [=[ self:GetParent():GetParent():Hide(); ]=]);
+				end
+				--  NON SECURE, NOT ALLOWED SINCE 2.0.1  --  ["onclick"] = function(self) HideUIPanel(self.parent.parent); end
 			},
 			["onenter"] = function(self)
 				lib:displayPredefinedTooltip(self, "DRAG");
@@ -2692,7 +2699,6 @@ local function controlPanelSkeleton()
 			"font#tl:-3:-69#v:GameFontNormalLarge#" .. lib.text["CT_Library/ModListing"],
 			"texture#i:hover#l:5:0#s:290:25#hidden#1:1:1:0.125",
 			"texture#i:select#l:5:0#s:290:25#hidden#1:1:1:0.25",
-			--"font#b:-10:-10#www.CTMod.net\ncurseforge.com/wow/addons/CTMod#0.72:0.36:0",
 						--700 is an offset to prevent taint affecting battleground queueing
 			["button#i:703#hidden#s:263:25#tl:17:-85"] = modListButtonTemplate,	
 			["button#i:704#hidden#s:263:25#tl:17:-110"] = modListButtonTemplate,
@@ -2707,8 +2713,8 @@ local function controlPanelSkeleton()
 			["button#i:713#hidden#s:263:25#tl:17:-335"] = modListButtonTemplate,
 			["button#i:714#hidden#s:263:25#tl:17:-360"] = modListButtonTemplate,
 			["button#i:715#hidden#s:263:25#tl:17:-385"] = modListButtonTemplate,
-			["button#i:701#hidden#s:263:25#tl:17:-410"] = modListButtonTemplate, -- settings import
-			["button#i:702#hidden#s:263:25#tl:17:-435"] = modListButtonTemplate, -- settings import
+			["button#i:701#hidden#s:263:25#tl:17:-410"] = modListButtonTemplate, -- Settings Import, 701
+			["button#i:702#hidden#s:263:25#tl:17:-435"] = modListButtonTemplate, -- Help, 702
 		},
 		["frame#s:315:0#tr:-15:-30#b:0:15#i:options#hidden"] = {
 			["onload"] = function(self)
@@ -2738,22 +2744,14 @@ end
 
 local function displayControlPanel()
 	if (InCombatLockdown()) then
-		print("CT options are not usable during combat");
-	else
-		if ( not controlPanelFrame ) then
-			controlPanelFrame = lib:getFrame(controlPanelSkeleton);
-			tinsert(UISpecialFrames, controlPanelFrame:GetName());
-			controlPanelFrame:HookScript("OnEvent",
-				function(__, event)
-					if (event == "PLAYER_REGEN_DISABLED") then
-						controlPanelFrame:Hide();
-					end
-				end
-			);
-			controlPanelFrame:RegisterEvent("PLAYER_REGEN_DISABLED");
-		end
-		controlPanelFrame:Show();
+		print("Cannot open the CT options while in combat");
+		return;
 	end
+	if ( not controlPanelFrame ) then
+		controlPanelFrame = lib:getFrame(controlPanelSkeleton);
+		tinsert(UISpecialFrames, controlPanelFrame:GetName());
+	end
+	controlPanelFrame:Show();
 end
 
 function lib:showControlPanel(show)
@@ -3299,7 +3297,6 @@ module.frame = function()
 		helpAddObject( -5, 2*14, "font#tl:10:%y#s:0:%s#l:13:0#r#" .. lib.text["CT_Library/Help/About/Credits"] .. "#" .. textColor1 .. ":l");  -- Two lines giving credits to Cide, TS, Resike and Dahk
 		
 		helpAddObject(-15,   14, "font#tl:10:%y#s:0:%s#l:13:0#r#" .. lib.text["CT_Library/Help/About/Updates"] .. "#" .. textColor1 .. ":l");  -- "Updates are available at:"
-		helpAddObject( -5,   14, "font#tl:30:%y#s:0:%s#l:13:0#r#www.CTMod.net#" .. textColor0 .. ":l");
 		helpAddObject( -5,   14, "font#tl:30:%y#s:0:%s#l:13:0#r#CurseForge.com/WoW/Addons/CTMod# " .. textColor0 .. ":l");
 	
 	helpEndFrame();

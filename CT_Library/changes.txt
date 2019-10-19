@@ -1,5 +1,6 @@
 CT_Library (8.2.5.5) 2019-10-14
 - Further tooltip changes to simplify code in all other modules
+- Fix made to close button so the control panel can stay open in combat
 
 CT_Library (8.2.5.4) 2019-10-11
 - Added more tooltip functionality, corresponding with CTRA changes
