@@ -107,10 +107,14 @@ L["CT_MailMod/Options/General/NetIncomeCheckButton"] = "Show net income when the
 L["CT_MailMod/Options/Inbox/Checkboxes/Heading"] = "Message Checkboxes"
 L["CT_MailMod/Options/Inbox/Checkboxes/Line1"] = "Mouseover the '?' for additional info"
 L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewCheckButton"] = "Clear selection when shift-clicking a range"
-L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewTip"] = [=[Choose a range by shift-clicking twice, or remove a range by shift-right-clicking the second time. 
+L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewTip"] = [=[Choose a range by shift-clicking twice, 
+or remove a range by shift-right-clicking the second time. 
+
 This option clears prior selections when doing so.]=]
 L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewCheckButton"] = "Clear selection when ctrl-clicking a sender"
-L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewTip"] = [=[Shift-click to choose all messages from the same sender; or shift-right-click to choose all messages from other senders. 
+L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewTip"] = [=[Shift-click to choose all messages from the same sender; 
+or shift-right-click to choose all messages from other senders. 
+
 This option clears your prior selections before doing so.]=]
 L["CT_MailMod/Options/Inbox/Checkboxes/ShowCheckboxesCheckButton"] = "Show checkboxes and open/close buttons"
 L["CT_MailMod/Options/Inbox/Checkboxes/ShowNumbersCheckButton"] = "Show message numbers"
@@ -384,10 +388,27 @@ L["CT_MailMod/Options/Inbox/ShowExpiryCheckButton"] = "Ablaufbuttons der Nachric
 L["CT_MailMod/Options/Inbox/ShowInboxCheckButton"] = "Anzahl der Briefe im Posteingang anzeigen"
 L["CT_MailMod/Options/Inbox/ShowLongCheckButton"] = "Langen Betreff in zwei Zeilen anzeigen"
 L["CT_MailMod/Options/Inbox/ShowMailboxCheckButton"] = "Anzahl der Briefe außerhalb des Posteingangs anzeigen"
+L["CT_MailMod/Options/MailLog/BackgroundLabel"] = "Hintergrundfarbe"
+L["CT_MailMod/Options/MailLog/Delete/Button"] = "Protokoll löschen"
+L["CT_MailMod/Options/MailLog/Delete/ConfirmationCheckButton"] = "Ich möchte alle Protokolle löschen"
+L["CT_MailMod/Options/MailLog/Delete/Heading"] = "Protokolle löschen"
+L["CT_MailMod/Options/MailLog/Heading"] = "Briefprotokoll"
+L["CT_MailMod/Options/MailLog/LogDeletedButton"] = "Gelöschte Briefe protokollieren"
+L["CT_MailMod/Options/MailLog/LogOpennedCheckButton"] = "Geöffnete Briefe protokollieren"
+L["CT_MailMod/Options/MailLog/LogReturnedCheckButton"] = "Zurückgesandte Briefe protokollieren"
+L["CT_MailMod/Options/MailLog/LogSentCheckButton"] = "Gesendete Briefe protokollieren"
+L["CT_MailMod/Options/MailLog/PrintCheckButton"] = "Protokollnachrichten im Chat ausgeben"
+L["CT_MailMod/Options/MailLog/SaveCheckButton"] = "Protokollnachrichten im Briefprotokoll speichern"
+L["CT_MailMod/Options/MailLog/ScaleSliderLabel"] = "Nachrichtenprotokoll Maßstab = <value>"
 L["CT_MailMod/Options/Reset/Heading"] = "Optionen zurücksetzen"
 L["CT_MailMod/Options/Reset/Line 1"] = "Hinweis: Setzt Optionen auf Standardwerte zurück und lädt das Interface neu."
 L["CT_MailMod/Options/Reset/ResetAllCheckbox"] = "Optionen für alle Charaktere zurücksetzen"
 L["CT_MailMod/Options/Reset/ResetButton"] = "Zurücksetzen"
+L["CT_MailMod/Options/SendMail/AltClickCheckButton"] = "Alt-Linksklick fügt Gegenstände zum Register gesendeter Briefe hinzu"
+L["CT_MailMod/Options/SendMail/FilterAutoCompleteCheckButton"] = "Auto-Vervollständigung des Empfängerfeldes filtern"
+L["CT_MailMod/Options/SendMail/FilterAutoCompleteTip"] = "Bei Aktivierung auf den Button neben dem Empfängerfeld klicken um zu filtern nach:"
+L["CT_MailMod/Options/SendMail/Heading"] = "Briefe versenden"
+L["CT_MailMod/Options/SendMail/ReplaceSubjectCheckButton"] = "Leeren Betreff durch Geldbetrag ersetzen"
 L["CT_MailMod/Options/Tips/Heading"] = "Hinweise"
 L["CT_MailMod/Options/Tips/Line1"] = "Durch Eingabe von  /ctmail oder /ctmailmod wird dieses Optionsfenster direkt geöffnet."
 
