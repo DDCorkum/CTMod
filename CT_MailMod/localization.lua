@@ -173,26 +173,27 @@ L["CT_MailMod/MAIL_DELETE_NO"] = "Pas supprimé."
 L["CT_MailMod/MAIL_DELETE_OK"] = "Supprimant le courrier"
 L["CT_MailMod/MAIL_DOWNLOAD_BEGIN"] = "Attendant du courrier d'arriver à la boîte de réception"
 L["CT_MailMod/MAIL_DOWNLOAD_END"] = "Du courrier a arrivé à la boîte de réception"
+L["CT_MailMod/MAIL_LOG"] = "Journ."
 L["CT_MailMod/MAIL_OPEN_CLICK"] = "Appuyez sur |c0080A0FFAlt-clic|r pour prendre les contenus."
-L["CT_MailMod/MAIL_OPEN_IS_COD"] = "Ce courrier demande d'un paiement à la livraison."
+L["CT_MailMod/MAIL_OPEN_IS_COD"] = "Ce courrier demande un paiement à la livraison."
 L["CT_MailMod/MAIL_OPEN_IS_GM"] = "Ce courrier est envoyé par Blizzard."
 L["CT_MailMod/MAIL_OPEN_NO"] = "Pas ouverte."
 L["CT_MailMod/MAIL_OPEN_NO_ITEMS_MONEY"] = "Ce courrier ne contient aucun objet ni argent."
-L["CT_MailMod/MAIL_OPEN_OK"] = "Ouvrant le courrier."
-L["CT_MailMod/MAIL_RETURN_CLICK"] = "Appuyez sur CTRL-clic pour renvoyer ce courrier."
+L["CT_MailMod/MAIL_OPEN_OK"] = "Ouvrir le courrier."
+L["CT_MailMod/MAIL_RETURN_CLICK"] = "Appuyez sur |c0080A0FFCtrl-clic|r pour renvoyer ce courrier."
 L["CT_MailMod/MAIL_RETURN_IS_GM"] = "Ce courrier est envoyé par Blizzard."
 L["CT_MailMod/MAIL_RETURN_IS_RETURNED"] = "Ce courrier est vous renvoyé."
 L["CT_MailMod/MAIL_RETURN_NO"] = "Pas renvoyé."
 L["CT_MailMod/MAIL_RETURN_NO_ITEMS_MONEY"] = "Ce courrier ne contient aucun objet ni argent."
-L["CT_MailMod/MAIL_RETURN_NO_REPLY"] = "Ce n'est pas possible de répondre ce courrier."
+L["CT_MailMod/MAIL_RETURN_NO_REPLY"] = "Ce n'est pas possible de répondre à ce courrier."
 L["CT_MailMod/MAIL_RETURN_NO_SENDER"] = "Ce courrier manque un envoyeur."
-L["CT_MailMod/MAIL_RETURN_OK"] = "Renvoyant le courrier."
+L["CT_MailMod/MAIL_RETURN_OK"] = "Renvoyer le courrier."
 L["CT_MailMod/MAIL_SEND_OK"] = "Le courrier est envoyé."
-L["CT_MailMod/MAIL_TAKE_ITEM_OK"] = "Prenant l'objet."
-L["CT_MailMod/MAIL_TAKE_MONEY_OK"] = "Prenant l'argent."
+L["CT_MailMod/MAIL_TAKE_ITEM_OK"] = "Prendre l'objet."
+L["CT_MailMod/MAIL_TAKE_MONEY_OK"] = "Prendre l'argent."
 L["CT_MailMod/MAIL_TIMEOUT"] = "L'action a arrêté après le dépassement de délai."
-L["CT_MailMod/MAILBOX_BUTTON_TIP1"] = "Obtenir de courrier"
-L["CT_MailMod/MAILBOX_DOWNLOAD_MORE_NOW"] = "Recevoir plus de courrier"
+L["CT_MailMod/MAILBOX_BUTTON_TIP1"] = "Obtenir plus de courrier"
+L["CT_MailMod/MAILBOX_DOWNLOAD_MORE_NOW"] = "Obtenir plus de courrier"
 L["CT_MailMod/MAILBOX_DOWNLOAD_MORE_SOON"] = [=[Plus de courrier arrive
 dans %d seconds]=]
 L["CT_MailMod/MAILBOX_OPTIONS_TIP1"] = [=[Cliquez ce bouton, tapez "/ctmail" ou tapez "/ctcourrier" pour accéder les options de CT_MailMod.
@@ -221,6 +222,7 @@ L["CT_MailMod/SELECT_MESSAGE_TIP2"] = [=[|c0080A0FFClic:|r Sélecter un seul cou
 |c0080A0FFMaj-clic:|r Commencer une gamme
 |c0080A0FFMaj-clic-gauche:|r Finir la gamme et sélectionner les courriers
 |c0080A0FFMaj-clic-droite:|r Finir la gamme et désélectionner les courriers]=]
+L["CT_MailMod/Send/AutoComplete/Tip"] = "Appuyez pour changer les filtres"
 L["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_COPPER"] = "%d cuivre"
 L["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_GOLD"] = "%d or %d argent %d cuivre"
 L["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_SILVER"] = "%d argent %d cuivre"
@@ -236,15 +238,19 @@ L["CT_MailMod/Options/General/BlockTradesCheckButton"] = "Bloquer les échanges 
 L["CT_MailMod/Options/General/Heading"] = "Les options génerales"
 L["CT_MailMod/Options/General/NetIncomeCheckButton"] = "Imprimer le revenu net quand le courrier ferme"
 L["CT_MailMod/Options/Inbox/Checkboxes/Heading"] = "Les cases à cocher"
-L["CT_MailMod/Options/Inbox/Checkboxes/Line1"] = "Passez la souris sur le bouton '?' pour plus d'info"
-L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewCheckButton"] = "Réinitialiser avant faire une gamme (Maj)"
-L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewTip"] = [=[Choisir une gamme en appuyant Maj-click deux fois, ou réduire une gamme en appuyant Maj-clic-droite la deuxième fois. 
+L["CT_MailMod/Options/Inbox/Checkboxes/Line1"] = "Passez la souris sur le '?' pour plus d'info"
+L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewCheckButton"] = "Réinitialiser avant de faire une gamme (Maj)"
+L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewTip"] = [=[Choisir une gamme en appuyant Maj-clic deux fois, 
+ou réduire une gamme en appuyant Maj-clic-droite la deuxième fois. 
+
 Cet option efface les sélections antérieures.]=]
-L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewCheckButton"] = "Réinitialiser avant choisir une éxp. (ctrl)"
-L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewTip"] = [=[Choisir chaque courrier du même éxpéditeur (ctrl-clic-gauche), ou des autres éxpéditeurs (ctrl-clic-droite). 
+L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewCheckButton"] = "Réinitialiser avant de choisir une exp. (ctrl)"
+L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewTip"] = [=[Choisir chaque courrier du même expéditeur (ctrl-clic-gauche), 
+ou des autres expéditeurs (ctrl-clic-droite). 
+
 Cet option efface les sélections antérieures.]=]
 L["CT_MailMod/Options/Inbox/Checkboxes/ShowCheckboxesCheckButton"] = "Montrer les cases à cocher et boutons d'ouv./fer."
-L["CT_MailMod/Options/Inbox/Checkboxes/ShowNumbersCheckButton"] = "Numérer les courriers"
+L["CT_MailMod/Options/Inbox/Checkboxes/ShowNumbersCheckButton"] = "Numéroter les courriers"
 L["CT_MailMod/Options/Inbox/Heading"] = "Boîte de réception"
 L["CT_MailMod/Options/Inbox/HideLogCheckButton"] = "|cFFFF9999Cacher|r le bouton 'Log' (journal)"
 L["CT_MailMod/Options/Inbox/MouseWheelCheckButton"] = "Activer le défilement de la souris"
@@ -254,6 +260,21 @@ L["CT_MailMod/Options/Inbox/ShowExpiryCheckButton"] = "Montrer les boutons d'éx
 L["CT_MailMod/Options/Inbox/ShowInboxCheckButton"] = "Montrer combien de courrier est arrivé"
 L["CT_MailMod/Options/Inbox/ShowLongCheckButton"] = "Diviser des sujets longs en deux lignes"
 L["CT_MailMod/Options/Inbox/ShowMailboxCheckButton"] = "Montrer combien de courrier ne peut pas arriver"
+L["CT_MailMod/Options/MailLog/BackgroundLabel"] = "Le couleur de fond"
+L["CT_MailMod/Options/MailLog/Delete/Button"] = "Effacer"
+L["CT_MailMod/Options/MailLog/Delete/ConfirmationCheckButton"] = "Je veux effacer tous les entrées dans le journal"
+L["CT_MailMod/Options/MailLog/Delete/Heading"] = "Effacer le journal"
+L["CT_MailMod/Options/MailLog/Heading"] = "Le journal de courrier"
+L["CT_MailMod/Options/MailLog/LogDeletedButton"] = "Enregistrer le courrier supprimé"
+L["CT_MailMod/Options/MailLog/LogOpennedCheckButton"] = "Enregistrer le courrier ouvert"
+L["CT_MailMod/Options/MailLog/LogReturnedCheckButton"] = "Enregistrer le courrier renvoyé"
+L["CT_MailMod/Options/MailLog/LogSentCheckButton"] = "Enregistrer le courrier envoyé"
+L["CT_MailMod/Options/MailLog/PrintCheckButton"] = "Imprimer des entrées au fenêtre de discussion"
+L["CT_MailMod/Options/MailLog/SaveCheckButton"] = "Sauvguarder des entrées au journal"
+L["CT_MailMod/Options/MailLog/ScaleSliderLabel"] = "Échelle du journal = <value>"
+L["CT_MailMod/Options/MailLog/Tip"] = [=[Tapez /maillog pour voir un journal de tous courriers envoyés/reçus.
+Changer la grandeur par glisser les bordures gauche et droite,
+ou en utilisant la glissière d’échelle en-bas.]=]
 L["CT_MailMod/Options/Reset/Heading"] = "Réinitialiser les options"
 L["CT_MailMod/Options/Reset/Line 1"] = "Note: Ce bouton va réinitialiser les options aux valeurs défauts et recharger l'interface"
 L["CT_MailMod/Options/Reset/ResetAllCheckbox"] = "Réinitialiser les options pour tous les personnages"
