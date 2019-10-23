@@ -102,50 +102,13 @@ local L = module.text
 -- triggered by module.update("init")
 function module:init()	
 	module.CTRAFrames = NewCTRAFrames();
+	
 	-- convert from pre-BFA CTRA to 8.2.0.5
-	if (not module:getOption("CTRA_LastConversion") or module:getOption("CTRA_LastConversion") < 8.205) then
-		module:setOption("CTRA_LastConversion", 8.205, true)
-		local currSet = CT_RAMenu_CurrSet;
-		local options = CT_RAMenu_Options;
-		if (currSet and options and options[currSet]) then
-			if (CT_Core) then
-				-- to help players find the new options, the minimap button will be forced back to on the first time they log on post-conversion
-				CT_Core:setOption("minimapIcon", nil, true);
-			end
-			C_Timer.After(20,
-				function()
-					DEFAULT_CHAT_FRAME:AddMessage("\n|cFF99FF99CT_RaidAssist has been updated!\nSome old settings were converted, but please type |r/ctra|cFF99FF99 to review the new configuration.");
-				end
-			);
-			if (options[currSet]["ShowGroups"]) then
-				for i=1, 8 do
-					module:setOption("CTRAWindow1_ShowGroup" .. i, options[currSet]["ShowGroups"][i] == 1, true);
-				end
-			end
-			if (options[currSet]["persort"]) then
-				for i=1, 8 do
-					module:setOption("CTRAWindow1_ShowGroup" .. i, options[currSet]["persort"]["group"]["ShowGroups"][i] == 1, true);
-				end
-			end
-			if (options[currSet]["WindowPositions"] and options[currSet]["WindowPositions"]["CT_RAGroupDrag1"]) then
-				module:setOption("MOVABLE-CTRAWindow" .. 1, {"TOPLEFT", nil, "TOPLEFT", options[currSet]["WindowPositions"]["CT_RAGroupDrag1"][1], options[currSet]["WindowPositions"]["CT_RAGroupDrag1"][2], 1}, true);
-			end
-			if (options[currSet]["DefaultColor"]) then
-				module:setOption("CTRAWindow1_ColorBackground", {options[currSet]["DefaultColor"].r, options[currSet]["DefaultColor"].g, options[currSet]["DefaultColor"].b, options[currSet]["DefaultColor"].a}, true);
-			end
-			if (options[currSet]["WindowScaling"]) then
-				module:setOption("CTRAWindow1_PlayerFrameScale", max(min(options[currSet]["WindowScaling"]*100,150),50), true);
-			end
-			if (options[currSet]["ShowHorizontal"]) then
-				module:setOption("CTRAWindow1_Orientation", 2, true);
-			else
-				module:setOption("CTRAWindow1_Orientation", nil, true);
-			end
-			if (options[currSet]["HideMP"]) then
-				module:setOption("CTRAWindow1_EnablePowerBar", false, true);
-			end
-		end
-	end
+	--if (not module:getOption("CTRA_LastConversion") or module:getOption("CTRA_LastConversion") < 8.205) then
+	--	module:setOption("CTRA_LastConversion", 8.205, true)
+	--	-- there was code here to do the conversion, but now that is removed and no longer necessary
+	--
+	--end
 end
 
 -- triggered by CT_Library whenever a setting changes, and upon initialization, to call functions associated with tailoring various functionality as required
@@ -986,6 +949,19 @@ function NewCTRAFrames()
 					optionsWindowizeObject("EnableTargetFrame");
 					optionsAddTooltip("Add a frame underneath with the player's target (often used for tanks)", "ANCHOR_TOPLEFT");
 				optionsEndFrame();
+				
+				-- Buffs and Debuffs
+				optionsAddObject(-10,   17, "font#tl:5:%y#v:GameFontNormal#" .. L["CT_RaidAssist/Options/Window/Auras/Heading"]);
+				optionsAddObject(-15,   26, "font#tl:15:%y#" .. L["CT_RaidAssist/Options/Window/Auras/NoCombatLabel"] .. "#" .. textColor1 .. ":l");
+				optionsBeginFrame(26,   20, "dropdown#tl:150:%y#s:100:%s#n:CTRAWindow_AuraFilterNoCombatDropDown" .. L["CT_RaidAssist/Options/Window/Auras/DropDown"]);
+					optionsWindowizeObject("AuraFilterNoCombat");
+				optionsEndFrame();				
+				optionsAddObject(-15,   26, "font#tl:15:%y#" .. L["CT_RaidAssist/Options/Window/Auras/CombatLabel"] .. "#" .. textColor1 .. ":l");
+				optionsBeginFrame(26,   20, "dropdown#tl:150:%y#s:100:%s#n:CTRAWindow_AuraFilterCombatDropDown" .. L["CT_RaidAssist/Options/Window/Auras/DropDown"]);
+					optionsWindowizeObject("AuraFilterCombat");
+				optionsEndFrame();				
+				
+				-- Colors
 				optionsAddObject(-10,   17, "font#tl:5:%y#v:GameFontNormal#Colors");
 				optionsBeginFrame(-10, 0, "frame#tl:0:%y#br:tr:0:%b#");
 					optionsAddScript("onload",
@@ -1156,8 +1132,8 @@ function NewCTRAWindow(owningCTRAFrames)
 		["ColorReadyCheckNotReady"] = {0.80, 0.45, 0.45, 1.00},
 		["HealthBarAsBackground"] = false,
 		["EnablePowerBar"] = true,
-		["PlayerFrameShowGenericDebuffs"] = 1,			--auto, show only debuff types the player can remove
-		["PlayerFrameShowEncounterDebuffs"] = 1,		--auto, show only debuff types the player is concerned with based on role
+		["AuraFilterNoCombat"] = 1,
+		["AuraFilterCombat"] = 2,
 		["EnableTargetFrame"] = false,
 	};
 
@@ -1655,7 +1631,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	local powerBar, powerBarWidth;
 	local roleTexture;
 	local unitNameFontStringLarge, unitNameFontStringSmall;
-	local aura1Texture, aura2Texture, aura3Texture;
+	local aura1Texture, aura2Texture, aura3Texture, auraBoss1Texture, auraBoss2Texture;
 	local statusTexture, statusFontString, statusBackground;
 	
 	
@@ -2095,39 +2071,70 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 		aura3Texture = aura3Texture or visualFrame:CreateTexture(nil, "OVERLAY");
 		aura3Texture:SetSize(9,9);
 		aura3Texture:SetPoint("TOPRIGHT", visualFrame, -5, -25);
+		
+		auraBoss1Texture = auraBoss1Texture or visualFrame:CreateTexture(nil, "OVERLAY");
+		auraBoss1Texture:SetSize(11,11);
+		auraBoss1Texture:SetPoint("TOPRIGHT", visualFrame, -15, -24);
+		
+		auraBoss2Texture = auraBoss2Texture or visualFrame:CreateTexture(nil, "OVERLAY");
+		auraBoss2Texture:SetSize(11,11);
+		auraBoss2Texture:SetPoint("TOPRIGHT", visualFrame, -15, -12);
 	end
 	
 	-- creates and updates buff/debuff icons
 	local updateAuras = function()
 		if (shownUnit) then
 			if(UnitExists(shownUnit) and not UnitIsDeadOrGhost(shownUnit)) then
-				local filter = (InCombatLockdown() and "RAID HARMFUL") or "RAID HELPFUL";
-				local name, icon = UnitAura(shownUnit, 1, filter);
-				if (name) then
-					aura1Texture:SetTexture(icon);
-					aura1Texture:Show();
-					aura1Texture.name = name;
-					name, icon = UnitAura(shownUnit, 2, filter);
-					if (name) then
-						aura2Texture:SetTexture(icon);
-						aura2Texture:Show();
-						aura2Texture.name = name;
-						name, icon = UnitAura(shownUnit, 3, filter);
-						if (name) then
-							aura3Texture:SetTexture(icon);
-							aura3Texture:Show();
-							aura3Texture.name = name;
-						else
-							aura3Texture:Hide();
-						end
-					else
-						aura2Texture:Hide();
-						aura3Texture:Hide();
-					end
+				local filterType = (InCombatLockdown() and owner:GetProperty("AuraFilterCombat") or owner:GetProperty("AuraFilterNoCombat"));
+				local filterText;
+				if (filterType == 1) then
+					filterText = "RAID HELPFUL";	-- default out of combat
+				elseif (filterType == 2) then
+					filterText = "RAID HARMFUL";	-- default in combat
+				elseif (filterType == 3) then
+					filterText = "HELPFUL";
+				elseif (filterType == 4) then
+					filterText = "HARMFUL";
+				elseif (filterType == 5) then
+					filterText = "HELPFUL";
 				else
-					aura1Texture:Hide();
-					aura2Texture:Hide();
-					aura3Texture:Hide();
+					filterText = "HELPFUL HARMFUL"	-- essentially deactivates the feature, by filtering out everything
+				end
+				local numShown, numBossShown, auraIndex = 0, 0, 0;
+				while (numShown + numBossShown < 5  and auraIndex < 40) do
+					auraIndex = auraIndex + 1;
+					local name, icon, count, debuffType, duration, expirationTime, source, isStealable, nameplateShowPersonal, spellId, canApplyAura, isBossDebuff, castByPlayer, nameplateShowAll, timeMod = UnitAura(shownUnit, auraIndex, filterText);
+					if (not name or not spellId) then
+						break;
+					elseif(
+						(not SpellIsSelfBuff(spellId) or isBossDebuff or debuffType)
+						and (filterType ~=5 or source == "player" or source == "vehicle" or source == "pet")
+					) then
+						if (isBossDebuff and numBossShown < 2) then
+							numBossShown = numBossShown + 1;
+							local tex = (numBossShown == 1 and auraBoss1Texture) or auraBoss2Texture;
+							tex:SetTexture(icon);
+							tex:Show();
+							tex.name = name
+						elseif (numShown < 3) then
+							numShown = numShown + 1;
+							local tex = (numShown == 1 and aura1Texture) or (numShown == 2 and aura2Texture) or aura3Texture;
+							tex:SetTexture(icon);
+							tex:Show();
+							tex.name = name;
+							tex.debuffType = debuffType;
+						end
+					end
+				end
+				while (numShown < 3) do
+					numShown = numShown + 1
+					local tex = (numShown == 1 and aura1Texture) or (numShown == 2 and aura2Texture) or aura3Texture;
+					tex:Hide();
+				end
+				while (numBossShown  < 2) do
+					numBossShown = numBossShown + 1
+					local tex = (numBossShown == 1 and auraBoss1Texture) or auraBoss2Texture;
+					tex:Hide();
 				end
 			else
 				aura1Texture:Hide();
@@ -2316,6 +2323,12 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 							GameTooltip:AddDoubleLine(UnitName(shownUnit) or "", UnitLevel(shownUnit) or "", r,g,b, 1,1,1);
 							local mapid = C_Map.GetBestMapForUnit(shownUnit);
 							GameTooltip:AddDoubleLine((UnitRace(shownUnit) or "") .. " " .. (className or ""), (not UnitInRange(shownUnit) and mapid and C_Map.GetMapInfo(mapid).name) or "", 1, 1, 1, 0.5, 0.5, 0.5);
+							if (auraBoss1Texture:IsShown()) then
+								GameTooltip:AddLine("|T" .. auraBoss1Texture:GetTexture() .. ":0|t  " .. (auraBoss1Texture.name or ""));
+								if (auraBoss2Texture:IsShown()) then
+									GameTooltip:AddLine("|T" .. auraBoss2Texture:GetTexture() .. ":0|t  " .. (auraBoss2Texture.name or ""));
+								end
+							end
 							if (aura1Texture:IsShown()) then
 								GameTooltip:AddLine("|T" .. aura1Texture:GetTexture() .. ":0|t  " .. (aura1Texture.name or ""));
 								if (aura2Texture:IsShown()) then

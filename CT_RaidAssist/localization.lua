@@ -35,6 +35,10 @@ L["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksTooltip"] = [=[Provide
 after missing a /readycheck]=]
 L["CT_RaidAssist/Options/GeneralFeatures/Heading"] = "General Features"
 L["CT_RaidAssist/Options/GeneralFeatures/Line1"] = "These general features are separate from the custom raid frames."
+L["CT_RaidAssist/Options/Window/Auras/CombatLabel"] = "Show during combat:"
+L["CT_RaidAssist/Options/Window/Auras/DropDown"] = "#Group buffs I can apply#Debuffs I can remove#All group buffs#All debuffs#Group buffs I applied#Nothing"
+L["CT_RaidAssist/Options/Window/Auras/Heading"] = "Buffs and Debuffs"
+L["CT_RaidAssist/Options/Window/Auras/NoCombatLabel"] = "Show out of combat:"
 L["CT_RaidAssist/Options/Window/Groups/ClassHeader"] = "Classes"
 L["CT_RaidAssist/Options/Window/Groups/GroupHeader"] = "Groups"
 L["CT_RaidAssist/Options/Window/Groups/GroupTooltipContent"] = [=[0.9:0.9:0.9#|cFFFFFF99During a raid: |r

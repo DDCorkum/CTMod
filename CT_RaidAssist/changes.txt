@@ -1,6 +1,7 @@
 CT_RaidAssist (8.2.5.5) 2019-10-14
 - Changes corresponding to CT_Library
 - Eliminated bug when zoning in to a new area
+- More control over displaying buffs and debuffs
 
 CT_RaidAssist (8.2.5.4) 2019-10-11
 - Fixed the large-row/large-column wrapping
