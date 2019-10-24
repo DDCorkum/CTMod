@@ -946,15 +946,15 @@ function NewCTRAFrames()
 				
 				-- Buffs and Debuffs
 				optionsAddObject(-10,   17, "font#tl:5:%y#v:GameFontNormal#" .. L["CT_RaidAssist/Options/Window/Auras/Heading"]);
-				optionsAddObject(-15,   26, "font#tl:15:%y#" .. L["CT_RaidAssist/Options/Window/Auras/NoCombatLabel"] .. "#" .. textColor1 .. ":l");
-				optionsBeginFrame(26,   20, "dropdown#tl:150:%y#s:100:%s#n:CTRAWindow_AuraFilterNoCombatDropDown" .. L["CT_RaidAssist/Options/Window/Auras/DropDown"]);
+				optionsAddObject(-15,   26, "font#tl:13:%y#" .. L["CT_RaidAssist/Options/Window/Auras/NoCombatLabel"] .. "#" .. textColor1 .. ":l");
+				optionsBeginFrame(26,   20, "dropdown#tl:140:%y#s:110:%s#n:CTRAWindow_AuraFilterNoCombatDropDown" .. L["CT_RaidAssist/Options/Window/Auras/DropDown"]);
 					optionsWindowizeObject("AuraFilterNoCombat");
 				optionsEndFrame();				
-				optionsAddObject(-15,   26, "font#tl:15:%y#" .. L["CT_RaidAssist/Options/Window/Auras/CombatLabel"] .. "#" .. textColor1 .. ":l");
-				optionsBeginFrame(26,   20, "dropdown#tl:150:%y#s:100:%s#n:CTRAWindow_AuraFilterCombatDropDown" .. L["CT_RaidAssist/Options/Window/Auras/DropDown"]);
+				optionsAddObject(-15,   26, "font#tl:13:%y#" .. L["CT_RaidAssist/Options/Window/Auras/CombatLabel"] .. "#" .. textColor1 .. ":l");
+				optionsBeginFrame(26,   20, "dropdown#tl:140:%y#s:110:%s#n:CTRAWindow_AuraFilterCombatDropDown" .. L["CT_RaidAssist/Options/Window/Auras/DropDown"]);
 					optionsWindowizeObject("AuraFilterCombat");
 				optionsEndFrame();
-				optionsBeginFrame(-10, 15, "checkbutton#tl:40:%y#n:CTRAWindow_ShowBossAurasCheckButton#" .. L["CT_RaidAssist/Options/Window/Auras/ShowBossCheckButton"]);
+				optionsBeginFrame(-10, 15, "checkbutton#tl:10:%y#n:CTRAWindow_ShowBossAurasCheckButton#" .. L["CT_RaidAssist/Options/Window/Auras/ShowBossCheckButton"]);
 					optionsWindowizeObject("ShowBossAuras");
 					optionsAddTooltip(L["CT_RaidAssist/Options/Window/Auras/ShowBossTip"], "ANCHOR_TOPLEFT");
 				optionsEndFrame();
