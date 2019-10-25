@@ -1,3 +1,8 @@
+CT_MailMod (8.2.5.5) 2019-10-18
+- Fix to text on the open/return buttons after actions performed
+- Further localization
+- Reducing filesize using Blizzard textures instead of custom ones
+
 CT_MailMod (8.2.5.4) 2019-10-12
 - Adding more French localization
 

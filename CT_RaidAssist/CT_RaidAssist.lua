@@ -102,50 +102,13 @@ local L = module.text
 -- triggered by module.update("init")
 function module:init()	
 	module.CTRAFrames = NewCTRAFrames();
+	
 	-- convert from pre-BFA CTRA to 8.2.0.5
-	if (not module:getOption("CTRA_LastConversion") or module:getOption("CTRA_LastConversion") < 8.205) then
-		module:setOption("CTRA_LastConversion", 8.205, true)
-		local currSet = CT_RAMenu_CurrSet;
-		local options = CT_RAMenu_Options;
-		if (currSet and options and options[currSet]) then
-			if (CT_Core) then
-				-- to help players find the new options, the minimap button will be forced back to on the first time they log on post-conversion
-				CT_Core:setOption("minimapIcon", nil, true);
-			end
-			C_Timer.After(20,
-				function()
-					DEFAULT_CHAT_FRAME:AddMessage("\n|cFF99FF99CT_RaidAssist has been updated!\nSome old settings were converted, but please type |r/ctra|cFF99FF99 to review the new configuration.");
-				end
-			);
-			if (options[currSet]["ShowGroups"]) then
-				for i=1, 8 do
-					module:setOption("CTRAWindow1_ShowGroup" .. i, options[currSet]["ShowGroups"][i] == 1, true);
-				end
-			end
-			if (options[currSet]["persort"]) then
-				for i=1, 8 do
-					module:setOption("CTRAWindow1_ShowGroup" .. i, options[currSet]["persort"]["group"]["ShowGroups"][i] == 1, true);
-				end
-			end
-			if (options[currSet]["WindowPositions"] and options[currSet]["WindowPositions"]["CT_RAGroupDrag1"]) then
-				module:setOption("MOVABLE-CTRAWindow" .. 1, {"TOPLEFT", nil, "TOPLEFT", options[currSet]["WindowPositions"]["CT_RAGroupDrag1"][1], options[currSet]["WindowPositions"]["CT_RAGroupDrag1"][2], 1}, true);
-			end
-			if (options[currSet]["DefaultColor"]) then
-				module:setOption("CTRAWindow1_ColorBackground", {options[currSet]["DefaultColor"].r, options[currSet]["DefaultColor"].g, options[currSet]["DefaultColor"].b, options[currSet]["DefaultColor"].a}, true);
-			end
-			if (options[currSet]["WindowScaling"]) then
-				module:setOption("CTRAWindow1_PlayerFrameScale", max(min(options[currSet]["WindowScaling"]*100,150),50), true);
-			end
-			if (options[currSet]["ShowHorizontal"]) then
-				module:setOption("CTRAWindow1_Orientation", 2, true);
-			else
-				module:setOption("CTRAWindow1_Orientation", nil, true);
-			end
-			if (options[currSet]["HideMP"]) then
-				module:setOption("CTRAWindow1_EnablePowerBar", false, true);
-			end
-		end
-	end
+	--if (not module:getOption("CTRA_LastConversion") or module:getOption("CTRA_LastConversion") < 8.205) then
+	--	module:setOption("CTRA_LastConversion", 8.205, true)
+	--	-- there was code here to do the conversion, but now that is removed and no longer necessary
+	--
+	--end
 end
 
 -- triggered by CT_Library whenever a setting changes, and upon initialization, to call functions associated with tailoring various functionality as required
@@ -170,13 +133,14 @@ function module:frame()
 	local optionsAddFrame = function(offset, size, details, data) module:framesAddFrame(optionsFrameList, offset, size, details, data); end
 	local optionsAddObject = function(offset, size, details) module:framesAddObject(optionsFrameList, offset, size, details); end
 	local optionsAddScript = function(name, func) module:framesAddScript(optionsFrameList, name, func); end
+	local optionsAddTooltip = function(text, anchor, offx, offy, owner) module:framesAddScript(optionsFrameList, "onenter", function(obj) module:displayTooltip(obj, text, anchor, offx, offy, owner); end); end
 	local optionsBeginFrame = function(offset, size, details, data) module:framesBeginFrame(optionsFrameList, offset, size, details, data); end
 	local optionsEndFrame = function() module:framesEndFrame(optionsFrameList); end
+
 
 	-- commonly used colors
 	local textColor1 = "0.9:0.9:0.9";
 	local textColor2 = "0.7:0.7:0.7";
-	local textColor3 = "0.9:0.72:0.0";
 	
 	-- actual start of the options objects, ended by optionsGetData()
 	optionsInit();
@@ -185,14 +149,7 @@ function module:frame()
 		optionsAddObject(-20, 17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_RaidAssist/Options/GeneralFeatures/Heading"]);
 		optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. L["CT_RaidAssist/Options/GeneralFeatures/Line1"] .. "#" .. textColor2 .. ":l");
 		optionsBeginFrame(-15, 26, "checkbutton#tl:10:%y#n:CTRA_ExtendReadyChecksCheckButton#o:CTRA_ExtendReadyChecks:1#" .. L["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksCheckButton"]);
-			optionsAddScript("onenter", function(button)
-					module:displayTooltip(button, L["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksTooltip"], "ANCHOR_TOPLEFT");
-				end
-			);
-			optionsAddScript("onleave", function()
-					module:hideTooltip();
-				end
-			);
+			optionsAddTooltip(L["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksTooltip"], "ANCHOR_TOPLEFT");
 		optionsEndFrame();
 		
 
@@ -329,6 +286,15 @@ local CTRA_Configuration_RezAbilities =
 	},
 }
 
+-- Which debuffs associated with boss encounters are super important and worth putting in the middle of the frame
+-- This is only checked when Blizzard's UnitAura() api does not return true for isBossDebuff (12th return value)
+-- key: 	spellId
+-- value:	anything that evaluates to true
+local CTRA_Configuration_BossDebuffs =
+{
+	-- Battle for Azeroth
+	[292133] = 1,	-- Blackwater Behemoth: Bioluminescence
+}
 
 --------------------------------------------
 -- Extended Ready Checks
@@ -536,13 +502,37 @@ function NewCTRAFrames()
 		local optionsAddFrame = function(offset, size, details, data) module:framesAddFrame(optionsFrameList, offset, size, details, data); end
 		local optionsAddObject = function(offset, size, details) module:framesAddObject(optionsFrameList, offset, size, details); end
 		local optionsAddScript = function(name, func) module:framesAddScript(optionsFrameList, name, func); end
+		local optionsAddTooltip = function(text, anchor, offx, offy, owner) module:framesAddScript(optionsFrameList, "onenter", function(obj) module:displayTooltip(obj, text, anchor, offx, offy, owner); end); end
 		local optionsBeginFrame = function(offset, size, details, data) module:framesBeginFrame(optionsFrameList, offset, size, details, data); end
 		local optionsEndFrame = function() module:framesEndFrame(optionsFrameList); end
 		
+		local optionsWindowizeObject = function(property) 
+			-- overloads the traditional CT_Library behaviour
+			optionsAddScript("onload",
+				function(obj)
+					obj.option = function() return "CTRAWindow" .. selectedWindow .. "_" .. property; end
+				end
+			);
+		end
+
+		local optionsWindowizeSlider = function(property) 
+			-- overloads the traditional CT_Library behaviour; same as above but with .suspend property
+			optionsAddScript("onload",
+				function(slider)
+					slider.option = function()
+						if (slider.suspend) then
+							return nil;
+						else
+							return "CTRAWindow" .. selectedWindow .. "_" .. property;
+						end
+					end
+				end
+			);
+		end		
+						
 		-- commonly used colors
 		local textColor1 = "0.9:0.9:0.9";
 		local textColor2 = "0.7:0.7:0.7";
-		local textColor3 = "0.9:0.72:0.0";
 		
 		
 		-- Heading
@@ -567,11 +557,6 @@ function NewCTRAFrames()
 					settingsOverlayToStopClicks:SetScript("OnEnter",
 						function()
 							module:displayTooltip(settingsOverlayToStopClicks, "Raid frames are currently disabled!\nYou must enable them using the dropdown above.", "ANCHOR_CURSOR");
-						end
-					);
-					settingsOverlayToStopClicks:SetScript("OnLeave",
-						function()
-							module:hideTooltip()
 						end
 					);
 				end
@@ -691,16 +676,7 @@ function NewCTRAFrames()
 							print(format(L["CT_RaidAssist/Options/WindowControls/WindowAddedMessage"],selectedWindow));
 						end
 					);
-					optionsAddScript("onenter",
-						function(button)
-							module:displayTooltip(button, {L["CT_RaidAssist/Options/WindowControls/AddTooltip"] .. "#1:0.82:1"}, "ANCHOR_TOPLEFT")
-						end
-					);
-					optionsAddScript("onleave",
-						function()
-							module:hideTooltip();
-						end
-					);
+					optionsAddTooltip({L["CT_RaidAssist/Options/WindowControls/AddTooltip"] .. "#1:0.82:1"}, "ANCHOR_TOPLEFT");
 				optionsEndFrame();
 				
 				-- clone an existing window
@@ -722,16 +698,7 @@ function NewCTRAFrames()
 							print(format(L["CT_RaidAssist/Options/WindowControls/WindowClonedMessage"],selectedWindow));
 						end
 					);
-					optionsAddScript("onenter",
-						function(button)
-							module:displayTooltip(button, {L["CT_RaidAssist/Options/WindowControls/CloneTooltip"] .. "#1:0.82:1#w"}, "ANCHOR_TOPLEFT")
-						end
-					);
-					optionsAddScript("onleave",
-						function()
-							module:hideTooltip();
-						end
-					);
+					optionsAddTooltip({L["CT_RaidAssist/Options/WindowControls/CloneTooltip"] .. "#1:0.82:1#w"}, "ANCHOR_TOPLEFT");
 				optionsEndFrame();
 				
 				-- delete a window
@@ -780,16 +747,7 @@ function NewCTRAFrames()
 							print(format(L["CT_RaidAssist/Options/WindowControls/WindowDeletedMessage"],windowToDelete));
 						end
 					);
-					optionsAddScript("onenter",
-						function(button)
-							module:displayTooltip(button, {L["CT_RaidAssist/Options/WindowControls/DeleteTooltip"] .. "#1:0.82:1#w"}, "ANCHOR_TOPLEFT")
-						end
-					);
-					optionsAddScript("onleave",
-						function()
-							module:hideTooltip();
-						end
-					);
+					optionsAddTooltip({L["CT_RaidAssist/Options/WindowControls/DeleteTooltip"] .. "#1:0.82:1#w"}, "ANCHOR_TOPLEFT");
 					optionsAddScript("onshow",
 						function(button)
 							if ((module:getOption("CTRAFrames_NumEnabledWindows") or 1) == 1) then
@@ -817,16 +775,7 @@ function NewCTRAFrames()
 							end
 							
 						);
-					optionsAddScript("onenter",
-						function(slider)
-							module:displayTooltip(CTCONTROLPANEL or slider, {L["CT_RaidAssist/Options/Window/Groups/GroupTooltipHeader"],L["CT_RaidAssist/Options/Window/Groups/GroupTooltipContent"]}, "CT_ABOVEBELOW");
-						end
-					);
-					optionsAddScript("onleave",
-						function()
-							module:hideTooltip();
-						end
-					);
+						optionsAddTooltip({L["CT_RaidAssist/Options/Window/Groups/GroupTooltipHeader"],L["CT_RaidAssist/Options/Window/Groups/GroupTooltipContent"]}, "CT_BESIDE", 0, 0, CTCONTROLPANEL);
 					optionsEndFrame();
 				end
 				optionsAddObject(220, 20, "font#tl:110:%y#s:0:%s#" .. L["CT_RaidAssist/Options/Window/Groups/RoleHeader"] .. "#" .. textColor1 .. ":l");
@@ -890,92 +839,31 @@ function NewCTRAFrames()
 				optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. L["CT_RaidAssist/Options/Window/Layout/Tip"] .. "#" .. textColor2 .. ":l");
 				optionsAddObject(-15, 26, "font#tl:15:%y#" .. L["CT_RaidAssist/Options/Window/Layout/OrientationLabel"] .. "#" .. textColor1 .. ":l");
 				optionsBeginFrame(26,   20, "dropdown#tl:140:%y#s:100:%s#n:CTRAWindow_OrientationDropDown" .. L["CT_RaidAssist/Options/Window/Layout/OrientationDropdown"]);
-					optionsAddScript("onload",
-						function(dropdown)
-							dropdown.option = function() return "CTRAWindow" .. selectedWindow .. "_Orientation"; end
-						end
-					);
+					optionsWindowizeObject("Orientation");
 				optionsEndFrame();
 				optionsAddObject(-20, 26, "font#tl:15:%y#" .. L["CT_RaidAssist/Options/Window/Layout/WrapLabel"] .. "#" .. textColor1 .. ":l");
 				optionsBeginFrame(26, 17, "slider#tl:160:%y#s:110:%s#n:CTRAWindow_WrapAfterSlider#" .. L["CT_RaidAssist/Options/Window/Layout/WrapSlider"] .. ":2:40#2:40:1");
-					optionsAddScript("onload",
-						function(slider)
-							slider.option = function()
-								if (slider.suspend) then
-									return nil;
-								else
-									return "CTRAWindow" .. selectedWindow .. "_WrapAfter";
-								end
-							end
-						end
-					);
-					optionsAddScript("onenter",
-						function(slider)
-							module:displayTooltip(CTCONTROLPANEL or slider, {L["CT_RaidAssist/Options/Window/Layout/WrapTooltipHeader"],L["CT_RaidAssist/Options/Window/Layout/WrapTooltipContent"]}, "CT_ABOVEBELOW");
-						end
-					);
-					optionsAddScript("onleave",
-						function()
-							module:hideTooltip();
-						end
-					);
+					optionsWindowizeSlider("WrapAfter");
+					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Layout/WrapTooltipHeader"],L["CT_RaidAssist/Options/Window/Layout/WrapTooltipContent"]}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
 				optionsEndFrame();
 				optionsBeginFrame(-10, 15, "checkbutton#tl:40:%y#n:CTRAWindow_GrowUpwardCheckButton#Grow Upward");
-					optionsAddScript("onload",
-						function(button)
-							button.option = function() return "CTRAWindow" .. selectedWindow .. "_GrowUpward"; end
-						end
-					);
+					optionsWindowizeObject("GrowUpward");
 				optionsEndFrame();
 				optionsBeginFrame(15, 15, "checkbutton#tl:160:%y#n:CTRAWindow_GrowLeftCheckButton#Grow Left");
-					optionsAddScript("onload",
-						function(button)
-							button.option = function() return "CTRAWindow" .. selectedWindow .. "_GrowLeft"; end
-						end
-					);
+					optionsWindowizeObject("GrowLeft");
 				optionsEndFrame();				
 				-- Size and Spacing
 				optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormal#Size and Spacing");
 				optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#Should frames touch each other, or be spaced apart vertically and horizontally?#" .. textColor2 .. ":l");
 				optionsBeginFrame(-20, 17, "slider#tl:15:%y#s:110:%s#n:CTRAWindow_HorizontalSpacingSlider#HSpacing = <value>:Touching:Far#0:100:1");
-					optionsAddScript("onload",
-						function(slider)
-							slider.option = function()
-								if (slider.suspend) then
-									return nil;
-								else
-									return "CTRAWindow" .. selectedWindow .. "_HorizontalSpacing";
-								end
-							end
-						end
-					);
+					optionsWindowizeSlider("HorizontalSpacing");
 				optionsEndFrame();
 				optionsBeginFrame( 20, 17, "slider#tl:150:%y#s:110:%s#n:CTRAWindow_VerticalSpacingSlider#VSpacing = <value>:Touching:Far#0:100:1");
-					optionsAddScript("onload",
-						function(slider)
-							slider.option = function()
-								if (slider.suspend) then
-									return nil;
-								else
-									return "CTRAWindow" .. selectedWindow .. "_VerticalSpacing";
-								end
-							end
-						end
-					);
+					optionsWindowizeSlider("VerticalSpacing");
 				optionsEndFrame();
 				optionsAddObject(-25, 1*14, "font#tl:15:%y#s:0:%s#l:13:0#r#How big should the frames themselves be?#" .. textColor2 .. ":l");
 				optionsBeginFrame(-20, 17, "slider#tl:50:%y#s:200:%s#n:CTRAWindow_PlayerFrameScaleSlider#Scale = <value>%:50%:150%#50:150:5");
-					optionsAddScript("onload",
-						function(slider)
-							slider.option = function()
-								if (slider.suspend) then
-									return nil;
-								else
-									return "CTRAWindow" .. selectedWindow .. "_PlayerFrameScale";
-								end
-							end
-						end
-					);
+					optionsWindowizeSlider("PlayerFrameScale");
 				optionsEndFrame();
 				
 				
@@ -1004,16 +892,7 @@ function NewCTRAFrames()
 							windows[selectedWindow]:Focus();
 						end
 					);
-					optionsAddScript("onenter",
-							function(button)
-								module:displayTooltip(button, "Keep the retro look from CTRA in Vanilla", "ANCHOR_TOPLEFT");
-							end
-						);
-					optionsAddScript("onleave",
-							function()
-								module:hideTooltip();
-							end
-						);
+					optionsAddTooltip("Keep the retro look from CTRA in Vanilla", "ANCHOR_TOPLEFT");
 				optionsEndFrame();
 				optionsBeginFrame( 30, 30, "button#tl:110:%y#s:80:%s#v:UIPanelButtonTemplate#Hybrid#n:CTRAWindow_HybridSchemeButton");
 					optionsAddScript("onclick", 
@@ -1036,16 +915,7 @@ function NewCTRAFrames()
 							windows[selectedWindow]:Focus();
 						end
 					);
-					optionsAddScript("onenter",
-							function(button)
-								module:displayTooltip(button, "In-between the classic and modern looks", "ANCHOR_TOPLEFT");
-							end
-						);
-					optionsAddScript("onleave",
-							function()
-								module:hideTooltip();
-							end
-						);
+					optionsAddTooltip("In-between the classic and modern looks", "ANCHOR_TOPLEFT");
 				optionsEndFrame();
 				optionsBeginFrame( 30, 30, "button#tl:205:%y#s:80:%s#v:UIPanelButtonTemplate#Modern#n:CTRAWindow_ModernSchemeButton");
 					optionsAddScript("onclick", 
@@ -1068,75 +938,38 @@ function NewCTRAFrames()
 							windows[selectedWindow]:Focus();
 						end
 					);
-					optionsAddScript("onenter",
-							function(button)
-								module:displayTooltip(button, "Adopt a modern feel like many other addons", "ANCHOR_TOPLEFT");
-							end
-						);
-					optionsAddScript("onleave",
-							function()
-								module:hideTooltip();
-							end
-						);
+					optionsAddTooltip("Adopt a modern feel like many other addons", "ANCHOR_TOPLEFT");
 				optionsEndFrame();
 				optionsBeginFrame(-10, 26, "checkbutton#tl:10:%y#n:CTRAWindow_HealthBarAsBackgroundCheckButton:false#Show health as full-size background");
-					optionsAddScript("onload",
-						function(checkbox)
-							checkbox.option = function()
-								return "CTRAWindow" .. selectedWindow .. "_HealthBarAsBackground";
-							end
-						end
-					);
-					optionsAddScript("onenter",
-							function(checkbox)
-								module:displayTooltip(checkbox, "Fill the entire background instead of a small bar", "ANCHOR_TOPLEFT");
-							end
-						);
-					optionsAddScript("onleave",
-							function()
-								module:hideTooltip();
-							end
-						);
+					optionsWindowizeObject("HealthBarAsBackground");
+					optionsAddTooltip("Fill the entire background instead of a small bar", "ANCHOR_TOPLEFT");
 				optionsEndFrame();
 				optionsBeginFrame(0, 26, "checkbutton#tl:10:%y#n:CTRAWindow_EnablePowerBarCheckButton:true#Show power bar?");
-					optionsAddScript("onload",
-						function(checkbox)
-							checkbox.option = function()
-								return "CTRAWindow" .. selectedWindow .. "_EnablePowerBar";
-							end
-						end
-					);
-					optionsAddScript("onenter",
-							function(checkbox)
-								module:displayTooltip(checkbox, "Show the mana, energy, rage, etc. at the bottom", "ANCHOR_TOPLEFT");
-							end
-						);
-					optionsAddScript("onleave",
-							function()
-								module:hideTooltip();
-							end
-						);
+					optionsWindowizeObject("EnablePowerBar");
+					optionsAddTooltip("Show the mana, energy, rage, etc. at the bottom", "ANCHOR_TOPLEFT");
 				optionsEndFrame();
 				optionsBeginFrame(0, 26, "checkbutton#tl:10:%y#n:CTRAWindow_EnableTargetFrameCheckButton:true#Show the target underneath?");
-					optionsAddScript("onload",
-						function(checkbox)
-							checkbox.option = function()
-								return "CTRAWindow" .. selectedWindow .. "_EnableTargetFrame";
-							end
-						end
-					);
-					optionsAddScript("onenter",
-							function(checkbox)
-								module:displayTooltip(checkbox, "Add a frame underneath with the player's target (often used for tanks)", "ANCHOR_TOPLEFT");
-							end
-						);
-					optionsAddScript("onleave",
-							function()
-								module:hideTooltip();
-							end
-						);
+					optionsWindowizeObject("EnableTargetFrame");
+					optionsAddTooltip("Add a frame underneath with the player's target (often used for tanks)", "ANCHOR_TOPLEFT");
 				optionsEndFrame();
-				optionsAddObject(-10,   17, "font#tl:5:%y#v:GameFontNormal#Colors");
+				
+				-- Buffs and Debuffs
+				optionsAddObject(-10,   17, "font#tl:5:%y#v:GameFontNormal#" .. L["CT_RaidAssist/Options/Window/Auras/Heading"]);
+				optionsAddObject(-15,   26, "font#tl:13:%y#" .. L["CT_RaidAssist/Options/Window/Auras/NoCombatLabel"] .. "#" .. textColor1 .. ":l");
+				optionsBeginFrame(26,   20, "dropdown#tl:140:%y#s:110:%s#n:CTRAWindow_AuraFilterNoCombatDropDown" .. L["CT_RaidAssist/Options/Window/Auras/DropDown"]);
+					optionsWindowizeObject("AuraFilterNoCombat");
+				optionsEndFrame();				
+				optionsAddObject(-15,   26, "font#tl:13:%y#" .. L["CT_RaidAssist/Options/Window/Auras/CombatLabel"] .. "#" .. textColor1 .. ":l");
+				optionsBeginFrame(26,   20, "dropdown#tl:140:%y#s:110:%s#n:CTRAWindow_AuraFilterCombatDropDown" .. L["CT_RaidAssist/Options/Window/Auras/DropDown"]);
+					optionsWindowizeObject("AuraFilterCombat");
+				optionsEndFrame();
+				optionsBeginFrame(-10, 15, "checkbutton#tl:10:%y#n:CTRAWindow_ShowBossAurasCheckButton#" .. L["CT_RaidAssist/Options/Window/Auras/ShowBossCheckButton"]);
+					optionsWindowizeObject("ShowBossAuras");
+					optionsAddTooltip(L["CT_RaidAssist/Options/Window/Auras/ShowBossTip"], "ANCHOR_TOPLEFT");
+				optionsEndFrame();
+				
+				-- Colors
+				optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormal#Colors");
 				optionsBeginFrame(-10, 0, "frame#tl:0:%y#br:tr:0:%b#");
 					optionsAddScript("onload",
 						function(frame)
@@ -1178,20 +1011,11 @@ function NewCTRAFrames()
 						{property = "ColorUnitZeroHealthCombat", label = "Near Death Combat", tooltip = "Color of the health bar when nearly dead during combat"},
 					}) do
 						optionsBeginFrame((i==1 and 30) or (i == 8 and 37) or -5, 16, "colorswatch#tl:" .. ((i > 7 and "-10") or "130") .. ":%y#s:16:16#n:CTRAWindow_" .. item.property .. "ColorSwatch#true");  -- the final #true causes it to use alpha
-							optionsAddScript("onload",
-								function(swatch)
-									swatch.option = function() return "CTRAWindow" .. selectedWindow .. "_" .. item.property; end
-								end
-							);
+							optionsWindowizeObject(item.property);
 							optionsAddScript("onenter",
 								function(swatch)
 									local r, g, b, a = unpack(windows[selectedWindow]:GetProperty(item.property));
 									module:displayTooltip(swatch, {item.tooltip .. "#" .. 1 - ((1-r)/3) .. ":" .. 1 - ((1-g)/3) .. ":" .. 1 - ((1-b)/3) , "Current:  |cFFFF6666r = " .. floor(100*r) .. "%|r, |cFF66FF66g = " .. floor(100*g) .. "%|r, |cFF6666FFb = " .. floor(100*b) .. ((a and ("%|r, |cFFFFFFFFa = " .. floor(100*a) .. "%")) or "%")}, "ANCHOR_TOPLEFT");
-								end
-							);
-							optionsAddScript("onleave",
-								function()
-									module:hideTooltip();
 								end
 							);
 						optionsEndFrame();
@@ -1315,8 +1139,9 @@ function NewCTRAWindow(owningCTRAFrames)
 		["ColorReadyCheckNotReady"] = {0.80, 0.45, 0.45, 1.00},
 		["HealthBarAsBackground"] = false,
 		["EnablePowerBar"] = true,
-		["PlayerFrameShowGenericDebuffs"] = 1,			--auto, show only debuff types the player can remove
-		["PlayerFrameShowEncounterDebuffs"] = 1,		--auto, show only debuff types the player is concerned with based on role
+		["AuraFilterNoCombat"] = 1,
+		["AuraFilterCombat"] = 2,
+		["ShowBossAuras"] = true;
 		["EnableTargetFrame"] = false,
 	};
 
@@ -1370,11 +1195,6 @@ function NewCTRAWindow(owningCTRAFrames)
 			anchorFrame:SetScript("OnEnter",
 				function()
 					module:displayTooltip(anchorFrame, {"Left-click to drag this window"}, "ANCHOR_TOPRIGHT");
-				end
-			);
-			anchorFrame:SetScript("OnLeave",
-				function()
-					module:hideTooltip();
 				end
 			);
 			-- indicator which window this is
@@ -1491,8 +1311,9 @@ function NewCTRAWindow(owningCTRAFrames)
 	
 	function obj:Update(option, value)
 		-- STEP 1: Update children and local copies of saved variables
-		-- STEP 2: Outside combat, obtain a roster of self, party members and raid members to use during step 2
-		-- STEP 3: Determine which players to show in this window, and construct/configure CTRAPlayerFrames accordingly
+		-- STEP 2: If enabled, continue to steps 3 and 4.
+		-- STEP 3: Outside combat, obtain a roster of self, party members and raid members to use during step 2
+		-- STEP 4: Determine which players to show in this window, and construct/configure CTRAPlayerFrames accordingly
 		
 		-- STEP 1:
 		if (option) then
@@ -1505,13 +1326,12 @@ function NewCTRAWindow(owningCTRAFrames)
 			end
 		end
 
-		-- this forces the object to dispose itself and go no further
+		-- STEP 2:
 		if (not obj:IsEnabled()) then
-			obj:Disable();
 			return;
 		end
 
-		-- STEP 2:
+		-- STEP 3:
 		local roster = { };
 		if (IsInRaid() or UnitExists("raid2")) then
 			for i=1, min(MAX_RAID_MEMBERS, GetNumGroupMembers()) do
@@ -1561,7 +1381,7 @@ function NewCTRAWindow(owningCTRAFrames)
 			end
 		end
 
-		-- STEP 3:
+		-- STEP 4:
 		local categories =
 		{
 			-- {
@@ -1819,7 +1639,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	local powerBar, powerBarWidth;
 	local roleTexture;
 	local unitNameFontStringLarge, unitNameFontStringSmall;
-	local aura1Texture, aura2Texture, aura3Texture;
+	local aura1Texture, aura2Texture, aura3Texture, aura4Texture, aura5Texture, auraBoss1Texture, auraBoss2Texture, auraBoss3Texture;
 	local statusTexture, statusFontString, statusBackground;
 	
 	
@@ -2259,44 +2079,100 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 		aura3Texture = aura3Texture or visualFrame:CreateTexture(nil, "OVERLAY");
 		aura3Texture:SetSize(9,9);
 		aura3Texture:SetPoint("TOPRIGHT", visualFrame, -5, -25);
+
+		aura4Texture = aura4Texture or visualFrame:CreateTexture(nil, "OVERLAY");
+		aura4Texture:SetSize(9,9);
+		aura4Texture:SetPoint("TOPRIGHT", visualFrame, -15, -25);
+
+		aura5Texture = aura5Texture or visualFrame:CreateTexture(nil, "OVERLAY");
+		aura5Texture:SetSize(9,9);
+		aura5Texture:SetPoint("TOPRIGHT", visualFrame, -15, -15);
+		
+		auraBoss1Texture = auraBoss1Texture or visualFrame:CreateTexture(nil, "OVERLAY");
+		auraBoss1Texture:SetSize(11,11);
+		--auraBoss1Texture:SetPoint("TOPLEFT", visualFrame, "CENTER", -5.5, -1);
+		
+		auraBoss2Texture = auraBoss2Texture or visualFrame:CreateTexture(nil, "OVERLAY");
+		auraBoss2Texture:SetSize(11,11);
+		auraBoss2Texture:SetPoint("LEFT", auraBoss1Texture, "RIGHT", 1, 0);
+		
+		auraBoss3Texture = auraBoss3Texture or visualFrame:CreateTexture(nil, "OVERLAY");
+		auraBoss3Texture:SetSize(11,11);
+		auraBoss3Texture:SetPoint("LEFT", auraBoss2Texture, "RIGHT", 1, 0);
 	end
 	
 	-- creates and updates buff/debuff icons
 	local updateAuras = function()
+		
+		-- STEP 1: selected buffs and debuffs for boss encounters, at the middle of the frame
+		-- STEP 2: all other buffs and debuffs, filtered, at the right edge of the frame
+		
 		if (shownUnit) then
-			if(UnitExists(shownUnit) and not UnitIsDeadOrGhost(shownUnit)) then
-				local filter = (InCombatLockdown() and "RAID HARMFUL") or "RAID HELPFUL";
-				local name, icon = UnitAura(shownUnit, 1, filter);
-				if (name) then
-					aura1Texture:SetTexture(icon);
-					aura1Texture:Show();
-					aura1Texture.name = name;
-					name, icon = UnitAura(shownUnit, 2, filter);
-					if (name) then
-						aura2Texture:SetTexture(icon);
-						aura2Texture:Show();
-						aura2Texture.name = name;
-						name, icon = UnitAura(shownUnit, 3, filter);
-						if (name) then
-							aura3Texture:SetTexture(icon);
-							aura3Texture:Show();
-							aura3Texture.name = name;
-						else
-							aura3Texture:Hide();
-						end
-					else
-						aura2Texture:Hide();
-						aura3Texture:Hide();
+			
+			-- STEP 1:
+			local numBossShown = 0;
+			if(UnitExists(shownUnit) and owner:GetProperty("ShowBossAuras")) then		
+				for auraIndex = 1, 40 do
+					local name, icon, count, debuffType, __, __, __, __, __, spellId, __, isBossDebuff = UnitAura(shownUnit, auraIndex);
+					if (not name or numBossShown == 3) then
+						break;
+					elseif (isBossDebuff or CTRA_Configuration_BossDebuffs[spellId]) then
+						numBossShown = numBossShown + 1;
+						local tex = (numBossShown == 1 and auraBoss1Texture) or (numBossShown == 2 and auraBoss2Texture) or auraBoss3Texture;
+						tex:SetTexture(icon);
+						tex:Show();
+						tex.name = name;
+						tex.count = count;
+						tex.debuffType = debuffType;
 					end
-				else
-					aura1Texture:Hide();
-					aura2Texture:Hide();
-					aura3Texture:Hide();
 				end
-			else
-				aura1Texture:Hide();
-				aura2Texture:Hide();
-				aura3Texture:Hide();
+				auraBoss1Texture:SetPoint("TOPLEFT", visualFrame, "CENTER", 0.5 - (numBossShown * 6), -1);
+			end
+			while (numBossShown  < 3) do
+				numBossShown = numBossShown + 1;
+				local tex = (numBossShown == 1 and auraBoss1Texture) or (numBossShown == 2 and auraBoss2Texture) or auraBoss3Texture;
+				tex:Hide();
+			end
+			
+			-- STEP 2:
+			local numShown = 0;
+			local filterType = (InCombatLockdown() and owner:GetProperty("AuraFilterCombat") or owner:GetProperty("AuraFilterNoCombat"));
+			if(UnitExists(shownUnit) and not UnitIsDeadOrGhost(shownUnit) and filterType ~= 6) then	
+				local filterText;
+				if (filterType == 1) then
+					filterText = "RAID HELPFUL";	-- default out of combat
+				elseif (filterType == 2) then
+					filterText = "RAID HARMFUL";	-- default in combat
+				elseif (filterType == 3) then
+					filterText = "HELPFUL";
+				elseif (filterType == 4) then
+					filterText = "HARMFUL";
+				elseif (filterType == 5) then
+					filterText = "HELPFUL";		-- further filtered by conditional statements during for loop below
+				end
+				for auraIndex = 1, 40 do
+					local name, icon, count, debuffType, __, __, source, __, __, spellId, __, isBossDebuff = UnitAura(shownUnit, auraIndex, filterText);
+					if (not name or not spellId or numShown == 5) then
+						break;
+					elseif(
+						not ((isBossDebuff or CTRA_Configuration_BossDebuffs[spellId]) and owner:GetProperty("ShowBossAuras"))					-- excludes buffs shown already in step 1
+						and (filterType == 2 or filterType == 4 or not SpellIsSelfBuff(spellId))			-- excludes self-only buffs
+						and (filterType ~= 5 or source == "player" or source == "vehicle" or source == "pet")		-- complements filterType == 5  (buffs cast by the player only)
+					) then
+						numShown = numShown + 1;
+						local tex = (numShown == 1 and aura1Texture) or (numShown == 2 and aura2Texture) or (numShown == 3 and aura3Texture) or (numShown == 4 and aura4Texture) or aura5Texture;
+						tex:SetTexture(icon);
+						tex:Show();
+						tex.name = name;
+						tex.count = count;
+						tex.debuffType = debuffType;
+					end
+				end
+			end
+			while (numShown < 5) do
+				numShown = numShown + 1;
+				local tex = (numShown == 1 and aura1Texture) or (numShown == 2 and aura2Texture) or (numShown == 3 and aura3Texture) or (numShown == 4 and aura4Texture) or aura5Texture;
+				tex:Hide();
 			end
 		end
 	end
@@ -2474,18 +2350,41 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				secureButton:HookScript("OnEnter",
 					function()
 						if (UnitExists(shownUnit)) then
-							GameTooltip:SetOwner(parent, "ANCHOR_TOPLEFT");
+							GameTooltip:SetOwner(parent, (owner:GetProperty("GrowUpward") and "ANCHOR_BOTTOMRIGHT") or "ANCHOR_TOPLEFT");
 							local className, classFilename = UnitClass(shownUnit);
 							local r,g,b = GetClassColor(classFilename);
 							GameTooltip:AddDoubleLine(UnitName(shownUnit) or "", UnitLevel(shownUnit) or "", r,g,b, 1,1,1);
 							local mapid = C_Map.GetBestMapForUnit(shownUnit);
 							GameTooltip:AddDoubleLine((UnitRace(shownUnit) or "") .. " " .. (className or ""), (not UnitInRange(shownUnit) and mapid and C_Map.GetMapInfo(mapid).name) or "", 1, 1, 1, 0.5, 0.5, 0.5);
+							if (auraBoss1Texture:IsShown()) then
+								local color = DebuffTypeColor[auraBoss1Texture.debuffType];
+								GameTooltip:AddLine("|T" .. auraBoss1Texture:GetTexture() .. ":0|t  " .. (auraBoss1Texture.name or "") .. ((auraBoss1Texture.count or 0) > 0 and (" (" .. auraBoss1Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+								if (auraBoss2Texture:IsShown()) then
+									color = DebuffTypeColor[auraBoss2Texture.debuffType];
+									GameTooltip:AddLine("|T" .. auraBoss2Texture:GetTexture() .. ":0|t  " .. (auraBoss2Texture.name or "") .. ((auraBoss2Texture.count or 0) > 0 and (" (" .. auraBoss2Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+									if (auraBoss3Texture:IsShown()) then
+										color = DebuffTypeColor[auraBoss3Texture.debuffType];
+										GameTooltip:AddLine("|T" .. auraBoss3Texture:GetTexture() .. ":0|t  " .. (auraBoss3Texture.name or "") .. ((auraBoss3Texture.count or 0) > 0 and (" (" .. auraBoss3Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+									end
+								end
+							end
 							if (aura1Texture:IsShown()) then
-								GameTooltip:AddLine("|T" .. aura1Texture:GetTexture() .. ":0|t  " .. (aura1Texture.name or ""));
+								local color = DebuffTypeColor[aura1Texture.debuffType];
+								GameTooltip:AddLine("|T" .. aura1Texture:GetTexture() .. ":0|t  " .. (aura1Texture.name or "") .. ((aura1Texture.count or 0) > 0 and (" (" .. aura1Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
 								if (aura2Texture:IsShown()) then
-									GameTooltip:AddLine("|T" .. aura2Texture:GetTexture() .. ":0|t  " .. (aura2Texture.name or ""));
+									color = DebuffTypeColor[aura2Texture.debuffType];
+									GameTooltip:AddLine("|T" .. aura2Texture:GetTexture() .. ":0|t  " .. (aura2Texture.name or "") .. ((aura2Texture.count or 0) > 0 and (" (" .. aura2Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
 									if (aura3Texture:IsShown()) then
-										GameTooltip:AddLine("|T" .. aura3Texture:GetTexture() .. ":0|t  " .. (aura3Texture.name or ""));
+										color = DebuffTypeColor[aura3Texture.debuffType];
+										GameTooltip:AddLine("|T" .. aura3Texture:GetTexture() .. ":0|t  " .. (aura3Texture.name or "") .. ((aura3Texture.count or 0) > 0 and (" (" .. aura3Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+										if (aura4Texture:IsShown()) then
+											color = DebuffTypeColor[aura4Texture.debuffType];
+											GameTooltip:AddLine("|T" .. aura4Texture:GetTexture() .. ":0|t  " .. (aura4Texture.name or "") .. ((aura4Texture.count or 0) > 0 and (" (" .. aura4Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+											if (aura5Texture:IsShown()) then
+												color = DebuffTypeColor[aura5Texture.debuffType];
+												GameTooltip:AddLine("|T" .. aura5Texture:GetTexture() .. ":0|t  " .. (aura5Texture.name or "") .. ((aura5Texture.count or 0) > 0 and (" (" .. aura5Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+											end
+										end
 									end
 								end
 							end
@@ -2502,10 +2401,10 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 									GameTooltip:AddDoubleLine("|cFFCC6666combat" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFCC6666" .. spellName);
 								end end
 								if rezCombat then for modifier, spellName in pairs(rezCombat) do 
-									GameTooltip:AddDoubleLine("|cFFCC6666combat, dead" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFCCCC66" .. spellName);
+									GameTooltip:AddDoubleLine("|cFFCC6666combat, dead" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFCC6666" .. spellName);
 								end end
 								if rezNoCombat then for modifier, spellName in pairs(rezNoCombat) do 
-									GameTooltip:AddDoubleLine("|cFF999999nocombat, dead" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFCC6666" .. spellName);
+									GameTooltip:AddDoubleLine("|cFF999999nocombat, dead" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFF999999" .. spellName);
 								end end
 							end
 							if (not module.GameTooltipExtraLine) then

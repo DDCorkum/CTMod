@@ -366,6 +366,7 @@ do
 			},
 
 			["onload"] = function(self)
+				local txDragRight, txDragLeft;
 				self:SetFrameLevel(100);
 				self:EnableMouse(true);
 				module:registerMovable("MAILLOG", self, true);
@@ -392,16 +393,30 @@ do
 				local onEnter = function(self, ...)
 					module:displayPredefinedTooltip(self, "RESIZE");
 					self:SetScript("OnUpdate", onUpdate);
+					if (self.side == "RIGHT" and txDragRight) then
+						txDragRight:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight");
+					elseif (self.side == "LEFT" and txDragLeft) then
+						txDragLeft:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight");
+					end
 				end;
 				local onLeave = function(self, ...)
-					module:hideTooltip();
 					self:SetScript("OnUpdate", nil);
+					if (self.side == "RIGHT" and txDragRight) then
+						txDragRight:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up");
+					elseif (self.side == "LEFT" and txDragLeft) then
+						txDragLeft:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up");
+					end
 				end;
 				local onMouseDown = function(self, button, ...)
 					if (button == "LeftButton") then
 						resizingMailLog = true;
 						self.resizingTimer = 0;
 						self:GetParent():StartSizing(self.side);
+						if (self.side == "RIGHT" and txDragRight) then
+							txDragRight:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down");
+						elseif (self.side == "LEFT" and txDragLeft) then
+							txDragLeft:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down");
+						end
 					end
 				end;
 				local onMouseUp = function(self, button, ...)
@@ -409,6 +424,11 @@ do
 						self:GetParent():StopMovingOrSizing();
 						resizingMailLog = false;
 						module:setOption("mailLogWidth", self:GetParent():GetWidth(), true);
+						if (self.side == "RIGHT" and txDragRight) then
+							txDragRight:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up");
+						elseif (self.side == "LEFT" and txDragLeft) then
+							txDragLeft:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up");
+						end
 					end
 				end;
 
@@ -438,23 +458,46 @@ do
 				leftFrame:SetScript("OnMouseDown", onMouseDown);
 				leftFrame:SetScript("OnMouseUp", onMouseUp);
 
-				local cornerFrame = CreateFrame("Frame", "CT_MailMod_MailLog_CornerResizeFrame", self);
-				cornerFrame:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", 0, 0);
-				cornerFrame:SetHeight(10);
-				cornerFrame:SetWidth(36);
-				cornerFrame:SetScale(0.72);
-				cornerFrame:EnableMouse(true);
-				cornerFrame:SetScript("OnEnter", onEnter);
-				cornerFrame:SetScript("OnLeave", onLeave);
-				cornerFrame:SetScript("OnMouseDown", onMouseDown);
-				cornerFrame:SetScript("OnMouseUp", onMouseUp);
-				cornerFrame:SetFrameLevel( CT_MailMod_MailLog_ScrollFrameScrollBarScrollDownButton:GetFrameLevel() + 1 );
-				cornerFrame:Show();
+				local cornerFrameRight = CreateFrame("Frame", "CT_MailMod_MailLog_CornerResizeFrameRight", self);
+				cornerFrameRight.side = "RIGHT";
+				cornerFrameRight:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", 0, 0);
+				cornerFrameRight:SetHeight(10);
+				cornerFrameRight:SetWidth(36);
+				cornerFrameRight:SetScale(0.72);
+				cornerFrameRight:EnableMouse(true);
+				cornerFrameRight:SetScript("OnEnter", onEnter);
+				cornerFrameRight:SetScript("OnLeave", onLeave);
+				cornerFrameRight:SetScript("OnMouseDown", onMouseDown);
+				cornerFrameRight:SetScript("OnMouseUp", onMouseUp);
+				cornerFrameRight:SetFrameLevel( CT_MailMod_MailLog_ScrollFrameScrollBarScrollDownButton:GetFrameLevel() + 1 );
+				cornerFrameRight:Show();
 
-				local txDrag = cornerFrame:CreateTexture();
-				txDrag:SetTexture("Interface\\AddOns\\CT_MailMod\\Images\\resize");
-				txDrag:SetPoint("BOTTOMRIGHT", cornerFrame, "BOTTOMRIGHT", -3, 3);
-				txDrag:Show();
+				txDragRight = cornerFrameRight:CreateTexture();	--local txDrag is at start of onload function
+				txDragRight:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up");
+				txDragRight:SetPoint("BOTTOMRIGHT", cornerFrameRight, "BOTTOMRIGHT", -3, 3);
+				txDragRight:Show();
+
+				local cornerFrameLeft = CreateFrame("Frame", "CT_MailMod_MailLog_CornerResizeFrameLeft", self);
+				cornerFrameLeft.side = "LEFT";
+				cornerFrameLeft:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 0, 0);
+				cornerFrameLeft:SetHeight(10);
+				cornerFrameLeft:SetWidth(36);
+				cornerFrameLeft:SetScale(0.72);
+				cornerFrameLeft:EnableMouse(true);
+				cornerFrameLeft:SetScript("OnEnter", onEnter);
+				cornerFrameLeft:SetScript("OnLeave", onLeave);
+				cornerFrameLeft:SetScript("OnMouseDown", onMouseDown);
+				cornerFrameLeft:SetScript("OnMouseUp", onMouseUp);
+				cornerFrameLeft:SetFrameLevel( CT_MailMod_MailLog_ScrollFrameScrollBarScrollDownButton:GetFrameLevel() + 1 );
+				cornerFrameLeft:Show();
+
+				txDragLeft = cornerFrameLeft:CreateTexture();	--local txDrag is at start of onload function
+				txDragLeft:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up");
+				SetClampedTextureRotation(txDragLeft, 90);
+				txDragLeft:SetPoint("BOTTOMLEFT", cornerFrameLeft, "BOTTOMLEFT", 3, 3);
+				txDragLeft:Show();
+
+
 
 				local width = module:getOption("mailLogWidth");
 				self:SetWidth(width or defaultLogWidth);
@@ -480,10 +523,6 @@ do
 			["onenter"] = function(self)
 				module:displayPredefinedTooltip(self, "DRAG");
 			end,
-
-			["onleave"] = function(self)
-				module:hideTooltip();
-			end
 		};
 	end
 

@@ -783,11 +783,6 @@ module.frame = function()
 					module:displayTooltip(button, {"|cFFCCCCCCAdds |r[1] |cFFCCCCCCor |r[60+] |cFFCCCCCCin front of the quest title","|cFF999999May not take effect until you close and open the quest log"}, "ANCHOR_RIGHT",30,0);
 				end
 			);
-			optionsAddScript("onleave",
-				function(button)
-					module:hideTooltip();
-				end
-			);
 		optionsEndFrame();
 
 	-- Regen Rates

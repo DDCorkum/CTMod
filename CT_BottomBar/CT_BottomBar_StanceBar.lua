@@ -24,6 +24,7 @@ local ctRelativeFrame = module.ctRelativeFrame;
 local appliedOptions;
 
 local CT_BB_StanceBar_IsEnabled = nil;
+local CT_BB_FlightBar_IsEnabled = nil;
 
 --------------------------------------------
 -- Action bar arrows and page number
@@ -33,17 +34,27 @@ local function moveStanceBar()
 	if (CT_BB_StanceBar_IsEnabled) then
 		StanceButton1:ClearAllPoints();
 		StanceButton1:SetPoint("BOTTOMLEFT",CT_BottomBar_CTStanceBarFrame_Frame);
+	else
+		StanceButton1:ClearAllPoints();
+		StanceButton1:SetPoint("BOTTOMLEFT",StanceBarFrame, 11, 3);
+	end
+end
+
+local function moveFlightBar()
+	if (not StanceBarFrame or not MainMenuBarVehicleLeaveButton or InCombatLockdown()) then return; end
+	if (CT_BB_FlightBar_IsEnabled) then
+		MainMenuBarVehicleLeaveButton:ClearAllPoints();
+		MainMenuBarVehicleLeaveButton:SetPoint("BOTTOMLEFT", CT_BottomBar_CTFlightBarFrame_Frame);	
+	elseif (CT_BB_StanceBar_IsEnabled) then
 		MainMenuBarVehicleLeaveButton:ClearAllPoints();
 		MainMenuBarVehicleLeaveButton:SetPoint("RIGHT", StanceButton1, "LEFT", -10, 0);
 	else
-		StanceButton1:ClearAllPoints();
-		StanceButton1:SetPoint("BOTTOMLEFT",StanceBarFrame);
 		MainMenuBarVehicleLeaveButton:ClearAllPoints();
 		MainMenuBarVehicleLeaveButton:SetPoint("RIGHT", StanceBarFrame, "LEFT", -10, 0);
 	end
 end
 
-local function addon_Update(self)
+local function UpdateStanceBar(self)
 	-- Update the frame
 	-- self == talking head object
 
@@ -52,17 +63,17 @@ local function addon_Update(self)
 	self.helperFrame:SetPoint("BOTTOMRIGHT", self.frame, "BOTTOMRIGHT", 5, -5);
 end
 
-local function addon_Enable(self)
+local function EnableStanceBar(self)
 	CT_BB_StanceBar_IsEnabled = true;
 	moveStanceBar();
 end
 
-local function addon_Disable(self)
+local function DisableStanceBar(self)
 	CT_BB_StanceBar_IsEnabled = false;
 	moveStanceBar();
 end
 
-local function addon_Init(self)
+local function InitStanceBar(self)
 	-- Initialization
 	-- self == stance bar object
 
@@ -82,6 +93,45 @@ local function addon_Init(self)
 	return true;
 end
 
+local function UpdateFlightBar(self)
+	-- Update the frame
+	-- self == talking head object
+
+	self.helperFrame:ClearAllPoints();
+	self.helperFrame:SetPoint("TOPLEFT", self.frame, "TOPLEFT", 0, 10);
+	self.helperFrame:SetPoint("BOTTOMRIGHT", self.frame, "BOTTOMRIGHT", 10, 0);
+end
+
+local function EnableFlightBar(self)
+	CT_BB_FlightBar_IsEnabled = true;
+	moveFlightBar();
+end
+
+local function DisableFlightBar(self)
+	CT_BB_FlightBar_IsEnabled = false;
+	moveFlightBar();
+end
+
+local function InitFlightBar(self)
+	-- Initialization
+	-- self == flight bar object
+
+	appliedOptions = module.appliedOptions;
+
+	module.ctFlightBar = self;
+
+	local frame = CreateFrame("Frame", "CT_BottomBar_" .. self.frameName .. "_GuideFrame");
+	self.helperFrame = frame;
+	
+	self.frame:SetHeight(20);
+	self.frame:SetWidth(20);
+	
+	hooksecurefunc("UIParent_ManageFramePositions", moveFlightBar);
+	MainMenuBarVehicleLeaveButton:HookScript("OnShow", moveFlightBar);
+
+	return true;
+end
+
 local function addon_Register()
 	module:registerAddon(
 		"Stance Bar",  -- option name
@@ -89,17 +139,17 @@ local function addon_Register()
 		"Stance Bar",  -- shown in options window & tooltips
 		"Stance Bar",  -- title for horizontal orientation
 		nil,  -- title for vertical orientation
-		{ "BOTTOMLEFT", MainMenuBar, "TOPLEFT", 30, 9 },
+		{ "BOTTOMLEFT", StanceBarFrame, "TOPLEFT", 11, 3 },
 		{ -- settings
 			orientation = "ACROSS",
 		},
-		addon_Init,
+		InitStanceBar,
 		nil,  -- no post init function
 		nil,  -- no config function
-		addon_Update,
+		UpdateStanceBar,
 		nil,  -- no orientation function
-		addon_Enable,
-		addon_Disable,  -- no disable function
+		EnableStanceBar,
+		DisableStanceBar,  -- no disable function
 		"helperFrame",
 		StanceButton1,
 		StanceButton2,
@@ -110,7 +160,26 @@ local function addon_Register()
 		StanceButton7,
 		StanceButton8,
 		StanceButton9,
-		StanceButton10,
+		StanceButton10
+	);
+	module:registerAddon(
+		"Flight Bar",  -- option name
+		"CTFlightBarFrame",  -- used in frame names
+		"Stop Flying Button",  -- shown in options window & tooltips
+		"Stop Flying",  -- title for horizontal orientation
+		nil,  -- title for vertical orientation
+		{ "RIGHT", StanceBarFrame, "LEFT", -10, 0 },
+		{ -- settings
+			orientation = "ACROSS",
+		},
+		InitFlightBar,
+		nil,  -- no post init function
+		nil,  -- no config function
+		UpdateFlightBar,
+		nil,  -- no orientation function
+		EnableFlightBar,
+		DisableFlightBar,  -- no disable function
+		"helperFrame",
 		MainMenuBarVehicleLeaveButton
 	);
 end

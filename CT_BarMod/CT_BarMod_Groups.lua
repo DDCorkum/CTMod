@@ -92,10 +92,6 @@ local function groupFrame_OnEnter(self)
 	end
 end
 
-local function groupFrame_OnLeave(self)
-	module.hideTooltip();
-end
-
 local function groupFrame_OnMouseDown(self, button)
 	if (button == "LeftButton") then
 		-- Hide the tooltip while user is dragging the frame.
@@ -143,7 +139,6 @@ local function groupFrameSkeleton()
 				"backdrop#tooltip#0:0:0.5:0.85",
 				"font#v:GameFontNormalLarge#i:text",
 				["onenter"] = groupFrame_OnEnter,
-				["onleave"] = groupFrame_OnLeave,
 				["onmousedown"] = groupFrame_OnMouseDown,
 				["onmouseup"] = groupFrame_OnMouseUp,
 				["onload"] = groupFrame_OnLoad,

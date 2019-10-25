@@ -35,6 +35,13 @@ L["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksTooltip"] = [=[Provide
 after missing a /readycheck]=]
 L["CT_RaidAssist/Options/GeneralFeatures/Heading"] = "General Features"
 L["CT_RaidAssist/Options/GeneralFeatures/Line1"] = "These general features are separate from the custom raid frames."
+L["CT_RaidAssist/Options/Window/Auras/CombatLabel"] = "Show during combat:"
+L["CT_RaidAssist/Options/Window/Auras/DropDown"] = "#Group buffs I can apply#Debuffs I can remove#All group buffs#All debuffs#Group buffs I applied#Nothing"
+L["CT_RaidAssist/Options/Window/Auras/ShowBossCheckButton"] = "Show important boss auras at middle"
+L["CT_RaidAssist/Options/Window/Auras/ShowBossTip"] = [=[Certain boss encounters create important buffs/debuffs critical to the fight.
+These will appear larger at the middle for emphasis.]=]
+L["CT_RaidAssist/Options/Window/Auras/Heading"] = "Buffs and Debuffs"
+L["CT_RaidAssist/Options/Window/Auras/NoCombatLabel"] = "Show out of combat:"
 L["CT_RaidAssist/Options/Window/Groups/ClassHeader"] = "Classes"
 L["CT_RaidAssist/Options/Window/Groups/GroupHeader"] = "Groups"
 L["CT_RaidAssist/Options/Window/Groups/GroupTooltipContent"] = [=[0.9:0.9:0.9#|cFFFFFF99During a raid: |r
@@ -119,6 +126,8 @@ L["CT_RaidAssist/AfterNotReadyFrame/WasAFK"] = "Vous étiez absent.  Revenez-vou
 L["CT_RaidAssist/AfterNotReadyFrame/WasNotReady"] = "Êtes-vous prêt maintenant?"
 L["CT_RaidAssist/PlayerFrame/TooltipFooter"] = "/ctra pour déplacer et configurer"
 L["CT_RaidAssist/WindowTitle"] = "Fenêtre %d"
+L["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksCheckButton"] = "Prolonger un /readycheck manqué"
+L["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksTooltip"] = "Fournir un bouton pour annoncer le retour après avoir manqué un /readycheck"
 L["CT_RaidAssist/Options/Window/Groups/ClassHeader"] = "Classes"
 L["CT_RaidAssist/Options/Window/Groups/GroupHeader"] = "Groupes"
 L["CT_RaidAssist/Options/Window/Groups/GroupTooltipContent"] = [=[0.9:0.9:0.9#|cFFFFFF99Pendent un raid: |r
@@ -154,7 +163,11 @@ L["CT_RaidAssist/Spells/Blessing of Might"] = "Bénédiction de puissance"
 L["CT_RaidAssist/Spells/Blessing of Salvation"] = "Bénédiction de salut"
 L["CT_RaidAssist/Spells/Blessing of Wisdom"] = "Bénédiction de sagesse"
 L["CT_RaidAssist/Spells/Cleanse"] = "Epuration"
+L["CT_RaidAssist/Spells/Cleanse Spirit"] = "Purifier l'esprit"
+L["CT_RaidAssist/Spells/Cure Poison"] = "Guérison du poison"
 L["CT_RaidAssist/Spells/Dampen Magic"] = "Atténuation de la magie"
+L["CT_RaidAssist/Spells/Detox"] = "Détoxification"
+L["CT_RaidAssist/Spells/Dispel Magic"] = "Dissipation de la magie"
 L["CT_RaidAssist/Spells/Nature's Cure"] = "Soins naturels"
 L["CT_RaidAssist/Spells/Power Word: Fortitude"] = "Mot de pouvoir : Robustesse"
 L["CT_RaidAssist/Spells/Purify"] = "Purification"
@@ -183,6 +196,10 @@ L["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksCheckButton"] = "Erwei
 L["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksTooltip"] = "Zeigt nach Verpassen eines Bereitschaftschecks eine Schaltfläche an um mitzuteilen, dass man wieder da ist"
 L["CT_RaidAssist/Options/GeneralFeatures/Heading"] = "Allgemeine Funktionen"
 L["CT_RaidAssist/Options/GeneralFeatures/Line1"] = "Diese allgemeinen Funktionen sind getrennt von den benutzerdefinierten Schlachtzugsfenstern."
+L["CT_RaidAssist/Options/Window/Auras/CombatLabel"] = "Während des Kampfes anzeigen:"
+L["CT_RaidAssist/Options/Window/Auras/DropDown"] = "#Wirkbare Gruppenzauber#Entfernbare Schwächungszauber#Alle Gruppenzauber#Alle Schwächungszauber#Gewirkte Gruppenzauber#Nichts"
+L["CT_RaidAssist/Options/Window/Auras/Heading"] = "Stärkungs- und Schwächungszauber"
+L["CT_RaidAssist/Options/Window/Auras/NoCombatLabel"] = "Außerhalb des Kampfes anzeigen:"
 L["CT_RaidAssist/Options/Window/Groups/ClassHeader"] = "Klassen"
 L["CT_RaidAssist/Options/Window/Groups/GroupHeader"] = "Gruppen"
 L["CT_RaidAssist/Options/Window/Groups/GroupTooltipContent"] = [=[0.9:0.9:0.9#|cFFFFFF99Im Schlachtzug: |r

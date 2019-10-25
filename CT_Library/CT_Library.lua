@@ -19,7 +19,7 @@
 -----------------------------------------------
 -- Initialization
 
-local LIBRARY_VERSION = 8.254;
+local LIBRARY_VERSION = 8.255;
 local LIBRARY_NAME = "CT_Library";
 
 local _G = getfenv(0);
@@ -206,28 +206,45 @@ function lib:printcolorformat(r, g, b, ...)
 	printText(ChatFrame1, r, g, b, format(...));
 end
 
--- Display a tooltip
+-- Displays a tooltip, then hides it when the mouse cursor leaves the object
 -- if text is a string, it will simply display the text
 -- if text is a table of strings, it will AddLine() each string and optionally set r,g,b,a and wrap by checking for '#' delimiters, or AddDoubleLine() if sufficient content is provided
-function lib:displayTooltip(obj, text, anchor, offx, offy)
+-- setting anchor to CT_ABOVEBELOW or CT_BESIDE will position the tooltip wherever there is more room on the screen
+function lib:displayTooltip(obj, text, anchor, offx, offy, owner)
 	local tooltip = GameTooltip;
-	if ( not anchor ) then
-		GameTooltip_SetDefaultAnchor(tooltip, obj);
-	elseif (anchor == "CT_ABOVEBELOW") then
-		if (obj:GetBottom() <= UIParent:GetTop() - obj:GetTop()) then
-			tooltip:SetOwner(obj, "ANCHOR_TOP", offx or 0, offy or 0);
+	if not obj or not tooltip then return; end
+	
+	-- when the mouse leaves this object, make the tooltip go away (using HookScript if possible to avoid overriding any other behaviour)
+	if not (obj.ct_displayTooltip_Hooked) then
+		if (obj.HookScript) then
+			obj:HookScript("OnLeave", function() tooltip:Hide(); end);
 		else
-			tooltip:SetOwner(obj, "ANCHOR_BOTTOM", offx or 0, -(offy or 0));
+			obj:SetScript("OnLeave", function() tooltip:Hide(); end);
+		end
+		obj.ct_displayTooltip_Hooked = true
+	end
+	
+	-- anchor the tooltip
+	owner = owner or obj;
+	if ( not anchor ) then
+		GameTooltip_SetDefaultAnchor(tooltip, owner);
+	elseif (anchor == "CT_ABOVEBELOW") then
+		if (owner:GetBottom() <= UIParent:GetTop() - owner:GetTop()) then
+			tooltip:SetOwner(owner, "ANCHOR_TOP", offx or 0, offy or 0);
+		else
+			tooltip:SetOwner(owner, "ANCHOR_BOTTOM", offx or 0, -(offy or 0));
 		end
 	elseif (anchor == "CT_BESIDE") then
-		if (obj:GetLeft() <= UIParent:GetRight() - obj:GetRight()) then
-			tooltip:SetOwner(obj, "ANCHOR_BOTTOMRIGHT", -(offx or 0), (offy or 0) + obj:GetHeight() / 2);
+		if (owner:GetLeft() <= UIParent:GetRight() - owner:GetRight()) then
+			tooltip:SetOwner(owner, "ANCHOR_BOTTOMRIGHT", offx or 0, (offy or 0) + owner:GetHeight());
 		else
-			tooltip:SetOwner(obj, "ANCHOR_BOTTOMLEFT", offx or 0, -(offy or 0) + obj:GetHeight() / 2);
-		end	
+			tooltip:SetOwner(owner, "ANCHOR_BOTTOMLEFT", -(offx or 0), (offy or 0) + owner:GetHeight());
+		end
 	else
-		tooltip:SetOwner(obj, anchor, offx or 0, offy or 0);
+		tooltip:SetOwner(owner, anchor, offx or 0, offy or 0);
 	end
+	
+	-- generate the tooltip content
 	if (type(text) == "string") then
 		tooltip:SetText(text);
 	elseif (type(text) == "table") then
@@ -268,22 +285,14 @@ function lib:displayTooltip(obj, text, anchor, offx, offy)
 			end
 		end
 	end
+	
+	-- make the tooltip finally appear!
 	tooltip:Show();
 end
 
--- Hide the tooltip
-function lib:hideTooltip()
-	GameTooltip:Hide();
-end
-
--- Display a tooltip using predefined text
-local predefinedTexts = {
-	DRAG = "Left click to drag\nRight click to reset",
-	RESIZE = "Click and drag to resize"
-};
-
-function lib:displayPredefinedTooltip(obj, text)
-	self:displayTooltip(obj, predefinedTexts[text]);
+-- Display a tooltip using predefined, localized text
+function lib:displayPredefinedTooltip(obj, text, ...)
+	self:displayTooltip(obj, lib.text["CT_Library/Tooltip/" .. text], ...);
 end
 
 -- Register a slash command
@@ -1530,7 +1539,6 @@ end
 -- Option Frame
 local optionFrameOnMouseUp = function(self) self:GetParent():StopMovingOrSizing(); end
 local optionFrameOnEnter = function(self) lib:displayPredefinedTooltip(self, "DRAG"); end
-local optionFrameOnLeave = function(self) lib:hideTooltip(); end
 local optionFrameOnMouseDown = function(self, button)
 	if ( button == "LeftButton" ) then
 		self:GetParent():StartMoving();
@@ -2653,15 +2661,21 @@ local function controlPanelSkeleton()
 		["button#tl:4:-5#br:tr:-4:-25"] = {
 			"font#tl#br:bl:296:0#CTMod Control Panel v"..LIBRARY_VERSION,
 			"texture#i:bg#all#1:1:1:0.25#BACKGROUND",
-			["button#tr:3:6#v:UIPanelCloseButton"] = {
-				["onclick"] = function(self) HideUIPanel(self.parent.parent); end
+			["button#tr:3:6#s:32:32#v:SecureHandlerClickTemplate"] = {
+				["onload"] = function(button)
+					button:SetNormalTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Up");
+					button:SetDisabledTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Up");
+					button:SetPushedTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Down");
+					button:SetHighlightTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight");
+					button:SetAttribute("_onclick", [=[ self:GetParent():GetParent():Hide(); ]=]);
+				end
+				--  NON SECURE, NOT ALLOWED SINCE 2.0.1  --  ["onclick"] = function(self) HideUIPanel(self.parent.parent); end
 			},
 			["onenter"] = function(self)
 				lib:displayPredefinedTooltip(self, "DRAG");
 				self.bg:SetVertexColor(1, 0.9, 0.5);
 			end,
 			["onleave"] = function(self)
-				lib:hideTooltip();
 				self.bg:SetVertexColor(1, 1, 1);
 			end,
 			["onmousedown"] = function(self, button)
@@ -2685,7 +2699,6 @@ local function controlPanelSkeleton()
 			"font#tl:-3:-69#v:GameFontNormalLarge#" .. lib.text["CT_Library/ModListing"],
 			"texture#i:hover#l:5:0#s:290:25#hidden#1:1:1:0.125",
 			"texture#i:select#l:5:0#s:290:25#hidden#1:1:1:0.25",
-			--"font#b:-10:-10#www.CTMod.net\ncurseforge.com/wow/addons/CTMod#0.72:0.36:0",
 						--700 is an offset to prevent taint affecting battleground queueing
 			["button#i:703#hidden#s:263:25#tl:17:-85"] = modListButtonTemplate,	
 			["button#i:704#hidden#s:263:25#tl:17:-110"] = modListButtonTemplate,
@@ -2700,8 +2713,8 @@ local function controlPanelSkeleton()
 			["button#i:713#hidden#s:263:25#tl:17:-335"] = modListButtonTemplate,
 			["button#i:714#hidden#s:263:25#tl:17:-360"] = modListButtonTemplate,
 			["button#i:715#hidden#s:263:25#tl:17:-385"] = modListButtonTemplate,
-			["button#i:701#hidden#s:263:25#tl:17:-410"] = modListButtonTemplate, -- settings import
-			["button#i:702#hidden#s:263:25#tl:17:-435"] = modListButtonTemplate, -- settings import
+			["button#i:701#hidden#s:263:25#tl:17:-410"] = modListButtonTemplate, -- Settings Import, 701
+			["button#i:702#hidden#s:263:25#tl:17:-435"] = modListButtonTemplate, -- Help, 702
 		},
 		["frame#s:315:0#tr:-15:-30#b:0:15#i:options#hidden"] = {
 			["onload"] = function(self)
@@ -2731,22 +2744,14 @@ end
 
 local function displayControlPanel()
 	if (InCombatLockdown()) then
-		print("CT options are not usable during combat");
-	else
-		if ( not controlPanelFrame ) then
-			controlPanelFrame = lib:getFrame(controlPanelSkeleton);
-			tinsert(UISpecialFrames, controlPanelFrame:GetName());
-			controlPanelFrame:HookScript("OnEvent",
-				function(__, event)
-					if (event == "PLAYER_REGEN_DISABLED") then
-						controlPanelFrame:Hide();
-					end
-				end
-			);
-			controlPanelFrame:RegisterEvent("PLAYER_REGEN_DISABLED");
-		end
-		controlPanelFrame:Show();
+		print("Cannot open the CT options while in combat");
+		return;
 	end
+	if ( not controlPanelFrame ) then
+		controlPanelFrame = lib:getFrame(controlPanelSkeleton);
+		tinsert(UISpecialFrames, controlPanelFrame:GetName());
+	end
+	controlPanelFrame:Show();
 end
 
 function lib:showControlPanel(show)
@@ -3292,7 +3297,6 @@ module.frame = function()
 		helpAddObject( -5, 2*14, "font#tl:10:%y#s:0:%s#l:13:0#r#" .. lib.text["CT_Library/Help/About/Credits"] .. "#" .. textColor1 .. ":l");  -- Two lines giving credits to Cide, TS, Resike and Dahk
 		
 		helpAddObject(-15,   14, "font#tl:10:%y#s:0:%s#l:13:0#r#" .. lib.text["CT_Library/Help/About/Updates"] .. "#" .. textColor1 .. ":l");  -- "Updates are available at:"
-		helpAddObject( -5,   14, "font#tl:30:%y#s:0:%s#l:13:0#r#www.CTMod.net#" .. textColor0 .. ":l");
 		helpAddObject( -5,   14, "font#tl:30:%y#s:0:%s#l:13:0#r#CurseForge.com/WoW/Addons/CTMod# " .. textColor0 .. ":l");
 	
 	helpEndFrame();

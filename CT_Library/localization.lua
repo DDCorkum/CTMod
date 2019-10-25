@@ -19,7 +19,7 @@
 -- Please see CurseForge.com/Projects/CTMod/Localization to contribute additional translations
 
 lib = _G["CT_Library"]
-lib.text = { }
+lib.text = lib.text or { }
 local L = lib.text
 
 
@@ -44,8 +44,10 @@ L["CT_Library/Help/WhatIs/Heading"] = "What is CTMod?"
 L["CT_Library/Help/WhatIs/Line1"] = "CTMod contains several modules:"
 L["CT_Library/Help/WhatIs/NotInstalled"] = "not installed"
 L["CT_Library/SettingsImport/Heading"] = "Settings Import"
-
-
+L["CT_Library/Tooltip/DRAG"] = [=[Left click to drag
+Right click to reset]=]
+L["CT_Library/Tooltip/RESIZE"] = [=[Left click to drag
+Right click to reset]=]
 
 
 
