@@ -286,6 +286,15 @@ local CTRA_Configuration_RezAbilities =
 	},
 }
 
+-- Which debuffs associated with boss encounters are super important and worth putting in the middle of the frame
+-- This is only checked when Blizzard's UnitAura() api does not return true for isBossDebuff (12th return value)
+-- key: 	spellId
+-- value:	anything that evaluates to true
+local CTRA_Configuration_BossDebuffs =
+{
+	-- Battle for Azeroth
+	[292133] = 1,	-- Blackwater Behemoth: Bioluminescence
+}
 
 --------------------------------------------
 -- Extended Ready Checks
@@ -2104,10 +2113,10 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			local numBossShown = 0;
 			if(UnitExists(shownUnit) and owner:GetProperty("ShowBossAuras")) then		
 				for auraIndex = 1, 40 do
-					local name, icon, count, debuffType, __, __, __, __, __, __, __, isBossDebuff = UnitAura(shownUnit, auraIndex);
+					local name, icon, count, debuffType, __, __, __, __, __, spellId, __, isBossDebuff = UnitAura(shownUnit, auraIndex);
 					if (not name or numBossShown == 3) then
 						break;
-					elseif (isBossDebuff) then
+					elseif (isBossDebuff or CTRA_Configuration_BossDebuffs[spellId]) then
 						numBossShown = numBossShown + 1;
 						local tex = (numBossShown == 1 and auraBoss1Texture) or (numBossShown == 2 and auraBoss2Texture) or auraBoss3Texture;
 						tex:SetTexture(icon);
@@ -2146,7 +2155,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 					if (not name or not spellId or numShown == 5) then
 						break;
 					elseif(
-						not (isBossDebuff and owner:GetProperty("ShowBossAuras"))					-- excludes buffs shown already in step 1
+						not ((isBossDebuff or CTRA_Configuration_BossDebuffs[spellId]) and owner:GetProperty("ShowBossAuras"))					-- excludes buffs shown already in step 1
 						and (filterType == 2 or filterType == 4 or not SpellIsSelfBuff(spellId))			-- excludes self-only buffs
 						and (filterType ~= 5 or source == "player" or source == "vehicle" or source == "pet")		-- complements filterType == 5  (buffs cast by the player only)
 					) then
@@ -2348,13 +2357,13 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 							local mapid = C_Map.GetBestMapForUnit(shownUnit);
 							GameTooltip:AddDoubleLine((UnitRace(shownUnit) or "") .. " " .. (className or ""), (not UnitInRange(shownUnit) and mapid and C_Map.GetMapInfo(mapid).name) or "", 1, 1, 1, 0.5, 0.5, 0.5);
 							if (auraBoss1Texture:IsShown()) then
-								local color = DebuffTypeColor[aura1BossTexture.debuffType];
+								local color = DebuffTypeColor[auraBoss1Texture.debuffType];
 								GameTooltip:AddLine("|T" .. auraBoss1Texture:GetTexture() .. ":0|t  " .. (auraBoss1Texture.name or "") .. ((auraBoss1Texture.count or 0) > 0 and (" (" .. auraBoss1Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
 								if (auraBoss2Texture:IsShown()) then
-									color = DebuffTypeColor[aura2BossTexture.debuffType];
+									color = DebuffTypeColor[auraBoss2Texture.debuffType];
 									GameTooltip:AddLine("|T" .. auraBoss2Texture:GetTexture() .. ":0|t  " .. (auraBoss2Texture.name or "") .. ((auraBoss2Texture.count or 0) > 0 and (" (" .. auraBoss2Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
 									if (auraBoss3Texture:IsShown()) then
-										color = DebuffTypeColor[aura3BossTexture.debuffType];
+										color = DebuffTypeColor[auraBoss3Texture.debuffType];
 										GameTooltip:AddLine("|T" .. auraBoss3Texture:GetTexture() .. ":0|t  " .. (auraBoss3Texture.name or "") .. ((auraBoss3Texture.count or 0) > 0 and (" (" .. auraBoss3Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
 									end
 								end
