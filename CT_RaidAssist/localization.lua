@@ -196,6 +196,10 @@ L["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksCheckButton"] = "Erwei
 L["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksTooltip"] = "Zeigt nach Verpassen eines Bereitschaftschecks eine Schaltfläche an um mitzuteilen, dass man wieder da ist"
 L["CT_RaidAssist/Options/GeneralFeatures/Heading"] = "Allgemeine Funktionen"
 L["CT_RaidAssist/Options/GeneralFeatures/Line1"] = "Diese allgemeinen Funktionen sind getrennt von den benutzerdefinierten Schlachtzugsfenstern."
+L["CT_RaidAssist/Options/Window/Auras/CombatLabel"] = "Während des Kampfes anzeigen:"
+L["CT_RaidAssist/Options/Window/Auras/DropDown"] = "#Wirkbare Gruppenzauber#Entfernbare Schwächungszauber#Alle Gruppenzauber#Alle Schwächungszauber#Gewirkte Gruppenzauber#Nichts"
+L["CT_RaidAssist/Options/Window/Auras/Heading"] = "Stärkungs- und Schwächungszauber"
+L["CT_RaidAssist/Options/Window/Auras/NoCombatLabel"] = "Außerhalb des Kampfes anzeigen:"
 L["CT_RaidAssist/Options/Window/Groups/ClassHeader"] = "Klassen"
 L["CT_RaidAssist/Options/Window/Groups/GroupHeader"] = "Gruppen"
 L["CT_RaidAssist/Options/Window/Groups/GroupTooltipContent"] = [=[0.9:0.9:0.9#|cFFFFFF99Im Schlachtzug: |r
