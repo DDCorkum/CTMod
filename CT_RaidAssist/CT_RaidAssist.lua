@@ -2350,7 +2350,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				secureButton:HookScript("OnEnter",
 					function()
 						if (UnitExists(shownUnit)) then
-							GameTooltip:SetOwner(parent, "ANCHOR_TOPLEFT");
+							GameTooltip:SetOwner(parent, (owner:GetProperty("GrowUpward") and "ANCHOR_BOTTOMRIGHT") or "ANCHOR_TOPLEFT");
 							local className, classFilename = UnitClass(shownUnit);
 							local r,g,b = GetClassColor(classFilename);
 							GameTooltip:AddDoubleLine(UnitName(shownUnit) or "", UnitLevel(shownUnit) or "", r,g,b, 1,1,1);
