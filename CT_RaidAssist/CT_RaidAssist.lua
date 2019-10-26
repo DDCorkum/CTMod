@@ -292,6 +292,19 @@ local CTRA_Configuration_RezAbilities =
 -- value:	0 to always show, or a positive integer to show when the stack count is this number or greater
 local CTRA_Configuration_BossDebuffs =
 {
+	-- Classic
+	[19702] = 0,		-- Lucifron: Impending Doom
+	[19703] = 0,		-- Lucifron: Lucifron's Curse
+	[20604] = 0,		-- Lucifron: Dominate Mind
+	[19408] = 0,		-- Magmadar: Panic
+	[19716] = 0,		-- Gehennas: Gehenna's Curse
+	[19658] = 0,		-- Baron Geddon: Ignite Mana
+	[20475] = 0,		-- Baron Geddon: Living Bomb
+	[19713] = 0,		-- Shazzrah: Shazzrah's Curse
+	[13880] = 20,		-- Golemagg the Incinerator: Magma Splash
+	[19776] = 0,		-- Sulfuron Harbinger: Shadow Word: Pain
+	[20294] = 0,		-- Sulfuron Harbinger: Immolate
+	
 	-- Battle for Azeroth
 	[294711] = 5,		-- Abyssal Commander Sivara: Frost Mark
 	[294715] = 5,		-- Abyssal Commander Sivara: Toxic Brand
@@ -1653,7 +1666,9 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	local powerBar, powerBarWidth;
 	local roleTexture;
 	local unitNameFontStringLarge, unitNameFontStringSmall;
-	local aura1Texture, aura2Texture, aura3Texture, aura4Texture, aura5Texture, auraBoss1Texture, auraBoss2Texture, auraBoss3Texture;
+	local aura1Texture, aura2Texture, aura3Texture, aura4Texture, aura5Texture;
+	local auraBoss1Texture, auraBoss2Texture, auraBoss3Texture;
+	local auraBoss1CountFontString, auraBoss2CountFontString, auraBoss3CountFontString;
 	local statusTexture, statusFontString, statusBackground;
 	
 	
@@ -2042,16 +2057,16 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 		unitNameFontStringLarge = unitNameFontStringLarge or visualFrame:CreateFontString(nil, "OVERLAY");
 		unitNameFontStringLarge:SetIgnoreParentScale(true);
 		unitNameFontStringLarge:SetFontObject(module:GetUnitNameFontLarge(scale));
-		unitNameFontStringLarge:SetPoint("BOTTOMLEFT", visualFrame, "LEFT", 12 * scale, 0);	-- leave room for roleTexture
-		unitNameFontStringLarge:SetPoint("BOTTOMRIGHT", visualFrame, "RIGHT", -12 * scale, 0);	-- leave room for aura icons
+		unitNameFontStringLarge:SetPoint("BOTTOMLEFT", visualFrame, "LEFT", 12 * scale, 1);	-- leave room for roleTexture
+		unitNameFontStringLarge:SetPoint("BOTTOMRIGHT", visualFrame, "RIGHT", -12 * scale, 1);	-- leave room for aura icons
 		unitNameFontStringLarge:SetHeight(8 * scale);	-- prevents a shift when the name is truncated
 		
 	
 		unitNameFontStringSmall = unitNameFontStringSmall or visualFrame:CreateFontString(nil, "OVERLAY");
 		unitNameFontStringSmall:SetIgnoreParentScale(true);
 		unitNameFontStringSmall:SetFontObject(module:GetUnitNameFontSmall(scale));
-		unitNameFontStringSmall:SetPoint("BOTTOMLEFT", visualFrame, "LEFT", 12 * scale, 0.5 * scale);		-- leave room for roleTexture
-		unitNameFontStringSmall:SetPoint("BOTTOMRIGHT", visualFrame, "RIGHT", -12 * scale, 0.5 * scale);	-- leave room for aura icons
+		unitNameFontStringSmall:SetPoint("BOTTOMLEFT", visualFrame, "LEFT", 12 * scale, 1.5 * scale);		-- leave room for roleTexture
+		unitNameFontStringSmall:SetPoint("BOTTOMRIGHT", visualFrame, "RIGHT", -12 * scale, 1.5 * scale);	-- leave room for aura icons
 		unitNameFontStringSmall:SetHeight(7 * scale);	-- prevents a shift when the name is truncated
 	end
 	
@@ -2082,37 +2097,45 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	end
 	
 	local configureAuras = function()
-		aura1Texture = aura1Texture or visualFrame:CreateTexture(nil, "OVERLAY");
+		aura1Texture = aura1Texture or visualFrame:CreateTexture(nil, "OVERLAY", nil, -1);
 		aura1Texture:SetSize(9,9);
 		aura1Texture:SetPoint("TOPRIGHT", visualFrame, -5, -5);
 
-		aura2Texture = aura2Texture or visualFrame:CreateTexture(nil, "OVERLAY");
+		aura2Texture = aura2Texture or visualFrame:CreateTexture(nil, "OVERLAY", nil, -1);
 		aura2Texture:SetSize(9,9);
 		aura2Texture:SetPoint("TOPRIGHT", visualFrame, -5, -15);
 		
-		aura3Texture = aura3Texture or visualFrame:CreateTexture(nil, "OVERLAY");
+		aura3Texture = aura3Texture or visualFrame:CreateTexture(nil, "OVERLAY", nil, -1);
 		aura3Texture:SetSize(9,9);
 		aura3Texture:SetPoint("TOPRIGHT", visualFrame, -5, -25);
 
-		aura4Texture = aura4Texture or visualFrame:CreateTexture(nil, "OVERLAY");
+		aura4Texture = aura4Texture or visualFrame:CreateTexture(nil, "OVERLAY", nil, -1);
 		aura4Texture:SetSize(9,9);
 		aura4Texture:SetPoint("TOPRIGHT", visualFrame, -15, -25);
 
-		aura5Texture = aura5Texture or visualFrame:CreateTexture(nil, "OVERLAY");
+		aura5Texture = aura5Texture or visualFrame:CreateTexture(nil, "OVERLAY", nil, -1);
 		aura5Texture:SetSize(9,9);
 		aura5Texture:SetPoint("TOPRIGHT", visualFrame, -15, -15);
 		
 		auraBoss1Texture = auraBoss1Texture or visualFrame:CreateTexture(nil, "OVERLAY");
 		auraBoss1Texture:SetSize(11,11);
-		--auraBoss1Texture:SetPoint("TOPLEFT", visualFrame, "CENTER", -5.5, -1);
+		auraBoss1CountFontString = auraBoss1CountFontString or visualFrame:CreateFontString(nil, "OVERLAY");
+		auraBoss1CountFontString:SetFont("Fonts\\ARIALN.TTF", 6, "");
+		auraBoss1CountFontString:SetPoint("TOP", auraBoss1Texture, "BOTTOM");
 		
 		auraBoss2Texture = auraBoss2Texture or visualFrame:CreateTexture(nil, "OVERLAY");
 		auraBoss2Texture:SetSize(11,11);
 		auraBoss2Texture:SetPoint("LEFT", auraBoss1Texture, "RIGHT", 1, 0);
+		auraBoss2CountFontString = auraBoss2CountFontString or visualFrame:CreateFontString(nil, "OVERLAY");
+		auraBoss2CountFontString:SetFont("Fonts\\ARIALN.TTF", 7, "");
+		auraBoss2CountFontString:SetPoint("TOP", auraBoss2Texture, "BOTTOM");
 		
 		auraBoss3Texture = auraBoss3Texture or visualFrame:CreateTexture(nil, "OVERLAY");
 		auraBoss3Texture:SetSize(11,11);
 		auraBoss3Texture:SetPoint("LEFT", auraBoss2Texture, "RIGHT", 1, 0);
+		auraBoss3CountFontString = auraBoss3CountFontString or visualFrame:CreateFontString(nil, "OVERLAY");
+		auraBoss3CountFontString:SetFont("Fonts\\ARIALN.TTF", 7, "");
+		auraBoss3CountFontString:SetPoint("TOP", auraBoss3Texture, "BOTTOM");
 	end
 	
 	-- creates and updates buff/debuff icons
@@ -2138,14 +2161,25 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 						tex.name = name;
 						tex.count = count;
 						tex.debuffType = debuffType;
+						local string = (numBossShown == 1 and auraBoss1CountFontString) or (numBossShown == 2 and auraBoss2CountFontString) or auraBoss3CountFontString;
+						if ((count or 0) > 1) then
+							local color = DebuffTypeColor[debuffType];
+							string:SetText(count);
+							string:SetTextColor(1 - (1-color.r)/2, 1 - (1-color.g)/2, 1 - (1-color.b)/2);
+							string:Show();
+						else
+							string:Hide();
+						end
 					end
 				end
-				auraBoss1Texture:SetPoint("TOPLEFT", visualFrame, "CENTER", 0.5 - (numBossShown * 6), -1);
+				auraBoss1Texture:SetPoint("TOPLEFT", visualFrame, "CENTER", 0.5 - (numBossShown * 6), 1);
 			end
 			while (numBossShown  < 3) do
 				numBossShown = numBossShown + 1;
 				local tex = (numBossShown == 1 and auraBoss1Texture) or (numBossShown == 2 and auraBoss2Texture) or auraBoss3Texture;
 				tex:Hide();
+				local string = (numBossShown == 1 and auraBoss1CountFontString) or (numBossShown == 2 and auraBoss2CountFontString) or auraBoss3CountFontString;
+				string:Hide();
 			end
 			
 			-- STEP 2:
