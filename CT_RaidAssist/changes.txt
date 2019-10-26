@@ -1,4 +1,7 @@
-CT_RaidAssist (8.2.5.5) 2019-10-14
+CT_RaidAssist (8.2.5.6) 2019-10-25
+- Adding raid encounter buffs for The Eternal Palace
+
+CT_RaidAssist (8.2.5.5) 2019-10-24
 - Changes corresponding to CT_Library
 - Eliminated bug when zoning in to a new area
 - Improvements to displaying buffs and debuffs

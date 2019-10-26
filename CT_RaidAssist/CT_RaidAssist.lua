@@ -289,11 +289,25 @@ local CTRA_Configuration_RezAbilities =
 -- Which debuffs associated with boss encounters are super important and worth putting in the middle of the frame
 -- This is only checked when Blizzard's UnitAura() api does not return true for isBossDebuff (12th return value)
 -- key: 	spellId
--- value:	anything that evaluates to true
+-- value:	0 to always show, or a positive integer to show when the stack count is this number or greater
 local CTRA_Configuration_BossDebuffs =
 {
 	-- Battle for Azeroth
-	[292133] = 1,	-- Blackwater Behemoth: Bioluminescence
+	[294711] = 5,		-- Abyssal Commander Sivara: Frost Mark
+	[294715] = 5,		-- Abyssal Commander Sivara: Toxic Brand
+	[292133] = 0,		-- Blackwater Behemoth: Bioluminescence
+	[292138] = 0,		-- Blackwater Behemoth: Radiant Biomass
+	[296746] = 0,		-- Radiance of Azshara: Arcane Bomb
+	[296725] = 0,		-- Lady Ashvane: Barnacle Bash
+	[298242] = 0,		-- Orgozoa: Incubation Fluid
+	[298156] = 5,		-- Orgozoa: Desensitizing Sting
+	[301829] = 5,		-- Queen's Court: Pashmar's Touch
+	[292963] = 0,		-- Za'qul: Dread
+	[295173] = 0,		-- Za'qul: Fear Realm
+	[295249] = 0,		-- Za'qul: Delirium Realm
+	[298014] = 3,		-- Queen Azshara: Cold Blast
+	[300743] = 2,		-- Queen Azshara: Void Touched
+	[298569] = 1,		-- Queen Azshara: Drained Soul
 }
 
 --------------------------------------------
@@ -2116,7 +2130,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 					local name, icon, count, debuffType, __, __, __, __, __, spellId, __, isBossDebuff = UnitAura(shownUnit, auraIndex);
 					if (not name or numBossShown == 3) then
 						break;
-					elseif (isBossDebuff or CTRA_Configuration_BossDebuffs[spellId]) then
+					elseif (isBossDebuff or (CTRA_Configuration_BossDebuffs[spellId] and (count or 0) >= CTRA_Configuration_BossDebuffs[spellId])) then
 						numBossShown = numBossShown + 1;
 						local tex = (numBossShown == 1 and auraBoss1Texture) or (numBossShown == 2 and auraBoss2Texture) or auraBoss3Texture;
 						tex:SetTexture(icon);
@@ -2155,7 +2169,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 					if (not name or not spellId or numShown == 5) then
 						break;
 					elseif(
-						not ((isBossDebuff or CTRA_Configuration_BossDebuffs[spellId]) and owner:GetProperty("ShowBossAuras"))					-- excludes buffs shown already in step 1
+						not ((isBossDebuff or (CTRA_Configuration_BossDebuffs[spellId] and (count or 0) >= CTRA_Configuration_BossDebuffs[spellId])) and owner:GetProperty("ShowBossAuras"))					-- excludes buffs shown already in step 1
 						and (filterType == 2 or filterType == 4 or not SpellIsSelfBuff(spellId))			-- excludes self-only buffs
 						and (filterType ~= 5 or source == "player" or source == "vehicle" or source == "pet")		-- complements filterType == 5  (buffs cast by the player only)
 					) then
