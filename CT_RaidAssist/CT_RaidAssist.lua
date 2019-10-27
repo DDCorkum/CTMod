@@ -74,20 +74,17 @@ local strsplit = strsplit;
 --------------------------------------------
 -- Pseudo-Object-Oriented Design
 
-local module;			-- CTRA pseudo-extends CT using CT_Library:registerModule()
 local NewCTRAFrames;		-- Wrapper over all raid-frame portions of the addon that creates and manages windows
 local NewCTRAWindow;		-- Set of player frames (and optionally labels or target frames) sharing a common appearance and anchor point
 local NewCTRAPlayerFrame;	-- A single, interactive player frame that is contained in a window
 local NewCTRATargetFrame;	-- A single, interactive target frame that is contained in a window
 
-
 --------------------------------------------
 -- Initialization
 
-module = { };
+local MODULE_NAME, module = ...;
 local _G = getfenv(0);
 
-local MODULE_NAME = "CT_RaidAssist";
 local MODULE_VERSION = strmatch(GetAddOnMetadata(MODULE_NAME, "version"), "^([%d.]+)");
 
 module.name = MODULE_NAME;
@@ -167,161 +164,7 @@ local function slashCommand()
 end
 
 module:setSlashCmd(slashCommand, "/ctra", "/ctraid", "/ctraidassist");
-
---------------------------------------------
--- General Configuration Data  (update these tables every expansion to reflect class changes, and also make changes to localization.lua)
-
--- Which buffs should be applied out of combat when right-clicking the player frame?  Used by CTRAPlayerFrame.  If multiple abilities have the same modifier, the first one takes precedence.
--- name: 	name of the spell to be cast 			(mandatory)
--- modifier: 	nomod, mod, mod:shift, mod:ctrl, or mod:alt	(mandatory)
--- gameVersion: if set, this line only applies to classic or retail using CT_GAME_VERSION_CLASSIC or CT_GAME_VERSION_RETAIL constants
-local CTRA_Configuration_Buffs =
-{
-	["PRIEST"] =
-	{
-		{["name"] = "Power Word: Fortitude", ["modifier"] = "nomod", },
-	},
-	["MAGE"] =
-	{
-		{["name"] = "Arcane Intellect", ["modifier"] = "nomod", } ,
-		{["name"] = "Arcane Brilliance", ["modifier"] = "mod:shift", ["gameVersion"] = CT_GAME_VERSION_CLASSIC,},
-		{["name"] = "Amplify Magic", ["modifier"] = "mod:ctrl", ["gameVersion"] = CT_GAME_VERSION_CLASSIC,},
-		{["name"] = "Dampen Magic", ["modifier"] = "mod:alt", ["gameVersion"] = CT_GAME_VERSION_CLASSIC,},
-	},
-	["WARRIOR"] =
-	{	
-		{["name"] = "Battle Shout", ["modifier"] = "nomod",},
-	},
-	["HUNTER"] =
-	{
-		{["name"] = "Trueshot Aura", ["modifier"] = "nomod", ["gameVersion"] = CT_GAME_VERSION_CLASSIC,},
-	},
-	["PALADIN"] = 
-	{
-		{["name"] = "Blessing of Kings", ["modifier"] = "nomod", ["gameVersion"] = CT_GAME_VERSION_CLASSIC,},
-		{["name"] = "Blessing of Wisdom", ["modifier"] = "mod:shift", ["gameVersion"] = CT_GAME_VERSION_CLASSIC,},
-		{["name"] = "Blessing of Might", ["modifier"] = "mod:ctrl", ["gameVersion"] = CT_GAME_VERSION_CLASSIC,},
-		{["name"] = "Blessing of Salvation", ["modifier"] = "mod:alt", ["gameVersion"] = CT_GAME_VERSION_CLASSIC,},
-	}
-}
-
--- Which spells should be cast in combat when right-clicking the player frame?  Used by CTRAPlayerFrame.  If multiple abilities have the same modifier, the first one takes precedence.
--- name: 	name of the spell to be cast 			(mandatory)
--- modifier: 	nomod, mod, mod:shift, mod:ctrl, or mod:alt	(mandatory)
--- magic: 	if set, the addon should indicate the presence of a removable magic debuff
--- curse, poison, disease: same as for magic
--- spec:	if set, this line only applies when GetInspectSpecialization("player") returns this SpecializationID
--- gameVersion: if set, this line only applies to classic or retail using CT_GAME_VERSION_CLASSIC or CT_GAME_VERSION_RETAIL constants
-local CTRA_Configuration_FriendlyRemoves =												
-{			
-	["DRUID"] =										
-	{											
-		{["name"] = "Nature's Cure", ["modifier"] = "nomod", ["magic"] = true, ["curse"] = true, ["poison"] = true, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
-		{["name"] = "Remove Corruption", ["modifier"] = "nomod", ["curse"] = true, ["poison"] = true, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
-		{["name"] = "Abolish Poison", ["modifier"] = "nomod", ["poison"] = true, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
-		{["name"] = "Cure Poison", ["modifier"] = "nomod", ["poison"] = true, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},  	--  the first available 'nomod' on the list has precedence, so at lvl 26 this stops being used
-		{["name"] = "Remove Curse", ["modifier"] = "mod:shift", ["curse"] = true, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
-	},
-	["MAGE"] =
-	{
-		{["name"] = "Remove Curse", ["modifier"] = "nomod", ["curse"] = true},
-		{["name"] = "Remove Lesser Curse", ["modifier"] = "nomod", ["curse"] = true},
-	},
-	["MONK"] =
-	{
-		{["name"] = "Detox", ["modifier"] = "nomod", ["spec"] = 270, ["magic"] = true, ["poison"] = true, ["disease"] = true},
-		{["name"] = "Detox", ["modifier"] = "nomod", ["poison"] = true, ["disease"] = true},	-- this is superceded for mistweavers by the higher one on the list with spec=270
-	},
-	["PALADIN"] =
-	{
-		{["name"] = "Cleanse", ["modifier"] = "nomod", ["magic"] = true, ["poison"] = true, ["disease"] = true},	-- exists (in roughly equivalent forms) in both retail and classic
-		{["name"] = "Cleanse  Toxins", ["modifier"] = "nomod", ["poison"] = true, ["disease"] = true, ["gameVersion"] = CT_GAME_VERSION_RETAIL},	-- used by specs in retail who don't get the full cleanse
-		{["name"] = "Purify", ["modifier"] = "nomod", ["poison"] = true, ["disease"] = true, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},	--at higher levels, replaced by cleanse
-	},
-	["PRIEST"] = 
-	{
-		{["name"] = "Purify Disease", ["modifier"] = "nomod", ["disease"] = true, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
-		{["name"] = "Purify", ["modifier"] = "nomod", ["magic"] = true, ["disease"] = true, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
-		{["name"] = "Dispel Magic", ["modifier"] = "nomod", ["magic"] = true, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
-	},
-	["SHAMAN"] =
-	{
-		{["name"] = "Purify Spirit", ["modifier"] = "nomod", ["magic"] = true, ["curse"] = true},
-		{["name"] = "Cleanse Spirit", ["modifier"] = "nomod", ["curse"] = true},
-	},
-}
-
--- Which spells should be cast on dead players when right-clicking the player frame?  Used by CTRAPlayerFrame.  If multiple abilities have the same modifier, the first one takes precedence.
--- name: 	name of the spell to be cast 			(mandatory)
--- modifier: 	nomod, mod, mod:shift, mod:ctrl, or mod:alt	(mandatory)
--- combat: 	if set, this spell may be cast during combat
--- nocombat:	if set, this spell may be cast outside combat
--- gameVersion: if set, this line only applies to classic or retail using CT_GAME_VERSION_CLASSIC or CT_GAME_VERSION_RETAIL constants
-local CTRA_Configuration_RezAbilities =
-{
-	["DRUID"] =
-	{
-		{["name"] = "Rebirth", ["modifier"] = "nomod", ["combat"] = true},
-		{["name"] = "Revive", ["modifier"] = "nomod", ["nocombat"] = true},
-	},
-	["DEATHKNIGHT"] =
-	{
-		{["name"] = "Raise Ally", ["modifier"] = "nomod", ["combat"] = true, ["nocombat"] = true},
-	},
-	["WARLOCK"] =
-	{
-		{["name"] = "Soulstone", ["modifier"] = "nomod", ["combat"] = true, ["gameVersion"] = CT_GAME_VERSION_RETAIL},	--TO DO: Make a classic version that uses the soulstone sitting in the bags
-	},
-	["PALADIN"] =
-	{
-		{["name"] = "Redemption", ["modifier"] = "nomod", ["nocombat"] = true},
-	},	
-	["PRIEST"] =
-	{
-		{["name"] = "Resurrection", ["modifier"] = "nomod", ["nocombat"] = true},
-	},	
-	["SHAMAN"] =
-	{
-		{["name"] = "Ancestral Spirit", ["modifier"] = "nomod", ["nocombat"] = true},
-	},
-}
-
--- Which debuffs associated with boss encounters are super important and worth putting in the middle of the frame
--- This is only checked when Blizzard's UnitAura() api does not return true for isBossDebuff (12th return value)
--- key: 	spellId
--- value:	0 to always show, or a positive integer to show when the stack count is this number or greater
-local CTRA_Configuration_BossDebuffs =
-{
-	-- Classic
-	[19702] = 0,		-- Lucifron: Impending Doom
-	[19703] = 0,		-- Lucifron: Lucifron's Curse
-	[20604] = 0,		-- Lucifron: Dominate Mind
-	[19408] = 0,		-- Magmadar: Panic
-	[19716] = 0,		-- Gehennas: Gehenna's Curse
-	[19658] = 0,		-- Baron Geddon: Ignite Mana
-	[20475] = 0,		-- Baron Geddon: Living Bomb
-	[19713] = 0,		-- Shazzrah: Shazzrah's Curse
-	[13880] = 20,		-- Golemagg the Incinerator: Magma Splash
-	[19776] = 0,		-- Sulfuron Harbinger: Shadow Word: Pain
-	[20294] = 0,		-- Sulfuron Harbinger: Immolate
-	
-	-- Battle for Azeroth
-	[294711] = 5,		-- Abyssal Commander Sivara: Frost Mark
-	[294715] = 5,		-- Abyssal Commander Sivara: Toxic Brand
-	[292133] = 0,		-- Blackwater Behemoth: Bioluminescence
-	[292138] = 0,		-- Blackwater Behemoth: Radiant Biomass
-	[296746] = 0,		-- Radiance of Azshara: Arcane Bomb
-	[296725] = 0,		-- Lady Ashvane: Barnacle Bash
-	[298242] = 0,		-- Orgozoa: Incubation Fluid
-	[298156] = 5,		-- Orgozoa: Desensitizing Sting
-	[301829] = 5,		-- Queen's Court: Pashmar's Touch
-	[292963] = 0,		-- Za'qul: Dread
-	[295173] = 0,		-- Za'qul: Fear Realm
-	[295249] = 0,		-- Za'qul: Delirium Realm
-	[298014] = 3,		-- Queen Azshara: Cold Blast
-	[300743] = 2,		-- Queen Azshara: Void Touched
-	[298569] = 1,		-- Queen Azshara: Drained Soul
-}
+ 
 
 --------------------------------------------
 -- Extended Ready Checks
@@ -1957,11 +1800,12 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	
 	local function updateStatusIndicators()
 		if (shownUnit and UnitExists(shownUnit)) then
-			local summonStatus, readyStatus, afkStatus, connectionStatus = 
+			local summonStatus, readyStatus, afkStatus, connectionStatus, removableDebuff = 
 				IncomingSummonStatus(shownUnit), 		 -- at the top of the file, IncomingSummonStatus is defined as C_IncomingSummon.IncomingSummonStatus or it just returns zero in classic
 				GetReadyCheckStatus(shownUnit),
 				UnitIsAFK(shownUnit),
-				UnitIsConnected(shownUnit);
+				UnitIsConnected(shownUnit),
+				select(4, UnitAura(shownUnit, 1, "RAID HARMFUL"));
 			if (summonStatus > 0) then
 				statusTexture:SetTexture(2470702);
 				statusTexture:Show();
@@ -2012,6 +1856,11 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				statusFontString:SetText("DC");
 				statusBackground:Show();
 				statusBackground:SetVertexColor(unpack(owner:GetProperty("ColorReadyCheckNotReady")));
+			elseif (removableDebuff) then
+				statusTexture:Hide();
+				statusFontString:Hide();
+				statusBackground:Show();
+				statusBackground:SetVertexColor(removableDebuff.r, removableDebuff.g, removableDebuff.b, 0.1);
 			else
 				statusTexture:Hide();
 				statusFontString:Hide();
@@ -2097,23 +1946,23 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	end
 	
 	local configureAuras = function()
-		aura1Texture = aura1Texture or visualFrame:CreateTexture(nil, "OVERLAY", nil, -1);
+		aura1Texture = aura1Texture or visualFrame:CreateTexture(nil, "OVERLAY");
 		aura1Texture:SetSize(9,9);
 		aura1Texture:SetPoint("TOPRIGHT", visualFrame, -5, -5);
 
-		aura2Texture = aura2Texture or visualFrame:CreateTexture(nil, "OVERLAY", nil, -1);
+		aura2Texture = aura2Texture or visualFrame:CreateTexture(nil, "OVERLAY");
 		aura2Texture:SetSize(9,9);
 		aura2Texture:SetPoint("TOPRIGHT", visualFrame, -5, -15);
 		
-		aura3Texture = aura3Texture or visualFrame:CreateTexture(nil, "OVERLAY", nil, -1);
+		aura3Texture = aura3Texture or visualFrame:CreateTexture(nil, "OVERLAY");
 		aura3Texture:SetSize(9,9);
 		aura3Texture:SetPoint("TOPRIGHT", visualFrame, -5, -25);
 
-		aura4Texture = aura4Texture or visualFrame:CreateTexture(nil, "OVERLAY", nil, -1);
+		aura4Texture = aura4Texture or visualFrame:CreateTexture(nil, "OVERLAY");
 		aura4Texture:SetSize(9,9);
 		aura4Texture:SetPoint("TOPRIGHT", visualFrame, -15, -25);
 
-		aura5Texture = aura5Texture or visualFrame:CreateTexture(nil, "OVERLAY", nil, -1);
+		aura5Texture = aura5Texture or visualFrame:CreateTexture(nil, "OVERLAY");
 		aura5Texture:SetSize(9,9);
 		aura5Texture:SetPoint("TOPRIGHT", visualFrame, -15, -15);
 		
@@ -2153,7 +2002,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 					local name, icon, count, debuffType, __, __, __, __, __, spellId, __, isBossDebuff = UnitAura(shownUnit, auraIndex);
 					if (not name or numBossShown == 3) then
 						break;
-					elseif (isBossDebuff or (CTRA_Configuration_BossDebuffs[spellId] and (count or 0) >= CTRA_Configuration_BossDebuffs[spellId])) then
+					elseif (isBossDebuff or (module.CTRA_Configuration_BossAuras[spellId] and (count or 0) >= module.CTRA_Configuration_BossAuras[spellId])) then
 						numBossShown = numBossShown + 1;
 						local tex = (numBossShown == 1 and auraBoss1Texture) or (numBossShown == 2 and auraBoss2Texture) or auraBoss3Texture;
 						tex:SetTexture(icon);
@@ -2203,7 +2052,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 					if (not name or not spellId or numShown == 5) then
 						break;
 					elseif(
-						not ((isBossDebuff or (CTRA_Configuration_BossDebuffs[spellId] and (count or 0) >= CTRA_Configuration_BossDebuffs[spellId])) and owner:GetProperty("ShowBossAuras"))					-- excludes buffs shown already in step 1
+						not ((isBossDebuff or (module.CTRA_Configuration_BossAuras[spellId] and (count or 0) >= module.CTRA_Configuration_BossAuras[spellId])) and owner:GetProperty("ShowBossAuras"))					-- excludes buffs shown already in step 1
 						and (filterType == 2 or filterType == 4 or not SpellIsSelfBuff(spellId))			-- excludes self-only buffs
 						and (filterType ~= 5 or source == "player" or source == "vehicle" or source == "pet")		-- complements filterType == 5  (buffs cast by the player only)
 					) then
@@ -2228,10 +2077,10 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	-- returns a table with nomod, mod:shift, mod:ctrl or mod:alt as a key and then a valid spellName as a value
 	local canRezCombat = function()
 		local __, class = UnitClass("player");
-		if (CTRA_Configuration_RezAbilities[class]) then
+		if (module.CTRA_Configuration_RezAbilities[class]) then
 			local combatRezToCast = { };
 			local hasRez = nil;
-			for i, details in ipairs(CTRA_Configuration_RezAbilities[class]) do
+			for i, details in ipairs(module.CTRA_Configuration_RezAbilities[class]) do
 				if (GetSpellInfo(L["CT_RaidAssist/Spells/" .. details.name]) and details.combat and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and combatRezToCast[details.modifier] == nil) then
 					combatRezToCast[details.modifier] = L["CT_RaidAssist/Spells/" .. details.name];
 					hasRez = true;
@@ -2247,10 +2096,10 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	-- returns a table with nomod, mod:shift, mod:ctrl or mod:alt as a key and then a valid spellName as a value
 	local canRezNoCombat = function()
 		local __, class = UnitClass("player");
-		if (CTRA_Configuration_RezAbilities[class]) then
+		if (module.CTRA_Configuration_RezAbilities[class]) then
 			local nocombatRezToCast = { };
 			local hasRez = nil;
-			for i, details in ipairs(CTRA_Configuration_RezAbilities[class]) do
+			for i, details in ipairs(module.CTRA_Configuration_RezAbilities[class]) do
 				if (GetSpellInfo(L["CT_RaidAssist/Spells/" .. details.name]) and details.nocombat and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and nocombatRezToCast[details.modifier] == nil) then
 					nocombatRezToCast[details.modifier] = L["CT_RaidAssist/Spells/" .. details.name];
 					hasRez = true;
@@ -2269,10 +2118,10 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	local canRemoveDebuff = function()				
 		local __, class = UnitClass("player");
 		local spec = GetInspectSpecialization("player");
-		if (CTRA_Configuration_FriendlyRemoves[class]) then
+		if (module.CTRA_Configuration_FriendlyRemoves[class]) then
 			local friendlyRemovesToCast = { };
 			local hasFriendlyRemoves = nil;
-			for i, details in ipairs(CTRA_Configuration_FriendlyRemoves[class]) do
+			for i, details in ipairs(module.CTRA_Configuration_FriendlyRemoves[class]) do
 				if (GetSpellInfo(L["CT_RaidAssist/Spells/" .. details.name]) and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and friendlyRemovesToCast[details.modifier] == nil and (details.spec == nil or spec == nil or details.spec == spec)) then
 					friendlyRemovesToCast[details.modifier] = L["CT_RaidAssist/Spells/" .. details.name];
 					hasFriendlyRemoves = true;
@@ -2290,10 +2139,10 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	--    the second table are a list of spells that should be checked to ensure they are not missing, using spellName as key and then a table with 'scope' (default: "raid") and 'noStack' (default: nil)
 	local canBuff = function()				
 		local __, class = UnitClass("player");
-		if (CTRA_Configuration_Buffs[class]) then
+		if (module.CTRA_Configuration_Buffs[class]) then
 			local buffsToCast = { };
 			local hasBuffs = nil;
-			for i, details in ipairs(CTRA_Configuration_Buffs[class]) do
+			for i, details in ipairs(module.CTRA_Configuration_Buffs[class]) do
 				if (GetSpellInfo(L["CT_RaidAssist/Spells/" .. details.name]) and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and (buffsToCast[details.modifier] == nil)) then
 					buffsToCast[details.modifier] = L["CT_RaidAssist/Spells/" .. details.name];
 					hasBuffs = true;
@@ -2406,63 +2255,75 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 							GameTooltip:AddDoubleLine((UnitRace(shownUnit) or "") .. " " .. (className or ""), (not UnitInRange(shownUnit) and mapid and C_Map.GetMapInfo(mapid).name) or "", 1, 1, 1, 0.5, 0.5, 0.5);
 							if (auraBoss1Texture:IsShown()) then
 								local color = DebuffTypeColor[auraBoss1Texture.debuffType];
-								GameTooltip:AddLine("|T" .. auraBoss1Texture:GetTexture() .. ":0|t  " .. (auraBoss1Texture.name or "") .. ((auraBoss1Texture.count or 0) > 0 and (" (" .. auraBoss1Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+								GameTooltip:AddLine("|T" .. auraBoss1Texture:GetTexture() .. ":0|t  " .. (auraBoss1Texture.name or "") .. ((auraBoss1Texture.count or 0) > 1 and (" (" .. auraBoss1Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
 								if (auraBoss2Texture:IsShown()) then
 									color = DebuffTypeColor[auraBoss2Texture.debuffType];
-									GameTooltip:AddLine("|T" .. auraBoss2Texture:GetTexture() .. ":0|t  " .. (auraBoss2Texture.name or "") .. ((auraBoss2Texture.count or 0) > 0 and (" (" .. auraBoss2Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+									GameTooltip:AddLine("|T" .. auraBoss2Texture:GetTexture() .. ":0|t  " .. (auraBoss2Texture.name or "") .. ((auraBoss2Texture.count or 0) > 1 and (" (" .. auraBoss2Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
 									if (auraBoss3Texture:IsShown()) then
 										color = DebuffTypeColor[auraBoss3Texture.debuffType];
-										GameTooltip:AddLine("|T" .. auraBoss3Texture:GetTexture() .. ":0|t  " .. (auraBoss3Texture.name or "") .. ((auraBoss3Texture.count or 0) > 0 and (" (" .. auraBoss3Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+										GameTooltip:AddLine("|T" .. auraBoss3Texture:GetTexture() .. ":0|t  " .. (auraBoss3Texture.name or "") .. ((auraBoss3Texture.count or 0) > 1 and (" (" .. auraBoss3Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
 									end
 								end
 							end
 							if (aura1Texture:IsShown()) then
 								local color = DebuffTypeColor[aura1Texture.debuffType];
-								GameTooltip:AddLine("|T" .. aura1Texture:GetTexture() .. ":0|t  " .. (aura1Texture.name or "") .. ((aura1Texture.count or 0) > 0 and (" (" .. aura1Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+								GameTooltip:AddLine("|T" .. aura1Texture:GetTexture() .. ":0|t  " .. (aura1Texture.name or "") .. ((aura1Texture.count or 0) > 1 and (" (" .. aura1Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
 								if (aura2Texture:IsShown()) then
 									color = DebuffTypeColor[aura2Texture.debuffType];
-									GameTooltip:AddLine("|T" .. aura2Texture:GetTexture() .. ":0|t  " .. (aura2Texture.name or "") .. ((aura2Texture.count or 0) > 0 and (" (" .. aura2Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+									GameTooltip:AddLine("|T" .. aura2Texture:GetTexture() .. ":0|t  " .. (aura2Texture.name or "") .. ((aura2Texture.count or 0) > 1 and (" (" .. aura2Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
 									if (aura3Texture:IsShown()) then
 										color = DebuffTypeColor[aura3Texture.debuffType];
-										GameTooltip:AddLine("|T" .. aura3Texture:GetTexture() .. ":0|t  " .. (aura3Texture.name or "") .. ((aura3Texture.count or 0) > 0 and (" (" .. aura3Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+										GameTooltip:AddLine("|T" .. aura3Texture:GetTexture() .. ":0|t  " .. (aura3Texture.name or "") .. ((aura3Texture.count or 0) > 1 and (" (" .. aura3Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
 										if (aura4Texture:IsShown()) then
 											color = DebuffTypeColor[aura4Texture.debuffType];
-											GameTooltip:AddLine("|T" .. aura4Texture:GetTexture() .. ":0|t  " .. (aura4Texture.name or "") .. ((aura4Texture.count or 0) > 0 and (" (" .. aura4Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+											GameTooltip:AddLine("|T" .. aura4Texture:GetTexture() .. ":0|t  " .. (aura4Texture.name or "") .. ((aura4Texture.count or 0) > 1 and (" (" .. aura4Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
 											if (aura5Texture:IsShown()) then
 												color = DebuffTypeColor[aura5Texture.debuffType];
-												GameTooltip:AddLine("|T" .. aura5Texture:GetTexture() .. ":0|t  " .. (aura5Texture.name or "") .. ((aura5Texture.count or 0) > 0 and (" (" .. aura5Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+												GameTooltip:AddLine("|T" .. aura5Texture:GetTexture() .. ":0|t  " .. (aura5Texture.name or "") .. ((aura5Texture.count or 0) > 1 and (" (" .. aura5Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
 											end
 										end
 									end
 								end
 							end
-							local buff = canBuff();
-							local remove = canRemoveDebuff();
-							local rezCombat = canRezCombat();
-							local rezNoCombat = canRezNoCombat();
-							if (not InCombatLockdown() and (buff or remove or rezCombat or rezNoCombat)) then
-								GameTooltip:AddLine("|nRight click...");
-								if buff then for modifier, spellName in pairs(buff) do
-									GameTooltip:AddDoubleLine("|cFF33CC66nocombat" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFF33CC66"  .. spellName);
-								end end
-								if remove then for modifier, spellName in pairs(remove) do
-									GameTooltip:AddDoubleLine("|cFFCC6666combat" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFCC6666" .. spellName);
-								end end
-								if rezCombat then for modifier, spellName in pairs(rezCombat) do 
-									GameTooltip:AddDoubleLine("|cFFCC6666combat, dead" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFCC6666" .. spellName);
-								end end
-								if rezNoCombat then for modifier, spellName in pairs(rezNoCombat) do 
-									GameTooltip:AddDoubleLine("|cFF999999nocombat, dead" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFF999999" .. spellName);
-								end end
-							end
+
 							if (not module.GameTooltipExtraLine) then
 								module.GameTooltipExtraLine = GameTooltip:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall");
 								module.GameTooltipExtraLine:SetPoint("BOTTOM", 0, 6);
 								module.GameTooltipExtraLine:SetText(L["CT_RaidAssist/PlayerFrame/TooltipFooter"]);
 								module.GameTooltipExtraLine:SetScale(0.90);
-							end
-							GameTooltip:Show();
+							end	
 							if (not InCombatLockdown()) then
+								-- Consumables
+								for i=1, 40 do
+									name, icon, __, __, __, __, __, __, __, spellId = UnitAura(shownUnit, i, "HELPFUL CANCELABLE");
+									if (not name) then
+										break;
+									elseif (module.CTRA_Configuration_Consumables[spellId]) then
+										GameTooltip:AddLine("|T" .. icon .. ":0|t  " .. name, 0.9, 0.9, 0.9);
+									end
+								end
+
+								-- Guide to spells that can be cast
+								local buff = canBuff();
+								local remove = canRemoveDebuff();
+								local rezCombat = canRezCombat();
+								local rezNoCombat = canRezNoCombat();
+								if (buff or remove or rezCombat or rezNoCombat) then
+									GameTooltip:AddLine("|nRight click...");
+									if buff then for modifier, spellName in pairs(buff) do
+										GameTooltip:AddDoubleLine("|cFF33CC66nocombat" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFF33CC66"  .. spellName);
+									end end
+									if remove then for modifier, spellName in pairs(remove) do
+										GameTooltip:AddDoubleLine("|cFFCC6666combat" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFCC6666" .. spellName);
+									end end
+									if rezCombat then for modifier, spellName in pairs(rezCombat) do 
+										GameTooltip:AddDoubleLine("|cFFCC6666combat, dead" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFCC6666" .. spellName);
+									end end
+									if rezNoCombat then for modifier, spellName in pairs(rezNoCombat) do 
+										GameTooltip:AddDoubleLine("|cFF999999nocombat, dead" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFF999999" .. spellName);
+									end end
+								end
+								GameTooltip:Show();
 								module.GameTooltipExtraLine:Show();
 								GameTooltip:SetHeight(GameTooltip:GetHeight()+5);
 								GameTooltip:SetWidth(max(150,GameTooltip:GetWidth()));
@@ -2471,6 +2332,8 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 								else
 									module.GameTooltipExtraLine:SetTextColor(1,1,1);
 								end
+							else
+								GameTooltip:Show();
 							end
 						end
 					end

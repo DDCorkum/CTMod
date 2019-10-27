@@ -9,4 +9,6 @@
 ## SavedVariables: CT_RaidAssistOptions
 
 CT_RaidAssist.lua
+CT_RaidAssist_ExpansionData.lua
 localization.lua
+

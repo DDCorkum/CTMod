@@ -19,7 +19,7 @@
 
 -- Please contribute new translations at <https://wow.curseforge.com/projects/ctmod/localization>
 
-local module = CT_RaidAssist
+local MODULE_NAME, module = ...;
 module.text = module.text or { };
 local L = module.text
 
