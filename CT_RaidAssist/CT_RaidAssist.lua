@@ -1999,10 +1999,10 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			local numBossShown = 0;
 			if(UnitExists(shownUnit) and owner:GetProperty("ShowBossAuras")) then		
 				for auraIndex = 1, 40 do
-					local name, icon, count, debuffType, __, __, __, __, __, spellId, __, isBossDebuff = UnitAura(shownUnit, auraIndex);
+					local name, icon, count, debuffType, __, __, __, __, __, spellId = UnitAura(shownUnit, auraIndex, "");
 					if (not name or numBossShown == 3) then
 						break;
-					elseif (isBossDebuff or (module.CTRA_Configuration_BossAuras[spellId] and (count or 0) >= module.CTRA_Configuration_BossAuras[spellId])) then
+					elseif (module.CTRA_Configuration_BossAuras[spellId] and (count or 0) >= module.CTRA_Configuration_BossAuras[spellId]) then
 						numBossShown = numBossShown + 1;
 						local tex = (numBossShown == 1 and auraBoss1Texture) or (numBossShown == 2 and auraBoss2Texture) or auraBoss3Texture;
 						tex:SetTexture(icon);
@@ -2048,11 +2048,14 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 					filterText = "HELPFUL";		-- further filtered by conditional statements during for loop below
 				end
 				for auraIndex = 1, 40 do
-					local name, icon, count, debuffType, __, __, source, __, __, spellId, __, isBossDebuff = UnitAura(shownUnit, auraIndex, filterText);
+					local name, icon, count, debuffType, __, __, source, __, __, spellId = UnitAura(shownUnit, auraIndex, filterText);
+					CTDebug = CTDebug or { };
+					CTDebug[auraIndex] = {UnitAura(shownUnit, auraIndex, filterText)};
+					
 					if (not name or not spellId or numShown == 5) then
 						break;
 					elseif(
-						not ((isBossDebuff or (module.CTRA_Configuration_BossAuras[spellId] and (count or 0) >= module.CTRA_Configuration_BossAuras[spellId])) and owner:GetProperty("ShowBossAuras"))					-- excludes buffs shown already in step 1
+						not (owner:GetProperty("ShowBossAuras") and (module.CTRA_Configuration_BossAuras[spellId] and (count or 0) >= module.CTRA_Configuration_BossAuras[spellId]))
 						and (filterType == 2 or filterType == 4 or not SpellIsSelfBuff(spellId))			-- excludes self-only buffs
 						and (filterType ~= 5 or source == "player" or source == "vehicle" or source == "pet")		-- complements filterType == 5  (buffs cast by the player only)
 					) then
@@ -2255,31 +2258,31 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 							GameTooltip:AddDoubleLine((UnitRace(shownUnit) or "") .. " " .. (className or ""), (not UnitInRange(shownUnit) and mapid and C_Map.GetMapInfo(mapid).name) or "", 1, 1, 1, 0.5, 0.5, 0.5);
 							if (auraBoss1Texture:IsShown()) then
 								local color = DebuffTypeColor[auraBoss1Texture.debuffType];
-								GameTooltip:AddLine("|T" .. auraBoss1Texture:GetTexture() .. ":0|t  " .. (auraBoss1Texture.name or "") .. ((auraBoss1Texture.count or 0) > 1 and (" (" .. auraBoss1Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+								GameTooltip:AddLine("|T" .. auraBoss1Texture:GetTexture() .. ":0|t " .. (auraBoss1Texture.name or "") .. ((auraBoss1Texture.count or 0) > 1 and (" (" .. auraBoss1Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
 								if (auraBoss2Texture:IsShown()) then
 									color = DebuffTypeColor[auraBoss2Texture.debuffType];
-									GameTooltip:AddLine("|T" .. auraBoss2Texture:GetTexture() .. ":0|t  " .. (auraBoss2Texture.name or "") .. ((auraBoss2Texture.count or 0) > 1 and (" (" .. auraBoss2Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+									GameTooltip:AddLine("|T" .. auraBoss2Texture:GetTexture() .. ":0|t " .. (auraBoss2Texture.name or "") .. ((auraBoss2Texture.count or 0) > 1 and (" (" .. auraBoss2Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
 									if (auraBoss3Texture:IsShown()) then
 										color = DebuffTypeColor[auraBoss3Texture.debuffType];
-										GameTooltip:AddLine("|T" .. auraBoss3Texture:GetTexture() .. ":0|t  " .. (auraBoss3Texture.name or "") .. ((auraBoss3Texture.count or 0) > 1 and (" (" .. auraBoss3Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+										GameTooltip:AddLine("|T" .. auraBoss3Texture:GetTexture() .. ":0|t " .. (auraBoss3Texture.name or "") .. ((auraBoss3Texture.count or 0) > 1 and (" (" .. auraBoss3Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
 									end
 								end
 							end
 							if (aura1Texture:IsShown()) then
 								local color = DebuffTypeColor[aura1Texture.debuffType];
-								GameTooltip:AddLine("|T" .. aura1Texture:GetTexture() .. ":0|t  " .. (aura1Texture.name or "") .. ((aura1Texture.count or 0) > 1 and (" (" .. aura1Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+								GameTooltip:AddLine("|T" .. aura1Texture:GetTexture() .. ":0|t " .. (aura1Texture.name or "") .. ((aura1Texture.count or 0) > 1 and (" (" .. aura1Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
 								if (aura2Texture:IsShown()) then
 									color = DebuffTypeColor[aura2Texture.debuffType];
-									GameTooltip:AddLine("|T" .. aura2Texture:GetTexture() .. ":0|t  " .. (aura2Texture.name or "") .. ((aura2Texture.count or 0) > 1 and (" (" .. aura2Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+									GameTooltip:AddLine("|T" .. aura2Texture:GetTexture() .. ":0|t " .. (aura2Texture.name or "") .. ((aura2Texture.count or 0) > 1 and (" (" .. aura2Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
 									if (aura3Texture:IsShown()) then
 										color = DebuffTypeColor[aura3Texture.debuffType];
-										GameTooltip:AddLine("|T" .. aura3Texture:GetTexture() .. ":0|t  " .. (aura3Texture.name or "") .. ((aura3Texture.count or 0) > 1 and (" (" .. aura3Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+										GameTooltip:AddLine("|T" .. aura3Texture:GetTexture() .. ":0|t " .. (aura3Texture.name or "") .. ((aura3Texture.count or 0) > 1 and (" (" .. aura3Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
 										if (aura4Texture:IsShown()) then
 											color = DebuffTypeColor[aura4Texture.debuffType];
-											GameTooltip:AddLine("|T" .. aura4Texture:GetTexture() .. ":0|t  " .. (aura4Texture.name or "") .. ((aura4Texture.count or 0) > 1 and (" (" .. aura4Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+											GameTooltip:AddLine("|T" .. aura4Texture:GetTexture() .. ":0|t " .. (aura4Texture.name or "") .. ((aura4Texture.count or 0) > 1 and (" (" .. aura4Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
 											if (aura5Texture:IsShown()) then
 												color = DebuffTypeColor[aura5Texture.debuffType];
-												GameTooltip:AddLine("|T" .. aura5Texture:GetTexture() .. ":0|t  " .. (aura5Texture.name or "") .. ((aura5Texture.count or 0) > 1 and (" (" .. aura5Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+												GameTooltip:AddLine("|T" .. aura5Texture:GetTexture() .. ":0|t " .. (aura5Texture.name or "") .. ((aura5Texture.count or 0) > 1 and (" (" .. aura5Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
 											end
 										end
 									end
@@ -2295,11 +2298,22 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 							if (not InCombatLockdown()) then
 								-- Consumables
 								for i=1, 40 do
-									name, icon, __, __, __, __, __, __, __, spellId = UnitAura(shownUnit, i, "HELPFUL CANCELABLE");
-									if (not name) then
+									local name, icon, __, __, __, __, __, __, __, spellId = UnitAura(shownUnit, i, "HELPFUL CANCELABLE");
+									if (not name or not spellId) then
 										break;
-									elseif (module.CTRA_Configuration_Consumables[spellId]) then
-										GameTooltip:AddLine("|T" .. icon .. ":0|t  " .. name, 0.9, 0.9, 0.9);
+									end
+									local isConsumable = module.CTRA_Configuration_Consumables[spellId];
+									if (isConsumable) then
+										if (type(isConsumable == "number")) then
+											local itemName, __, __, __, __, __, __, __, __, itemIcon = GetItemInfo(isConsumable);
+											if (itemName and itemIcon) then
+												GameTooltip:AddLine("|T" .. icon .. ":0|t " .. name .. " from " .. "|T" .. itemIcon .. ":0|t " .. itemName, 0.9, 0.9, 0.9);
+											else
+												GameTooltip:AddLine("|T" .. icon .. ":0|t " .. name, 0.9, 0.9, 0.9);
+											end
+										else
+											GameTooltip:AddLine("|T" .. icon .. ":0|t " .. name, 0.9, 0.9, 0.9);
+										end
 									end
 								end
 
