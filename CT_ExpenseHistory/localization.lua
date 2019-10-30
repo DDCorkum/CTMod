@@ -157,16 +157,43 @@ L["CT_ExpenseHistory/Summary/PlayerDistribution/AllServers"] = "All Servers"
 L["CT_ExpenseHistory/Summary/ReagentCost"] = "Composants:"
 L["CT_ExpenseHistory/Summary/RepairCost"] = "RÃ©parations:"
 L["CT_ExpenseHistory/Summary/TotalCost"] = "Montant DÃ©pensÃ© Total:"
+L["CT_ExpenseHistory/Ammo/Accurate Slugs"] = "Balles de précision"
+L["CT_ExpenseHistory/Ammo/Balanced Throwing Dagger"] = "Dague de lancer équilibrée"
+L["CT_ExpenseHistory/Ammo/Blackflight Arrow"] = "Flèche de vol noir"
+L["CT_ExpenseHistory/Ammo/Blacksteel Throwing Dagger"] = "Dague de lancer en noiracier"
+L["CT_ExpenseHistory/Ammo/Crude Throwing Axe"] = "Hache de lncer grossière"
+L["CT_ExpenseHistory/Ammo/Deadly Throwing Axe"] = "Hache de lancer mortelle"
+L["CT_ExpenseHistory/Ammo/Frostbite Bullets"] = "Balles morsure-de-givre"
 L["CT_ExpenseHistory/Ammo/Heavy Shot"] = "Balle lourde"
+L["CT_ExpenseHistory/Ammo/Heavy Throwing Dagger"] = "Couteau de lancer lourd"
 L["CT_ExpenseHistory/Ammo/Ice Threaded Arrow"] = "Flèche de glace"
 L["CT_ExpenseHistory/Ammo/Ice Threaded Bullet"] = "Balle de glace"
+L["CT_ExpenseHistory/Ammo/Jagged Arrow"] = "Flèche barbelée"
+L["CT_ExpenseHistory/Ammo/Keen Throwing Knife"] = "Couteau de lancer perçant"
 L["CT_ExpenseHistory/Ammo/Light Shot"] = "Balle légère"
+L["CT_ExpenseHistory/Ammo/Mysterious Arrow"] = "Flèche mystérieuse"
+L["CT_ExpenseHistory/Ammo/Razor Arrow"] = "Flèche rasoir"
+L["CT_ExpenseHistory/Ammo/Rough Arrow"] = "Flèche grossière"
+L["CT_ExpenseHistory/Ammo/Scout's Arrow"] = "Flèche d'éclaireur"
+L["CT_ExpenseHistory/Ammo/Sharp Arrow"] = "Flèche pointue"
+L["CT_ExpenseHistory/Ammo/Sharp Throwing Axe"] = "Hache de lancer aiguisée"
+L["CT_ExpenseHistory/Ammo/Terrorshaft Arrow"] = "Flèche trait de terreur"
+L["CT_ExpenseHistory/Ammo/Timeless Arrow"] = "Flèche intemporelle"
+L["CT_ExpenseHistory/Ammo/Warden's Arrow"] = "Flèche de sylvegarde"
+L["CT_ExpenseHistory/Ammo/Wicked Arrow"] = "Flèche cruelle"
+L["CT_ExpenseHistory/Reagent/Ankh"] = "Ankh"
 L["CT_ExpenseHistory/Reagent/Arcane Powder"] = "Poudre des arcane"
 L["CT_ExpenseHistory/Reagent/Ashwood Seed"] = "Graine de frêne"
+L["CT_ExpenseHistory/Reagent/Corpse Dust"] = "Poussière de cadavre"
+L["CT_ExpenseHistory/Reagent/Flash Powder"] = "Poudre éclipsante"
+L["CT_ExpenseHistory/Reagent/Holy Candle"] = "Bougie sanctifiée"
+L["CT_ExpenseHistory/Reagent/Hornbeam Seed"] = "Graine de charme"
+L["CT_ExpenseHistory/Reagent/Infernal Stone"] = "Pierre infernale"
 L["CT_ExpenseHistory/Reagent/Ironwood Seed"] = "Graine de bois de fer"
 L["CT_ExpenseHistory/Reagent/Maple Seed"] = "Graine d'erable"
 L["CT_ExpenseHistory/Reagent/Rune of Portals"] = "Rune de téléportation"
 L["CT_ExpenseHistory/Reagent/Rune of Teleportation"] = "Rune de portails"
+L["CT_ExpenseHistory/Reagent/Sacred Candle"] = "Bougie sacrée"
 L["CT_ExpenseHistory/Reagent/Stranglethorn Seed"] = "Graine de stranglethorn"
 L["CT_ExpenseHistory/Reagent/Symbol of Divinity"] = "Symbole de divinité"
 L["CT_ExpenseHistory/Reagent/Wild Berries"] = "Baies sauvages"
@@ -189,12 +216,12 @@ L["CT_ExpenseHistory/Reagent/Wild Berries"] = "Baies sauvages"
 		"Afficher Fen\195\170tre",
 		"Affiche la fen\195\170tre \195\160 partir de laquelle vous pouvez voir une liste et un r\195\169sum\195\169 de vos d\195\169penses."
 	};
-end
 
 
 -- deDE (Credits: anon)
 
-if ( GetLocale() == "deDE" ) then
+elseif ( GetLocale() == "deDE" ) then
+
 L["CT_ExpenseHistory/Ammo"] = "Munition"
 L["CT_ExpenseHistory/Flight"] = "Flug"
 L["CT_ExpenseHistory/Log/Char"] = "Charakter"
@@ -219,6 +246,9 @@ L["CT_ExpenseHistory/Summary/PlayerDistribution/AllServers"] = "All Servers"
 L["CT_ExpenseHistory/Summary/ReagentCost"] = "Zutaten:"
 L["CT_ExpenseHistory/Summary/RepairCost"] = "Reparaturen:"
 L["CT_ExpenseHistory/Summary/TotalCost"] = "Gesamtausgaben:"
+L["CT_ExpenseHistory/Ammo/Accurate Slugs"] = "Genaue Patronen"
+L["CT_ExpenseHistory/Ammo/Balanced Throwing Dagger"] = "Ausbalancierter Wurfdolch"
+L["CT_ExpenseHistory/Reagent/Ankh"] = "Ankh"
 
 
 	-- Classes
@@ -239,4 +269,51 @@ L["CT_ExpenseHistory/Summary/TotalCost"] = "Gesamtausgaben:"
 		"Zeige Dialogfenster",
 		"Zeigt ein dialogfenster, in dem du eine auflistung und zusammenfassung deiner ausgaben sehen kannst."
 	};
+
+
+-- reRU (Credits: imposeren)
+
+elseif ( GetLocale() == "deDE" ) then
+
+L["CT_ExpenseHistory/Ammo"] = "Патроны"
+L["CT_ExpenseHistory/Reagent"] = "Реагент"
+L["CT_ExpenseHistory/Ammo/Accurate Slugs"] = "Точные пули"
+L["CT_ExpenseHistory/Ammo/Crude Throwing Axe"] = "Грубый метательный топорик"
+L["CT_ExpenseHistory/Ammo/Deadly Throwing Axe"] = "Смертоносный метательный топорик"
+L["CT_ExpenseHistory/Ammo/Gleaming Throwing Axe"] = "Блестящий метательный топорик"
+L["CT_ExpenseHistory/Ammo/Heavy Shot"] = "Тяжелый патрон"
+L["CT_ExpenseHistory/Ammo/Heavy Throwing Dagger"] = "Тяжелый метательный кинжал"
+L["CT_ExpenseHistory/Ammo/Ice Threaded Arrow"] = "Пронизанная льдом стрела"
+L["CT_ExpenseHistory/Ammo/Ice Threaded Bullet"] = "Пронизанная льдом пуля"
+L["CT_ExpenseHistory/Ammo/Jagged Arrow"] = "Зазубренная стрела"
+L["CT_ExpenseHistory/Ammo/Keen Throwing Knife"] = "Остро отточенный метательный нож"
+L["CT_ExpenseHistory/Ammo/Light Shot"] = "Легкий патрон"
+L["CT_ExpenseHistory/Ammo/Razor Arrow"] = "Стрела-бритва"
+L["CT_ExpenseHistory/Ammo/Rough Arrow"] = "Грубая стрела"
+L["CT_ExpenseHistory/Ammo/Sharp Arrow"] = "Острая стрела"
+L["CT_ExpenseHistory/Ammo/Sharp Throwing Axe"] = "Острый метательный топорик"
+L["CT_ExpenseHistory/Ammo/Small Throwing Knife"] = "Малый метательный нож"
+L["CT_ExpenseHistory/Ammo/Smooth Pebble"] = "Шлифованный метательный камень"
+L["CT_ExpenseHistory/Ammo/Solid Shot"] = "Твердый патрон"
+L["CT_ExpenseHistory/Ammo/Weighted Throwing Axe"] = "Утяжеленный метательный топорик"
+L["CT_ExpenseHistory/Reagent/Ankh"] = "Крест"
+L["CT_ExpenseHistory/Reagent/Arcane Powder"] = "Порошок чар"
+L["CT_ExpenseHistory/Reagent/Ashwood Seed"] = "Семена ясеня"
+L["CT_ExpenseHistory/Reagent/Demonic Figurine"] = "Демоническая статуэтка"
+L["CT_ExpenseHistory/Reagent/Flash Powder"] = "Воспламеняющийся порошок"
+L["CT_ExpenseHistory/Reagent/Holy Candle"] = "Святая свеча"
+L["CT_ExpenseHistory/Reagent/Hornbeam Seed"] = "Семена граба"
+L["CT_ExpenseHistory/Reagent/Infernal Stone"] = "Камень инфернала"
+L["CT_ExpenseHistory/Reagent/Ironwood Seed"] = "Семена железного дерева"
+L["CT_ExpenseHistory/Reagent/Maple Seed"] = "Семена клена"
+L["CT_ExpenseHistory/Reagent/Rune of Portals"] = "Руна порталов"
+L["CT_ExpenseHistory/Reagent/Rune of Teleportation"] = "Руна телепортации"
+L["CT_ExpenseHistory/Reagent/Sacred Candle"] = "Священная свеча"
+L["CT_ExpenseHistory/Reagent/Stranglethorn Seed"] = "Семя из Тернистой долины"
+L["CT_ExpenseHistory/Reagent/Symbol of Divinity"] = "Знак божественности"
+L["CT_ExpenseHistory/Reagent/Symbol of Kings"] = "Знак королей"
+L["CT_ExpenseHistory/Reagent/Wild Berries"] = "Лесные ягоды"
+L["CT_ExpenseHistory/Reagent/Wild Thornroot"] = "Дикий шипокорень"
+
+
 end

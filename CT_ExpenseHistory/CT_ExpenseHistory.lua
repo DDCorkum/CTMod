@@ -1,11 +1,16 @@
 ------------------------------------------------
---             CT_ExpenseHistory              --
+--              CT_ExpenseHistory             --
 --                                            --
 -- Keeps a detailed log of expenses for each  --
 -- of your characters.                        --
+--                                            --
 -- Please do not modify or otherwise          --
 -- redistribute this without the consent of   --
 -- the CTMod Team. Thank you.                 --
+--					      --
+-- Original credits to Cide and TS            --
+-- Maintained by Resike from 2014 to 2017     --
+-- Maintained by Dahk Celes (ddc) since 2019  --
 ------------------------------------------------
 
 --------------------------------------------
