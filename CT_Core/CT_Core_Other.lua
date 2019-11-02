@@ -1625,13 +1625,17 @@ do
 	local opt_watchframeClamped;
 	local opt_watchframeChangeWidth;
 	local opt_watchframeScale;
+	local opt_watchframeAddMinimizeButton;
+
+	-- set to true when the player presses a custom minimize button in classic (mimicking retail functionality)
+	local classicIsMinimized = false;
 
 	local function getBlizzardExpandedWidth()
 		local width;
 		if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
 			width = 235;
 		else
-			width = 170.6;
+			width = 195.4;
 		end
 		return width;
 	end
@@ -1718,7 +1722,20 @@ do
 			watchFrame:SetScale(1);
 		end
 	end
-
+		
+	local function updateVisibility()
+		-- Show our watchFrame if there is at least one thing being tracked (which is the case
+		-- when the WatchFrameHeader is shown.
+		-- Also show our watchFrame if at least one auto quest pop up frame is shown, even if
+		-- there are no objectives being tracked. These pop up frames have a height of 82.
+		if ((not opt_watchframeAddMinimizeButton or not classicIsMinimized) and (WatchFrame:IsShown() or ((GetNumAutoQuestPopUps and GetNumAutoQuestPopUps()) or 0) > 0)) then	-- nil check because there are no auto-popups in Classic
+			watchFrame:Show();
+		else
+			-- Blizzard hid their WatchFrame so hide ours also; or the player pressed a custom minimize button on classic (mimicking retail functionality)
+			watchFrame:Hide();
+		end
+	end
+				
 	local function watchFrame_Update()
 		if (opt_watchframeEnabled) then
 			local width, height;
@@ -1756,25 +1773,15 @@ do
 			watchFrame:SetWidth(width);
 			watchFrame:SetHeight(height);
 
-			if ( WatchFrame.collapsed and not WatchFrame.userCollapsed ) then
-				-- WatchFrame is collapsed, but not because user clicked the collapse button.
-				-- There was not enough room to show objectives, so Blizzard collapsed the frame.
-				--WatchFrameCollapseExpandButton:Disable();
-			else
-				--WatchFrameCollapseExpandButton:Enable();
+			if (CT_Core_MinimizeWatchFrameButton) then
+				if (opt_watchframeAddMinimizeButton) then
+					CT_Core_MinimizeWatchFrameButton:Show();	-- adds a custom minimize button on classic only, mimicking retail behaviour
+				else
+					CT_Core_MinimizeWatchFrameButton:Hide();
+				end
 			end
 
-			-- Show our watchFrame if there is at least one thing being tracked (which is the case
-			-- when the WatchFrameHeader is shown.
-			-- Also show our watchFrame if at least one auto quest pop up frame is shown, even if
-			-- there are no objectives being tracked. These pop up frames have a height of 82.
-			if (WatchFrame:IsShown() or ((GetNumAutoQuestPopUps and GetNumAutoQuestPopUps()) or 0) > 0) then	-- nil check because there are no auto-popups in Classic
-				watchFrame:Show();
-			else
-				-- Blizzard hid their WatchFrame, so hide ours also.
-				watchFrame:Hide();
-			end
-
+			updateVisibility();
 			updateBackground();
 			updateBorder();
 			updateClamping();
@@ -1942,8 +1949,15 @@ do
 		else
 			if (isEnabled) then
 				watchFrame:Hide();
+				if (CT_Core_MinimizeWatchFrameButton) then
+					CT_Core_MinimizeWatchFrameButton:Hide();	-- hides the custom minimize button on classic only
+				end
 				-- Restore Blizzard's WatchFrame
-				WatchFrame:SetWidth(getBlizzardExpandedWidth());
+				if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+					WatchFrame:SetWidth(getBlizzardExpandedWidth());
+				elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+					QuestWatch_Update();
+				end
 				frameSetParent(WatchFrame, "UIParent");
 				WatchFrame:ClearAllPoints();
 				WatchFrame:SetPoint("TOPRIGHT", MiniMapCluster, "BOTTOMRIGHT", ((MultiBarRight:IsShown() and -52) and MultiBarLeft:IsShown() and -95) or 0);	-- this is probably not even required because of UIParent_ManageFramePositions()
@@ -2104,6 +2118,41 @@ do
 					self.background:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up");
 				end,
 			},
+
+			["onload"] = function(self)
+				if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+					module:getFrame(
+					{
+						["button#s:16:16#n:CT_Core_MinimizeWatchFrameButton#tl:tr:CT_WatchFrame"] = 
+						{
+							["onload"] = function(button)
+								button:SetNormalTexture("Interface\\Buttons\\UI-Panel-QuestHideButton");
+								button:GetNormalTexture():SetTexCoord(0.0, 0.5, 0.5, 1.0);
+								button:SetPushedTexture("Interface\\Buttons\\UI-Panel-QuestHideButton");
+								button:GetPushedTexture():SetTexCoord(0.5, 1.0, 0.5, 1.0);
+								button:SetHighlightTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight")
+								button:GetHighlightTexture():SetBlendMode("ADD");
+								button:SetDisabledTexture("Interface\\Buttons\\UI-Panel-QuestHideButton-disabled");
+								button:Hide();
+							end;
+							["onclick"] = function(button)
+								if (CT_WatchFrame:IsShown()) then
+									classicIsMinimized = true;
+									button:GetNormalTexture():SetTexCoord(0.0, 0.5, 0.0, 0.5);
+									button:GetPushedTexture():SetTexCoord(0.5, 1.0, 0.0, 0.5);
+								else
+									classicIsMinimized = false;
+									button:GetNormalTexture():SetTexCoord(0.0, 0.5, 0.5, 1.0);
+									button:GetPushedTexture():SetTexCoord(0.5, 1.0, 0.5, 1.0);
+								end
+								updateVisibility();
+								PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+							end
+						}
+					},
+					UIParent);
+				end
+			end,
 
 			["onenter"] = function(self)
 				if ( isResizing ) then return; end
@@ -2288,6 +2337,11 @@ do
 		opt_watchframeScale = value;
 		-- do this even when not enabled!
 		updateScale();
+	end
+	
+	module.watchframeAddMinimizeButton = function(value)
+		opt_watchframeAddMinimizeButton = value;
+		watchFrame_Update();
 	end
 end
 
@@ -2527,6 +2581,7 @@ local modFunctions = {
 	["watchframeClamped"] = module.watchframeClamped,
 	["watchframeBackground"] = module.watchframeBackground,
 	["watchframeChangeWidth"] = module.watchframeChangeWidth,
+	["watchframeAddMinimizeButton"] = module.watchframeAddMinimizeButton,
 	["CTCore_WatchFrameScale"] = module.watchframeChangeScale,
 	["auctionOpenNoBags"] = setBagOption,
 	["auctionOpenBackpack"] = setBagOption,

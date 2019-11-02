@@ -1,3 +1,6 @@
+CT_Core (8.2.5.6) 2019-11-02
+- The classic quest tracker may now be minimized similar to retail
+
 CT_Core (8.2.5.5) 2019-10-14
 - Changes corresponding to CT_Library
 
