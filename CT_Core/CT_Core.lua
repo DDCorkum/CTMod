@@ -760,7 +760,7 @@ module.frame = function()
 		optionsAddObject(  4,   26, "checkbutton#tl:40:%y#i:watchframeLocked#o:watchframeLocked:true#Lock the game's Objectives window");
 		optionsAddObject(  6,   26, "checkbutton#tl:40:%y#i:watchframeShowTooltip#o:watchframeShowTooltip:true#Show drag and resize tooltips");
 		if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-			optionsAddObject(  6,   26, "checkbutton#tl:40:%y#i:watchframeAddMinimizeButton#o:watchframeAddMinimizeButton:false#Add a minimize button (like retail)");
+			optionsAddObject(  6,   26, "checkbutton#tl:40:%y#i:watchframeAddMinimizeButton#o:watchframeAddMinimizeButton:true#Add a minimize button (like retail)");
 		end
 		optionsAddObject(  6,   26, "checkbutton#tl:40:%y#i:watchframeClamped#o:watchframeClamped:true#Keep the window on screen");
 		optionsAddObject(  6,   26, "checkbutton#tl:40:%y#i:watchframeShowBorder#o:watchframeShowBorder#Show the border");

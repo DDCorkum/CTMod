@@ -2340,7 +2340,10 @@ do
 	end
 	
 	module.watchframeAddMinimizeButton = function(value)
-		opt_watchframeAddMinimizeButton = value;
+		opt_watchframeAddMinimizeButton = (value ~= false);
+		if (not opt_watchframeEnabled) then
+			return;
+		end
 		watchFrame_Update();
 	end
 end
