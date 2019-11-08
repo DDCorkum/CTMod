@@ -29,14 +29,34 @@ L["CT_RaidAssist/AfterNotReadyFrame/MissedCheck"] = "You might have missed a rea
 L["CT_RaidAssist/AfterNotReadyFrame/WasAFK"] = "You were afk, are you back now?"
 L["CT_RaidAssist/AfterNotReadyFrame/WasNotReady"] = "Are you ready now?"
 L["CT_RaidAssist/PlayerFrame/TooltipFooter"] = "/ctra to move and configure"
+L["CT_RaidAssist/PlayerFrame/TooltipItemsBroken"] = "%d%% durability, %d broken items (as of %d:%02d mins ago)"
+L["CT_RaidAssist/PlayerFrame/TooltipItemsNotBroken"] = "%d%% durability (as of %d:%02d mins ago)"
 L["CT_RaidAssist/WindowTitle"] = "Window %d"
+L["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksCheckButton"] = "Extend missed ready checks"
+L["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksTooltip"] = [=[Provides a button to announce returning 
+after missing a /readycheck]=]
+L["CT_RaidAssist/Options/GeneralFeatures/Heading"] = "General Features"
+L["CT_RaidAssist/Options/GeneralFeatures/Line1"] = "These general features are separate from the custom raid frames."
+L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksCheckButton"] = "Extend missed ready checks"
+L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksTooltip"] = [=[Provides a button to announce returning 
+after missing a /readycheck]=]
+L["CT_RaidAssist/Options/ReadyCheckMonitor/Heading"] = "Ready Check Enhancements"
+L["CT_RaidAssist/Options/ReadyCheckMonitor/MonitorDurabilityLabel"] = "Provide warnings if your durability is getting low"
+L["CT_RaidAssist/Options/ReadyCheckMonitor/MonitorDurabilitySlider"] = "Warn if gear below <value>%:Off:50%"
+L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityCheckButton"] = "Let CTRA share your durability with the raid"
+L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityTooltip"] = [=[Share your durability with peers using addons like CTRA, DBM or oRA.
+
+Notes:
+- Other addons may enable sharing even if you opt out with CTRA
+- This requires a /reload to take effect]=]
+L["CT_RaidAssist/Options/ReadyCheckMonitor/Tooltip"] = "These settings are meant for raiding guilds using CT"
 L["CT_RaidAssist/Options/Window/Auras/CombatLabel"] = "Show during combat:"
 L["CT_RaidAssist/Options/Window/Auras/DropDown"] = "#Group buffs I can apply#Debuffs I can remove#All group buffs#All debuffs#Group buffs I applied#Nothing"
+L["CT_RaidAssist/Options/Window/Auras/Heading"] = "Buffs and Debuffs"
+L["CT_RaidAssist/Options/Window/Auras/NoCombatLabel"] = "Show out of combat:"
 L["CT_RaidAssist/Options/Window/Auras/ShowBossCheckButton"] = "Show important boss auras at middle"
 L["CT_RaidAssist/Options/Window/Auras/ShowBossTip"] = [=[Certain boss encounters create important buffs/debuffs critical to the fight.
 These will appear larger at the middle for emphasis.]=]
-L["CT_RaidAssist/Options/Window/Auras/Heading"] = "Buffs and Debuffs"
-L["CT_RaidAssist/Options/Window/Auras/NoCombatLabel"] = "Show out of combat:"
 L["CT_RaidAssist/Options/Window/Groups/ClassHeader"] = "Classes"
 L["CT_RaidAssist/Options/Window/Groups/GroupHeader"] = "Groups"
 L["CT_RaidAssist/Options/Window/Groups/GroupTooltipContent"] = [=[0.9:0.9:0.9#|cFFFFFF99During a raid: |r
@@ -112,25 +132,6 @@ L["CT_RaidAssist/Spells/Soulstone"] = "Soulstone"
 L["CT_RaidAssist/Spells/Trueshot Aura"] = "Trueshot Aura"
 
 
-L["CT_RaidAssist/Options/ReadyCheckMonitor/Heading"] = "Ready Check Enhancements"
-L["CT_RaidAssist/Options/ReadyCheckMonitor/Tooltip"] = "These settings are meant for raiding guilds using CT"
-L["CT_RaidAssist/Options/ReadyCheckMonitor/MonitorDurabilityLabel"] = "Provide warnings if your gear is damaged during a readycheck"
-L["CT_RaidAssist/Options/ReadyCheckMonitor/MonitorDurabilitySlider"] = "Warn if gear below <value>%:Off:50"
-L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityCheckButton"] = "Let CTRA share your durability with the raid"
-L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityTooltip"] = [=[Share your durability with peers using addons like CTRA, DBM or oRA.
-
-Notes:
-- Other addons may enable sharing even if you opt out with CTRA
-- This requires a /reload to take effect]=]
-L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksCheckButton"] = "Extend missed ready checks"
-L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksTooltip"] = [=[Provides a button to announce returning 
-after missing a /readycheck]=]
-L["CT_RaidAssist/PlayerFrame/TooltipItemsBroken"] = "%d%% durability, %d broken items (%d:%02d mins ago)";
-L["CT_RaidAssist/PlayerFrame/TooltipItemsNotBroken"] = "%d%% durability (%d:%02d mins ago)";
-
---L["CT_RaidAssist/Options/GeneralFeatures/Heading"] = "General Features"
---L["CT_RaidAssist/Options/GeneralFeatures/Line1"] = "These general features are separate from the custom raid frames."
-
 -- frFR (Credits: ddc)
 
 if (GetLocale() == "frFR") then
@@ -142,6 +143,12 @@ L["CT_RaidAssist/PlayerFrame/TooltipFooter"] = "/ctra pour déplacer et configur
 L["CT_RaidAssist/WindowTitle"] = "Fenêtre %d"
 L["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksCheckButton"] = "Prolonger un /readycheck manqué"
 L["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksTooltip"] = "Fournir un bouton pour annoncer le retour après avoir manqué un /readycheck"
+L["CT_RaidAssist/Options/Window/Auras/CombatLabel"] = "Montrer pendant le combat :"
+L["CT_RaidAssist/Options/Window/Auras/DropDown"] = "#Les auras utiles que je peux appliquer aux autres#Les auras nocives que je peux retirer#Tous les auras utiles de groupe#Tous les auras nocives#Les auras utiles de groupe que j'ai appliqué#Rien"
+L["CT_RaidAssist/Options/Window/Auras/Heading"] = "Les auras"
+L["CT_RaidAssist/Options/Window/Auras/NoCombatLabel"] = "Montrer hors combat :"
+L["CT_RaidAssist/Options/Window/Auras/ShowBossCheckButton"] = "Montrer les auras de combat de boss au milieu"
+L["CT_RaidAssist/Options/Window/Auras/ShowBossTip"] = "Souligner les mécaniques des combats de boss en mettre l'aura au milieu avec plus grandeur."
 L["CT_RaidAssist/Options/Window/Groups/ClassHeader"] = "Classes"
 L["CT_RaidAssist/Options/Window/Groups/GroupHeader"] = "Groupes"
 L["CT_RaidAssist/Options/Window/Groups/GroupTooltipContent"] = [=[0.9:0.9:0.9#|cFFFFFF99Pendent un raid: |r
@@ -153,6 +160,7 @@ L["CT_RaidAssist/Options/Window/Groups/GroupTooltipHeader"] = "Les groupes 1 à 
 L["CT_RaidAssist/Options/Window/Groups/Header"] = "Les sélections de groupes et classes"
 L["CT_RaidAssist/Options/Window/Groups/Line1"] = "Ce fenêtre montre lesquels groupes, rôles et classes?"
 L["CT_RaidAssist/Options/Window/Groups/RoleHeader"] = "Rôles"
+L["CT_RaidAssist/Options/Window/Layout/WrapLabel"] = "Des grands rangs/colonnes"
 L["CT_RaidAssist/Options/Window/Layout/WrapSlider"] = "Habillage du texte après <value>"
 L["CT_RaidAssist/Options/WindowControls/AddButton"] = "Ajouter"
 L["CT_RaidAssist/Options/WindowControls/AddTooltip"] = "Ajouter une fenêtre avec les options defauts."
@@ -169,6 +177,7 @@ L["CT_RaidAssist/Options/WindowControls/WindowDeletedMessage"] = "La fenêtre %d
 L["CT_RaidAssist/Options/WindowControls/WindowSelectedMessage"] = "La fenêtre %d sélectionnée."
 L["CT_RaidAssist/Spells/Abolish Poison"] = "Abolir le poison"
 L["CT_RaidAssist/Spells/Amplify Magic"] = "Amplification de la magie"
+L["CT_RaidAssist/Spells/Ancestral Spirit"] = "Esprit ancestral"
 L["CT_RaidAssist/Spells/Arcane Brilliance"] = "Illumination des arcanes"
 L["CT_RaidAssist/Spells/Arcane Intellect"] = "Intelligence des Arcanes"
 L["CT_RaidAssist/Spells/Battle Shout"] = "Cri de guerre"
@@ -178,12 +187,14 @@ L["CT_RaidAssist/Spells/Blessing of Salvation"] = "Bénédiction de salut"
 L["CT_RaidAssist/Spells/Blessing of Wisdom"] = "Bénédiction de sagesse"
 L["CT_RaidAssist/Spells/Cleanse"] = "Epuration"
 L["CT_RaidAssist/Spells/Cleanse Spirit"] = "Purifier l'esprit"
+L["CT_RaidAssist/Spells/Cleanse Toxins"] = "Purification des toxines"
 L["CT_RaidAssist/Spells/Cure Poison"] = "Guérison du poison"
 L["CT_RaidAssist/Spells/Dampen Magic"] = "Atténuation de la magie"
 L["CT_RaidAssist/Spells/Detox"] = "Détoxification"
 L["CT_RaidAssist/Spells/Dispel Magic"] = "Dissipation de la magie"
 L["CT_RaidAssist/Spells/Nature's Cure"] = "Soins naturels"
 L["CT_RaidAssist/Spells/Power Word: Fortitude"] = "Mot de pouvoir : Robustesse"
+L["CT_RaidAssist/Spells/Prayer of Fortitude"] = "Prière de rebustesse"
 L["CT_RaidAssist/Spells/Purify"] = "Purification"
 L["CT_RaidAssist/Spells/Raise Ally"] = "Réanimation d'un allié"
 L["CT_RaidAssist/Spells/Rebirth"] = "Renaissance"
@@ -208,12 +219,12 @@ L["CT_RaidAssist/PlayerFrame/TooltipFooter"] = "/ctra zum Verschieben und Konfig
 L["CT_RaidAssist/WindowTitle"] = "Fenster %d"
 L["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksCheckButton"] = "Erweiterte Bereitschaftschecks anzeigen"
 L["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksTooltip"] = "Zeigt nach Verpassen eines Bereitschaftschecks eine Schaltfläche an um mitzuteilen, dass man wieder da ist"
-L["CT_RaidAssist/Options/GeneralFeatures/Heading"] = "Allgemeine Funktionen"
-L["CT_RaidAssist/Options/GeneralFeatures/Line1"] = "Diese allgemeinen Funktionen sind getrennt von den benutzerdefinierten Schlachtzugsfenstern."
 L["CT_RaidAssist/Options/Window/Auras/CombatLabel"] = "Während des Kampfes anzeigen:"
 L["CT_RaidAssist/Options/Window/Auras/DropDown"] = "#Wirkbare Gruppenzauber#Entfernbare Schwächungszauber#Alle Gruppenzauber#Alle Schwächungszauber#Gewirkte Gruppenzauber#Nichts"
 L["CT_RaidAssist/Options/Window/Auras/Heading"] = "Stärkungs- und Schwächungszauber"
 L["CT_RaidAssist/Options/Window/Auras/NoCombatLabel"] = "Außerhalb des Kampfes anzeigen:"
+L["CT_RaidAssist/Options/Window/Auras/ShowBossCheckButton"] = "Wichtige Bossauren mittig anzeigen"
+L["CT_RaidAssist/Options/Window/Auras/ShowBossTip"] = "Einige Bosse besitzen wichtige Stärkungs-/Schwächungszauber während des Kampfes. Diese erscheinen zur Erregung der Aufmerksamkeit vergrößert in der Mitte."
 L["CT_RaidAssist/Options/Window/Groups/ClassHeader"] = "Klassen"
 L["CT_RaidAssist/Options/Window/Groups/GroupHeader"] = "Gruppen"
 L["CT_RaidAssist/Options/Window/Groups/GroupTooltipContent"] = [=[0.9:0.9:0.9#|cFFFFFF99Im Schlachtzug: |r
@@ -305,6 +316,7 @@ L["CT_RaidAssist/Spells/Power Word: Fortitude"] = "신의 권능: 인내"
 
 elseif (GetLocale() == "zhCN") then
 
+L["CT_RaidAssist/Spells/Abolish Poison"] = "驱毒术"
 L["CT_RaidAssist/Spells/Arcane Intellect"] = "奥术智慧"
 L["CT_RaidAssist/Spells/Cleanse"] = "清洁术"
 
