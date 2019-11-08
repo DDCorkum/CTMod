@@ -74,10 +74,12 @@ local strsplit = strsplit;
 --------------------------------------------
 -- Pseudo-Object-Oriented Design
 
-local NewCTRAFrames;		-- Wrapper over all raid-frame portions of the addon that creates and manages windows
-local NewCTRAWindow;		-- Set of player frames (and optionally labels or target frames) sharing a common appearance and anchor point
-local NewCTRAPlayerFrame;	-- A single, interactive player frame that is contained in a window
-local NewCTRATargetFrame;	-- A single, interactive target frame that is contained in a window
+local StaticCTRAReadyCheck;		-- Adds features to help you share your ready check status with raid members
+local StaticCTRAFrames;			-- Wrapper over all raid-frame portions of the addon
+local NewCTRAWindow;			-- Set of player frames (and optionally labels or target frames) sharing a common appearance and anchor point
+local NewCTRAPlayerFrame;		-- A single, interactive player frame that is contained in a window
+local NewCTRATargetFrame;		-- A single, interactive target frame that is contained in a window
+
 
 --------------------------------------------
 -- Initialization
@@ -98,7 +100,8 @@ local L = module.text
 
 -- triggered by module.update("init")
 function module:init()	
-	module.CTRAFrames = NewCTRAFrames();
+	module.CTRAReadyCheck = StaticCTRAReadyCheck();
+	module.CTRAFrames = StaticCTRAFrames();
 	
 	-- convert from pre-BFA CTRA to 8.2.0.5
 	--if (not module:getOption("CTRA_LastConversion") or module:getOption("CTRA_LastConversion") < 8.205) then
@@ -111,52 +114,26 @@ end
 -- triggered by CT_Library whenever a setting changes, and upon initialization, to call functions associated with tailoring various functionality as required
 function module:update(option, value)
 	if (option == "init") then
-		module:init(option, value);
-	--TODO: insert elseif with non-raid-frame functionality here
+		module:init();
 	else
-		-- any functionality not handled exclusively by CTRA is related to the raid frames themselves and must be passed to the CTRAFrames object
+		module.CTRAReadyCheck:Update(option, value);
 		module.CTRAFrames:Update(option, value);
 	end
 end
 
 --produces the options frames
 function module:frame()
-	-- optionsFrameList is a table used by CT_Library that must be passed (by reference)
-	local optionsFrameList;
-	
-	-- helper functions to shorten the code a bit
-	local optionsInit = function() optionsFrameList = module:framesInit(); end
-	local optionsGetData = function() return module:framesGetData(optionsFrameList); end
-	local optionsAddFrame = function(offset, size, details, data) module:framesAddFrame(optionsFrameList, offset, size, details, data); end
-	local optionsAddObject = function(offset, size, details) module:framesAddObject(optionsFrameList, offset, size, details); end
-	local optionsAddScript = function(name, func) module:framesAddScript(optionsFrameList, name, func); end
-	local optionsAddTooltip = function(text, anchor, offx, offy, owner) module:framesAddScript(optionsFrameList, "onenter", function(obj) module:displayTooltip(obj, text, anchor, offx, offy, owner); end); end
-	local optionsBeginFrame = function(offset, size, details, data) module:framesBeginFrame(optionsFrameList, offset, size, details, data); end
-	local optionsEndFrame = function() module:framesEndFrame(optionsFrameList); end
+	-- see CT_Library
+	local optionsFrameList = module:framesInit();
+		
+	-- Ready Check Monitor
+	module.CTRAReadyCheck:Frame(optionsFrameList);
 
+	-- Custom Raid Frames
+	module.CTRAFrames:Frame(optionsFrameList);
 
-	-- commonly used colors
-	local textColor1 = "0.9:0.9:0.9";
-	local textColor2 = "0.7:0.7:0.7";
-	
-	-- actual start of the options objects, ended by optionsGetData()
-	optionsInit();
-		
-		-- General Features
-		optionsAddObject(-20, 17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_RaidAssist/Options/GeneralFeatures/Heading"]);
-		optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. L["CT_RaidAssist/Options/GeneralFeatures/Line1"] .. "#" .. textColor2 .. ":l");
-		optionsBeginFrame(-15, 26, "checkbutton#tl:10:%y#n:CTRA_ExtendReadyChecksCheckButton#o:CTRA_ExtendReadyChecks:1#" .. L["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksCheckButton"]);
-			optionsAddTooltip(L["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksTooltip"], "ANCHOR_TOPLEFT");
-		optionsEndFrame();
-		
-
-		
-	
-		
-		-- Custom Raid Frames
-		module.CTRAFrames:Frame(optionsFrameList);
-	
-	return "frame#all", optionsGetData();
+	-- see CT_Library
+	return "frame#all", module:framesGetData(optionsFrameList);
 end
 
 local function slashCommand()
@@ -169,103 +146,268 @@ module:setSlashCmd(slashCommand, "/ctra", "/ctraid", "/ctraidassist");
 --------------------------------------------
 -- Extended Ready Checks
 
-local AfterNotReadyFrame = CreateFrame("Frame", nil, UIParent);
-AfterNotReadyFrame:Hide();
-AfterNotReadyFrame:SetSize(323,97);
-AfterNotReadyFrame:SetPoint("CENTER", 0, -10);
-AfterNotReadyFrame:RegisterEvent("PLAYER_REGEN_DISABLED");
-AfterNotReadyFrame:RegisterEvent("GROUP_LEFT");
-AfterNotReadyFrame:RegisterEvent("READY_CHECK");
-AfterNotReadyFrame:RegisterUnitEvent("READY_CHECK_CONFIRM", "player");
-AfterNotReadyFrame:RegisterEvent("READY_CHECK_FINISHED");
-AfterNotReadyFrame:SetScript("OnEvent",
-	function(self, event, arg1)
-		if (event == "PLAYER_REGEN_DISABLED") then
-			self:Hide();
-		elseif (event == "GROUP_LEFT") then
-			self:Hide();
-		elseif (event == "READY_CHECK") then
-			self:Hide();
-			SetPortraitTexture(AfterNotReadyFrame.portrait, arg1)
-			self.status = GetReadyCheckStatus("player");
-			self.initiator = arg1;
-		elseif (event == "READY_CHECK_CONFIRM") then
-			self.status = GetReadyCheckStatus("player");
-		elseif (event == "READY_CHECK_FINISHED") then
-			if (module:getOption("CTRA_ExtendReadyChecks") ~= false) then
-				if (self.status == "waiting") then
-					self:Show();
-					self.text:SetText(L["CT_RaidAssist/AfterNotReadyFrame/WasAFK"]);
-				elseif (self.status == "notready") then
-					self:Show();
-					self.text:SetText(L["CT_RaidAssist/AfterNotReadyFrame/WasNotReady"]);
-				elseif (not self.status) then
-					self:Show();
-					SetPortraitTexture(AfterNotReadyFrame.portrait, "player");
-					self.text:SetText(L["CT_RaidAssist/AfterNotReadyFrame/MissedCheck"]);
-					self.initiator = nil;
+local CTRAReadyCheck;
+function StaticCTRAReadyCheck()
+	if CTRAReadyCheck then
+		return CTRAReadyCheck;		-- this can only be created once (hense the name 'static')
+	end
+	
+	local obj = { };
+	CTRAReadyCheck = obj;
+	
+	-- PRIVATE PROPERTIES
+	local extendReadyChecks = module:getOption("CTRA_ExtendReadyChecks") ~= false;
+	local monitorDurability = module:getOption("CTRA_MonitorDurability") or 50;
+	
+	local invSlots =
+	{
+		-- name, 		anchorPt, 	relTo, 			relPtm		xOff, 	yOff, 		width, 	height, 		leftTexCoord,	rightTexCoord,	topTexCoord,	bottomTexCoord
+		{INVSLOT_HEAD,		"TOP",		"",			"TOP",		0,	-10,		18,	22,			0.0,		0.140625,	0.0,		0.171875},
+		{INVSLOT_SHOULDER,	"TOP",		INVSLOT_HEAD,		"BOTTOM",	0,	16,		48,	22,			0.140625,	0.515625,	0.0,		0.171875},
+		{INVSLOT_CHEST,		"TOP",		INVSLOT_SHOULDER,	"TOP",		0,	-7,		20,	22,			0.515625,	0.6640625,	0.0,		0.171875},
+		{INVSLOT_WRIST,		"TOP",		INVSLOT_SHOULDER,	"BOTTOM",	0,	7,		44,	22,			0.6640625,	1.0,		0.0,		0.171875},
+		{INVSLOT_HAND,		"TOP",		INVSLOT_WRIST,		"BOTTOM",	0,	15,		42,	18,			0.0,		0.328125,	0.171875,	0.3046875},
+		{INVSLOT_WAIST,		"TOP",		INVSLOT_CHEST,		"BOTTOM",	0,	6,		16,	5,			0.328125,	0.46875,	0.171875,	0.203125},
+		{INVSLOT_LEGS,		"TOP",		INVSLOT_WAIST,		"BOTTOM",	0,	2,		29,	20,			0.46875,	0.6875,		0.171875,	0.3203125},
+		{INVSLOT_FEET,		"TOP",		INVSLOT_LEGS,		"BOTTOM",	0,	8,		41,	32,			0.6875,		1.0,		0.171875,	0.4140625},
+		{INVSLOT_MAINHAND,	"RIGHT",	INVSLOT_WRIST,		"LEFT",		0,	-6,		20,	45,			0.0,		0.140625,	0.3203125,	0.6640625},
+		{INVSLOT_OFFHAND,	"LEFT",		INVSLOT_WRIST,		"RIGHT",	0,	10,		25,	31,			0.1875,		0.375,		0.3203125,	0.5546875},
+		--{"OffWeapon",		"LEFT",		INVSLOT_WRIST,		"RIGHT",	0,	-6,		20,	45,			0.0,		0.140625,	0.3203125,	0.6640625},
+		{INVSLOT_RANGED,	"TOP",		INVSLOT_OFFHAND,	"BOTTOM",	0,	5,		28,	38,			0.1875,		0.3984375,	0.5546875,	0.84375},
+	}
+
+	-- PRIVATE METHODS
+	local function configureAfterReadyCheckFrame()
+		local frame = CreateFrame("Frame", nil, UIParent);
+		frame:Hide();
+		frame:SetSize(323,97);
+		frame:SetPoint("CENTER", 0, -10);
+		frame:RegisterEvent("PLAYER_REGEN_DISABLED");
+		frame:RegisterEvent("GROUP_LEFT");
+		frame:RegisterEvent("READY_CHECK");
+		frame:RegisterUnitEvent("READY_CHECK_CONFIRM", "player");
+		frame:RegisterEvent("READY_CHECK_FINISHED");
+		frame:SetScript("OnEvent",
+			function(self, event, arg1)
+				if (event == "PLAYER_REGEN_DISABLED") then
+					self:Hide();
+				elseif (event == "GROUP_LEFT") then
+					self:Hide();
+				elseif (event == "READY_CHECK") then
+					self:Hide();
+					SetPortraitTexture(frame.portrait, arg1)
+					self.status = GetReadyCheckStatus("player");
+					self.initiator = arg1;
+				elseif (event == "READY_CHECK_CONFIRM") then
+					self.status = GetReadyCheckStatus("player");
+				elseif (event == "READY_CHECK_FINISHED") then
+					if (extendReadyChecks) then
+						if (self.status == "waiting") then
+							self:Show();
+							self.text:SetText(L["CT_RaidAssist/frame/WasAFK"]);
+						elseif (self.status == "notready") then
+							self:Show();
+							self.text:SetText(L["CT_RaidAssist/frame/WasNotReady"]);
+						elseif (not self.status) then
+							self:Show();
+							SetPortraitTexture(frame.portrait, "player");
+							self.text:SetText(L["CT_RaidAssist/frame/MissedCheck"]);
+							self.initiator = nil;
+						end
+					else
+						self.initiator = nil;
+					end
 				end
+			end
+		);
+
+		frame.portrait = frame:CreateTexture(nil, "BACKGROUND");
+		frame.portrait:SetSize(50,50);
+		frame.portrait:SetPoint("TOPLEFT", 7, -6);
+
+		frame.texture = frame:CreateTexture(nil, "ARTWORK");
+		frame.texture:SetSize(323, 97);
+		frame.texture:SetTexture("Interface\\RaidFrame\\UI-ReadyCheckFrame");
+		frame.texture:SetTexCoord(0, 0.630859375, 0, 0.7578125);
+		frame.texture:SetPoint("TOPLEFT");
+
+		frame.text = frame:CreateFontString(nil, "ARTWORK", "GameFontNormal");
+		frame.text:SetSize(240, 0);
+		frame.text:SetJustifyV("MIDDLE");
+		frame.text:SetPoint("CENTER", frame, "TOP", 20, -35);
+		frame.text:SetText("Are you ready now?");
+
+		frame.footnote = frame:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall");
+		frame.footnote:SetPoint("BOTTOMRIGHT", -10, 10);
+		frame.footnote:SetTextColor(0.35, 0.35, 0.35);
+		frame.footnote:SetText("/ctra");
+
+		frame.returnedButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate");
+		frame.returnedButton:SetText("Ready");
+		frame.returnedButton:SetSize(119, 24);
+		frame.returnedButton:SetPoint("TOPRIGHT", frame, "TOP", 13, -55);
+		frame.returnedButton:SetScript("OnClick",
+			function()
+				PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+				frame:Hide();
+				if (frame.initiator and UnitExists(frame.initiator) and UnitInRange(frame.initiator)) then
+					DoEmote("ready", frame.initiator);
+				else
+					SendChatMessage("Ready", "RAID");
+				end
+				frame.initiator = nil;
+			end
+		);
+
+		frame.goingafkButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate");
+		frame.goingafkButton:SetText("Cancel");
+		frame.goingafkButton:SetSize(119, 24);
+		frame.goingafkButton:SetPoint("TOPLEFT", frame, "TOP", 17, -55);
+		frame.goingafkButton:SetScript("OnClick",
+			function()
+				frame:Hide();
+			end
+		);
+	end
+	
+	local function configureDurabilityMonitor()
+	
+		local frame = CreateFrame("Frame", nil, UIParent);
+		frame:Hide();
+		frame:SetSize(110, 120);
+		frame:SetPoint("LEFT", ReadyCheckFrame, "RIGHT", 10, 0);
+		frame:RegisterEvent("PLAYER_REGEN_DISABLED");
+		frame:RegisterEvent("GROUP_LEFT");
+		frame:RegisterEvent("READY_CHECK");
+		frame:RegisterUnitEvent("READY_CHECK_CONFIRM", "player");
+		frame:RegisterEvent("READY_CHECK_FINISHED");
+		frame:RegisterEvent("UPDATE_INVENTORY_DURABILITY");
+		frame:SetScript("OnEvent",
+			function(self, event, arg1, arg2)
+				if (event == "READY_CHECK") then
+					frame:Show();
+				else
+					frame:Hide();
+				end
+			end
+		);
+		
+		frame.closeButton = CreateFrame("Button", nil, frame, "SecureHandlerClickTemplate");
+		frame.closeButton:SetSize(24, 24);
+		frame.closeButton:SetPoint("TOPRIGHT");
+		frame.closeButton:SetNormalTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Up");
+		frame.closeButton:SetPushedTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Down");
+		frame.closeButton:SetHighlightTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight");
+		frame.closeButton:SetAttribute("_onclick", [=[ self:GetParent():Hide(); ]=]);
+		
+		frame.text = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+		frame.text:SetPoint("BOTTOM", 0, 24);
+		
+		for __, bodyPart in ipairs(invSlots) do
+			frame[bodyPart[1]] = frame:CreateTexture(nil, "ARTWORK");
+			frame[bodyPart[1]]:SetTexture("Interface\\Durability\\UI-Durability-Icons");
+			frame[bodyPart[1]]:SetPoint(bodyPart[2], (bodyPart[3] ~= "" and frame[bodyPart[3]]) or frame, bodyPart[4], bodyPart[5], bodyPart[6]);
+			frame[bodyPart[1]]:SetSize(bodyPart[7], bodyPart[8]);
+			frame[bodyPart[1]]:SetTexCoord(bodyPart[9], bodyPart[10], bodyPart[11], bodyPart[12]);
+		end
+
+		frame:SetScript("OnShow", 
+			function()
+				local worst, worstTex = 100, "";
+				for __, bodyPart in ipairs(invSlots) do
+					local current, maximum = GetInventoryItemDurability(bodyPart[1]);
+					if (maximum and maximum > 0) then
+						if (current/maximum * 100 < worst) then
+							worst = floor(current/maximum * 100);
+							worstTex = GetInventoryItemTexture("player", bodyPart[1]);
+						end
+						if (current == 0) then
+							frame[bodyPart[1]]:SetVertexColor(1.0, 0.0, 0.0, 1.00);
+						elseif (current/maximum > monitorDurability/100) then
+							frame[bodyPart[1]]:SetVertexColor(1.0, 1.0, 1.0, 1.00 - 0.50 * current / maximum);
+						else
+							frame[bodyPart[1]]:SetVertexColor(1.0, 1.0, 0.0, 1.00 - 0.50 * current / maximum);
+						end
+					else
+						frame[bodyPart[1]]:SetVertexColor(1.0, 1.0, 1.0, 0.25);
+					end
+				end
+				frame.text:SetText("|T" .. worstTex ..  ":0|t " .. worst .. "%");
+				if (worst >= monitorDurability) then
+					frame:Hide();
+				end
+			end
+		);
+	end
+	
+	-- PUBLIC METHODS
+	
+	function obj:Update(option, value)
+		if (option == "CTRA_ExtendReadyChecks") then
+			extendReadyChecks = value;
+		elseif (option == "CTRA_MonitorDurability") then
+			monitorDurability = value;
+		elseif (option == "CTRA_ShareDurability") then
+			if (value) then
+				module:InstallLibDurability()
 			else
-				self.initiator = nil;
+				print("Please /reload for CTRA to stop sharing.  Also, other addons (DBM, oRA, etc.) may still activate this feature.");
 			end
 		end
 	end
-);
+	
+	function obj:Frame(optionsFrameList)
+		-- helper functions to shorten the code a bit
+		local optionsAddFrame = function(offset, size, details, data) module:framesAddFrame(optionsFrameList, offset, size, details, data); end
+		local optionsAddObject = function(offset, size, details) module:framesAddObject(optionsFrameList, offset, size, details); end
+		local optionsAddScript = function(name, func) module:framesAddScript(optionsFrameList, name, func); end
+		local optionsAddTooltip = function(text, anchor, offx, offy, owner) module:framesAddScript(optionsFrameList, "onenter", function(obj) module:displayTooltip(obj, text, anchor, offx, offy, owner); end); end
+		local optionsBeginFrame = function(offset, size, details, data) module:framesBeginFrame(optionsFrameList, offset, size, details, data); end
+		local optionsEndFrame = function() module:framesEndFrame(optionsFrameList); end
+		
+		-- commonly used colors
+		local textColor1 = "0.9:0.9:0.9";
+		local textColor2 = "0.7:0.7:0.7";
 
-AfterNotReadyFrame.portrait = AfterNotReadyFrame:CreateTexture(nil, "BACKGROUND");
-AfterNotReadyFrame.portrait:SetSize(50,50);
-AfterNotReadyFrame.portrait:SetPoint("TOPLEFT", 7, -6);
+		-- Heading
+		optionsAddObject(-20, 17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_RaidAssist/Options/ReadyCheckMonitor/Heading"]);
+		--optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. L["CT_RaidAssist/Options/ReadyCheckMonitor/Line1"] .. "#" .. textColor2 .. ":l");
+		
+		-- Extend overdue readychecks
+		optionsBeginFrame(-15, 26, "checkbutton#tl:10:%y#n:CTRA_ExtendReadyChecksCheckButton#o:CTRA_ExtendReadyChecks:1#" .. L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksCheckButton"]);
+			optionsAddTooltip(L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksTooltip"], "ANCHOR_TOPLEFT");
+		optionsEndFrame();
+		
+		-- Monitor and share durability
+		optionsAddObject( -20	, 17, "slider#tl:50:%y#s:200:%s#n:CTRA_MonitorDurabilitySlider#o:CTRA_MonitorDurability:50#" .. L["CT_RaidAssist/Options/ReadyCheckMonitor/MonitorDurabilitySlider"] .. "#0:100:5");
+		optionsBeginFrame(-15, 26, "checkbutton#tl:10:%y#n:CTRA_ShareDurabilityCheckButton#o:CTRA_ShareDurability:true#" .. L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityCheckButton"]);
+			optionsAddTooltip({L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityCheckButton"],L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityTooltip"] .. "#" .. textColor1}, "ANCHOR_TOPLEFT");
+		optionsEndFrame();
 
-AfterNotReadyFrame.texture = AfterNotReadyFrame:CreateTexture(nil, "ARTWORK");
-AfterNotReadyFrame.texture:SetSize(323, 97);
-AfterNotReadyFrame.texture:SetTexture("Interface\\RaidFrame\\UI-ReadyCheckFrame");
-AfterNotReadyFrame.texture:SetTexCoord(0, 0.630859375, 0, 0.7578125);
-AfterNotReadyFrame.texture:SetPoint("TOPLEFT");
-
-AfterNotReadyFrame.text = AfterNotReadyFrame:CreateFontString(nil, "ARTWORK", "GameFontNormal");
-AfterNotReadyFrame.text:SetSize(240, 0);
-AfterNotReadyFrame.text:SetJustifyV("MIDDLE");
-AfterNotReadyFrame.text:SetPoint("CENTER", AfterNotReadyFrame, "TOP", 20, -35);
-AfterNotReadyFrame.text:SetText("Are you ready now?");
-
-AfterNotReadyFrame.footnote = AfterNotReadyFrame:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall");
-AfterNotReadyFrame.footnote:SetPoint("BOTTOMRIGHT", -10, 10);
-AfterNotReadyFrame.footnote:SetTextColor(0.35, 0.35, 0.35);
-AfterNotReadyFrame.footnote:SetText("/ctra");
-
-AfterNotReadyFrame.returnedButton = CreateFrame("Button", nil, AfterNotReadyFrame, "UIPanelButtonTemplate");
-AfterNotReadyFrame.returnedButton:SetText("Ready");
-AfterNotReadyFrame.returnedButton:SetSize(119, 24);
-AfterNotReadyFrame.returnedButton:SetPoint("TOPRIGHT", AfterNotReadyFrame, "TOP", 13, -55);
-AfterNotReadyFrame.returnedButton:SetScript("OnClick",
-	function()
-		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
-		AfterNotReadyFrame:Hide();
-		if (AfterNotReadyFrame.initiator and UnitExists(AfterNotReadyFrame.initiator) and UnitInRange(AfterNotReadyFrame.initiator)) then
-			DoEmote("ready", AfterNotReadyFrame.initiator);
-		else
-			SendChatMessage("Ready", "RAID");
-		end
-		AfterNotReadyFrame.initiator = nil;
 	end
-);
-
-AfterNotReadyFrame.goingafkButton = CreateFrame("Button", nil, AfterNotReadyFrame, "UIPanelButtonTemplate");
-AfterNotReadyFrame.goingafkButton:SetText("Cancel");
-AfterNotReadyFrame.goingafkButton:SetSize(119, 24);
-AfterNotReadyFrame.goingafkButton:SetPoint("TOPLEFT", AfterNotReadyFrame, "TOP", 17, -55);
-AfterNotReadyFrame.goingafkButton:SetScript("OnClick",
-	function()
-		AfterNotReadyFrame:Hide();
+	
+	-- PUBLIC CONSTRUCTOR
+	do
+		configureAfterReadyCheckFrame();
+		module:InstallLibDurability(); -- see Libs/LibDurability.lua
+		configureDurabilityMonitor();
+		return obj;
 	end
-);
+end
+
 
 --------------------------------------------
 -- CTRAFrames
 
-function NewCTRAFrames()
-	-- public interface
+local CTRAFrames;
+function StaticCTRAFrames()
+	if CTRAFrames then
+		return CTRAFrames;		-- this can only be created once (hense the name 'static')
+	end
+	
+	-- PUBLIC INTERFACE
 	local obj = { };
+	CTRAFrames = obj;
 	
 	-- private properties, and where applicable their default values
 	local windows = { };			-- non-interactive frames that anchor and orient assigned collections of PlayerFrames, TargetFrames and LabelFrames
@@ -873,14 +1015,14 @@ function NewCTRAFrames()
 						{property = "ColorBackgroundDeadOrGhost", label = "Background Dead", tooltip = "Background when the unit is dead or a ghost", hasAlpha = "true"},
 						{property = "ColorBorder", label = "Border In Range", tooltip = "Border when the unit is within 30 yards"},
 						{property = "ColorBorderBeyondRange", label = "Border Too Far", tooltip = "Border when the unit is not found within 30 yards"},
-						{property = "ColorBorderTargetTarget", label = "Border Aggro", tooltip = "Border when the unit is the target's target"},
+						--{property = "ColorBorderTargetTarget", label = "Border Aggro", tooltip = "Border when the unit is the target's target"},
 						{property = "ColorUnitFullHealthNoCombat", label = "Full Health No Combat", tooltip = "Color of the health bar at 100% outside combat"},
 						{property = "ColorUnitZeroHealthNoCombat", label = "Near Death No Combat", tooltip = "Color of the health bar when nearly dead outside combat"},
-						-- START OF FLOAT:LEFT COLUMN
+						-- START OF LEFT COLUMN
 						{property = "ColorUnitFullHealthCombat", label = "Full Health Combat", tooltip = "Color of the health bar at 100% during combat"},
 						{property = "ColorUnitZeroHealthCombat", label = "Near Death Combat", tooltip = "Color of the health bar when nearly dead during combat"},
 					}) do
-						optionsBeginFrame((i==1 and 30) or (i == 8 and 37) or -5, 16, "colorswatch#tl:" .. ((i > 7 and "-10") or "130") .. ":%y#s:16:16#n:CTRAWindow_" .. item.property .. "ColorSwatch#true");  -- the final #true causes it to use alpha
+						optionsBeginFrame((i==1 and 30) or (i == 7 and 37) or -5, 16, "colorswatch#tl:" .. ((i > 6 and "-10") or "130") .. ":%y#s:16:16#n:CTRAWindow_" .. item.property .. "ColorSwatch#true");  -- the final #true causes it to use alpha
 							optionsWindowizeObject(item.property);
 							optionsAddScript("onenter",
 								function(swatch)
@@ -889,7 +1031,7 @@ function NewCTRAFrames()
 								end
 							);
 						optionsEndFrame();
-						optionsAddObject(16, 16, "font#tl:" .. ((i > 7 and "10") or "150") .. ":%y#s:0:%s#l:13:0#r#" .. item.label .. "#" .. textColor1 .. ":l");
+						optionsAddObject(16, 16, "font#tl:" .. ((i > 6 and "10") or "150") .. ":%y#s:0:%s#l:13:0#r#" .. item.label .. "#" .. textColor1 .. ":l");
 					end;
 				optionsEndFrame();
 				
@@ -1513,6 +1655,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	local auraBoss1Texture, auraBoss2Texture, auraBoss3Texture;
 	local auraBoss1CountFontString, auraBoss2CountFontString, auraBoss3CountFontString;
 	local statusTexture, statusFontString, statusBackground;
+	local durabilityAverage, durabilityBroken, durabilityTime;
 	
 	
 	-- PRIVATE FUNCTIONS
@@ -1540,8 +1683,15 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				background:SetColorTexture(background.colorBackgroundRed, background.colorBackgroundGreen, background.colorBackgroundBlue, background.colorBackgroundAlpha);
 			end
 			if (UnitInRange(shownUnit) or UnitIsUnit("player", shownUnit)) then
-				if (UnitExists("target") and UnitIsUnit(shownUnit, "targettarget") and UnitIsEnemy("player", "target")) then
-					visualFrame:SetBackdropBorderColor(visualFrame.colorBorderTargetTargetRed, visualFrame.colorBorderTargetTargetGreen, visualFrame.colorBorderTargetTargetBlue, visualFrame.colorBorderTargetTargetAlpha);
+				--if (UnitExists("target") and UnitIsUnit(shownUnit, "targettarget") and UnitIsEnemy("player", "target")) then
+				--	visualFrame:SetBackdropBorderColor(visualFrame.colorBorderTargetTargetRed, visualFrame.colorBorderTargetTargetGreen, visualFrame.colorBorderTargetTargetBlue, visualFrame.colorBorderTargetTargetAlpha);
+				--else
+				--	visualFrame:SetBackdropBorderColor(visualFrame.colorBorderRed, visualFrame.colorBorderGreen, visualFrame.colorBorderBlue, visualFrame.colorBorderAlpha);
+				--end
+				local removableDebuff = select(4, UnitAura(shownUnit, 1, "RAID HARMFUL"));
+				if (removableDebuff) then
+					local color = DebuffTypeColor[removableDebuff];
+					visualFrame:SetBackdropBorderColor(color.r, color.g, color.b, visualFrame.colorBorderAlpha);
 				else
 					visualFrame:SetBackdropBorderColor(visualFrame.colorBorderRed, visualFrame.colorBorderGreen, visualFrame.colorBorderBlue, visualFrame.colorBorderAlpha);
 				end
@@ -1800,12 +1950,11 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	
 	local function updateStatusIndicators()
 		if (shownUnit and UnitExists(shownUnit)) then
-			local summonStatus, readyStatus, afkStatus, connectionStatus, removableDebuff = 
+			local summonStatus, readyStatus, afkStatus, connectionStatus = 
 				IncomingSummonStatus(shownUnit), 		 -- at the top of the file, IncomingSummonStatus is defined as C_IncomingSummon.IncomingSummonStatus or it just returns zero in classic
 				GetReadyCheckStatus(shownUnit),
 				UnitIsAFK(shownUnit),
-				UnitIsConnected(shownUnit),
-				select(4, UnitAura(shownUnit, 1, "RAID HARMFUL"));
+				UnitIsConnected(shownUnit)
 			if (summonStatus > 0) then
 				statusTexture:SetTexture(2470702);
 				statusTexture:Show();
@@ -1826,21 +1975,29 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				end
 			elseif (readyStatus) then
 				statusTexture:Show();
-				statusTexture:SetTexCoord(0,1,0,1);
-				if (readyStatus	== "waiting") then
-					statusTexture:SetTexture(READY_CHECK_WAITING_TEXTURE);
-					statusFontString:Show();
-					statusFontString:SetText("No Reply");
-					statusBackground:Show();
-					statusBackground:SetVertexColor(unpack(owner:GetProperty("ColorReadyCheckWaiting")));
-				elseif (readyStatus == "notready") then
+				if (readyStatus == "notready") then
 					statusTexture:SetTexture(READY_CHECK_NOT_READY_TEXTURE);
+					statusTexture:SetTexCoord(0,1,0,1);
 					statusFontString:Show();
 					statusFontString:SetText("Not Ready");
 					statusBackground:Show();
 					statusBackground:SetVertexColor(unpack(owner:GetProperty("ColorReadyCheckNotReady")));
+				elseif (readyStatus == "waiting") then
+					statusFontString:Show();
+					statusBackground:Show();
+					statusBackground:SetVertexColor(unpack(owner:GetProperty("ColorReadyCheckWaiting")));
+					if ((durabilityAverage or 100) < (module:getOption("CTRA_MonitorDurability") or 50) and GetTime() - (durabilityTime or 0) < 30) then
+						statusTexture:SetTexture(1121272);
+						statusTexture:SetTexCoord(0.4609375, 0.5234375, 0.328125, 0.390625);
+						statusFontString:SetText("Gear: " .. durabilityAverage .. "%");
+					else
+						statusTexture:SetTexture(READY_CHECK_WAITING_TEXTURE);
+						statusTexture:SetTexCoord(0,1,0,1);
+						statusFontString:SetText("No Reply");
+					end
 				else
 					statusTexture:SetTexture(READY_CHECK_READY_TEXTURE);
+					statusTexture:SetTexCoord(0,1,0,1);
 					statusFontString:Hide();
 					statusBackground:Hide();
 				end
@@ -1856,11 +2013,6 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				statusFontString:SetText("DC");
 				statusBackground:Show();
 				statusBackground:SetVertexColor(unpack(owner:GetProperty("ColorReadyCheckNotReady")));
-			elseif (removableDebuff) then
-				statusTexture:Hide();
-				statusFontString:Hide();
-				statusBackground:Show();
-				statusBackground:SetVertexColor(removableDebuff.r, removableDebuff.g, removableDebuff.b, 0.1);
 			else
 				statusTexture:Hide();
 				statusFontString:Hide();
@@ -1987,15 +2139,34 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 		auraBoss3CountFontString:SetPoint("TOP", auraBoss3Texture, "BOTTOM");
 	end
 	
-	-- creates and updates buff/debuff icons
-	local updateAuras = function()
+	-- creates and updates buff/debuff icons; however, an update only occurs once every 0.1 seconds
+--	local aurasLastUpdated = 0;
+--	local aurasUpdatePlanned = false;
+	local function updateAuras()
 		
-		-- STEP 1: selected buffs and debuffs for boss encounters, at the middle of the frame
-		-- STEP 2: all other buffs and debuffs, filtered, at the right edge of the frame
+		-- STEP 1: perform steps 2 and 3 no more than once every 0.1 seconds				-- CURRENTLY DISABLED... DOESN'T SEEM NECESSARY
+		-- STEP 2: selected buffs and debuffs for boss encounters, at the middle of the frame
+		-- STEP 3: all other buffs and debuffs, filtered, at the right edge of the frame
+
+		-- STEP 1:
+--[[		local elapsed = GetTime() - aurasLastUpdated;
+		if (elapsed < 0.1) then
+			if (not aurasUpdatePlanned) then
+				aurasUpdatePlanned = true;
+				C_Timer.After(elapsed, updateAuras);
+			end
+			print("update pending");
+			return;
+		else
+			print("updating now");
+			aurasUpdatePlanned = false;
+			aurasLastUpdated = GetTime();
+		end
+--]]		
 		
 		if (shownUnit) then
 			
-			-- STEP 1:
+			-- STEP 2:
 			local numBossShown = 0;
 			if(UnitExists(shownUnit) and owner:GetProperty("ShowBossAuras")) then		
 				for auraIndex = 1, 40 do
@@ -2031,7 +2202,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				string:Hide();
 			end
 			
-			-- STEP 2:
+			-- STEP 3:
 			local numShown = 0;
 			local filterType = (InCombatLockdown() and owner:GetProperty("AuraFilterCombat") or owner:GetProperty("AuraFilterNoCombat"));
 			if(UnitExists(shownUnit) and not UnitIsDeadOrGhost(shownUnit) and filterType ~= 6) then	
@@ -2197,6 +2368,19 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 		secureButton:SetAttribute("*macrotext2", macroRight);
 	end
 	
+	local function updateDurability(percent, broken, sender, __)
+		if (sender == UnitName(shownUnit)) then
+			durabilityAverage = percent;
+			durabilityBroken = broken;
+			durabilityTime = GetTime();
+			updateStatusIndicators();
+		end
+	end
+	
+	local function clearDurability()
+		durabilityAverage, durabilityBroken, durabilityTime = nil, nil, nil;
+	end
+	
 	-- PUBLIC FUNCTIONS
 	
 	function obj:Enable(unit, xOff, yOff)
@@ -2296,6 +2480,16 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 								module.GameTooltipExtraLine:SetScale(0.90);
 							end	
 							if (not InCombatLockdown()) then
+								-- Durability
+								if (durabilityAverage) then
+									local time = GetTime() - (durabilityTime or 0);
+									if (durabilityBroken > 0) then
+										GameTooltip:AddLine(format(L["CT_RaidAssist/PlayerFrame/TooltipItemsBroken"],durabilityBroken, durabilityAverage, floor(time/60),time - floor(time/60) * 60), 1.0, 1.0, 0.0);
+									else
+										GameTooltip:AddLine(format(L["CT_RaidAssist/PlayerFrame/TooltipItemsNotBroken"],durabilityAverage,  floor(time/60),time - floor(time/60) * 60), 0.9, 0.9, 0.9);
+									end
+								end
+								
 								-- Consumables
 								for i=1, 40 do
 									local name, icon, __, __, __, __, __, __, __, spellId = UnitAura(shownUnit, i, "HELPFUL CANCELABLE");
@@ -2410,7 +2604,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			if (not listenerFrame) then
 				listenerFrame = CreateFrame("Frame", nil);
 				listenerFrame:SetScript("OnEvent",
-					function(__, event)
+					function(__, event, arg1, arg2, __, arg4)
 						if (event == "SPELLS_CHANGED") then
 							updateMacros();
 						elseif (event == "UNIT_NAME_UPDATE") then
@@ -2424,13 +2618,17 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 							configurePowerBar();
 						elseif (event == "UNIT_AURA") then
 							updateAuras();
+							updateBackdrop();
 						elseif (event == "PLAYER_REGEN_DISABLED") then
 							updateMacros();
+						elseif (event == "READY_CHECK") then
+							local LD = LibStub:GetLibrary("LibDurability", true);
+							if (LD) then LD:RequestDurability(); end
+							updateStatusIndicators();
 						elseif (
 							event == "INCOMING_SUMMON_CHANGED"
 							or event == "ACCEPT_SUMMON"
 							or event == "CANCEL_SUMMON"
-							or event == "READY_CHECK"
 							or event == "READY_CHECK_CONFIRM"
 							or event == "READY_CHECK_FINISHED"
 							or event == "PLAYER_FLAGS_CHANGED"
@@ -2446,9 +2644,10 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				listenerFrame:SetScript("OnUpdate",
 					function(__, elapsed)
 						timeElapsed = timeElapsed + elapsed;
-						if (timeElapsed < 3) then return; end
+						if (timeElapsed < 2.5) then return; end
 						timeElapsed = 0;
 						updateBackdrop();
+						updateStatusIndicators();
 					end
 				);
 			end
@@ -2465,24 +2664,25 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				configureAuras();
 				configureStatusIndicators();
 				listenerFrame:UnregisterAllEvents();  -- probably not required, but doing it to be absolute
-				listenerFrame:RegisterUnitEvent("UNIT_NAME_UPDATE", shownUnit);		-- updateName();
-				listenerFrame:RegisterUnitEvent("UNIT_HEALTH", shownUnit);		-- updateHealthBar(); updateBackdrop();
-				listenerFrame:RegisterUnitEvent("UNIT_MAXHEALTH", shownUnit);		-- updateHealthBar(); updateBackdrop();
-				listenerFrame:RegisterUnitEvent("UNIT_POWER_UPDATE", shownUnit);	-- updatePowerBar();
-				listenerFrame:RegisterUnitEvent("UNIT_DISPLAYPOWER", shownUnit);	-- configurePowerBar();
-				listenerFrame:RegisterUnitEvent("UNIT_AURA", shownUnit);		-- updateAuras();
-				listenerFrame:RegisterEvent("READY_CHECK");				-- updateStatusIndicators();
-				listenerFrame:RegisterUnitEvent("READY_CHECK_CONFIRM", shownUnit);	-- updateStatusIndicators();
-				listenerFrame:RegisterEvent("READY_CHECK_FINISHED");			-- updateStatusIndicators();
-				listenerFrame:RegisterUnitEvent("PLAYER_FLAGS_CHANGED");		-- updateStatusIndicators();
-				listenerFrame:RegisterUnitEvent("UNIT_CONNECTION");			-- updateStatusIndicators();
-				listenerFrame:RegisterUnitEvent("CANCEL_SUMMON");			-- updateRoleTexture();
-				listenerFrame:RegisterUnitEvent("CONFIRM_SUMMON");			-- updateRoleTexture();
-				listenerFrame:RegisterUnitEvent("RAID_TARGET_UPDATE");			-- updateRoleTexture();
+				listenerFrame:RegisterUnitEvent("UNIT_NAME_UPDATE", shownUnit);			-- updateName();
+				listenerFrame:RegisterUnitEvent("UNIT_HEALTH", shownUnit);			-- updateHealthBar(); updateBackdrop();
+				listenerFrame:RegisterUnitEvent("UNIT_MAXHEALTH", shownUnit);			-- updateHealthBar(); updateBackdrop();
+				listenerFrame:RegisterUnitEvent("UNIT_POWER_UPDATE", shownUnit);		-- updatePowerBar();
+				listenerFrame:RegisterUnitEvent("UNIT_DISPLAYPOWER", shownUnit);		-- configurePowerBar();
+				listenerFrame:RegisterUnitEvent("UNIT_AURA", shownUnit);			-- updateAuras();
+				listenerFrame:RegisterEvent("READY_CHECK");					-- updateStatusIndicators();
+				listenerFrame:RegisterUnitEvent("READY_CHECK_CONFIRM", shownUnit);		-- updateStatusIndicators();
+				listenerFrame:RegisterEvent("READY_CHECK_FINISHED");				-- updateStatusIndicators();
+				listenerFrame:RegisterUnitEvent("PLAYER_FLAGS_CHANGED", shownUnit);		-- updateStatusIndicators();
+				listenerFrame:RegisterUnitEvent("UNIT_CONNECTION", shownUnit);			-- updateStatusIndicators();
+				listenerFrame:RegisterEvent("CANCEL_SUMMON");					-- updateRoleTexture();
+				listenerFrame:RegisterEvent("CONFIRM_SUMMON");					-- updateRoleTexture();
+				listenerFrame:RegisterEvent("RAID_TARGET_UPDATE");				-- updateRoleTexture();
 				if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
-					listenerFrame:RegisterUnitEvent("INCOMING_SUMMON_CHANGED");	-- updateStatusIndicators();
-					listenerFrame:RegisterUnitEvent("UNIT_ABSORB_AMOUNT_CHANGED");	-- updateHealthBar; updateBackdrop();
+					listenerFrame:RegisterUnitEvent("INCOMING_SUMMON_CHANGED", shownUnit);		-- updateStatusIndicators();
+					listenerFrame:RegisterUnitEvent("UNIT_ABSORB_AMOUNT_CHANGED", shownUnit);	-- updateHealthBar; updateBackdrop();
 				end
+				
 			else
 				UnregisterStateDriver(visualFrame, "visibility");
 				visualFrame:Hide();
@@ -2492,8 +2692,6 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 
 			-- reposition the frames
 			visualFrame:SetPoint("TOPLEFT", requestedXOff, requestedYOff);
-
-
 
 			-- configure the secureButton for the new unit
 			secureButton:SetAttribute("unit", shownUnit);
@@ -2510,6 +2708,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			updateAuras();
 			updateStatusIndicators();
 			updateMacros();
+			clearDurability();
 		end
 	end
 	
@@ -2517,6 +2716,12 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	do
 		owner = parentInterface;	
 		parent = parentFrame;
+		
+		local LD = LibStub:GetLibrary("LibDurability", true);
+		if (LD) then
+			LD:Register(obj,updateDurability)
+		end
+		
 		return obj;			-- that's it!  nothing else is done until obj:Enable()
 	end
 	

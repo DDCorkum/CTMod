@@ -30,11 +30,6 @@ L["CT_RaidAssist/AfterNotReadyFrame/WasAFK"] = "You were afk, are you back now?"
 L["CT_RaidAssist/AfterNotReadyFrame/WasNotReady"] = "Are you ready now?"
 L["CT_RaidAssist/PlayerFrame/TooltipFooter"] = "/ctra to move and configure"
 L["CT_RaidAssist/WindowTitle"] = "Window %d"
-L["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksCheckButton"] = "Extend missed ready checks"
-L["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksTooltip"] = [=[Provides a button to announce returning 
-after missing a /readycheck]=]
-L["CT_RaidAssist/Options/GeneralFeatures/Heading"] = "General Features"
-L["CT_RaidAssist/Options/GeneralFeatures/Line1"] = "These general features are separate from the custom raid frames."
 L["CT_RaidAssist/Options/Window/Auras/CombatLabel"] = "Show during combat:"
 L["CT_RaidAssist/Options/Window/Auras/DropDown"] = "#Group buffs I can apply#Debuffs I can remove#All group buffs#All debuffs#Group buffs I applied#Nothing"
 L["CT_RaidAssist/Options/Window/Auras/ShowBossCheckButton"] = "Show important boss auras at middle"
@@ -116,6 +111,25 @@ L["CT_RaidAssist/Spells/Revive"] = "Revive"
 L["CT_RaidAssist/Spells/Soulstone"] = "Soulstone"
 L["CT_RaidAssist/Spells/Trueshot Aura"] = "Trueshot Aura"
 
+
+L["CT_RaidAssist/Options/ReadyCheckMonitor/Heading"] = "Ready Check Enhancements"
+L["CT_RaidAssist/Options/ReadyCheckMonitor/Tooltip"] = "These settings are meant for raiding guilds using CT"
+L["CT_RaidAssist/Options/ReadyCheckMonitor/MonitorDurabilityLabel"] = "Provide warnings if your gear is damaged during a readycheck"
+L["CT_RaidAssist/Options/ReadyCheckMonitor/MonitorDurabilitySlider"] = "Warn if gear below <value>%:Off:50"
+L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityCheckButton"] = "Let CTRA share your durability with the raid"
+L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityTooltip"] = [=[Share your durability with peers using addons like CTRA, DBM or oRA.
+
+Notes:
+- Other addons may enable sharing even if you opt out with CTRA
+- This requires a /reload to take effect]=]
+L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksCheckButton"] = "Extend missed ready checks"
+L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksTooltip"] = [=[Provides a button to announce returning 
+after missing a /readycheck]=]
+L["CT_RaidAssist/PlayerFrame/TooltipItemsBroken"] = "%d%% durability, %d broken items (%d:%02d mins ago)";
+L["CT_RaidAssist/PlayerFrame/TooltipItemsNotBroken"] = "%d%% durability (%d:%02d mins ago)";
+
+--L["CT_RaidAssist/Options/GeneralFeatures/Heading"] = "General Features"
+--L["CT_RaidAssist/Options/GeneralFeatures/Line1"] = "These general features are separate from the custom raid frames."
 
 -- frFR (Credits: ddc)
 
