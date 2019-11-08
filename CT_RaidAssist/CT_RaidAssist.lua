@@ -2369,7 +2369,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	end
 	
 	local function updateDurability(percent, broken, sender, __)
-		if (sender == UnitName(shownUnit)) then
+		if (shownUnit and sender == UnitName(shownUnit)) then
 			durabilityAverage = percent;
 			durabilityBroken = broken;
 			durabilityTime = GetTime();
