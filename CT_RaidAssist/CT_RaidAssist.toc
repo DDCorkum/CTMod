@@ -8,6 +8,8 @@
 ## Dependencies: CT_Library
 ## SavedVariables: CT_RaidAssistOptions
 
+Libs/LibDurability.lua
+
 CT_RaidAssist.lua
 CT_RaidAssist_ExpansionData.lua
 localization.lua
