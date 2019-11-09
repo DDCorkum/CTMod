@@ -375,15 +375,16 @@ function StaticCTRAReadyCheck()
 		
 		-- Extend overdue readychecks
 		optionsBeginFrame(-15, 26, "checkbutton#tl:10:%y#n:CTRA_ExtendReadyChecksCheckButton#o:CTRA_ExtendReadyChecks:1#" .. L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksCheckButton"]);
-			optionsAddTooltip(L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksTooltip"], "ANCHOR_TOPLEFT");
+			optionsAddTooltip({L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksCheckButton"],L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksTooltip"] .. "#" .. textColor1},"CT_ABOVEBELOW",0,0,CTCONTROLPANEL);
 		optionsEndFrame();
 		
 		-- Monitor and share durability
+		optionsBeginFrame(0, 26, "checkbutton#tl:10:%y#n:CTRA_ShareDurabilityCheckButton#o:CTRA_ShareDurability:true#" .. L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityCheckButton"]);
+			optionsAddTooltip({L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityCheckButton"],L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityTooltip"] .. "#" .. textColor1},"CT_ABOVEBELOW",0,0,CTCONTROLPANEL);
+		optionsEndFrame();
 		optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. L["CT_RaidAssist/Options/ReadyCheckMonitor/MonitorDurabilityLabel"] .. "#" .. textColor2 .. ":l");
 		optionsAddObject( -20	, 17, "slider#tl:50:%y#s:200:%s#n:CTRA_MonitorDurabilitySlider#o:CTRA_MonitorDurability:50#" .. L["CT_RaidAssist/Options/ReadyCheckMonitor/MonitorDurabilitySlider"] .. "#0:50:5");
-		optionsBeginFrame(-15, 26, "checkbutton#tl:10:%y#n:CTRA_ShareDurabilityCheckButton#o:CTRA_ShareDurability:true#" .. L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityCheckButton"]);
-			optionsAddTooltip({L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityCheckButton"],L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityTooltip"] .. "#" .. textColor1}, "ANCHOR_TOPLEFT");
-		optionsEndFrame();
+
 
 	end
 	
@@ -420,10 +421,11 @@ function StaticCTRAFrames()
 	
 	-- public methods
 	function obj:Enable()
-		-- STEP 1: if not already enabled, do steps 2-3
+		-- STEP 1: if not already enabled, do steps 2-5
 		-- STEP 2: create (if necessary) and enable CTRAWindow objects
 		-- STEP 3: set a flag to respond positively to IsEnabled() queries
 		-- STEP 4: focus the options menu if it is created already (otherwise, this step will occur when it is created)
+		-- STEP 5: hide the default ui frames (if appropriate)
 		
 		--STEP 1:
 		if (not self:IsEnabled() and not InCombatLockdown()) then
@@ -447,13 +449,18 @@ function StaticCTRAFrames()
 			if (settingsOverlayToStopClicks) then 
 				settingsOverlayToStopClicks:Hide();
 			end
+			
+			-- STEP 5:
+			CompactRaidFrameContainer:SetShown(module:getOption("CTRAFrames_HideBlizzardDefaultFrames") ~= false);
 		end
+		
 	end
 	
 	function obj:Disable()
-		-- STEP 1: if not already disabled, do steps 2-3
+		-- STEP 1: if not already disabled, do steps 2-4
 		-- STEP 2: disable all current CTRAWindow objects
 		-- STEP 3: set a flag to respond negatively to IsEnabled() queries
+		-- STEP 4: stop hiding the blizzard default frames
 		
 		--STEP 1:
 		if (self:IsEnabled() and not InCombatLockdown()) then
@@ -471,6 +478,9 @@ function StaticCTRAFrames()
 			if (settingsOverlayToStopClicks) then
 				settingsOverlayToStopClicks:Show();
 			end
+			
+			-- STEP 4:
+			CompactRaidFrameContainer:Show();
 		end
 	end
 	
@@ -553,7 +563,10 @@ function StaticCTRAFrames()
 		
 		-- General Options
 		optionsAddObject(-15, 26, "font#tl:15:%y#Enable CTRA Frames?#" .. textColor1 .. ":l"); -- Enable custom raid frames
-		optionsAddFrame( 26, 20, "dropdown#tl:130:%y#s:120:%s#n:CTRAFrames_EnableFramesDropDown#o:CTRAFrames_EnableFrames:2 #Always#During Raids#During Groups#Never"); 
+		optionsAddFrame( 26, 20, "dropdown#tl:130:%y#s:120:%s#n:CTRAFrames_EnableFramesDropDown#o:CTRAFrames_EnableFrames:2 #Always#During Raids#During Groups#Never");
+		optionsBeginFrame( -5,  20, "checkbutton#tl:15:%y#n:CTRAFrames_HideBlizzardDefaultFramesCheckButton#o:CTRAFrames_HideBlizzardDefaultFrames:true#" .. L["CT_RaidAssist/Options/Frames/HideBlizzardDefaultCheckButton"]);
+			optionsAddTooltip({L["CT_RaidAssist/Options/Frames/HideBlizzardDefaultCheckButton"],L["CT_RaidAssist/Options/Frames/HideBlizzardDefaultTooltip"] .. "#" .. textColor1},"CT_ABOVEBELOW",0,0,CTCONTROLPANEL);
+		optionsEndFrame();
 		
 		
 		-- Everything below this line will pseudo-disable when the frames are disabled
@@ -854,7 +867,7 @@ function StaticCTRAFrames()
 				optionsBeginFrame(26,   20, "dropdown#tl:140:%y#s:100:%s#n:CTRAWindow_OrientationDropDown" .. L["CT_RaidAssist/Options/Window/Layout/OrientationDropdown"]);
 					optionsWindowizeObject("Orientation");
 				optionsEndFrame();
-				optionsAddObject(-20, 26, "font#tl:15:%y#" .. L["CT_RaidAssist/Options/Window/Layout/WrapLabel"] .. "#" .. textColor1 .. ":l");
+				optionsAddObject(-26, 20, "font#l:tl:15:%y#" .. L["CT_RaidAssist/Options/Window/Layout/WrapLabel"] .. "#" .. textColor1 .. ":l");
 				optionsBeginFrame(26, 17, "slider#tl:160:%y#s:110:%s#n:CTRAWindow_WrapAfterSlider#" .. L["CT_RaidAssist/Options/Window/Layout/WrapSlider"] .. ":2:40#2:40:1");
 					optionsWindowizeSlider("WrapAfter");
 					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Layout/WrapTooltipHeader"],L["CT_RaidAssist/Options/Window/Layout/WrapTooltipContent"]}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
@@ -881,8 +894,8 @@ function StaticCTRAFrames()
 				
 				
 				-- Appearance of Player Frames
-				optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormal#Appearance");
-				optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#Do you want the retro CTRA feel, or more a modern look?#" .. textColor2 .. ":l");
+				optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormal#" .. L["CT_RaidAssist/Options/Window/Appearance/Heading"]);
+				optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. L["CT_RaidAssist/Options/Window/Appearance/Line1"] .. "#" .. textColor2 .. ":l");
 				optionsBeginFrame( -5, 30, "button#tl:15:%y#s:80:%s#v:UIPanelButtonTemplate#Classic#n:CTRAWindow_ClassicSchemeButton");
 					optionsAddScript("onclick", 
 						function()
@@ -928,7 +941,7 @@ function StaticCTRAFrames()
 							windows[selectedWindow]:Focus();
 						end
 					);
-					optionsAddTooltip("In-between the classic and modern looks", "ANCHOR_TOPLEFT");
+					optionsAddTooltip("In-between the classic and modern looks", "ANCHOR_TOPLEFT", 0, 0, "CTRAWindow_ClassicSchemeButton");
 				optionsEndFrame();
 				optionsBeginFrame( 30, 30, "button#tl:205:%y#s:80:%s#v:UIPanelButtonTemplate#Modern#n:CTRAWindow_ModernSchemeButton");
 					optionsAddScript("onclick", 
@@ -951,34 +964,34 @@ function StaticCTRAFrames()
 							windows[selectedWindow]:Focus();
 						end
 					);
-					optionsAddTooltip("Adopt a modern feel like many other addons", "ANCHOR_TOPLEFT");
+					optionsAddTooltip("Adopt a modern feel like many other addons", "ANCHOR_TOPLEFT", 0, 0, "CTRAWindow_ClassicSchemeButton");
 				optionsEndFrame();
-				optionsBeginFrame(-10, 26, "checkbutton#tl:10:%y#n:CTRAWindow_HealthBarAsBackgroundCheckButton:false#Show health as full-size background");
+				optionsBeginFrame(-10, 26, "checkbutton#tl:10:%y#n:CTRAWindow_HealthBarAsBackgroundCheckButton:false#" .. L["CT_RaidAssist/Options/Window/Appearance/HealthBarAsBackgroundCheckButton"]);
 					optionsWindowizeObject("HealthBarAsBackground");
-					optionsAddTooltip("Fill the entire background instead of a small bar", "ANCHOR_TOPLEFT");
+					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Appearance/HealthBarAsBackgroundCheckButton"],L["CT_RaidAssist/Options/Window/Appearance/HealthBarAsBackgroundTooltip"] .. "#" .. textColor1}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
 				optionsEndFrame();
-				optionsBeginFrame(0, 26, "checkbutton#tl:10:%y#n:CTRAWindow_EnablePowerBarCheckButton:true#Show power bar?");
+				optionsBeginFrame(0, 26, "checkbutton#tl:10:%y#n:CTRAWindow_EnablePowerBarCheckButton:true#" .. L["CT_RaidAssist/Options/Window/Appearance/EnablePowerBarCheckButton"]);
 					optionsWindowizeObject("EnablePowerBar");
-					optionsAddTooltip("Show the mana, energy, rage, etc. at the bottom", "ANCHOR_TOPLEFT");
+					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Appearance/EnablePowerBarCheckButton"],L["CT_RaidAssist/Options/Window/Appearance/EnablePowerBarTooltip"] .. "#" .. textColor1}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
 				optionsEndFrame();
-				optionsBeginFrame(0, 26, "checkbutton#tl:10:%y#n:CTRAWindow_EnableTargetFrameCheckButton:true#Show the target underneath?");
+				optionsBeginFrame(0, 26, "checkbutton#tl:10:%y#n:CTRAWindow_EnableTargetFrameCheckButton:true#" .. L["CT_RaidAssist/Options/Window/Appearance/EnableTargetFrameCheckButton"]);
 					optionsWindowizeObject("EnableTargetFrame");
-					optionsAddTooltip("Add a frame underneath with the player's target (often used for tanks)", "ANCHOR_TOPLEFT");
+					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Appearance/EnableTargetFrameCheckButton"],L["CT_RaidAssist/Options/Window/Appearance/EnableTargetFrameTooltip"] .. "#" .. textColor1}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
 				optionsEndFrame();
 				
 				-- Buffs and Debuffs
 				optionsAddObject(-10,   17, "font#tl:5:%y#v:GameFontNormal#" .. L["CT_RaidAssist/Options/Window/Auras/Heading"]);
-				optionsAddObject(-15,   26, "font#tl:13:%y#" .. L["CT_RaidAssist/Options/Window/Auras/NoCombatLabel"] .. "#" .. textColor1 .. ":l");
+				optionsAddObject(-21,   20, "font#l:tl:13:%y#" .. L["CT_RaidAssist/Options/Window/Auras/NoCombatLabel"] .. "#" .. textColor1 .. ":l");
 				optionsBeginFrame(26,   20, "dropdown#tl:140:%y#s:110:%s#n:CTRAWindow_AuraFilterNoCombatDropDown" .. L["CT_RaidAssist/Options/Window/Auras/DropDown"]);
 					optionsWindowizeObject("AuraFilterNoCombat");
 				optionsEndFrame();				
-				optionsAddObject(-15,   26, "font#tl:13:%y#" .. L["CT_RaidAssist/Options/Window/Auras/CombatLabel"] .. "#" .. textColor1 .. ":l");
+				optionsAddObject(-21,   20, "font#l:tl:13:%y#" .. L["CT_RaidAssist/Options/Window/Auras/CombatLabel"] .. "#" .. textColor1 .. ":l");
 				optionsBeginFrame(26,   20, "dropdown#tl:140:%y#s:110:%s#n:CTRAWindow_AuraFilterCombatDropDown" .. L["CT_RaidAssist/Options/Window/Auras/DropDown"]);
 					optionsWindowizeObject("AuraFilterCombat");
 				optionsEndFrame();
 				optionsBeginFrame(-10, 15, "checkbutton#tl:10:%y#n:CTRAWindow_ShowBossAurasCheckButton#" .. L["CT_RaidAssist/Options/Window/Auras/ShowBossCheckButton"]);
 					optionsWindowizeObject("ShowBossAuras");
-					optionsAddTooltip(L["CT_RaidAssist/Options/Window/Auras/ShowBossTip"], "ANCHOR_TOPLEFT");
+					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Auras/ShowBossCheckButton"],L["CT_RaidAssist/Options/Window/Auras/ShowBossTip"] .. "#" .. textColor1}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
 				optionsEndFrame();
 				
 				-- Colors
@@ -1028,7 +1041,7 @@ function StaticCTRAFrames()
 							optionsAddScript("onenter",
 								function(swatch)
 									local r, g, b, a = unpack(windows[selectedWindow]:GetProperty(item.property));
-									module:displayTooltip(swatch, {item.tooltip .. "#" .. 1 - ((1-r)/3) .. ":" .. 1 - ((1-g)/3) .. ":" .. 1 - ((1-b)/3) , "Current:  |cFFFF6666r = " .. floor(100*r) .. "%|r, |cFF66FF66g = " .. floor(100*g) .. "%|r, |cFF6666FFb = " .. floor(100*b) .. ((a and ("%|r, |cFFFFFFFFa = " .. floor(100*a) .. "%")) or "%")}, "ANCHOR_TOPLEFT");
+									module:displayTooltip(swatch, {item.tooltip .. "#" .. 1 - ((1-r)/3) .. ":" .. 1 - ((1-g)/3) .. ":" .. 1 - ((1-b)/3) , "Current:  |cFFFF6666r = " .. floor(100*r) .. "%|r, |cFF66FF66g = " .. floor(100*g) .. "%|r, |cFF6666FFb = " .. floor(100*b) .. ((a and ("%|r, |cFFFFFFFFa = " .. floor(100*a) .. "%")) or "%")}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
 								end
 							);
 						optionsEndFrame();

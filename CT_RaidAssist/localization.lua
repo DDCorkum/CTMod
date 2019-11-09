@@ -32,11 +32,11 @@ L["CT_RaidAssist/PlayerFrame/TooltipFooter"] = "/ctra to move and configure"
 L["CT_RaidAssist/PlayerFrame/TooltipItemsBroken"] = "%d%% durability, %d broken items (as of %d:%02d mins ago)"
 L["CT_RaidAssist/PlayerFrame/TooltipItemsNotBroken"] = "%d%% durability (as of %d:%02d mins ago)"
 L["CT_RaidAssist/WindowTitle"] = "Window %d"
-L["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksCheckButton"] = "Extend missed ready checks"
-L["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksTooltip"] = [=[Provides a button to announce returning 
-after missing a /readycheck]=]
-L["CT_RaidAssist/Options/GeneralFeatures/Heading"] = "General Features"
-L["CT_RaidAssist/Options/GeneralFeatures/Line1"] = "These general features are separate from the custom raid frames."
+L["CT_RaidAssist/Options/Frames/HideBlizzardDefaultCheckButton"] = "Hide Blizzard's Default Raid Frames"
+L["CT_RaidAssist/Options/Frames/HideBlizzardDefaultTooltip"] = [=[Prevents default raid groups from appearing whenever custom CTRA frames are present.
+Has no effect if CTRA frames are disabled.
+
+Note: some other addons may also disable the default frames.]=]
 L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksCheckButton"] = "Extend missed ready checks"
 L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksTooltip"] = [=[Provides a button to announce returning 
 after missing a /readycheck]=]
@@ -50,6 +50,14 @@ Notes:
 - Other addons may enable sharing even if you opt out with CTRA
 - This requires a /reload to take effect]=]
 L["CT_RaidAssist/Options/ReadyCheckMonitor/Tooltip"] = "These settings are meant for raiding guilds using CT"
+L["CT_RaidAssist/Options/Window/Appearance/EnablePowerBarCheckButton"] = "Show power bar?"
+L["CT_RaidAssist/Options/Window/Appearance/EnablePowerBarTooltip"] = "Show the mana, energy, rage, etc. at the bottom"
+L["CT_RaidAssist/Options/Window/Appearance/EnableTargetFrameCheckButton"] = "Show the target underneath?"
+L["CT_RaidAssist/Options/Window/Appearance/EnableTargetFrameTooltip"] = "Add a frame underneath each player with the name of its target (often used for tanks)"
+L["CT_RaidAssist/Options/Window/Appearance/Heading"] = "Appearance"
+L["CT_RaidAssist/Options/Window/Appearance/HealthBarAsBackgroundCheckButton"] = "Show health as full-size background"
+L["CT_RaidAssist/Options/Window/Appearance/HealthBarAsBackgroundTooltip"] = "Fill the entire background as one large health metre.  Otherwise, health is just a small bar at the bottom"
+L["CT_RaidAssist/Options/Window/Appearance/Line1"] = "Do you want the retro CTRA feel, or more a modern look?"
 L["CT_RaidAssist/Options/Window/Auras/CombatLabel"] = "Show during combat:"
 L["CT_RaidAssist/Options/Window/Auras/DropDown"] = "#Group buffs I can apply#Debuffs I can remove#All group buffs#All debuffs#Group buffs I applied#Nothing"
 L["CT_RaidAssist/Options/Window/Auras/Heading"] = "Buffs and Debuffs"
@@ -141,9 +149,10 @@ L["CT_RaidAssist/AfterNotReadyFrame/WasAFK"] = "Vous étiez absent.  Revenez-vou
 L["CT_RaidAssist/AfterNotReadyFrame/WasNotReady"] = "Êtes-vous prêt maintenant?"
 L["CT_RaidAssist/PlayerFrame/TooltipFooter"] = "/ctra pour déplacer et configurer"
 L["CT_RaidAssist/WindowTitle"] = "Fenêtre %d"
-L["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksCheckButton"] = "Prolonger un /readycheck manqué"
-L["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksTooltip"] = "Fournir un bouton pour annoncer le retour après avoir manqué un /readycheck"
-L["CT_RaidAssist/Options/Window/Auras/CombatLabel"] = "Montrer pendant le combat :"
+L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksCheckButton"] = "Prolonger un /readycheck manqué"
+L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksTooltip"] = "Fournir un bouton pour annoncer le retour après avoir manqué un /readycheck"
+L["CT_RaidAssist/Options/Window/Auras/CombatLabel"] = [=[Montrer pendant 
+le combat :]=]
 L["CT_RaidAssist/Options/Window/Auras/DropDown"] = "#Les auras utiles que je peux appliquer aux autres#Les auras nocives que je peux retirer#Tous les auras utiles de groupe#Tous les auras nocives#Les auras utiles de groupe que j'ai appliqué#Rien"
 L["CT_RaidAssist/Options/Window/Auras/Heading"] = "Les auras"
 L["CT_RaidAssist/Options/Window/Auras/NoCombatLabel"] = "Montrer hors combat :"
@@ -160,7 +169,8 @@ L["CT_RaidAssist/Options/Window/Groups/GroupTooltipHeader"] = "Les groupes 1 à 
 L["CT_RaidAssist/Options/Window/Groups/Header"] = "Les sélections de groupes et classes"
 L["CT_RaidAssist/Options/Window/Groups/Line1"] = "Ce fenêtre montre lesquels groupes, rôles et classes?"
 L["CT_RaidAssist/Options/Window/Groups/RoleHeader"] = "Rôles"
-L["CT_RaidAssist/Options/Window/Layout/WrapLabel"] = "Des grands rangs/colonnes"
+L["CT_RaidAssist/Options/Window/Layout/WrapLabel"] = [=[Des grands 
+rangs/colonnes :]=]
 L["CT_RaidAssist/Options/Window/Layout/WrapSlider"] = "Habillage du texte après <value>"
 L["CT_RaidAssist/Options/WindowControls/AddButton"] = "Ajouter"
 L["CT_RaidAssist/Options/WindowControls/AddTooltip"] = "Ajouter une fenêtre avec les options defauts."
@@ -217,8 +227,8 @@ L["CT_RaidAssist/AfterNotReadyFrame/WasAFK"] = "Du warst AFK, bist Du zurück?"
 L["CT_RaidAssist/AfterNotReadyFrame/WasNotReady"] = "Bist Du jetzt bereit?"
 L["CT_RaidAssist/PlayerFrame/TooltipFooter"] = "/ctra zum Verschieben und Konfigurieren"
 L["CT_RaidAssist/WindowTitle"] = "Fenster %d"
-L["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksCheckButton"] = "Erweiterte Bereitschaftschecks anzeigen"
-L["CT_RaidAssist/Options/GeneralFeatures/ExtendReadyChecksTooltip"] = "Zeigt nach Verpassen eines Bereitschaftschecks eine Schaltfläche an um mitzuteilen, dass man wieder da ist"
+L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksCheckButton"] = "Erweiterte Bereitschaftschecks anzeigen"
+L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksTooltip"] = "Zeigt nach Verpassen eines Bereitschaftschecks eine Schaltfläche an um mitzuteilen, dass man wieder da ist"
 L["CT_RaidAssist/Options/Window/Auras/CombatLabel"] = "Während des Kampfes anzeigen:"
 L["CT_RaidAssist/Options/Window/Auras/DropDown"] = "#Wirkbare Gruppenzauber#Entfernbare Schwächungszauber#Alle Gruppenzauber#Alle Schwächungszauber#Gewirkte Gruppenzauber#Nichts"
 L["CT_RaidAssist/Options/Window/Auras/Heading"] = "Stärkungs- und Schwächungszauber"
