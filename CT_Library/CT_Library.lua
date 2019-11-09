@@ -225,7 +225,7 @@ function lib:displayTooltip(obj, text, anchor, offx, offy, owner)
 	end
 	
 	-- anchor the tooltip
-	owner = owner or obj;
+	owner = (type(owner) == "string" and _G[owner]) or owner or obj;
 	if ( not anchor ) then
 		GameTooltip_SetDefaultAnchor(tooltip, owner);
 	elseif (anchor == "CT_ABOVEBELOW") then

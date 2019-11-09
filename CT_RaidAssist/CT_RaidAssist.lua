@@ -284,6 +284,7 @@ function StaticCTRAReadyCheck()
 		frame:RegisterEvent("UPDATE_INVENTORY_DURABILITY");
 		frame:SetScript("OnEvent",
 			function(self, event, arg1, arg2)
+				if (InCombatLockdown()) then return; end
 				if (event == "READY_CHECK") then
 					frame:Show();
 				else
@@ -418,10 +419,60 @@ function StaticCTRAFrames()
 	local enabledState;			-- are the raidframes enabled (but possibly hidden if not in a raid)
 	local settingsOverlayToStopClicks;	-- button that sits overtop several options to stop interactions with them
 	local dummyFrame;			-- pretend CTRAPlayerFrame to illustrate options
+	local optionsWaiting = { };		-- options to be applied once combat ends
+	local defaultFramesHooked;		-- prevents hooks from being applied multiple times
+
+	-- private methods
+	
+	-- prevents the default blizzard frames from appearing, and prints a notice if the user tries to use them
+	local function hideDefaultFrames()		
+		
+		-- STEP 1: Hide the frames
+		-- STEP 2: Do step 3 once only
+		-- STEP 3: Send a message the first time someone tries to show the frames while CT is hiding them
+		
+		-- STEP 1:
+		RegisterStateDriver(CompactRaidFrameContainer, "visibility", "hide");
+		
+		-- STEP 2:
+		if defaultFramesHooked then return; end
+		defaultFramesHooked = 1;
+		
+		-- STEP 3:
+		local function forHooking()
+			if (module:getOption("CTRAFrames_HideBlizzardDefaultFrames") ~= false and obj:IsEnabled() and defaultFramesHooked == 1) then
+				print("Note:|n  CT_RaidAssist is hiding Blizzard's default raid frames.|n  Please type |cFFFFFF00/ctra|r to reconfigure this behaviour");
+				defaultFramesHooked = 2;
+			end
+		end
+		for i=1, 8 do
+			local button = _G["CompactRaidFrameManagerDisplayFrameFilterOptionsFilterGroup" .. i];
+			if (button) then
+				button:HookScript("OnClick", forHooking);
+			end
+		end
+		if (CompactRaidFrameManagerDisplayFrameHiddenModeToggle) then
+			CompactRaidFrameManagerDisplayFrameHiddenModeToggle:HookScript("OnClick", forHooking);
+		end
+	end
+	
+	-- allows the default blizzard frames to reappear
+	local function showDefaultFrames()
+		
+		-- STEP 1: Stop forcing the frames to be hidden
+		-- STEP 2: Update them to their natural state
+		
+		-- STEP 1:
+		RegisterStateDriver(CompactRaidFrameContainer, "visibility", "");
+		
+		-- STEP 2:
+		CompactRaidFrameManager_SetSetting("IsShown",CompactUnitFrameProfiles_GetAutoActivationState());    --    (IsInRaid() and true) or (IsInGroup() and CompactRaidFrameManagerDisplayFrameHiddenModeToggle.shownMode) or false);
+		--CompactRaidFrameContainer_TryUpdate(CompactRaidFrameContainer);
+	end
 	
 	-- public methods
 	function obj:Enable()
-		-- STEP 1: if not already enabled, do steps 2-5
+		-- STEP 1: if not already enabled, do steps 2-4
 		-- STEP 2: create (if necessary) and enable CTRAWindow objects
 		-- STEP 3: set a flag to respond positively to IsEnabled() queries
 		-- STEP 4: focus the options menu if it is created already (otherwise, this step will occur when it is created)
@@ -451,9 +502,10 @@ function StaticCTRAFrames()
 			end
 			
 			-- STEP 5:
-			CompactRaidFrameContainer:SetShown(module:getOption("CTRAFrames_HideBlizzardDefaultFrames") ~= false);
-		end
-		
+			if (module:getOption("CTRAFrames_HideBlizzardDefaultFrames")) then
+				hideDefaultFrames();
+			end
+		end		
 	end
 	
 	function obj:Disable()
@@ -480,7 +532,7 @@ function StaticCTRAFrames()
 			end
 			
 			-- STEP 4:
-			CompactRaidFrameContainer:Show();
+			showDefaultFrames();
 		end
 	end
 	
@@ -501,8 +553,23 @@ function StaticCTRAFrames()
 	end
 		
 	function obj:Update(option, value)
-		if (option == "CTRAFrames_EnableFrames") then
-			self:ToggleEnableState(value);
+		if (option) then
+			optionsWaiting[option] = value;
+		end
+		if (not InCombatLockdown()) then
+			for key, val in pairs(optionsWaiting) do
+				if (key == "CTRAFrames_EnableFrames") then
+					self:ToggleEnableState(val);
+				elseif (key == "CTRAFrames_HideBlizzardDefaultFrames") then
+					if (val and obj:IsEnabled()) then
+						hideDefaultFrames();
+					else
+						showDefaultFrames();
+					end
+				end
+				optionsWaiting[key] = nil;
+			end
+			--optionsWaiting = { };
 		end
 		for i, window in ipairs(windows) do
 			if (option) then
@@ -1083,22 +1150,24 @@ function StaticCTRAFrames()
 	end
 	
 	-- public constructor
-	listener = CreateFrame("Frame", nil);
-	listener:RegisterEvent("PLAYER_ENTERING_WORLD");		-- defers creating the frames until the player is in the game
-	listener:RegisterEvent("GROUP_ROSTER_UPDATE");			-- the frames might enable only during raids, groups, or always!
-	listener:RegisterEvent("PLAYER_REGEN_ENABLED");			-- in case the player's membership in a group/raid changed during combat
-	listener:HookScript("OnEvent",
-		function(self, event)
-			obj:ToggleEnableState();
-			if (event == "PLAYER_ENTERING_WORLD") then
-				-- a hack because SpellInfo() isn't quite ready at PLAYER_ENTERING_WORLD in Classic
-				C_Timer.After(1, function() obj:Update(); end);		-- in case SpellInfo() is a split second late loading
-				C_Timer.After(10, function() obj:Update(); end);	-- in case SpellInfo() is a few seconds late loading
+	do
+		listener = CreateFrame("Frame", nil);
+		listener:RegisterEvent("PLAYER_ENTERING_WORLD");		-- defers creating the frames until the player is in the game
+		listener:RegisterEvent("GROUP_ROSTER_UPDATE");			-- the frames might enable only during raids, groups, or always!
+		listener:RegisterEvent("PLAYER_REGEN_ENABLED");			-- in case the player's membership in a group/raid changed during combat
+		listener:HookScript("OnEvent",
+			function(self, event)
+				obj:ToggleEnableState();
+				obj:Update();
+				if (event == "PLAYER_ENTERING_WORLD") then
+					-- a hack because SpellInfo() isn't quite ready at PLAYER_ENTERING_WORLD in Classic
+					C_Timer.After(1, function() obj:Update(); end);		-- in case SpellInfo() is a split second late loading
+					C_Timer.After(10, function() obj:Update(); end);	-- in case SpellInfo() is a few seconds late loading
+				end
 			end
-		end
-	);	
-	return obj;
-
+		);	
+		return obj;
+	end
 end
 
 
