@@ -44,11 +44,14 @@ local GetClassColor = function(fileName)
 		return unpack(colors[fileName] or { });
 	end
 end;
+local CompactRaidFrameManager_SetSetting = CompactRaidFrameManager_SetSetting;
 local GetInspectSpecialization = GetInspectSpecialization or function() return nil; end	-- doesn't exist in classic
 local GetSpecializationRoleByID = GetSpecializationRoleByID or function() return nil; end -- doesn't exist in classic
 local GetReadyCheckStatus = GetReadyCheckStatus;
 local InCombatLockdown = InCombatLockdown;
 local IncomingSummonStatus = (C_IncomingSummon and C_IncomingSummon.IncomingSummonStatus) or function() return 0; end	-- doesn't exist in classic, and 0 means no incoming summons
+local RegisterStateDriver = RegisterStateDriver;
+local SetPortraitTexture = SetPortraitTexture;
 local UnitAura = UnitAura;
 local UnitClass = UnitClass;
 local UnitExists = UnitExists;
@@ -63,6 +66,7 @@ local UnitGroupRolesAssigned = UnitGroupRolesAssigned or function() return nil; 
 local UnitName = UnitName;
 local UnitPower = UnitPower;
 local UnitPowerMax = UnitPowerMax;
+local UnregisterStateDriver = UnregisterStateDriver;
 
 -- lua functions
 local max = max;
@@ -463,7 +467,7 @@ function StaticCTRAFrames()
 		-- STEP 2: Update them to their natural state
 		
 		-- STEP 1:
-		RegisterStateDriver(CompactRaidFrameContainer, "visibility", "");
+		UnregisterStateDriver(CompactRaidFrameContainer, "visibility");
 		
 		-- STEP 2:
 		CompactRaidFrameManager_SetSetting("IsShown",CompactUnitFrameProfiles_GetAutoActivationState());    --    (IsInRaid() and true) or (IsInGroup() and CompactRaidFrameManagerDisplayFrameHiddenModeToggle.shownMode) or false);
@@ -2266,7 +2270,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 						tex.debuffType = debuffType;
 						local string = (numBossShown == 1 and auraBoss1CountFontString) or (numBossShown == 2 and auraBoss2CountFontString) or auraBoss3CountFontString;
 						if ((count or 0) > 1) then
-							local color = DebuffTypeColor[debuffType];
+							local color = DebuffTypeColor[debuffType or ""];
 							string:SetText(count);
 							string:SetTextColor(1 - (1-color.r)/2, 1 - (1-color.g)/2, 1 - (1-color.b)/2);
 							string:Show();
@@ -2303,9 +2307,6 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				end
 				for auraIndex = 1, 40 do
 					local name, icon, count, debuffType, __, __, source, __, __, spellId = UnitAura(shownUnit, auraIndex, filterText);
-					CTDebug = CTDebug or { };
-					CTDebug[auraIndex] = {UnitAura(shownUnit, auraIndex, filterText)};
-					
 					if (not name or not spellId or numShown == 5) then
 						break;
 					elseif(
@@ -2524,31 +2525,31 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 							local mapid = C_Map.GetBestMapForUnit(shownUnit);
 							GameTooltip:AddDoubleLine((UnitRace(shownUnit) or "") .. " " .. (className or ""), (not UnitInRange(shownUnit) and mapid and C_Map.GetMapInfo(mapid).name) or "", 1, 1, 1, 0.5, 0.5, 0.5);
 							if (auraBoss1Texture:IsShown()) then
-								local color = DebuffTypeColor[auraBoss1Texture.debuffType];
+								local color = DebuffTypeColor[auraBoss1Texture.debuffType or ""];
 								GameTooltip:AddLine("|T" .. auraBoss1Texture:GetTexture() .. ":0|t " .. (auraBoss1Texture.name or "") .. ((auraBoss1Texture.count or 0) > 1 and (" (" .. auraBoss1Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
 								if (auraBoss2Texture:IsShown()) then
-									color = DebuffTypeColor[auraBoss2Texture.debuffType];
+									color = DebuffTypeColor[auraBoss2Texture.debuffType or ""];
 									GameTooltip:AddLine("|T" .. auraBoss2Texture:GetTexture() .. ":0|t " .. (auraBoss2Texture.name or "") .. ((auraBoss2Texture.count or 0) > 1 and (" (" .. auraBoss2Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
 									if (auraBoss3Texture:IsShown()) then
-										color = DebuffTypeColor[auraBoss3Texture.debuffType];
+										color = DebuffTypeColor[auraBoss3Texture.debuffType or ""];
 										GameTooltip:AddLine("|T" .. auraBoss3Texture:GetTexture() .. ":0|t " .. (auraBoss3Texture.name or "") .. ((auraBoss3Texture.count or 0) > 1 and (" (" .. auraBoss3Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
 									end
 								end
 							end
 							if (aura1Texture:IsShown()) then
-								local color = DebuffTypeColor[aura1Texture.debuffType];
+								local color = DebuffTypeColor[aura1Texture.debuffType or ""];
 								GameTooltip:AddLine("|T" .. aura1Texture:GetTexture() .. ":0|t " .. (aura1Texture.name or "") .. ((aura1Texture.count or 0) > 1 and (" (" .. aura1Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
 								if (aura2Texture:IsShown()) then
-									color = DebuffTypeColor[aura2Texture.debuffType];
+									color = DebuffTypeColor[aura2Texture.debuffType or ""];
 									GameTooltip:AddLine("|T" .. aura2Texture:GetTexture() .. ":0|t " .. (aura2Texture.name or "") .. ((aura2Texture.count or 0) > 1 and (" (" .. aura2Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
 									if (aura3Texture:IsShown()) then
-										color = DebuffTypeColor[aura3Texture.debuffType];
+										color = DebuffTypeColor[aura3Texture.debuffType or ""];
 										GameTooltip:AddLine("|T" .. aura3Texture:GetTexture() .. ":0|t " .. (aura3Texture.name or "") .. ((aura3Texture.count or 0) > 1 and (" (" .. aura3Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
 										if (aura4Texture:IsShown()) then
-											color = DebuffTypeColor[aura4Texture.debuffType];
+											color = DebuffTypeColor[aura4Texture.debuffType or ""];
 											GameTooltip:AddLine("|T" .. aura4Texture:GetTexture() .. ":0|t " .. (aura4Texture.name or "") .. ((aura4Texture.count or 0) > 1 and (" (" .. aura4Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
 											if (aura5Texture:IsShown()) then
-												color = DebuffTypeColor[aura5Texture.debuffType];
+												color = DebuffTypeColor[aura5Texture.debuffType or ""];
 												GameTooltip:AddLine("|T" .. aura5Texture:GetTexture() .. ":0|t " .. (aura5Texture.name or "") .. ((aura5Texture.count or 0) > 1 and (" (" .. aura5Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
 											end
 										end

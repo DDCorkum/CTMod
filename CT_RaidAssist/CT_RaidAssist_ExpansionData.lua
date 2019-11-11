@@ -172,9 +172,9 @@ module.CTRA_Configuration_BossAuras =
 	[19776] = 0,		-- Molten Core - Sulfuron Harbinger: Shadow Word: Pain
 	[20294] = 0,		-- Molten Core - Sulfuron Harbinger: Immolater
 	[18431] = 0,		-- Onyxia's Lair - Onyxia: Bellowing Roar
-	
+
 	-- Battle for Azeroth
-	[243237] = 1,		-- Mythic Plus: Bursting
+	[240443] = 1,		-- Mythic Plus: Bursting
 	[209858] = 20,		-- Mythic Plus: Necrotic
 	[240559] = 1,		-- Mythic Plus: Grievous
 	[255558] = 0,		-- Atal'Dazar - Priestess Alun'za: Tainted Blood

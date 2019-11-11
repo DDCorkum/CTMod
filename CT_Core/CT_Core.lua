@@ -259,6 +259,7 @@ local sectionYOffsets;	--used to move the scroll bar to each section for conveni
 local function optionsInit()
 	optionsFrameList = module:framesInit();
 	sectionYOffsets = { };
+	module.optionYOffsets = sectionYOffsets
 end
 local function optionsGetData()
 	return module:framesGetData(optionsFrameList);
@@ -608,13 +609,17 @@ module.frame = function()
 		optionsAddObject(  6,   26, "checkbutton#tl:40:%y#o:castingbarMovable#Unlock the casting bar");
 
 	-- Chat options
-		optionsAddBookmark("Chat Features");
+		optionsAddBookmark("Chat Features", true);
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Chat");
 
 		-- Chat frame timestamps
-		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:chatTimestamp#Display timestamps");
+		--optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:chatTimestamp#Display timestamps");
+		--optionsAddObject( -2,   15, "font#tl:60:%y#v:ChatFontNormal#Format:");
+		--optionsAddObject( 14,   20, "dropdown#tl:100:%y#s:100:%s#o:chatTimestampFormat#n:CTCoreDropdown2#12:00#12:00:00#24:00#24:00:00");
 		optionsAddObject( -2,   15, "font#tl:60:%y#v:ChatFontNormal#Format:");
-		optionsAddObject( 14,   20, "dropdown#tl:100:%y#s:100:%s#o:chatTimestampFormat#n:CTCoreDropdown2#12:00#12:00:00#24:00#24:00:00");
+		optionsAddObject( 14,   20, "dropdown#tl:100:%y#s:100:%s#o:chatTimestampFormatBase#n:CTCore_chatTimestampFormatBaseDropDown#None#03:27#03:27:32#03:27 PM#03:27:32 PM#15:27#15:27:32");
+		optionsAddObject( -2,   15, "font#tl:60:%y#v:ChatFontNormal#Delimiter:");
+		optionsAddObject( 14,   20, "dropdown#tl:100:%y#s:100:%s#o:chatTimestampFormatDelimiter#n:CTCore_chatTimestampFormatDelimiterDropDown#None#[03:27]#03:27 - ");
 
 		-- Chat frame buttons
 		optionsAddObject( -2,   26, "checkbutton#tl:10:%y#o:chatArrows#Hide the chat buttons");

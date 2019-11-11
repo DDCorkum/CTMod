@@ -261,9 +261,71 @@ local function updateChatEditTop()
 end
 
 --------------------------------------------
--- Chat timestamps
+-- Chat timestamps (changed in 8.2.5.6 to work with the game interface options)
 
-local chgChatTimestamp;
+do
+	local frame = CreateFrame("Frame", nil, InterfaceOptionsSocialPanelTimestamps);
+	frame:SetFrameLevel(6);
+	frame:SetAllPoints();
+	frame:EnableMouse();
+	frame:SetScript("OnEnter", function()
+		module:displayTooltip(frame, "CT_Core controls this setting.  Click here to open the CT options.", "ANCHOR_TOP");
+	end);
+	frame:SetScript("OnMouseDown", function()
+		if (not InCombatLockdown()) then
+			InterfaceOptionsFrameCancel:Click();
+			GameMenuButtonContinue:Click();
+			module:showModuleOptions(module.name);
+			for __, data in pairs(module.optionYOffsets) do
+				if data.name == "Chat Features" then
+					CT_LibraryOptionsScrollFrameScrollBar:SetValue(data.offset);
+				end
+			end
+		end
+	end);
+end
+
+local function updateChatTimestamp()
+	local formats = {
+		[1] = nil,
+		[2] = "%I:%M",
+		[3] = "%I:%M:%S",
+		[4] = "%I:%M %p",
+		[5] = "%I:%M:%S %p",
+		[6] = "%H:%M",
+		[7] = "%H:%M:%S",
+	};
+	CTDebug = formats;
+	local base, delimiter, firstTime = (module:getOption("chatTimestampFormatBase")), (module:getOption("chatTimestampFormatDelimiter"));
+	local format;
+	if base then
+		format = formats[base];
+	else
+		for i=1, 7 do
+			if (
+				CHAT_TIMESTAMP_FORMAT == formats[i] 
+				or CHAT_TIMESTAMP_FORMAT == (formats[i] or "") .. " " 
+				or CHAT_TIMESTAMP_FORMAT == "[" .. (formats[i] or "") .. "] "
+			) then
+				module:setOption("chatTimestampFormatBase", i, true);
+				format = formats[i];
+			end
+		end
+	end
+	if (format) then
+		if (delimiter == 2) then
+			format = "[" .. format .. "] ";
+		elseif (delimiter == 3) then
+			format = format .. " - ";
+		else
+			format = format .. " ";
+		end
+	end
+	CHAT_TIMESTAMP_FORMAT = format;
+end
+
+
+--[[local chgChatTimestamp;
 local valChatTimestampShow;
 local valChatTimestampFormat = 1;
 local oldChatFrameAddMessage = {};
@@ -330,7 +392,7 @@ local function updateChatTimestamp()
 		setChatTimestamp(true);
 		chgChatTimestamp = true;
 	end
-end
+end--]]
 
 --------------------------------------------
 -- Chat text fading: Time visible
@@ -1191,21 +1253,38 @@ module:setSlashCmd(
 
 module.chatupdate = function(self, type, value)
 	if ( type == "init" ) then
+	
+		-- change the old timestamp options to the newest format before doing anything else
+		if (module:getOption("chatTimestamp")) then
+			local oldFormat = module:getOption("chatTimestampFormat") or 1;
+			module:setOption("chatTimestampFormatBase", (oldFormat == 1 and 2) or (oldFormat == 2 and 3) or (oldFormat == 3 and 6) or 7, true);
+			module:setOption("chatTimestampFormatDelimiter", 2, true);
+		end
+		module:setOption("chatTimestamp", nil, true);
+		module:setOption("chatTimestampFormat", nil, true);
+		
 		-- Update chat frames with the settings.
-		updateChat();
-
-		-- At this point ChatFrame2 may not yet be the Combat Log
-		-- window. We need to watch for it to get loaded, and then
-		-- perform any updates that depend on knowing if a frame
-		-- is the Combat Log frame.
-		module:regEvent("ADDON_LOADED",
-			function(event, addonName)
-				if (addonName == "Blizzard_CombatLog") then
-					updateChatEditTop();
-					updateChatTimestamp();
-				end
+		module:regEvent("PLAYER_ENTERING_WORLD",
+			function()
+				updateChat();
+				module:unregEvent("PLAYER_ENTERING_WORLD");
 			end
 		);
+
+	--	-- At this point ChatFrame2 may not yet be the Combat Log
+	--	-- window. We need to watch for it to get loaded, and then
+	--	-- perform any updates that depend on knowing if a frame
+	--	-- is the Combat Log frame.
+	--	module:regEvent("ADDON_LOADED",
+	--		function(event, addonName)
+	--			if (addonName == "Blizzard_CombatLog") then
+	--				updateChatEditTop();
+	--				updateChatTimestamp();
+	--			end
+	--		end
+	--	);
+		
+
 	else
 		if ( type == "chatArrows" ) then
 			updateChatMenuButtonHide();
@@ -1214,10 +1293,13 @@ module.chatupdate = function(self, type, value)
 		elseif ( type == "friendsMicroButton" ) then
 			updateFriendsButtonHide();
 
-		elseif ( type == "chatTimestamp" ) then
-			updateChatTimestamp();
+	--	elseif ( type == "chatTimestamp" ) then
+	--		updateChatTimestamp();
 
-		elseif ( type == "chatTimestampFormat" ) then
+	--	elseif ( type == "chatTimestampFormat" ) then
+	--		updateChatTimestamp();
+	
+		elseif ( type == "chatTimestampFormatBase" or type == "chatTimestampFormatDelimiter" ) then
 			updateChatTimestamp();
 
 		elseif ( type == "chatEditMove" ) then
