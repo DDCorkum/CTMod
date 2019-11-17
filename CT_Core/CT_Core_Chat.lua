@@ -261,138 +261,11 @@ local function updateChatEditTop()
 end
 
 --------------------------------------------
--- Chat timestamps (changed in 8.2.5.6 to work with the game interface options)
+-- Chat timestamps 
 
-do
-	local frame = CreateFrame("Frame", nil, InterfaceOptionsSocialPanelTimestamps);
-	frame:SetFrameLevel(6);
-	frame:SetAllPoints();
-	frame:EnableMouse();
-	frame:SetScript("OnEnter", function()
-		module:displayTooltip(frame, "CT_Core controls this setting.  Click here to open the CT options.", "ANCHOR_TOP");
-	end);
-	frame:SetScript("OnMouseDown", function()
-		if (not InCombatLockdown()) then
-			InterfaceOptionsFrameCancel:Click();
-			GameMenuButtonContinue:Click();
-			module:showModuleOptions(module.name);
-			for __, data in pairs(module.optionYOffsets) do
-				if data.name == "Chat Features" then
-					CT_LibraryOptionsScrollFrameScrollBar:SetValue(data.offset);
-				end
-			end
-		end
-	end);
-end
-
-local function updateChatTimestamp()
-	local formats = {
-		[1] = nil,
-		[2] = "%I:%M",
-		[3] = "%I:%M:%S",
-		[4] = "%I:%M %p",
-		[5] = "%I:%M:%S %p",
-		[6] = "%H:%M",
-		[7] = "%H:%M:%S",
-	};
-	CTDebug = formats;
-	local base, delimiter, firstTime = (module:getOption("chatTimestampFormatBase")), (module:getOption("chatTimestampFormatDelimiter"));
-	local format;
-	if base then
-		format = formats[base];
-	else
-		for i=1, 7 do
-			if (
-				CHAT_TIMESTAMP_FORMAT == formats[i] 
-				or CHAT_TIMESTAMP_FORMAT == (formats[i] or "") .. " " 
-				or CHAT_TIMESTAMP_FORMAT == "[" .. (formats[i] or "") .. "] "
-			) then
-				module:setOption("chatTimestampFormatBase", i, true);
-				format = formats[i];
-			end
-		end
-	end
-	if (format) then
-		if (delimiter == 2) then
-			format = "[" .. format .. "] ";
-		elseif (delimiter == 3) then
-			format = format .. " - ";
-		else
-			format = format .. " ";
-		end
-	end
-	CHAT_TIMESTAMP_FORMAT = format;
-end
+-- this section is removed in 8.2.5.6, being more integrated with the default UI and written inside the options menu for CT_Core (via cvar)
 
 
---[[local chgChatTimestamp;
-local valChatTimestampShow;
-local valChatTimestampFormat = 1;
-local oldChatFrameAddMessage = {};
-local useChatTimestamp = {};
-
-local function addChatTimestamp(self, msg, ...)
-	local addMessage = oldChatFrameAddMessage[self];
-	if (not addMessage) then
-		return;
-	end
-	if (valChatTimestampShow and useChatTimestamp[self]) then
-		if (valChatTimestampFormat == 1) then
-			-- 12h
-			return addMessage(self, "[" .. tonumber(date("%I")) .. date(":%M] ") .. (msg or ""), ...);
-		elseif (valChatTimestampFormat == 2) then
-			-- 12hs
-			return addMessage(self, "[" .. tonumber(date("%I")) .. date(":%M:%S] ") .. (msg or ""), ...);
-		elseif (valChatTimestampFormat == 3) then
-			-- 24h
-			return addMessage(self, date("[%H:%M] ") .. (msg or ""), ...);
-		elseif (valChatTimestampFormat == 4) then
-			-- 24hs
-			return addMessage(self, date("[%H:%M:%S] ") .. (msg or ""), ...);
-		end
-	end
-	return addMessage(self, (msg or ""), ...);
-end
-
-local function setChatFrameTimestamp(chatFrame, showTimestamp)
-	if (showTimestamp) then
-		if (not oldChatFrameAddMessage[chatFrame]) then
-			-- Hook the chat frame's AddMessage routine.
-			oldChatFrameAddMessage[chatFrame] = chatFrame.AddMessage;
-			chatFrame.AddMessage = addChatTimestamp;
-		end
-	end
-	useChatTimestamp[chatFrame] = not IsCombatLog(chatFrame);
-end
-
-local function setChatTimestamp(showTimestamp)
-	for _, chatFrameName in pairs(CHAT_FRAMES) do
-		local chatFrame = _G[chatFrameName];
-		if (chatFrame) then
-			setChatFrameTimestamp(chatFrame, showTimestamp);
-		end
-	end
-end
-
-local function updateChatTimestamp()
-	valChatTimestampShow = module:getOption("chatTimestamp");
-	valChatTimestampFormat = module:getOption("chatTimestampFormat") or 1;
-
-	local showTimestamp = valChatTimestampShow;
-	if (not showTimestamp) then
-		-- If we have changed this setting...
-		if (chgChatTimestamp) then
-			chgChatTimestamp = false;
-			-- Reset to game default.
-			-- No timestamps.
-			setChatTimestamp(false);
-		end
-	else
-		-- Show timestamps.
-		setChatTimestamp(true);
-		chgChatTimestamp = true;
-	end
-end--]]
 
 --------------------------------------------
 -- Chat text fading: Time visible
@@ -1212,7 +1085,6 @@ local function updateChat()
 	updateChatButtonsHide();
 	updateChatScrolling();
 	updateChatEditTop();
-	updateChatTimestamp();
 	updateChatTimeVisible();
 	updateChatFadeDuration();
 	updateChatFadingDisable();
@@ -1253,19 +1125,20 @@ module:setSlashCmd(
 
 module.chatupdate = function(self, type, value)
 	if ( type == "init" ) then
-	
-		-- change the old timestamp options to the newest format before doing anything else
-		if (module:getOption("chatTimestamp")) then
-			local oldFormat = module:getOption("chatTimestampFormat") or 1;
-			module:setOption("chatTimestampFormatBase", (oldFormat == 1 and 2) or (oldFormat == 2 and 3) or (oldFormat == 3 and 6) or 7, true);
-			module:setOption("chatTimestampFormatDelimiter", 2, true);
-		end
-		module:setOption("chatTimestamp", nil, true);
-		module:setOption("chatTimestampFormat", nil, true);
 		
 		-- Update chat frames with the settings.
 		module:regEvent("PLAYER_ENTERING_WORLD",
 			function()
+				-- change the old timestamp options to the newest format before doing anything else
+				if (module:getOption("chatTimestamp")) then
+					local oldFormat = module:getOption("chatTimestampFormat") or 1;
+					local newFormat = (oldFormat == 1 and "[%I:%M] ") or (oldFormat == 2 and "[%I:%M:%S] ") or (oldFormat == 3 and "[%H:%M:%S] ") or "[%H:%M:%S] "
+					CHAT_TIMESTAMP_FORMAT = newFormat;
+					SetCVar("showTimestamps", newFormat);
+				end
+				module:setOption("chatTimestamp", nil, true);
+				module:setOption("chatTimestampFormat", nil, true);
+
 				updateChat();
 				module:unregEvent("PLAYER_ENTERING_WORLD");
 			end
@@ -1292,15 +1165,6 @@ module.chatupdate = function(self, type, value)
 
 		elseif ( type == "friendsMicroButton" ) then
 			updateFriendsButtonHide();
-
-	--	elseif ( type == "chatTimestamp" ) then
-	--		updateChatTimestamp();
-
-	--	elseif ( type == "chatTimestampFormat" ) then
-	--		updateChatTimestamp();
-	
-		elseif ( type == "chatTimestampFormatBase" or type == "chatTimestampFormatDelimiter" ) then
-			updateChatTimestamp();
 
 		elseif ( type == "chatEditMove" ) then
 			updateChatEditTop();
