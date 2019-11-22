@@ -2582,7 +2582,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 									end
 									local isConsumable = module.CTRA_Configuration_Consumables[spellId];
 									if (isConsumable) then
-										if (type(isConsumable == "number")) then
+										if (type(isConsumable) == "number") then
 											local itemName, __, __, __, __, __, __, __, __, itemIcon = GetItemInfo(isConsumable);
 											if (itemName and itemIcon) then
 												GameTooltip:AddLine("|T" .. icon .. ":0|t " .. name .. " from " .. "|T" .. itemIcon .. ":0|t " .. itemName, 0.9, 0.9, 0.9);
