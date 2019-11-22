@@ -261,76 +261,11 @@ local function updateChatEditTop()
 end
 
 --------------------------------------------
--- Chat timestamps
+-- Chat timestamps 
 
-local chgChatTimestamp;
-local valChatTimestampShow;
-local valChatTimestampFormat = 1;
-local oldChatFrameAddMessage = {};
-local useChatTimestamp = {};
+-- this section is removed in 8.2.5.6, being more integrated with the default UI and written inside the options menu for CT_Core (via cvar)
 
-local function addChatTimestamp(self, msg, ...)
-	local addMessage = oldChatFrameAddMessage[self];
-	if (not addMessage) then
-		return;
-	end
-	if (valChatTimestampShow and useChatTimestamp[self]) then
-		if (valChatTimestampFormat == 1) then
-			-- 12h
-			return addMessage(self, "[" .. tonumber(date("%I")) .. date(":%M] ") .. (msg or ""), ...);
-		elseif (valChatTimestampFormat == 2) then
-			-- 12hs
-			return addMessage(self, "[" .. tonumber(date("%I")) .. date(":%M:%S] ") .. (msg or ""), ...);
-		elseif (valChatTimestampFormat == 3) then
-			-- 24h
-			return addMessage(self, date("[%H:%M] ") .. (msg or ""), ...);
-		elseif (valChatTimestampFormat == 4) then
-			-- 24hs
-			return addMessage(self, date("[%H:%M:%S] ") .. (msg or ""), ...);
-		end
-	end
-	return addMessage(self, (msg or ""), ...);
-end
 
-local function setChatFrameTimestamp(chatFrame, showTimestamp)
-	if (showTimestamp) then
-		if (not oldChatFrameAddMessage[chatFrame]) then
-			-- Hook the chat frame's AddMessage routine.
-			oldChatFrameAddMessage[chatFrame] = chatFrame.AddMessage;
-			chatFrame.AddMessage = addChatTimestamp;
-		end
-	end
-	useChatTimestamp[chatFrame] = not IsCombatLog(chatFrame);
-end
-
-local function setChatTimestamp(showTimestamp)
-	for _, chatFrameName in pairs(CHAT_FRAMES) do
-		local chatFrame = _G[chatFrameName];
-		if (chatFrame) then
-			setChatFrameTimestamp(chatFrame, showTimestamp);
-		end
-	end
-end
-
-local function updateChatTimestamp()
-	valChatTimestampShow = module:getOption("chatTimestamp");
-	valChatTimestampFormat = module:getOption("chatTimestampFormat") or 1;
-
-	local showTimestamp = valChatTimestampShow;
-	if (not showTimestamp) then
-		-- If we have changed this setting...
-		if (chgChatTimestamp) then
-			chgChatTimestamp = false;
-			-- Reset to game default.
-			-- No timestamps.
-			setChatTimestamp(false);
-		end
-	else
-		-- Show timestamps.
-		setChatTimestamp(true);
-		chgChatTimestamp = true;
-	end
-end
 
 --------------------------------------------
 -- Chat text fading: Time visible
@@ -1150,7 +1085,6 @@ local function updateChat()
 	updateChatButtonsHide();
 	updateChatScrolling();
 	updateChatEditTop();
-	updateChatTimestamp();
 	updateChatTimeVisible();
 	updateChatFadeDuration();
 	updateChatFadingDisable();
@@ -1191,21 +1125,39 @@ module:setSlashCmd(
 
 module.chatupdate = function(self, type, value)
 	if ( type == "init" ) then
+		
 		-- Update chat frames with the settings.
-		updateChat();
-
-		-- At this point ChatFrame2 may not yet be the Combat Log
-		-- window. We need to watch for it to get loaded, and then
-		-- perform any updates that depend on knowing if a frame
-		-- is the Combat Log frame.
-		module:regEvent("ADDON_LOADED",
-			function(event, addonName)
-				if (addonName == "Blizzard_CombatLog") then
-					updateChatEditTop();
-					updateChatTimestamp();
+		module:regEvent("PLAYER_ENTERING_WORLD",
+			function()
+				-- change the old timestamp options to the newest format before doing anything else
+				if (module:getOption("chatTimestamp")) then
+					local oldFormat = module:getOption("chatTimestampFormat") or 1;
+					local newFormat = (oldFormat == 1 and "[%I:%M] ") or (oldFormat == 2 and "[%I:%M:%S] ") or (oldFormat == 3 and "[%H:%M:%S] ") or "[%H:%M:%S] "
+					CHAT_TIMESTAMP_FORMAT = newFormat;
+					SetCVar("showTimestamps", newFormat);
 				end
+				module:setOption("chatTimestamp", nil, true);
+				module:setOption("chatTimestampFormat", nil, true);
+
+				updateChat();
+				module:unregEvent("PLAYER_ENTERING_WORLD");
 			end
 		);
+
+	--	-- At this point ChatFrame2 may not yet be the Combat Log
+	--	-- window. We need to watch for it to get loaded, and then
+	--	-- perform any updates that depend on knowing if a frame
+	--	-- is the Combat Log frame.
+	--	module:regEvent("ADDON_LOADED",
+	--		function(event, addonName)
+	--			if (addonName == "Blizzard_CombatLog") then
+	--				updateChatEditTop();
+	--				updateChatTimestamp();
+	--			end
+	--		end
+	--	);
+		
+
 	else
 		if ( type == "chatArrows" ) then
 			updateChatMenuButtonHide();
@@ -1213,12 +1165,6 @@ module.chatupdate = function(self, type, value)
 
 		elseif ( type == "friendsMicroButton" ) then
 			updateFriendsButtonHide();
-
-		elseif ( type == "chatTimestamp" ) then
-			updateChatTimestamp();
-
-		elseif ( type == "chatTimestampFormat" ) then
-			updateChatTimestamp();
 
 		elseif ( type == "chatEditMove" ) then
 			updateChatEditTop();

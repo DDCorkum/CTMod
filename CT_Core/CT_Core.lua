@@ -259,6 +259,7 @@ local sectionYOffsets;	--used to move the scroll bar to each section for conveni
 local function optionsInit()
 	optionsFrameList = module:framesInit();
 	sectionYOffsets = { };
+	module.optionYOffsets = sectionYOffsets
 end
 local function optionsGetData()
 	return module:framesGetData(optionsFrameList);
@@ -608,13 +609,39 @@ module.frame = function()
 		optionsAddObject(  6,   26, "checkbutton#tl:40:%y#o:castingbarMovable#Unlock the casting bar");
 
 	-- Chat options
-		optionsAddBookmark("Chat Features");
+		optionsAddBookmark("Chat Features", true);
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Chat");
 
 		-- Chat frame timestamps
-		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:chatTimestamp#Display timestamps");
-		optionsAddObject( -2,   15, "font#tl:60:%y#v:ChatFontNormal#Format:");
-		optionsAddObject( 14,   20, "dropdown#tl:100:%y#s:100:%s#o:chatTimestampFormat#n:CTCoreDropdown2#12:00#12:00:00#24:00#24:00:00");
+		--optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:chatTimestamp#Display timestamps");
+		--optionsAddObject( -2,   15, "font#tl:60:%y#v:ChatFontNormal#Format:");
+		--optionsAddObject( 14,   20, "dropdown#tl:100:%y#s:100:%s#o:chatTimestampFormat#n:CTCoreDropdown2#12:00#12:00:00#24:00#24:00:00");
+		--optionsAddObject( -2,   15, "font#tl:60:%y#v:ChatFontNormal#Format:");
+		--optionsAddObject( 14,   20, "dropdown#tl:100:%y#s:100:%s#o:chatTimestampFormatBase#n:CTCore_chatTimestampFormatBaseDropDown#None#03:27#03:27:32#03:27 PM#03:27:32 PM#15:27#15:27:32");
+		
+		optionsAddObject(-15, 1*13, "font#tl:15:%y#Chat Timestamps");
+		optionsAddObject(-15, 2*13, "font#tl:15:%y#r#Change how timestamps appear in chat windows, overriding the default game setting#" .. textColor2 .. ":l");
+		local function addTimestampButton(yOff, ySize, xOff, xSize, label, format)
+			optionsBeginFrame(yOff, ySize, "button#v:GameMenuButtonTemplate#tl:" .. xOff .. ":%y#s:" .. xSize .. ":%s#" .. label)
+				optionsAddScript("onclick", function()
+					CHAT_TIMESTAMP_FORMAT = format;
+					SetCVar("showTimestamps", format);
+				end);
+			optionsEndFrame();	
+		end
+		addTimestampButton(-5, 22,  120, 80, "None", nil);
+		addTimestampButton(-5, 22,  30, 80, "03:27", "%I:%M ");
+		addTimestampButton(22, 22, 120, 80, "03:27 -", "%I:%M - ");
+		addTimestampButton(22, 22, 210, 80, "[03:27]", "[%I:%M] ");
+		addTimestampButton(-5, 22,  30, 80, "03:27:32", "%I:%M:%S ");
+		addTimestampButton(22, 22, 120, 80, "03:27:32 -", "%I:%M:%S - ");
+		addTimestampButton(22, 22, 210, 80, "[03:27:32]", "[%I:%M:%S] ");
+		addTimestampButton(-5, 22,  30, 80, "15:27", "%H:%M ");
+		addTimestampButton(22, 22, 120, 80, "15:27 -", "%H:%M - ");
+		addTimestampButton(22, 22, 210, 80, "[15:27]", "[%H:%M] ");
+		addTimestampButton(-5, 22,  30, 80, "15:27:32", "%H:%M:%S ");
+		addTimestampButton(22, 22, 120, 80, "15:27:32 -", "%H:%M:%S - ");
+		addTimestampButton(22, 22, 210, 80, "[15:27:32]", "[%H:%M:%S] ");
 
 		-- Chat frame buttons
 		optionsAddObject( -2,   26, "checkbutton#tl:10:%y#o:chatArrows#Hide the chat buttons");
@@ -759,6 +786,9 @@ module.frame = function()
 		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#i:watchframeEnabled#o:watchframeEnabled#Enable these options");
 		optionsAddObject(  4,   26, "checkbutton#tl:40:%y#i:watchframeLocked#o:watchframeLocked:true#Lock the game's Objectives window");
 		optionsAddObject(  6,   26, "checkbutton#tl:40:%y#i:watchframeShowTooltip#o:watchframeShowTooltip:true#Show drag and resize tooltips");
+		if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+			optionsAddObject(  6,   26, "checkbutton#tl:40:%y#i:watchframeAddMinimizeButton#o:watchframeAddMinimizeButton:true#Add a minimize button (like retail)");
+		end
 		optionsAddObject(  6,   26, "checkbutton#tl:40:%y#i:watchframeClamped#o:watchframeClamped:true#Keep the window on screen");
 		optionsAddObject(  6,   26, "checkbutton#tl:40:%y#i:watchframeShowBorder#o:watchframeShowBorder#Show the border");
 		optionsAddObject(  0,   16, "colorswatch#tl:45:%y#s:16:%s#o:watchframeBackground:0,0,0,0#true");

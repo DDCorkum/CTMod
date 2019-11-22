@@ -1,9 +1,5 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
-	<Script file="localization.lua"/>
-	<Script file="localization.de.lua"/>
-	<Script file="localization.fr.lua"/>
-	<Script file="CT_ExpenseHistory.lua"/>
 	<GameTooltip name="CT_EHTooltip" inherits="GameTooltipTemplate" parent="WorldFrame">
 		<Scripts>
 			<OnLoad>
@@ -24,9 +20,9 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 			</Layer>
 		</Layers>
 		<Scripts>
-			<OnLoad>
+			<OnShow>
 				_G[self:GetName() .. "Background"]:SetVertexColor(0, 0, 0, 0.5);
-			</OnLoad>
+			</OnShow>
 			<OnEnter>
 				_G[self:GetName() .. "Background"]:SetVertexColor(0.5, 0.5, 0.5, 0.5);
 			</OnEnter>
@@ -281,16 +277,16 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				</Anchors>
 				<Layers>
 					<Layer level="ARTWORK">
-					<FontString name="$parentPlayerDistribution" text="CT_EH_PLAYERDISTRIBUTION" inherits="GameFontNormal">
-						<Anchors>
-							<Anchor point="TOPLEFT">
-								<Offset>
-									<AbsDimension x="25" y="-265"/>
-								</Offset>
-							</Anchor>
-						</Anchors>
-					</FontString>
-						<FontString name="$parentAverageRepair" text="CT_EH_AVERAGEREPAIR" inherits="GameFontNormal">
+						<FontString name="$parentPlayerDistribution" inherits="GameFontNormal">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="25" y="-265"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentAverageRepair" inherits="GameFontNormal">
 							<Anchors>
 								<Anchor point="TOPLEFT">
 									<Offset>
@@ -299,7 +295,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 								</Anchor>
 							</Anchors>
 						</FontString>
-						<FontString name="$parentAvgExpensesPerDay" text="CT_EH_AVERAGEEXPENSES" inherits="GameFontNormal">
+						<FontString name="$parentAvgExpensesPerDay" inherits="GameFontNormal">
 							<Anchors>
 								<Anchor point="TOPLEFT">
 									<Offset>
@@ -308,7 +304,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 								</Anchor>
 							</Anchors>
 						</FontString>
-						<FontString name="$parentAvgExpensesFlights" text="CT_EH_FLIGHTCOSTS" inherits="ChatFontNormal">
+						<FontString name="$parentAvgExpensesFlights" inherits="ChatFontNormal">
 							<Anchors>
 								<Anchor point="TOPLEFT">
 									<Offset>
@@ -317,7 +313,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 								</Anchor>
 							</Anchors>
 						</FontString>
-						<FontString name="$parentAvgExpensesRepairs" text="CT_EH_REPAIRCOSTS" inherits="ChatFontNormal">
+						<FontString name="$parentAvgExpensesRepairs" inherits="ChatFontNormal">
 							<Anchors>
 								<Anchor point="TOPLEFT">
 									<Offset>
@@ -326,7 +322,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 								</Anchor>
 							</Anchors>
 						</FontString>
-						<FontString name="$parentAvgExpensesReagents" text="CT_EH_REAGENTCOSTS" inherits="ChatFontNormal">
+						<FontString name="$parentAvgExpensesReagents" inherits="ChatFontNormal">
 							<Anchors>
 								<Anchor point="TOPLEFT">
 									<Offset>
@@ -335,7 +331,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 								</Anchor>
 							</Anchors>
 						</FontString>
-						<FontString name="$parentAvgExpensesAmmo" text="CT_EH_AMMOCOSTS" inherits="ChatFontNormal">
+						<FontString name="$parentAvgExpensesAmmo" inherits="ChatFontNormal">
 							<Anchors>
 								<Anchor point="TOPLEFT">
 									<Offset>
@@ -344,7 +340,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 								</Anchor>
 							</Anchors>
 						</FontString>
-						<FontString name="$parentAvgExpensesMail" text="CT_EH_MAILCOSTS" inherits="ChatFontNormal">
+						<FontString name="$parentAvgExpensesMail" inherits="ChatFontNormal">
 							<Anchors>
 								<Anchor point="TOPLEFT">
 									<Offset>
@@ -353,7 +349,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 								</Anchor>
 							</Anchors>
 						</FontString>
-						<FontString name="$parentTotalCost" text="CT_EH_TOTALCOST" inherits="GameFontNormal">
+						<FontString name="$parentTotalCost"  inherits="GameFontNormal">
 							<Anchors>
 								<Anchor point="TOPLEFT">
 									<Offset>
@@ -362,7 +358,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 								</Anchor>
 							</Anchors>
 						</FontString>
-						<FontString name="$parentTotalCostFlights" text="CT_EH_FLIGHTCOSTS" inherits="ChatFontNormal">
+						<FontString name="$parentTotalCostFlights"  inherits="ChatFontNormal">
 							<Anchors>
 								<Anchor point="TOPLEFT">
 									<Offset>
@@ -371,7 +367,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 								</Anchor>
 							</Anchors>
 						</FontString>
-						<FontString name="$parentTotalCostRepairs" text="CT_EH_REPAIRCOSTS" inherits="ChatFontNormal">
+						<FontString name="$parentTotalCostRepairs" inherits="ChatFontNormal">
 							<Anchors>
 								<Anchor point="TOPLEFT">
 									<Offset>
@@ -380,7 +376,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 								</Anchor>
 							</Anchors>
 						</FontString>
-						<FontString name="$parentTotalCostReagents" text="CT_EH_REAGENTCOSTS" inherits="ChatFontNormal">
+						<FontString name="$parentTotalCostReagents" inherits="ChatFontNormal">
 							<Anchors>
 								<Anchor point="TOPLEFT">
 									<Offset>
@@ -389,7 +385,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 								</Anchor>
 							</Anchors>
 						</FontString>
-						<FontString name="$parentTotalCostAmmo" text="CT_EH_AMMOCOSTS" inherits="ChatFontNormal">
+						<FontString name="$parentTotalCostAmmo" inherits="ChatFontNormal">
 							<Anchors>
 								<Anchor point="TOPLEFT">
 									<Offset>
@@ -398,7 +394,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 								</Anchor>
 							</Anchors>
 						</FontString>
-						<FontString name="$parentTotalCostMail" text="CT_EH_MAILCOSTS" inherits="ChatFontNormal">
+						<FontString name="$parentTotalCostMail" inherits="ChatFontNormal">
 							<Anchors>
 								<Anchor point="TOPLEFT">
 									<Offset>
@@ -725,6 +721,30 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 						frame2:SetID(1);
 						frame2:SetSize(200,15);
 						frame2:SetPoint("LEFT", frame1, "RIGHT", -30, 0);
+						
+						-- adding localized strings
+						local L = CT_ExpenseHistory.text or { } --see localization.lua
+						local strings =
+						{
+							{"AverageRepair", L["CT_ExpenseHistory/Summary/AverageRepair"]},
+							{"AvgExpensesPerDay", L["CT_ExpenseHistory/Summary/AverageExpenses"]},
+							{"AvgExpensesFlights", L["CT_ExpenseHistory/Summary/FlightCost"]},
+							{"AvgExpensesRepairs", L["CT_ExpenseHistory/Summary/RepairCost"]},
+							{"AvgExpensesReagents", L["CT_ExpenseHistory/Summary/ReagentCost"]},
+							{"AvgExpensesAmmo", L["CT_ExpenseHistory/Summary/AmmoCost"]},
+							{"AvgExpensesMail", L["CT_ExpenseHistory/Summary/MailCost"]},
+							{"TotalCost", L["CT_ExpenseHistory/Summary/TotalCost"]},
+							{"TotalCostFlights", L["CT_ExpenseHistory/Summary/FlightCost"]},
+							{"TotalCostRepairs", L["CT_ExpenseHistory/Summary/RepairCost"]},
+							{"TotalCostReagents", L["CT_ExpenseHistory/Summary/ReagentCost"]},
+							{"TotalCostAmmo", L["CT_ExpenseHistory/Summary/AmmoCost"]},
+							{"TotalCostMail", L["CT_ExpenseHistory/Summary/MailCost"]},
+							{"PlayerDistribution", L["CT_ExpenseHistory/Summary/PlayerDistribution"]},
+						}
+						for __, data in ipairs(strings) do
+							local string = _G[self:GetName() .. data[1]];
+							string:SetText(data[2]);
+						end
 					</OnLoad>
 				</Scripts>
 			</Frame>
@@ -750,16 +770,10 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 								CT_EH_SortLogBy(1);
 								PlaySound(856);
 							</OnClick>
+							<OnLoad>
+								self:SetText(CT_ExpenseHistory.text["CT_ExpenseHistory/Log/Date"]);
+							</OnLoad>
 						</Scripts>
-						<ButtonText text="CT_EH_LOGDATE">
-							<Anchors>
-								<Anchor point="LEFT">
-									<Offset>
-										<AbsDimension x="8" y="0"/>
-									</Offset>
-								</Anchor>
-							</Anchors>
-						</ButtonText>
 					</Button>
 					<Button name="$parentChar" inherits="CT_EH_LogTabTemplate">
 						<Anchors>
@@ -777,16 +791,10 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 								CT_EH_SortLogBy(2);
 								PlaySound(856);
 							</OnClick>
+							<OnLoad>
+								self:SetText(CT_ExpenseHistory.text["CT_ExpenseHistory/Log/Char"]);
+							</OnLoad>
 						</Scripts>
-						<ButtonText text="CT_EH_LOGCHAR">
-							<Anchors>
-								<Anchor point="LEFT">
-									<Offset>
-										<AbsDimension x="8" y="0"/>
-									</Offset>
-								</Anchor>
-							</Anchors>
-						</ButtonText>
 					</Button>
 					<Button name="$parentType" inherits="CT_EH_LogTabTemplate">
 						<Anchors>
@@ -804,16 +812,10 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 								CT_EH_SortLogBy(3);
 								PlaySound(856);
 							</OnClick>
+							<OnLoad>
+								self:SetText(CT_ExpenseHistory.text["CT_ExpenseHistory/Log/Type"]);
+							</OnLoad>
 						</Scripts>
-						<ButtonText text="CT_EH_LOGTYPE">
-							<Anchors>
-								<Anchor point="LEFT">
-									<Offset>
-										<AbsDimension x="8" y="0"/>
-									</Offset>
-								</Anchor>
-							</Anchors>
-						</ButtonText>
 					</Button>
 					<Button name="$parentCost" inherits="CT_EH_LogTabTemplate">
 						<Anchors>
@@ -831,16 +833,10 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 								CT_EH_SortLogBy(4);
 								PlaySound(856);
 							</OnClick>
+							<OnLoad>
+								self:SetText(CT_ExpenseHistory.text["CT_ExpenseHistory/Log/Cost"]);
+							</OnLoad>
 						</Scripts>
-						<ButtonText text="CT_EH_LOGCOST">
-							<Anchors>
-								<Anchor point="LEFT">
-									<Offset>
-										<AbsDimension x="8" y="0"/>
-									</Offset>
-								</Anchor>
-							</Anchors>
-						</ButtonText>
 					</Button>
 					<ScrollFrame name="$parentScrollFrame" inherits="FauxScrollFrameTemplate">
 						<Size>
@@ -976,7 +972,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 					</Frame>
 				</Frames>
 			</Frame>
-			<Button name="$parentTab1" inherits="CT_ExpenseHistoryFrameTabTemplate" id="1" text="CT_EH_SUMMARY">
+			<Button name="$parentTab1" inherits="CT_ExpenseHistoryFrameTabTemplate" id="1" ><Scripts><OnLoad>self:SetText(CT_ExpenseHistory.text["CT_ExpenseHistory/Summary/Heading"]);</OnLoad></Scripts>
                 <Anchors>
                     <Anchor point="CENTER" relativePoint="BOTTOMLEFT">
                         <Offset>
@@ -985,7 +981,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
                     </Anchor>
                 </Anchors>
 			</Button>
-			<Button name="$parentTab2" inherits="CT_ExpenseHistoryFrameTabTemplate" id="2" text="CT_EH_LOG">
+			<Button name="$parentTab2" inherits="CT_ExpenseHistoryFrameTabTemplate" id="2" ><Scripts><OnLoad>self:SetText(CT_ExpenseHistory.text["CT_ExpenseHistory/Log/Heading"]);</OnLoad></Scripts>
                 <Anchors>
                    <Anchor point="LEFT" relativeTo="$parentTab1" relativePoint="RIGHT">
                         <Offset>

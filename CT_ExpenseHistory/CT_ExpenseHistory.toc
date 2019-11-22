@@ -1,9 +1,12 @@
 ## Interface: 80205
-## Version: 8.2.0.1
+## Version: 8.2.5.6
 ## Title: CT_ExpenseHistory |cFF333333(BFA)
 ## Notes: Detailed log of character expenses.
 ## DefaultState: Enabled
 ## SavedVariables: CT_EH_History
 ## Dependencies: CT_Library
 
+
+CT_ExpenseHistory.lua
+localization.lua
 CT_ExpenseHistory.xml

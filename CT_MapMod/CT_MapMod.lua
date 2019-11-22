@@ -1391,6 +1391,10 @@ do
 							if (arg2:sub(1,9) == "Veine de " and arg2:len() > 10) then arg2 = arg2:sub(10,10):upper() .. arg2:sub(11); end -- changes "Veine de gangreschiste" to "Gangreschiste"
 							elseif (GetLocale() == "deDE") then
 							-- need to add german modifiers
+						elseif (GetLocale() == "ruRU") then
+							if (arg2:sub(1,8) == "Богатая " and arg2:len() > 9) then arg2 = arg2:sub(9,9):upper() .. arg2:sub(10); end -- changes "Богатая ториевая жила" to "Ториевая жила"
+							if (arg2:sub(-5) == " жила" and arg2:len() > 5) then arg2 = arg2:sub(1,-6); end	--changes "Медная жила" to "Медная"
+							if (arg2:sub(1,7) == "Залежи " and arg2:len() > 8) then arg2 = arg2:sub(8,8):upper() .. arg2:sub(9); end -- changes "Залежи истинного серебра" to "Истинного серебра"
 						end
 						for key, expansion in pairs(module.NoteTypes["Ore"]) do
 							for j, type in ipairs(expansion) do

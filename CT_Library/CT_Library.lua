@@ -19,7 +19,7 @@
 -----------------------------------------------
 -- Initialization
 
-local LIBRARY_VERSION = 8.255;
+local LIBRARY_VERSION = 8.256;
 local LIBRARY_NAME = "CT_Library";
 
 local _G = getfenv(0);
@@ -225,7 +225,7 @@ function lib:displayTooltip(obj, text, anchor, offx, offy, owner)
 	end
 	
 	-- anchor the tooltip
-	owner = owner or obj;
+	owner = (type(owner) == "string" and _G[owner]) or owner or obj;
 	if ( not anchor ) then
 		GameTooltip_SetDefaultAnchor(tooltip, owner);
 	elseif (anchor == "CT_ABOVEBELOW") then
@@ -2459,18 +2459,25 @@ local selectedModule;
 local previousModule;
 
 -- Resizes the frame smoothly
+local combatWarningPrinted;
 local function resizer(self, elapsed)
 	local width = self.width;
-	if ( width < 630 ) then
-		-- Set Width
-		local newWidth = min(width + 705 * elapsed, 635); -- Resize to 620 over ~0.9 sec
-		self:SetWidth(newWidth);
-		self.width = newWidth;
+	if ( width < 635 ) then
+		if (InCombatLockdown()) then
+			if (not combatWarningPrinted) then
+				print("The CT options menu cannot expand until combat ends.");
+				combatWarningPrinted = true;
+			end
+		else
+			local newWidth = min(width + 837.5 * elapsed, 635); -- Resize to 635 over 0.4 sec
+			self:SetWidth(newWidth);
+			self.width = newWidth;
+		end
 	else
 		-- Set Alpha
 		local alpha = self.alpha;
 		if ( alpha < 1 ) then
-			local newAlpha = min(alpha + 1.25 * elapsed, 1); -- Set to 100% opacity over 0.8 sec
+			local newAlpha = min(alpha + 5 * elapsed, 1); -- Set to 100% opacity over 0.2 sec
 
 			self.options:SetAlpha(newAlpha);
 			self.alpha = newAlpha;
@@ -2763,7 +2770,7 @@ function lib:showControlPanel(show)
 
 	if ( show ~= false ) then
 		displayControlPanel();
-	elseif ( controlPanelFrame ) then
+	elseif ( controlPanelFrame and not InCombatLockdown()) then
 		controlPanelFrame:Hide();
 	end
 end

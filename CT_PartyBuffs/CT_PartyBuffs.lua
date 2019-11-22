@@ -29,7 +29,7 @@ CT_NUM_PARTY_BUFFS = 14;
 CT_NUM_PARTY_DEBUFFS = 6;
 CT_NUM_PET_BUFFS = 9;
 
-local numBuffs, numDebuffs, numPetBuffs;
+local numBuffs, numDebuffs, numPetBuffs, buffType, debuffType;
 
 function CT_PartyBuffs_OnLoad(self)
 	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
@@ -59,7 +59,7 @@ function CT_PartyBuffs_RefreshBuffs(self, elapsed)
 			if ( i > numBuffs ) then
 				_G[name .. "Buff" .. i]:Hide();
 			else
-				local _, bufftexture = UnitBuff("party" .. self:GetID(), i);
+				local _, bufftexture = UnitBuff("party" .. self:GetID(), i, (buffType == 2 and "RAID") or "");
 				if ( bufftexture ) then
 					_G[name .. "Buff" .. i .. "Icon"]:SetTexture(bufftexture);
 					_G[name .. "Buff" .. i]:Show();
@@ -74,7 +74,7 @@ function CT_PartyBuffs_RefreshBuffs(self, elapsed)
 					if ( i > numDebuffs ) then
 						_G[name .. "Debuff" .. i]:Hide();
 					else
-						local _, debufftexture, debuffApplications, debuffType = UnitDebuff("party" .. self:GetID(), i);
+						local _, debufftexture, debuffApplications, debuffType = UnitDebuff("party" .. self:GetID(), i, (debuffType == 2 and "RAID") or "");
 						if ( debufftexture ) then
 							local color;
 							if ( debuffApplications > 1 ) then
@@ -168,8 +168,48 @@ module.frame = function()
 		"slider#t:0:-80#s:190:17#o:numDebuffs:6#Debuffs Displayed - <value>#0:6:1",
 		"slider#t:0:-115#s:190:17#o:numPetBuffs:4#Pet Buffs Displayed - <value>#0:14:1"
 	};
+	yoffset = yoffset + ysize;
 
+	-- Position of the buffs and debuffs
+	ysize = 70;
+	options["frame#tl:0:-" .. yoffset .. "#br:tr:0:-".. (yoffset + ysize)] = {
+		"font#tl:5:0#v:GameFontNormalLarge#Layout",
+		"dropdown#t:0:-30#s:190:17#o:layout:1#n:CT_PartyBuffs_LayoutDropdown#Buffs under the mana bar; Debuffs to the side in the top-right#Buffs to the side in the top-right; Debuffs under the mana bar",
+	};
+	yoffset = yoffset + ysize;
+
+	-- Position of the buffs and debuffs
+	ysize = 70;
+	options["frame#tl:0:-" .. yoffset .. "#br:tr:0:-".. (yoffset + ysize)] = {
+		"font#tl:5:0#v:GameFontNormalLarge#What to show?",
+		"font#tr:t:-30:-30#v:GameFontNormal#Buffs: #0.9:0.9:0.9:l",
+		"font#tr:t:-30:-60#v:GameFontNormal#Debuffs: #0.9:0.9:0.9:l",
+		"dropdown#tl:t:-28:-30#s:95:17#o:buffType:1#n:CT_PartyBuffs_BuffTypeDropdown#All buffs#Buffs I can cast",
+		"dropdown#tl:t:-28:-60#s:95:17#o:debuffType:1#n:CT_PartyBuffs_DebuffTypeDropdown#All Debuffs#Debuffs I can remove",
+	};
 	return "frame#all", options;
+end
+
+local function updateLayout(value)
+	if (value == 2) then
+		CT_PartyBuffFrame1Buff1:SetPoint("TOPLEFT", 75, 38);
+		CT_PartyBuffFrame2Buff1:SetPoint("TOPLEFT", 75, 38);
+		CT_PartyBuffFrame3Buff1:SetPoint("TOPLEFT", 75, 38);
+		CT_PartyBuffFrame4Buff1:SetPoint("TOPLEFT", 75, 38);
+		CT_PartyBuffFrame1Debuff1:SetPoint("TOPLEFT", 0, 0);
+		CT_PartyBuffFrame2Debuff1:SetPoint("TOPLEFT", 0, 0);
+		CT_PartyBuffFrame3Debuff1:SetPoint("TOPLEFT", 0, 0);
+		CT_PartyBuffFrame4Debuff1:SetPoint("TOPLEFT", 0, 0);			
+	else	-- value == 1 or nil, default
+		CT_PartyBuffFrame1Buff1:SetPoint("TOPLEFT", 0, 0);
+		CT_PartyBuffFrame2Buff1:SetPoint("TOPLEFT", 0, 0);
+		CT_PartyBuffFrame3Buff1:SetPoint("TOPLEFT", 0, 0);
+		CT_PartyBuffFrame4Buff1:SetPoint("TOPLEFT", 0, 0);
+		CT_PartyBuffFrame1Debuff1:SetPoint("TOPLEFT", 75, 38);
+		CT_PartyBuffFrame2Debuff1:SetPoint("TOPLEFT", 75, 38);
+		CT_PartyBuffFrame3Debuff1:SetPoint("TOPLEFT", 75, 38);
+		CT_PartyBuffFrame4Debuff1:SetPoint("TOPLEFT", 75, 38);
+	end
 end
 
 module.update = function(self, type, value)
@@ -177,11 +217,20 @@ module.update = function(self, type, value)
 		numBuffs = self:getOption("numBuffs") or 4;
 		numDebuffs = self:getOption("numDebuffs") or 6;
 		numPetBuffs = self:getOption("numPetBuffs") or 4;
+		buffType = self:getOption("buffType");
+		debuffType = self:getOption("debuffType");
+		updateLayout(self:getOption("layout"));
 	elseif ( type == "numBuffs" ) then
 		numBuffs = value;
 	elseif ( type == "numDebuffs" ) then
 		numDebuffs = value;
 	elseif ( type == "numPetBuffs" ) then
 		numPetBuffs = value;
+	elseif ( type == "buffType" ) then
+		buffType = value;
+	elseif ( type == "debuffType" ) then
+		debuffType = value;
+	elseif ( type == "layout" ) then
+		updateLayout(value);
 	end
 end

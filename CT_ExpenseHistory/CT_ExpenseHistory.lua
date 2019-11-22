@@ -1,20 +1,25 @@
 ------------------------------------------------
---             CT_ExpenseHistory              --
+--              CT_ExpenseHistory             --
 --                                            --
 -- Keeps a detailed log of expenses for each  --
 -- of your characters.                        --
+--                                            --
 -- Please do not modify or otherwise          --
 -- redistribute this without the consent of   --
 -- the CTMod Team. Thank you.                 --
+--					      --
+-- Original credits to Cide and TS            --
+-- Maintained by Resike from 2014 to 2017     --
+-- Maintained by Dahk Celes (ddc) since 2019  --
 ------------------------------------------------
 
 --------------------------------------------
 -- Initialization
 
-local module = { };
+local MODULE_NAME, module = ...;
+
 local _G = getfenv(0);
 
-local MODULE_NAME = "CT_ExpenseHistory";
 local MODULE_VERSION = strmatch(GetAddOnMetadata(MODULE_NAME, "version"), "^([%d.]+)");
 
 module.name = MODULE_NAME;
@@ -26,11 +31,14 @@ _G[MODULE_NAME] = module;
 CT_Library:registerModule(module);
 tinsert(UISpecialFrames, "CT_ExpenseHistoryFrame");
 
+module.text = module.text or { };	-- see localization.lua
+local L = module.text
+
 --------------------------------------------
 -- Variables
 
 CT_EH_History = { };
-CT_EH_DISPLAYTHRESHOLD = 100; -- 1 Silver
+CT_EH_DISPLAYTHRESHOLD = 1; -- 1 Silver
 CT_EH_NUMCLASSPILES = 8;
 CT_EH_Version = 1.3;
 CT_EH_LogSort = {
@@ -75,15 +83,15 @@ function CT_EH_UpdateSummary()
 		dropdownsInitialized = true;
 	end
 
-	L_UIDropDownMenu_SetSelectedName(CT_ExpenseHistoryFrameServerDropDown, ( CT_ExpenseHistoryFrame.currServer or CT_EH_ALLSERVERS ) );
+	L_UIDropDownMenu_SetSelectedName(CT_ExpenseHistoryFrameServerDropDown, ( CT_ExpenseHistoryFrame.currServer or L["CT_ExpenseHistory/Summary/PlayerDistribution/AllServers"] ) );
 	L_UIDropDownMenu_SetWidth(CT_ExpenseHistoryFrameServerDropDown, 100);
-	CT_ExpenseHistoryFrameServerDropDownText:SetText(( CT_ExpenseHistoryFrame.currServer or CT_EH_ALLSERVERS ));
+	CT_ExpenseHistoryFrameServerDropDownText:SetText(( CT_ExpenseHistoryFrame.currServer or L["CT_ExpenseHistory/Summary/PlayerDistribution/AllServers"] ));
 
-	L_UIDropDownMenu_SetSelectedName(CT_ExpenseHistoryFrameDropDown, ( currPlayer or CT_EH_ALLCHARACTERS ) );
+	L_UIDropDownMenu_SetSelectedName(CT_ExpenseHistoryFrameDropDown, ( currPlayer or L["CT_ExpenseHistory/Summary/PlayerDistribution/AllCharacters"] ) );
 	L_UIDropDownMenu_SetWidth(CT_ExpenseHistoryFrameDropDown, 200);
-	CT_ExpenseHistoryFrameDropDownText:SetText(( currPlayer or CT_EH_ALLCHARACTERS ));
+	CT_ExpenseHistoryFrameDropDownText:SetText(( currPlayer or L["CT_ExpenseHistory/Summary/PlayerDistribution/AllCharacters"] ));
 
-	CT_ExpenseHistoryFrameRecordingText:SetText(format(CT_EH_RECORDINGFROM, date("%m/%d/%Y", CT_EH_History["startUsage"])));
+	CT_ExpenseHistoryFrameRecordingText:SetText(format(L["CT_ExpenseHistory/Log/RecordingSince"], date("%m/%d/%Y", CT_EH_History["startUsage"])));
 
 	local classCoords = CLASS_ICON_TCOORDS;  -- Table index is non-localized class name (eg: "WARRIOR")
 
@@ -256,7 +264,7 @@ function CT_EH_UpdateLog()
 			line:Show();
 			dateText:SetText(date("%m/%d/%y", entries[index][1]));
 			charText:SetText(charName .. "@" .. serverName);
-			typeText:SetText(entries[index][3]);
+			typeText:SetText(L["CT_ExpenseHistory/" .. (entries[index][3] or "")] or entries[index][3]);
 			MoneyFrame_Update(costFrameName, entries[index][4]);
 		else
 			line:Hide();
@@ -356,16 +364,16 @@ function CT_EH_GetMoney(name)
 		for k, v in pairs(CT_EH_History[name]) do
 			if ( k ~= "class" and k ~= "key" and k ~= "filename" ) then
 				total = total + v[1];
-				if ( v[2] == CT_EH_REPAIR ) then
+				if ( v[2] == "Repair" or v[2] == L["CT_ExpenseHistory/Repair"] ) then
 					totalRep = totalRep + v[1];
 					numRep = numRep + 1;
-				elseif ( v[2] == CT_EH_FLIGHT ) then
+				elseif ( v[2] == "Flight" or v[2] == L["CT_ExpenseHistory/Flight"] ) then
 					totalFli = totalFli + v[1];
-				elseif ( v[2] == CT_EH_REAGENT ) then
+				elseif ( v[2] == "Reagent" or v[2] == L["CT_ExpenseHistory/Reagent"] ) then
 					totalReg = totalReg + v[1];
-				elseif ( v[2] == CT_EH_AMMO ) then
+				elseif ( v[2] == "Ammo" or v[2] == L["CT_ExpenseHistory/Ammo"] ) then
 					totalAmm = totalAmm + v[1];
-				elseif ( v[2] == CT_EH_MAIL ) then
+				elseif ( v[2] == "Mail" or v[2] == L["CT_ExpenseHistory/Mail"] ) then
 					totalMai = totalMai + v[1];
 				end
 			end
@@ -576,6 +584,7 @@ function CT_EH_Tab_OnClick(self)
 end
 
 -- Find out if vendor is reagent vendor
+--[[		-- REMOVED IN 8.2.5.6 -- it isn't really clear why this was even necessary
 function CT_EH_IsVendor(tbl)
 	for i = 1, GetMerchantNumItems(), 1 do
 		local name, texture, price, quantity, numAvailable, isUsable = GetMerchantItemInfo(i);
@@ -585,9 +594,10 @@ function CT_EH_IsVendor(tbl)
 	end
 	return false;
 end
+--]]
 
 MerchantFrame:HookScript("OnShow", function(self)
-	if ( CT_EH_IsVendor(CT_EH_SCANFORREAGENTS) ) then
+--[[	if ( CT_EH_IsVendor(CT_EH_SCANFORREAGENTS) ) then		-- it isn't really clear why this was even necessary.
 		MerchantFrame.reagentCost = 0;
 	else
 		MerchantFrame.reagentCost = nil;
@@ -603,41 +613,130 @@ MerchantFrame:HookScript("OnShow", function(self)
 	else
 		MerchantFrame.repairCost = nil;
 	end
+--]]
+	MerchantFrame.reagentCost = 0;
+	MerchantFrame.ammoCost = 0;
+	MerchantFrame.repairCost = 0;
 end);
 
 MerchantFrame:HookScript("OnHide", function(self)
 	if ( MerchantFrame.reagentCost and MerchantFrame.reagentCost > 0 ) then
-		CT_EH_AddExpense(MerchantFrame.reagentCost, CT_EH_REAGENT)
+		CT_EH_AddExpense(MerchantFrame.reagentCost, "Reagent")
 	end
 	if ( MerchantFrame.ammoCost and MerchantFrame.ammoCost > 0 ) then
-		CT_EH_AddExpense(MerchantFrame.ammoCost, CT_EH_AMMO)
+		CT_EH_AddExpense(MerchantFrame.ammoCost, "Ammo")
 	end
 	if ( MerchantFrame.repairCost and MerchantFrame.repairCost > 0 ) then
-		CT_EH_AddExpense(MerchantFrame.repairCost, CT_EH_REPAIR)
+		CT_EH_AddExpense(MerchantFrame.repairCost, "Repair")
 	end
 	MerchantFrame.repairCost = nil;
 	MerchantFrame.reagentCost = nil;
 	MerchantFrame.ammoCost = nil;
 end);
 
+local CT_EH_SCANFORREAGENTS =
+{
+	"Arcane Powder",
+	"Ankh",
+	"Ashwood Seed",
+	"Corpse Dust",
+	"Demonic Figurine",
+	"Devout Candle",
+	"Flash Powder",
+	"Flintweed Seed",
+	"Holy Candle",
+	"Hornbeam Seed",
+	"Infernal Stone",
+	"Ironwood Seed",
+	"Maple Seed",
+	"Rune of Portals",
+	"Rune of Teleportation",
+	"Sacred Candle",
+	"Starleaf Seed",
+	"Stranglethorn Seed",
+	"Symbol of Divinity",
+	"Symbol of Divinity",
+	"Symbol of Kings",
+	"Wild Berries",
+	"Wild Quillvine",
+	"Wild Spineleaf",
+	"Wild Thornroot",
+}
+
+local CT_EH_SCANFORAMMO =
+{
+	"Accurate Slugs",
+	"Balanced Throwing Dagger",
+	"Blackflight Arrow",
+	"Blacksteel Throwing Dagger",
+	"Crude Throwing Axe",
+	"Deadly Throwing Axe",
+	"Felbane Slugs",
+	"Frostbite Bullets",
+	"Gleaming Throwing Axe",
+	"Halaani Grimshot",
+	"Halaani Razorshaft",
+	"Heavy Throwing Dagger",
+	"Heavy Shot",
+	"Hellfire Shot",
+	"Ice Threaded Arrow",
+	"Ice Threaded Bullet",
+	"Impact Shot",
+	"Ironbite Shell",
+	"Jagged Arrow",
+	"Jagged Throwing Axe",
+	"Keen Throwing Knife",
+	"Light Shot",
+	"Mysterious Arrow",
+	"Mysterious Shell",
+	"Razor Arrow",
+	"Rough Arrow",
+	"Scout's Arrow",
+	"Sharp Arrow",
+	"Sharp Throwing Axe",
+	"Small Throwing Knife",
+	"Smooth Pebble",
+	"Solid Shot",
+	"Terrorshaft Arrow",
+	"Timeless Arrow",
+	"Timeless Shell",
+	"Warden's Arrow",
+	"Weighted Throwing Axe",
+	"Wicked Arrow",
+	"Wicked Throwing Dagger",
+}
+
 -- Hook BuyMerchantItem()
+local localizedReagents, localizedAmmo;
 local CT_EH_oldBuyMerchantItem = BuyMerchantItem;
 function BuyMerchantItem(id, qty)
 	local name, texture, price, quantity, numAvailable, isUsable = GetMerchantItemInfo(id);
 	local realPrice = price*(qty or 1);
 	CT_EH_oldBuyMerchantItem(id, qty);
-	if ( MerchantFrame.reagentCost and name and CT_EH_SCANFORREAGENTS[strlower(name)] and realPrice <= GetMoney() ) then
-		MerchantFrame.reagentCost = MerchantFrame.reagentCost + realPrice;
-	end
-	if ( MerchantFrame.ammoCost and name and CT_EH_SCANFORAMMO[strlower(name)] and realPrice <= GetMoney() ) then
-		MerchantFrame.ammoCost = MerchantFrame.ammoCost + realPrice;
+	if (name) then
+		if (not localizedReagents or not localizedAmmo) then
+			localizedReagents = { };
+			for __, val in ipairs(CT_EH_SCANFORREAGENTS) do
+				localizedReagents[L["CT_ExpenseHistory/Reagent/" .. val]] = true;
+			end
+			localizedAmmo = { };
+			for __, val in ipairs(CT_EH_SCANFORAMMO) do
+				localizedAmmo[L["CT_ExpenseHistory/Ammo/" .. val]] = true;
+			end
+		end
+		if ( MerchantFrame.reagentCost and localizedReagents[name] and realPrice <= GetMoney() ) then
+			MerchantFrame.reagentCost = MerchantFrame.reagentCost + realPrice;
+		end
+		if ( MerchantFrame.ammoCost and localizedAmmo[name] and realPrice <= GetMoney() ) then
+			MerchantFrame.ammoCost = MerchantFrame.ammoCost + realPrice;
+		end
 	end
 end
 
 function CT_EH_SendMail(target, subject, body)
 	local price = SendMailCostMoneyFrame.staticMoney;
 	if ( price <= GetMoney() and price > 0 ) then
-		CT_EH_AddExpense(price, CT_EH_MAIL)
+		CT_EH_AddExpense(price, "Mail")
 	end
 end
 hooksecurefunc("SendMail", CT_EH_SendMail);
@@ -646,7 +745,7 @@ hooksecurefunc("SendMail", CT_EH_SendMail);
 CT_EH_oldTakeTaxiNode = TakeTaxiNode;
 function CT_EH_newTakeTaxiNode(id)
 	if ( GetMoney() >= TaxiNodeCost(id) and TaxiNodeCost(id) > 0 ) then
-		CT_EH_AddExpense(TaxiNodeCost(id), CT_EH_FLIGHT)
+		CT_EH_AddExpense(TaxiNodeCost(id), "Flight")
 	end
 	CT_EH_oldTakeTaxiNode(id);
 end

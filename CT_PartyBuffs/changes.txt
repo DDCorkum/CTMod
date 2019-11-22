@@ -1,3 +1,6 @@
+CT_PartyBuffs (8.2.5.6) 2019-10-30
+- Added more options to configure the addon
+
 CT_PartyBuffs (8.2.0.1) 2019-06-19
 - Compatibility with WoW Classic and Retail editions
 

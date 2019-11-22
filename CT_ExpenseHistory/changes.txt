@@ -1,3 +1,6 @@
+CT_ExpenseHistory (8.2.5.6) 2019-10-28
+- Adding Russian translations by CurseForge user imposeren
+
 CT_ExpenseHistory (8.0.1.0) 2018-07-17
 - Updated for 8.0.1
 
