@@ -1064,6 +1064,10 @@ function StaticCTRAFrames()
 					optionsWindowizeObject("ShowBossAuras");
 					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Auras/ShowBossCheckButton"],L["CT_RaidAssist/Options/Window/Auras/ShowBossTip"] .. "#" .. textColor1}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
 				optionsEndFrame();
+				optionsBeginFrame(-10, 15, "checkbutton#tl:10:%y#n:CTRAWindow_RemovableDebuffColorCheckButton#" .. L["CT_RaidAssist/Options/Window/Auras/RemovableDebuffColorCheckButton"]);
+					optionsWindowizeObject("RemovableDebuffColor");
+					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Auras/RemovableDebuffColorCheckButton"],L["CT_RaidAssist/Options/Window/Auras/RemovableDebuffColorTip"] .. "#" .. textColor1}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
+				optionsEndFrame();
 				
 				-- Colors
 				optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormal#Colors");
@@ -1100,7 +1104,6 @@ function StaticCTRAFrames()
 						{property = "ColorBackgroundDeadOrGhost", label = "Background Dead", tooltip = "Background when the unit is dead or a ghost", hasAlpha = "true"},
 						{property = "ColorBorder", label = "Border In Range", tooltip = "Border when the unit is within 30 yards"},
 						{property = "ColorBorderBeyondRange", label = "Border Too Far", tooltip = "Border when the unit is not found within 30 yards"},
-						--{property = "ColorBorderTargetTarget", label = "Border Aggro", tooltip = "Border when the unit is the target's target"},
 						{property = "ColorUnitFullHealthNoCombat", label = "Full Health No Combat", tooltip = "Color of the health bar at 100% outside combat"},
 						{property = "ColorUnitZeroHealthNoCombat", label = "Near Death No Combat", tooltip = "Color of the health bar when nearly dead outside combat"},
 						-- START OF LEFT COLUMN
@@ -1232,10 +1235,10 @@ function NewCTRAWindow(owningCTRAFrames)
 		["ColorBackground"] = {0.00, 0.10, 0.90, 0.50},
 		["ColorBackgroundDeadOrGhost"] = {0.10, 0.10, 0.10, 0.50},
 		["ColorBorder"] = {1.00, 1.00, 1.00, 0.75},
-		["ColorBorderTargetTarget"] = {1.00, 0.10, 0.10, 0.75},
 		["ColorBorderBeyondRange"] = {0.10, 0.10, 0.10, 0.75},
 		["ColorReadyCheckWaiting"] = {0.45, 0.45, 0.45, 1.00},
 		["ColorReadyCheckNotReady"] = {0.80, 0.45, 0.45, 1.00},
+		["RemovableDebuffColor"] = true,
 		["HealthBarAsBackground"] = false,
 		["EnablePowerBar"] = true,
 		["AuraFilterNoCombat"] = 1,
@@ -1732,6 +1735,10 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	
 	-- graphical textures and fontstrings of visualFrame
 	local background;
+	local colorBackgroundRed, colorBackgroundGreen, colorBackgroundBlue, colorBackgroundAlpha;
+	local colorBackgroundDeadOrGhostRed, colorBackgroundDeadOrGhostGreen, colorBackgroundDeadOrGhostBlue, colorBackgroundDeadOrGhostAlpha;
+	local colorBorderRed, colorBorderGreen, colorBorderBlue, colorBorderAlpha;
+	local colorBorderBeyondRangeRed, colorBorderBeyondRangeGreen, colorBorderBeyondRangeBlue, colorBorderBeyondRangeAlpha
 	local healthBarFullCombat, healthBarZeroCombat, healthBarFullNoCombat, healthBarZeroNoCombat;
 	local absorbBarFullCombat, absorbBarZeroCombat, absorbBarFullNoCombat, absorbBarZeroNoCombat;
 	local healthBarWidth;
@@ -1752,38 +1759,38 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 		background = background or visualFrame:CreateTexture(nil, "BACKGROUND");
 		background:SetPoint("TOPLEFT", visualFrame, 3, -3);
 		background:SetPoint("BOTTOMRIGHT", visualFrame, -3, 3);
-		background.colorBackgroundRed, background.colorBackgroundGreen, background.colorBackgroundBlue, background.colorBackgroundAlpha = unpack(owner:GetProperty("ColorBackground"));
-		background.colorBackgroundDeadOrGhostRed, background.colorBackgroundDeadOrGhostGreen, background.colorBackgroundDeadOrGhostBlue, background.colorBackgroundDeadOrGhostAlpha = unpack(owner:GetProperty("ColorBackgroundDeadOrGhost"));
+		colorBackgroundRed, colorBackgroundGreen, colorBackgroundBlue, colorBackgroundAlpha = unpack(owner:GetProperty("ColorBackground"));
+		colorBackgroundDeadOrGhostRed, colorBackgroundDeadOrGhostGreen, colorBackgroundDeadOrGhostBlue, colorBackgroundDeadOrGhostAlpha = unpack(owner:GetProperty("ColorBackgroundDeadOrGhost"));
 		
 		visualFrame:SetBackdrop({["edgeFile"] = "Interface\\Tooltips\\UI-Tooltip-Border",["edgeSize"] = 16,});
-		visualFrame.colorBorderRed, visualFrame.colorBorderGreen, visualFrame.colorBorderBlue, visualFrame.colorBorderAlpha = unpack(owner:GetProperty("ColorBorder"));
-		visualFrame.colorBorderTargetTargetRed, visualFrame.colorBorderTargetTargetGreen, visualFrame.colorBorderTargetTargetBlue, visualFrame.colorBorderTargetTargetAlpha = unpack(owner:GetProperty("ColorBorderTargetTarget"));
-		visualFrame.colorBorderBeyondRangeRed, visualFrame.colorBorderBeyondRangeGreen, visualFrame.colorBorderBeyondRangeBlue, visualFrame.colorBorderBeyondRangeAlpha = unpack(owner:GetProperty("ColorBorderBeyondRange"));
+		colorBorderRed, colorBorderGreen, colorBorderBlue, colorBorderAlpha = unpack(owner:GetProperty("ColorBorder"));
+		colorBorderBeyondRangeRed, colorBorderBeyondRangeGreen, colorBorderBeyondRangeBlue, colorBorderBeyondRangeAlpha = unpack(owner:GetProperty("ColorBorderBeyondRange"));
 	end
 	
 	-- updates the background and borders, but must not be run until configureBackdrop() has been done
 	local function updateBackdrop()
 		if (shownUnit and UnitExists(shownUnit)) then
 			if (UnitIsDeadOrGhost(shownUnit)) then
-				background:SetColorTexture(background.colorBackgroundDeadOrGhostRed, background.colorBackgroundDeadOrGhostGreen, background.colorBackgroundDeadOrGhostBlue, background.colorBackgroundDeadOrGhostAlpha);
-			else
-				background:SetColorTexture(background.colorBackgroundRed, background.colorBackgroundGreen, background.colorBackgroundBlue, background.colorBackgroundAlpha);
-			end
-			if (UnitInRange(shownUnit) or UnitIsUnit("player", shownUnit)) then
-				--if (UnitExists("target") and UnitIsUnit(shownUnit, "targettarget") and UnitIsEnemy("player", "target")) then
-				--	visualFrame:SetBackdropBorderColor(visualFrame.colorBorderTargetTargetRed, visualFrame.colorBorderTargetTargetGreen, visualFrame.colorBorderTargetTargetBlue, visualFrame.colorBorderTargetTargetAlpha);
-				--else
-				--	visualFrame:SetBackdropBorderColor(visualFrame.colorBorderRed, visualFrame.colorBorderGreen, visualFrame.colorBorderBlue, visualFrame.colorBorderAlpha);
-				--end
-				local removableDebuff = select(4, UnitAura(shownUnit, 1, "RAID HARMFUL"));
-				if (removableDebuff) then
-					local color = DebuffTypeColor[removableDebuff];
-					visualFrame:SetBackdropBorderColor(color.r, color.g, color.b, visualFrame.colorBorderAlpha);
+				background:SetColorTexture(colorBackgroundDeadOrGhostRed, colorBackgroundDeadOrGhostGreen, colorBackgroundDeadOrGhostBlue, colorBackgroundDeadOrGhostAlpha);
+				if (UnitInRange(shownUnit) or UnitIsUnit(shownUnit, "player")) then
+					visualFrame:SetBackdropBorderColor(colorBorderRed, colorBorderGreen, colorBorderBlue, colorBorderAlpha);
 				else
-					visualFrame:SetBackdropBorderColor(visualFrame.colorBorderRed, visualFrame.colorBorderGreen, visualFrame.colorBorderBlue, visualFrame.colorBorderAlpha);
+					visualFrame:SetBackdropBorderColor(colorBorderBeyondRangeRed, colorBorderBeyondRangeGreen, colorBorderBeyondRangeBlue, colorBorderBeyondRangeAlpha);
 				end
 			else
-				visualFrame:SetBackdropBorderColor(visualFrame.colorBorderBeyondRangeRed, visualFrame.colorBorderBeyondRangeGreen, visualFrame.colorBorderBeyondRangeBlue, visualFrame.colorBorderBeyondRangeAlpha);
+				local removableDebuff = select(4, UnitAura(shownUnit, 1, "RAID HARMFUL"));
+				if (removableDebuff and owner:GetProperty("RemovableDebuffColor")) then
+					local color = DebuffTypeColor[removableDebuff] or {r = 1, g = 0, b = 0};
+					background:SetColorTexture(colorBackgroundRed/2 + color.r/2, colorBackgroundGreen/2 + color.g/2, colorBackgroundBlue/2 + color.b/2, colorBackgroundAlpha);
+					if (UnitInRange(shownUnit) or UnitIsUnit(shownUnit, "player")) then
+						visualFrame:SetBackdropBorderColor(color.r, color.g, color.b, colorBorderAlpha);
+					else
+						visualFrame:SetBackdropBorderColor(colorBorderBeyondRangeRed, colorBorderBeyondRangeGreen, colorBorderBeyondRangeBlue, colorBorderBeyondRangeAlpha);
+					end
+				else
+					background:SetColorTexture(colorBackgroundRed, colorBackgroundGreen, colorBackgroundBlue, colorBackgroundAlpha);
+					visualFrame:SetBackdropBorderColor(colorBorderRed, colorBorderGreen, colorBorderBlue, colorBorderAlpha);
+				end
 			end
 		end	
 

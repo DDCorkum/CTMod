@@ -62,6 +62,8 @@ L["CT_RaidAssist/Options/Window/Auras/CombatLabel"] = "Show during combat:"
 L["CT_RaidAssist/Options/Window/Auras/DropDown"] = "#Group buffs I can apply#Debuffs I can remove#All group buffs#All debuffs#Group buffs I applied#Nothing"
 L["CT_RaidAssist/Options/Window/Auras/Heading"] = "Buffs and Debuffs"
 L["CT_RaidAssist/Options/Window/Auras/NoCombatLabel"] = "Show out of combat:"
+L["CT_RaidAssist/Options/Window/Auras/RemovableDebuffColorCheckButton"] = "Add colour to removable debuffs"
+L["CT_RaidAssist/Options/Window/Auras/RemovableDebuffColorTip"] = "Changes the background and border when you can remove a harmful debuff."
 L["CT_RaidAssist/Options/Window/Auras/ShowBossCheckButton"] = "Show important boss auras at middle"
 L["CT_RaidAssist/Options/Window/Auras/ShowBossTip"] = [=[Certain boss encounters create important buffs/debuffs critical to the fight.
 These will appear larger at the middle for emphasis.]=]
