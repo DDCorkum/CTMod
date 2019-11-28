@@ -212,6 +212,12 @@ module.CTRA_Configuration_BossAuras =
 	[298014] = 3,		-- The Eternal Palace - Queen Azshara: Cold Blast
 	[300743] = 2,		-- The Eternal Palace - Queen Azshara: Void Touched
 	[298569] = 1,		-- The Eternal Palace - Queen Azshara: Drained Soul
+	[307056] = 0,		-- Ny'alotha - Wrathion: Burning Madness
+	[306015] = 5,		-- Ny'alotha - Wrathion: Searing Armor
+	[313250] = 50,		-- Ny'alotha - Wrathion: Creeping Madness
+	[307839] = 0,		-- Ny'alotha - Maut: Devoured Abyss
+	[307399] = 5,		-- Ny'alotha - Maut: Arcane Wounds
+	[314337] = 1,		-- Ny'alotha - Maut: Ancient Curse
 }
 
 

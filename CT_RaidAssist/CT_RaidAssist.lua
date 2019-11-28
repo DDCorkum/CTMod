@@ -1781,9 +1781,9 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				local removableDebuff = select(4, UnitAura(shownUnit, 1, "RAID HARMFUL"));
 				if (removableDebuff and owner:GetProperty("RemovableDebuffColor")) then
 					local color = DebuffTypeColor[removableDebuff] or {r = 1, g = 0, b = 0};
-					background:SetColorTexture(colorBackgroundRed/2 + color.r/2, colorBackgroundGreen/2 + color.g/2, colorBackgroundBlue/2 + color.b/2, colorBackgroundAlpha);
+					background:SetColorTexture(colorBackgroundRed/2 + color.r/2, colorBackgroundGreen/2 + color.g/2, colorBackgroundBlue/2 + color.b/2, colorBackgroundAlpha*0.8 + 0.2);
 					if (UnitInRange(shownUnit) or UnitIsUnit(shownUnit, "player")) then
-						visualFrame:SetBackdropBorderColor(color.r, color.g, color.b, colorBorderAlpha);
+						visualFrame:SetBackdropBorderColor(color.r, color.g, color.b, colorBorderAlpha*0.8 + 0.2);
 					else
 						visualFrame:SetBackdropBorderColor(colorBorderBeyondRangeRed, colorBorderBeyondRangeGreen, colorBorderBeyondRangeBlue, colorBorderBeyondRangeAlpha);
 					end
@@ -2193,33 +2193,40 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	
 	local configureAuras = function()
 		aura1Texture = aura1Texture or visualFrame:CreateTexture(nil, "OVERLAY");
-		aura1Texture:SetSize(9,9);
+		aura1Texture:SetSize(10,10);
 		aura1Texture:SetPoint("TOPRIGHT", visualFrame, -5, -5);
+		aura1Texture:SetTexCoord(0.04,0.96,0.04,0.96);
 
 		aura2Texture = aura2Texture or visualFrame:CreateTexture(nil, "OVERLAY");
-		aura2Texture:SetSize(9,9);
+		aura2Texture:SetSize(10,10);
 		aura2Texture:SetPoint("TOPRIGHT", visualFrame, -5, -15);
+		aura2Texture:SetTexCoord(0.04,0.96,0.04,0.96);
 		
 		aura3Texture = aura3Texture or visualFrame:CreateTexture(nil, "OVERLAY");
-		aura3Texture:SetSize(9,9);
+		aura3Texture:SetSize(10,10);
 		aura3Texture:SetPoint("TOPRIGHT", visualFrame, -5, -25);
+		aura3Texture:SetTexCoord(0.04,0.96,0.04,0.96);
 
 		aura4Texture = aura4Texture or visualFrame:CreateTexture(nil, "OVERLAY");
-		aura4Texture:SetSize(9,9);
+		aura4Texture:SetSize(10,10);
 		aura4Texture:SetPoint("TOPRIGHT", visualFrame, -15, -25);
+		aura4Texture:SetTexCoord(0.04,0.96,0.04,0.96);
 
 		aura5Texture = aura5Texture or visualFrame:CreateTexture(nil, "OVERLAY");
-		aura5Texture:SetSize(9,9);
+		aura5Texture:SetSize(10,10);
 		aura5Texture:SetPoint("TOPRIGHT", visualFrame, -15, -15);
+		aura5Texture:SetTexCoord(0.04,0.96,0.04,0.96);
 		
 		auraBoss1Texture = auraBoss1Texture or visualFrame:CreateTexture(nil, "OVERLAY");
 		auraBoss1Texture:SetSize(11,11);
+		auraBoss1Texture:SetTexCoord(0.04,0.96,0.04,0.96);
 		auraBoss1CountFontString = auraBoss1CountFontString or visualFrame:CreateFontString(nil, "OVERLAY");
-		auraBoss1CountFontString:SetFont("Fonts\\ARIALN.TTF", 6, "");
+		auraBoss1CountFontString:SetFont("Fonts\\ARIALN.TTF", 7, "");
 		auraBoss1CountFontString:SetPoint("TOP", auraBoss1Texture, "BOTTOM");
 		
 		auraBoss2Texture = auraBoss2Texture or visualFrame:CreateTexture(nil, "OVERLAY");
 		auraBoss2Texture:SetSize(11,11);
+		auraBoss2Texture:SetTexCoord(0.04,0.96,0.04,0.96);
 		auraBoss2Texture:SetPoint("LEFT", auraBoss1Texture, "RIGHT", 1, 0);
 		auraBoss2CountFontString = auraBoss2CountFontString or visualFrame:CreateFontString(nil, "OVERLAY");
 		auraBoss2CountFontString:SetFont("Fonts\\ARIALN.TTF", 7, "");
@@ -2227,6 +2234,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 		
 		auraBoss3Texture = auraBoss3Texture or visualFrame:CreateTexture(nil, "OVERLAY");
 		auraBoss3Texture:SetSize(11,11);
+		auraBoss3Texture:SetTexCoord(0.04,0.96,0.04,0.96);
 		auraBoss3Texture:SetPoint("LEFT", auraBoss2Texture, "RIGHT", 1, 0);
 		auraBoss3CountFontString = auraBoss3CountFontString or visualFrame:CreateFontString(nil, "OVERLAY");
 		auraBoss3CountFontString:SetFont("Fonts\\ARIALN.TTF", 7, "");
