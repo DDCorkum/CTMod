@@ -1,3 +1,7 @@
+CT_MailMod (8.2.5.7) 2019-12-08
+- Timestamps and tooltips added to the mail log
+- Russian localization (courtesy: imposeren)
+
 CT_MailMod (8.2.5.5) 2019-10-18
 - Fix to text on the open/return buttons after actions performed
 - Further localization

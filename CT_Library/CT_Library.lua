@@ -19,7 +19,7 @@
 -----------------------------------------------
 -- Initialization
 
-local LIBRARY_VERSION = 8.256;
+local LIBRARY_VERSION = 8.257;
 local LIBRARY_NAME = "CT_Library";
 
 local _G = getfenv(0);
@@ -229,7 +229,7 @@ function lib:displayTooltip(obj, text, anchor, offx, offy, owner)
 	if ( not anchor ) then
 		GameTooltip_SetDefaultAnchor(tooltip, owner);
 	elseif (anchor == "CT_ABOVEBELOW") then
-		if (owner:GetBottom() <= UIParent:GetTop() - owner:GetTop()) then
+		if (owner:GetBottom() * owner:GetEffectiveScale() <= (UIParent:GetTop() * UIParent:GetEffectiveScale()) - (owner:GetTop() * owner:GetEffectiveScale())) then
 			tooltip:SetOwner(owner, "ANCHOR_TOP", offx or 0, offy or 0);
 		else
 			tooltip:SetOwner(owner, "ANCHOR_BOTTOM", offx or 0, -(offy or 0));
@@ -1426,15 +1426,16 @@ objectHandlers.backdrop = function(self, parent, name, virtual, option, backdrop
 end
 
 -- FontString
+-- #r:b:g:j or #j will set colour and justification.  j can be l,r,c (horizontal) or t, b, m (vertical).
+-- If j is a number and only one point is defined and the fontstring's width exceeds this number, then the font will be shrunk.  This is meant for localizing single-line labels/headings in small spaces.
 objectHandlers.font = function(self, parent, name, virtual, option, text, data, layer)
 	-- Data
 	local r, g, b, justify;
 	local a, b, c, d = splitString(data, colonSeparator);
 
 	-- Parse our attributes
-	r = tonumber(a);
-	if ( r ) then
-		g, b = tonumber(b), tonumber(c);
+	if ( tonumber(a) and tonumber(b) and tonumber(c) ) then
+		r, g, b = tonumber(a), tonumber(b), tonumber(c);
 		justify = d;
 	else
 		justify = a;
@@ -1445,19 +1446,23 @@ objectHandlers.font = function(self, parent, name, virtual, option, text, data, 
 
 	-- Justify
 	if ( justify ) then
-		local h = match(justify, "[lLrR]");
-		local v = match(justify, "[tTbB]");
+		local h = match(justify, "[lLrRcC]");
+		local v = match(justify, "[tTbBmM]");
 
 		if ( h == "l" ) then
 			fontString:SetJustifyH("LEFT");
 		elseif ( h == "r" ) then
 			fontString:SetJustifyH("RIGHT");
+		elseif ( h == "c" ) then
+			fontString:SetJustifyH("CENTER");
 		end
 
 		if ( v == "t" ) then
 			fontString:SetJustifyV("TOP");
 		elseif ( v == "b" ) then
 			fontString:SetJustifyV("BOTTOM");
+		elseif ( v == "m") then
+			fontString:SetJustifyV("MIDDLE");
 		end
 	end
 
@@ -1468,6 +1473,12 @@ objectHandlers.font = function(self, parent, name, virtual, option, text, data, 
 
 	-- Text
 	fontString:SetText(self:getText(text) or _G[text] or text);
+	
+	-- Max Width (to fit localizations)
+	if (tonumber(justify) and fontString:GetWidth() > tonumber(justify) and fontString:GetNumPoints == 1) then
+		local fontName, fontHeight, fontFlags = fontString:GetFont();
+		fontString:SetFont(fontName, fontHeight * tonumber(justify) / fontString:GetWidth(), fontFlags)
+	end
 
 	return fontString;
 end

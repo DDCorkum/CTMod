@@ -65,6 +65,16 @@ in %d seconds]=]
 L["CT_MailMod/MAILBOX_OPTIONS_TIP1"] = [=[To access CT_MailMod options and tips, click this button or type /ctmail.
 Right click to toggle the mail log window or type /maillog.]=]
 L["CT_MailMod/MAILBOX_OVERFLOW_COUNT"] = "Overflow: %d"
+L["CT_MailMod/MailLog/Date"] = "Date"
+L["CT_MailMod/MailLog/Delete"] = "Delete"
+L["CT_MailMod/MailLog/Items"] = "Items"
+L["CT_MailMod/MailLog/Money"] = "Money"
+L["CT_MailMod/MailLog/Open"] = "Open"
+L["CT_MailMod/MailLog/Receiver"] = "Receiver"
+L["CT_MailMod/MailLog/Return"] = "Return"
+L["CT_MailMod/MailLog/Send"] = "Send"
+L["CT_MailMod/MailLog/Sender"] = "Sender"
+L["CT_MailMod/MailLog/Subject"] = "Subject"
 L["CT_MailMod/MONEY_DECREASED"] = "Your money decreased by: %s"
 L["CT_MailMod/MONEY_INCREASED"] = "Your money increased by: %s"
 L["CT_MailMod/NOTHING_SELECTED"] = "No messages are selected."
@@ -204,6 +214,16 @@ L["CT_MailMod/MAILBOX_OPTIONS_TIP1"] = [=[Cliquez ce bouton, tapez "/ctmail" ou 
 
 Faites un clic-droit ou tapez "/mailog" pour ouvrir le journal de courrier.]=]
 L["CT_MailMod/MAILBOX_OVERFLOW_COUNT"] = "Débordement : %d"
+L["CT_MailMod/MailLog/Date"] = "La date"
+L["CT_MailMod/MailLog/Delete"] = "Supprimer"
+L["CT_MailMod/MailLog/Items"] = "Les objets"
+L["CT_MailMod/MailLog/Money"] = "L'argent"
+L["CT_MailMod/MailLog/Open"] = "Ouvrir"
+L["CT_MailMod/MailLog/Receiver"] = "Le receveur"
+L["CT_MailMod/MailLog/Return"] = "Renvoyer"
+L["CT_MailMod/MailLog/Send"] = "Envoyer"
+L["CT_MailMod/MailLog/Sender"] = "L'expéditeur"
+L["CT_MailMod/MailLog/Subject"] = "Le sujet"
 L["CT_MailMod/MONEY_DECREASED"] = "Votre argent diminue de : %s"
 L["CT_MailMod/MONEY_INCREASED"] = "Votre argent augmente de : %s"
 L["CT_MailMod/NOTHING_SELECTED"] = "Aucune courrier sélectionné."
@@ -226,6 +246,7 @@ L["CT_MailMod/SELECT_MESSAGE_TIP2"] = [=[|c0080A0FFClic:|r Sélecter un seul cou
 |c0080A0FFMaj-clic:|r Commencer une gamme
 |c0080A0FFMaj-clic-gauche:|r Finir la gamme et sélectionner les courriers
 |c0080A0FFMaj-clic-droite:|r Finir la gamme et désélectionner les courriers]=]
+L["CT_MailMod/Send/AutoComplete/Heading"] = "La saisie automatique"
 L["CT_MailMod/Send/AutoComplete/Tip"] = "Appuyez pour changer les filtres"
 L["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_COPPER"] = "%d cuivre"
 L["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_GOLD"] = "%d or %d argent %d cuivre"
@@ -283,6 +304,11 @@ L["CT_MailMod/Options/Reset/Heading"] = "Réinitialiser les options"
 L["CT_MailMod/Options/Reset/Line 1"] = "Note: Ce bouton va réinitialiser les options aux valeurs défauts et recharger l'interface"
 L["CT_MailMod/Options/Reset/ResetAllCheckbox"] = "Réinitialiser les options pour tous les personnages"
 L["CT_MailMod/Options/Reset/ResetButton"] = "Réinitialiser"
+L["CT_MailMod/Options/SendMail/AltClickCheckButton"] = "Alt-clic-gauche ajoute des objets à l'onglet Envoyer un Message"
+L["CT_MailMod/Options/SendMail/FilterAutoCompleteCheckButton"] = "Filtrer la saisie automatique du destinataire"
+L["CT_MailMod/Options/SendMail/FilterAutoCompleteTip"] = "Ajouter un menu à côté du destinataire pour filtrer la saisie automatique par :"
+L["CT_MailMod/Options/SendMail/Heading"] = "Envoyer un message"
+L["CT_MailMod/Options/SendMail/ReplaceSubjectCheckButton"] = "Remplir le sujet vide avec le montant d'argent"
 L["CT_MailMod/Options/Tips/Heading"] = "Des conseils"
 L["CT_MailMod/Options/Tips/Line1"] = "Vous pouvez écrire /ctcourrier or /ctmailmod pour ouvrir ces options."
 
@@ -376,7 +402,9 @@ L["CT_MailMod/Options/General/NetIncomeCheckButton"] = "Gesamteinkommen beim Sch
 L["CT_MailMod/Options/Inbox/Checkboxes/Heading"] = "Nachrichten Kontrollkästchen"
 L["CT_MailMod/Options/Inbox/Checkboxes/Line1"] = "Für zusätzliche Info mit der Maus über das '?' fahren"
 L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewCheckButton"] = "Auswahl durch Shift-Linksklick auf einen Bereich aufheben"
+L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewTip"] = "Auswahl durch Shift-Doppelklick treffen oder Auswahl entfernen durch Shift-Linksklick und dann Shift-Rechtsklick. Diese Option entfernt dabei vorherige Auswahlen."
 L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewCheckButton"] = "Auswahl durch Strg-Linksklick auf einen Absender aufheben"
+L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewTip"] = "Shift-Klick um alle Nachrichten vom gleichen Absender zu wählen oder Shift-Rechtsklick um alle Nachrichten von anderen Absenders zu wählen. Diese Option entfernt dabei vorherige Auswahlen."
 L["CT_MailMod/Options/Inbox/Checkboxes/ShowCheckboxesCheckButton"] = "Kontrollkästchen und Öffnen/Schließen Buttons verstecken"
 L["CT_MailMod/Options/Inbox/Checkboxes/ShowNumbersCheckButton"] = "Nachrichtenanzahl auf Kontrollkästchen anzeigen"
 L["CT_MailMod/Options/Inbox/Heading"] = "Posteingang"
@@ -400,6 +428,7 @@ L["CT_MailMod/Options/MailLog/LogSentCheckButton"] = "Gesendete Briefe protokoll
 L["CT_MailMod/Options/MailLog/PrintCheckButton"] = "Protokollnachrichten im Chat ausgeben"
 L["CT_MailMod/Options/MailLog/SaveCheckButton"] = "Protokollnachrichten im Briefprotokoll speichern"
 L["CT_MailMod/Options/MailLog/ScaleSliderLabel"] = "Nachrichtenprotokoll Maßstab = <value>"
+L["CT_MailMod/Options/MailLog/Tip"] = "Gebe /maillog ein um ein Protokoll aller gesendeten/empfangenen Briefe anzuzeigen. Die Fenster des Protokolls kann durch Ziehen an den linken oder rechten Rändern angepasst werden oder durch den Schieberegler hierunter im Maßstab verstellt werden."
 L["CT_MailMod/Options/Reset/Heading"] = "Optionen zurücksetzen"
 L["CT_MailMod/Options/Reset/Line 1"] = "Hinweis: Setzt Optionen auf Standardwerte zurück und lädt das Interface neu."
 L["CT_MailMod/Options/Reset/ResetAllCheckbox"] = "Optionen für alle Charaktere zurücksetzen"
@@ -411,6 +440,30 @@ L["CT_MailMod/Options/SendMail/Heading"] = "Briefe versenden"
 L["CT_MailMod/Options/SendMail/ReplaceSubjectCheckButton"] = "Leeren Betreff durch Geldbetrag ersetzen"
 L["CT_MailMod/Options/Tips/Heading"] = "Hinweise"
 L["CT_MailMod/Options/Tips/Line1"] = "Durch Eingabe von  /ctmail oder /ctmailmod wird dieses Optionsfenster direkt geöffnet."
+
+
+--esES (credits: n/a)
+
+elseif (GetLocale() == "esES") then
+
+L["CT_MailMod/DELETE_POPUP2"] = "algún dinero y %s"
+L["CT_MailMod/DELETE_POPUP3"] = "algún dinero y %d objetos incluyendo %s"
+
+
+--reRU (credits: imposeren)
+
+elseif (GetLocale() == "ruRU") then
+
+L["CT_MailMod/Inbox/OpenSelectedButton"] = "Открыть"
+L["CT_MailMod/Inbox/OpenSelectedTip"] = "Открыть выбранные сообщения"
+L["CT_MailMod/Inbox/ReturnSelectedButton"] = "Вернуть"
+L["CT_MailMod/Inbox/ReturnSelectedTip"] = "Вернуть выбранные сообщения"
+L["CT_MailMod/Options/Bags/CloseLabel"] = "Когда закрывается почта:"
+L["CT_MailMod/Options/Bags/OpenAllCheckButton"] = "Открыть все сумки"
+L["CT_MailMod/Options/Bags/OpenLabel"] = "Когда открывается почта:"
+L["CT_MailMod/Options/General/BlockTradesCheckButton"] = "Блокировать обмен когда используется почта"
+L["CT_MailMod/Options/General/NetIncomeCheckButton"] = "Показывать общую прибыль по закрытию почты"
+L["CT_MailMod/Options/Inbox/Checkboxes/Line1"] = "Наведите мышь на '?' для доп. информации"
 
 
 end

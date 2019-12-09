@@ -311,23 +311,35 @@ do
 --			"texture#s:40:20#l:5:0#i:icon",
 			"font#s:50:20#l:5:0#i:icontext#v:GameFontNormal##1:1:1:l",
 			"font#s:100:20#l:55:0#i:receiver#v:GameFontNormal##1:1:1:l",
-			"font#s:100:20#l:160:0#i:sender#v:GameFontNormal##1:1:1:l",
-			"font#s:200:20#l:265:0#i:subject#v:ChatFontNormal##1:1:1:l",
+			"font#s:100:20#l:155:0#i:sender#v:GameFontNormal##1:1:1:l",
+			"font#s:60:20#l:255:0#i:date#v:GameFontNormal##1:1:1:c",
+			"font#s:150:20#l:315:0#i:subject#v:ChatFontNormal##1:1:1:l",
 			"font#tl:55:0#br:-5:0#i:message#v:GameFontNormal##1:0:0:l",
 			"font#tl:475:0#br:-5:0#i:comment#v:GameFontNormal##1:0:0:l",
 			-- Having a moneyframe "here", but creating it dynamically later
 			-- Having several icons "here", but creating them dynamically later
+			["onenter"] = function(self)
+				module:displayTooltip(self,
+				{
+					self.icontext:GetText() or "", 
+					self.sender:GetText() and "|cffcccccc" .. module.text["CT_MailMod/MailLog/Receiver"] .. " -|r " .. self.sender:GetText() .. "#1:1:1", 
+					self.receiver:GetText() and "|cffcccccc" .. module.text["CT_MailMod/MailLog/Sender"] .. " -|r " .. self.receiver:GetText() .. "#1:1:1", 
+					self.timestamp and "|cffcccccc" .. module.text["CT_MailMod/MailLog/Date"] .. " -|r " .. date("%Y-%m-%d %H:%M:%S", self.timestamp) .. "#1:1:1", 
+					self.subject:GetText() and "|cffcccccc" .. module.text["CT_MailMod/MailLog/Subject"] .. " -|r " .. gsub(self.subject:GetText(),"#","~") .. "#1:1:1"
+				}, "CT_ABOVEBELOW", 0, 0, CT_MailMod_MailLog);
+			end
 		}
 
 		return "frame#n:CT_MailMod_MailLog#s:" .. defaultLogWidth .. ":500", {
 			"backdrop#tooltip#0:0:0:0.75",
 			"font#t:0:-10#v:GameFontNormalHuge#" .. module.text["CT_MailMod/MAIL_LOG"] .. "#1:1:1",
 
-			"font#tl:60:-47#i:receiverHeading#v:GameFontNormalLarge#Receiver#1:1:1",
-			"font#tl:165:-47#i:senderHeading#v:GameFontNormalLarge#Sender#1:1:1",
-			"font#tl:270:-47#i:subjectHeading#v:GameFontNormalLarge#Subject#1:1:1",
-			"font#tl:475:-47#i:moneyHeading#v:GameFontNormalLarge#Money#1:1:1",
-			"font#tl:553:-47#i:itemsHeading#v:GameFontNormalLarge#Items#1:1:1",
+			"font#tl:60:-47#i:receiverHeading#v:GameFontNormalLarge#" .. module.text["CT_MailMod/MailLog/Receiver"] .. "#1:1:1:100",
+			"font#tl:160:-47#i:senderHeading#v:GameFontNormalLarge#" .. module.text["CT_MailMod/MailLog/Sender"] .. "#1:1:1:100",
+			"font#tl:265:-47#i:dateHeading#v:GameFontNormalLarge#" .. module.text["CT_MailMod/MailLog/Date"] .. "#1:1:1:55",
+			"font#tl:320:-47#i:subjectHeading#v:GameFontNormalLarge#" .. module.text["CT_MailMod/MailLog/Subject"] .. "#1:1:1:150",
+			"font#tl:475:-47#i:moneyHeading#v:GameFontNormalLarge#" .. module.text["CT_MailMod/MailLog/Money"] .. "#1:1:1:78:",
+			"font#tl:553:-47#i:itemsHeading#v:GameFontNormalLarge#" .. module.text["CT_MailMod/MailLog/Items"] .. "#1:1:1:100",
 
 			--"font#tl:20:-40#v:GameFontNormalLarge#Filter:#1:1:1",
 			--"dropdown#n:CT_MAILMOD_MAILLOGDROPDOWN1#tl:80:-43#All Mail#Incoming Mail#Outgoing Mail",
@@ -606,6 +618,10 @@ do
 
 				frame.receiver:SetText(receiver);
 				frame.sender:SetText(sender);
+				frame.date:SetText(
+					((timestamp > time() - 30000000) and date("%b %d", timestamp))
+					or date("%y%m%d", timestamp)
+				);
 				frame.subject:SetText(subject);
 				frame.message:SetText("");
 				frame.comment:SetText("");
@@ -639,13 +655,13 @@ do
 			-- Icon
 --			frame.icon:SetTexture("Interface\\AddOns\\CT_MailMod\\Images\\mail_"..type);
 			if (type == "returned") then
-				frame.icontext:SetText("Return");
+				frame.icontext:SetText(module.text["CT_MailMod/MailLog/Return"]);
 			elseif (type == "deleted") then
-				frame.icontext:SetText("Delete");
+				frame.icontext:SetText(module.text["CT_MailMod/MailLog/Delete"]);
 			elseif (type == "outgoing") then
-				frame.icontext:SetText("Send");
+				frame.icontext:SetText(module.text["CT_MailMod/MailLog/Send"]);
 			elseif (type == "incoming") then
-				frame.icontext:SetText("Open");
+				frame.icontext:SetText(module.text["CT_MailMod/MailLog/Open"]);
 			else
 				frame.icontext:SetText("");
 			end
@@ -703,7 +719,7 @@ do
 	resizeMailLog = function(logFrame)
 		local tostring = tostring;
 		local diff = logFrame:GetWidth() - defaultLogWidth;
-		local subjectWidth = 200 + diff;
+		local subjectWidth = 155 + diff;			-- was 200 until CTMod 8.2.5.7 and the addition of a date column
 		local children = logFrame.scrollChildren;
 
 		logFrame.moneyHeading:ClearAllPoints();
