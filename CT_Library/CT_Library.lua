@@ -1475,7 +1475,7 @@ objectHandlers.font = function(self, parent, name, virtual, option, text, data, 
 	fontString:SetText(self:getText(text) or _G[text] or text);
 	
 	-- Max Width (to fit localizations)
-	if (tonumber(justify) and fontString:GetWidth() > tonumber(justify) and fontString:GetNumPoints == 1) then
+	if (tonumber(justify) and fontString:GetWidth() > tonumber(justify) and fontString:GetNumPoints() == 1) then
 		local fontName, fontHeight, fontFlags = fontString:GetFont();
 		fontString:SetFont(fontName, fontHeight * tonumber(justify) / fontString:GetWidth(), fontFlags)
 	end
