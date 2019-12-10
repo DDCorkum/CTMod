@@ -1799,7 +1799,11 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 					end
 				else
 					background:SetColorTexture(colorBackgroundRed, colorBackgroundGreen, colorBackgroundBlue, colorBackgroundAlpha);
-					visualFrame:SetBackdropBorderColor(colorBorderRed, colorBorderGreen, colorBorderBlue, colorBorderAlpha);
+					if (UnitInRange(shownUnit) or UnitIsUnit(shownUnit, "player")) then
+						visualFrame:SetBackdropBorderColor(colorBorderRed, colorBorderGreen, colorBorderBlue, colorBorderAlpha);
+					else
+						visualFrame:SetBackdropBorderColor(colorBorderBeyondRangeRed, colorBorderBeyondRangeGreen, colorBorderBeyondRangeBlue, colorBorderBeyondRangeAlpha);
+					end
 				end
 			end
 		end	
