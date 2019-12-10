@@ -1064,6 +1064,10 @@ function StaticCTRAFrames()
 					optionsWindowizeObject("ShowBossAuras");
 					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Auras/ShowBossCheckButton"],L["CT_RaidAssist/Options/Window/Auras/ShowBossTip"] .. "#" .. textColor1}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
 				optionsEndFrame();
+				optionsBeginFrame(-10, 15, "checkbutton#tl:10:%y#n:CTRAWindow_ShowReverseCooldownCheckButton#" .. L["CT_RaidAssist/Options/Window/Auras/ShowReverseCooldownCheckButton"]);
+					optionsWindowizeObject("ShowReverseCooldown");
+					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Auras/ShowReverseCooldownCheckButton"],L["CT_RaidAssist/Options/Window/Auras/ShowReverseCooldownTip"] .. "#" .. textColor1}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
+				optionsEndFrame();
 				optionsBeginFrame(-10, 15, "checkbutton#tl:10:%y#n:CTRAWindow_RemovableDebuffColorCheckButton#" .. L["CT_RaidAssist/Options/Window/Auras/RemovableDebuffColorCheckButton"]);
 					optionsWindowizeObject("RemovableDebuffColor");
 					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Auras/RemovableDebuffColorCheckButton"],L["CT_RaidAssist/Options/Window/Auras/RemovableDebuffColorTip"] .. "#" .. textColor1}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
@@ -1243,7 +1247,8 @@ function NewCTRAWindow(owningCTRAFrames)
 		["EnablePowerBar"] = true,
 		["AuraFilterNoCombat"] = 1,
 		["AuraFilterCombat"] = 2,
-		["ShowBossAuras"] = true;
+		["ShowBossAuras"] = true,
+		["ShowReverseCooldown"] = true,
 		["EnableTargetFrame"] = false,
 	};
 
@@ -1306,6 +1311,7 @@ function NewCTRAWindow(owningCTRAFrames)
 			
 			-- window that player frames reside in
 			windowFrame = CreateFrame("Frame", nil, UIParent);
+			windowFrame:SetScale((module:getGameVersion() == CT_GAME_VERSION_CLASSIC and 1) or 1.03);
 			windowFrame:SetSize(1,1);	-- arbitrary, just to make it exist
 			windowFrame:SetPoint("LEFT", anchorFrame, "LEFT");
 			windowFrame:Show();
@@ -1315,7 +1321,7 @@ function NewCTRAWindow(owningCTRAFrames)
 						self:Update();
 					end
 				end
-			);		
+			);
 		end
 		
 		
@@ -1747,6 +1753,10 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	local unitNameFontStringLarge, unitNameFontStringSmall;
 	local aura1Texture, aura2Texture, aura3Texture, aura4Texture, aura5Texture;
 	local auraBoss1Texture, auraBoss2Texture, auraBoss3Texture;
+	local aura1CooldownParent, aura2CooldownParent, aura3CooldownParent, aura4CooldownParent, aura5CooldownParent;
+	local aura1Cooldown, aura2Cooldown, aura3Cooldown, aura4Cooldown, aura5Cooldown;
+	local auraBoss1CooldownParent, auraBoss2CooldownParent, auraBoss3CooldownParent;
+	local auraBoss1Cooldown, auraBoss2Cooldown, auraBoss3Cooldown;
 	local auraBoss1CountFontString, auraBoss2CountFontString, auraBoss3CountFontString;
 	local statusTexture, statusFontString, statusBackground;
 	local durabilityAverage, durabilityBroken, durabilityTime;
@@ -2192,30 +2202,74 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	end
 	
 	local configureAuras = function()
+	
+		local bgr, bgg, bgb, bga = unpack(owner:GetProperty("ColorBackground"));
+		bgr, bgg, bgb, bga = bgr * 0.5, bgg * 0.5, bgb * 0.5, bga * 0.25 + 0.5
+	
 		aura1Texture = aura1Texture or visualFrame:CreateTexture(nil, "OVERLAY");
 		aura1Texture:SetSize(10,10);
 		aura1Texture:SetPoint("TOPRIGHT", visualFrame, -5, -5);
 		aura1Texture:SetTexCoord(0.04,0.96,0.04,0.96);
+		aura1CooldownParent = aura1CooldownParent or CreateFrame("Frame", nil, visualFrame);
+		aura1CooldownParent:SetSize(10,10);
+		aura1CooldownParent:SetPoint("TOPRIGHT", visualFrame, -5, -5);
+		aura1Cooldown = aura1Cooldown or CreateFrame("Cooldown", nil, aura1CooldownParent, "CooldownFrameTemplate");
+		aura1Cooldown:SetAllPoints();
+		aura1Cooldown:SetDrawEdge(false);
+		aura1Cooldown:SetReverse(true);
+		aura1Cooldown:SetSwipeColor(bgr, bgg, bgb, bga);
 
 		aura2Texture = aura2Texture or visualFrame:CreateTexture(nil, "OVERLAY");
 		aura2Texture:SetSize(10,10);
 		aura2Texture:SetPoint("TOPRIGHT", visualFrame, -5, -15);
 		aura2Texture:SetTexCoord(0.04,0.96,0.04,0.96);
+		aura2CooldownParent = aura2CooldownParent or CreateFrame("Frame", nil, visualFrame);
+		aura2CooldownParent:SetSize(10,10);
+		aura2CooldownParent:SetPoint("TOPRIGHT", visualFrame, -5, -15);
+		aura2Cooldown = aura2Cooldown or CreateFrame("Cooldown", nil, aura2CooldownParent, "CooldownFrameTemplate");
+		aura2Cooldown:SetAllPoints();
+		aura2Cooldown:SetDrawEdge(false);
+		aura2Cooldown:SetReverse(true);
+		aura2Cooldown:SetSwipeColor(bgr, bgg, bgb, bga);
 		
 		aura3Texture = aura3Texture or visualFrame:CreateTexture(nil, "OVERLAY");
 		aura3Texture:SetSize(10,10);
 		aura3Texture:SetPoint("TOPRIGHT", visualFrame, -5, -25);
 		aura3Texture:SetTexCoord(0.04,0.96,0.04,0.96);
+		aura3CooldownParent = aura3CooldownParent or CreateFrame("Frame", nil, visualFrame);
+		aura3CooldownParent:SetSize(10,10);
+		aura3CooldownParent:SetPoint("TOPRIGHT", visualFrame, -5, -25);
+		aura3Cooldown = aura3Cooldown or CreateFrame("Cooldown", nil, aura3CooldownParent, "CooldownFrameTemplate");
+		aura3Cooldown:SetAllPoints();
+		aura3Cooldown:SetDrawEdge(false);
+		aura3Cooldown:SetReverse(true);
+		aura3Cooldown:SetSwipeColor(bgr, bgg, bgb, bga);
 
 		aura4Texture = aura4Texture or visualFrame:CreateTexture(nil, "OVERLAY");
 		aura4Texture:SetSize(10,10);
 		aura4Texture:SetPoint("TOPRIGHT", visualFrame, -15, -25);
 		aura4Texture:SetTexCoord(0.04,0.96,0.04,0.96);
-
+		aura4CooldownParent = aura4CooldownParent or CreateFrame("Frame", nil, visualFrame);
+		aura4CooldownParent:SetSize(10,10);
+		aura4CooldownParent:SetPoint("TOPRIGHT", visualFrame, -15, -25);
+		aura4Cooldown = aura4Cooldown or CreateFrame("Cooldown", nil, aura4CooldownParent, "CooldownFrameTemplate");
+		aura4Cooldown:SetAllPoints();
+		aura4Cooldown:SetDrawEdge(false);
+		aura4Cooldown:SetReverse(true);
+		aura4Cooldown:SetSwipeColor(bgr, bgg, bgb, bga);
+		
 		aura5Texture = aura5Texture or visualFrame:CreateTexture(nil, "OVERLAY");
 		aura5Texture:SetSize(10,10);
 		aura5Texture:SetPoint("TOPRIGHT", visualFrame, -15, -15);
 		aura5Texture:SetTexCoord(0.04,0.96,0.04,0.96);
+		aura5CooldownParent = aura5CooldownParent or CreateFrame("Frame", nil, visualFrame);
+		aura5CooldownParent:SetSize(10,10);
+		aura5CooldownParent:SetPoint("TOPRIGHT", visualFrame, -15, -15);
+		aura5Cooldown = aura5Cooldown or CreateFrame("Cooldown", nil, aura5CooldownParent, "CooldownFrameTemplate");
+		aura5Cooldown:SetAllPoints();
+		aura5Cooldown:SetDrawEdge(false);
+		aura5Cooldown:SetReverse(true);
+		aura5Cooldown:SetSwipeColor(bgr, bgg, bgb, bga);
 		
 		auraBoss1Texture = auraBoss1Texture or visualFrame:CreateTexture(nil, "OVERLAY");
 		auraBoss1Texture:SetSize(11,11);
@@ -2223,6 +2277,14 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 		auraBoss1CountFontString = auraBoss1CountFontString or visualFrame:CreateFontString(nil, "OVERLAY");
 		auraBoss1CountFontString:SetFont("Fonts\\ARIALN.TTF", 7, "");
 		auraBoss1CountFontString:SetPoint("TOP", auraBoss1Texture, "BOTTOM");
+		auraBoss1CooldownParent = auraBoss1CooldownParent or CreateFrame("Frame", nil, visualFrame);
+		auraBoss1CooldownParent:SetSize(10,10);
+		auraBoss1CooldownParent:SetPoint("CENTER", auraBoss1Texture);
+		auraBoss1Cooldown = auraBoss1Cooldown or CreateFrame("Cooldown", nil, auraBoss1CooldownParent, "CooldownFrameTemplate");
+		auraBoss1Cooldown:SetAllPoints();
+		auraBoss1Cooldown:SetDrawEdge(false);
+		auraBoss1Cooldown:SetReverse(true);
+		auraBoss1Cooldown:SetSwipeColor(bgr, bgg, bgb, bga);
 		
 		auraBoss2Texture = auraBoss2Texture or visualFrame:CreateTexture(nil, "OVERLAY");
 		auraBoss2Texture:SetSize(11,11);
@@ -2231,6 +2293,14 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 		auraBoss2CountFontString = auraBoss2CountFontString or visualFrame:CreateFontString(nil, "OVERLAY");
 		auraBoss2CountFontString:SetFont("Fonts\\ARIALN.TTF", 7, "");
 		auraBoss2CountFontString:SetPoint("TOP", auraBoss2Texture, "BOTTOM");
+		auraBoss2CooldownParent = auraBoss2CooldownParent or CreateFrame("Frame", nil, visualFrame);
+		auraBoss2CooldownParent:SetSize(10,10);
+		auraBoss2CooldownParent:SetPoint("LEFT", auraBoss1Texture, "RIGHT", 1, 0);
+		auraBoss2Cooldown = auraBoss2Cooldown or CreateFrame("Cooldown", nil, auraBoss2CooldownParent, "CooldownFrameTemplate");
+		auraBoss2Cooldown:SetAllPoints();
+		auraBoss2Cooldown:SetDrawEdge(false);
+		auraBoss2Cooldown:SetReverse(true);
+		auraBoss2Cooldown:SetSwipeColor(bgr, bgg, bgb, bga);
 		
 		auraBoss3Texture = auraBoss3Texture or visualFrame:CreateTexture(nil, "OVERLAY");
 		auraBoss3Texture:SetSize(11,11);
@@ -2239,6 +2309,14 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 		auraBoss3CountFontString = auraBoss3CountFontString or visualFrame:CreateFontString(nil, "OVERLAY");
 		auraBoss3CountFontString:SetFont("Fonts\\ARIALN.TTF", 7, "");
 		auraBoss3CountFontString:SetPoint("TOP", auraBoss3Texture, "BOTTOM");
+		auraBoss3CooldownParent = auraBoss3CooldownParent or CreateFrame("Frame", nil, visualFrame);
+		auraBoss3CooldownParent:SetSize(10,10);
+		auraBoss3CooldownParent:SetPoint("LEFT", auraBoss2Texture, "RIGHT", 1, 0);
+		auraBoss3Cooldown = auraBoss3Cooldown or CreateFrame("Cooldown", nil, auraBoss3CooldownParent, "CooldownFrameTemplate");
+		auraBoss3Cooldown:SetAllPoints();
+		auraBoss3Cooldown:SetDrawEdge(false);
+		auraBoss3Cooldown:SetReverse(true);
+		auraBoss3Cooldown:SetSwipeColor(bgr, bgg, bgb, bga);
 	end
 	
 	-- creates and updates buff/debuff icons; however, an update only occurs once every 0.1 seconds
@@ -2272,12 +2350,13 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			local numBossShown = 0;
 			if(UnitExists(shownUnit) and owner:GetProperty("ShowBossAuras")) then		
 				for auraIndex = 1, 40 do
-					local name, icon, count, debuffType, __, __, __, __, __, spellId = UnitAura(shownUnit, auraIndex, "");
+					local name, icon, count, debuffType, duration, expirationTime, __, __, __, spellId = UnitAura(shownUnit, auraIndex, "");
 					if (not name or numBossShown == 3) then
 						break;
 					elseif (module.CTRA_Configuration_BossAuras[spellId] and (count or 0) >= module.CTRA_Configuration_BossAuras[spellId]) then
 						numBossShown = numBossShown + 1;
 						local tex = (numBossShown == 1 and auraBoss1Texture) or (numBossShown == 2 and auraBoss2Texture) or auraBoss3Texture;
+						local cooldown = (numBossShown == 1 and auraBoss1Cooldown) or (numBossShown == 2 and auraBoss2Cooldown) or auraBoss3Cooldown;
 						tex:SetTexture(icon);
 						tex:Show();
 						tex.name = name;
@@ -2292,6 +2371,12 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 						else
 							string:Hide();
 						end
+						if (owner:GetProperty("ShowReverseCooldown") and duration and duration >= 12 and expirationTime and expirationTime > 0) then
+							print(name .. " has duration " .. duration .. " and expires at " .. expirationTime);
+							cooldown:SetCooldown(expirationTime - duration * 0.4, duration * 0.4);
+						else
+							cooldown:Clear();
+						end
 					end
 				end
 				auraBoss1Texture:SetPoint("TOPLEFT", visualFrame, "CENTER", 0.5 - (numBossShown * 6), 1);
@@ -2302,6 +2387,8 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				tex:Hide();
 				local string = (numBossShown == 1 and auraBoss1CountFontString) or (numBossShown == 2 and auraBoss2CountFontString) or auraBoss3CountFontString;
 				string:Hide();
+				local cooldown = (numBossShown == 1 and auraBoss1Cooldown) or (numBossShown == 2 and auraBoss2Cooldown) or auraBoss3Cooldown;
+				cooldown:Clear();
 			end
 			
 			-- STEP 3:
@@ -2321,28 +2408,36 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 					filterText = "HELPFUL";		-- further filtered by conditional statements during for loop below
 				end
 				for auraIndex = 1, 40 do
-					local name, icon, count, debuffType, __, __, source, __, __, spellId = UnitAura(shownUnit, auraIndex, filterText);
+					local name, icon, count, debuffType, duration, expirationTime, source, __, __, spellId = UnitAura(shownUnit, auraIndex, filterText);
 					if (not name or not spellId or numShown == 5) then
 						break;
 					elseif(
 						not (owner:GetProperty("ShowBossAuras") and (module.CTRA_Configuration_BossAuras[spellId] and (count or 0) >= module.CTRA_Configuration_BossAuras[spellId]))
-						and (filterType == 2 or filterType == 4 or not SpellIsSelfBuff(spellId))			-- excludes self-only buffs
+						--and (filterType == 2 or filterType == 4 or not SpellIsSelfBuff(spellId))			-- excludes self-only buffs
 						and (filterType ~= 5 or source == "player" or source == "vehicle" or source == "pet")		-- complements filterType == 5  (buffs cast by the player only)
 					) then
 						numShown = numShown + 1;
 						local tex = (numShown == 1 and aura1Texture) or (numShown == 2 and aura2Texture) or (numShown == 3 and aura3Texture) or (numShown == 4 and aura4Texture) or aura5Texture;
+						local cooldown = (numShown == 1 and aura1Cooldown) or (numShown == 2 and aura2Cooldown) or (numShown == 3 and aura3Cooldown) or (numShown == 4 and aura4Cooldown) or aura5Cooldown;
 						tex:SetTexture(icon);
 						tex:Show();
 						tex.name = name;
 						tex.count = count;
 						tex.debuffType = debuffType;
+						if (owner:GetProperty("ShowReverseCooldown") and duration and duration >= 15 and expirationTime and expirationTime > 0) then
+							cooldown:SetCooldown(expirationTime - duration * 0.3, duration * 0.3);
+						else
+							cooldown:Clear();
+						end
 					end
 				end
 			end
 			while (numShown < 5) do
 				numShown = numShown + 1;
 				local tex = (numShown == 1 and aura1Texture) or (numShown == 2 and aura2Texture) or (numShown == 3 and aura3Texture) or (numShown == 4 and aura4Texture) or aura5Texture;
+				local cooldown = (numShown == 1 and aura1Cooldown) or (numShown == 2 and aura2Cooldown) or (numShown == 3 and aura3Cooldown) or (numShown == 4 and aura4Cooldown) or aura5Cooldown;
 				tex:Hide();
+				cooldown:Clear();
 			end
 		end
 	end
