@@ -466,7 +466,7 @@ local function addon_Register()
 			"Menu Bar",  -- shown in options window & tooltips
 			"Menu Bar",  -- title for horizontal orientation
 			"Menu",  -- title for vertical orientation
-			{ "BOTTOMLEFT", ctRelativeFrame, "BOTTOM", 65, 4 },
+			{ "BOTTOMLEFT", ctRelativeFrame, "BOTTOM", 40, 4 },
 			{ -- settings
 				orientation = "ACROSS",
 				usedOnVehicleUI = true,

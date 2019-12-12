@@ -100,16 +100,16 @@ local shownLions;
 
 function module:showLions(show)
 	if (show) then
-		MainMenuBarArtFrame.LeftEndCap:SetTexture("Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Human");
-		MainMenuBarArtFrame.RightEndCap:SetTexture("Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Human");
+		(MainMenuBarArtFrame.LeftEndCap or MainMenuBarLeftEndCap):SetTexture("Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Human");
+		(MainMenuBarArtFrame.RightEndCap or MainMenuBarRightEndCap):SetTexture("Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Human");
 		shownLions = true;
 	else
 		-- Only show the gryphons if we have previously shown the lions.
 		if (not shownLions) then
 			return;
 		end
-		MainMenuBarArtFrame.LeftEndCap:SetTexture("Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Dwarf");
-		MainMenuBarArtFrame.RightEndCap:SetTexture("Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Dwarf");
+		(MainMenuBarArtFrame.LeftEndCap or MainMenuBarLeftEndCap):SetTexture("Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Dwarf");
+		(MainMenuBarArtFrame.LeftEndCap or MainMenuBarRightEndCap):SetTexture("Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Dwarf");
 		shownLions = false;
 	end
 end

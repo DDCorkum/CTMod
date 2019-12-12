@@ -38,7 +38,7 @@ local function addon_Enable(self)
 end
 
 local function addon_Disable(self)
-	MainMenuBarPerformanceBarFrame:SetPoint("BOTTOMRIGHT", MainMenuBar, -227, -10);
+	MainMenuBarPerformanceBarFrame:SetPoint("BOTTOMRIGHT", MainMenuBar, -235, -10);
 end
 
 local function addon_Init(self)
@@ -64,7 +64,7 @@ local function addon_Register()
 		"Performance Bar",  -- shown in options window & tooltips
 		nil,  -- title for horizontal orientation
 		nil,  -- title for vertical orientation
-		{ "BOTTOMRIGHT", MainMenuBar, "BOTTOMRIGHT", -227, -10 },
+		{ "BOTTOMRIGHT", ctRelativeFrame, "BOTTOM", 277, -10 },
 		{ -- settings
 			orientation = "ACROSS",
 		},
