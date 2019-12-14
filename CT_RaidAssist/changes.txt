@@ -1,3 +1,8 @@
+CT_RaidAssist (8.2.5.7) 2019-12-11
+- New option to change background/border colours for removable debuffs
+- New option for cooldown animation on expiring buffs, debuffs
+- Improved the visibility of buffs, debuffs
+
 CT_RaidAssist (8.2.5.6) 2019-11-09
 - Adding encounter buffs for Molten Core, Onyxia, Eternal Palace and M+
 - Adding consumable and durability monitor, with privacy opt-out feature

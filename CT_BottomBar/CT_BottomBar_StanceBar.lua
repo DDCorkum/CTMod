@@ -50,7 +50,7 @@ local function moveFlightBar()
 		MainMenuBarVehicleLeaveButton:SetPoint("RIGHT", StanceButton1, "LEFT", -10, 0);
 	else
 		MainMenuBarVehicleLeaveButton:ClearAllPoints();
-		MainMenuBarVehicleLeaveButton:SetPoint("RIGHT", StanceBarFrame, "LEFT", -10, 0);
+		MainMenuBarVehicleLeaveButton:SetPoint("RIGHT", ctRelativeFrame, "BOTTOM", -492, 90);
 	end
 end
 
@@ -139,7 +139,7 @@ local function addon_Register()
 		"Stance Bar",  -- shown in options window & tooltips
 		"Stance Bar",  -- title for horizontal orientation
 		nil,  -- title for vertical orientation
-		{ "BOTTOMLEFT", StanceBarFrame, "TOPLEFT", 11, 3 },
+		{ "BOTTOMLEFT", ctRelativeFrame, "BOTTOM", -482, 60 },
 		{ -- settings
 			orientation = "ACROSS",
 		},
@@ -168,7 +168,7 @@ local function addon_Register()
 		"Stop Flying Button",  -- shown in options window & tooltips
 		"Stop Flying",  -- title for horizontal orientation
 		nil,  -- title for vertical orientation
-		{ "RIGHT", StanceBarFrame, "LEFT", -10, 0 },
+		{ "RIGHT", ctRelativeFrame, "BOTTOM", -492, 90 },
 		{ -- settings
 			orientation = "ACROSS",
 		},

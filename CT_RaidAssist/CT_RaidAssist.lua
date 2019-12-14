@@ -1064,6 +1064,14 @@ function StaticCTRAFrames()
 					optionsWindowizeObject("ShowBossAuras");
 					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Auras/ShowBossCheckButton"],L["CT_RaidAssist/Options/Window/Auras/ShowBossTip"] .. "#" .. textColor1}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
 				optionsEndFrame();
+				optionsBeginFrame(-10, 15, "checkbutton#tl:10:%y#n:CTRAWindow_ShowReverseCooldownCheckButton#" .. L["CT_RaidAssist/Options/Window/Auras/ShowReverseCooldownCheckButton"]);
+					optionsWindowizeObject("ShowReverseCooldown");
+					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Auras/ShowReverseCooldownCheckButton"],L["CT_RaidAssist/Options/Window/Auras/ShowReverseCooldownTip"] .. "#" .. textColor1}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
+				optionsEndFrame();
+				optionsBeginFrame(-10, 15, "checkbutton#tl:10:%y#n:CTRAWindow_RemovableDebuffColorCheckButton#" .. L["CT_RaidAssist/Options/Window/Auras/RemovableDebuffColorCheckButton"]);
+					optionsWindowizeObject("RemovableDebuffColor");
+					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Auras/RemovableDebuffColorCheckButton"],L["CT_RaidAssist/Options/Window/Auras/RemovableDebuffColorTip"] .. "#" .. textColor1}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
+				optionsEndFrame();
 				
 				-- Colors
 				optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormal#Colors");
@@ -1100,7 +1108,6 @@ function StaticCTRAFrames()
 						{property = "ColorBackgroundDeadOrGhost", label = "Background Dead", tooltip = "Background when the unit is dead or a ghost", hasAlpha = "true"},
 						{property = "ColorBorder", label = "Border In Range", tooltip = "Border when the unit is within 30 yards"},
 						{property = "ColorBorderBeyondRange", label = "Border Too Far", tooltip = "Border when the unit is not found within 30 yards"},
-						--{property = "ColorBorderTargetTarget", label = "Border Aggro", tooltip = "Border when the unit is the target's target"},
 						{property = "ColorUnitFullHealthNoCombat", label = "Full Health No Combat", tooltip = "Color of the health bar at 100% outside combat"},
 						{property = "ColorUnitZeroHealthNoCombat", label = "Near Death No Combat", tooltip = "Color of the health bar when nearly dead outside combat"},
 						-- START OF LEFT COLUMN
@@ -1232,15 +1239,16 @@ function NewCTRAWindow(owningCTRAFrames)
 		["ColorBackground"] = {0.00, 0.10, 0.90, 0.50},
 		["ColorBackgroundDeadOrGhost"] = {0.10, 0.10, 0.10, 0.50},
 		["ColorBorder"] = {1.00, 1.00, 1.00, 0.75},
-		["ColorBorderTargetTarget"] = {1.00, 0.10, 0.10, 0.75},
 		["ColorBorderBeyondRange"] = {0.10, 0.10, 0.10, 0.75},
 		["ColorReadyCheckWaiting"] = {0.45, 0.45, 0.45, 1.00},
 		["ColorReadyCheckNotReady"] = {0.80, 0.45, 0.45, 1.00},
+		["RemovableDebuffColor"] = true,
 		["HealthBarAsBackground"] = false,
 		["EnablePowerBar"] = true,
 		["AuraFilterNoCombat"] = 1,
 		["AuraFilterCombat"] = 2,
-		["ShowBossAuras"] = true;
+		["ShowBossAuras"] = true,
+		["ShowReverseCooldown"] = true,
 		["EnableTargetFrame"] = false,
 	};
 
@@ -1303,6 +1311,7 @@ function NewCTRAWindow(owningCTRAFrames)
 			
 			-- window that player frames reside in
 			windowFrame = CreateFrame("Frame", nil, UIParent);
+			windowFrame:SetScale((module:getGameVersion() == CT_GAME_VERSION_CLASSIC and 1) or 1.03);
 			windowFrame:SetSize(1,1);	-- arbitrary, just to make it exist
 			windowFrame:SetPoint("LEFT", anchorFrame, "LEFT");
 			windowFrame:Show();
@@ -1312,7 +1321,7 @@ function NewCTRAWindow(owningCTRAFrames)
 						self:Update();
 					end
 				end
-			);		
+			);
 		end
 		
 		
@@ -1732,6 +1741,10 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	
 	-- graphical textures and fontstrings of visualFrame
 	local background;
+	local colorBackgroundRed, colorBackgroundGreen, colorBackgroundBlue, colorBackgroundAlpha;
+	local colorBackgroundDeadOrGhostRed, colorBackgroundDeadOrGhostGreen, colorBackgroundDeadOrGhostBlue, colorBackgroundDeadOrGhostAlpha;
+	local colorBorderRed, colorBorderGreen, colorBorderBlue, colorBorderAlpha;
+	local colorBorderBeyondRangeRed, colorBorderBeyondRangeGreen, colorBorderBeyondRangeBlue, colorBorderBeyondRangeAlpha
 	local healthBarFullCombat, healthBarZeroCombat, healthBarFullNoCombat, healthBarZeroNoCombat;
 	local absorbBarFullCombat, absorbBarZeroCombat, absorbBarFullNoCombat, absorbBarZeroNoCombat;
 	local healthBarWidth;
@@ -1740,6 +1753,10 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	local unitNameFontStringLarge, unitNameFontStringSmall;
 	local aura1Texture, aura2Texture, aura3Texture, aura4Texture, aura5Texture;
 	local auraBoss1Texture, auraBoss2Texture, auraBoss3Texture;
+	local aura1CooldownParent, aura2CooldownParent, aura3CooldownParent, aura4CooldownParent, aura5CooldownParent;
+	local aura1Cooldown, aura2Cooldown, aura3Cooldown, aura4Cooldown, aura5Cooldown;
+	local auraBoss1CooldownParent, auraBoss2CooldownParent, auraBoss3CooldownParent;
+	local auraBoss1Cooldown, auraBoss2Cooldown, auraBoss3Cooldown;
 	local auraBoss1CountFontString, auraBoss2CountFontString, auraBoss3CountFontString;
 	local statusTexture, statusFontString, statusBackground;
 	local durabilityAverage, durabilityBroken, durabilityTime;
@@ -1752,38 +1769,42 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 		background = background or visualFrame:CreateTexture(nil, "BACKGROUND");
 		background:SetPoint("TOPLEFT", visualFrame, 3, -3);
 		background:SetPoint("BOTTOMRIGHT", visualFrame, -3, 3);
-		background.colorBackgroundRed, background.colorBackgroundGreen, background.colorBackgroundBlue, background.colorBackgroundAlpha = unpack(owner:GetProperty("ColorBackground"));
-		background.colorBackgroundDeadOrGhostRed, background.colorBackgroundDeadOrGhostGreen, background.colorBackgroundDeadOrGhostBlue, background.colorBackgroundDeadOrGhostAlpha = unpack(owner:GetProperty("ColorBackgroundDeadOrGhost"));
+		colorBackgroundRed, colorBackgroundGreen, colorBackgroundBlue, colorBackgroundAlpha = unpack(owner:GetProperty("ColorBackground"));
+		colorBackgroundDeadOrGhostRed, colorBackgroundDeadOrGhostGreen, colorBackgroundDeadOrGhostBlue, colorBackgroundDeadOrGhostAlpha = unpack(owner:GetProperty("ColorBackgroundDeadOrGhost"));
 		
 		visualFrame:SetBackdrop({["edgeFile"] = "Interface\\Tooltips\\UI-Tooltip-Border",["edgeSize"] = 16,});
-		visualFrame.colorBorderRed, visualFrame.colorBorderGreen, visualFrame.colorBorderBlue, visualFrame.colorBorderAlpha = unpack(owner:GetProperty("ColorBorder"));
-		visualFrame.colorBorderTargetTargetRed, visualFrame.colorBorderTargetTargetGreen, visualFrame.colorBorderTargetTargetBlue, visualFrame.colorBorderTargetTargetAlpha = unpack(owner:GetProperty("ColorBorderTargetTarget"));
-		visualFrame.colorBorderBeyondRangeRed, visualFrame.colorBorderBeyondRangeGreen, visualFrame.colorBorderBeyondRangeBlue, visualFrame.colorBorderBeyondRangeAlpha = unpack(owner:GetProperty("ColorBorderBeyondRange"));
+		colorBorderRed, colorBorderGreen, colorBorderBlue, colorBorderAlpha = unpack(owner:GetProperty("ColorBorder"));
+		colorBorderBeyondRangeRed, colorBorderBeyondRangeGreen, colorBorderBeyondRangeBlue, colorBorderBeyondRangeAlpha = unpack(owner:GetProperty("ColorBorderBeyondRange"));
 	end
 	
 	-- updates the background and borders, but must not be run until configureBackdrop() has been done
 	local function updateBackdrop()
 		if (shownUnit and UnitExists(shownUnit)) then
 			if (UnitIsDeadOrGhost(shownUnit)) then
-				background:SetColorTexture(background.colorBackgroundDeadOrGhostRed, background.colorBackgroundDeadOrGhostGreen, background.colorBackgroundDeadOrGhostBlue, background.colorBackgroundDeadOrGhostAlpha);
-			else
-				background:SetColorTexture(background.colorBackgroundRed, background.colorBackgroundGreen, background.colorBackgroundBlue, background.colorBackgroundAlpha);
-			end
-			if (UnitInRange(shownUnit) or UnitIsUnit("player", shownUnit)) then
-				--if (UnitExists("target") and UnitIsUnit(shownUnit, "targettarget") and UnitIsEnemy("player", "target")) then
-				--	visualFrame:SetBackdropBorderColor(visualFrame.colorBorderTargetTargetRed, visualFrame.colorBorderTargetTargetGreen, visualFrame.colorBorderTargetTargetBlue, visualFrame.colorBorderTargetTargetAlpha);
-				--else
-				--	visualFrame:SetBackdropBorderColor(visualFrame.colorBorderRed, visualFrame.colorBorderGreen, visualFrame.colorBorderBlue, visualFrame.colorBorderAlpha);
-				--end
-				local removableDebuff = select(4, UnitAura(shownUnit, 1, "RAID HARMFUL"));
-				if (removableDebuff) then
-					local color = DebuffTypeColor[removableDebuff];
-					visualFrame:SetBackdropBorderColor(color.r, color.g, color.b, visualFrame.colorBorderAlpha);
+				background:SetColorTexture(colorBackgroundDeadOrGhostRed, colorBackgroundDeadOrGhostGreen, colorBackgroundDeadOrGhostBlue, colorBackgroundDeadOrGhostAlpha);
+				if (UnitInRange(shownUnit) or UnitIsUnit(shownUnit, "player")) then
+					visualFrame:SetBackdropBorderColor(colorBorderRed, colorBorderGreen, colorBorderBlue, colorBorderAlpha);
 				else
-					visualFrame:SetBackdropBorderColor(visualFrame.colorBorderRed, visualFrame.colorBorderGreen, visualFrame.colorBorderBlue, visualFrame.colorBorderAlpha);
+					visualFrame:SetBackdropBorderColor(colorBorderBeyondRangeRed, colorBorderBeyondRangeGreen, colorBorderBeyondRangeBlue, colorBorderBeyondRangeAlpha);
 				end
 			else
-				visualFrame:SetBackdropBorderColor(visualFrame.colorBorderBeyondRangeRed, visualFrame.colorBorderBeyondRangeGreen, visualFrame.colorBorderBeyondRangeBlue, visualFrame.colorBorderBeyondRangeAlpha);
+				local removableDebuff = select(4, UnitAura(shownUnit, 1, "RAID HARMFUL"));
+				if (removableDebuff and owner:GetProperty("RemovableDebuffColor")) then
+					local color = DebuffTypeColor[removableDebuff] or {r = 1, g = 0, b = 0};
+					background:SetColorTexture(colorBackgroundRed/2 + color.r/2, colorBackgroundGreen/2 + color.g/2, colorBackgroundBlue/2 + color.b/2, colorBackgroundAlpha*0.8 + 0.2);
+					if (UnitInRange(shownUnit) or UnitIsUnit(shownUnit, "player")) then
+						visualFrame:SetBackdropBorderColor(color.r, color.g, color.b, colorBorderAlpha*0.8 + 0.2);
+					else
+						visualFrame:SetBackdropBorderColor(colorBorderBeyondRangeRed, colorBorderBeyondRangeGreen, colorBorderBeyondRangeBlue, colorBorderBeyondRangeAlpha);
+					end
+				else
+					background:SetColorTexture(colorBackgroundRed, colorBackgroundGreen, colorBackgroundBlue, colorBackgroundAlpha);
+					if (UnitInRange(shownUnit) or UnitIsUnit(shownUnit, "player")) then
+						visualFrame:SetBackdropBorderColor(colorBorderRed, colorBorderGreen, colorBorderBlue, colorBorderAlpha);
+					else
+						visualFrame:SetBackdropBorderColor(colorBorderBeyondRangeRed, colorBorderBeyondRangeGreen, colorBorderBeyondRangeBlue, colorBorderBeyondRangeAlpha);
+					end
+				end
 			end
 		end	
 
@@ -2185,45 +2206,121 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	end
 	
 	local configureAuras = function()
+	
+		local bgr, bgg, bgb, bga = unpack(owner:GetProperty("ColorBackground"));
+		bgr, bgg, bgb, bga = bgr * 0.5, bgg * 0.5, bgb * 0.5, bga * 0.25 + 0.5
+	
 		aura1Texture = aura1Texture or visualFrame:CreateTexture(nil, "OVERLAY");
-		aura1Texture:SetSize(9,9);
+		aura1Texture:SetSize(10,10);
 		aura1Texture:SetPoint("TOPRIGHT", visualFrame, -5, -5);
+		aura1Texture:SetTexCoord(0.04,0.96,0.04,0.96);
+		aura1CooldownParent = aura1CooldownParent or CreateFrame("Frame", nil, visualFrame);
+		aura1CooldownParent:SetSize(10,10);
+		aura1CooldownParent:SetPoint("TOPRIGHT", visualFrame, -5, -5);
+		aura1Cooldown = aura1Cooldown or CreateFrame("Cooldown", nil, aura1CooldownParent, "CooldownFrameTemplate");
+		aura1Cooldown:SetAllPoints();
+		aura1Cooldown:SetDrawEdge(false);
+		aura1Cooldown:SetReverse(true);
+		aura1Cooldown:SetSwipeColor(bgr, bgg, bgb, bga);
 
 		aura2Texture = aura2Texture or visualFrame:CreateTexture(nil, "OVERLAY");
-		aura2Texture:SetSize(9,9);
+		aura2Texture:SetSize(10,10);
 		aura2Texture:SetPoint("TOPRIGHT", visualFrame, -5, -15);
+		aura2Texture:SetTexCoord(0.04,0.96,0.04,0.96);
+		aura2CooldownParent = aura2CooldownParent or CreateFrame("Frame", nil, visualFrame);
+		aura2CooldownParent:SetSize(10,10);
+		aura2CooldownParent:SetPoint("TOPRIGHT", visualFrame, -5, -15);
+		aura2Cooldown = aura2Cooldown or CreateFrame("Cooldown", nil, aura2CooldownParent, "CooldownFrameTemplate");
+		aura2Cooldown:SetAllPoints();
+		aura2Cooldown:SetDrawEdge(false);
+		aura2Cooldown:SetReverse(true);
+		aura2Cooldown:SetSwipeColor(bgr, bgg, bgb, bga);
 		
 		aura3Texture = aura3Texture or visualFrame:CreateTexture(nil, "OVERLAY");
-		aura3Texture:SetSize(9,9);
+		aura3Texture:SetSize(10,10);
 		aura3Texture:SetPoint("TOPRIGHT", visualFrame, -5, -25);
+		aura3Texture:SetTexCoord(0.04,0.96,0.04,0.96);
+		aura3CooldownParent = aura3CooldownParent or CreateFrame("Frame", nil, visualFrame);
+		aura3CooldownParent:SetSize(10,10);
+		aura3CooldownParent:SetPoint("TOPRIGHT", visualFrame, -5, -25);
+		aura3Cooldown = aura3Cooldown or CreateFrame("Cooldown", nil, aura3CooldownParent, "CooldownFrameTemplate");
+		aura3Cooldown:SetAllPoints();
+		aura3Cooldown:SetDrawEdge(false);
+		aura3Cooldown:SetReverse(true);
+		aura3Cooldown:SetSwipeColor(bgr, bgg, bgb, bga);
 
 		aura4Texture = aura4Texture or visualFrame:CreateTexture(nil, "OVERLAY");
-		aura4Texture:SetSize(9,9);
+		aura4Texture:SetSize(10,10);
 		aura4Texture:SetPoint("TOPRIGHT", visualFrame, -15, -25);
-
+		aura4Texture:SetTexCoord(0.04,0.96,0.04,0.96);
+		aura4CooldownParent = aura4CooldownParent or CreateFrame("Frame", nil, visualFrame);
+		aura4CooldownParent:SetSize(10,10);
+		aura4CooldownParent:SetPoint("TOPRIGHT", visualFrame, -15, -25);
+		aura4Cooldown = aura4Cooldown or CreateFrame("Cooldown", nil, aura4CooldownParent, "CooldownFrameTemplate");
+		aura4Cooldown:SetAllPoints();
+		aura4Cooldown:SetDrawEdge(false);
+		aura4Cooldown:SetReverse(true);
+		aura4Cooldown:SetSwipeColor(bgr, bgg, bgb, bga);
+		
 		aura5Texture = aura5Texture or visualFrame:CreateTexture(nil, "OVERLAY");
-		aura5Texture:SetSize(9,9);
+		aura5Texture:SetSize(10,10);
 		aura5Texture:SetPoint("TOPRIGHT", visualFrame, -15, -15);
+		aura5Texture:SetTexCoord(0.04,0.96,0.04,0.96);
+		aura5CooldownParent = aura5CooldownParent or CreateFrame("Frame", nil, visualFrame);
+		aura5CooldownParent:SetSize(10,10);
+		aura5CooldownParent:SetPoint("TOPRIGHT", visualFrame, -15, -15);
+		aura5Cooldown = aura5Cooldown or CreateFrame("Cooldown", nil, aura5CooldownParent, "CooldownFrameTemplate");
+		aura5Cooldown:SetAllPoints();
+		aura5Cooldown:SetDrawEdge(false);
+		aura5Cooldown:SetReverse(true);
+		aura5Cooldown:SetSwipeColor(bgr, bgg, bgb, bga);
 		
 		auraBoss1Texture = auraBoss1Texture or visualFrame:CreateTexture(nil, "OVERLAY");
 		auraBoss1Texture:SetSize(11,11);
+		auraBoss1Texture:SetTexCoord(0.04,0.96,0.04,0.96);
 		auraBoss1CountFontString = auraBoss1CountFontString or visualFrame:CreateFontString(nil, "OVERLAY");
-		auraBoss1CountFontString:SetFont("Fonts\\ARIALN.TTF", 6, "");
+		auraBoss1CountFontString:SetFont("Fonts\\ARIALN.TTF", 7, "");
 		auraBoss1CountFontString:SetPoint("TOP", auraBoss1Texture, "BOTTOM");
+		auraBoss1CooldownParent = auraBoss1CooldownParent or CreateFrame("Frame", nil, visualFrame);
+		auraBoss1CooldownParent:SetSize(10,10);
+		auraBoss1CooldownParent:SetPoint("CENTER", auraBoss1Texture);
+		auraBoss1Cooldown = auraBoss1Cooldown or CreateFrame("Cooldown", nil, auraBoss1CooldownParent, "CooldownFrameTemplate");
+		auraBoss1Cooldown:SetAllPoints();
+		auraBoss1Cooldown:SetDrawEdge(false);
+		auraBoss1Cooldown:SetReverse(true);
+		auraBoss1Cooldown:SetSwipeColor(bgr, bgg, bgb, bga);
 		
 		auraBoss2Texture = auraBoss2Texture or visualFrame:CreateTexture(nil, "OVERLAY");
 		auraBoss2Texture:SetSize(11,11);
+		auraBoss2Texture:SetTexCoord(0.04,0.96,0.04,0.96);
 		auraBoss2Texture:SetPoint("LEFT", auraBoss1Texture, "RIGHT", 1, 0);
 		auraBoss2CountFontString = auraBoss2CountFontString or visualFrame:CreateFontString(nil, "OVERLAY");
 		auraBoss2CountFontString:SetFont("Fonts\\ARIALN.TTF", 7, "");
 		auraBoss2CountFontString:SetPoint("TOP", auraBoss2Texture, "BOTTOM");
+		auraBoss2CooldownParent = auraBoss2CooldownParent or CreateFrame("Frame", nil, visualFrame);
+		auraBoss2CooldownParent:SetSize(10,10);
+		auraBoss2CooldownParent:SetPoint("LEFT", auraBoss1Texture, "RIGHT", 1, 0);
+		auraBoss2Cooldown = auraBoss2Cooldown or CreateFrame("Cooldown", nil, auraBoss2CooldownParent, "CooldownFrameTemplate");
+		auraBoss2Cooldown:SetAllPoints();
+		auraBoss2Cooldown:SetDrawEdge(false);
+		auraBoss2Cooldown:SetReverse(true);
+		auraBoss2Cooldown:SetSwipeColor(bgr, bgg, bgb, bga);
 		
 		auraBoss3Texture = auraBoss3Texture or visualFrame:CreateTexture(nil, "OVERLAY");
 		auraBoss3Texture:SetSize(11,11);
+		auraBoss3Texture:SetTexCoord(0.04,0.96,0.04,0.96);
 		auraBoss3Texture:SetPoint("LEFT", auraBoss2Texture, "RIGHT", 1, 0);
 		auraBoss3CountFontString = auraBoss3CountFontString or visualFrame:CreateFontString(nil, "OVERLAY");
 		auraBoss3CountFontString:SetFont("Fonts\\ARIALN.TTF", 7, "");
 		auraBoss3CountFontString:SetPoint("TOP", auraBoss3Texture, "BOTTOM");
+		auraBoss3CooldownParent = auraBoss3CooldownParent or CreateFrame("Frame", nil, visualFrame);
+		auraBoss3CooldownParent:SetSize(10,10);
+		auraBoss3CooldownParent:SetPoint("LEFT", auraBoss2Texture, "RIGHT", 1, 0);
+		auraBoss3Cooldown = auraBoss3Cooldown or CreateFrame("Cooldown", nil, auraBoss3CooldownParent, "CooldownFrameTemplate");
+		auraBoss3Cooldown:SetAllPoints();
+		auraBoss3Cooldown:SetDrawEdge(false);
+		auraBoss3Cooldown:SetReverse(true);
+		auraBoss3Cooldown:SetSwipeColor(bgr, bgg, bgb, bga);
 	end
 	
 	-- creates and updates buff/debuff icons; however, an update only occurs once every 0.1 seconds
@@ -2257,12 +2354,13 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			local numBossShown = 0;
 			if(UnitExists(shownUnit) and owner:GetProperty("ShowBossAuras")) then		
 				for auraIndex = 1, 40 do
-					local name, icon, count, debuffType, __, __, __, __, __, spellId = UnitAura(shownUnit, auraIndex, "");
+					local name, icon, count, debuffType, duration, expirationTime, __, __, __, spellId = UnitAura(shownUnit, auraIndex, "");
 					if (not name or numBossShown == 3) then
 						break;
 					elseif (module.CTRA_Configuration_BossAuras[spellId] and (count or 0) >= module.CTRA_Configuration_BossAuras[spellId]) then
 						numBossShown = numBossShown + 1;
 						local tex = (numBossShown == 1 and auraBoss1Texture) or (numBossShown == 2 and auraBoss2Texture) or auraBoss3Texture;
+						local cooldown = (numBossShown == 1 and auraBoss1Cooldown) or (numBossShown == 2 and auraBoss2Cooldown) or auraBoss3Cooldown;
 						tex:SetTexture(icon);
 						tex:Show();
 						tex.name = name;
@@ -2277,6 +2375,12 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 						else
 							string:Hide();
 						end
+						if (owner:GetProperty("ShowReverseCooldown") and duration and duration >= 12 and expirationTime and expirationTime > 0) then
+							print(name .. " has duration " .. duration .. " and expires at " .. expirationTime);
+							cooldown:SetCooldown(expirationTime - duration * 0.4, duration * 0.4);
+						else
+							cooldown:Clear();
+						end
 					end
 				end
 				auraBoss1Texture:SetPoint("TOPLEFT", visualFrame, "CENTER", 0.5 - (numBossShown * 6), 1);
@@ -2287,6 +2391,8 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				tex:Hide();
 				local string = (numBossShown == 1 and auraBoss1CountFontString) or (numBossShown == 2 and auraBoss2CountFontString) or auraBoss3CountFontString;
 				string:Hide();
+				local cooldown = (numBossShown == 1 and auraBoss1Cooldown) or (numBossShown == 2 and auraBoss2Cooldown) or auraBoss3Cooldown;
+				cooldown:Clear();
 			end
 			
 			-- STEP 3:
@@ -2306,7 +2412,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 					filterText = "HELPFUL";		-- further filtered by conditional statements during for loop below
 				end
 				for auraIndex = 1, 40 do
-					local name, icon, count, debuffType, __, __, source, __, __, spellId = UnitAura(shownUnit, auraIndex, filterText);
+					local name, icon, count, debuffType, duration, expirationTime, source, __, __, spellId = UnitAura(shownUnit, auraIndex, filterText);
 					if (not name or not spellId or numShown == 5) then
 						break;
 					elseif(
@@ -2316,18 +2422,26 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 					) then
 						numShown = numShown + 1;
 						local tex = (numShown == 1 and aura1Texture) or (numShown == 2 and aura2Texture) or (numShown == 3 and aura3Texture) or (numShown == 4 and aura4Texture) or aura5Texture;
+						local cooldown = (numShown == 1 and aura1Cooldown) or (numShown == 2 and aura2Cooldown) or (numShown == 3 and aura3Cooldown) or (numShown == 4 and aura4Cooldown) or aura5Cooldown;
 						tex:SetTexture(icon);
 						tex:Show();
 						tex.name = name;
 						tex.count = count;
 						tex.debuffType = debuffType;
+						if (owner:GetProperty("ShowReverseCooldown") and duration and duration >= 15 and expirationTime and expirationTime > 0) then
+							cooldown:SetCooldown(expirationTime - duration * 0.3, duration * 0.3);
+						else
+							cooldown:Clear();
+						end
 					end
 				end
 			end
 			while (numShown < 5) do
 				numShown = numShown + 1;
 				local tex = (numShown == 1 and aura1Texture) or (numShown == 2 and aura2Texture) or (numShown == 3 and aura3Texture) or (numShown == 4 and aura4Texture) or aura5Texture;
+				local cooldown = (numShown == 1 and aura1Cooldown) or (numShown == 2 and aura2Cooldown) or (numShown == 3 and aura3Cooldown) or (numShown == 4 and aura4Cooldown) or aura5Cooldown;
 				tex:Hide();
+				cooldown:Clear();
 			end
 		end
 	end

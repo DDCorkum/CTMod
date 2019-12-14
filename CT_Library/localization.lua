@@ -26,7 +26,6 @@ local L = lib.text
 
 -----------------------------------------------
 -- enUS (Default) Unlocalized Strings
--- DO NOT INDENT because some strings are multi-line!
 
 
 L["CT_Library/Introduction"] = [=[Thank you for using CTMod!
@@ -50,11 +49,8 @@ L["CT_Library/Tooltip/RESIZE"] = [=[Left click to drag
 Right click to reset]=]
 
 
-
-
 -----------------------------------------------
 -- frFR Localizations
--- DO NOT INDENT because some strings are multiline
 
 if (GetLocale() == "frFR") then
 
@@ -67,13 +63,15 @@ L["CT_Library/ModListing"] = "Les modules :"
 L["CT_Library/Help/About/Credits"] = "CTMod continue dupuis « Vanilla » par Cide et TS, 2014 par Resike, et 2017 par Dahk"
 L["CT_Library/Help/About/Heading"] = "À propos de nous"
 L["CT_Library/Help/About/Updates"] = "Pour mettre à jour :"
-L["CT_Library/Help/Heading"] = "Aide"
+L["CT_Library/Help/Heading"] = "L'aide"
 L["CT_Library/Help/WhatIs/Heading"] = "Qu'est-ce CTMod?"
 L["CT_Library/Help/WhatIs/Line1"] = "CTMod contient des modules :"
 L["CT_Library/Help/WhatIs/NotInstalled"] = "pas installée"
 L["CT_Library/SettingsImport/Heading"] = "Importer les configurations"
 
 
+-----------------------------------------------
+-- deDE Localizations
 
 elseif (GetLocale() == "deDE") then
 
@@ -92,9 +90,23 @@ L["CT_Library/Help/WhatIs/NotInstalled"] = "nicht installiert"
 L["CT_Library/SettingsImport/Heading"] = "Einstellungen importieren"
 
 
+-----------------------------------------------
+-- esES Localizations
+
+elseif (GetLocale() == "esES") then
+
+L["CT_Library/Help/About/Credits"] = "CTMod originado en Vanilla by Cide y TS Resike y  Dahk jse unieron en '14 y '17"
+L["CT_Library/Help/About/Heading"] = [=[Acerca CTMod
+
+]=]
+L["CT_Library/Help/About/Updates"] = "Actualización en:"
 
 
--- add other languages here using elseif statements
+-----------------------------------------------
+-- ruRU Localizations
 
+elseif (GetLocale() == "ruRU") then
+
+L["CT_Library/SettingsImport/Heading"] = "Импорт настроек"
 
 end

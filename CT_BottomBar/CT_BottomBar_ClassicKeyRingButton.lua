@@ -27,18 +27,18 @@ local function addon_Update(self)
 	-- self == actionbar arrows bar object
 
 	self.helperFrame:ClearAllPoints();
-	self.helperFrame:SetPoint("TOPLEFT", MainMenuBarPerformanceBarFrame, "TOPLEFT", -5, 5);
-	self.helperFrame:SetPoint("BOTTOMRIGHT", MainMenuBarPerformanceBarFrame, "BOTTOMRIGHT", 5, 0);
+	self.helperFrame:SetPoint("TOPLEFT", KeyRingButton, "TOPLEFT", -5, 5);
+	self.helperFrame:SetPoint("BOTTOMRIGHT", KeyRingButton, "BOTTOMRIGHT", 0, 5);
 
 end
 
 local function addon_Enable(self)
-	MainMenuBarPerformanceBarFrame:SetPoint("BOTTOMRIGHT", self.frame, 0, 0);
-	self.frame:SetClampRectInsets(5,5,35,15);
+	KeyRingButton:SetPoint("RIGHT", self.frame, 0, 0);
+	self.frame:SetClampRectInsets(0,0,0,0);
 end
 
 local function addon_Disable(self)
-	MainMenuBarPerformanceBarFrame:SetPoint("BOTTOMRIGHT", MainMenuBar, -235, -10);
+	KeyRingButton:SetPoint("RIGHT", ctRelativeFrame, "BOTTOM", 295, 21.5);
 end
 
 local function addon_Init(self)
@@ -47,7 +47,7 @@ local function addon_Init(self)
 
 	appliedOptions = module.appliedOptions;
 
-	module.ctClassicPerformanceBar = self;
+	module.ctClassicKeyRingButton = self;
 
 	self.frame:SetFrameLevel(1);
 
@@ -59,12 +59,13 @@ end
 
 local function addon_Register()
 	module:registerAddon(
-		"Classic Performance Bar",  -- option name
-		"ClassicPerformanceBar",  -- used in frame names
-		"Performance Bar",  -- shown in options window & tooltips
+		"Classic Key Ring Button",  -- option name
+		"ClassicKeyRingButton",  -- used in frame names
+		"Key Ring Button",  -- shown in options window & tooltips
 		nil,  -- title for horizontal orientation
 		nil,  -- title for vertical orientation
-		{ "BOTTOMRIGHT", ctRelativeFrame, "BOTTOM", 277, -10 },
+		--{ "RIGHT", MainMenuBarArtFrame, "BOTTOMRIGHT", -216, 21.5 },
+		{"RIGHT", ctRelativeFrame, "BOTTOM", 295, 21.5 },
 		{ -- settings
 			orientation = "ACROSS",
 		},
@@ -76,8 +77,8 @@ local function addon_Register()
 		addon_Enable,
 		addon_Disable,
 		"helperFrame",
-		MainMenuBarPerformanceBarFrame
+		KeyRingButton
 	);
 end
 
-module.loadedAddons["Classic Performance Bar"] = addon_Register;
+module.loadedAddons["Classic Key Ring Button"] = addon_Register;

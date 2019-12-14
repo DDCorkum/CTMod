@@ -100,16 +100,16 @@ local shownLions;
 
 function module:showLions(show)
 	if (show) then
-		MainMenuBarArtFrame.LeftEndCap:SetTexture("Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Human");
-		MainMenuBarArtFrame.RightEndCap:SetTexture("Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Human");
+		(MainMenuBarArtFrame.LeftEndCap or MainMenuBarLeftEndCap):SetTexture("Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Human");
+		(MainMenuBarArtFrame.RightEndCap or MainMenuBarRightEndCap):SetTexture("Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Human");
 		shownLions = true;
 	else
 		-- Only show the gryphons if we have previously shown the lions.
 		if (not shownLions) then
 			return;
 		end
-		MainMenuBarArtFrame.LeftEndCap:SetTexture("Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Dwarf");
-		MainMenuBarArtFrame.RightEndCap:SetTexture("Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Dwarf");
+		(MainMenuBarArtFrame.LeftEndCap or MainMenuBarLeftEndCap):SetTexture("Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Dwarf");
+		(MainMenuBarArtFrame.LeftEndCap or MainMenuBarRightEndCap):SetTexture("Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Dwarf");
 		shownLions = false;
 	end
 end
@@ -129,7 +129,8 @@ function module:hideTexturesBackground(hide)
 		if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
 			MainMenuBarArtFrameBackground:Hide();
 		elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-			MainMenuBarArtFrame:Hide();
+			MainMenuBarTexture0:Hide();
+			MainMenuBarTexture1:Hide();
 			StanceBarLeft:SetAlpha(0);
 			StanceBarMiddle:SetAlpha(0);
 			StanceBarRight:SetAlpha(0);
@@ -143,7 +144,8 @@ function module:hideTexturesBackground(hide)
 		if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
 			MainMenuBarArtFrameBackground:Show();
 		elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-			MainMenuBarArtFrame:Show();
+			MainMenuBarTexture0:Show();
+			MainMenuBarTexture1:Show();
 			StanceBarLeft:SetAlpha(1);
 			StanceBarMiddle:SetAlpha(1);
 			StanceBarRight:SetAlpha(1);
@@ -157,18 +159,28 @@ end
 function module:hideMenuAndBagsBackground(hide)
 	-- Hide/Show the background textures
 	
-	if (hide and module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
-		MicroButtonAndBagsBar:Hide();
-		
+	if (hide) then
+		if(module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+			MicroButtonAndBagsBar:Hide();
+		elseif(module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+			MainMenuBarTexture2:Hide();
+			MainMenuBarTexture3:Hide();
+		end
 		hidMenuAndBagsBackground = true;
 	else
 		-- Only show the textures if we previously hid them.
 		if (not hidMenuAndBagsBackground) then
 			return;
 		end
-		MicroButtonAndBagsBar:Show();
+		if(module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+			MicroButtonAndBagsBar:Show();
+		elseif(module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+			MainMenuBarTexture2:Show();
+			MainMenuBarTexture3:Show();
+		end
 		hidMenuAndBagsBackground = false;
 	end
+
 	
 end
 

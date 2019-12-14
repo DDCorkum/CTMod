@@ -62,9 +62,13 @@ L["CT_RaidAssist/Options/Window/Auras/CombatLabel"] = "Show during combat:"
 L["CT_RaidAssist/Options/Window/Auras/DropDown"] = "#Group buffs I can apply#Debuffs I can remove#All group buffs#All debuffs#Group buffs I applied#Nothing"
 L["CT_RaidAssist/Options/Window/Auras/Heading"] = "Buffs and Debuffs"
 L["CT_RaidAssist/Options/Window/Auras/NoCombatLabel"] = "Show out of combat:"
+L["CT_RaidAssist/Options/Window/Auras/RemovableDebuffColorCheckButton"] = "Add colour to removable debuffs"
+L["CT_RaidAssist/Options/Window/Auras/RemovableDebuffColorTip"] = "Changes the background and border when you can remove a harmful debuff."
 L["CT_RaidAssist/Options/Window/Auras/ShowBossCheckButton"] = "Show important boss auras at middle"
 L["CT_RaidAssist/Options/Window/Auras/ShowBossTip"] = [=[Certain boss encounters create important buffs/debuffs critical to the fight.
 These will appear larger at the middle for emphasis.]=]
+L["CT_RaidAssist/Options/Window/Auras/ShowReverseCooldownCheckButton"] = "Identify auras expiring soon"
+L["CT_RaidAssist/Options/Window/Auras/ShowReverseCooldownTip"] = "Adds a cooldown animation to auras with less than 50% of time remaining"
 L["CT_RaidAssist/Options/Window/Groups/ClassHeader"] = "Classes"
 L["CT_RaidAssist/Options/Window/Groups/GroupHeader"] = "Groups"
 L["CT_RaidAssist/Options/Window/Groups/GroupTooltipContent"] = [=[0.9:0.9:0.9#|cFFFFFF99During a raid: |r
@@ -158,6 +162,8 @@ L["CT_RaidAssist/Options/Window/Auras/Heading"] = "Les auras"
 L["CT_RaidAssist/Options/Window/Auras/NoCombatLabel"] = "Montrer hors combat :"
 L["CT_RaidAssist/Options/Window/Auras/ShowBossCheckButton"] = "Montrer les auras de combat de boss au milieu"
 L["CT_RaidAssist/Options/Window/Auras/ShowBossTip"] = "Souligner les mécaniques des combats de boss en mettre l'aura au milieu avec plus grandeur."
+L["CT_RaidAssist/Options/Window/Auras/ShowReverseCooldownCheckButton"] = "Indiquer les auras qui expirent bientôt"
+L["CT_RaidAssist/Options/Window/Auras/ShowReverseCooldownTip"] = "Ajouter une animation de temps de recharge aux auras avec moins de 50% de temps resté"
 L["CT_RaidAssist/Options/Window/Groups/ClassHeader"] = "Classes"
 L["CT_RaidAssist/Options/Window/Groups/GroupHeader"] = "Groupes"
 L["CT_RaidAssist/Options/Window/Groups/GroupTooltipContent"] = [=[0.9:0.9:0.9#|cFFFFFF99Pendent un raid: |r

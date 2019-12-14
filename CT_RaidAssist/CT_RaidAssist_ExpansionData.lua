@@ -212,6 +212,12 @@ module.CTRA_Configuration_BossAuras =
 	[298014] = 3,		-- The Eternal Palace - Queen Azshara: Cold Blast
 	[300743] = 2,		-- The Eternal Palace - Queen Azshara: Void Touched
 	[298569] = 1,		-- The Eternal Palace - Queen Azshara: Drained Soul
+	[307056] = 0,		-- Ny'alotha - Wrathion: Burning Madness
+	[306015] = 5,		-- Ny'alotha - Wrathion: Searing Armor
+	[313250] = 50,		-- Ny'alotha - Wrathion: Creeping Madness
+	[307839] = 0,		-- Ny'alotha - Maut: Devoured Abyss
+	[307399] = 5,		-- Ny'alotha - Maut: Arcane Wounds
+	[314337] = 1,		-- Ny'alotha - Maut: Ancient Curse
 }
 
 
@@ -378,6 +384,10 @@ module.CTRA_Configuration_Consumables =
 	[270058] = true, -- Battle-Scarred Augment Rune
 	[279639] = true, -- Galley Banquet
 	[288076] = true, -- Seasoned Steak and Potatoes
+	[257410] = 154882, -- Honey-Glazed Haunches
+	[257415] = 154884, -- Swamp Fish 'n Chips
+	[257420] = 154888, -- Sailor's Pie
+	[257424] = 154886, -- Spiced Snapper
 	[290467] = 166804, -- Boralus Blood Sausage (Agi)
 	[290468] = 166804, -- Boralus Blood Sausage (Int)
 	[290478] = 166804, -- Boralus Blood Sausage (Str)
