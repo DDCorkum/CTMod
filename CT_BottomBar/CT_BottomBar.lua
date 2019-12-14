@@ -702,7 +702,7 @@ module.update = function(self, optName, value)
 			module:loadAddon("Framerate Bar");
 			module:loadAddon("Talking Head");
 		elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-			-- module:loadAddon("Action Bar Arrows");
+			module:loadAddon("Action Bar Arrows");
 			module:loadAddon("Bags Bar");
 			module:loadAddon("Experience Bar");
 			module:loadAddon("Reputation Bar");  -- Show after exp bar in options window

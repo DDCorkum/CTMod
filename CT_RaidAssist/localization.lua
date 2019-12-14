@@ -68,7 +68,8 @@ L["CT_RaidAssist/Options/Window/Auras/ShowBossCheckButton"] = "Show important bo
 L["CT_RaidAssist/Options/Window/Auras/ShowBossTip"] = [=[Certain boss encounters create important buffs/debuffs critical to the fight.
 These will appear larger at the middle for emphasis.]=]
 L["CT_RaidAssist/Options/Window/Auras/ShowReverseCooldownCheckButton"] = "Identify auras expiring soon"
-L["CT_RaidAssist/Options/Window/Auras/ShowReverseCooldownTip"] = "Adds a cooldown animation to auras with less than 50% of time remaining"
+L["CT_RaidAssist/Options/Window/Auras/ShowReverseCooldownTip"] = [=[Adds a cooldown animation to auras with less than 50% of time remaining
+Note: this feature is limited on WoW Classic due to game restrictions]=]
 L["CT_RaidAssist/Options/Window/Groups/ClassHeader"] = "Classes"
 L["CT_RaidAssist/Options/Window/Groups/GroupHeader"] = "Groups"
 L["CT_RaidAssist/Options/Window/Groups/GroupTooltipContent"] = [=[0.9:0.9:0.9#|cFFFFFF99During a raid: |r

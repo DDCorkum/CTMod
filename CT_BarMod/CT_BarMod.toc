@@ -1,5 +1,5 @@
 ## Interface: 80205
-## Version: 8.2.5.5
+## Version: 8.2.5.8
 ## Title: CT_BarMod |cFF333333(BFA)
 ## Notes: Intuitive yet powerful action bar addon.
 ## DefaultState: Enabled

@@ -66,7 +66,36 @@ local ActionHasRange = ActionHasRange;
 local CanExitVehicle = CanExitVehicle;
 local GetActionCharges = GetActionCharges;
 local GetActionCooldown = GetActionCooldown;
-local GetActionCount = GetActionCount;
+
+-- GetActionCount, overridden for WoW Classic 1.13.3 (CTMod 8.2.5.8)
+-- Credit to addon reagentCounter by Kurtzen and Kebabstorm for the basic methodology, adapted by DDC for CTMod 8.2.5.8
+local OldGetActionCount, GetActionCount, ReagentScannerTooltip = GetActionCount, GetActionCount, CreateFrame("GameTooltip", "CT_BarMod_ReagentScanner", nil, "GameTooltipTemplate");
+if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+	GetActionCount = function(actionId)
+		ReagentScannerTooltip:SetOwner(UIParent, "ANCHOR_NONE");
+		ReagentScannerTooltip:SetAction(actionId);
+		for __, region in pairs({ReagentScannerTooltip:GetRegions()}) do
+			if (region:GetObjectType() == "FontString" and string.find(region:GetText() or "", SPELL_REAGENTS)) then
+				local count = 0
+				local reagent = string.gsub(region:GetText(), SPELL_REAGENTS, "")
+				reagent = select(2,reagent:match("|H(.*)|h%[(.*)%]|h")) or reagent;
+				for i=0, 4 do
+					for j=1, GetContainerNumSlots(i) do
+						local __, itemCount, __, __, __, __, __, __, __, itemId = GetContainerItemInfo(i,j);
+						if (itemId) then
+							if (reagent == (GetItemInfo(itemId))) then
+								count = count + itemCount;
+							end
+						end
+					end
+				end
+				return count;
+			end
+		end
+		return OldGetActionCount(actionId);
+	end
+end
+
 local GetActionInfo = GetActionInfo;
 local GetActionLossOfControlCooldown = GetActionLossOfControlCooldown;
 local GetActionRange = GetActionRange;
@@ -1085,8 +1114,14 @@ function useButton:updateCount()
 	if ( not hasAction ) then
 		text:SetText("");
 	else
-		if ( IsConsumableAction(actionId) or IsStackableAction(actionId) or (not IsItemAction(actionId) and GetActionCount(actionId) > 0) ) then
-			text:SetText(GetActionCount(actionId));
+		
+		if (
+			IsConsumableAction(actionId)
+			or IsStackableAction(actionId)
+			or (not IsItemAction(actionId) and GetActionCount(actionId) > 0)
+			
+		) then
+			text:SetText((GetActionCount(actionId) < 1000 and GetActionCount(actionId)) or "*");
 		else
 			local charges, maxCharges, chargeStart, chargeDuration = GetActionCharges(actionId);
 			if (maxCharges > 1) then

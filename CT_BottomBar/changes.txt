@@ -1,3 +1,6 @@
+CT_BottomBar (8.2.5.8) 2019-12-13
+- Fix to the movable performance monitor in Classic 1.13.3
+
 CT_BottomBar (8.2.5.7) 2019-12-11
 - Added a movable key ring button to Classic
 - More control over textures behind the main menu bar in Classic

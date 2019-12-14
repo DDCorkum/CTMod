@@ -322,8 +322,8 @@ do
 				module:displayTooltip(self,
 				{
 					self.icontext:GetText() or "", 
-					self.sender:GetText() and "|cffcccccc" .. module.text["CT_MailMod/MailLog/Receiver"] .. " -|r " .. self.sender:GetText() .. "#1:1:1", 
-					self.receiver:GetText() and "|cffcccccc" .. module.text["CT_MailMod/MailLog/Sender"] .. " -|r " .. self.receiver:GetText() .. "#1:1:1", 
+					self.sender:GetText() and "|cffcccccc" .. module.text["CT_MailMod/MailLog/Receiver"] .. " -|r " .. self.receiver:GetText() .. "#1:1:1", 
+					self.receiver:GetText() and "|cffcccccc" .. module.text["CT_MailMod/MailLog/Sender"] .. " -|r " .. self.sender:GetText() .. "#1:1:1", 
 					self.timestamp and "|cffcccccc" .. module.text["CT_MailMod/MailLog/Date"] .. " -|r " .. date("%Y-%m-%d %H:%M:%S", self.timestamp) .. "#1:1:1", 
 					self.subject:GetText() and "|cffcccccc" .. module.text["CT_MailMod/MailLog/Subject"] .. " -|r " .. gsub(self.subject:GetText(),"#","~") .. "#1:1:1"
 				}, "CT_ABOVEBELOW", 0, 0, CT_MailMod_MailLog);
