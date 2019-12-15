@@ -94,8 +94,8 @@ local function addon_Register()
 	module:registerAddon(
 		"Talking Head",  -- option name
 		"CTTalkingHead",  -- used in frame names
-		"Talking Head",  -- shown in options window & tooltips
-		"Talking Head (quest dialogue)",  -- title for horizontal orientation
+		module.text["CT_BottomBar/Options/TalkingHead"],  -- shown in options window & tooltips
+		module.text["CT_BottomBar/Options/TalkingHead"],  -- title for horizontal orientation
 		nil,  -- title for vertical orientation
 		{ "BOTTOM", ctRelativeFrame, "BOTTOM", 0, 96 },
 		{ -- settings

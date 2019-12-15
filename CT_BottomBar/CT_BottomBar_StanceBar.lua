@@ -136,8 +136,8 @@ local function addon_Register()
 	module:registerAddon(
 		"Stance Bar",  -- option name
 		"CTStanceBarFrame",  -- used in frame names
-		"Stance Bar",  -- shown in options window & tooltips
-		"Stance Bar",  -- title for horizontal orientation
+		module.text["CT_BottomBar/Options/StanceBar"],  -- shown in options window & tooltips
+		module.text["CT_BottomBar/Options/StanceBar"],  -- title for horizontal orientation
 		nil,  -- title for vertical orientation
 		{ "BOTTOMLEFT", ctRelativeFrame, "BOTTOM", -482, 60 },
 		{ -- settings
@@ -165,8 +165,8 @@ local function addon_Register()
 	module:registerAddon(
 		"Flight Bar",  -- option name
 		"CTFlightBarFrame",  -- used in frame names
-		"Stop Flying Button",  -- shown in options window & tooltips
-		"Stop Flying",  -- title for horizontal orientation
+		module.text["CT_BottomBar/Options/FlightBar"],  -- shown in options window & tooltips
+		module.text["CT_BottomBar/Options/FlightBar"],  -- title for horizontal orientation
 		nil,  -- title for vertical orientation
 		{ "RIGHT", ctRelativeFrame, "BOTTOM", -492, 90 },
 		{ -- settings

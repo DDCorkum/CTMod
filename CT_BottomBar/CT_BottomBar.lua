@@ -8,6 +8,14 @@
 -- Please do not modify or otherwise          --
 -- redistribute this without the consent of   --
 -- the CTMod Team. Thank you.                 --
+--                                            --
+-- Original credits to Cide and TS (Vanilla)  --
+-- Maintained by Resike from 2014 to 2017     --
+-- Maintained by Dahk Celes since 2018        --
+--                                            --
+-- This file provides the core functionality, --
+-- together with CT_BottomBar_Addon.lua that  --
+-- forms the basis for all the custom bars.   --
 ------------------------------------------------
 
 --------------------------------------------

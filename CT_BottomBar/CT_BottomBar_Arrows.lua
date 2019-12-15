@@ -89,7 +89,7 @@ local function addon_Register()
 	module:registerAddon(
 		"Action Bar Arrows",  -- option name
 		"ActionBarPage",  -- used in frame names
-		"Action Bar Page",  -- shown in options window & tooltips
+		module.text["CT_BottomBar/Options/ActionBarPage"],  -- shown in options window & tooltips
 		"Page",  -- title for horizontal orientation
 		nil,  -- title for vertical orientation
 		{ "BOTTOMLEFT", ctRelativeFrame, "BOTTOM",  (module:getGameVersion() == CT_GAME_VERSION_CLASSIC and -5) or -6, (module:getGameVersion() == CT_GAME_VERSION_CLASSIC and 25.5) or 24},

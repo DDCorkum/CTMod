@@ -19,7 +19,7 @@
 -----------------------------------------------
 -- Initialization
 
-local LIBRARY_VERSION = 8.257;
+local LIBRARY_VERSION = 8.258;
 local LIBRARY_NAME = "CT_Library";
 
 local _G = getfenv(0);
@@ -1426,19 +1426,19 @@ objectHandlers.backdrop = function(self, parent, name, virtual, option, backdrop
 end
 
 -- FontString
--- #r:b:g:j or #j will set colour and justification.  j can be l,r,c (horizontal) or t, b, m (vertical).
--- If j is a number and only one point is defined and the fontstring's width exceeds this number, then the font will be shrunk.  This is meant for localizing single-line labels/headings in small spaces.
+-- #r:b:g:just:max where just is the justification and max is the maximum width (strings will shrink to fit within it)
+-- Do not use maximum width when also setting #s:___:___ because then the width is strictly controlled!
 objectHandlers.font = function(self, parent, name, virtual, option, text, data, layer)
 	-- Data
-	local r, g, b, justify;
-	local a, b, c, d = splitString(data, colonSeparator);
+	local r, g, b, justify, maxwidth;
+	local a, b, c, d, e = splitString(data, colonSeparator);
 
 	-- Parse our attributes
 	if ( tonumber(a) and tonumber(b) and tonumber(c) ) then
 		r, g, b = tonumber(a), tonumber(b), tonumber(c);
-		justify = d;
+		justify, maxwidth = d, tonumber(e);
 	else
-		justify = a;
+		justify = a, tonumber(b);
 	end
 
 	-- Create FontString
@@ -1466,6 +1466,20 @@ objectHandlers.font = function(self, parent, name, virtual, option, text, data, 
 		end
 	end
 
+	-- Maximum width (to support localization
+	if (maxwidth) then
+		hooksecurefunc(fontString, "SetText", function()
+			local fontName, fontHeight, fontFlags = fontString:GetFont();
+			fontString.originalFontHeight = fontString.originalFontHeight or fontHeight;
+			if (fontString.originalFontHeight ~= fontHeight) then
+				fontString:SetFont(fontName, fontString.originalFontHeight, fontFlags);
+			end
+			if (fontString:GetWidth() > maxwidth) then
+				fontString:SetFont(fontName, fontString.originalFontHeight / fontString:GetWidth() * maxwidth, fontFlags);
+			end
+		end);
+	end
+
 	-- Color
 	if ( r and g and b ) then
 		fontString:SetTextColor(tonumber(r) or 1, tonumber(g) or 1, tonumber(b) or 1);
@@ -1473,12 +1487,6 @@ objectHandlers.font = function(self, parent, name, virtual, option, text, data, 
 
 	-- Text
 	fontString:SetText(self:getText(text) or _G[text] or text);
-	
-	-- Max Width (to fit localizations)
-	if (tonumber(justify) and fontString:GetWidth() > tonumber(justify) and fontString:GetNumPoints() == 1) then
-		local fontName, fontHeight, fontFlags = fontString:GetFont();
-		fontString:SetFont(fontName, fontHeight * tonumber(justify) / fontString:GetWidth(), fontFlags)
-	end
 
 	return fontString;
 end

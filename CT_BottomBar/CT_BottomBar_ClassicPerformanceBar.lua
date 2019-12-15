@@ -22,7 +22,7 @@ local appliedOptions;
 local isEnabled = nil;
 
 --------------------------------------------
--- Action bar arrows and page number
+-- Performance Monitor
 
 local function addon_Update(self)
 	-- Update the frame
@@ -87,12 +87,12 @@ local function addon_Register()
 	module:registerAddon(
 		"Classic Performance Bar",  -- option name
 		"ClassicPerformanceBar",  -- used in frame names
-		"Performance Bar",  -- shown in options window & tooltips
-		nil,  -- title for horizontal orientation
+		module.text["CT_BottomBar/Options/ClassicPerformanceBar"],  -- shown in options window & tooltips
+		module.text["CT_BottomBar/Options/ClassicPerformanceBar"],  -- title for horizontal orientation
 		nil,  -- title for vertical orientation
 		{ "BOTTOMRIGHT", ctRelativeFrame, "BOTTOM", 277, -10 },
 		{ -- settings
-			--orientation = "ACROSS",
+			orientation = "ACROSS",
 		},
 		addon_Init,
 		addon_PostInit,  -- no post init function

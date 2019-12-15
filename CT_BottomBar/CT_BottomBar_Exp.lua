@@ -1106,8 +1106,8 @@ local function addon_Register()
 	module:registerAddon(
 		"Experience Bar",  -- option name
 		"ExpBar",  -- used in frame names
-		"Experience Bar",  -- shown in options window & tooltips
-		"Experience Frame",  -- title for horizontal orientation
+		module.text["CT_BottomBar/Options/ExpBar"],  -- shown in options window & tooltips
+		module.text["CT_BottomBar/Options/ExpBar"],  -- title for horizontal orientation
 		nil,  -- title for vertical orientation
 		{ "BOTTOMLEFT", ctRelativeFrame, "BOTTOM", -512, 42 },
 		{ -- settings

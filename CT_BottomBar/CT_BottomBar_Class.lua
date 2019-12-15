@@ -221,8 +221,8 @@ local function addon_Register()
 	module:registerAddon(
 		"Class Bar",  -- option name
 		"ClassBar",  -- used in frame names
-		"Class Bar",  -- shown in options window & tooltips
-		"Class Bar",  -- title for horizontal orientation
+		module.text["CT_BottomBar/Options/ClassBar"],  -- shown in options window & tooltips
+		module.text["CT_BottomBar/Options/ClassBar"],  -- title for horizontal orientation
 		"Class",  -- title for vertical orientation
 		{ "BOTTOMLEFT", ctRelativeFrame, "BOTTOM", -484, 107 },
 		{ -- settings
