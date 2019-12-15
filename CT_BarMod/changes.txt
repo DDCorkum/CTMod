@@ -1,3 +1,6 @@
+CT_BarMod (8.2.5.8) 2019-12-13
+- Displays reagent counts on spell buttons in WoW Classic 1.13.3
+
 CT_BarMod (8.2.5.3) 2019-10-01
 - Correction to interactions between CT_BarMod and CT_BottomBar after 8.2.5.2
 

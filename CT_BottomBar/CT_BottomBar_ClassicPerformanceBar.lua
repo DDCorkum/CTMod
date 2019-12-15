@@ -19,8 +19,10 @@ local module = _G.CT_BottomBar;
 local ctRelativeFrame = module.ctRelativeFrame;
 local appliedOptions;
 
+local isEnabled = nil;
+
 --------------------------------------------
--- Action bar arrows and page number
+-- Performance Monitor
 
 local function addon_Update(self)
 	-- Update the frame
@@ -32,13 +34,23 @@ local function addon_Update(self)
 
 end
 
+local function updatePosition(self)
+	if (isEnabled) then
+		MainMenuBarPerformanceBarFrame:SetPoint("BOTTOMRIGHT", self.frame, 0, 0);
+		self.frame:SetClampRectInsets(5,5,35,15);
+	else
+		MainMenuBarPerformanceBarFrame:SetPoint("BOTTOMRIGHT", MainMenuBar, -235, -10);
+	end
+end
+
 local function addon_Enable(self)
-	MainMenuBarPerformanceBarFrame:SetPoint("BOTTOMRIGHT", self.frame, 0, 0);
-	self.frame:SetClampRectInsets(5,5,35,15);
+	isEnabled = true;
+	updatePosition(self);
 end
 
 local function addon_Disable(self)
-	MainMenuBarPerformanceBarFrame:SetPoint("BOTTOMRIGHT", MainMenuBar, -235, -10);
+	isEnabled = false;
+	updatePosition(self);
 end
 
 local function addon_Init(self)
@@ -57,19 +69,33 @@ local function addon_Init(self)
 	return true;
 end
 
+local function addon_PostInit(self)
+	local isActive = nil;
+	hooksecurefunc(MainMenuBarPerformanceBarFrame, "SetPoint", function()
+		if (isActive) then
+			return;
+		else
+			isActive = true;
+			updatePosition(self);
+			isActive = nil;
+		end
+		
+	end);
+end
+
 local function addon_Register()
 	module:registerAddon(
 		"Classic Performance Bar",  -- option name
 		"ClassicPerformanceBar",  -- used in frame names
-		"Performance Bar",  -- shown in options window & tooltips
-		nil,  -- title for horizontal orientation
+		module.text["CT_BottomBar/Options/ClassicPerformanceBar"],  -- shown in options window & tooltips
+		module.text["CT_BottomBar/Options/ClassicPerformanceBar"],  -- title for horizontal orientation
 		nil,  -- title for vertical orientation
 		{ "BOTTOMRIGHT", ctRelativeFrame, "BOTTOM", 277, -10 },
 		{ -- settings
 			orientation = "ACROSS",
 		},
 		addon_Init,
-		nil,  -- no post init function
+		addon_PostInit,  -- no post init function
 		nil,  -- no config function
 		addon_Update,
 		nil,  -- no orientation function

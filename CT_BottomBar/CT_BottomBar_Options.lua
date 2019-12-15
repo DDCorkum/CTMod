@@ -8,6 +8,12 @@
 -- Please do not modify or otherwise          --
 -- redistribute this without the consent of   --
 -- the CTMod Team. Thank you.                 --
+--                                            --
+-- Original credits to Cide and TS (Vanilla)  --
+-- Maintained by Resike from 2014 to 2017     --
+-- Maintained by Dahk Celes since 2018        --
+--                                            --
+-- This file provides the /ctbb options menu  --
 ------------------------------------------------
 
 --------------------------------------------
@@ -24,6 +30,9 @@ local pendingOptions;
 
 local theOptionsFrame;
 local exprepOptionsFrame;
+
+module.text = module.text or {}; --see localization.lua
+L = module.text
 
 ----------------------------------------------
 -- Miscellaneous
@@ -638,9 +647,9 @@ module.frame = function()
 						left = 15;
 						color = textColor0;
 					end
-					optionsAddObject(off,   14, "font#tl:" .. left .. ":%y#" .. obj.addonName .. "#" .. color);
-					optionsAddObject( 21,   26, "checkbutton#tl:150:%y" .. "#i:enable" .. obj.optionName .. "#o:enable" .. obj.optionName .. ":true#Activate");
-					optionsAddObject( 26,   26, "checkbutton#tl:240:%y" .. "#i:" .. obj.optionName .. "#o:" .. obj.optionName .. ((obj:isDefaultHidden() and ":true") or "") .. "#Hide");
+					optionsAddObject(off,   14, "font#tl:" .. left .. ":%y#" .. obj.addonName .. "#" .. color .. ":l:130");
+					optionsAddObject( 21,   26, "checkbutton#tl:150:%y" .. "#i:enable" .. obj.optionName .. "#o:enable" .. obj.optionName .. ":true#" .. L["CT_BottomBar/Options/MovableBars/Activate"]);
+					optionsAddObject( 26,   26, "checkbutton#tl:230:%y" .. "#i:" .. obj.optionName .. "#o:" .. obj.optionName .. ((obj:isDefaultHidden() and ":true") or "") .. "#" .. L["CT_BottomBar/Options/MovableBars/Hide"]);
 				end
 				off = -5;
 			end
@@ -678,13 +687,13 @@ module.frame = function()
 	-- General Options
 	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Important General Options");
-		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormal#Background Textures");
-		optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#Control the grey backgrounds behind the default UI bar positions.#" .. textColor2 .. ":l");
-		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#i:showLions#o:showLions#Show lions instead of gryphons");
-		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#i:hideGryphons#o:hideGryphons:true#Hide the gryphons/lions");
-		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#i:hideTexturesBackground#o:hideTexturesBackground:true#Hide the background textures");
+		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormal#" .. L["CT_BottomBar/Options/General/BackgroundTextures/Heading"]);
+		optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_BottomBar/Options/General/BackgroundTextures/Line1"] .. "#" .. textColor2 .. ":l");
+		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#i:showLions#o:showLions#" .. L["CT_BottomBar/Options/General/BackgroundTextures/ShowLionsCheckButton"]);
+		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#i:hideGryphons#o:hideGryphons:true#" .. L["CT_BottomBar/Options/General/BackgroundTextures/HideGryphonsCheckButton"]);
+		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#i:hideTexturesBackground#o:hideTexturesBackground:true#" .. L["CT_BottomBar/Options/General/BackgroundTextures/HideActionBarCheckButton"]);
 		--optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#Warning: don't hide the bag/menu background if you unchecked 'Activate' up above#" .. textColor2 .. ":l");
-		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#i:hideMenuAndBagsBackground#o:hideMenuAndBagsBackground:true#Hide the menu and bags textures");
+		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#i:hideMenuAndBagsBackground#o:hideMenuAndBagsBackground:true#" .. L["CT_BottomBar/Options/General/BackgroundTextures/HideMenuAndBagsCheckButton"]);
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormal#How to move bars");
 		optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#You can move a bar off the screen if you want... but consider just hiding it instead#" .. textColor2 .. ":l");
 		optionsAddObject(  -5,   26, "checkbutton#tl:20:%y#o:clampFrames:true#Cannot drag bars completely off screen");

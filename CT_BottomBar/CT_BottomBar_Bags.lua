@@ -121,8 +121,8 @@ local function addon_Register()
 	module:registerAddon(
 		"Bags Bar",  -- option name
 		"BagsBar",  -- used in frame names
-		"Bags Bar",  -- shown in options window & tooltips
-		"Bags Bar",  -- title for horizontal orientation
+		module.text["CT_BottomBar/Options/BagsBar"],  -- shown in options window & tooltips
+		module.text["CT_BottomBar/Options/BagsBar"],  -- title for horizontal orientation
 		"Bags",  -- title for vertical orientation
 		{ "BOTTOMLEFT", ctRelativeFrame, "BOTTOM", x, y },  --default position
 		{ -- settings

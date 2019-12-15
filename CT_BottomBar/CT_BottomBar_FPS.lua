@@ -110,8 +110,8 @@ local function addon_Register()
 	module:registerAddon(
 		"Framerate Bar",  -- option name
 		"Frameratebar",  -- used in frame names
-		"FPS Indicator (CTRL-R)",  -- shown in options window & tooltips
-		"FPS (Ctrl-R)",  -- title for horizontal orientation
+		module.text["CT_BottomBar/Options/FPSBar"],  -- shown in options window & tooltips
+		module.text["CT_BottomBar/Options/FPSBar"],  -- title for horizontal orientation
 		nil,  -- title for vertical orientation
 		{ "BOTTOMLEFT", ctRelativeFrame, "BOTTOM", -20, 120 },
 		{ -- settings

@@ -806,8 +806,8 @@ local function addon_Register()
 	module:registerAddon(
 		"Reputation Bar",  -- option name
 		"RepBar",  -- used in frame names
-		"Reputation Bar",  -- shown in options window & tooltips
-		"Reputation Frame",  -- title for horizontal orientation
+		module.text["CT_BottomBar/Options/RepBar"],  -- shown in options window & tooltips
+		module.text["CT_BottomBar/Options/RepBar"],  -- title for horizontal orientation
 		nil,  -- title for vertical orientation
 		{ "BOTTOMLEFT", ctRelativeFrame, "BOTTOM", -512, 52 },
 		{ -- settings

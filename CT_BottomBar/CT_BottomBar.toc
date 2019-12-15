@@ -1,5 +1,5 @@
 ## Interface: 80205
-## Version: 8.2.5.7
+## Version: 8.2.5.8
 ## Title: CT_BottomBar |cFF333333(BFA)
 ## Notes: Breaks up the main menu bar into movable pieces.
 ## DefaultState: Enabled
@@ -29,3 +29,4 @@ CT_BottomBar_Rep.lua
 CT_BottomBar_ClassicPerformanceBar.lua
 CT_BottomBar_ClassicKeyRingButton.lua
 CT_BottomBar_StanceBar.lua
+localization.lua

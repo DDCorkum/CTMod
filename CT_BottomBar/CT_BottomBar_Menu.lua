@@ -426,8 +426,8 @@ local function addon_Register()
 		module:registerAddon(
 			"Menu Bar",  -- option name
 			"MenuBar",  -- used in frame names
-			"Menu Bar",  -- shown in options window & tooltips
-			"Menu Bar",  -- title for horizontal orientation
+			module.text["CT_BottomBar/Options/MenuBar"],  -- shown in options window & tooltips
+			module.text["CT_BottomBar/Options/MenuBar"],  -- title for horizontal orientation
 			"Menu",  -- title for vertical orientation
 			{ "BOTTOMLEFT", ctRelativeFrame, "BOTTOM", 36, 28 },
 			{ -- settings
@@ -463,8 +463,8 @@ local function addon_Register()
 		module:registerAddon(
 			"Menu Bar",  -- option name
 			"MenuBar",  -- used in frame names
-			"Menu Bar",  -- shown in options window & tooltips
-			"Menu Bar",  -- title for horizontal orientation
+			module.text["CT_BottomBar/Options/MenuBar"],  -- shown in options window & tooltips
+			module.text["CT_BottomBar/Options/MenuBar"],  -- title for horizontal orientation
 			"Menu",  -- title for vertical orientation
 			{ "BOTTOMLEFT", ctRelativeFrame, "BOTTOM", 40, 4 },
 			{ -- settings

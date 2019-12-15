@@ -8,6 +8,14 @@
 -- Please do not modify or otherwise          --
 -- redistribute this without the consent of   --
 -- the CTMod Team. Thank you.                 --
+--                                            --
+-- Original credits to Cide and TS (Vanilla)  --
+-- Maintained by Resike from 2014 to 2017     --
+-- Maintained by Dahk Celes since 2018        --
+--                                            --
+-- This file provides the core functionality, --
+-- together with CT_BottomBar_Addon.lua that  --
+-- forms the basis for all the custom bars.   --
 ------------------------------------------------
 
 --------------------------------------------
@@ -702,7 +710,7 @@ module.update = function(self, optName, value)
 			module:loadAddon("Framerate Bar");
 			module:loadAddon("Talking Head");
 		elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-			-- module:loadAddon("Action Bar Arrows");
+			module:loadAddon("Action Bar Arrows");
 			module:loadAddon("Bags Bar");
 			module:loadAddon("Experience Bar");
 			module:loadAddon("Reputation Bar");  -- Show after exp bar in options window

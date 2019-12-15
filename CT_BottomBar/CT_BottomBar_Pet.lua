@@ -218,8 +218,8 @@ local function addon_Register()
 	module:registerAddon(
 		"Pet Bar",  -- option name
 		"PetBar",  -- used in frame names
-		"Pet Bar",  -- shown in options window & tooltips
-		"Pet Bar",  -- title for horizontal orientation
+		module.text["CT_BottomBar/Options/PetBar"],  -- shown in options window & tooltips
+		module.text["CT_BottomBar/Options/PetBar"],  -- title for horizontal orientation
 		"Pet",  -- title for vertical orientation
 		{ "BOTTOMLEFT", ctRelativeFrame, "BOTTOM", -98, 107 },
 		{ -- settings

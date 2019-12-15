@@ -61,8 +61,8 @@ local function addon_Register()
 	module:registerAddon(
 		"Classic Key Ring Button",  -- option name
 		"ClassicKeyRingButton",  -- used in frame names
-		"Key Ring Button",  -- shown in options window & tooltips
-		nil,  -- title for horizontal orientation
+		module.text["CT_BottomBar/Options/ClassicKeyRingButton"],  -- shown in options window & tooltips
+		module.text["CT_BottomBar/Options/ClassicKeyRingButton"],  -- title for horizontal orientation
 		nil,  -- title for vertical orientation
 		--{ "RIGHT", MainMenuBarArtFrame, "BOTTOMRIGHT", -216, 21.5 },
 		{"RIGHT", ctRelativeFrame, "BOTTOM", 295, 21.5 },

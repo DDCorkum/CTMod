@@ -1,5 +1,5 @@
 ## Interface: 80205
-## Version: 8.2.5.7
+## Version: 8.2.5.8
 ## Title: CT_Library |cFF333333(BFA)
 ## Notes: Library features for CTMod. 
 ## DefaultState: Enabled
