@@ -29,3 +29,4 @@ CT_BottomBar_Rep.lua
 CT_BottomBar_ClassicPerformanceBar.lua
 CT_BottomBar_ClassicKeyRingButton.lua
 CT_BottomBar_StanceBar.lua
+localization.lua
