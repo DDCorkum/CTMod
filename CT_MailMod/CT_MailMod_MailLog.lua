@@ -309,7 +309,7 @@ do
 		local scrollChild = {
 			-- "texture#tl#br:0:1#1:1:1:0.25"
 --			"texture#s:40:20#l:5:0#i:icon",
-			"font#s:50:20#l:5:0#i:icontext#v:GameFontNormal##1:1:1:l",
+			"font#l:5:0#i:icontext#v:GameFontNormal##1:1:1:l:48",
 			"font#s:100:20#l:55:0#i:receiver#v:GameFontNormal##1:1:1:l",
 			"font#s:100:20#l:155:0#i:sender#v:GameFontNormal##1:1:1:l",
 			"font#s:60:20#l:255:0#i:date#v:GameFontNormal##1:1:1:c",
@@ -334,12 +334,12 @@ do
 			"backdrop#tooltip#0:0:0:0.75",
 			"font#t:0:-10#v:GameFontNormalHuge#" .. module.text["CT_MailMod/MAIL_LOG"] .. "#1:1:1",
 
-			"font#tl:60:-47#i:receiverHeading#v:GameFontNormalLarge#" .. module.text["CT_MailMod/MailLog/Receiver"] .. "#1:1:1:100",
-			"font#tl:160:-47#i:senderHeading#v:GameFontNormalLarge#" .. module.text["CT_MailMod/MailLog/Sender"] .. "#1:1:1:100",
-			"font#tl:265:-47#i:dateHeading#v:GameFontNormalLarge#" .. module.text["CT_MailMod/MailLog/Date"] .. "#1:1:1:55",
-			"font#tl:320:-47#i:subjectHeading#v:GameFontNormalLarge#" .. module.text["CT_MailMod/MailLog/Subject"] .. "#1:1:1:150",
-			"font#tl:475:-47#i:moneyHeading#v:GameFontNormalLarge#" .. module.text["CT_MailMod/MailLog/Money"] .. "#1:1:1:78:",
-			"font#tl:553:-47#i:itemsHeading#v:GameFontNormalLarge#" .. module.text["CT_MailMod/MailLog/Items"] .. "#1:1:1:100",
+			"font#l:tl:60:-55#i:receiverHeading#v:GameFontNormalLarge#" .. module.text["CT_MailMod/MailLog/Receiver"] .. "#1:1:1:c:100",
+			"font#l:tl:160:-55#i:senderHeading#v:GameFontNormalLarge#" .. module.text["CT_MailMod/MailLog/Sender"] .. "#1:1:1:c:100",
+			"font#l:tl:265:-55#i:dateHeading#v:GameFontNormalLarge#" .. module.text["CT_MailMod/MailLog/Date"] .. "#1:1:1:c:55",
+			"font#l:tl:320:-55#i:subjectHeading#v:GameFontNormalLarge#" .. module.text["CT_MailMod/MailLog/Subject"] .. "#1:1:1:c:150",
+			"font#l:tl:475:-55#i:moneyHeading#v:GameFontNormalLarge#" .. module.text["CT_MailMod/MailLog/Money"] .. "#1:1:1:c:78:",
+			"font#l:tl:553:-55#i:itemsHeading#v:GameFontNormalLarge#" .. module.text["CT_MailMod/MailLog/Items"] .. "#1:1:1:c:100",
 
 			--"font#tl:20:-40#v:GameFontNormalLarge#Filter:#1:1:1",
 			--"dropdown#n:CT_MAILMOD_MAILLOGDROPDOWN1#tl:80:-43#All Mail#Incoming Mail#Outgoing Mail",

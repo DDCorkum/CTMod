@@ -1,5 +1,6 @@
-CT_MailMod (8.2.5.8) 2019-12-12
+CT_MailMod (8.2.5.8) 2019-12-15
 - Small fix to tooltips in the mail log
+- More localization support
 
 CT_MailMod (8.2.5.7) 2019-12-08
 - Timestamps and tooltips added to the mail log
