@@ -693,7 +693,7 @@ do
 				frame.items = {};
 			end
 			for y = 1, module.MAX_ATTACHMENTS, 1 do
-				item = frame.items[y];
+				local item = frame.items[y];
 				if ( y <= items ) then
 					if ( not item ) then
 						item = createItemFrame(frame, y);

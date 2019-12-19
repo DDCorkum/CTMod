@@ -18,7 +18,7 @@
 
 -- Please see CurseForge.com/Projects/CTMod/Localization to contribute additional translations
 
-lib = _G["CT_Library"]
+local lib = _G["CT_Library"]
 lib.text = lib.text or { }
 local L = lib.text
 

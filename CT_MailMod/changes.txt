@@ -1,3 +1,6 @@
+CT_MailMod (8.2.5.9) 2019-12-18
+- Minor code cleanup; nothing substantive
+
 CT_MailMod (8.2.5.8) 2019-12-15
 - Small fix to tooltips in the mail log
 - More localization support

@@ -1,5 +1,5 @@
 ## Interface: 80205
-## Version: 8.2.5.6
+## Version: 8.2.5.9
 ## Title: CT_ExpenseHistory |cFF333333(BFA)
 ## Notes: Detailed log of character expenses.
 ## DefaultState: Enabled

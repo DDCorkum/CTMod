@@ -97,8 +97,8 @@ if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
 			questNormalText = _G["QuestLogTitle"..i.."NormalText"];
 			questHighlight = _G["QuestLogTitle"..i.."Highlight"];
 			if ( questIndex <= numEntries ) then
-				questLogTitleText, level, questTag, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isBounty, isStory, isHidden, isScaling = GetQuestLogTitle(questIndex);
 -- CT_CORE MODIFICATION STARTS HERE
+				local questLogTitleText, level, questTag, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isBounty, isStory, isHidden, isScaling = GetQuestLogTitle(questIndex);
 				if (displayLevels and questLogTitleText and level and level > 0) then
 					if (questTag) then
 						questLogTitleText = "[" .. level .. "+] " .. questLogTitleText;
@@ -747,7 +747,7 @@ local function updateTickDisplay(key, diff)
 		tickFrame:SetWidth(tickFrameWidth);
 	end
 
-	counter = 0.05;
+	tickCounter = 0.05;
 	tickFrame:SetScript("OnUpdate", fadeTicks);
 end
 

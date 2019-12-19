@@ -32,7 +32,7 @@ local theOptionsFrame;
 local exprepOptionsFrame;
 
 module.text = module.text or {}; --see localization.lua
-L = module.text
+local L = module.text
 
 ----------------------------------------------
 -- Miscellaneous

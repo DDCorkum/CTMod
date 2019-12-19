@@ -22,7 +22,7 @@ local outMail_meta = { __index = outMail };
 
 -- Creates the main mail structure.
 function module:newOutgoingMail(sendTo, subject, body)
-	mail = setmetatable(self:getTable(), outMail_meta);
+	local mail = setmetatable(self:getTable(), outMail_meta);
 	mail.sender = module:getPlayerName();  -- "name @ server"
 	mail.receiver = module:getPlayerName(sendTo);  -- "name @ server"
 	mail.subject = subject or "";

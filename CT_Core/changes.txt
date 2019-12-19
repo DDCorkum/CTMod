@@ -1,3 +1,6 @@
+CT_Core (8.2.5.9) 2019-12-18
+- Minor code cleanup; nothing substantive
+
 CT_Core (8.2.5.6) 2019-11-16
 - The classic quest tracker may now be minimized similar to retail
 - More control over timestamps in the chat window, mirroring the Blizzard default UI
