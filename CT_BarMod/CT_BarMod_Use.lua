@@ -70,14 +70,16 @@ local GetActionCooldown = GetActionCooldown;
 -- GetActionCount, overridden for WoW Classic 1.13.3 (CTMod 8.2.5.8)
 -- Credit to addon reagentCounter by Kurtzen and Kebabstorm for the basic methodology, adapted by DDC for CTMod 8.2.5.8
 local OldGetActionCount, GetActionCount, ReagentScannerTooltip = GetActionCount, GetActionCount, CreateFrame("GameTooltip", "CT_BarMod_ReagentScanner", nil, "GameTooltipTemplate");
+local reagentScannerTable = {};
 if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
 	GetActionCount = function(actionId)
 		ReagentScannerTooltip:SetOwner(UIParent, "ANCHOR_NONE");
 		ReagentScannerTooltip:SetAction(actionId);
-		for __, region in pairs({ReagentScannerTooltip:GetRegions()}) do
-			if (region:GetObjectType() == "FontString" and string.find(region:GetText() or "", SPELL_REAGENTS)) then
+		reagentScannerTable[7], reagentScannerTable[8], reagentScannerTable[9], reagentScannerTable[10] = select(7,ReagentScannerTooltip:GetRegions());
+		for i=7, 10 do
+			if (reagentScannerTable[i]:GetObjectType() == "FontString" and string.find(reagentScannerTable[i]:GetText() or "", SPELL_REAGENTS)) then
 				local count = 0
-				local reagent = string.gsub(region:GetText(), SPELL_REAGENTS, "")
+				local reagent = string.gsub(reagentScannerTable[i]:GetText(), SPELL_REAGENTS, "")
 				reagent = select(2,reagent:match("|H(.*)|h%[(.*)%]|h")) or reagent;
 				for i=0, 4 do
 					for j=1, GetContainerNumSlots(i) do
