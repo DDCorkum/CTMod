@@ -67,31 +67,20 @@ local CanExitVehicle = CanExitVehicle;
 local GetActionCharges = GetActionCharges;
 local GetActionCooldown = GetActionCooldown;
 
--- GetActionCount, overridden for WoW Classic 1.13.3 (CTMod 8.2.5.8)
+-- GetActionCount, overridden for WoW Classic 1.13.3 (CTMod 8.2.5.8) using GetItemCount and some tooltip scanning
 -- Credit to addon reagentCounter by Kurtzen and Kebabstorm for the basic methodology, adapted by DDC for CTMod 8.2.5.8
-local OldGetActionCount, GetActionCount, ReagentScannerTooltip = GetActionCount, GetActionCount, CreateFrame("GameTooltip", "CT_BarMod_ReagentScanner", nil, "GameTooltipTemplate");
+local OldGetActionCount, GetActionCount, GetItemCount, ReagentScannerTooltip = GetActionCount, GetActionCount, GetItemCount, CreateFrame("GameTooltip", "CT_BarMod_ReagentScanner", nil, "GameTooltipTemplate");
 local reagentScannerTable = {};
 if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
 	GetActionCount = function(actionId)
 		ReagentScannerTooltip:SetOwner(UIParent, "ANCHOR_NONE");
 		ReagentScannerTooltip:SetAction(actionId);
-		reagentScannerTable[7], reagentScannerTable[8], reagentScannerTable[9], reagentScannerTable[10] = select(7,ReagentScannerTooltip:GetRegions());
-		for i=7, 10 do
-			if (reagentScannerTable[i]:GetObjectType() == "FontString" and string.find(reagentScannerTable[i]:GetText() or "", SPELL_REAGENTS)) then
-				local count = 0
-				local reagent = string.gsub(reagentScannerTable[i]:GetText(), SPELL_REAGENTS, "")
-				reagent = select(2,reagent:match("|H(.*)|h%[(.*)%]|h")) or reagent;
-				for i=0, 4 do
-					for j=1, GetContainerNumSlots(i) do
-						local __, itemCount, __, __, __, __, __, __, __, itemId = GetContainerItemInfo(i,j);
-						if (itemId) then
-							if (reagent == (GetItemInfo(itemId))) then
-								count = count + itemCount;
-							end
-						end
-					end
-				end
-				return count;
+		reagentScannerTable[7], reagentScannerTable[8], reagentScannerTable[9], reagentScannerTable[10], reagentScannerTable[11] = select(7,ReagentScannerTooltip:GetRegions());
+		for k=7, 11 do		-- the reagent is #9 on mage spells (teleport, slow fall); checking 7 to 11 in case it is different for other classes
+			if (reagentScannerTable[k]:GetObjectType() == "FontString" and string.find(reagentScannerTable[k]:GetText() or "", SPELL_REAGENTS)) then	
+				local reagent = string.gsub(reagentScannerTable[k]:GetText(), SPELL_REAGENTS, "")
+				--reagent = select(2,reagent:match("|H(.*)|h%[(.*)%]|h")) or reagent;		-- I don't think this is even necessary.
+				return GetItemCount(reagent);
 			end
 		end
 		return OldGetActionCount(actionId);
