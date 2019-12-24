@@ -68,21 +68,37 @@ local GetActionCharges = GetActionCharges;
 local GetActionCooldown = GetActionCooldown;
 
 -- GetActionCount, overridden for WoW Classic 1.13.3 (CTMod 8.2.5.8) using GetItemCount and some tooltip scanning
--- Credit to addon reagentCounter by Kurtzen and Kebabstorm for the basic methodology, adapted by DDC for CTMod 8.2.5.8
 local OldGetActionCount, GetActionCount, GetItemCount, ReagentScannerTooltip = GetActionCount, GetActionCount, GetItemCount, CreateFrame("GameTooltip", "CT_BarMod_ReagentScanner", nil, "GameTooltipTemplate");
-local reagentScannerTable = {};
+local reagentScannerCache = {};
 if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
 	GetActionCount = function(actionId)
-		ReagentScannerTooltip:SetOwner(UIParent, "ANCHOR_NONE");
-		ReagentScannerTooltip:SetAction(actionId);
-		reagentScannerTable[7], reagentScannerTable[8], reagentScannerTable[9], reagentScannerTable[10], reagentScannerTable[11] = select(7,ReagentScannerTooltip:GetRegions());
-		for k=7, 11 do		-- the reagent is #9 on mage spells (teleport, slow fall); checking 7 to 11 in case it is different for other classes
-			if (reagentScannerTable[k]:GetObjectType() == "FontString" and string.find(reagentScannerTable[k]:GetText() or "", SPELL_REAGENTS)) then	
-				local reagent = string.gsub(reagentScannerTable[k]:GetText(), SPELL_REAGENTS, "")
-				--reagent = select(2,reagent:match("|H(.*)|h%[(.*)%]|h")) or reagent;		-- I don't think this is even necessary.
+		
+		-- perform custom execution only if this item is likely to require a reagent
+		if (IsConsumableAction(actionId) and not IsItemAction(actionId)) then
+			
+			-- first check if this ability is cached
+			local actionType, actionInfoId = GetActionInfo(actionId);
+			local reagent = reagentScannerCache[actionType .. actionInfoId];
+			if (reagent) then
 				return GetItemCount(reagent);
 			end
+			
+			-- it wasn't cached, so do the time-consuming process of finding the reagents necessary
+			ReagentScannerTooltip:SetOwner(UIParent, "ANCHOR_NONE");
+			ReagentScannerTooltip:SetAction(actionId);
+			for i=1, ReagentScannerTooltip:NumLines() do
+				local text = _G["CT_BarMod_ReagentScannerTextLeft" .. i]:GetText();
+				if (text and string.find(text, SPELL_REAGENTS)) then	
+					reagent = string.gsub(text, SPELL_REAGENTS, "");		-- strip out the localized header
+					reagent = string.gsub(reagent, "|cffff2020", "");		-- strip out the red colour if there is none of the reagent
+					reagent = string.gsub(reagent, "|r", "");			-- strip out the red colour if there is none of the reagent
+					reagentScannerCache[actionType .. actionInfoId] = reagent;	-- add to the cache!
+					return GetItemCount(reagent);
+				end
+			end								
 		end
+		
+		-- this item does not appear to require a reagent, so use the native API method
 		return OldGetActionCount(actionId);
 	end
 end
