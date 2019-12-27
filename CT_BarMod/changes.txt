@@ -1,5 +1,6 @@
-CT_BarMod (8.2.5.9) 2019-12-24
-- Reduced memory and CPU usage for reagent counts in WoW Classic 1.13.3
+CT_BarMod (8.2.5.9) 2019-12-26
+- Reduced memory usage in WoW Classic 1.13.3
+- Reduced CPU usage in all editions
 
 CT_BarMod (8.2.5.8) 2019-12-13
 - Displays reagent counts on spell buttons in WoW Classic 1.13.3

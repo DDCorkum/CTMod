@@ -76,11 +76,19 @@ end
 --------------------------------------------
 -- Miscellaneous
 
+local hasCachedBindingKeys, cachedBindingKey1, cachedBindingKey2 = {}, {}, {}
 module.getBindingKey = function(buttonId)
 	-- Returns key(s) currently bound to the CT_BarMod button number.
 	-- Eg. "1", "SHIFT-A", etc.
-	return GetBindingKey("CLICK CT_BarModActionButton" .. buttonId .. ":LeftButton");
+	
+	if (hasCachedBindingKeys[buttonId]) then
+		return cachedBindingKey1[buttonId], cachedBindingKey2[buttonId]
+	end
+	local key1, key2 = GetBindingKey("CLICK CT_BarModActionButton" .. buttonId .. ":LeftButton");
+	hasCachedBindingKeys[buttonId], cachedBindingKey1[buttonId], cachedBindingKey2[buttonId] = true, key1, key2
+	return key1, key2
 end
+module:regEvent("UPDATE_BINDINGS", function() wipe(hasCachedBindingKeys) end);
 
 -- Key Bindings Purger
 --[[module:regEvent("UPDATE_BINDINGS", function()

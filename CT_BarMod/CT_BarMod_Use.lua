@@ -133,7 +133,8 @@ local UnitExists = UnitExists;
 --------------------------------------------
 -- Cooldown Handler
 
-local cooldownList, cooldownUpdater;
+local cooldownList = {};
+local cooldownUpdater;
 
 local function updateCooldown(fsCount, time)
 	if ( time > 3540 ) then
@@ -151,26 +152,22 @@ local function updateCooldown(fsCount, time)
 end
 
 local function dropCooldownFromQueue(button)
-	if ( cooldownList ) then
-		cooldownList[button] = nil;
-		if ( not next(cooldownList) ) then
-			module:unschedule(cooldownUpdater, true);
-		end
+	cooldownList[button] = nil;
+	if ( not next(cooldownList) ) then
+		module:unschedule(cooldownUpdater, true);
 	end
 end
 
 cooldownUpdater = function()
-	if ( cooldownList ) then
-		local currTime = GetTime();
-		local start, duration, enable;
-		for button, fsCount in pairs(cooldownList) do
-			if button.actionId then
-				start, duration, enable = GetActionCooldown(button.actionId);
-				if ( start > 0 and duration > 0 and enable > 0 ) then
-					updateCooldown(fsCount, duration - (currTime - start));
-				else
-					dropCooldownFromQueue(button);
-				end
+	local currTime = GetTime();
+	local start, duration, enable;
+	for button, fsCount in pairs(cooldownList) do
+		if button.actionId then
+			start, duration, enable = GetActionCooldown(button.actionId);
+			if ( start > 0 and enable > 0 ) then
+				updateCooldown(fsCount, duration - (currTime - start));
+			else
+				dropCooldownFromQueue(button);
 			end
 		end
 	end
@@ -194,14 +191,12 @@ local function hideCooldown(cooldown)
 end
 
 function CT_BarMod_HideShowAllCooldowns(show)
-	if ( cooldownList ) then
-		for button, fsCount in pairs(cooldownList) do
-			if ( fsCount ) then
-				if (show) then
-					fsCount:Show();
-				else
-					fsCount:Hide();
-				end
+	for button, fsCount in pairs(cooldownList) do
+		if ( fsCount ) then
+			if (show) then
+				fsCount:Show();
+			else
+				fsCount:Hide();
 			end
 		end
 	end
@@ -221,15 +216,10 @@ local function startCooldown(cooldown, start, duration)
 		cooldown.fsCount = fsCount;
 	end
 	
-	if ( not cooldownList ) then
-		cooldownList = { [cooldown.object] = fsCount };
+	if ( not next(cooldownList) ) then
 		module:schedule(0.5, true, cooldownUpdater);
-	else
-		if ( not next(cooldownList) ) then
-			module:schedule(0.5, true, cooldownUpdater);
-		end
-		cooldownList[cooldown.object] = fsCount;
 	end
+	cooldownList[cooldown.object] = fsCount;
 	
 	fsCount:Show();
 	updateCooldown(fsCount, duration - (GetTime() - start));
@@ -1013,7 +1003,7 @@ function useButton:updateCooldown()
 	local cooldown = self.button.cooldown;
 	-- Action cooldown
 	local start, duration, enable = GetActionCooldown(self.actionId);
-	if ( start > 0 and duration > 0 and enable > 0 ) then
+	if ( start > 0 and enable > 0 ) then
 		cooldown:SetCooldown(start, duration);
 		actionCooldown = true;
 		if ( displayCount ) then
@@ -1061,7 +1051,8 @@ end
 -- Update Binding
 function useButton:updateBinding()
 	local actionId = self.actionId;
-	if ( IsActionInRange(self.actionId) == false ) then
+	local isInRange = IsActionInRange(actionId)
+	if ( isInRange == false ) then
 		local button = self.button;
 		self.outOfRange = true;
 		button.hotkey:SetVertexColor(1.0, 0.1, 0.1);
@@ -1069,10 +1060,10 @@ function useButton:updateBinding()
 		self.outOfRange = nil;
 		self.button.hotkey:SetVertexColor(0.6, 0.6, 0.6);
 	end
-	if ( displayBindings ) then
+	if ( displayBindings ) then		
 		local text = self:getBinding();
 		if ( text == "" or not text ) then
-			if ( not self.hasAction or not IsActionInRange(actionId) ) then
+			if ( not self.hasAction or not isInRange ) then
 				self.button.hotkey:SetText("");
 				self.hasRange = nil;
 				return;
@@ -1187,7 +1178,24 @@ function useButton:hideGrid()
 	end
 end
 
+
+
+local hasCachedBindingKeys, cachedBindingKey1, cachedBindingKey2 = {}, {}, {}
+local getActionBindingKey = function(value)
+	-- Returns key(s) currently bound to the default game button number.
+	-- Eg. "1", "SHIFT-A", etc.
+	
+	if (hasCachedBindingKeys[value]) then
+		return cachedBindingKey1[value], cachedBindingKey2[value]
+	end
+	local key1, key2 = GetBindingKey(value);
+	hasCachedBindingKeys[value], cachedBindingKey1[value], cachedBindingKey2[value] = true, key1, key2
+	return key1, key2
+end
+module:regEvent("UPDATE_BINDINGS", function() wipe(hasCachedBindingKeys) end);
+
 -- Get Binding
+local cachedBindingText = {}	-- used near the end of useButton:getBinding() to improve performance
 function useButton:getBinding()
 	-- local text = module:getOption("BINDING-"..self.buttonId);
 
@@ -1214,7 +1222,7 @@ function useButton:getBinding()
 	end
 	if (showBar and showDef and self.actionName) then
 		-- Get the key used on the default action bar's corresponding button.
-		local key1, key2 = GetBindingKey(self.actionName .. self.buttonNum);
+		local key1, key2 = getActionBindingKey(self.actionName .. self.buttonNum);
 		if (key1) then
 			-- Get the override binding action.
 			local action = GetBindingAction(key1, true);
@@ -1234,7 +1242,7 @@ function useButton:getBinding()
 			end
 		end
 	end
-
+	
 	if (not text) then
 		-- Get the key assigned directly to this (our) button.
 		local key1, key2 = module.getBindingKey(self.buttonId);
@@ -1269,14 +1277,19 @@ function useButton:getBinding()
 			return;
 		end
 --]]
+	end	
+
+	if (cachedBindingText[text]) then			-- multiple gsub queries are expensive, so cache the results to improve performance
+		return cachedBindingText[text]
 	end
-	
-	text = text:gsub("(.-)MOUSEWHEELUP(.+)", "%1WU%2");
+	local newKey = text;
+	text = text:gsub("(.-)MOUSEWHEELUP(.-)", "%1WU%2");
 	text = text:gsub("(.-)MOUSEWHEELDOWN(.+)", "%1WD%2");
 	text = text:gsub("(.-)BUTTON(.+)", "%1B%2");
 	text = text:gsub("(.-)SHIFT%-(.+)", "%1S-%2");
 	text = text:gsub("(.-)CTRL%-(.+)", "%1C-%2");
 	text = text:gsub("(.-)ALT%-(.+)", "%1A-%2");
+	cachedBindingText[newKey] = text;
 	return text;
 end
 
