@@ -1,4 +1,4 @@
-CT_BarMod (8.2.5.9) 2019-12-26
+CT_BarMod (8.2.5.9) 2019-12-28
 - Reduced memory usage in WoW Classic 1.13.3
 - Reduced CPU usage in all editions
 

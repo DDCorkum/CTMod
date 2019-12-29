@@ -71,6 +71,8 @@ local GetActionCooldown = GetActionCooldown;
 local OldGetActionCount, GetActionCount, GetItemCount, ReagentScannerTooltip = GetActionCount, GetActionCount, GetItemCount, CreateFrame("GameTooltip", "CT_BarMod_ReagentScanner", nil, "GameTooltipTemplate");
 local reagentScannerCache = {};
 if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+	ReagentScannerTooltip:SetOwner(UIParent, "ANCHOR_NONE");
+	
 	GetActionCount = function(actionId)
 		
 		-- perform custom execution only if this item is likely to require a reagent
@@ -84,7 +86,7 @@ if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
 			end
 			
 			-- it wasn't cached, so do the time-consuming process of finding the reagents necessary
-			ReagentScannerTooltip:SetOwner(UIParent, "ANCHOR_NONE");
+			ReagentScannerTooltip:ClearLines();
 			ReagentScannerTooltip:SetAction(actionId);
 			for i=1, ReagentScannerTooltip:NumLines() do
 				local text = _G["CT_BarMod_ReagentScannerTextLeft" .. i]:GetText();
@@ -948,7 +950,15 @@ function useButton:updateUsable()
 			button.icon:SetVertexColor(0.8, 0.4, 0.4);
 		end
 		
-	elseif ( isUsable ) then
+	elseif (
+		isUsable
+		and (
+			module:getGameVersion() == CT_GAME_VERSION_RETAIL
+			or not IsConsumableAction(self.actionId)	-- reagents behave differently in classic
+			or IsItemAction(self.actionId)
+			or GetActionCount(self.actionId) > 0
+		)
+	) then
 		button.icon:SetVertexColor(1, 1, 1);
 		
 	elseif ( notEnoughMana ) then
@@ -1049,50 +1059,34 @@ function useButton:updateState(checked)
 end
 
 -- Update Binding
+local hasCachedRanges, cachedMinRange, cachedMaxRange = {}, {}, {}
+local estimatedMinRange, estimatedMaxRange, estimatedRangeTime = 0, 0, 0
+local displayedBindings = {}
 function useButton:updateBinding()
 	local actionId = self.actionId;
+	local hotkey = self.button.hotkey
+	if (not self.hasAction) then
+		hotkey:SetText("");
+		return;
+	end
 	local isInRange = IsActionInRange(actionId)
 	if ( isInRange == false ) then
-		local button = self.button;
 		self.outOfRange = true;
-		button.hotkey:SetVertexColor(1.0, 0.1, 0.1);
+		hotkey:SetVertexColor(1.0, 0.1, 0.1);
 	else
 		self.outOfRange = nil;
-		self.button.hotkey:SetVertexColor(0.6, 0.6, 0.6);
+		hotkey:SetVertexColor(0.6, 0.6, 0.6);
 	end
+	local text;
 	if ( displayBindings ) then		
-		local text = self:getBinding();
-		if ( text == "" or not text ) then
-			if ( not self.hasAction or not isInRange ) then
-				self.button.hotkey:SetText("");
-				self.hasRange = nil;
-				return;
-			else
-				if (displayRangeDot) then
-					self.button.hotkey:SetText(rangeIndicator);
-				else
-					self.button.hotkey:SetText("");
-				end
-				self:updateUsable();
-			end
-		else
-			self.button.hotkey:SetText(text);
-		end
-		self.hasRange = true;
+		text = self:getBinding();
+	end
+	if (text) then
+			hotkey:SetText(text);
+	elseif (displayRangeDot and isInRange) then
+			hotkey:SetText(rangeIndicator);
 	else
-		if (displayRangeDot) then
-			if ( not self.hasAction or not IsActionInRange(actionId) ) then
-				self.button.hotkey:SetText("");
-				self.hasRange = nil;
-				return;
-			else
-				self.button.hotkey:SetText(rangeIndicator);
-				self:updateUsable();
-			end
-		else
-			self.button.hotkey:SetText("");
-		end
-		self.hasRange = self.hasAction and ActionHasRange(actionId);
+			hotkey:SetText("");
 	end
 end
 
@@ -1179,7 +1173,7 @@ function useButton:hideGrid()
 end
 
 
-
+-- cache to improve the performance of useButton:getBinding()
 local hasCachedBindingKeys, cachedBindingKey1, cachedBindingKey2 = {}, {}, {}
 local getActionBindingKey = function(value)
 	-- Returns key(s) currently bound to the default game button number.
@@ -1194,103 +1188,99 @@ local getActionBindingKey = function(value)
 end
 module:regEvent("UPDATE_BINDINGS", function() wipe(hasCachedBindingKeys) end);
 
+-- another cache to improve the performance of useButton:getBinding()
+local checkedBindingActions = {}
+local checkBindingAction = function(key, buttonId)
+	-- Confirms that the binding really does point to CT_BarMod and hasn't been overriden by some other addon
+	if (checkedBindingActions[key] == nil) then
+		checkedBindingActions[key] = ("CLICK CT_BarModActionButton" .. buttonId .. ":LeftButton" == GetBindingAction(key, true))
+	end
+	return checkedBindingActions[key]
+end
+hooksecurefunc("SetOverrideBinding", function() wipe(checkedBindingActions) end);
+hooksecurefunc("SetOverrideBindingSpell", function() wipe(checkedBindingActions) end);
+hooksecurefunc("SetOverrideBindingItem", function() wipe(checkedBindingActions) end);
+hooksecurefunc("SetOverrideBindingMacro", function() wipe(checkedBindingActions) end);
+hooksecurefunc("SetOverrideBindingClick", function() wipe(checkedBindingActions) end);
+hooksecurefunc("ClearOverrideBindings", function() wipe(checkedBindingActions) end);
+
 -- Get Binding
 local cachedBindingText = {}	-- used near the end of useButton:getBinding() to improve performance
+local frame2, frame3, frame4, frame5, frame12;
+local func2, func3, func4, func5, func12;
 function useButton:getBinding()
 	-- local text = module:getOption("BINDING-"..self.buttonId);
-
 	local text;
-	local ourAction = "CLICK CT_BarModActionButton" .. self.buttonId .. ":LeftButton";
-
+	local id = self.buttonId
 	local showBar, showDef;
 	local groupId = self.groupId;
-	if (groupId == module.actionBarId) then
-		showBar = module:getOption("showGroup" .. groupId) ~= false;
+	if (not frame2) then
+		frame2 = module:getGroup(2).frame
+		frame3 = module:getGroup(3).frame
+		frame4 = module:getGroup(4).frame
+		frame5 = module:getGroup(5).frame
+		frame12 = module:getGroup(12).frame
+		func2 = frame2.IsShown
+		func3 = frame3.IsShown
+		func4 = frame4.IsShown
+		func5 = frame5.IsShown
+		func12 = frame12.IsShown
+	end
+	if (groupId == 12) then		-- if (groupId == module.actionBarId)		-- hardcoding the value 12 to improve performance
+		-- showBar = module:getOption("showGroup" .. module.actionBarId) ~= false;
+		showBar = func12(frame12);
 		showDef = actionBindings;
 	elseif (groupId == 2) then -- CT bar 3 (game Right Bar)
-		showBar = module:getOption("showGroup" .. groupId) ~= false;
+		--showBar = module:getOption("showGroup2") ~= false;
+		showBar = func2(frame2);	
 		showDef = bar3Bindings;
 	elseif (groupId == 3) then -- CT bar 4 (game Right Bar 2)
-		showBar = module:getOption("showGroup" .. groupId) ~= false;
+		--showBar = module:getOption("showGroup3") ~= false;
+		showBar = func3(frame3);	
 		showDef = bar4Bindings;
 	elseif (groupId == 4) then -- CT bar 5 (game Bottom Right Bar)
-		showBar = module:getOption("showGroup" .. groupId) ~= false;
+		--showBar = module:getOption("showGroup4") ~= false;
+		showBar = func4(frame4);
 		showDef = bar5Bindings;
 	elseif (groupId == 5) then -- CT bar 6 (game Bottom Left Bar)
-		showBar = module:getOption("showGroup" .. groupId) ~= false;
+		--showBar = module:getOption("showGroup5") ~= false;
+		showBar = func5(frame5);	
 		showDef = bar6Bindings;
 	end
+	
 	if (showBar and showDef and self.actionName) then
 		-- Get the key used on the default action bar's corresponding button.
 		local key1, key2 = getActionBindingKey(self.actionName .. self.buttonNum);
-		if (key1) then
-			-- Get the override binding action.
-			local action = GetBindingAction(key1, true);
-			-- If it is still bound to our button...
-			if (action == ourAction) then
-				-- Show this key on the button.
-				text = key1;
-			end
-		end
-		if (key2 and not text) then
-			-- Get the override binding action.
-			local action = GetBindingAction(key2, true);
-			-- If it is still bound to our button...
-			if (action == ourAction) then
-				-- Show this key on the button.
-				text = key2;
-			end
+		if (key1 and checkBindingAction(key1, id)) then
+			text = key1;
+		elseif (key2 and checkBindingAction(key2, id)) then
+			text = key2;
 		end
 	end
 	
 	if (not text) then
 		-- Get the key assigned directly to this (our) button.
-		local key1, key2 = module.getBindingKey(self.buttonId);
-		if (key1) then
-			-- Get the override binding action.
-			local action = GetBindingAction(key1, true);
-			-- If it is bound to our button...
-			if (action == ourAction) then
-				-- Show this key on the button.
-				text = key1;
-			end
-		end
-		if (key2 and not text) then
-			-- Get the override binding action.
-			local action = GetBindingAction(key2, true);
-			-- If it is bound to our button...
-			if (action == ourAction) then
-				-- Show this key on the button.
-				text = key2;
-			end
-		end
-		if (not text) then
-			-- No key binding to show.
-			return;
-		end
---[[
-		if (key1) then
+		local key1, key2 = module.getBindingKey(id);
+		if (key1 and checkBindingAction(key1, id)) then			--checkBindingAction detects potential interference from other addons using SetOverrideBinding()
 			text = key1;
-		elseif (key2) then
+		elseif (key2 and checkBindingAction(key2, id)) then
 			text = key2;
 		else
 			return;
 		end
---]]
-	end	
-
-	if (cachedBindingText[text]) then			-- multiple gsub queries are expensive, so cache the results to improve performance
-		return cachedBindingText[text]
 	end
-	local newKey = text;
-	text = text:gsub("(.-)MOUSEWHEELUP(.-)", "%1WU%2");
-	text = text:gsub("(.-)MOUSEWHEELDOWN(.+)", "%1WD%2");
-	text = text:gsub("(.-)BUTTON(.+)", "%1B%2");
-	text = text:gsub("(.-)SHIFT%-(.+)", "%1S-%2");
-	text = text:gsub("(.-)CTRL%-(.+)", "%1C-%2");
-	text = text:gsub("(.-)ALT%-(.+)", "%1A-%2");
-	cachedBindingText[newKey] = text;
-	return text;
+
+	if (not cachedBindingText[text]) then			-- multiple gsub queries are expensive, so cache the results to improve performance
+		local uncachedText = text;
+		uncachedText = uncachedText:gsub("(.-)MOUSEWHEELUP(.-)", "%1WU%2");
+		uncachedText = uncachedText:gsub("(.-)MOUSEWHEELDOWN(.+)", "%1WD%2");
+		uncachedText = uncachedText:gsub("(.-)BUTTON(.+)", "%1B%2");
+		uncachedText = uncachedText:gsub("(.-)SHIFT%-(.+)", "%1S-%2");
+		uncachedText = uncachedText:gsub("(.-)CTRL%-(.+)", "%1C-%2");
+		uncachedText = uncachedText:gsub("(.-)ALT%-(.+)", "%1A-%2");
+		cachedBindingText[text] = uncachedText;
+	end
+	return cachedBindingText[text];
 end
 
 function useButton:getSkin()
@@ -1419,7 +1409,6 @@ function useButton:applySkin()
 	-- for the Glow and Ants textures to use the default square textures.
 	module:skinOverlayGlow(button, nil, nil);
 end
-
 
 ------------------------
 -- Button Handlers
@@ -1778,7 +1767,7 @@ do
 
 		if actionId then
 			local start, duration, enable = GetActionCooldown(actionId);
-			if ( start > 0 and duration > 0 and enable > 0 ) then
+			if ( start > 0 and enable > 0 ) then
 				startCooldown(cooldown, start, duration);
 				if (not displayCount) then
 					hideCooldown(cooldown);
