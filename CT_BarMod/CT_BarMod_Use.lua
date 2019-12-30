@@ -1059,9 +1059,6 @@ function useButton:updateState(checked)
 end
 
 -- Update Binding
-local hasCachedRanges, cachedMinRange, cachedMaxRange = {}, {}, {}
-local estimatedMinRange, estimatedMaxRange, estimatedRangeTime = 0, 0, 0
-local displayedBindings = {}
 function useButton:updateBinding()
 	local actionId = self.actionId;
 	local hotkey = self.button.hotkey
@@ -1186,7 +1183,6 @@ local getActionBindingKey = function(value)
 	hasCachedBindingKeys[value], cachedBindingKey1[value], cachedBindingKey2[value] = true, key1, key2
 	return key1, key2
 end
-module:regEvent("UPDATE_BINDINGS", function() wipe(hasCachedBindingKeys) end);
 
 -- another cache to improve the performance of useButton:getBinding()
 local checkedBindingActions = {}
@@ -1197,12 +1193,18 @@ local checkBindingAction = function(key, buttonId)
 	end
 	return checkedBindingActions[key]
 end
-hooksecurefunc("SetOverrideBinding", function() wipe(checkedBindingActions) end);
-hooksecurefunc("SetOverrideBindingSpell", function() wipe(checkedBindingActions) end);
-hooksecurefunc("SetOverrideBindingItem", function() wipe(checkedBindingActions) end);
-hooksecurefunc("SetOverrideBindingMacro", function() wipe(checkedBindingActions) end);
-hooksecurefunc("SetOverrideBindingClick", function() wipe(checkedBindingActions) end);
-hooksecurefunc("ClearOverrideBindings", function() wipe(checkedBindingActions) end);
+
+local function wipeBindingCaches()
+	wipe(hasCachedBindingKeys)
+	wipe(checkedBindingActions)
+end
+
+hooksecurefunc("SetOverrideBinding", wipeBindingCaches);
+hooksecurefunc("SetOverrideBindingSpell", wipeBindingCaches);
+hooksecurefunc("SetOverrideBindingItem", wipeBindingCaches);
+hooksecurefunc("SetOverrideBindingMacro", wipeBindingCaches);
+hooksecurefunc("SetOverrideBindingClick", wipeBindingCaches);
+hooksecurefunc("ClearOverrideBindings", wipeBindingCaches);
 
 -- Get Binding
 local cachedBindingText = {}	-- used near the end of useButton:getBinding() to improve performance
@@ -1560,11 +1562,26 @@ local function eventHandler_UpdateState()
 end
 
 local function eventHandler_UpdateStateVehicle(event, arg1)
-	if (arg1 == "player") then
-		eventHandler_UpdateState();
-		-- Update the buttons to make sure the exit vehicle
-		-- button is properly shown if CanExitVehicle().
-		actionButtonList:update();
+	if (arg1 == "player") then		
+		-- Put correct keybinds labels on all the buttons after entering or leaving a vehicle
+		if (event == "UNIT_ENTERING_VEHICLE") then
+			module:clearKeyBindingsCache();
+			module.setActionBindings(true);
+			wipeBindingCaches();
+			actionButtonList:updateBinding();
+		elseif (event == "UNIT_ENTERED_VEHICLE") then
+			eventHandler_UpdateState();
+			-- Update the buttons to make sure the exit vehicle
+			-- button is properly shown if CanExitVehicle().
+			actionButtonList:update();
+		elseif (event == "UNIT_EXITED_VEHICLE") then
+			eventHandler_UpdateState();
+			actionButtonList:update();
+			module:clearKeyBindingsCache();
+			module.setActionBindings(nil, true);			-- Do not use a colon!  This function's first parameter is a boolean, not self
+			wipeBindingCaches();
+			actionButtonList:updateBinding();
+		end
 	end
 end
 
@@ -1593,6 +1610,7 @@ local function eventHandler_UpdateUsable()
 end
 
 local function eventHandler_UpdateBindings()
+	wipeBindingCaches();
 	actionButtonList:updateBinding();
 end
 
@@ -1974,6 +1992,12 @@ end
 
 local function combatFlagger(event)
 	inCombat = ( event == "PLAYER_REGEN_DISABLED" );
+	if (event == "PLAYER_REGEN_ENABLED" and module.needSetActionBindings) then
+		wipeBindingCaches();			-- clears caches in this file
+		module:clearKeyBindingsCache();		-- clears caches in _KeyBindings		
+		module.setActionBindings();		-- sets override bindings in _KeyBindings
+		actionButtonList:updateBinding();	-- sets labels on all bars in this file
+	end
 end
 
 local useButtonMeta = { __index = useButton };
@@ -2004,6 +2028,7 @@ module.useEnable = function(self)
 	self:regEvent("SPELL_UPDATE_CHARGES", eventHandler_UpdateCount);
 	self:regEvent("LOSS_OF_CONTROL_UPDATE", eventHandler_UpdateCooldown);
 	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+		self:regEvent("UNIT_ENTERING_VEHICLE", eventHandler_UpdateStateVehicle);
 		self:regEvent("UNIT_ENTERED_VEHICLE", eventHandler_UpdateStateVehicle);
 		self:regEvent("UNIT_EXITED_VEHICLE", eventHandler_UpdateStateVehicle);
 		self:regEvent("ARCHAEOLOGY_CLOSED", eventHandler_UpdateState);
@@ -2044,6 +2069,7 @@ module.useDisable = function(self)
 	self:unregEvent("SPELL_UPDATE_CHARGES", eventHandler_UpdateCount);
 	self:unregEvent("UPDATE_SUMMONPETS_ACTION", eventHandler_updateSummonPets);
 	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+		self:unregEvent("UNIT_ENTERING_VEHICLE", eventHandler_UpdateStateVehicle);
 		self:unregEvent("UNIT_ENTERED_VEHICLE", eventHandler_UpdateStateVehicle);
 		self:unregEvent("UNIT_EXITED_VEHICLE", eventHandler_UpdateStateVehicle);
 		self:unregEvent("ARCHAEOLOGY_CLOSED", eventHandler_UpdateState);
@@ -2069,22 +2095,32 @@ module.useUpdate = function(self, optName, value)
 
 	elseif ( optName == "actionBindings" ) then
 		actionBindings = value ~= false;
+		wipeBindingCaches();
+		module.setActionBindings();
 		actionButtonList:updateBinding();
 
 	elseif ( optName == "bar3Bindings" ) then
 		bar3Bindings = value ~= false;
+		wipeBindingCaches();
+		module.setActionBindings();
 		actionButtonList:updateBinding();
 
 	elseif ( optName == "bar4Bindings" ) then
 		bar4Bindings = value ~= false;
+		wipeBindingCaches();
+		module.setActionBindings();
 		actionButtonList:updateBinding();
 
 	elseif ( optName == "bar5Bindings" ) then
 		bar5Bindings = value ~= false;
+		wipeBindingCaches();
+		module.setActionBindings();
 		actionButtonList:updateBinding();
 
 	elseif ( optName == "bar6Bindings" ) then
 		bar6Bindings = value ~= false;
+		wipeBindingCaches();
+		module.setActionBindings();
 		actionButtonList:updateBinding();
 
 	elseif ( optName == "displayBindings" ) then
@@ -2150,6 +2186,7 @@ module.useUpdate = function(self, optName, value)
 
 	elseif ( optName == "defbarShowBindings" ) then
 		defbarShowBindings = value;
+		wipeBindingCaches();
 		CT_BarMod_UpdateActionButtonHotkeys();
 
 	elseif ( optName == "defbarShowActionText" ) then

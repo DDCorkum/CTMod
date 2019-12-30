@@ -1987,9 +1987,6 @@ local function CT_BarMod_OnEvent(self, event, arg1, ...)
 		if (module.needRegisterPagingStateDrivers) then
 			module:registerAllPagingStateDrivers();
 		end
-		if (module.needSetActionBindings) then
-			module.setActionBindings();
-		end
 		if (module.needHideExtraBars) then
 			module:hideExtraBars();
 		end
@@ -2005,15 +2002,6 @@ local function CT_BarMod_OnEvent(self, event, arg1, ...)
 		end
 		CT_BarMod_UpdateVisibility();
 		updateGroups();
-
-	elseif (event == "UPDATE_BINDINGS") then
-		-- A keybinding was updated, or a key binding list was loaded/saved.
-		--
-		-- Set or clear our override bindings of the default action bar.
-		-- Note: Setting and clearing override bindings does not generate
-		-- another of this event.
-		module.setActionBindings();
-
 	end
 end
 
@@ -2356,9 +2344,6 @@ module.optionUpdate = function(self, optName, value)
 	elseif ( optName == "buttonLockKey" ) then
 		module:setAttributes();
 
-	elseif ( optName == "actionBindings" ) then
-		module.setActionBindings();
-
 	elseif (optName == "showCTBottomBar") then
 		value = not not value;
 		if (value) then
@@ -2495,7 +2480,6 @@ module.optionUpdate = function(self, optName, value)
 		frame:RegisterEvent("PLAYER_REGEN_ENABLED");
 		frame:RegisterEvent("PLAYER_REGEN_DISABLED");
 		frame:RegisterEvent("PLAYER_ENTERING_WORLD");
-		frame:RegisterEvent("UPDATE_BINDINGS");
 		frame:Show();
 
 		CT_BarMod_Shift_Init();
