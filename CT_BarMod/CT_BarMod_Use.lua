@@ -1565,8 +1565,7 @@ local function eventHandler_UpdateStateVehicle(event, arg1)
 	if (arg1 == "player") then		
 		-- Put correct keybinds labels on all the buttons after entering or leaving a vehicle
 		if (event == "UNIT_ENTERING_VEHICLE") then
-			module:clearKeyBindingsCache();
-			module.setActionBindings(true);
+			module.setActionBindings(event);
 			wipeBindingCaches();
 			actionButtonList:updateBinding();
 		elseif (event == "UNIT_ENTERED_VEHICLE") then
@@ -1577,8 +1576,7 @@ local function eventHandler_UpdateStateVehicle(event, arg1)
 		elseif (event == "UNIT_EXITED_VEHICLE") then
 			eventHandler_UpdateState();
 			actionButtonList:update();
-			module:clearKeyBindingsCache();
-			module.setActionBindings(nil, true);			-- Do not use a colon!  This function's first parameter is a boolean, not self
+			module.setActionBindings(event);
 			wipeBindingCaches();
 			actionButtonList:updateBinding();
 		end
@@ -1611,6 +1609,7 @@ end
 
 local function eventHandler_UpdateBindings()
 	wipeBindingCaches();
+	module.setActionBindings();
 	actionButtonList:updateBinding();
 end
 
@@ -2018,6 +2017,7 @@ module.useEnable = function(self)
 	self:regEvent("TRADE_SKILL_SHOW", eventHandler_UpdateState);
 	self:regEvent("TRADE_SKILL_CLOSE", eventHandler_UpdateState);
 	self:regEvent("UPDATE_BINDINGS", eventHandler_UpdateBindings);
+	self:regEvent("PLAYER_LOGIN", eventHandler_UpdateBindings);
 	self:regEvent("PLAYER_ENTER_COMBAT", eventHandler_CheckRepeat);
 	self:regEvent("PLAYER_LEAVE_COMBAT", eventHandler_CheckRepeat);
 	self:regEvent("STOP_AUTOREPEAT_SPELL", eventHandler_CheckRepeat);
@@ -2059,6 +2059,7 @@ module.useDisable = function(self)
 	self:unregEvent("TRADE_SKILL_SHOW", eventHandler_UpdateState);
 	self:unregEvent("TRADE_SKILL_CLOSE", eventHandler_UpdateState);
 	self:unregEvent("UPDATE_BINDINGS", eventHandler_UpdateBindings);
+	self:unregEvent("PLAYER_LOGIN", eventHandler_UpdateBindings);
 	self:unregEvent("PLAYER_ENTER_COMBAT", eventHandler_CheckRepeat);
 	self:unregEvent("PLAYER_LEAVE_COMBAT", eventHandler_CheckRepeat);
 	self:unregEvent("STOP_AUTOREPEAT_SPELL", eventHandler_CheckRepeat);
@@ -2186,7 +2187,6 @@ module.useUpdate = function(self, optName, value)
 
 	elseif ( optName == "defbarShowBindings" ) then
 		defbarShowBindings = value;
-		wipeBindingCaches();
 		CT_BarMod_UpdateActionButtonHotkeys();
 
 	elseif ( optName == "defbarShowActionText" ) then

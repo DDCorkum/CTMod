@@ -927,12 +927,16 @@ end
 --------------------------------------------
 -- Override default action bar key bindings.
 
-local function setActionBindings(prevehicle, postvehicle)
-	-- Set or clear the overrride bindings for the action bar.
+-- Set or clear the overrride bindings for the action bar.
+local function setActionBindings(event)	
 	if (InCombatLockdown()) then
 		module.needSetActionBindings = true;
 		return;
 	end
+	
+	-- clear the cache earlier in this file to ensure a fresh set of override bindings
+	wipeBindingCache()
+	
 	-- These CT_BarMod groups correspond with action bars in the default UI.
 	-- Each of the buttons in these groups is associated with an action name
 	-- (eg. "ACTIONBUTTON1", "MULTIACTIONBAR1BUTTON1", etc).
@@ -953,9 +957,9 @@ local function setActionBindings(prevehicle, postvehicle)
 			if (groupId == module.actionBarId) then
 				useDefault = module:getOption("actionBindings") ~= false;
 				if (
-					not postvehicle 
+					not event == "UNIT_EXITED_VEHICLE"					-- special case, while exiting the vehicle the secure frame may not have updated yet
 					and (
-						prevehicle 
+						event == "UNIT_ENTERING_VEHICLE"				-- special case, some world quests activate combat lockdown before the secure frame registers being inside the vehicleUI
 						or CT_BarMod_SecureFrame:GetAttribute("hasPetBattle") 
 						or CT_BarMod_SecureFrame:GetAttribute("hasOverrideBar") 
 						or CT_BarMod_SecureFrame:GetAttribute("hasVehicleUI")
@@ -1087,8 +1091,6 @@ local function keyBindingOnLoad(self)
 	module:regEvent("UPDATE_BINDINGS", buttonsUpdateList);
 	module:regEvent("ACTIONBAR_SLOT_CHANGED", buttonsUpdateList);
 	module:regEvent("UPDATE_BONUS_ACTIONBAR", buttonsUpdateList);
-	module:regEvent("UPDATE_BINDINGS", wipeBindingCache);
-	module:regEvent("UPDATE_BINDINGS", setActionBindings);
 
 	local yoffset = self:GetTop() - self["1"]:GetTop();
 

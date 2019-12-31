@@ -1,7 +1,7 @@
-CT_BarMod (8.2.5.9) 2019-12-29
+CT_BarMod (8.2.5.9) 2019-12-31
 - Reduced memory usage in WoW Classic 1.13.3
 - Reduced CPU usage in all editions
-- Restores key-binding labels to bar 12 after exiting a vehicle (related to 8.1.5.1)
+- Fixes to disappearing key-binding labels on the custom action bar (related to 8.1.5.1)
 
 CT_BarMod (8.2.5.8) 2019-12-13
 - Displays reagent counts on spell buttons in WoW Classic 1.13.3
