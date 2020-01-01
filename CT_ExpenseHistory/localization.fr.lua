@@ -1,1 +1,0 @@
--- This file is merged into localization.lua and will be depreciated in a future version

@@ -368,7 +368,7 @@ do
 			-- Ctrl Right-Click to unselect all messages from this sender.
 			local sentfrom = select(3, GetInboxHeaderInfo(mailIndex));
 			if (not sentfrom) then
-				sendfrom = UNKNOWN;
+				sentfrom = UNKNOWN;
 			end
 			if (button == "LeftButton") then
 				status = true;  -- Select

@@ -58,7 +58,6 @@ local UnitExists = UnitExists;
 local UnitGetTotalAbsorbs = UnitGetTotalAbsorbs or function() return 0; end -- doesn't exist in classic, and zero means no absorb bar will be created
 local UnitInRange = UnitInRange;
 local UnitIsDeadOrGhost = UnitIsDeadOrGhost;
-local UnitIsEnemy = UnitIsEnemy;
 local UnitIsUnit = UnitIsUnit;
 local UnitHealth = UnitHealth;
 local UnitHealthMax = UnitHealthMax;
@@ -88,15 +87,15 @@ local NewCTRATargetFrame;		-- A single, interactive target frame that is contain
 --------------------------------------------
 -- Initialization
 
-local MODULE_NAME, module = ...;
+local MODULE_TOC_NAME, module = ...;
 local _G = getfenv(0);
 
-local MODULE_VERSION = strmatch(GetAddOnMetadata(MODULE_NAME, "version"), "^([%d.]+)");
+local MODULE_TOC_VERSION = strmatch(GetAddOnMetadata(MODULE_TOC_NAME, "version"), "^([%d.]+)");
 
-module.name = MODULE_NAME;
-module.version = MODULE_VERSION;
+module.name = "CT_RaidAssist";
+module.version = MODULE_TOC_VERSION;
 
-_G[MODULE_NAME] = module;
+_G[module.name] = module;
 CT_Library:registerModule(module);
 
 module.text = module.text or { };	-- see localization.lua
@@ -287,7 +286,7 @@ function StaticCTRAReadyCheck()
 		frame:RegisterEvent("READY_CHECK_FINISHED");
 		frame:RegisterEvent("UPDATE_INVENTORY_DURABILITY");
 		frame:SetScript("OnEvent",
-			function(self, event, arg1, arg2)
+			function(__, event)
 				if (InCombatLockdown()) then return; end
 				if (event == "READY_CHECK") then
 					frame:Show();
@@ -356,7 +355,7 @@ function StaticCTRAReadyCheck()
 			if (value) then
 				module:InstallLibDurability()
 			else
-				print("Please /reload for CTRA to stop sharing.  Also, other addons (DBM, oRA, etc.) may still activate this feature.");
+				print("Please /reload for CTRA to stop sharing durability.  Other addons (DBM, oRA, etc.) may re-activate this feature.");
 			end
 		end
 	end
@@ -1366,7 +1365,7 @@ function NewCTRAWindow(owningCTRAFrames)
 		
 		-- STEP 1:
 		if (deletePermanently and windowID) then
-			for key, val in pairs(defaultOptions) do
+			for key, __ in pairs(defaultOptions) do
 				module:setOption("CTRAWindow" .. windowID .. "_" .. key,nil,true,false);
 			end
 			module:resetMovable("CTRAWindow" .. windowID);
@@ -1668,7 +1667,7 @@ function NewCTRAWindow(owningCTRAFrames)
 		if (not self:IsEnabled()) then
 			return;
 		end
-		for key, val in pairs(defaultOptions) do
+		for key, __ in pairs(defaultOptions) do
 			if (_G["CTRAWindow_" .. key .. "CheckButton"]) then
 				_G["CTRAWindow_" .. key .. "CheckButton"]:Enable();
 				_G["CTRAWindow_" .. key .. "CheckButton"]:SetChecked(self:GetProperty(key));
@@ -2452,7 +2451,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 		if (module.CTRA_Configuration_RezAbilities[class]) then
 			local combatRezToCast = { };
 			local hasRez = nil;
-			for i, details in ipairs(module.CTRA_Configuration_RezAbilities[class]) do
+			for __, details in ipairs(module.CTRA_Configuration_RezAbilities[class]) do
 				if (GetSpellInfo(L["CT_RaidAssist/Spells/" .. details.name]) and details.combat and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and combatRezToCast[details.modifier] == nil) then
 					combatRezToCast[details.modifier] = L["CT_RaidAssist/Spells/" .. details.name];
 					hasRez = true;
@@ -2471,7 +2470,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 		if (module.CTRA_Configuration_RezAbilities[class]) then
 			local nocombatRezToCast = { };
 			local hasRez = nil;
-			for i, details in ipairs(module.CTRA_Configuration_RezAbilities[class]) do
+			for __, details in ipairs(module.CTRA_Configuration_RezAbilities[class]) do
 				if (GetSpellInfo(L["CT_RaidAssist/Spells/" .. details.name]) and details.nocombat and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and nocombatRezToCast[details.modifier] == nil) then
 					nocombatRezToCast[details.modifier] = L["CT_RaidAssist/Spells/" .. details.name];
 					hasRez = true;
@@ -2493,7 +2492,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 		if (module.CTRA_Configuration_FriendlyRemoves[class]) then
 			local friendlyRemovesToCast = { };
 			local hasFriendlyRemoves = nil;
-			for i, details in ipairs(module.CTRA_Configuration_FriendlyRemoves[class]) do
+			for __, details in ipairs(module.CTRA_Configuration_FriendlyRemoves[class]) do
 				if (GetSpellInfo(L["CT_RaidAssist/Spells/" .. details.name]) and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and friendlyRemovesToCast[details.modifier] == nil and (details.spec == nil or spec == nil or details.spec == spec)) then
 					friendlyRemovesToCast[details.modifier] = L["CT_RaidAssist/Spells/" .. details.name];
 					hasFriendlyRemoves = true;
@@ -2514,7 +2513,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 		if (module.CTRA_Configuration_Buffs[class]) then
 			local buffsToCast = { };
 			local hasBuffs = nil;
-			for i, details in ipairs(module.CTRA_Configuration_Buffs[class]) do
+			for __, details in ipairs(module.CTRA_Configuration_Buffs[class]) do
 				if (GetSpellInfo(L["CT_RaidAssist/Spells/" .. details.name]) and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and (buffsToCast[details.modifier] == nil)) then
 					buffsToCast[details.modifier] = L["CT_RaidAssist/Spells/" .. details.name];
 					hasBuffs = true;
@@ -2760,7 +2759,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 		if (not InCombatLockdown()) then
 			for key, val in pairs(optionsWaiting) do
 				if (key == "PlayerFrameScale") then
-					visualFrame:SetScale((value or 100)/100);
+					visualFrame:SetScale((val or 100)/100);
 					configureUnitNameFontString();
 				elseif (
 					key == "ColorUnitFullHealthCombat"
@@ -2780,7 +2779,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 					configureHealthBar();
 					configurePowerBar();
 				elseif (key == "EnablePowerBar") then
-					powerBar:SetShown(value);
+					powerBar:SetShown(val);
 				elseif (
 					key == "ColorBackground"
 					or key == "ColorBorder"
@@ -2802,7 +2801,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			if (not listenerFrame) then
 				listenerFrame = CreateFrame("Frame", nil);
 				listenerFrame:SetScript("OnEvent",
-					function(__, event, arg1, arg2, __, arg4)
+					function(__, event)
 						if (event == "SPELLS_CHANGED") then
 							updateMacros();
 						elseif (event == "UNIT_NAME_UPDATE") then
@@ -3098,7 +3097,7 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 		if (not InCombatLockdown()) then
 			for key, val in pairs(optionsWaiting) do
 				if (key == "PlayerFrameScale") then
-					visualFrame:SetScale((value or 100)/100);
+					visualFrame:SetScale((val or 100)/100);
 					configureUnitNameFontString();
 				elseif (
 					key == "ColorTargetFrameBackground"

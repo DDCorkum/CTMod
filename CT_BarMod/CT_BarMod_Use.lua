@@ -67,31 +67,40 @@ local CanExitVehicle = CanExitVehicle;
 local GetActionCharges = GetActionCharges;
 local GetActionCooldown = GetActionCooldown;
 
--- GetActionCount, overridden for WoW Classic 1.13.3 (CTMod 8.2.5.8)
--- Credit to addon reagentCounter by Kurtzen and Kebabstorm for the basic methodology, adapted by DDC for CTMod 8.2.5.8
-local OldGetActionCount, GetActionCount, ReagentScannerTooltip = GetActionCount, GetActionCount, CreateFrame("GameTooltip", "CT_BarMod_ReagentScanner", nil, "GameTooltipTemplate");
+-- GetActionCount, overridden for WoW Classic 1.13.3 (CTMod 8.2.5.8) using GetItemCount and some tooltip scanning
+local OldGetActionCount, GetActionCount, GetItemCount, ReagentScannerTooltip = GetActionCount, GetActionCount, GetItemCount, CreateFrame("GameTooltip", "CT_BarMod_ReagentScanner", nil, "GameTooltipTemplate");
+local reagentScannerCache = {};
 if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+	ReagentScannerTooltip:SetOwner(UIParent, "ANCHOR_NONE");
+	
 	GetActionCount = function(actionId)
-		ReagentScannerTooltip:SetOwner(UIParent, "ANCHOR_NONE");
-		ReagentScannerTooltip:SetAction(actionId);
-		for __, region in pairs({ReagentScannerTooltip:GetRegions()}) do
-			if (region:GetObjectType() == "FontString" and string.find(region:GetText() or "", SPELL_REAGENTS)) then
-				local count = 0
-				local reagent = string.gsub(region:GetText(), SPELL_REAGENTS, "")
-				reagent = select(2,reagent:match("|H(.*)|h%[(.*)%]|h")) or reagent;
-				for i=0, 4 do
-					for j=1, GetContainerNumSlots(i) do
-						local __, itemCount, __, __, __, __, __, __, __, itemId = GetContainerItemInfo(i,j);
-						if (itemId) then
-							if (reagent == (GetItemInfo(itemId))) then
-								count = count + itemCount;
-							end
-						end
-					end
-				end
-				return count;
+		
+		-- perform custom execution only if this item is likely to require a reagent
+		if (IsConsumableAction(actionId) and not IsItemAction(actionId)) then
+			
+			-- first check if this ability is cached
+			local actionType, actionInfoId = GetActionInfo(actionId);
+			local reagent = reagentScannerCache[actionType .. actionInfoId];
+			if (reagent) then
+				return GetItemCount(reagent);
 			end
+			
+			-- it wasn't cached, so do the time-consuming process of finding the reagents necessary
+			ReagentScannerTooltip:ClearLines();
+			ReagentScannerTooltip:SetAction(actionId);
+			for i=1, ReagentScannerTooltip:NumLines() do
+				local text = _G["CT_BarMod_ReagentScannerTextLeft" .. i]:GetText();
+				if (text and string.find(text, SPELL_REAGENTS)) then	
+					reagent = string.gsub(text, SPELL_REAGENTS, "");		-- strip out the localized header
+					reagent = string.gsub(reagent, "|cffff2020", "");		-- strip out the red colour if there is none of the reagent
+					reagent = string.gsub(reagent, "|r", "");			-- strip out the red colour if there is none of the reagent
+					reagentScannerCache[actionType .. actionInfoId] = reagent;	-- add to the cache!
+					return GetItemCount(reagent);
+				end
+			end								
 		end
+		
+		-- this item does not appear to require a reagent, so use the native API method
 		return OldGetActionCount(actionId);
 	end
 end
@@ -126,7 +135,8 @@ local UnitExists = UnitExists;
 --------------------------------------------
 -- Cooldown Handler
 
-local cooldownList, cooldownUpdater;
+local cooldownList = {};
+local cooldownUpdater;
 
 local function updateCooldown(fsCount, time)
 	if ( time > 3540 ) then
@@ -144,26 +154,22 @@ local function updateCooldown(fsCount, time)
 end
 
 local function dropCooldownFromQueue(button)
-	if ( cooldownList ) then
-		cooldownList[button] = nil;
-		if ( not next(cooldownList) ) then
-			module:unschedule(cooldownUpdater, true);
-		end
+	cooldownList[button] = nil;
+	if ( not next(cooldownList) ) then
+		module:unschedule(cooldownUpdater, true);
 	end
 end
 
 cooldownUpdater = function()
-	if ( cooldownList ) then
-		local currTime = GetTime();
-		local start, duration, enable;
-		for button, fsCount in pairs(cooldownList) do
-			if button.actionId then
-				start, duration, enable = GetActionCooldown(button.actionId);
-				if ( start > 0 and duration > 0 and enable > 0 ) then
-					updateCooldown(fsCount, duration - (currTime - start));
-				else
-					dropCooldownFromQueue(button);
-				end
+	local currTime = GetTime();
+	local start, duration, enable;
+	for button, fsCount in pairs(cooldownList) do
+		if button.actionId then
+			start, duration, enable = GetActionCooldown(button.actionId);
+			if ( start > 0 and enable > 0 ) then
+				updateCooldown(fsCount, duration - (currTime - start));
+			else
+				dropCooldownFromQueue(button);
 			end
 		end
 	end
@@ -187,14 +193,12 @@ local function hideCooldown(cooldown)
 end
 
 function CT_BarMod_HideShowAllCooldowns(show)
-	if ( cooldownList ) then
-		for button, fsCount in pairs(cooldownList) do
-			if ( fsCount ) then
-				if (show) then
-					fsCount:Show();
-				else
-					fsCount:Hide();
-				end
+	for button, fsCount in pairs(cooldownList) do
+		if ( fsCount ) then
+			if (show) then
+				fsCount:Show();
+			else
+				fsCount:Hide();
 			end
 		end
 	end
@@ -214,15 +218,10 @@ local function startCooldown(cooldown, start, duration)
 		cooldown.fsCount = fsCount;
 	end
 	
-	if ( not cooldownList ) then
-		cooldownList = { [cooldown.object] = fsCount };
+	if ( not next(cooldownList) ) then
 		module:schedule(0.5, true, cooldownUpdater);
-	else
-		if ( not next(cooldownList) ) then
-			module:schedule(0.5, true, cooldownUpdater);
-		end
-		cooldownList[cooldown.object] = fsCount;
 	end
+	cooldownList[cooldown.object] = fsCount;
 	
 	fsCount:Show();
 	updateCooldown(fsCount, duration - (GetTime() - start));
@@ -951,7 +950,15 @@ function useButton:updateUsable()
 			button.icon:SetVertexColor(0.8, 0.4, 0.4);
 		end
 		
-	elseif ( isUsable ) then
+	elseif (
+		isUsable
+		and (
+			module:getGameVersion() == CT_GAME_VERSION_RETAIL
+			or not IsConsumableAction(self.actionId)	-- reagents behave differently in classic
+			or IsItemAction(self.actionId)
+			or GetActionCount(self.actionId) > 0
+		)
+	) then
 		button.icon:SetVertexColor(1, 1, 1);
 		
 	elseif ( notEnoughMana ) then
@@ -1006,7 +1013,7 @@ function useButton:updateCooldown()
 	local cooldown = self.button.cooldown;
 	-- Action cooldown
 	local start, duration, enable = GetActionCooldown(self.actionId);
-	if ( start > 0 and duration > 0 and enable > 0 ) then
+	if ( start > 0 and enable > 0 ) then
 		cooldown:SetCooldown(start, duration);
 		actionCooldown = true;
 		if ( displayCount ) then
@@ -1054,47 +1061,29 @@ end
 -- Update Binding
 function useButton:updateBinding()
 	local actionId = self.actionId;
-	if ( IsActionInRange(self.actionId) == false ) then
-		local button = self.button;
+	local hotkey = self.button.hotkey
+	if (not self.hasAction) then
+		hotkey:SetText("");
+		return;
+	end
+	local isInRange = IsActionInRange(actionId)
+	if ( isInRange == false ) then
 		self.outOfRange = true;
-		button.hotkey:SetVertexColor(1.0, 0.1, 0.1);
+		hotkey:SetVertexColor(1.0, 0.1, 0.1);
 	else
 		self.outOfRange = nil;
-		self.button.hotkey:SetVertexColor(0.6, 0.6, 0.6);
+		hotkey:SetVertexColor(0.6, 0.6, 0.6);
 	end
-	if ( displayBindings ) then
-		local text = self:getBinding();
-		if ( text == "" or not text ) then
-			if ( not self.hasAction or not IsActionInRange(actionId) ) then
-				self.button.hotkey:SetText("");
-				self.hasRange = nil;
-				return;
-			else
-				if (displayRangeDot) then
-					self.button.hotkey:SetText(rangeIndicator);
-				else
-					self.button.hotkey:SetText("");
-				end
-				self:updateUsable();
-			end
-		else
-			self.button.hotkey:SetText(text);
-		end
-		self.hasRange = true;
+	local text;
+	if ( displayBindings ) then		
+		text = self:getBinding();
+	end
+	if (text) then
+			hotkey:SetText(text);
+	elseif (displayRangeDot and isInRange) then
+			hotkey:SetText(rangeIndicator);
 	else
-		if (displayRangeDot) then
-			if ( not self.hasAction or not IsActionInRange(actionId) ) then
-				self.button.hotkey:SetText("");
-				self.hasRange = nil;
-				return;
-			else
-				self.button.hotkey:SetText(rangeIndicator);
-				self:updateUsable();
-			end
-		else
-			self.button.hotkey:SetText("");
-		end
-		self.hasRange = self.hasAction and ActionHasRange(actionId);
+			hotkey:SetText("");
 	end
 end
 
@@ -1180,97 +1169,120 @@ function useButton:hideGrid()
 	end
 end
 
+
+-- cache to improve the performance of useButton:getBinding()
+local hasCachedBindingKeys, cachedBindingKey1, cachedBindingKey2 = {}, {}, {}
+local getActionBindingKey = function(value)
+	-- Returns key(s) currently bound to the default game button number.
+	-- Eg. "1", "SHIFT-A", etc.
+	
+	if (hasCachedBindingKeys[value]) then
+		return cachedBindingKey1[value], cachedBindingKey2[value]
+	end
+	local key1, key2 = GetBindingKey(value);
+	hasCachedBindingKeys[value], cachedBindingKey1[value], cachedBindingKey2[value] = true, key1, key2
+	return key1, key2
+end
+
+-- another cache to improve the performance of useButton:getBinding()
+local checkedBindingActions = {}
+local checkBindingAction = function(key, buttonId)
+	-- Confirms that the binding really does point to CT_BarMod and hasn't been overriden by some other addon
+	if (checkedBindingActions[key] == nil) then
+		checkedBindingActions[key] = ("CLICK CT_BarModActionButton" .. buttonId .. ":LeftButton" == GetBindingAction(key, true))
+	end
+	return checkedBindingActions[key]
+end
+
+local function wipeBindingCaches()
+	wipe(hasCachedBindingKeys)
+	wipe(checkedBindingActions)
+end
+
+hooksecurefunc("SetOverrideBinding", wipeBindingCaches);
+hooksecurefunc("SetOverrideBindingSpell", wipeBindingCaches);
+hooksecurefunc("SetOverrideBindingItem", wipeBindingCaches);
+hooksecurefunc("SetOverrideBindingMacro", wipeBindingCaches);
+hooksecurefunc("SetOverrideBindingClick", wipeBindingCaches);
+hooksecurefunc("ClearOverrideBindings", wipeBindingCaches);
+
 -- Get Binding
+local cachedBindingText = {}	-- used near the end of useButton:getBinding() to improve performance
+local frame2, frame3, frame4, frame5, frame12;
+local func2, func3, func4, func5, func12;
 function useButton:getBinding()
 	-- local text = module:getOption("BINDING-"..self.buttonId);
-
 	local text;
-	local ourAction = "CLICK CT_BarModActionButton" .. self.buttonId .. ":LeftButton";
-
+	local id = self.buttonId
 	local showBar, showDef;
 	local groupId = self.groupId;
-	if (groupId == module.actionBarId) then
-		showBar = module:getOption("showGroup" .. groupId) ~= false;
+	if (not frame2) then
+		frame2 = module:getGroup(2).frame
+		frame3 = module:getGroup(3).frame
+		frame4 = module:getGroup(4).frame
+		frame5 = module:getGroup(5).frame
+		frame12 = module:getGroup(12).frame
+		func2 = frame2.IsShown
+		func3 = frame3.IsShown
+		func4 = frame4.IsShown
+		func5 = frame5.IsShown
+		func12 = frame12.IsShown
+	end
+	if (groupId == 12) then		-- if (groupId == module.actionBarId)		-- hardcoding the value 12 to improve performance
+		-- showBar = module:getOption("showGroup" .. module.actionBarId) ~= false;
+		showBar = func12(frame12);
 		showDef = actionBindings;
 	elseif (groupId == 2) then -- CT bar 3 (game Right Bar)
-		showBar = module:getOption("showGroup" .. groupId) ~= false;
+		--showBar = module:getOption("showGroup2") ~= false;
+		showBar = func2(frame2);	
 		showDef = bar3Bindings;
 	elseif (groupId == 3) then -- CT bar 4 (game Right Bar 2)
-		showBar = module:getOption("showGroup" .. groupId) ~= false;
+		--showBar = module:getOption("showGroup3") ~= false;
+		showBar = func3(frame3);	
 		showDef = bar4Bindings;
 	elseif (groupId == 4) then -- CT bar 5 (game Bottom Right Bar)
-		showBar = module:getOption("showGroup" .. groupId) ~= false;
+		--showBar = module:getOption("showGroup4") ~= false;
+		showBar = func4(frame4);
 		showDef = bar5Bindings;
 	elseif (groupId == 5) then -- CT bar 6 (game Bottom Left Bar)
-		showBar = module:getOption("showGroup" .. groupId) ~= false;
+		--showBar = module:getOption("showGroup5") ~= false;
+		showBar = func5(frame5);	
 		showDef = bar6Bindings;
 	end
+	
 	if (showBar and showDef and self.actionName) then
 		-- Get the key used on the default action bar's corresponding button.
-		local key1, key2 = GetBindingKey(self.actionName .. self.buttonNum);
-		if (key1) then
-			-- Get the override binding action.
-			local action = GetBindingAction(key1, true);
-			-- If it is still bound to our button...
-			if (action == ourAction) then
-				-- Show this key on the button.
-				text = key1;
-			end
-		end
-		if (key2 and not text) then
-			-- Get the override binding action.
-			local action = GetBindingAction(key2, true);
-			-- If it is still bound to our button...
-			if (action == ourAction) then
-				-- Show this key on the button.
-				text = key2;
-			end
+		local key1, key2 = getActionBindingKey(self.actionName .. self.buttonNum);
+		if (key1 and checkBindingAction(key1, id)) then
+			text = key1;
+		elseif (key2 and checkBindingAction(key2, id)) then
+			text = key2;
 		end
 	end
-
+	
 	if (not text) then
 		-- Get the key assigned directly to this (our) button.
-		local key1, key2 = module.getBindingKey(self.buttonId);
-		if (key1) then
-			-- Get the override binding action.
-			local action = GetBindingAction(key1, true);
-			-- If it is bound to our button...
-			if (action == ourAction) then
-				-- Show this key on the button.
-				text = key1;
-			end
-		end
-		if (key2 and not text) then
-			-- Get the override binding action.
-			local action = GetBindingAction(key2, true);
-			-- If it is bound to our button...
-			if (action == ourAction) then
-				-- Show this key on the button.
-				text = key2;
-			end
-		end
-		if (not text) then
-			-- No key binding to show.
-			return;
-		end
---[[
-		if (key1) then
+		local key1, key2 = module.getBindingKey(id);
+		if (key1 and checkBindingAction(key1, id)) then			--checkBindingAction detects potential interference from other addons using SetOverrideBinding()
 			text = key1;
-		elseif (key2) then
+		elseif (key2 and checkBindingAction(key2, id)) then
 			text = key2;
 		else
 			return;
 		end
---]]
 	end
-	
-	text = text:gsub("(.-)MOUSEWHEELUP(.+)", "%1WU%2");
-	text = text:gsub("(.-)MOUSEWHEELDOWN(.+)", "%1WD%2");
-	text = text:gsub("(.-)BUTTON(.+)", "%1B%2");
-	text = text:gsub("(.-)SHIFT%-(.+)", "%1S-%2");
-	text = text:gsub("(.-)CTRL%-(.+)", "%1C-%2");
-	text = text:gsub("(.-)ALT%-(.+)", "%1A-%2");
-	return text;
+
+	if (not cachedBindingText[text]) then			-- multiple gsub queries are expensive, so cache the results to improve performance
+		local uncachedText = text;
+		uncachedText = uncachedText:gsub("(.-)MOUSEWHEELUP(.-)", "%1WU%2");
+		uncachedText = uncachedText:gsub("(.-)MOUSEWHEELDOWN(.+)", "%1WD%2");
+		uncachedText = uncachedText:gsub("(.-)BUTTON(.+)", "%1B%2");
+		uncachedText = uncachedText:gsub("(.-)SHIFT%-(.+)", "%1S-%2");
+		uncachedText = uncachedText:gsub("(.-)CTRL%-(.+)", "%1C-%2");
+		uncachedText = uncachedText:gsub("(.-)ALT%-(.+)", "%1A-%2");
+		cachedBindingText[text] = uncachedText;
+	end
+	return cachedBindingText[text];
 end
 
 function useButton:getSkin()
@@ -1399,7 +1411,6 @@ function useButton:applySkin()
 	-- for the Glow and Ants textures to use the default square textures.
 	module:skinOverlayGlow(button, nil, nil);
 end
-
 
 ------------------------
 -- Button Handlers
@@ -1551,11 +1562,24 @@ local function eventHandler_UpdateState()
 end
 
 local function eventHandler_UpdateStateVehicle(event, arg1)
-	if (arg1 == "player") then
-		eventHandler_UpdateState();
-		-- Update the buttons to make sure the exit vehicle
-		-- button is properly shown if CanExitVehicle().
-		actionButtonList:update();
+	if (arg1 == "player") then		
+		-- Put correct keybinds labels on all the buttons after entering or leaving a vehicle
+		if (event == "UNIT_ENTERING_VEHICLE") then
+			module.setActionBindings(event);
+			wipeBindingCaches();
+			actionButtonList:updateBinding();
+		elseif (event == "UNIT_ENTERED_VEHICLE") then
+			eventHandler_UpdateState();
+			-- Update the buttons to make sure the exit vehicle
+			-- button is properly shown if CanExitVehicle().
+			actionButtonList:update();
+		elseif (event == "UNIT_EXITED_VEHICLE") then
+			eventHandler_UpdateState();
+			actionButtonList:update();
+			module.setActionBindings(event);
+			wipeBindingCaches();
+			actionButtonList:updateBinding();
+		end
 	end
 end
 
@@ -1584,6 +1608,8 @@ local function eventHandler_UpdateUsable()
 end
 
 local function eventHandler_UpdateBindings()
+	wipeBindingCaches();
+	module.setActionBindings();
 	actionButtonList:updateBinding();
 end
 
@@ -1758,7 +1784,7 @@ do
 
 		if actionId then
 			local start, duration, enable = GetActionCooldown(actionId);
-			if ( start > 0 and duration > 0 and enable > 0 ) then
+			if ( start > 0 and enable > 0 ) then
 				startCooldown(cooldown, start, duration);
 				if (not displayCount) then
 					hideCooldown(cooldown);
@@ -1965,6 +1991,12 @@ end
 
 local function combatFlagger(event)
 	inCombat = ( event == "PLAYER_REGEN_DISABLED" );
+	if (event == "PLAYER_REGEN_ENABLED" and module.needSetActionBindings) then
+		wipeBindingCaches();			-- clears caches in this file
+		module:clearKeyBindingsCache();		-- clears caches in _KeyBindings		
+		module.setActionBindings();		-- sets override bindings in _KeyBindings
+		actionButtonList:updateBinding();	-- sets labels on all bars in this file
+	end
 end
 
 local useButtonMeta = { __index = useButton };
@@ -1985,6 +2017,7 @@ module.useEnable = function(self)
 	self:regEvent("TRADE_SKILL_SHOW", eventHandler_UpdateState);
 	self:regEvent("TRADE_SKILL_CLOSE", eventHandler_UpdateState);
 	self:regEvent("UPDATE_BINDINGS", eventHandler_UpdateBindings);
+	self:regEvent("PLAYER_LOGIN", eventHandler_UpdateBindings);
 	self:regEvent("PLAYER_ENTER_COMBAT", eventHandler_CheckRepeat);
 	self:regEvent("PLAYER_LEAVE_COMBAT", eventHandler_CheckRepeat);
 	self:regEvent("STOP_AUTOREPEAT_SPELL", eventHandler_CheckRepeat);
@@ -1995,6 +2028,7 @@ module.useEnable = function(self)
 	self:regEvent("SPELL_UPDATE_CHARGES", eventHandler_UpdateCount);
 	self:regEvent("LOSS_OF_CONTROL_UPDATE", eventHandler_UpdateCooldown);
 	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+		self:regEvent("UNIT_ENTERING_VEHICLE", eventHandler_UpdateStateVehicle);
 		self:regEvent("UNIT_ENTERED_VEHICLE", eventHandler_UpdateStateVehicle);
 		self:regEvent("UNIT_EXITED_VEHICLE", eventHandler_UpdateStateVehicle);
 		self:regEvent("ARCHAEOLOGY_CLOSED", eventHandler_UpdateState);
@@ -2025,6 +2059,7 @@ module.useDisable = function(self)
 	self:unregEvent("TRADE_SKILL_SHOW", eventHandler_UpdateState);
 	self:unregEvent("TRADE_SKILL_CLOSE", eventHandler_UpdateState);
 	self:unregEvent("UPDATE_BINDINGS", eventHandler_UpdateBindings);
+	self:unregEvent("PLAYER_LOGIN", eventHandler_UpdateBindings);
 	self:unregEvent("PLAYER_ENTER_COMBAT", eventHandler_CheckRepeat);
 	self:unregEvent("PLAYER_LEAVE_COMBAT", eventHandler_CheckRepeat);
 	self:unregEvent("STOP_AUTOREPEAT_SPELL", eventHandler_CheckRepeat);
@@ -2035,6 +2070,7 @@ module.useDisable = function(self)
 	self:unregEvent("SPELL_UPDATE_CHARGES", eventHandler_UpdateCount);
 	self:unregEvent("UPDATE_SUMMONPETS_ACTION", eventHandler_updateSummonPets);
 	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+		self:unregEvent("UNIT_ENTERING_VEHICLE", eventHandler_UpdateStateVehicle);
 		self:unregEvent("UNIT_ENTERED_VEHICLE", eventHandler_UpdateStateVehicle);
 		self:unregEvent("UNIT_EXITED_VEHICLE", eventHandler_UpdateStateVehicle);
 		self:unregEvent("ARCHAEOLOGY_CLOSED", eventHandler_UpdateState);
@@ -2060,22 +2096,32 @@ module.useUpdate = function(self, optName, value)
 
 	elseif ( optName == "actionBindings" ) then
 		actionBindings = value ~= false;
+		wipeBindingCaches();
+		module.setActionBindings();
 		actionButtonList:updateBinding();
 
 	elseif ( optName == "bar3Bindings" ) then
 		bar3Bindings = value ~= false;
+		wipeBindingCaches();
+		module.setActionBindings();
 		actionButtonList:updateBinding();
 
 	elseif ( optName == "bar4Bindings" ) then
 		bar4Bindings = value ~= false;
+		wipeBindingCaches();
+		module.setActionBindings();
 		actionButtonList:updateBinding();
 
 	elseif ( optName == "bar5Bindings" ) then
 		bar5Bindings = value ~= false;
+		wipeBindingCaches();
+		module.setActionBindings();
 		actionButtonList:updateBinding();
 
 	elseif ( optName == "bar6Bindings" ) then
 		bar6Bindings = value ~= false;
+		wipeBindingCaches();
+		module.setActionBindings();
 		actionButtonList:updateBinding();
 
 	elseif ( optName == "displayBindings" ) then

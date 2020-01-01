@@ -76,10 +76,21 @@ end
 --------------------------------------------
 -- Miscellaneous
 
+local hasCachedBindingKeys, cachedBindingKey1, cachedBindingKey2 = {}, {}, {}
 module.getBindingKey = function(buttonId)
 	-- Returns key(s) currently bound to the CT_BarMod button number.
 	-- Eg. "1", "SHIFT-A", etc.
-	return GetBindingKey("CLICK CT_BarModActionButton" .. buttonId .. ":LeftButton");
+	
+	if (hasCachedBindingKeys[buttonId]) then
+		return cachedBindingKey1[buttonId], cachedBindingKey2[buttonId]
+	end
+	local key1, key2 = GetBindingKey("CLICK CT_BarModActionButton" .. buttonId .. ":LeftButton");
+	hasCachedBindingKeys[buttonId], cachedBindingKey1[buttonId], cachedBindingKey2[buttonId] = true, key1, key2
+	return key1, key2
+end
+
+local function wipeBindingCache()
+	wipe(hasCachedBindingKeys);
 end
 
 -- Key Bindings Purger
@@ -912,6 +923,105 @@ local function flyoutModeEnd()
 
 end
 
+
+--------------------------------------------
+-- Override default action bar key bindings.
+
+-- Set or clear the overrride bindings for the action bar.
+local function setActionBindings(event)	
+	if (InCombatLockdown()) then
+		module.needSetActionBindings = true;
+		return;
+	end
+	
+	-- clear the cache earlier in this file to ensure a fresh set of override bindings
+	wipeBindingCache()
+	
+	-- These CT_BarMod groups correspond with action bars in the default UI.
+	-- Each of the buttons in these groups is associated with an action name
+	-- (eg. "ACTIONBUTTON1", "MULTIACTIONBAR1BUTTON1", etc).
+	local groupIds = {2, 3, 4, 5, module.actionBarId};
+
+	for i, groupId in ipairs(groupIds) do
+		local groupNum = module.GroupIdToNum( groupId );
+		local groupObj = groupList[groupNum];
+		if (groupObj) then
+			local owner = groupObj.frame;
+			local showBar = module:getOption("showGroup" .. groupId) ~= false;
+			local useDefault;  -- Assign override bindings to CT_BarMod buttons using default UI's keys.
+			local overrideActions;  -- Assign override bindings to actions using CT_BarMod's keys.
+
+			-- Clear the current override bindings for this bar.
+			ClearOverrideBindings(owner);
+
+			if (groupId == module.actionBarId) then
+				useDefault = module:getOption("actionBindings") ~= false;
+				if (
+					not event == "UNIT_EXITED_VEHICLE"					-- special case, while exiting the vehicle the secure frame may not have updated yet
+					and (
+						event == "UNIT_ENTERING_VEHICLE"				-- special case, some world quests activate combat lockdown before the secure frame registers being inside the vehicleUI
+						or CT_BarMod_SecureFrame:GetAttribute("hasPetBattle") 
+						or CT_BarMod_SecureFrame:GetAttribute("hasOverrideBar") 
+						or CT_BarMod_SecureFrame:GetAttribute("hasVehicleUI")
+					)
+				) then
+					-- We are in a pet battle or the override bar is showing
+					-- 1. Leave the main action bar's override bindings cleared.
+					useDefault = false;
+					-- 2. Assign override bindings to the actions "ACTIONBUTTON1"
+					--    through "ACTIONBUTTON12" using the keys that are currently
+					--    assigned to the buttons on CT_BarMod's action bar (bar 12).
+					overrideActions = true;
+				end
+			elseif (groupId == 2) then
+				useDefault = module:getOption("bar3Bindings") ~= false;
+			elseif (groupId == 3) then
+				useDefault = module:getOption("bar4Bindings") ~= false;
+			elseif (groupId == 4) then
+				useDefault = module:getOption("bar5Bindings") ~= false;
+			elseif (groupId == 5) then
+				useDefault = module:getOption("bar6Bindings") ~= false;
+			end
+
+			if (showBar) then
+				local buttonObjs = groupObj.objects;
+				local action;
+				local baseNum = (groupNum - 1) * 12;
+				for buttonNum = 1, 12 do
+					local buttonObj = buttonObjs[buttonNum];
+					-- Get the action name associated with this button (eg. "ACTIONBUTTON1")
+					local action = buttonObj.actionName .. buttonNum;
+					if (useDefault) then
+						-- Get the key(s) currently assigned to the action.
+						local key1, key2 = GetBindingKey(action);
+						-- Assign override binding clicks to the CT_BarMod button.
+						if (key1) then
+							SetOverrideBindingClick(owner, false, key1, buttonObj.name);
+						end
+						if (key2) then
+							SetOverrideBindingClick(owner, false, key2, buttonObj.name);
+						end
+					end
+					if (overrideActions) then
+						-- Get the key(s) currently assigned to the CT_BarMod button.
+						local key1, key2 = module.getBindingKey(baseNum + buttonNum );
+						-- Assign override bindings to the action.
+						if (key1) then
+							SetOverrideBinding(owner, false, key1, action);
+						end
+						if (key2) then
+							SetOverrideBinding(owner, false, key2, action);
+						end
+					end
+				end
+			end
+		end
+	end
+
+	module.needSetActionBindings = false;
+end
+
+
 ---------------------------------------------
 -- Key Bindings options frame related
 
@@ -1078,88 +1188,10 @@ local function keyBindingOnKeyDown(self, key)
 end
 
 --------------------------------------------
--- Override default action bar key bindings.
+-- Options
 
-local function setActionBindings(prevehicle)
-	-- Set or clear the overrride bindings for the action bar.
-	if (InCombatLockdown()) then
-		module.needSetActionBindings = true;
-		return;
-	end
-	-- These CT_BarMod groups correspond with action bars in the default UI.
-	-- Each of the buttons in these groups is associated with an action name
-	-- (eg. "ACTIONBUTTON1", "MULTIACTIONBAR1BUTTON1", etc).
-	local groupIds = {2, 3, 4, 5, module.actionBarId};
-
-	for i, groupId in ipairs(groupIds) do
-		local groupNum = module.GroupIdToNum( groupId );
-		local groupObj = groupList[groupNum];
-		if (groupObj) then
-			local owner = groupObj.frame;
-			local showBar = module:getOption("showGroup" .. groupId) ~= false;
-			local useDefault;  -- Assign override bindings to CT_BarMod buttons using default UI's keys.
-			local overrideActions;  -- Assign override bindings to actions using CT_BarMod's keys.
-
-			-- Clear the current override bindings for this bar.
-			ClearOverrideBindings(owner);
-
-			if (groupId == module.actionBarId) then
-				useDefault = module:getOption("actionBindings") ~= false;
-				if (prevehicle or CT_BarMod_SecureFrame:GetAttribute("hasPetBattle") or CT_BarMod_SecureFrame:GetAttribute("hasOverrideBar") or CT_BarMod_SecureFrame:GetAttribute("hasVehicleUI")) then
-					-- We are in a pet battle or the override bar is showing
-					-- 1. Leave the main action bar's override bindings cleared.
-					useDefault = false;
-					-- 2. Assign override bindings to the actions "ACTIONBUTTON1"
-					--    through "ACTIONBUTTON12" using the keys that are currently
-					--    assigned to the buttons on CT_BarMod's action bar (bar 12).
-					overrideActions = true;
-				end
-			elseif (groupId == 2) then
-				useDefault = module:getOption("bar3Bindings") ~= false;
-			elseif (groupId == 3) then
-				useDefault = module:getOption("bar4Bindings") ~= false;
-			elseif (groupId == 4) then
-				useDefault = module:getOption("bar5Bindings") ~= false;
-			elseif (groupId == 5) then
-				useDefault = module:getOption("bar6Bindings") ~= false;
-			end
-
-			if (showBar) then
-				local buttonObjs = groupObj.objects;
-				local action;
-				local baseNum = (groupNum - 1) * 12;
-				for buttonNum = 1, 12 do
-					local buttonObj = buttonObjs[buttonNum];
-					-- Get the action name associated with this button (eg. "ACTIONBUTTON1")
-					local action = buttonObj.actionName .. buttonNum;
-					if (useDefault) then
-						-- Get the key(s) currently assigned to the action.
-						local key1, key2 = GetBindingKey(action);
-						-- Assign override binding clicks to the CT_BarMod button.
-						if (key1) then
-							SetOverrideBindingClick(owner, false, key1, buttonObj.name);
-						end
-						if (key2) then
-							SetOverrideBindingClick(owner, false, key2, buttonObj.name);
-						end
-					end
-					if (overrideActions) then
-						-- Get the key(s) currently assigned to the CT_BarMod button.
-						local key1, key2 = module.getBindingKey(baseNum + buttonNum );
-						-- Assign override bindings to the action.
-						if (key1) then
-							SetOverrideBinding(owner, false, key1, action);
-						end
-						if (key2) then
-							SetOverrideBinding(owner, false, key2, action);
-						end
-					end
-				end
-			end
-		end
-	end
-
-	module.needSetActionBindings = false;
+local function keyBindingUpdate(option, value)
+	wipeBindingCache();
 end
 
 --------------------------------------------
@@ -1171,3 +1203,6 @@ module.keyBindingOnShow = keyBindingOnShow;
 module.keyBindingOnKeyDown = keyBindingOnKeyDown;
 
 module.setActionBindings = setActionBindings;
+
+module.bindingUpdate = keyBindingUpdate;
+module.clearKeyBindingsCache = wipeBindingCache;

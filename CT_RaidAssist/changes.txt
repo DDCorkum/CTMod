@@ -1,3 +1,6 @@
+CT_RaidAssist (8.2.5.9) 2019-12-18
+- Minor code cleanup; nothing substantive
+
 CT_RaidAssist (8.2.5.8) 2019-12-12
 - Small tooltip tweak to explain the limitations of a feature on Classic
 

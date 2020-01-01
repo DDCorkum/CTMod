@@ -720,24 +720,6 @@ local function initSecureFrame()
 end
 
 --------------------------------------------
--- Unsecure pre-vehicle trigger
-
--- This code allows activating vehicleui "faster" before some world quests begin combat
-
-if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
-	local unsecureWatchFrame = CreateFrame("Frame")
-	unsecureWatchFrame:RegisterEvent("UNIT_ENTERING_VEHICLE");
-	unsecureWatchFrame:SetScript("OnEvent",
-		function(self, event, ...)
-			local unitToken = ...;
-			if (event == "UNIT_ENTERING_VEHICLE" and unitToken == "player") then
-				module.setActionBindings(true);
-			end
-		end
-	);
-end
-
---------------------------------------------
 -- Mod Initialization
 
 local firstRun;
@@ -796,7 +778,8 @@ module.update = function(self, optName, value)
 		--	end
 		--end
 	end
---	self:editUpdate(optName, value);
+
+	self:bindingUpdate(optName, value);
 	self:useUpdate(optName, value);
 	self:optionUpdate(optName, value);
 end

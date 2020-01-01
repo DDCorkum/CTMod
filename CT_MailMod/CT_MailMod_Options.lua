@@ -15,7 +15,7 @@ local _G = getfenv(0);
 local module = _G["CT_MailMod"];
 
 module.text = module.text or { };	-- see localization.lua
-L = module.text;
+local L = module.text;
 
 --------------------------------------------
 

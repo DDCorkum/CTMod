@@ -16,18 +16,18 @@
 --------------------------------------------
 -- Initialization
 
-local MODULE_NAME, module = ...;
+local MODULE_TOC_NAME, module = ...;
 
 local _G = getfenv(0);
 
-local MODULE_VERSION = strmatch(GetAddOnMetadata(MODULE_NAME, "version"), "^([%d.]+)");
+local MODULE_TOC_VERSION = strmatch(GetAddOnMetadata(MODULE_TOC_NAME, "version"), "^([%d.]+)");
 
-module.name = MODULE_NAME;
-module.version = MODULE_VERSION;
+module.name = "CT_ExpenseHistory";
+module.version = MODULE_TOC_VERSION;
 -- module.frame = "CT_ExpenseHistoryFrame";
 -- module.external = true;
 
-_G[MODULE_NAME] = module;
+_G[module.name] = module;
 CT_Library:registerModule(module);
 tinsert(UISpecialFrames, "CT_ExpenseHistoryFrame");
 
@@ -424,7 +424,7 @@ end
 -- Data collection
 function CT_EH_UpdateRepair(arg1, arg2)
 	if ( InRepairMode() ) then
-		local cost, _;
+		local repairCost;
 		if ( arg2 ) then
 			_, repairCost = CT_EHTooltip:SetBagItem(arg1, arg2);
 		else
