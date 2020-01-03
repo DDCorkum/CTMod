@@ -8682,7 +8682,7 @@ local function options_updateWindowWidgets(windowId)
 	if (not dropdown.isInitialized) then
 		dropdown.isInitialized = true;
 		-- Only need to do this one time.
-		UIDROPDOWNMENU_Initialize(dropdown,
+		UIDropDownMenu_Initialize(dropdown,
 			function()
 				local i = 1;
 				local dropdownEntry = {};
@@ -8693,16 +8693,16 @@ local function options_updateWindowWidgets(windowId)
 					dropdownEntry.value = i;
 					dropdownEntry.checked = nil;
 					dropdownEntry.func = dropdown.ctDropdownClick;
-					UIDROPDOWNMENU_AddButton(dropdownEntry);
+					UIDropDownMenu_AddButton(dropdownEntry);
 					i = i + 1;
 				end
 			end
 		);
 	else
-		UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
+		UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
 	end
-	UIDROPDOWNMENU_SetSelectedValue( dropdown, globalObject.windowListObject:windowIdToNum(windowId) );
-	UIDROPDOWNMENU_JustifyText(dropdown, "LEFT");
+	UIDropDownMenu_SetSelectedValue( dropdown, globalObject.windowListObject:windowIdToNum(windowId) );
+	UIDropDownMenu_JustifyText(dropdown, "LEFT");
 
 	----------
 	-- Window
@@ -8726,8 +8726,8 @@ local function options_updateWindowWidgets(windowId)
 	local playerUnsecure = not not frameOptions.playerUnsecure;
 
 	dropdown = CT_BuffModDropdown_unitType;
-	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
-	UIDROPDOWNMENU_SetSelectedValue( dropdown, unitType );
+	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	UIDropDownMenu_SetSelectedValue( dropdown, unitType );
 
 	-- Use unsecure buttons
 	frame.playerUnsecure:SetChecked( playerUnsecure );
@@ -8771,12 +8771,12 @@ local function options_updateWindowWidgets(windowId)
 	local sortMethod = frameOptions.sortMethod or constants.SORT_METHOD_NAME;
 
 	dropdown = CT_BuffModDropdown_sortMethod;
-	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
-	UIDROPDOWNMENU_SetSelectedValue( dropdown, sortMethod );
+	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	UIDropDownMenu_SetSelectedValue( dropdown, sortMethod );
 
 	dropdown = CT_BuffModDropdown_separateZero;
-	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
-	UIDROPDOWNMENU_SetSelectedValue( dropdown, frameOptions.separateZero or constants.SEPARATE_ZERO_WITH );
+	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.separateZero or constants.SEPARATE_ZERO_WITH );
 	if (playerUnsecure) then
 		frame.separateZeroText:Show();
 		frame.separateZero:Show();
@@ -8788,34 +8788,34 @@ local function options_updateWindowWidgets(windowId)
 	frame.sortDirection:SetChecked( not not frameOptions.sortDirection );
 
 	dropdown = CT_BuffModDropdown_separateOwn;
-	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
+	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
 	-- Bug: Originally due to a bug in Blizzard's code, the SEPARATE_OWN_WITH value
 	--      acted like the SEPARATE_OWN_BEFORE value.
 	--
 	--      Note: As of WoW 4.3 they hvae fixed the bug.
 	--            I am now using SEPARATE_OWN_WITH as the default instead of SEPARATE_OWN_BEFORE.
 	--
-	UIDROPDOWNMENU_SetSelectedValue( dropdown, frameOptions.separateOwn or constants.SEPARATE_OWN_WITH );
+	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.separateOwn or constants.SEPARATE_OWN_WITH );
 
 	dropdown = CT_BuffModDropdown_sortSeq1;
-	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
-	UIDROPDOWNMENU_SetSelectedValue( dropdown, frameOptions.sortSeq1 or constants.FILTER_TYPE_DEBUFF );
+	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.sortSeq1 or constants.FILTER_TYPE_DEBUFF );
 
 	dropdown = CT_BuffModDropdown_sortSeq2;
-	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
-	UIDROPDOWNMENU_SetSelectedValue( dropdown, frameOptions.sortSeq2 or constants.FILTER_TYPE_WEAPON );
+	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.sortSeq2 or constants.FILTER_TYPE_WEAPON );
 
 	dropdown = CT_BuffModDropdown_sortSeq3;
-	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
-	UIDROPDOWNMENU_SetSelectedValue( dropdown, frameOptions.sortSeq3 or constants.FILTER_TYPE_BUFF_CANCELABLE );
+	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.sortSeq3 or constants.FILTER_TYPE_BUFF_CANCELABLE );
 
 	dropdown = CT_BuffModDropdown_sortSeq4;
-	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
-	UIDROPDOWNMENU_SetSelectedValue( dropdown, frameOptions.sortSeq4 or constants.FILTER_TYPE_BUFF_UNCANCELABLE );
+	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.sortSeq4 or constants.FILTER_TYPE_BUFF_UNCANCELABLE );
 
 	dropdown = CT_BuffModDropdown_sortSeq5;
-	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
-	UIDROPDOWNMENU_SetSelectedValue( dropdown, frameOptions.sortSeq5 or constants.FILTER_TYPE_NONE );
+	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.sortSeq5 or constants.FILTER_TYPE_NONE );
 
 	----------
 	-- Consolidation
@@ -8890,8 +8890,8 @@ local function options_updateWindowWidgets(windowId)
 
 	-- Layout
 	dropdown = CT_BuffModDropdown_layoutType;
-	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
-	UIDROPDOWNMENU_SetSelectedValue( dropdown, layoutType );
+	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	UIDropDownMenu_SetSelectedValue( dropdown, layoutType );
 
 	if (
 		layoutType == constants.LAYOUT_GROW_DOWN_WRAP_RIGHT or
@@ -8932,8 +8932,8 @@ local function options_updateWindowWidgets(windowId)
 	-- Appearance
 	----------
 	dropdown = CT_BuffModDropdown_buttonStyle;
-	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
-	UIDROPDOWNMENU_SetSelectedValue( dropdown, frameOptions.buttonStyle or 1 );
+	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.buttonStyle or 1 );
 
 	----------
 	-- Style 1
@@ -8943,8 +8943,8 @@ local function options_updateWindowWidgets(windowId)
 	frame.detailWidth1:SetValue( frameOptions.detailWidth1 or constants.DEFAULT_DETAIL_WIDTH );
 
 	dropdown = CT_BuffModDropdown_rightAlign1;
-	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
-	UIDROPDOWNMENU_SetSelectedValue( dropdown, tonumber(frameOptions.rightAlign1) or constants.RIGHT_ALIGN_DEFAULT );
+	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	UIDropDownMenu_SetSelectedValue( dropdown, tonumber(frameOptions.rightAlign1) or constants.RIGHT_ALIGN_DEFAULT );
 
 	frame.colorBuffs1:SetChecked( frameOptions.colorBuffs1 ~= false );
 	frame.colorCodeBackground1:SetChecked( not not frameOptions.colorCodeBackground1 );
@@ -8954,26 +8954,26 @@ local function options_updateWindowWidgets(windowId)
 	frame.colorCodeDebuffs1:SetChecked( not not frameOptions.colorCodeDebuffs1 );
 
 	dropdown = CT_BuffModDropdown_nameJustifyWithTime1;
-	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
-	UIDROPDOWNMENU_SetSelectedValue( dropdown, frameOptions.nameJustifyWithTime1 or constants.JUSTIFY_DEFAULT );
+	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.nameJustifyWithTime1 or constants.JUSTIFY_DEFAULT );
 
 	dropdown = CT_BuffModDropdown_nameJustifyNoTime1;
-	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
-	UIDROPDOWNMENU_SetSelectedValue( dropdown, frameOptions.nameJustifyNoTime1 or constants.JUSTIFY_DEFAULT );
+	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.nameJustifyNoTime1 or constants.JUSTIFY_DEFAULT );
 
 	frame.showTimers1:SetChecked( frameOptions.showTimers1 ~= false );
 
 	dropdown = CT_BuffModDropdown_durationFormat1;
-	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
-	UIDROPDOWNMENU_SetSelectedValue( dropdown, frameOptions.durationFormat1 or 1 );
+	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.durationFormat1 or 1 );
 
 	dropdown = CT_BuffModDropdown_durationLocation1;
-	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
-	UIDROPDOWNMENU_SetSelectedValue( dropdown, frameOptions.durationLocation1 or constants.DURATION_LOCATION_DEFAULT );
+	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.durationLocation1 or constants.DURATION_LOCATION_DEFAULT );
 
 	dropdown = CT_BuffModDropdown_timeJustifyNoName1;
-	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
-	UIDROPDOWNMENU_SetSelectedValue( dropdown, frameOptions.timeJustifyNoName1 or constants.JUSTIFY_DEFAULT );
+	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.timeJustifyNoName1 or constants.JUSTIFY_DEFAULT );
 
 	frame.showBuffTimer1:SetChecked( frameOptions.showBuffTimer1 ~= false );
 	frame.showTimerBackground1:SetChecked( frameOptions.showTimerBackground1 ~= false );
@@ -8990,12 +8990,12 @@ local function options_updateWindowWidgets(windowId)
 	frame.showTimers2:SetChecked( frameOptions.showTimers2 ~= false );
 
 	dropdown = CT_BuffModDropdown_durationFormat2;
-	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
-	UIDROPDOWNMENU_SetSelectedValue( dropdown, frameOptions.durationFormat2 or 1 );
+	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.durationFormat2 or 1 );
 
 	dropdown = CT_BuffModDropdown_dataSide2;
-	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
-	UIDROPDOWNMENU_SetSelectedValue( dropdown, frameOptions.dataSide2 or constants.DATA_SIDE_BOTTOM );
+	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.dataSide2 or constants.DATA_SIDE_BOTTOM );
 
 	frame.spacingFromIcon2:SetValue( frameOptions.spacingFromIcon2 or 0 );
 
@@ -10280,7 +10280,7 @@ CONSOLIDATION REMOVED FROM GAME--]]
 					elapsedbuttonstyle = elapsedbuttonstyle + elapsed;
 					if elapsedbuttonstyle < 0.5 then return; end
 					elapsedbuttonstyle = 0;
-					if (UIDROPDOWNMENU_GetSelectedID(CT_BuffModDropdown_buttonStyle) == 1) then
+					if (UIDropDownMenu_GetSelectedID(CT_BuffModDropdown_buttonStyle) == 1) then
 						-- maximize Style 1 options, minimize Style 2 options
 						CT_BuffMod_Style1Label:Show();
 						CT_BuffMod_Style1SizeLabel:Show();
@@ -10495,7 +10495,7 @@ CONSOLIDATION REMOVED FROM GAME--]]
 		optionsBeginFrame(15,   17, "slider#tl:190:%y#s:100:%s#i:spacingFromIcon2#o:spacingFromIcon2:0#<value>#0:50:1");
 			optionsAddScript("onupdate",
 				function(self)
-					if (UIDROPDOWNMENU_GetSelectedID(CT_BuffModDropdown_dataSide2) == constants.DATA_SIDE_CENTER) then
+					if (UIDropDownMenu_GetSelectedID(CT_BuffModDropdown_dataSide2) == constants.DATA_SIDE_CENTER) then
 						self:Disable();
 						spacingFromIcon2Low:SetTextColor(.5,.5,.5)
 						spacingFromIcon2Text:SetTextColor(.5,.5,.5)
