@@ -973,7 +973,7 @@ module.externalDropDown_Initialize = function(useLibUIDropDownMenu)		-- useLibUI
 	info.isTitle = 1;
 	info.justifyH = "CENTER";
 	info.notCheckable = 1;
-	if (useLibUIDropDownMenu) then
+	if (useLibUIDropDownMenu == "L_") then
 		L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL); 	
 	else
 		UIDropDownMenu_AddButton(info, UIDROPDOWNMENU_MENU_LEVEL);
@@ -993,7 +993,7 @@ module.externalDropDown_Initialize = function(useLibUIDropDownMenu)		-- useLibUI
 				CT_LibraryOptionsScrollFrameScrollBar:SetValue(item.offset);
 			end
 		end
-		if (useLibUIDropDownMenu) then
+		if (useLibUIDropDownMenu == "L_") then
 			L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL);
 		else
 			UIDropDownMenu_AddButton(info, UIDROPDOWNMENU_MENU_LEVEL);

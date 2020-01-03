@@ -379,7 +379,7 @@ module.externalDropDown_Initialize = function(useLibUIDropDownMenu)		-- useLibUI
 	info.isTitle = 1;
 	info.justifyH = "CENTER";
 	info.notCheckable = 1;
-	if (useLibUIDropDownMenu) then
+	if (useLibUIDropDownMenu == "L_") then
 		L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL); 	-- Compatiblity with TitanPanel for arith's LibUIDropDownMenu
 	else
 		UIDropDownMenu_AddButton(info, UIDROPDOWNMENU_MENU_LEVEL);
@@ -391,7 +391,7 @@ module.externalDropDown_Initialize = function(useLibUIDropDownMenu)		-- useLibUI
 	info.func = function()
 		module:showModuleOptions(module.name);
 	end
-	if (useLibUIDropDownMenu) then
+	if (useLibUIDropDownMenu == "L_") then
 		L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL); 	-- Compatiblity with TitanPanel for arith's LibUIDropDownMenu
 	else
 		UIDropDownMenu_AddButton(info, UIDROPDOWNMENU_MENU_LEVEL);
@@ -401,7 +401,7 @@ module.externalDropDown_Initialize = function(useLibUIDropDownMenu)		-- useLibUI
 	info.text = "Open mail log";
 	info.notCheckable = 1;
 	info.func = module.showMailLog;
-	if (useLibUIDropDownMenu) then
+	if (useLibUIDropDownMenu == "L_") then
 		L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL); 	-- Compatiblity with TitanPanel for arith's LibUIDropDownMenu
 	else
 		UIDropDownMenu_AddButton(info, UIDROPDOWNMENU_MENU_LEVEL);

@@ -1126,15 +1126,15 @@ local function keyBindingOnLoad(self)
 
 	do
 		local function buttonsOptionDropdownClick(self)
-			local dropdown = L_UIDROPDOWNMENU_OPEN_MENU;
+			local dropdown = UIDROPDOWNMENU_OPEN_MENU;
 			-- 7.0.3
 			if not dropdown then
-				dropdown = L_UIDROPDOWNMENU_INIT_MENU
+				dropdown = UIDROPDOWNMENU_INIT_MENU
 			end
 			if ( dropdown ) then
 				local value = self.value;
 				local option = dropdown.option;
-				L_UIDropDownMenu_SetSelectedValue(dropdown, value);
+				UIDropDownMenu_SetSelectedValue(dropdown, value);
 				if ( option ) then
 					dropdown.object:setOption(option, value, not dropdown.global);
 				end
@@ -1144,18 +1144,18 @@ local function keyBindingOnLoad(self)
 		end
 
 		local dropdownEntry = {};
-		L_UIDropDownMenu_Initialize(CT_BarModDropButtonOptions, function()
+		UIDropDownMenu_Initialize(CT_BarModDropButtonOptions, function()
 			for i = 1, #buttonsModes, 1 do
 				dropdownEntry.text = buttonsModes[i].name;
 				dropdownEntry.value = i;
 				dropdownEntry.checked = nil;
 				dropdownEntry.func = buttonsOptionDropdownClick;
-				L_UIDropDownMenu_AddButton(dropdownEntry);
+				UIDropDownMenu_AddButton(dropdownEntry);
 			end
 		end);
 	end
 
-	L_UIDropDownMenu_SetSelectedValue(CT_BarModDropButtonOptions, 1);
+	UIDropDownMenu_SetSelectedValue(CT_BarModDropButtonOptions, 1);
 
 	buttonsSetMode();
 end
