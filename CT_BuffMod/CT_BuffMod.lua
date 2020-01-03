@@ -157,7 +157,7 @@ local sortSeqChanged;
 local optionsFrame;
 local globalFrame;
 local globalObject;
-local frame_Show;
+--local frame_Show; -- it doesn't appear this is ever used
 local frame_Hide;
 
 --------------------------------------------
@@ -575,7 +575,7 @@ local function sortFactory(key, separateOwn, reverse, separateZero)
 	end
 end
 
-for i, key in ipairs{"index", "name", "expires"} do
+for __, key in ipairs{"index", "name", "expires"} do
 	local label = key:upper();
 	sorters[label] = {};
 	for bool in pairs{[true] = true, [false] = false} do
@@ -969,7 +969,7 @@ local function queueBuffRecast(buffName)
 	end
 
 	-- Make sure it's not in here already
-	for key, value in ipairs(buffQueue) do
+	for __, value in ipairs(buffQueue) do
 		if ( value == buffName ) then
 			return;
 		end
@@ -1373,7 +1373,7 @@ function unitClass:removeSpell(spellId)
 	-- Returns nil or the aura object.
 	if (spellId) then
 		local auraObject;
-		for auraType, auraObjects in pairs(self.spellAuras) do
+		for __, auraObjects in pairs(self.spellAuras) do
 			auraObject = auraObjects[spellId];
 			if (auraObject) then
 				-- Remove and return the aura object.
@@ -1427,7 +1427,7 @@ function unitClass:findSpell(spellId)
 	if (spellId) then
 		-- Return the aura object or nil.
 		local auraObject;
-		for auraType, auraObjects in pairs(self.spellAuras) do
+		for __, auraObjects in pairs(self.spellAuras) do
 			auraObject = auraObjects[spellId];
 			if (auraObject) then
 				return auraObject;
@@ -1438,7 +1438,7 @@ function unitClass:findSpell(spellId)
 end
 
 function unitClass:updateSpellsForFilter(filter, buffFlag)
-	local name, rank, texture, count, debuffType, duration, expirationTime, casterUnit, canStealOrPurge, shouldConsolidate, spellId;
+	local name, texture, count, debuffType, duration, expirationTime, casterUnit, canStealOrPurge, shouldConsolidate, spellId;
 	local unit, index, auraObject, auraType;
 	unit = self.unitId;
 	index = 1;
@@ -1462,7 +1462,6 @@ function unitClass:updateSpellsForFilter(filter, buffFlag)
 			auraObject = self:addSpell(spellId, auraType);
 
 			auraObject.name = name;
-			auraObject.rank = rank;
 			auraObject.texture = texture;
 			auraObject.debuffType = debuffType;
 			auraObject.duration = duration;
@@ -1604,8 +1603,8 @@ function unitClass:updateSpells()
 	-- Update spell auras for this unit.
 
 	-- Reset the .updated flag on each aura object.
-	for auraType, auraObjects in pairs(self.spellAuras) do
-		for spellId, auraObject in pairs(auraObjects) do
+	for __, auraObjects in pairs(self.spellAuras) do
+		for __, auraObject in pairs(auraObjects) do
 			auraObject.updated = false;
 		end
 	end
@@ -1615,7 +1614,7 @@ function unitClass:updateSpells()
 	self:updateSpellsForFilter("harmful", false);
 
 	-- Remove auras no longer present.
-	for auraType, auraObjects in pairs(self.spellAuras) do
+	for __, auraObjects in pairs(self.spellAuras) do
 		for spellId, auraObject in pairs(auraObjects) do
 			if (not auraObject.updated) then
 				self:removeSpell(spellId);
@@ -1662,7 +1661,7 @@ function unitClass:findEnchant(index)
 end
 
 local TOOLTIP = CreateFrame("GameTooltip", "CT_BuffModTooltip", nil, "GameTooltipTemplate");
-local TOOLTIP_TITLE = _G.CT_BuffModTooltipTextLeft1;
+--local TOOLTIP_TITLE = _G.CT_BuffModTooltipTextLeft1;	-- it doesn't appear this is ever used
 TOOLTIP:SetOwner(WorldFrame, "ANCHOR_NONE");
 
 local function getTemporaryEnchantInfo(index, slot, unit)
@@ -1671,7 +1670,7 @@ local function getTemporaryEnchantInfo(index, slot, unit)
 	-- unit == unit ID (should be "player")
 
 	local numValues = 4;  -- Number of return values from GetWeaponEnchantInfo() per weapon
-	local hasEnchant, timeRemaining, count, id = select(numValues * (index - 1) + 1, GetWeaponEnchantInfo());
+	local hasEnchant, timeRemaining, count = select(numValues * (index - 1) + 1, GetWeaponEnchantInfo());
 	if (not hasEnchant) then
 		return false;
 	end
@@ -1864,7 +1863,7 @@ function unitClass:checkExpiration()
 
 	-- Check enchants
 	auraObjects = self.enchantAuras;
-	for index, auraObject in pairs(auraObjects) do
+	for __, auraObject in pairs(auraObjects) do
 		auraObject:checkExpiration();
 	end
 end
@@ -1977,7 +1976,7 @@ end
 function unitListClass:updateSpells(unitId)
 	-- Update spell auras for all units in the list, or just the specified unit.
 	if (not unitId) then
-		for unitId, unitObject in pairs(self.unitObjects) do
+		for __, unitObject in pairs(self.unitObjects) do
 			unitObject:updateSpells();
 		end
 	else
@@ -1992,7 +1991,7 @@ function unitListClass:updateEnchants(unitId)
 	-- Update enchants for all units in the list, or just the specified unit.
 	local numEnchants = 0;
 	if (not unitId) then
-		for unitId, unitObject in pairs(self.unitObjects) do
+		for __, unitObject in pairs(self.unitObjects) do
 			numEnchants = numEnchants + unitObject:updateEnchants();
 		end
 	else
@@ -2008,7 +2007,7 @@ function unitListClass:updateSpellsAndEnchants(unitId)
 	-- Update auras and enchants for all units in the list, or just the specified unit.
 	local numEnchants = 0;
 	if (not unitId) then
-		for unitId, unitObject in pairs(self.unitObjects) do
+		for __, unitObject in pairs(self.unitObjects) do
 			unitObject:updateSpells();
 			numEnchants = numEnchants + unitObject:updateEnchants();
 		end
@@ -2023,7 +2022,7 @@ function unitListClass:updateSpellsAndEnchants(unitId)
 end
 
 function unitListClass:setConsolidateAura()
-	for unitId, unitObject in pairs(self.unitObjects) do
+	for __, unitObject in pairs(self.unitObjects) do
 		unitObject:setConsolidateAura();
 	end
 end
@@ -2932,8 +2931,8 @@ function CT_BuffMod_AuraButton_OnEnter(self)
 		return;
 	end
 
-	local cursorX, cursorY = GetCursorPosition();
-	local centerX, centerY = UIParent:GetCenter();
+	local cursorX = GetCursorPosition();
+	local centerX = UIParent:GetCenter();
 	centerX = centerX * UIParent:GetScale();
 	if (cursorX < centerX) then
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
@@ -4915,7 +4914,7 @@ local function consolidatedAuraFrame_OnEvent(auraFrame, event, arg1)
 	end
 end
 
-local function consolidatedAuraFrame_OnUpdate(auraFrame, elapsed)
+local function consolidatedAuraFrame_OnUpdate(auraFrame)
 	local frameObject = auraFrame.frameObject;
 
 	if (not frameObject) then
@@ -6636,22 +6635,22 @@ local function consolidatedButton_OnMouseUp(self, button)
 	end
 end
 
-local function consolidatedButton_OnEnter(self, motion)
+local function consolidatedButton_OnEnter(self)
 	-- Unsecure consolidated button OnEnter
 	local consolidatedFrame = self.auraFrame:GetAttribute("consolidateHeader");
 	local primaryFrame = self.auraFrame;
 
 	consolidatedFrame:Show();
 
-	local frameLeft, frameBottom, frameWidth, frameHeight = consolidatedFrame:GetRect();
+	local __, __, frameWidth = consolidatedFrame:GetRect();
 
-	local buttonLeft, buttonBottom, buttonWidth, buttonHeight = self:GetRect();
+	local buttonLeft, __, buttonWidth = self:GetRect();
 	local buttonRight = buttonLeft + buttonWidth;
 
 	local anchorToEdgeLeft = consolidatedFrame:GetAttribute("anchorToEdgeLeft");
 	local anchorToEdgeRight = consolidatedFrame:GetAttribute("anchorToEdgeRight");
-	local anchorToEdgeTop = consolidatedFrame:GetAttribute("anchorToEdgeTop");
-	local anchorToEdgeBottom = consolidatedFrame:GetAttribute("anchorToEdgeBottom");
+	--local anchorToEdgeTop = consolidatedFrame:GetAttribute("anchorToEdgeTop");	--not used
+	--local anchorToEdgeBottom = consolidatedFrame:GetAttribute("anchorToEdgeBottom");	--not used
 	local rightAlignIcon1 = primaryFrame:GetAttribute("rightAlignIcon1");
 	local buttonStyle = primaryFrame:GetAttribute("buttonStyle");
 
@@ -6667,7 +6666,7 @@ local function consolidatedButton_OnEnter(self, motion)
 	local uiparent = primaryFrame:GetParent();
 
 	local parentWidth = uiparent:GetWidth();
-	local parentHeight = uiparent:GetHeight();
+	--local parentHeight = uiparent:GetHeight();	--not used
 
 	local showRight;
 	if (isDetailRight == true) then
@@ -6719,7 +6718,7 @@ local function consolidatedButton_OnEnter(self, motion)
 	autoHide_set(consolidatedFrame, self, seconds);
 end
 
-local function consolidatedButton_OnHide(self, motion)
+local function consolidatedButton_OnHide(self)
 	local consolidatedFrame = self.auraFrame:GetAttribute("consolidateHeader");
 	consolidatedFrame:Hide();
 end
@@ -8505,7 +8504,7 @@ local function convertToFormat1()
 
 		-- Validate the anchor point
 		local found = false;
-		for i, point in ipairs(framePoints) do
+		for __, point in ipairs(framePoints) do
 			if (anchorPoint == point) then
 				found = true;
 				break;
@@ -8517,7 +8516,7 @@ local function convertToFormat1()
 
 		-- Validate the relative point
 		local found = false;
-		for i, point in ipairs(framePoints) do
+		for __, point in ipairs(framePoints) do
 			if (relativePoint == point) then
 				found = true;
 				break;
@@ -8683,7 +8682,7 @@ local function options_updateWindowWidgets(windowId)
 	if (not dropdown.isInitialized) then
 		dropdown.isInitialized = true;
 		-- Only need to do this one time.
-		L_UIDropDownMenu_Initialize(dropdown,
+		UIDROPDOWNMENU_Initialize(dropdown,
 			function()
 				local i = 1;
 				local dropdownEntry = {};
@@ -8694,16 +8693,16 @@ local function options_updateWindowWidgets(windowId)
 					dropdownEntry.value = i;
 					dropdownEntry.checked = nil;
 					dropdownEntry.func = dropdown.ctDropdownClick;
-					L_UIDropDownMenu_AddButton(dropdownEntry);
+					UIDROPDOWNMENU_AddButton(dropdownEntry);
 					i = i + 1;
 				end
 			end
 		);
 	else
-		L_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+		UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
 	end
-	L_UIDropDownMenu_SetSelectedValue( dropdown, globalObject.windowListObject:windowIdToNum(windowId) );
-	L_UIDropDownMenu_JustifyText(dropdown, "LEFT");
+	UIDROPDOWNMENU_SetSelectedValue( dropdown, globalObject.windowListObject:windowIdToNum(windowId) );
+	UIDROPDOWNMENU_JustifyText(dropdown, "LEFT");
 
 	----------
 	-- Window
@@ -8727,8 +8726,8 @@ local function options_updateWindowWidgets(windowId)
 	local playerUnsecure = not not frameOptions.playerUnsecure;
 
 	dropdown = CT_BuffModDropdown_unitType;
-	L_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-	L_UIDropDownMenu_SetSelectedValue( dropdown, unitType );
+	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
+	UIDROPDOWNMENU_SetSelectedValue( dropdown, unitType );
 
 	-- Use unsecure buttons
 	frame.playerUnsecure:SetChecked( playerUnsecure );
@@ -8772,12 +8771,12 @@ local function options_updateWindowWidgets(windowId)
 	local sortMethod = frameOptions.sortMethod or constants.SORT_METHOD_NAME;
 
 	dropdown = CT_BuffModDropdown_sortMethod;
-	L_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-	L_UIDropDownMenu_SetSelectedValue( dropdown, sortMethod );
+	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
+	UIDROPDOWNMENU_SetSelectedValue( dropdown, sortMethod );
 
 	dropdown = CT_BuffModDropdown_separateZero;
-	L_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-	L_UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.separateZero or constants.SEPARATE_ZERO_WITH );
+	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
+	UIDROPDOWNMENU_SetSelectedValue( dropdown, frameOptions.separateZero or constants.SEPARATE_ZERO_WITH );
 	if (playerUnsecure) then
 		frame.separateZeroText:Show();
 		frame.separateZero:Show();
@@ -8789,34 +8788,34 @@ local function options_updateWindowWidgets(windowId)
 	frame.sortDirection:SetChecked( not not frameOptions.sortDirection );
 
 	dropdown = CT_BuffModDropdown_separateOwn;
-	L_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
 	-- Bug: Originally due to a bug in Blizzard's code, the SEPARATE_OWN_WITH value
 	--      acted like the SEPARATE_OWN_BEFORE value.
 	--
 	--      Note: As of WoW 4.3 they hvae fixed the bug.
 	--            I am now using SEPARATE_OWN_WITH as the default instead of SEPARATE_OWN_BEFORE.
 	--
-	L_UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.separateOwn or constants.SEPARATE_OWN_WITH );
+	UIDROPDOWNMENU_SetSelectedValue( dropdown, frameOptions.separateOwn or constants.SEPARATE_OWN_WITH );
 
 	dropdown = CT_BuffModDropdown_sortSeq1;
-	L_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-	L_UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.sortSeq1 or constants.FILTER_TYPE_DEBUFF );
+	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
+	UIDROPDOWNMENU_SetSelectedValue( dropdown, frameOptions.sortSeq1 or constants.FILTER_TYPE_DEBUFF );
 
 	dropdown = CT_BuffModDropdown_sortSeq2;
-	L_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-	L_UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.sortSeq2 or constants.FILTER_TYPE_WEAPON );
+	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
+	UIDROPDOWNMENU_SetSelectedValue( dropdown, frameOptions.sortSeq2 or constants.FILTER_TYPE_WEAPON );
 
 	dropdown = CT_BuffModDropdown_sortSeq3;
-	L_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-	L_UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.sortSeq3 or constants.FILTER_TYPE_BUFF_CANCELABLE );
+	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
+	UIDROPDOWNMENU_SetSelectedValue( dropdown, frameOptions.sortSeq3 or constants.FILTER_TYPE_BUFF_CANCELABLE );
 
 	dropdown = CT_BuffModDropdown_sortSeq4;
-	L_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-	L_UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.sortSeq4 or constants.FILTER_TYPE_BUFF_UNCANCELABLE );
+	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
+	UIDROPDOWNMENU_SetSelectedValue( dropdown, frameOptions.sortSeq4 or constants.FILTER_TYPE_BUFF_UNCANCELABLE );
 
 	dropdown = CT_BuffModDropdown_sortSeq5;
-	L_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-	L_UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.sortSeq5 or constants.FILTER_TYPE_NONE );
+	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
+	UIDROPDOWNMENU_SetSelectedValue( dropdown, frameOptions.sortSeq5 or constants.FILTER_TYPE_NONE );
 
 	----------
 	-- Consolidation
@@ -8891,8 +8890,8 @@ local function options_updateWindowWidgets(windowId)
 
 	-- Layout
 	dropdown = CT_BuffModDropdown_layoutType;
-	L_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-	L_UIDropDownMenu_SetSelectedValue( dropdown, layoutType );
+	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
+	UIDROPDOWNMENU_SetSelectedValue( dropdown, layoutType );
 
 	if (
 		layoutType == constants.LAYOUT_GROW_DOWN_WRAP_RIGHT or
@@ -8933,8 +8932,8 @@ local function options_updateWindowWidgets(windowId)
 	-- Appearance
 	----------
 	dropdown = CT_BuffModDropdown_buttonStyle;
-	L_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-	L_UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.buttonStyle or 1 );
+	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
+	UIDROPDOWNMENU_SetSelectedValue( dropdown, frameOptions.buttonStyle or 1 );
 
 	----------
 	-- Style 1
@@ -8944,8 +8943,8 @@ local function options_updateWindowWidgets(windowId)
 	frame.detailWidth1:SetValue( frameOptions.detailWidth1 or constants.DEFAULT_DETAIL_WIDTH );
 
 	dropdown = CT_BuffModDropdown_rightAlign1;
-	L_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-	L_UIDropDownMenu_SetSelectedValue( dropdown, tonumber(frameOptions.rightAlign1) or constants.RIGHT_ALIGN_DEFAULT );
+	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
+	UIDROPDOWNMENU_SetSelectedValue( dropdown, tonumber(frameOptions.rightAlign1) or constants.RIGHT_ALIGN_DEFAULT );
 
 	frame.colorBuffs1:SetChecked( frameOptions.colorBuffs1 ~= false );
 	frame.colorCodeBackground1:SetChecked( not not frameOptions.colorCodeBackground1 );
@@ -8955,26 +8954,26 @@ local function options_updateWindowWidgets(windowId)
 	frame.colorCodeDebuffs1:SetChecked( not not frameOptions.colorCodeDebuffs1 );
 
 	dropdown = CT_BuffModDropdown_nameJustifyWithTime1;
-	L_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-	L_UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.nameJustifyWithTime1 or constants.JUSTIFY_DEFAULT );
+	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
+	UIDROPDOWNMENU_SetSelectedValue( dropdown, frameOptions.nameJustifyWithTime1 or constants.JUSTIFY_DEFAULT );
 
 	dropdown = CT_BuffModDropdown_nameJustifyNoTime1;
-	L_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-	L_UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.nameJustifyNoTime1 or constants.JUSTIFY_DEFAULT );
+	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
+	UIDROPDOWNMENU_SetSelectedValue( dropdown, frameOptions.nameJustifyNoTime1 or constants.JUSTIFY_DEFAULT );
 
 	frame.showTimers1:SetChecked( frameOptions.showTimers1 ~= false );
 
 	dropdown = CT_BuffModDropdown_durationFormat1;
-	L_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-	L_UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.durationFormat1 or 1 );
+	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
+	UIDROPDOWNMENU_SetSelectedValue( dropdown, frameOptions.durationFormat1 or 1 );
 
 	dropdown = CT_BuffModDropdown_durationLocation1;
-	L_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-	L_UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.durationLocation1 or constants.DURATION_LOCATION_DEFAULT );
+	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
+	UIDROPDOWNMENU_SetSelectedValue( dropdown, frameOptions.durationLocation1 or constants.DURATION_LOCATION_DEFAULT );
 
 	dropdown = CT_BuffModDropdown_timeJustifyNoName1;
-	L_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-	L_UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.timeJustifyNoName1 or constants.JUSTIFY_DEFAULT );
+	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
+	UIDROPDOWNMENU_SetSelectedValue( dropdown, frameOptions.timeJustifyNoName1 or constants.JUSTIFY_DEFAULT );
 
 	frame.showBuffTimer1:SetChecked( frameOptions.showBuffTimer1 ~= false );
 	frame.showTimerBackground1:SetChecked( frameOptions.showTimerBackground1 ~= false );
@@ -8991,12 +8990,12 @@ local function options_updateWindowWidgets(windowId)
 	frame.showTimers2:SetChecked( frameOptions.showTimers2 ~= false );
 
 	dropdown = CT_BuffModDropdown_durationFormat2;
-	L_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-	L_UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.durationFormat2 or 1 );
+	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
+	UIDROPDOWNMENU_SetSelectedValue( dropdown, frameOptions.durationFormat2 or 1 );
 
 	dropdown = CT_BuffModDropdown_dataSide2;
-	L_UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
-	L_UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.dataSide2 or constants.DATA_SIDE_BOTTOM );
+	UIDROPDOWNMENU_Initialize( dropdown, dropdown.initialize );
+	UIDROPDOWNMENU_SetSelectedValue( dropdown, frameOptions.dataSide2 or constants.DATA_SIDE_BOTTOM );
 
 	frame.spacingFromIcon2:SetValue( frameOptions.spacingFromIcon2 or 0 );
 
@@ -10281,7 +10280,7 @@ CONSOLIDATION REMOVED FROM GAME--]]
 					elapsedbuttonstyle = elapsedbuttonstyle + elapsed;
 					if elapsedbuttonstyle < 0.5 then return; end
 					elapsedbuttonstyle = 0;
-					if (L_UIDropDownMenu_GetSelectedID(CT_BuffModDropdown_buttonStyle) == 1) then
+					if (UIDROPDOWNMENU_GetSelectedID(CT_BuffModDropdown_buttonStyle) == 1) then
 						-- maximize Style 1 options, minimize Style 2 options
 						CT_BuffMod_Style1Label:Show();
 						CT_BuffMod_Style1SizeLabel:Show();
@@ -10496,7 +10495,7 @@ CONSOLIDATION REMOVED FROM GAME--]]
 		optionsBeginFrame(15,   17, "slider#tl:190:%y#s:100:%s#i:spacingFromIcon2#o:spacingFromIcon2:0#<value>#0:50:1");
 			optionsAddScript("onupdate",
 				function(self)
-					if (L_UIDropDownMenu_GetSelectedID(CT_BuffModDropdown_dataSide2) == constants.DATA_SIDE_CENTER) then
+					if (UIDROPDOWNMENU_GetSelectedID(CT_BuffModDropdown_dataSide2) == constants.DATA_SIDE_CENTER) then
 						self:Disable();
 						spacingFromIcon2Low:SetTextColor(.5,.5,.5)
 						spacingFromIcon2Text:SetTextColor(.5,.5,.5)
@@ -10746,13 +10745,13 @@ globalFrame:SetScript("OnEvent", globalFrame_OnEvent);
 globalFrame:RegisterEvent("PLAYER_LOGIN");
 globalFrame:Show();
 
-frame_Show = globalFrame.Show;
+--frame_Show = globalFrame.Show; -- it doesn't appear this is ever used
 frame_Hide = globalFrame.Hide;
 
 --------------------------------------------
 -- Slash command.
 
-local function slashCommand(msg)
+local function slashCommand()
 	module:showModuleOptions(module.name);
 end
 

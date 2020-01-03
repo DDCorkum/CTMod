@@ -1,5 +1,5 @@
-## Interface: 80205
-## Version: 8.2.5.8
+## Interface: 80300
+## Version: 8.3.0.1
 ## Title: CT_Library |cFF333333(BFA)
 ## Notes: Library features for CTMod. 
 ## DefaultState: Enabled
@@ -7,7 +7,7 @@
 
 
 Libs\LibStub\LibStub.lua
-Libs\LibUIDropDownMenu\LibUIDropDownMenu.xml
+Libs\UIDropDown_TownlongYak_Workarounds.lua
 
 CT_Library.lua
 localization.lua

@@ -19,7 +19,7 @@
 
 -- Please contribute new translations at <https://wow.curseforge.com/projects/ctmod/localization>
 
-local MODULE_NAME, module = ...;
+local __, module = ...;
 module.text = module.text or { };
 local L = module.text
 
@@ -42,6 +42,8 @@ L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksTooltip"] = [=[Provi
 after missing a /readycheck]=]
 L["CT_RaidAssist/Options/ReadyCheckMonitor/Heading"] = "Ready Check Enhancements"
 L["CT_RaidAssist/Options/ReadyCheckMonitor/MonitorDurabilityLabel"] = "Provide warnings if your durability is getting low"
+L["CT_RaidAssist/Options/ReadyCheckMonitor/MonitorDurabilityMessage"] = [=[Please /reload for CTRA to stop sharing durability.
+Other raid addons like DBM and oRA may re-activate this feature.]=]
 L["CT_RaidAssist/Options/ReadyCheckMonitor/MonitorDurabilitySlider"] = "Warn if gear below <value>%:Off:50%"
 L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityCheckButton"] = "Let CTRA share your durability with the raid"
 L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityTooltip"] = [=[Share your durability with peers using addons like CTRA, DBM or oRA.

@@ -355,7 +355,7 @@ function StaticCTRAReadyCheck()
 			if (value) then
 				module:InstallLibDurability()
 			else
-				print("Please /reload for CTRA to stop sharing durability.  Other addons (DBM, oRA, etc.) may re-activate this feature.");
+				print(L["CT_RaidAssist/Options/ReadyCheckMonitor/MonitorDurabilityMessage"]);
 			end
 		end
 	end
@@ -418,7 +418,6 @@ function StaticCTRAFrames()
 	-- private properties, and where applicable their default values
 	local windows = { };			-- non-interactive frames that anchor and orient assigned collections of PlayerFrames, TargetFrames and LabelFrames
 	local selectedWindow = nil;		-- the currently selected window
-	local listener = nil;			-- listener for joining and leaving a raid
 	local enabledState;			-- are the raidframes enabled (but possibly hidden if not in a raid)
 	local settingsOverlayToStopClicks;	-- button that sits overtop several options to stop interactions with them
 	local dummyFrame;			-- pretend CTRAPlayerFrame to illustrate options
@@ -471,6 +470,11 @@ function StaticCTRAFrames()
 		-- STEP 2:
 		CompactRaidFrameManager_SetSetting("IsShown",CompactUnitFrameProfiles_GetAutoActivationState());    --    (IsInRaid() and true) or (IsInGroup() and CompactRaidFrameManagerDisplayFrameHiddenModeToggle.shownMode) or false);
 		--CompactRaidFrameContainer_TryUpdate(CompactRaidFrameContainer);
+	end
+	
+	local function eventHandler(event)
+		obj:ToggleEnableState();
+		obj:Update();
 	end
 	
 	-- public methods
@@ -572,7 +576,6 @@ function StaticCTRAFrames()
 				end
 				optionsWaiting[key] = nil;
 			end
-			--optionsWaiting = { };
 		end
 		for i, window in ipairs(windows) do
 			if (option) then
@@ -673,7 +676,7 @@ function StaticCTRAFrames()
 							if (selectedWindow > 1) then
 								selectedWindow = selectedWindow - 1;
 								windows[selectedWindow]:Focus();
-								L_UIDropDownMenu_SetText(CTRAFrames_WindowSelectionDropDown, format(L["CT_RaidAssist/WindowTitle"],selectedWindow));
+								UIDropDownMenu_SetText(CTRAFrames_WindowSelectionDropDown, format(L["CT_RaidAssist/WindowTitle"],selectedWindow));
 								if (selectedWindow == 1) then
 									button:Disable();
 								end
@@ -697,7 +700,7 @@ function StaticCTRAFrames()
 							if (selectedWindow < (module:getOption("CTRAFrames_NumEnabledWindows") or 1)) then
 								selectedWindow = selectedWindow + 1;
 								windows[selectedWindow]:Focus();
-								L_UIDropDownMenu_SetText(CTRAFrames_WindowSelectionDropDown, format(L["CT_RaidAssist/WindowTitle"],selectedWindow));
+								UIDropDownMenu_SetText(CTRAFrames_WindowSelectionDropDown, format(L["CT_RaidAssist/WindowTitle"],selectedWindow));
 								if (selectedWindow == (module:getOption("CTRAFrames_NumEnabledWindows") or 1)) then
 									button:Disable();
 								end
@@ -720,8 +723,8 @@ function StaticCTRAFrames()
 				optionsBeginFrame(20, 20, "dropdown#tl:140:%y#n:CTRAFrames_WindowSelectionDropDown");
 					optionsAddScript("onload",
 						function(dropdown)
-							L_UIDropDownMenu_SetText(dropdown, "Window 1");
-							L_UIDropDownMenu_Initialize(dropdown,
+							UIDropDownMenu_SetText(dropdown, "Window 1");
+							UIDropDownMenu_Initialize(dropdown,
 								function(frame, level)
 									for i=1, (module:getOption("CTRAFrames_NumEnabledWindows") or 1) do
 										local dropdownEntry = { }
@@ -744,9 +747,9 @@ function StaticCTRAFrames()
 												CTRAFrames_NextWindowButton:Enable();
 											end
 											windows[i]:Focus();
-											L_UIDropDownMenu_SetText(frame, format(L["CT_RaidAssist/WindowTitle"],i));
+											UIDropDownMenu_SetText(frame, format(L["CT_RaidAssist/WindowTitle"],i));
 										end
-										L_UIDropDownMenu_AddButton(dropdownEntry, level);
+										UIDropDownMenu_AddButton(dropdownEntry, level);
 									end
 								end
 							)
@@ -765,7 +768,7 @@ function StaticCTRAFrames()
 							end
 							windows[selectedWindow]:Enable(selectedWindow);
 							windows[selectedWindow]:Focus();
-							L_UIDropDownMenu_SetText(CTRAFrames_WindowSelectionDropDown, format(L["CT_RaidAssist/WindowTitle"],selectedWindow));
+							UIDropDownMenu_SetText(CTRAFrames_WindowSelectionDropDown, format(L["CT_RaidAssist/WindowTitle"],selectedWindow));
 							CTRAFrames_DeleteWindowButton:Enable(); -- the delete button may have been previously disabled if there was only one window available
 							CTRAFrames_PreviousWindowButton:Enable();
 							CTRAFrames_NextWindowButton:Disable();
@@ -787,7 +790,7 @@ function StaticCTRAFrames()
 							end
 							windows[selectedWindow]:Enable(selectedWindow, windowToClone);
 							windows[selectedWindow]:Focus();
-							L_UIDropDownMenu_SetText(CTRAFrames_WindowSelectionDropDown, format(L["CT_RaidAssist/WindowTitle"],selectedWindow));
+							UIDropDownMenu_SetText(CTRAFrames_WindowSelectionDropDown, format(L["CT_RaidAssist/WindowTitle"],selectedWindow));
 							CTRAFrames_DeleteWindowButton:Enable(); -- the delete button may have been previously disabled if there was only one window available
 							CTRAFrames_PreviousWindowButton:Enable();
 							CTRAFrames_NextWindowButton:Disable();
@@ -830,7 +833,7 @@ function StaticCTRAFrames()
 							
 							-- update the appearance of the options frame
 							windows[selectedWindow]:Focus(); -- the options panel should now focus on this window
-							L_UIDropDownMenu_SetText(CTRAFrames_WindowSelectionDropDown, format(L["CT_RaidAssist/WindowTitle"],selectedWindow));
+							UIDropDownMenu_SetText(CTRAFrames_WindowSelectionDropDown, format(L["CT_RaidAssist/WindowTitle"],selectedWindow));
 							if (module:getOption("CTRAFrames_NumEnabledWindows") == 1) then
 								button:Disable();
 								CTRAFrames_PreviousWindowButton:Disable();
@@ -1161,21 +1164,9 @@ function StaticCTRAFrames()
 	
 	-- public constructor
 	do
-		listener = CreateFrame("Frame", nil);
-		listener:RegisterEvent("PLAYER_ENTERING_WORLD");		-- defers creating the frames until the player is in the game
-		listener:RegisterEvent("GROUP_ROSTER_UPDATE");			-- the frames might enable only during raids, groups, or always!
-		listener:RegisterEvent("PLAYER_REGEN_ENABLED");			-- in case the player's membership in a group/raid changed during combat
-		listener:HookScript("OnEvent",
-			function(self, event)
-				obj:ToggleEnableState();
-				obj:Update();
-				if (event == "PLAYER_ENTERING_WORLD") then
-					-- a hack because SpellInfo() isn't quite ready at PLAYER_ENTERING_WORLD in Classic
-					C_Timer.After(1, function() obj:Update(); end);		-- in case SpellInfo() is a split second late loading
-					C_Timer.After(10, function() obj:Update(); end);	-- in case SpellInfo() is a few seconds late loading
-				end
-			end
-		);	
+		module:regEvent("PLAYER_LOGIN", eventHandler);		-- defers creating the frames until the player is in the game
+		module:regEvent("GROUP_ROSTER_UPDATE", eventHandler);		-- enables/disables frames when forming raids, groups, etc. per the player's options
+		module:regEvent("PLAYER_REGEN_ENABLED", eventHandler);		-- executes actions that were deferred while combat was in progress			
 		return obj;
 	end
 end
@@ -1259,11 +1250,10 @@ function NewCTRAWindow(owningCTRAFrames)
 		
 		-- STEP 1: If copyFromWindow then this window should clone the settings from something else before proceeding further
 		-- STEP 2: If this window has never been enabled, then create its component windowFrame and anchorFrame
-		-- STEP 3: If this window was not previously enabled, then register for all events
-		-- STEP 4: Position the anchor via module:RegisterMovable
-		-- STEP 5: Set flags to track the frame's enabled identity
-		-- STEP 6: Initialize and/or update the child frames
-		-- STEP 7: If the CT options are currently open, show the movable anchor
+		-- STEP 3: Position the anchor via module:RegisterMovable
+		-- STEP 4: Set flags to track the frame's enabled identity
+		-- STEP 5: Initialize and/or update the child frames
+		-- STEP 6: If the CT options are currently open, show the movable anchor
 
 		
 		
@@ -1314,23 +1304,8 @@ function NewCTRAWindow(owningCTRAFrames)
 			windowFrame:SetSize(1,1);	-- arbitrary, just to make it exist
 			windowFrame:SetPoint("LEFT", anchorFrame, "LEFT");
 			windowFrame:Show();
-			windowFrame:SetScript("OnEvent",
-				function(__, event)
-					if (event == "GROUP_ROSTER_UPDATE" or event == "PLAYER_ENTERING_WORLD" or event == "PLAYER_REGEN_ENABLED") then
-						self:Update();
-					end
-				end
-			);
 		end
-		
-		
-		-- STEP 3:
-		if (not self:IsEnabled()) then
-			windowFrame:RegisterEvent("GROUP_ROSTER_UPDATE");
-			windowFrame:RegisterEvent("PLAYER_ENTERING_WORLD");
-			windowFrame:RegisterEvent("PLAYER_REGEN_ENABLED");
-		end
-		
+				
 		-- STEP 4:
 		module:registerMovable("CTRAWindow" .. asWindow, anchorFrame, true);
 		
@@ -1357,11 +1332,9 @@ function NewCTRAWindow(owningCTRAFrames)
 	function obj:Disable(deletePermanently)
 		
 		-- STEP 1: If deletePermanently then the settings for this window must be eliminated
-		-- STEP 2: Deregister from all events
-		-- STEP 3: Disable all child frames
-		-- STEP 4: Disappear the anchor via module:UnregisterMovable
-		-- STEP 5: Set flags to track the frame's disabled state
-		-- STEP 6: Remove the anchor (which might already be hidden)
+		-- STEP 2: Disable all child frames
+		-- STEP 3: Disappear the anchor via module:UnregisterMovable
+		-- STEP 4: Set flags to track the frame's disabled state
 		
 		-- STEP 1:
 		if (deletePermanently and windowID) then
@@ -1370,13 +1343,8 @@ function NewCTRAWindow(owningCTRAFrames)
 			end
 			module:resetMovable("CTRAWindow" .. windowID);
 		end
-		
+				
 		-- STEP 2:
-		windowFrame:UnregisterEvent("GROUP_ROSTER_UPDATE");
-		windowFrame:UnregisterEvent("PLAYER_ENTERING_WORLD");
-		windowFrame:UnregisterEvent("PLAYER_REGEN_ENABLED");
-		
-		-- STEP 3:
 		for __, playerframe in pairs(playerFrames) do
 			playerframe:Disable();
 		end
@@ -1384,11 +1352,11 @@ function NewCTRAWindow(owningCTRAFrames)
 			targetframe:Disable();
 		end
 		
-		-- STEP 4:
+		-- STEP 3:
 		module:UnregisterMovable("CTRAWindow" .. windowID);
 		self:HideAnchor();
 		
-		-- STEP 5:
+		-- STEP 4:
 		windowID = nil;		
 	end
 	
@@ -1673,9 +1641,9 @@ function NewCTRAWindow(owningCTRAFrames)
 				_G["CTRAWindow_" .. key .. "CheckButton"]:SetChecked(self:GetProperty(key));
 			elseif (_G["CTRAWindow_" .. key .. "DropDown"]) then
 				local dropdown = _G["CTRAWindow_" .. key .. "DropDown"];
-				L_UIDropDownMenu_EnableDropDown(dropdown)
-				L_UIDropDownMenu_Initialize(dropdown, dropdown.initialize);
-				L_UIDropDownMenu_SetSelectedValue(dropdown, self:GetProperty(key));
+				UIDropDownMenu_EnableDropDown(dropdown)
+				UIDropDownMenu_Initialize(dropdown, dropdown.initialize);
+				UIDropDownMenu_SetSelectedValue(dropdown, self:GetProperty(key));
 			elseif (_G["CTRAWindow_" .. key .. "Slider"]) then
 				_G["CTRAWindow_" .. key .. "Slider"]:Enable();
 				_G["CTRAWindow_" .. key .. "Slider"].suspend = 1;			-- hack to stop OnValueChanged from storing the value in SavedVariables

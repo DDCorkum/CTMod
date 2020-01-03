@@ -373,13 +373,17 @@ module.update = function(self, optName, value)
 end
 
 
-module.externalDropDown_Initialize = function()
+module.externalDropDown_Initialize = function(useLibUIDropDownMenu)		-- useLibUIDropDownMenu used for compatibility with TitanPanel for arith's LibUIDropDownMenu
 	info = { };
 	info.text = "CT_MailMod";
 	info.isTitle = 1;
 	info.justifyH = "CENTER";
 	info.notCheckable = 1;
-	L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL);
+	if (useLibUIDropDownMenu) then
+		L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL); 	-- Compatiblity with TitanPanel for arith's LibUIDropDownMenu
+	else
+		UIDropDownMenu_AddButton(info, UIDROPDOWNMENU_MENU_LEVEL);
+	end
 
 	info = { };
 	info.text = "Open options";
@@ -387,11 +391,19 @@ module.externalDropDown_Initialize = function()
 	info.func = function()
 		module:showModuleOptions(module.name);
 	end
-	L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL);	
+	if (useLibUIDropDownMenu) then
+		L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL); 	-- Compatiblity with TitanPanel for arith's LibUIDropDownMenu
+	else
+		UIDropDownMenu_AddButton(info, UIDROPDOWNMENU_MENU_LEVEL);
+	end
 	
 	info = { };
 	info.text = "Open mail log";
 	info.notCheckable = 1;
 	info.func = module.showMailLog;
-	L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL);	
+	if (useLibUIDropDownMenu) then
+		L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL); 	-- Compatiblity with TitanPanel for arith's LibUIDropDownMenu
+	else
+		UIDropDownMenu_AddButton(info, UIDROPDOWNMENU_MENU_LEVEL);
+	end
 end

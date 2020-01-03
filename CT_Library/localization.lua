@@ -23,17 +23,20 @@ lib.text = lib.text or { }
 local L = lib.text
 
 
-
 -----------------------------------------------
 -- enUS (Default) Unlocalized Strings
 
-
+L["CT_Library/ControlPanelCannotOpen"] = "Cannot open the CT options while in combat"
 L["CT_Library/Introduction"] = [=[Thank you for using CTMod!
 
 You can open this window with /ct or /ctmod
 
 Click below to open options for each module]=]
 L["CT_Library/ModListing"] = "Mod Listing:"
+L["CT_Library/Tooltip/DRAG"] = [=[Left click to drag
+Right click to reset]=]
+L["CT_Library/Tooltip/RESIZE"] = [=[Left click to resize
+Right click to reset]=]
 L["CT_Library/Help/About/Credits"] = [=[CTMod originated in Vanilla by Cide and TS
 Resike and Dahk joined the team in '14 and '17]=]
 L["CT_Library/Help/About/Heading"] = "About CTMod"
@@ -43,10 +46,7 @@ L["CT_Library/Help/WhatIs/Heading"] = "What is CTMod?"
 L["CT_Library/Help/WhatIs/Line1"] = "CTMod contains several modules:"
 L["CT_Library/Help/WhatIs/NotInstalled"] = "not installed"
 L["CT_Library/SettingsImport/Heading"] = "Settings Import"
-L["CT_Library/Tooltip/DRAG"] = [=[Left click to drag
-Right click to reset]=]
-L["CT_Library/Tooltip/RESIZE"] = [=[Left click to drag
-Right click to reset]=]
+L["CT_Library/SettingsImport/NoAddonsSelected"] = "No addons are selected."
 
 
 -----------------------------------------------
@@ -54,6 +54,7 @@ Right click to reset]=]
 
 if (GetLocale() == "frFR") then
 
+L["CT_Library/ControlPanelCannotOpen"] = "Il faut finir le combat avant d'acceder les options de CTMod"
 L["CT_Library/Introduction"] = [=[Merci pour utiliser CTMod!
 
 Vous pouvez ouvrir cette fênetre avec /ct
@@ -95,7 +96,8 @@ L["CT_Library/SettingsImport/Heading"] = "Einstellungen importieren"
 
 elseif (GetLocale() == "esES") then
 
-L["CT_Library/Help/About/Credits"] = "CTMod originado en Vanilla by Cide y TS Resike y  Dahk jse unieron en '14 y '17"
+L["CT_Library/Help/About/Credits"] = [=[CTMod originado en Vanilla by Cide y TS
+Resike y Dahk unieron en '14 y '17]=]
 L["CT_Library/Help/About/Heading"] = [=[Acerca CTMod
 
 ]=]

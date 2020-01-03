@@ -273,7 +273,7 @@ L["CT_ExpenseHistory/Reagent/Ankh"] = "Ankh"
 
 -- reRU (Credits: imposeren)
 
-elseif ( GetLocale() == "deDE" ) then
+elseif ( GetLocale() == "ruRU" ) then
 
 L["CT_ExpenseHistory/Ammo"] = "Патроны"
 L["CT_ExpenseHistory/Reagent"] = "Реагент"
@@ -314,6 +314,5 @@ L["CT_ExpenseHistory/Reagent/Symbol of Divinity"] = "Знак божествен
 L["CT_ExpenseHistory/Reagent/Symbol of Kings"] = "Знак королей"
 L["CT_ExpenseHistory/Reagent/Wild Berries"] = "Лесные ягоды"
 L["CT_ExpenseHistory/Reagent/Wild Thornroot"] = "Дикий шипокорень"
-
 
 end

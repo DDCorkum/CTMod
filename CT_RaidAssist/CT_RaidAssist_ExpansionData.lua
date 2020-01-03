@@ -17,7 +17,7 @@
 -- Rebuilt by Dahk Celes (ddc) in 2019        --
 ------------------------------------------------
 
-local MODULE_NAME, module = ...;
+local __, module = ...;
 
 -- Expansion Configuration Data
 -- These tables should be updated every expansion or major patch to reflect new content
@@ -212,12 +212,18 @@ module.CTRA_Configuration_BossAuras =
 	[298014] = 3,		-- The Eternal Palace - Queen Azshara: Cold Blast
 	[300743] = 2,		-- The Eternal Palace - Queen Azshara: Void Touched
 	[298569] = 1,		-- The Eternal Palace - Queen Azshara: Drained Soul
-	[307056] = 0,		-- Ny'alotha - Wrathion: Burning Madness
-	[306015] = 5,		-- Ny'alotha - Wrathion: Searing Armor
+	[307056] = 1,		-- Ny'alotha - Wrathion: Burning Madness
+	[306015] = 2,		-- Ny'alotha - Wrathion: Searing Armor
 	[313250] = 50,		-- Ny'alotha - Wrathion: Creeping Madness
+	[307805] = 0,		-- Ny'alotha - Maut: Devouring Magic
 	[307839] = 0,		-- Ny'alotha - Maut: Devoured Abyss
-	[307399] = 5,		-- Ny'alotha - Maut: Arcane Wounds
-	[314337] = 1,		-- Ny'alotha - Maut: Ancient Curse
+	[307399] = 3,		-- Ny'alotha - Maut: Shadow Wounds
+	[314337] = 0,		-- Ny'alotha - Maut: Ancient Curse
+	[307937] = 0,		-- Ny'alotha - Prophet Skitra: Shred Psyche
+	[308059] = 3,		-- Ny'alotha - Prophet Skitra: Shadow Shock
+	[311551] = 1,		-- Ny'alotha - Dark Inquisitor Xanesh: Abyssal Strike
+	[309569] = 0,		-- Ny'alotha - Dark Inquisitor Xanesh: Voidwoken
+	[313198] = 0,		-- Ny'alotha - Dark Inquisitor Xanesh: Void-Touched
 }
 
 

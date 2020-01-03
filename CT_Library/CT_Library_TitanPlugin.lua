@@ -124,7 +124,7 @@ For this example plugin, we show the standard Titan buttons plus options to dete
 		-- SDK : The routine above is used to put a "Hide" (localized) in the menu.
 	
 	elseif (_G[L_UIDROPDOWNMENU_MENU_VALUE] and _G[L_UIDROPDOWNMENU_MENU_VALUE].externalDropDown_Initialize) then
-		_G[L_UIDROPDOWNMENU_MENU_VALUE].externalDropDown_Initialize()
+		_G[L_UIDROPDOWNMENU_MENU_VALUE].externalDropDown_Initialize(true)	-- true instructs it to useLibUIDropDownMenu
 	end
 
 end

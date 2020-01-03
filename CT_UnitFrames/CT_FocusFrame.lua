@@ -985,7 +985,7 @@ end
 
 --[[
 function CT_FocusFrameDropDown_OnLoad (self)
-	L_UIDropDownMenu_Initialize(self, CT_FocusFrameDropDown_Initialize, "MENU");
+	UIDropDownMenu_Initialize(self, CT_FocusFrameDropDown_Initialize, "MENU");
 end
 ]]
 

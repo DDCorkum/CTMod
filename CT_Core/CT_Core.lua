@@ -97,11 +97,11 @@ local function minimapFrameSkeleton()    -- note: one of the images is embedded 
 			end
 			if (button == "RightButton") then
 				if (not minimapdropdown) then
-					minimapdropdown = L_Create_UIDropDownMenu("CT_MinimapDropdown", CT_MinimapButton)
-					L_UIDropDownMenu_Initialize(
+					minimapdropdown = CreateFrame("Frame", "CT_MinimapDropdown", CT_MinimapButton, "UIDropDownMenuTemplate"); --L_Create_UIDropDownMenu("CT_MinimapDropdown", CT_MinimapButton)
+					UIDropDownMenu_Initialize(
 						minimapdropdown,
 						function()
-							if L_UIDROPDOWNMENU_MENU_LEVEL == 1 then
+							if (UIDROPDOWNMENU_MENU_LEVEL == 1) then
 								local CT = _G["CT_Library"];
 								if (not CT) then return; end
 
@@ -123,17 +123,17 @@ local function minimapFrameSkeleton()    -- note: one of the images is embedded 
 												CT:showModuleOptions(module.name);
 											end;
 										end
-										L_UIDropDownMenu_AddButton(info);
+										UIDropDownMenu_AddButton(info);
 									end
 								end
-							elseif (_G[L_UIDROPDOWNMENU_MENU_VALUE] and _G[L_UIDROPDOWNMENU_MENU_VALUE].externalDropDown_Initialize) then
-								_G[L_UIDROPDOWNMENU_MENU_VALUE].externalDropDown_Initialize()
+							elseif (_G[ UIDROPDOWNMENU_MENU_VALUE] and _G[UIDROPDOWNMENU_MENU_VALUE].externalDropDown_Initialize) then
+								_G[UIDROPDOWNMENU_MENU_VALUE].externalDropDown_Initialize()
 							end
 						end,
 						"MENU"  --causes it to be like a context menu
 					);
 				end
-				L_ToggleDropDownMenu(1, nil, CT_MinimapDropdown, self, -100, 0);
+				ToggleDropDownMenu(1, nil, CT_MinimapDropdown, self, -100, 0);
 			end
 		end,
 		
@@ -357,11 +357,11 @@ module.frame = function()
 		optionsBeginFrame(-20, 60, "frame#tl:0:%y#s:0:%s#r");
 			optionsAddScript("onload",
 				function(frame)
-					local dropdown = L_Create_UIDropDownMenu("", frame);
+					local dropdown = CreateFrame("Frame", nil, frame, "UIDropDownMenuTemplate"); -- L_Create_UIDropDownMenu("", frame);
 					dropdown:SetPoint("CENTER");
-					L_UIDropDownMenu_SetWidth(dropdown, 120);
-					L_UIDropDownMenu_SetText(dropdown, "Skip to section...");
-					L_UIDropDownMenu_Initialize(dropdown, module.externalDropDown_Initialize);
+					UIDropDownMenu_SetWidth(dropdown, 120);
+					UIDropDownMenu_SetText(dropdown, "Skip to section...");
+					UIDropDownMenu_Initialize(dropdown, module.externalDropDown_Initialize);
 				end
 			);
 		optionsEndFrame();
@@ -834,12 +834,12 @@ module.frame = function()
 		optionsBeginFrame(14,   20, "dropdown#tl:110:%y#s:125:%s#o:tooltipRelocation#n:CTCoreDropdownTooltipRelocation#Default#On Mouse (stationary)#On Anchor#On Mouse (following)");
 			optionsAddScript("onupdate",
 				function(self)
-					local value = L_UIDropDownMenu_GetSelectedValue(self);
+					local value = UIDropDownMenu_GetSelectedValue(self);
 					if (value and value ~= tooltipOptionsValue) then
 						tooltipOptionsValue = value;
 						for key, table in pairs(tooltipOptionsObjects) do
 							if table[value] then
-				--[[				if table.dropdown then L_UIDropDownMenu_EnableDropDown(table.dropdown); end
+				--[[				if table.dropdown then UIDropDownMenu_EnableDropDown(table.dropdown); end
 								if table.button then table.button:Enable(); end
 								if table.text1 then table.text1:SetTextColor(1,1,1); end
 								if table.text2 then table.text2:SetTextColor(1,1,1); end
@@ -967,14 +967,17 @@ end
 -- Options
 
 -- used by the minimap and titan-panel plugins
-module.externalDropDown_Initialize = function()
-
+module.externalDropDown_Initialize = function(useLibUIDropDownMenu)		-- useLibUIDropDownMenu used for compatibility with TitanPanel for arith's LibUIDropDownMenu
 	local info = { };
 	info.text = "CT_Core";
 	info.isTitle = 1;
 	info.justifyH = "CENTER";
 	info.notCheckable = 1;
-	L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL);
+	if (useLibUIDropDownMenu) then
+		L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL); 	
+	else
+		UIDropDownMenu_AddButton(info, UIDROPDOWNMENU_MENU_LEVEL);
+	end
 	
 	if (not sectionYOffsets) then
 		module:frame();
@@ -990,7 +993,11 @@ module.externalDropDown_Initialize = function()
 				CT_LibraryOptionsScrollFrameScrollBar:SetValue(item.offset);
 			end
 		end
-		L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL);
+		if (useLibUIDropDownMenu) then
+			L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL);
+		else
+			UIDropDownMenu_AddButton(info, UIDROPDOWNMENU_MENU_LEVEL);
+		end
 	end
 	
 end
