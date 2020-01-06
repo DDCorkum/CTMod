@@ -127,14 +127,18 @@ local function updateClickDirection()
 		return;
 	end
 
-	local down = not not module:getOption("clickDirection");
-	local click = not not module:getOption("clickIncluded");
+	--local down = not not module:getOption("clickDirection");
+	--local click = not not module:getOption("clickIncluded");
+	
+	local GetCVar = GetCVar or C_CVar.GetCVar;
+	local down = GetCVar("ActionButtonUseKeyDown") == "1";		-- 1 is the default value, meaning activate abilities when you press DOWN
 
 	for gkey, group in pairs(groupList) do
 		local objects = group.objects;
 		if ( objects ) then
 			for bkey, object in ipairs(objects) do
-				object:setClickDirection(down, click);
+				--object:setClickDirection(down, click);
+				object:setClickDirection(down);
 			end
 		end
 	end
@@ -990,15 +994,55 @@ module.frame = function()
 		optionsAddObject(  0,   14, "font#tl:50:%y#v:ChatFontNormal#Move buttons key:");
 		optionsAddObject( 14,   20, "dropdown#tl:140:%y#n:CT_BarModDropdown_buttonLockKey#o:buttonLockKey:3#Alt#Ctrl#Shift");
 
-		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:clickDirection#Activate button on key down only");
-		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:clickIncluded#Activate button on key or mouse down");
+		--optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:clickDirection:true#Activate on key down only");
+		--optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:clickIncluded#Activate button on key or mouse down");
+		
+		optionsAddObject(-40, 26, "font#tl:20:%y#v:ChatFontNormal#n:CT_BarMod_ToggleKeyFontString#Toggle mouse/key press down or release up");
+		
+		local SetCVar = SetCVar or C_CVar.SetCVar;	--retail vs classic
+		local GetCVar = GetCVar or C_CVar.GetCVar;
+		optionsBeginFrame( 55,   30,  "button#t:0:%y#s:200:%s#v:GameMenuButtonTemplate#Toggle Action Key Up/Down")
+			optionsAddScript("onclick", function()
+				SetCVar("ActionButtonUseKeyDown", 1 - GetCVar("ActionButtonUseKeyDown"));	--toggles between 0 and 1
+				updateClickDirection();
+			end);
+			local timeElapsed = 0;
+			optionsAddScript("onupdate", function(font, elapsed)
+				timeElapsed = timeElapsed + elapsed;
+				if (timeElapsed < 0.25) then return; end
+				timeElapsed = 0;
+				if (GetCVar("ActionButtonUseKeyDown") == "1") then
+					CT_BarMod_ToggleKeyFontString:SetText("Currently responding to |cFFFFFF99 mouse/key press down");
+				else
+					CT_BarMod_ToggleKeyFontString:SetText("Currently responding to |cFFFFFF99 mouse/key release up");
+				end
+			end);
+			optionsAddScript("onenter", function(button)
+				module:displayTooltip(button, {
+					"Toggle Key Up/Down", 
+					"Toggles console variable 'ActionButtonUseKeyDown' between 0 and 1", 
+					" ", 
+					"|cFFFFFF99Action on Key Release Up:", 
+					"- Same as typing /console ActionButtonUseKeyDown 0", 
+					"- Game buttons will respond when key/mouse released", 
+					" ", 
+					"|cFFFFFF99Action on Key Press Down:", 
+					"- Same as typing /console ActionButtonUseKeyDown 1", 
+					"- Game buttons will respond when key/mouse pressed (Game Default)", 
+					" ", 
+					"|cFF666666Console variables persist even if you get rid of addons",
+					"|cFF666666but can be reset by typing /console cvar_reset"
+				}, "CT_ABOVEBELOW", 0, 0, CT_CONTROLPANEL);
+			end);
+		optionsEndFrame();
+		
 	optionsEndFrame();
 
 	----------
 	-- Shifting options
 	----------
 
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
+	optionsBeginFrame(-30, 0, "frame#tl:0:%y#br:tr:0:%b");
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Shifting");
 
 		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:shiftParty:true#Shift default party frames to the right");
@@ -2332,11 +2376,11 @@ module.optionUpdate = function(self, optName, value)
 			obj:setClamped(value);
 		end
 
-	elseif ( optName == "clickDirection" ) then
-		updateClickDirection();
+	--elseif ( optName == "clickDirection" ) then
+	--	updateClickDirection();
 
-	elseif ( optName == "clickIncluded" ) then
-		updateClickDirection();
+	--elseif ( optName == "clickIncluded" ) then
+	--	updateClickDirection();
 
 	elseif ( optName == "buttonLock" ) then
 		module:setAttributes();

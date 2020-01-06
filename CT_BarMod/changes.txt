@@ -1,3 +1,6 @@
+CT_BarMod (8.3.0.1) 2020-01-05
+- Integrated with /console ActionButtonUseKeyDown
+
 CT_BarMod (8.2.5.9) 2019-12-31
 - Reduced memory usage in WoW Classic 1.13.3
 - Reduced CPU usage in all editions
