@@ -957,7 +957,7 @@ local function setActionBindings(event)
 			if (groupId == module.actionBarId) then
 				useDefault = module:getOption("actionBindings") ~= false;
 				if (
-					not event == "UNIT_EXITED_VEHICLE"					-- special case, while exiting the vehicle the secure frame may not have updated yet
+					event ~= "UNIT_EXITED_VEHICLE"						-- special case, while exiting the vehicle the secure frame may not have updated yet
 					and (
 						event == "UNIT_ENTERING_VEHICLE"				-- special case, some world quests activate combat lockdown before the secure frame registers being inside the vehicleUI
 						or CT_BarMod_SecureFrame:GetAttribute("hasPetBattle") 

@@ -1,4 +1,5 @@
-CT_BarMod (8.3.0.1) 2020-01-05
+CT_BarMod (8.3.0.1) 2020-01-06
+- Fix to pet battles, relating to 8.2.5.9 and 8.1.5.1
 - Integrated with /console ActionButtonUseKeyDown
 
 CT_BarMod (8.2.5.9) 2019-12-31
