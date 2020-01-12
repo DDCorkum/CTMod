@@ -12,7 +12,7 @@
 --------------------------------------------
 -- Initialization
 
-local module = { };
+local module = select(2,...);
 local _G = getfenv(0);
 
 local MODULE_NAME = "CT_UnitFrames";

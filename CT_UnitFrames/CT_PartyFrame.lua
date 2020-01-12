@@ -150,3 +150,17 @@ hooksecurefunc("PartyMemberFrame_UpdateNotPresentIcon",
 		CT_PartyFrame_AnchorSideText_Single(id);
 	end
 );
+
+function CT_PartyFrame_UpdateClassColor()
+	local GetClassColor = GetClassColor or C_ClassColor.GetClassColor
+	local r, g, b
+	for i=1, 4 do
+		if (CT_UnitFramesOptions.partyClassColor and UnitExists("party" .. i)) then
+			r, g, b = GetClassColor(select(2,UnitClass("party1")));
+		end
+		if (not r) then
+			r, g, b = 1, 0.82, 0;
+		end
+		_G["PartyMemberFrame" .. i .. "Name"]:SetTextColor(r, g, b);
+	end
+end

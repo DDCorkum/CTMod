@@ -91,6 +91,8 @@ function CT_UnitFramesOptions_Box_OnLoad(self)
 	if ( self:GetID() == 1 ) then
 		_G[self:GetName() .. "PlayerTextLeftCBName"]:SetText(CT_UFO_TEXTLEFT);
 		_G[self:GetName() .. "PlayerCoordsRightCBName"]:SetText(CT_UFO_SHOWCOORDS);
+	elseif ( self:GetID() == 2) then
+		_G[self:GetName() .. "PartyClassColorCBName"]:SetText(CT_UFO_PARTYCLASSCOLORS);
 	elseif ( self:GetID() == 3 ) then
 		_G[self:GetName() .. "ClassFrameCBName"]:SetText(CT_UFO_TARGETCLASS);
 		_G[self:GetName() .. "TargetTextRightCBName"]:SetText(CT_UFO_TEXTRIGHT);
@@ -241,6 +243,7 @@ function CT_UnitFramesOptions_Radio_Update()
 
 	CT_UnitFramesOptionsFrameBox1PlayerTextLeftCB:SetChecked(CT_UnitFramesOptions.playerTextLeft);
 	CT_UnitFramesOptionsFrameBox1PlayerCoordsRightCB:SetChecked(CT_UnitFramesOptions.playerCoordsRight);
+	CT_UnitFramesOptionsFrameBox2PartyClassColorCB:SetChecked(CT_UnitFramesOptions.partyClassColor);
 	CT_UnitFramesOptionsFrameBox3ClassFrameCB:SetChecked(CT_UnitFramesOptions.displayTargetClass);
 	CT_UnitFramesOptionsFrameBox3TargetTextRightCB:SetChecked(CT_UnitFramesOptions.targetTextRight);
 	CT_UnitFramesOptionsFrameBox3ShowToTCB:SetChecked(GetCVar("showTargetOfTarget") == "1");
@@ -340,6 +343,18 @@ function CT_UnitFramesOptions_Box_CB_OnClick(self)
 			-- "Show player coordinates"
 			CT_UnitFramesOptions.playerCoordsRight = self:GetChecked();
 			CT_PlayerFrame_PlayerCoords();
+		end
+	elseif ( self:GetParent():GetID() == 2 ) then
+		-- Box2
+		if (self:GetID() == 65) then
+			-- "Use class colors"
+			CT_UnitFramesOptions.partyClassColor = self:GetChecked();
+			CT_PartyFrame_UpdateClassColor();
+			if (CT_UnitFramesOptions.partyClassColor) then
+				module:regEvent("GROUP_ROSTER_UPDATE", CT_PartyFrame_UpdateClassColor);
+			else
+				module:unregEvent("GROUP_ROSTER_UPDATE", CT_PartyFrame_UpdateClassColor);
+			end
 		end
 	elseif ( self:GetParent():GetID() == 3 ) then
 		-- Box3
