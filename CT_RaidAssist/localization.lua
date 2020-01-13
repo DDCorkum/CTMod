@@ -19,7 +19,7 @@
 
 -- Please contribute new translations at <https://wow.curseforge.com/projects/ctmod/localization>
 
-local __, module = ...;
+local MODULE_NAME, module = ...;
 module.text = module.text or { };
 local L = module.text
 
@@ -42,8 +42,6 @@ L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksTooltip"] = [=[Provi
 after missing a /readycheck]=]
 L["CT_RaidAssist/Options/ReadyCheckMonitor/Heading"] = "Ready Check Enhancements"
 L["CT_RaidAssist/Options/ReadyCheckMonitor/MonitorDurabilityLabel"] = "Provide warnings if your durability is getting low"
-L["CT_RaidAssist/Options/ReadyCheckMonitor/MonitorDurabilityMessage"] = [=[Please /reload for CTRA to stop sharing durability.
-Other raid addons like DBM and oRA may re-activate this feature.]=]
 L["CT_RaidAssist/Options/ReadyCheckMonitor/MonitorDurabilitySlider"] = "Warn if gear below <value>%:Off:50%"
 L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityCheckButton"] = "Let CTRA share your durability with the raid"
 L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityTooltip"] = [=[Share your durability with peers using addons like CTRA, DBM or oRA.
@@ -72,6 +70,16 @@ These will appear larger at the middle for emphasis.]=]
 L["CT_RaidAssist/Options/Window/Auras/ShowReverseCooldownCheckButton"] = "Identify auras expiring soon"
 L["CT_RaidAssist/Options/Window/Auras/ShowReverseCooldownTip"] = [=[Adds a cooldown animation to auras with less than 50% of time remaining
 Note: this feature is limited on WoW Classic due to game restrictions]=]
+L["CT_RaidAssist/Options/Window/Color/BackgroundClassHeading"] = "Class background color"
+L["CT_RaidAssist/Options/Window/Color/BackgroundClassSlider"] = "Background = <value>%"
+L["CT_RaidAssist/Options/Window/Color/BackgroundClassTip"] = [=[Changes the background color by a proportionate amount.
+However, uses the same transparency (alpha) as the standard background color. ]=]
+L["CT_RaidAssist/Options/Window/Color/BorderClassHeading"] = "Class border color"
+L["CT_RaidAssist/Options/Window/Color/BorderClassSlider"] = "Border = <value>%"
+L["CT_RaidAssist/Options/Window/Color/BorderClassTip"] = [=[Changes the border color by a proportionate amount.
+However, uses the same transparency (alpha) as the standard border color. ]=]
+L["CT_RaidAssist/Options/Window/Color/Line1"] = "First, set a standard colour palette:"
+L["CT_RaidAssist/Options/Window/Color/Line2"] = "Next, blend in class colours:"
 L["CT_RaidAssist/Options/Window/Groups/ClassHeader"] = "Classes"
 L["CT_RaidAssist/Options/Window/Groups/GroupHeader"] = "Groups"
 L["CT_RaidAssist/Options/Window/Groups/GroupTooltipContent"] = [=[0.9:0.9:0.9#|cFFFFFF99During a raid: |r

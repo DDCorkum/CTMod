@@ -163,3 +163,5 @@ function CT_PartyFrame_UpdateClassColor()
 		
 	end
 end
+
+module:regEvent("GROUP_ROSTER_UPDATE", CT_PartyFrame_UpdateClassColor);

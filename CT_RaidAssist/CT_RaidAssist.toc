@@ -1,4 +1,4 @@
-## Interface: 80300
+## Interface: 80205
 ## Version: 8.3.0.1
 ## Title: CT_RaidAssist |cFF333333(BFA)
 ## Author: TS & Cide (Original), Dargen (MT Addon), DDC (Redesign)

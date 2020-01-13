@@ -387,7 +387,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				</Scripts>
 				<Layers>
 					<Layer level="ARTWORK">
-						<FontString name="$parentName" inherits="GameFontNormalSmall" text="|cFFFFFF00New! |rUse retail font on bars">
+						<FontString name="$parentName" inherits="GameFontNormalSmall" text="Use retail font on bars">
 							<Anchors>
 								<Anchor point="LEFT" relativePoint="RIGHT">
 									<Offset>

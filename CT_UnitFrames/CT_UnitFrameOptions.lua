@@ -13,6 +13,11 @@ local _G = getfenv(0);
 local module = _G.CT_UnitFrames;
 
 --------------------------------------------
+-- API
+
+local GetCVar = GetCVar or C_CVar.GetCVar;
+
+--------------------------------------------
 -- General Mod Code (rewrite imminent!)
 
 tinsert(UISpecialFrames, "CT_UnitFramesOptionsFrame"); -- So we can close it with escape
@@ -350,11 +355,6 @@ function CT_UnitFramesOptions_Box_CB_OnClick(self)
 			-- "Use class colors"
 			CT_UnitFramesOptions.partyClassColor = self:GetChecked();
 			CT_PartyFrame_UpdateClassColor();
-			if (CT_UnitFramesOptions.partyClassColor) then
-				module:regEvent("GROUP_ROSTER_UPDATE", CT_PartyFrame_UpdateClassColor);
-			else
-				module:unregEvent("GROUP_ROSTER_UPDATE", CT_PartyFrame_UpdateClassColor);
-			end
 		end
 	elseif ( self:GetParent():GetID() == 3 ) then
 		-- Box3
