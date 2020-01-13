@@ -622,18 +622,7 @@ function StaticCTRAFrames()
 				end
 			);
 		end
-		
-		local optionsAddTooltipsToChildren = function(text, anchor)
-			-- workaround for sliders that have several subframes
-			module:framesAddScript(optionsFrameList, "onload", function(obj)
-				if (not obj.GetChildren) then return; end
-				for __, child in ipairs({obj, obj:GetChildren()}) do
-					print(child:GetName());
-					child:HookScript("OnEnter", function() module:displayTooltip(child, text, anchor or "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL); end);
-				end
-			end);
-		end
-						
+								
 		-- commonly used colors
 		local textColor1 = "0.9:0.9:0.9";
 		local textColor2 = "0.7:0.7:0.7";
