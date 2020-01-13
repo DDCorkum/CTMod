@@ -2431,6 +2431,39 @@ end
 -- End Frame Creation
 -----------------------------------------------
 
+--------------------------------------------
+-- AddOn Conflict Resolution
+
+local addOnConflictResolutions = {}
+local addOnConflictRequests = {}
+
+-- used by CTMod to set aside functions that may be executed at the request of other addons for resolving conflict
+function lib:registerConflictResolution(conflict, version, func)
+	addOnConflictResolutions[conflict] = addOnConflictResolutions[conflict] or {};
+	addOnConflictResolutions[conflict][version] = addOnConflictResolutions[conflict][version] or {};
+	tinsert(addOnConflictResolutions[conflict][version], func);
+	if (addOnConflictRequests[conflict] and addOnConflictRequests[conflict][version]) then
+		func(unpack(addOnConflictRequests[conflict][version]));
+	end
+end
+
+-- used by other addons to request CTMod to resolve conflict
+function lib:requestAddOnConflictResolution(conflict, version, ...)
+	if (addOnConflictResolutions[conflict] and addOnConflictResolutions[conflict][version]) then
+		for __, func in ipairs(addOnConflictResolutions[conflict][version]) do
+			func(...);
+		end
+		addOnConflictRequests[conflict] = addOnConflictRequests[conflict] or {};
+		addOnConflictRequests[conflict][version] = {...}
+	end
+	return false;
+end
+
+
+-- End AddOn Conflict Resolution
+-----------------------------------------------
+
+
 -----------------------------------------------
 -- Control Panel
 
