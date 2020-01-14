@@ -673,7 +673,7 @@ function StaticCTRAFrames()
 							if (selectedWindow > 1) then
 								selectedWindow = selectedWindow - 1;
 								windows[selectedWindow]:Focus();
-								L_UIDropDownMenu_SetText(CTRAFrames_WindowSelectionDropDown, format(L["CT_RaidAssist/WindowTitle"],selectedWindow));
+								UIDropDownMenu_SetText(CTRAFrames_WindowSelectionDropDown, format(L["CT_RaidAssist/WindowTitle"],selectedWindow));
 								if (selectedWindow == 1) then
 									button:Disable();
 								end
@@ -697,7 +697,7 @@ function StaticCTRAFrames()
 							if (selectedWindow < (module:getOption("CTRAFrames_NumEnabledWindows") or 1)) then
 								selectedWindow = selectedWindow + 1;
 								windows[selectedWindow]:Focus();
-								L_UIDropDownMenu_SetText(CTRAFrames_WindowSelectionDropDown, format(L["CT_RaidAssist/WindowTitle"],selectedWindow));
+								UIDropDownMenu_SetText(CTRAFrames_WindowSelectionDropDown, format(L["CT_RaidAssist/WindowTitle"],selectedWindow));
 								if (selectedWindow == (module:getOption("CTRAFrames_NumEnabledWindows") or 1)) then
 									button:Disable();
 								end
@@ -720,8 +720,8 @@ function StaticCTRAFrames()
 				optionsBeginFrame(20, 20, "dropdown#tl:140:%y#n:CTRAFrames_WindowSelectionDropDown");
 					optionsAddScript("onload",
 						function(dropdown)
-							L_UIDropDownMenu_SetText(dropdown, "Window 1");
-							L_UIDropDownMenu_Initialize(dropdown,
+							UIDropDownMenu_SetText(dropdown, "Window 1");
+							UIDropDownMenu_Initialize(dropdown,
 								function(frame, level)
 									for i=1, (module:getOption("CTRAFrames_NumEnabledWindows") or 1) do
 										local dropdownEntry = { }
@@ -744,9 +744,9 @@ function StaticCTRAFrames()
 												CTRAFrames_NextWindowButton:Enable();
 											end
 											windows[i]:Focus();
-											L_UIDropDownMenu_SetText(frame, format(L["CT_RaidAssist/WindowTitle"],i));
+											UIDropDownMenu_SetText(frame, format(L["CT_RaidAssist/WindowTitle"],i));
 										end
-										L_UIDropDownMenu_AddButton(dropdownEntry, level);
+										UIDropDownMenu_AddButton(dropdownEntry, level);
 									end
 								end
 							)
@@ -765,7 +765,7 @@ function StaticCTRAFrames()
 							end
 							windows[selectedWindow]:Enable(selectedWindow);
 							windows[selectedWindow]:Focus();
-							L_UIDropDownMenu_SetText(CTRAFrames_WindowSelectionDropDown, format(L["CT_RaidAssist/WindowTitle"],selectedWindow));
+							UIDropDownMenu_SetText(CTRAFrames_WindowSelectionDropDown, format(L["CT_RaidAssist/WindowTitle"],selectedWindow));
 							CTRAFrames_DeleteWindowButton:Enable(); -- the delete button may have been previously disabled if there was only one window available
 							CTRAFrames_PreviousWindowButton:Enable();
 							CTRAFrames_NextWindowButton:Disable();
@@ -787,7 +787,7 @@ function StaticCTRAFrames()
 							end
 							windows[selectedWindow]:Enable(selectedWindow, windowToClone);
 							windows[selectedWindow]:Focus();
-							L_UIDropDownMenu_SetText(CTRAFrames_WindowSelectionDropDown, format(L["CT_RaidAssist/WindowTitle"],selectedWindow));
+							UIDropDownMenu_SetText(CTRAFrames_WindowSelectionDropDown, format(L["CT_RaidAssist/WindowTitle"],selectedWindow));
 							CTRAFrames_DeleteWindowButton:Enable(); -- the delete button may have been previously disabled if there was only one window available
 							CTRAFrames_PreviousWindowButton:Enable();
 							CTRAFrames_NextWindowButton:Disable();
@@ -830,7 +830,7 @@ function StaticCTRAFrames()
 							
 							-- update the appearance of the options frame
 							windows[selectedWindow]:Focus(); -- the options panel should now focus on this window
-							L_UIDropDownMenu_SetText(CTRAFrames_WindowSelectionDropDown, format(L["CT_RaidAssist/WindowTitle"],selectedWindow));
+							UIDropDownMenu_SetText(CTRAFrames_WindowSelectionDropDown, format(L["CT_RaidAssist/WindowTitle"],selectedWindow));
 							if (module:getOption("CTRAFrames_NumEnabledWindows") == 1) then
 								button:Disable();
 								CTRAFrames_PreviousWindowButton:Disable();
@@ -978,6 +978,11 @@ function StaticCTRAFrames()
 								"ColorReadyCheckWaiting",
 								"ColorReadyCheckNotReady",
 								"ColorBackground",
+								"ColorBackgroundDeadOrGhost",
+								"ColorBackgroundClass",
+								"ColorBorder",
+								"ColorBorderBeyondRange",
+								"ColorBorderClass",
 								"HealthBarAsBackground",
 								"EnablePowerBar",
 							}
@@ -1686,9 +1691,9 @@ function NewCTRAWindow(owningCTRAFrames)
 				_G["CTRAWindow_" .. key .. "CheckButton"]:SetChecked(self:GetProperty(key));
 			elseif (_G["CTRAWindow_" .. key .. "DropDown"]) then
 				local dropdown = _G["CTRAWindow_" .. key .. "DropDown"];
-				L_UIDropDownMenu_EnableDropDown(dropdown)
-				L_UIDropDownMenu_Initialize(dropdown, dropdown.initialize);
-				L_UIDropDownMenu_SetSelectedValue(dropdown, self:GetProperty(key));
+				UIDropDownMenu_EnableDropDown(dropdown)
+				UIDropDownMenu_Initialize(dropdown, dropdown.initialize);
+				UIDropDownMenu_SetSelectedValue(dropdown, self:GetProperty(key));
 			elseif (_G["CTRAWindow_" .. key .. "Slider"]) then
 				_G["CTRAWindow_" .. key .. "Slider"]:Enable();
 				_G["CTRAWindow_" .. key .. "Slider"].suspend = 1;			-- hack to stop OnValueChanged from storing the value in SavedVariables
