@@ -1,3 +1,6 @@
+CT_BottomBar (8.3.0.1) 2020-01-06
+- Fix to the custom XP bar in Classic when it is deactivated, so it properly remains hidden
+
 CT_BottomBar (8.2.5.9) 2019-12-18
 - Minor code cleanup; nothing substantive
 

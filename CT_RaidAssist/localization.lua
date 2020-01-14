@@ -42,6 +42,8 @@ L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksTooltip"] = [=[Provi
 after missing a /readycheck]=]
 L["CT_RaidAssist/Options/ReadyCheckMonitor/Heading"] = "Ready Check Enhancements"
 L["CT_RaidAssist/Options/ReadyCheckMonitor/MonitorDurabilityLabel"] = "Provide warnings if your durability is getting low"
+L["CT_RaidAssist/Options/ReadyCheckMonitor/MonitorDurabilityMessage"] = [=[Please /reload for CTRA to stop sharing durability.
+Other raid addons like DBM and oRA may re-activate this feature.]=]
 L["CT_RaidAssist/Options/ReadyCheckMonitor/MonitorDurabilitySlider"] = "Warn if gear below <value>%:Off:50%"
 L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityCheckButton"] = "Let CTRA share your durability with the raid"
 L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityTooltip"] = [=[Share your durability with peers using addons like CTRA, DBM or oRA.
@@ -70,6 +72,16 @@ These will appear larger at the middle for emphasis.]=]
 L["CT_RaidAssist/Options/Window/Auras/ShowReverseCooldownCheckButton"] = "Identify auras expiring soon"
 L["CT_RaidAssist/Options/Window/Auras/ShowReverseCooldownTip"] = [=[Adds a cooldown animation to auras with less than 50% of time remaining
 Note: this feature is limited on WoW Classic due to game restrictions]=]
+L["CT_RaidAssist/Options/Window/Color/BackgroundClassHeading"] = "Class background color"
+L["CT_RaidAssist/Options/Window/Color/BackgroundClassSlider"] = "Background = <value>%"
+L["CT_RaidAssist/Options/Window/Color/BackgroundClassTip"] = [=[Changes the background color by a proportionate amount.
+However, uses the same transparency (alpha) as the standard background color. ]=]
+L["CT_RaidAssist/Options/Window/Color/BorderClassHeading"] = "Class border color"
+L["CT_RaidAssist/Options/Window/Color/BorderClassSlider"] = "Border = <value>%"
+L["CT_RaidAssist/Options/Window/Color/BorderClassTip"] = [=[Changes the border color by a proportionate amount.
+However, uses the same transparency (alpha) as the standard border color. ]=]
+L["CT_RaidAssist/Options/Window/Color/Line1"] = "First, set a standard colour palette:"
+L["CT_RaidAssist/Options/Window/Color/Line2"] = "Next, blend in class colours:"
 L["CT_RaidAssist/Options/Window/Groups/ClassHeader"] = "Classes"
 L["CT_RaidAssist/Options/Window/Groups/GroupHeader"] = "Groups"
 L["CT_RaidAssist/Options/Window/Groups/GroupTooltipContent"] = [=[0.9:0.9:0.9#|cFFFFFF99During a raid: |r
@@ -122,6 +134,7 @@ L["CT_RaidAssist/Spells/Blessing of Wisdom"] = "Blessing of Wisdom"
 L["CT_RaidAssist/Spells/Cleanse"] = "Cleanse"
 L["CT_RaidAssist/Spells/Cleanse Spirit"] = "Cleanse Spirit"
 L["CT_RaidAssist/Spells/Cleanse Toxins"] = "Cleanse Toxins"
+L["CT_RaidAssist/Spells/Cure Disease"] = "Cure Disease"
 L["CT_RaidAssist/Spells/Cure Poison"] = "Cure Poison"
 L["CT_RaidAssist/Spells/Dampen Magic"] = "Dampen Magic"
 L["CT_RaidAssist/Spells/Detox"] = "Detox"
@@ -153,6 +166,8 @@ L["CT_RaidAssist/AfterNotReadyFrame/MissedCheck"] = "Vous pourriez manquer un ap
 L["CT_RaidAssist/AfterNotReadyFrame/WasAFK"] = "Vous étiez absent.  Revenez-vous?"
 L["CT_RaidAssist/AfterNotReadyFrame/WasNotReady"] = "Êtes-vous prêt maintenant?"
 L["CT_RaidAssist/PlayerFrame/TooltipFooter"] = "/ctra pour déplacer et configurer"
+L["CT_RaidAssist/PlayerFrame/TooltipItemsBroken"] = "%d%% durabilité, %d objets brisés (il y a %d:%02d mins)"
+L["CT_RaidAssist/PlayerFrame/TooltipItemsNotBroken"] = "%d%% durabilité (il y a %d:%02d mins)"
 L["CT_RaidAssist/WindowTitle"] = "Fenêtre %d"
 L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksCheckButton"] = "Prolonger un /readycheck manqué"
 L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksTooltip"] = "Fournir un bouton pour annoncer le retour après avoir manqué un /readycheck"
@@ -205,6 +220,7 @@ L["CT_RaidAssist/Spells/Blessing of Wisdom"] = "Bénédiction de sagesse"
 L["CT_RaidAssist/Spells/Cleanse"] = "Epuration"
 L["CT_RaidAssist/Spells/Cleanse Spirit"] = "Purifier l'esprit"
 L["CT_RaidAssist/Spells/Cleanse Toxins"] = "Purification des toxines"
+L["CT_RaidAssist/Spells/Cure Disease"] = "Guérison des maladies"
 L["CT_RaidAssist/Spells/Cure Poison"] = "Guérison du poison"
 L["CT_RaidAssist/Spells/Dampen Magic"] = "Atténuation de la magie"
 L["CT_RaidAssist/Spells/Detox"] = "Détoxification"
@@ -234,8 +250,12 @@ L["CT_RaidAssist/AfterNotReadyFrame/WasAFK"] = "Du warst AFK, bist Du zurück?"
 L["CT_RaidAssist/AfterNotReadyFrame/WasNotReady"] = "Bist Du jetzt bereit?"
 L["CT_RaidAssist/PlayerFrame/TooltipFooter"] = "/ctra zum Verschieben und Konfigurieren"
 L["CT_RaidAssist/WindowTitle"] = "Fenster %d"
+L["CT_RaidAssist/Options/Frames/HideBlizzardDefaultCheckButton"] = "Blizzard's Standard-Schlachtzugfemster ausblenden"
 L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksCheckButton"] = "Erweiterte Bereitschaftschecks anzeigen"
 L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksTooltip"] = "Zeigt nach Verpassen eines Bereitschaftschecks eine Schaltfläche an um mitzuteilen, dass man wieder da ist"
+L["CT_RaidAssist/Options/Window/Appearance/EnablePowerBarCheckButton"] = "Energieleiste anzeigen?"
+L["CT_RaidAssist/Options/Window/Appearance/EnablePowerBarTooltip"] = "Mana, Energie, Wut, etc. am unteren Rand anzeigen"
+L["CT_RaidAssist/Options/Window/Appearance/EnableTargetFrameCheckButton"] = "Ziel unter Spieler anzeigen?"
 L["CT_RaidAssist/Options/Window/Auras/CombatLabel"] = "Während des Kampfes anzeigen:"
 L["CT_RaidAssist/Options/Window/Auras/DropDown"] = "#Wirkbare Gruppenzauber#Entfernbare Schwächungszauber#Alle Gruppenzauber#Alle Schwächungszauber#Gewirkte Gruppenzauber#Nichts"
 L["CT_RaidAssist/Options/Window/Auras/Heading"] = "Stärkungs- und Schwächungszauber"
@@ -311,11 +331,16 @@ L["CT_RaidAssist/Spells/Trueshot Aura"] = "Aura des Volltreffers"
 
 elseif (GetLocale() == "esES") then
 
+L["CT_RaidAssist/AfterNotReadyFrame/MissedCheck"] = "Puede que hayas omitido un \"Estas Listo\" de la Raid."
+L["CT_RaidAssist/AfterNotReadyFrame/WasAFK"] = "Estabas lejos del teclado, Has vuelto ya?"
+L["CT_RaidAssist/AfterNotReadyFrame/WasNotReady"] = "Estás listo ya?"
 L["CT_RaidAssist/Spells/Abolish Poison"] = "Suprimir veneno"
 L["CT_RaidAssist/Spells/Amplify Magic"] = "Amplificar magia"
+L["CT_RaidAssist/Spells/Ancestral Spirit"] = "Espíritu Ancestral"
 L["CT_RaidAssist/Spells/Arcane Intellect"] = "Intelecto Arcano"
 L["CT_RaidAssist/Spells/Cleanse"] = "Purgación"
 L["CT_RaidAssist/Spells/Power Word: Fortitude"] = "Palabra de poder: entereza"
+
 
 elseif (GetLocale() == "ruRU") then
 

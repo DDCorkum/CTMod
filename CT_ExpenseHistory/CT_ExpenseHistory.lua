@@ -83,12 +83,12 @@ function CT_EH_UpdateSummary()
 		dropdownsInitialized = true;
 	end
 
-	L_UIDropDownMenu_SetSelectedName(CT_ExpenseHistoryFrameServerDropDown, ( CT_ExpenseHistoryFrame.currServer or L["CT_ExpenseHistory/Summary/PlayerDistribution/AllServers"] ) );
-	L_UIDropDownMenu_SetWidth(CT_ExpenseHistoryFrameServerDropDown, 100);
+	UIDropDownMenu_SetSelectedName(CT_ExpenseHistoryFrameServerDropDown, ( CT_ExpenseHistoryFrame.currServer or L["CT_ExpenseHistory/Summary/PlayerDistribution/AllServers"] ) );
+	UIDropDownMenu_SetWidth(CT_ExpenseHistoryFrameServerDropDown, 100);
 	CT_ExpenseHistoryFrameServerDropDownText:SetText(( CT_ExpenseHistoryFrame.currServer or L["CT_ExpenseHistory/Summary/PlayerDistribution/AllServers"] ));
 
-	L_UIDropDownMenu_SetSelectedName(CT_ExpenseHistoryFrameDropDown, ( currPlayer or L["CT_ExpenseHistory/Summary/PlayerDistribution/AllCharacters"] ) );
-	L_UIDropDownMenu_SetWidth(CT_ExpenseHistoryFrameDropDown, 200);
+	UIDropDownMenu_SetSelectedName(CT_ExpenseHistoryFrameDropDown, ( currPlayer or L["CT_ExpenseHistory/Summary/PlayerDistribution/AllCharacters"] ) );
+	UIDropDownMenu_SetWidth(CT_ExpenseHistoryFrameDropDown, 200);
 	CT_ExpenseHistoryFrameDropDownText:SetText(( currPlayer or L["CT_ExpenseHistory/Summary/PlayerDistribution/AllCharacters"] ));
 
 	CT_ExpenseHistoryFrameRecordingText:SetText(format(L["CT_ExpenseHistory/Log/RecordingSince"], date("%m/%d/%Y", CT_EH_History["startUsage"])));
@@ -467,7 +467,7 @@ SLASH_EXPENSEHISTORY2 = "/expensehistory";
 SLASH_EXPENSEHISTORY3 = "/cteh";
 
 function CT_EH_DropDown_OnLoad(self)
-	L_UIDropDownMenu_Initialize(self, CT_EH_DropDown_Initialize);
+	UIDropDownMenu_Initialize(self, CT_EH_DropDown_Initialize);
 end
 
 function CT_EH_DropDown_Initialize()
@@ -492,14 +492,14 @@ function CT_EH_DropDown_Initialize()
 	info.value = nil;
 	info.checked = ( not CT_ExpenseHistoryFrame.currPlayer );
 	info.func = CT_EH_DropDown_OnClick;
-	L_UIDropDownMenu_AddButton(info);
+	UIDropDownMenu_AddButton(info);
 	for i, k in pairs(players) do
 		local _, _, playerName, server = string.find(k, "^(.+)@(.+)$");
 		info.text = playerName .. " @ " .. server;
 		info.value = k;
 		info.checked = ( CT_ExpenseHistoryFrame.currPlayer == k );
 		info.func = CT_EH_DropDown_OnClick;
-		L_UIDropDownMenu_AddButton(info);
+		UIDropDownMenu_AddButton(info);
 	end
 end
 
@@ -513,7 +513,7 @@ function CT_EH_DropDown_OnClick(self)
 end
 
 function CT_EH_ServerDropDown_OnLoad(self)
-	L_UIDropDownMenu_Initialize(self, CT_EH_ServerDropDown_Initialize);
+	UIDropDownMenu_Initialize(self, CT_EH_ServerDropDown_Initialize);
 end
 
 function CT_EH_ServerDropDown_Initialize()
@@ -544,13 +544,13 @@ function CT_EH_ServerDropDown_Initialize()
 	info.value = nil;
 	info.checked = ( not CT_ExpenseHistoryFrame.currServer );
 	info.func = CT_EH_ServerDropDown_OnClick;
-	L_UIDropDownMenu_AddButton(info);
+	UIDropDownMenu_AddButton(info);
 	for k, v in ipairs(serversort) do
 		info.text = v .. " (" .. servers[v] .. ")";
 		info.value = v;
 		info.checked = ( CT_ExpenseHistoryFrame.currServer == v );
 		info.func = CT_EH_ServerDropDown_OnClick;
-		L_UIDropDownMenu_AddButton(info);
+		UIDropDownMenu_AddButton(info);
 	end
 end
 

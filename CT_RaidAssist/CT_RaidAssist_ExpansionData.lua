@@ -100,8 +100,9 @@ module.CTRA_Configuration_FriendlyRemoves =
 	},
 	["PRIEST"] = 
 	{
-		{["name"] = "Purify Disease", ["modifier"] = "nomod", ["disease"] = true, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
 		{["name"] = "Purify", ["modifier"] = "nomod", ["magic"] = true, ["disease"] = true, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
+		{["name"] = "Purify Disease", ["modifier"] = "nomod", ["disease"] = true, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
+		{["name"] = "Cure Disease", ["modifier"] = "mod:shift", ["disease"] = true, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
 		{["name"] = "Dispel Magic", ["modifier"] = "nomod", ["magic"] = true, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
 	},
 	["SHAMAN"] =

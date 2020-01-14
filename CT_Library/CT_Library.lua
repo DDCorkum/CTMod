@@ -19,7 +19,7 @@
 -----------------------------------------------
 -- Initialization
 
-local LIBRARY_VERSION = 8.259;
+local LIBRARY_VERSION = 8.301;
 local LIBRARY_NAME = "CT_Library";
 
 local _G = getfenv(0);
@@ -50,7 +50,8 @@ else
 	-- Create a new lib table.
 	lib = { };
 	_G[LIBRARY_NAME] = lib;
-	lib.text = { };  -- this will be populated by localization.lua
+	lib.text = lib.text or { };  -- this will be populated by localization.lua
+	L = lib.text
 end
 
 -- Set the variables used
@@ -58,36 +59,6 @@ lib.name = LIBRARY_NAME;
 lib.version = LIBRARY_VERSION;
 
 -- End Initialization
------------------------------------------------
-
-
-
------------------------------------------------
--- LibUIDropDownMenu Conflict Warning
-
-
--- this warning is temporary, and should be removed after a few months
--- addons using "LibUIDropDownMenu-2.0" are incompatible with addons using "LibUIDropDownMenu"
-local LibStub = _G.LibStub
-if LibStub then
-	if LibStub:GetLibrary("LibUIDropDownMenu",true) then
-		C_Timer.After(30,
-			function()
-				print("|n|cFFFFFF00Warning by CTMod Addon:|r|nOne of your addons uses an outdated version of LibUIDropDownMenu.|nThis could break some dropdown menus.  Please don't shoot the messenger!|n(The offending addon likely comes |cFFFFFF00earlier|r in the alphabet than ct)")
-			end
-		);
-	else
-		C_Timer.After(30,
-			function()
-				if LibStub:GetLibrary("LibUIDropDownMenu",true) then
-					print("|n|cFFFFFF00Warning by CTMod Addon:|r|nOne of your addons uses an outdated version of LibUIDropDownMenu.|nThis could break some dropdown menus.  Please don't shoot the messenger!|n(The offending addon likely comes |cFFFFFF00later|r in the alphabet than ct)")
-				end
-			end
-		);		
-	end
-end
-
--- End LibUIDropDownMenu Conflict Warning
 -----------------------------------------------
 
 
@@ -292,7 +263,7 @@ end
 
 -- Display a tooltip using predefined, localized text
 function lib:displayPredefinedTooltip(obj, text, ...)
-	self:displayTooltip(obj, lib.text["CT_Library/Tooltip/" .. text], ...);
+	self:displayTooltip(obj, L["CT_Library/Tooltip/" .. text], ...);
 end
 
 -- Register a slash command
@@ -1603,7 +1574,7 @@ end
 local function dropdownSetWidth(self, width)
 	-- Ugly, ugly hack.
 	self.SetWidth = self.oldSetWidth;
-	L_UIDropDownMenu_SetWidth(self, width);
+	UIDropDownMenu_SetWidth(self, width);
 	self.SetWidth = dropdownSetWidth;
 end
 
@@ -1611,17 +1582,17 @@ local function dropdownClick(self, arg1, arg2, checked)
 	local dropdown;
 	local value;
 	local option;
-	if ( type(L_UIDROPDOWNMENU_OPEN_MENU) == "string" ) then
+	if ( type(UIDROPDOWNMENU_OPEN_MENU) == "string" ) then
 		-- Prior to the 3.0.8 patch UIDROPDOWNMEN_OPEN_MENU was a string (name of the object).
-		dropdown = _G[L_UIDROPDOWNMENU_OPEN_MENU];
+		dropdown = _G[UIDROPDOWNMENU_OPEN_MENU];
 	else
 		-- As of the 3.0.8 patch UIDROPDOWNMEN_OPEN_MENU is an object.
-		dropdown = L_UIDROPDOWNMENU_OPEN_MENU;
+		dropdown = UIDROPDOWNMENU_OPEN_MENU;
 	end
 
 	-- 7.0.3
 	if not dropdown then
-		dropdown = L_UIDROPDOWNMENU_INIT_MENU
+		dropdown = UIDROPDOWNMENU_INIT_MENU
 	end
 	--print(dropdown:GetName())
 	
@@ -1634,7 +1605,7 @@ local function dropdownClick(self, arg1, arg2, checked)
 		else
 			value = self.value;
 			option = dropdown.option;
-			L_UIDropDownMenu_SetSelectedValue(dropdown, value);
+			UIDropDownMenu_SetSelectedValue(dropdown, value);
 		end
 		
 		if ( option ) then
@@ -1646,12 +1617,7 @@ end
 -- basic radio-button dropdown without any fancy modifications.  Each arg is text to display
 objectHandlers.dropdown = function(self, parent, name, virtual, option, ...)
 	local dropdownEntry = { };
-	local frame;
-	if (virtual) then
-		frame = CreateFrame("Frame", name, parent, virtual);
-	else
-		frame = L_Create_UIDropDownMenu(name, parent);
-	end
+	local frame = CreateFrame("Frame", name, parent, virtual or "UIDropDownMenuTemplate");
 	frame.oldSetWidth = frame.SetWidth;
 	frame.SetWidth = dropdownSetWidth;
 	frame.ctDropdownClick = dropdownClick;
@@ -1669,18 +1635,18 @@ objectHandlers.dropdown = function(self, parent, name, virtual, option, ...)
 
 	local entries = { ... };
 	
-	L_UIDropDownMenu_Initialize(frame, function()
+	UIDropDownMenu_Initialize(frame, function()
 		for i = 1, #entries, 1 do
 			dropdownEntry.text = entries[i];
 			dropdownEntry.value = i;
 			dropdownEntry.checked = nil;
 			dropdownEntry.func = dropdownClick;
-			L_UIDropDownMenu_AddButton(dropdownEntry);
+			UIDropDownMenu_AddButton(dropdownEntry);
 		end
 	end);
-	L_UIDropDownMenu_SetSelectedValue(frame, self:getOption(option) or 1);
+	UIDropDownMenu_SetSelectedValue(frame, self:getOption(option) or 1);
 
-	L_UIDropDownMenu_JustifyText(frame, "LEFT");
+	UIDropDownMenu_JustifyText(frame, "LEFT");
 	return frame;
 end
 
@@ -1688,12 +1654,7 @@ end
 -- two parameters (separated by #) are display-text and the CT option (similar to o:)
 objectHandlers.multidropdown = function(self, parent, name, virtual, option, ...)
 	local dropdownEntry = { };
-	local frame;
-	if (virtual) then
-		frame = CreateFrame("Frame", name, parent, virtual);
-	else
-		frame = L_Create_UIDropDownMenu(name, parent);
-	end
+	local frame = CreateFrame("Frame", name, parent, virtual or "UIDropDownMenuTemplate");
 	frame.oldSetWidth = frame.SetWidth;
 	frame.SetWidth = dropdownSetWidth;
 	frame.ctDropdownClick = dropdownClick;
@@ -1711,7 +1672,7 @@ objectHandlers.multidropdown = function(self, parent, name, virtual, option, ...
 
 	local entries = { ... };
 	
-	L_UIDropDownMenu_Initialize(frame, function()
+	UIDropDownMenu_Initialize(frame, function()
 		for i = 1, #entries, 2 do
 			dropdownEntry.text = entries[i];
 			dropdownEntry.value = (i+1)/2;
@@ -1719,11 +1680,11 @@ objectHandlers.multidropdown = function(self, parent, name, virtual, option, ...
 			dropdownEntry.checked = self:getOption(entries[i+1]);
 			dropdownEntry.func = dropdownClick;
 			dropdownEntry.arg1 = entries[i+1];
-			L_UIDropDownMenu_AddButton(dropdownEntry);
+			UIDropDownMenu_AddButton(dropdownEntry);
 		end
 	end);
 	
-	L_UIDropDownMenu_JustifyText(frame, "LEFT");
+	UIDropDownMenu_JustifyText(frame, "LEFT");
 	return frame;
 end
 
@@ -1840,7 +1801,7 @@ local function colorSwatchShow(self)
 	self.hasOpacity = self.hasAlpha;
 
 	ColorPickerFrame.object = self;
-	L_UIDropDownMenuButton_OpenColorPicker(self);
+	UIDropDownMenuButton_OpenColorPicker(self);
 	ColorPickerFrame:SetFrameStrata("TOOLTIP");
 	ColorPickerFrame:Raise();
 end
@@ -2470,6 +2431,39 @@ end
 -- End Frame Creation
 -----------------------------------------------
 
+--------------------------------------------
+-- AddOn Conflict Resolution
+
+local addOnConflictResolutions = {}
+local addOnConflictRequests = {}
+
+-- used by CTMod to set aside functions that may be executed at the request of other addons for resolving conflict
+function lib:registerConflictResolution(conflict, version, func)
+	addOnConflictResolutions[conflict] = addOnConflictResolutions[conflict] or {};
+	addOnConflictResolutions[conflict][version] = addOnConflictResolutions[conflict][version] or {};
+	tinsert(addOnConflictResolutions[conflict][version], func);
+	if (addOnConflictRequests[conflict] and addOnConflictRequests[conflict][version]) then
+		func(unpack(addOnConflictRequests[conflict][version]));
+	end
+end
+
+-- used by other addons to request CTMod to resolve conflict
+function lib:requestAddOnConflictResolution(conflict, version, ...)
+	if (addOnConflictResolutions[conflict] and addOnConflictResolutions[conflict][version]) then
+		for __, func in ipairs(addOnConflictResolutions[conflict][version]) do
+			func(...);
+		end
+		addOnConflictRequests[conflict] = addOnConflictRequests[conflict] or {};
+		addOnConflictRequests[conflict][version] = {...}
+	end
+	return false;
+end
+
+
+-- End AddOn Conflict Resolution
+-----------------------------------------------
+
+
 -----------------------------------------------
 -- Control Panel
 
@@ -2484,7 +2478,7 @@ local function resizer(self, elapsed)
 	if ( width < 635 ) then
 		if (InCombatLockdown()) then
 			if (not combatWarningPrinted) then
-				print("The CT options menu cannot expand until combat ends.");
+				print(L["CT_Library/ControlPanelCannotOpen"]);
 				combatWarningPrinted = true;
 			end
 		else
@@ -2647,10 +2641,10 @@ local function controlPanelSkeleton()
 					obj:Show();
 
 					-- localize the title of these two modules specifically
-					if (num == 701 and module.name == "|c00FFFFCCSettings Import|r" and lib.text["CT_Library/SettingsImport/Heading"]) then
-						module.name = "|c00FFFFCC" .. lib.text["CT_Library/SettingsImport/Heading"] .. "|r";
-					elseif (num == 702 and module.name == "|c00FFFFCCHelp|r" and lib.text["CT_Library/Help/Heading"]) then
-						module.name = "|c00FFFFCC" .. lib.text["CT_Library/Help/Heading"] .. "|r";
+					if (num == 701 and module.name == "|c00FFFFCCSettings Import|r" and L["CT_Library/SettingsImport/Heading"]) then
+						module.name = "|c00FFFFCC" .. L["CT_Library/SettingsImport/Heading"] .. "|r";
+					elseif (num == 702 and module.name == "|c00FFFFCCHelp|r" and L["CT_Library/Help/Heading"]) then
+						module.name = "|c00FFFFCC" .. L["CT_Library/Help/Heading"] .. "|r";
 					end
 					
 					obj:SetText(module.name);
@@ -2720,9 +2714,9 @@ local function controlPanelSkeleton()
 			end,
 		},
 		["frame#s:300:0#tl:15:-30#b:0:15#i:listing"] = {
-			"font#tl:-5:0#s:285:64#" .. lib.text["CT_Library/Introduction"] .. "#t",
+			"font#tl:-5:0#s:285:64#" .. L["CT_Library/Introduction"] .. "#t",
 			"texture#tl:0:-64#br:tr:-25:-65#1:1:1",
-			"font#tl:-3:-69#v:GameFontNormalLarge#" .. lib.text["CT_Library/ModListing"],
+			"font#tl:-3:-69#v:GameFontNormalLarge#" .. L["CT_Library/ModListing"],
 			"texture#i:hover#l:5:0#s:290:25#hidden#1:1:1:0.125",
 			"texture#i:select#l:5:0#s:290:25#hidden#1:1:1:0.25",
 						--700 is an offset to prevent taint affecting battleground queueing
@@ -2770,7 +2764,7 @@ end
 
 local function displayControlPanel()
 	if (InCombatLockdown()) then
-		print("Cannot open the CT options while in combat");
+		print(L["CT_Library/ControlPanelCannotOpen"]);
 		return;
 	end
 	if ( not controlPanelFrame ) then
@@ -2962,7 +2956,7 @@ local function populateCharDropdownInit()
 			importDropdownEntry.value = value;
 			importDropdownEntry.checked = nil;
 			importDropdownEntry.func = dropdownClick;
-			L_UIDropDownMenu_AddButton(importDropdownEntry);
+			UIDropDownMenu_AddButton(importDropdownEntry);
 
 			importPlayerCount = importPlayerCount + 1;
 		end
@@ -2971,7 +2965,7 @@ local function populateCharDropdownInit()
 	if (importSetPlayer) then
 		if (importRealm) then
 			local value = players[1];
-			L_UIDropDownMenu_SetSelectedValue(CT_LibraryDropdown1, value);
+			UIDropDownMenu_SetSelectedValue(CT_LibraryDropdown1, value);
 			populateAddonsList(value);
 		end
 	end
@@ -2986,7 +2980,7 @@ local function populateCharDropdownInit()
 end
 
 local function populateCharDropdown()
-	L_UIDropDownMenu_Initialize(CT_LibraryDropdown1, populateCharDropdownInit);
+	UIDropDownMenu_Initialize(CT_LibraryDropdown1, populateCharDropdownInit);
 end
 
 local function populateServerDropdownInit()
@@ -3033,7 +3027,7 @@ local function populateServerDropdownInit()
 		importDropdownEntry.value = value;
 		importDropdownEntry.checked = nil;
 		importDropdownEntry.func = dropdownClick;
-		L_UIDropDownMenu_AddButton(importDropdownEntry);
+		UIDropDownMenu_AddButton(importDropdownEntry);
 	end
 
 	importPlayerCount = 0;
@@ -3043,7 +3037,7 @@ local function populateServerDropdownInit()
 		if (importRealm2) then
 			value = importRealm2;
 		end
-		L_UIDropDownMenu_SetSelectedValue(CT_LibraryDropdown0, value);
+		UIDropDownMenu_SetSelectedValue(CT_LibraryDropdown0, value);
 		module:update("char", value);
 		-- CT_LibraryDropdown1Label:Hide();
 		-- CT_LibraryDropdown1:Hide();
@@ -3059,7 +3053,7 @@ local function populateServerDropdownInit()
 end
 
 local function populateServerDropdown()
-	L_UIDropDownMenu_Initialize(CT_LibraryDropdown0, populateServerDropdownInit);
+	UIDropDownMenu_Initialize(CT_LibraryDropdown0, populateServerDropdownInit);
 end
 
 local function hideAddonsList()
@@ -3129,7 +3123,7 @@ local function import()
 		if ( success ) then
 			ConsoleExec("reloadui");
 		else
-			print("No addons are selected.");
+			print(L["CT_Library/SettingsImport/NoAddonsSelected"]);
 		end
 	end
 end
@@ -3162,7 +3156,7 @@ local function delete()
 			if (count == 0) then
 				-- No addons left for the character.
 				importRealm = nil;
-				importRealm2 = L_UIDropDownMenu_GetSelectedValue(CT_LibraryDropdown0);
+				importRealm2 = UIDropDownMenu_GetSelectedValue(CT_LibraryDropdown0);
 				populateServerDropdown();
 				importRealm2 = nil;
 				if (importPlayerCount == 0) then
@@ -3172,7 +3166,7 @@ local function delete()
 				end
 			end
 		else
-			print("No addons are selected.");
+			print(L["CT_Library/SettingsImport/NoAddonsSelected"]);
 		end
 	end
 end
@@ -3318,21 +3312,21 @@ module.frame = function()
 	-- About CTMod
 	helpBeginFrame(-5, 0, "frame#tl:0:%y#r");
 		
-		helpAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. lib.text["CT_Library/Help/About/Heading"]); -- About CTMod
+		helpAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_Library/Help/About/Heading"]); -- About CTMod
 		
-		helpAddObject( -5, 2*14, "font#tl:10:%y#s:0:%s#l:13:0#r#" .. lib.text["CT_Library/Help/About/Credits"] .. "#" .. textColor1 .. ":l");  -- Two lines giving credits to Cide, TS, Resike and Dahk
+		helpAddObject( -5, 2*14, "font#tl:10:%y#s:0:%s#l:13:0#r#" .. L["CT_Library/Help/About/Credits"] .. "#" .. textColor1 .. ":l");  -- Two lines giving credits to Cide, TS, Resike and Dahk
 		
-		helpAddObject(-15,   14, "font#tl:10:%y#s:0:%s#l:13:0#r#" .. lib.text["CT_Library/Help/About/Updates"] .. "#" .. textColor1 .. ":l");  -- "Updates are available at:"
+		helpAddObject(-15,   14, "font#tl:10:%y#s:0:%s#l:13:0#r#" .. L["CT_Library/Help/About/Updates"] .. "#" .. textColor1 .. ":l");  -- "Updates are available at:"
 		helpAddObject( -5,   14, "font#tl:30:%y#s:0:%s#l:13:0#r#CurseForge.com/WoW/Addons/CTMod# " .. textColor0 .. ":l");
 	
 	helpEndFrame();
 	
 	-- What is CTMod?
 	helpBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
-		local sNotInstalled = lib.text["CT_Library/Help/WhatIs/NotInstalled"];
-		helpAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. lib.text["CT_Library/Help/WhatIs/Heading"]); -- What is CTMod?
+		local sNotInstalled = L["CT_Library/Help/WhatIs/NotInstalled"];
+		helpAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_Library/Help/WhatIs/Heading"]); -- What is CTMod?
 		
-		helpAddObject( -5,   14, "font#tl:10:%y#s:0:%s#r#" .. lib.text["CT_Library/Help/WhatIs/Line1"] .. "#" .. textColor1 .. ":l"); -- CTMod contains several modules
+		helpAddObject( -5,   14, "font#tl:10:%y#s:0:%s#r#" .. L["CT_Library/Help/WhatIs/Line1"] .. "#" .. textColor1 .. ":l"); -- CTMod contains several modules
 		if (CT_BarMod and CT_BottomBar) then
 			helpAddObject(-10,   14, "font#tl:30:%y#s:0:%s#r#BarMod (/ctbar) and BottomBar (/ctbb)#" .. textColor0 .. ":l");
 			helpAddObject(  5, 5*14, "font#tl:30:%y#s:0:%s#r#Changes the appearance of action bars and other UI elements.  Open BarMod to move numbered bars, and open BottomBar to move everything else.#" .. textColor2 .. ":l");

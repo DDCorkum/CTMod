@@ -1,3 +1,6 @@
+CT_UnitFrames (8.3.0.1) 2020-01-11
+- Added option to use class colours on party frames
+
 CT_UnitFrames (8.2.5.2) 2019-09-28
 - Classic font toggle correctly shows as disabled by default for first-time users
 

@@ -338,7 +338,10 @@ function actionButton:constructor(buttonId, actionId, groupId, count, noInherit,
 	self:setMode(currentMode);
 	self:setBinding();
 
-	self:setClickDirection( not not module:getOption("clickDirection"), not not module:getOption("clickIncluded") );
+	--self:setClickDirection( not not module:getOption("clickDirection"), not not module:getOption("clickIncluded") );
+	local GetCVar = GetCVar or C_CVar.GetCVar;
+	self:setClickDirection(GetCVar("ActionButtonUseKeyDown") == "1");		-- "1" is the default value, meaning activate abilities when you press DOWN
+	
 	button:RegisterForDrag("LeftButton", "RightButton");
 	button:SetAttribute("type", "action");
 end
@@ -388,17 +391,17 @@ end
 -- Set if action is triggered on click up or click down.
 function actionButton:setClickDirection(down, clicks)
 	if (down) then
-		if (clicks) then
+		--if (clicks) then
 			self.button:RegisterForClicks("AnyDown");
-		else
-			self.button:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp", "Button4Down", "Button5Down");
-		end
+		--else
+		--	self.button:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp", "Button4Down", "Button5Down");
+		--end
 	else
-		if (clicks) then
-			self.button:RegisterForClicks("LeftButtonDown");
-		else
+		--if (clicks) then
+		--	self.button:RegisterForClicks("LeftButtonDown");
+		--else
 			self.button:RegisterForClicks("AnyUp");
-		end
+		--end
 	end
 end
 

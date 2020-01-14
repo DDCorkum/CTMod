@@ -495,6 +495,14 @@ local function CT_BottomBar_MainMenuExpBar_CreateFrames()
 			TextStatusBar_OnValueChanged(self);
 		end
 	);
+	
+	hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",
+		function()
+			if (module.ctExpBar and module.ctExpBar.isDisabled) then
+				experBar:Hide();		-- Counteracts line 50 of TextStatusBar.lua when the custom XP bar isn't being used
+			end
+		end
+	);
 
 	tx = experBar:CreateTexture("CT_BottomBar_ExhaustionLevelFillBar", "BORDER");
 	tx:SetHeight(10);
@@ -624,7 +632,7 @@ local function CT_BottomBar_MainMenuExpBar_CreateFrames()
 
 	CharacterFrame:HookScript("OnHide",
 		function(self)
-			CT_BottomBar_MainMenuExpBar.showNumeric =nil;
+			CT_BottomBar_MainMenuExpBar.showNumeric = nil;
 			HideTextStatusBarText(CT_BottomBar_MainMenuExpBar);
 		end
 	);

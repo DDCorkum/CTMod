@@ -182,6 +182,14 @@ do
 			end,
 			["onleave"] = function(self)
 				GameTooltip:Hide();
+			end,
+			["onload"] = function(self)
+				module:registerConflictResolution("ClassicGuildBank", 1, function()			
+					-- move our frame down a bit and make it smaller, so there is more room for them
+					self:SetPoint("LEFT", InboxFrame, "TOPLEFT", 155, -49.5);
+					self:SetSize(65, 19);
+					self:SetNormalFontObject("GameFontNormalSmall");
+				end);
 			end
 		},
 		["button#n:CTMailModReturnSelected#s:68:25#l:tl:212:-39.5#v:UIPanelButtonTemplate#" .. module.text["CT_MailMod/Inbox/ReturnSelectedButton"]] = {
@@ -206,6 +214,14 @@ do
 			end,
 			["onleave"] = function(self)
 				GameTooltip:Hide();
+			end,
+			["onload"] = function(self)
+				module:registerConflictResolution("ClassicGuildBank", 1, function()			
+					-- move our frame down a bit and make it smaller, so there is more room for them
+					self:SetPoint("LEFT", InboxFrame, "TOPLEFT", 219, -49.5);
+					self:SetSize(65, 19);
+					self:SetNormalFontObject("GameFontNormalSmall");
+				end);
 			end
 		},
 	}, InboxFrame);
@@ -261,6 +277,13 @@ do
 				self.text:SetText(module.text["CT_MailMod/SELECT_ALL"]);
 				self.text:SetPoint("LEFT", self, "RIGHT", 1, 0);
 				self:SetHitRectInsets(0, -55, 0, 0);
+				module:registerConflictResolution("ClassicGuildBank", 1, function(cgbButton)			
+					-- ask the ClassGuildBank button to move up a bit and be smaller
+					cgbButton:SetSize(129, 19);
+					cgbButton:SetNormalFontObject("GameFontNormalSmall");
+					cgbButton:ClearAllPoints();
+					cgbButton:SetPoint('BOTTOM', 28, 471);
+				end);
 			end,
 			["onenter"] = function(self)
 				self.text:SetTextColor(1, 1, 1);
@@ -845,6 +868,13 @@ do
 			btn:Show();
 		end
 	end
+	
+	module:registerConflictResolution("ClassicGuildBank", 1, function()			
+		-- move our frame down a bit and make it smaller, so there is more room for them
+		btn:SetPoint("TOPLEFT", 284, -40);
+		btn:SetSize(48, 19);
+		btn:SetNormalFontObject("GameFontNormalSmall");
+	end);
 end
 
 -- Mail icon buttons

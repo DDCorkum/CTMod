@@ -1,3 +1,6 @@
+CT_BuffMod (8.3.0.1) 2019-01-01
+- Minor code cleanup; nothing substantive
+
 CT_BuffMod (8.2.5.5) 2019-10-14
 - Changes corresponding to CT_Library
 

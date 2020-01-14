@@ -1,3 +1,7 @@
+CT_Library (8.3.0.1) 2019-01-12
+- No longer using LibUIDropDownMenu; replacing with foxlit's workarounds published at Townlong Yak
+- Added tool for modules to resolve conflicts with other addons
+
 CT_Library (8.2.5.9) 2019-12-18
 - Minor code cleanup; nothing substantive
 

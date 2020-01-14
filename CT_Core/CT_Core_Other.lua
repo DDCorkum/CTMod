@@ -2192,8 +2192,6 @@ do
 						module.watchframeInit();
 					end
 					updateEnabled();
-				elseif (event == "PLAYER_ENTERING_WORLD") then
-					-- previously this did the forcecollapse()
 				end
 			end,
 		};

@@ -150,3 +150,18 @@ hooksecurefunc("PartyMemberFrame_UpdateNotPresentIcon",
 		CT_PartyFrame_AnchorSideText_Single(id);
 	end
 );
+
+function CT_PartyFrame_UpdateClassColor()
+	local GetClassColor = GetClassColor or C_ClassColor.GetClassColor
+	for i=1, 4 do
+		if (CT_UnitFramesOptions.partyClassColor and UnitExists("party" .. i)) then
+			local r, g, b = GetClassColor(select(2,UnitClass("party" .. i)));
+			_G["PartyMemberFrame" .. i .. "Name"]:SetTextColor(r or 1, g or 0.82, b or 0);
+		else
+			_G["PartyMemberFrame" .. i .. "Name"]:SetTextColor(1,0.82,0);
+		end
+		
+	end
+end
+
+module:regEvent("GROUP_ROSTER_UPDATE", CT_PartyFrame_UpdateClassColor);

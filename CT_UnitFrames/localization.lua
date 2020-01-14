@@ -18,3 +18,4 @@ CT_UFO_RIGHTSPACING = "Beside health/power bar spacing = ";
 CT_UFO_TEXTRIGHT = "Show health/power on right side";
 CT_UFO_TEXTLEFT = "Show health/power on left side";
 CT_UFO_SHOWCOORDS = "Show player coordinates";
+CT_UFO_PARTYCLASSCOLORS = "|cFFFFFF00New! |rShow class colors"
