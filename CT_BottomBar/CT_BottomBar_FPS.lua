@@ -110,7 +110,14 @@ local function addon_Register()
 	module:registerAddon(
 		"Framerate Bar",  -- option name
 		"Frameratebar",  -- used in frame names
-		module.text["CT_BottomBar/Options/FPSBar"],  -- shown in options window & tooltips
+		module.text["CT_BottomBar/Options/FPSBar"] .. 
+			(
+				(
+					GetBindingKey("TOGGLEFPS") 
+					and " (" .. GetBindingKey("TOGGLEFPS") .. ")"
+				)
+				or ""
+			),  -- shown in options window & tooltips
 		module.text["CT_BottomBar/Options/FPSBar"],  -- title for horizontal orientation
 		nil,  -- title for vertical orientation
 		{ "BOTTOMLEFT", ctRelativeFrame, "BOTTOM", -20, 120 },

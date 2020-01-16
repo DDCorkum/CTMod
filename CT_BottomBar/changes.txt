@@ -1,3 +1,6 @@
+CT_BottomBar (8.3.0.3) 2019-01-16
+- Small tweak to options menu
+
 CT_BottomBar (8.3.0.2) 2019-01-16
 - Minor code cleanup; nothing substantive
 
