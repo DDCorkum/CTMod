@@ -1,3 +1,5 @@
+local module = select(2,...);
+
 local _G = _G
 local tonumber = tonumber
 

@@ -19,7 +19,7 @@
 
 -- Please see CurseForge.com/Projects/CTMod/Localization to contribute additional translations
 
-module = _G["CT_BottomBar"]
+local module = _G["CT_BottomBar"]
 module.text = module.text or { }
 local L = module.text
 
