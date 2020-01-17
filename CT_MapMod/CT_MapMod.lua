@@ -1330,9 +1330,11 @@ do
 		if (event == "UNIT_SPELLCAST_SENT" and arg1 == "player") then
 			if (InCombatLockdown() or IsInInstance()) then return; end
 			local mapid = C_Map.GetBestMapForUnit("player");
-			if (not mapid) then return; end
-			local x,y = C_Map.GetPlayerMapPosition(mapid,"player"):GetXY();
-			if (not x or not y or (x == 0 and y == 0)) then return; end
+			if (not mapid) then return; end					-- could be nil when the player isn't on any real map
+			local position = C_Map.GetPlayerMapPosition(mapid,"player");
+			if not (position) then return; end				-- could be nil in places like the Warlords of Draenor garrison
+			local x,y = position:GetXY();
+			if (not x or not y or (x == 0 and y == 0)) then return; end	-- could be nil or 0 in dungeons and raids to prevent cheating
 			local herbskills = { 2366, 2368, 3570, 11993, 28695, 50300, 74519, 110413, 158745, 265819, 265821, 265823, 265825, 265827, 265829, 265831, 265834, 265835 }
 			local oreskills =  { 2575, 2576, 3564, 10248, 29354, 50310, 74517, 102161, 158754, 195122, 265837, 265839, 265841, 265843, 265845, 265847, 265849, 265851, 265854 }
 			if ((module:getOption("CT_MapMod_AutoGatherHerbs") or 1) == 1) then
@@ -1389,8 +1391,9 @@ do
 							if (arg2:sub(1,9) == "Filon de " and arg2:len() > 10) then arg2 = arg2:sub(10,10):upper() .. arg2:sub(11); end -- changes "Filon de cuivre" to "Cuivre"
 							if (arg2:sub(1,12) == "Gisement de " and arg2:len() > 13) then arg2 = arg2:sub(13,13):upper() .. arg2:sub(14); end -- changes "Gisement de fer" to "Fer"
 							if (arg2:sub(1,9) == "Veine de " and arg2:len() > 10) then arg2 = arg2:sub(10,10):upper() .. arg2:sub(11); end -- changes "Veine de gangreschiste" to "Gangreschiste"
-							elseif (GetLocale() == "deDE") then
-							-- need to add german modifiers
+						elseif (GetLocale() == "deDE") then
+							if (arg2:sub(1,9) == "Reiches " and arg2:len() > 9) then arg2 = arg2:sub(10); end  -- changes "Reiches Thoriumvorkommen" to "Thoriumvorkommen"
+							if (arg2:sub(-9) == "vorkommen" and arg2:len() > 9) then arg2 = arg2:sub(1, -10); end -- changes "Kupfervorkommen" to "Kupfer"
 						elseif (GetLocale() == "ruRU") then
 							if (arg2:sub(1,8) == "Богатая " and arg2:len() > 9) then arg2 = arg2:sub(9,9):upper() .. arg2:sub(10); end -- changes "Богатая ториевая жила" to "Ториевая жила"
 							if (arg2:sub(-5) == " жила" and arg2:len() > 5) then arg2 = arg2:sub(1,-6); end	--changes "Медная жила" to "Медная"
