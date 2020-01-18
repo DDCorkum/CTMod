@@ -35,29 +35,30 @@ module.CTRA_Configuration_Buffs =
 {
 	["PRIEST"] =
 	{
-		{["name"] = "Power Word: Fortitude", ["modifier"] = "nomod", },
+		{["name"] = "Power Word: Fortitude", ["modifier"] = "nomod", ["id"] = 211681, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
+		{["name"] = "Power Word: Fortitude", ["modifier"] = "nomod", ["id"] = 1243, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
 	},
 	["MAGE"] =
 	{
-		{["name"] = "Arcane Intellect", ["modifier"] = "nomod", } ,
-		{["name"] = "Arcane Brilliance", ["modifier"] = "mod:shift", ["gameVersion"] = CT_GAME_VERSION_CLASSIC,},
-		{["name"] = "Amplify Magic", ["modifier"] = "mod:ctrl", ["gameVersion"] = CT_GAME_VERSION_CLASSIC,},
-		{["name"] = "Dampen Magic", ["modifier"] = "mod:alt", ["gameVersion"] = CT_GAME_VERSION_CLASSIC,},
+		{["name"] = "Arcane Intellect", ["modifier"] = "nomod", ["id"] = 1459},
+		{["name"] = "Arcane Brilliance", ["modifier"] = "mod:shift", ["id"] = 23028, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
+		{["name"] = "Amplify Magic", ["modifier"] = "mod:ctrl", ["id"] = 1008, ["gameVersion"] = CT_GAME_VERSION_CLASSI,},
+		{["name"] = "Dampen Magic", ["modifier"] = "mod:alt", ["id"] = 604, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
 	},
 	["WARRIOR"] =
 	{	
-		{["name"] = "Battle Shout", ["modifier"] = "nomod",},
+		{["name"] = "Battle Shout", ["modifier"] = "nomod", ["id"] = 6673},
 	},
 	["HUNTER"] =
 	{
-		{["name"] = "Trueshot Aura", ["modifier"] = "nomod", ["gameVersion"] = CT_GAME_VERSION_CLASSIC,},
+		{["name"] = "Trueshot Aura", ["modifier"] = "nomod", ["id"] = 19506, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
 	},
 	["PALADIN"] = 
 	{
-		{["name"] = "Blessing of Kings", ["modifier"] = "nomod", ["gameVersion"] = CT_GAME_VERSION_CLASSIC,},
-		{["name"] = "Blessing of Wisdom", ["modifier"] = "mod:shift", ["gameVersion"] = CT_GAME_VERSION_CLASSIC,},
-		{["name"] = "Blessing of Might", ["modifier"] = "mod:ctrl", ["gameVersion"] = CT_GAME_VERSION_CLASSIC,},
-		{["name"] = "Blessing of Salvation", ["modifier"] = "mod:alt", ["gameVersion"] = CT_GAME_VERSION_CLASSIC,},
+		{["name"] = "Blessing of Kings", ["modifier"] = "nomod", ["id"] = 20217, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
+		{["name"] = "Blessing of Wisdom", ["modifier"] = "mod:shift", ["id"] = 19742, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
+		{["name"] = "Blessing of Might", ["modifier"] = "mod:ctrl", ["id"] = 19740, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
+		{["name"] = "Blessing of Salvation", ["modifier"] = "mod:alt", ["id"] = 1038, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
 	}
 }
 
@@ -76,39 +77,41 @@ module.CTRA_Configuration_FriendlyRemoves =
 {			
 	["DRUID"] =										
 	{											
-		{["name"] = "Nature's Cure", ["modifier"] = "nomod", ["magic"] = true, ["curse"] = true, ["poison"] = true, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
-		{["name"] = "Remove Corruption", ["modifier"] = "nomod", ["curse"] = true, ["poison"] = true, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
-		{["name"] = "Abolish Poison", ["modifier"] = "nomod", ["poison"] = true, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
-		{["name"] = "Cure Poison", ["modifier"] = "nomod", ["poison"] = true, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},  	--  the first available 'nomod' on the list has precedence, so at lvl 26 this stops being used
-		{["name"] = "Remove Curse", ["modifier"] = "mod:shift", ["curse"] = true, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
+		{["name"] = "Nature's Cure", ["modifier"] = "nomod", ["id"] = 88423, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
+		{["name"] = "Remove Corruption", ["modifier"] = "nomod", ["id"] = 2782, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
+		{["name"] = "Abolish Poison", ["modifier"] = "nomod", ["id"] = 2893, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
+		{["name"] = "Cure Poison", ["modifier"] = "nomod", ["id"] = 8946, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},  	--  the first available 'nomod' on the list has precedence, so at lvl 26 this stops being used
+		{["name"] = "Remove Curse", ["modifier"] = "mod:shift", ["id"] = 2782, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
 	},
 	["MAGE"] =
 	{
-		{["name"] = "Remove Curse", ["modifier"] = "nomod", ["curse"] = true},
-		{["name"] = "Remove Lesser Curse", ["modifier"] = "nomod", ["curse"] = true},
+		{["name"] = "Remove Curse", ["modifier"] = "nomod", ["id"] = 475, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
+		{["name"] = "Remove Lesser Curse", ["modifier"] = "nomod", ["id"] = 475, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
 	},
 	["MONK"] =
 	{
-		{["name"] = "Detox", ["modifier"] = "nomod", ["spec"] = 270, ["magic"] = true, ["poison"] = true, ["disease"] = true},
-		{["name"] = "Detox", ["modifier"] = "nomod", ["poison"] = true, ["disease"] = true},	-- this is superceded for mistweavers by the higher one on the list with spec=270
+		{["name"] = "Detox", ["modifier"] = "nomod", ["id"] = 115450, ["spec"] = 270},
+		{["name"] = "Detox", ["modifier"] = "nomod", ["id"] = 218164},	-- this is superceded for mistweavers by the higher one on the list with spec=270
 	},
 	["PALADIN"] =
 	{
-		{["name"] = "Cleanse", ["modifier"] = "nomod", ["magic"] = true, ["poison"] = true, ["disease"] = true},	-- exists (in roughly equivalent forms) in both retail and classic
-		{["name"] = "Cleanse  Toxins", ["modifier"] = "nomod", ["poison"] = true, ["disease"] = true, ["gameVersion"] = CT_GAME_VERSION_RETAIL},	-- used by specs in retail who don't get the full cleanse
-		{["name"] = "Purify", ["modifier"] = "nomod", ["poison"] = true, ["disease"] = true, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},	--at higher levels, replaced by cleanse
+		{["name"] = "Cleanse", ["modifier"] = "nomod", ["id"] = 4987},
+		{["name"] = "Cleanse  Toxins", ["modifier"] = "nomod", ["id"] = 213644, ["gameVersion"] = CT_GAME_VERSION_RETAIL},	-- used by specs in retail who don't get the full cleanse
+		{["name"] = "Purify", ["modifier"] = "nomod", ["id"] = 1152, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},	--at higher levels, replaced by cleanse
 	},
 	["PRIEST"] = 
 	{
-		{["name"] = "Purify", ["modifier"] = "nomod", ["magic"] = true, ["disease"] = true, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
-		{["name"] = "Purify Disease", ["modifier"] = "nomod", ["disease"] = true, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
-		{["name"] = "Cure Disease", ["modifier"] = "mod:shift", ["disease"] = true, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
-		{["name"] = "Dispel Magic", ["modifier"] = "nomod", ["magic"] = true, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
+		{["name"] = "Purify", ["modifier"] = "nomod", ["id"] = 527, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
+		{["name"] = "Purify Disease", ["modifier"] = "nomod", ["id"] = 213634, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
+		{["name"] = "Cure Disease", ["modifier"] = "mod:shift", ["id"] = 528, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
+		{["name"] = "Dispel Magic", ["modifier"] = "nomod", ["id"] = 527, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
 	},
 	["SHAMAN"] =
 	{
-		{["name"] = "Purify Spirit", ["modifier"] = "nomod", ["magic"] = true, ["curse"] = true},
-		{["name"] = "Cleanse Spirit", ["modifier"] = "nomod", ["curse"] = true},
+		{["name"] = "Purify Spirit", ["modifier"] = "nomod", ["id"] = 77130, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
+		{["name"] = "Cleanse Spirit", ["modifier"] = "nomod", ["id"] = 51886, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
+		{["name"] = "Cure Poison", ["modifier"] = "mod:shift", ["id"] = 526},
+		{["name"] = "Cure Disease", ["modifier"] = "mod:alt", ["id"] = 2870},
 	},
 }
 
@@ -126,31 +129,30 @@ module.CTRA_Configuration_RezAbilities =
 {
 	["DRUID"] =
 	{
-		{["name"] = "Rebirth", ["modifier"] = "nomod", ["combat"] = true},
-		{["name"] = "Revive", ["modifier"] = "nomod", ["nocombat"] = true},
+		{["name"] = "Rebirth", ["modifier"] = "nomod", ["id"] = 20484, ["combat"] = true},
+		{["name"] = "Revive", ["modifier"] = "nomod", ["id"] = 50769, ["nocombat"] = true},
 	},
 	["DEATHKNIGHT"] =
 	{
-		{["name"] = "Raise Ally", ["modifier"] = "nomod", ["combat"] = true, ["nocombat"] = true},
+		{["name"] = "Raise Ally", ["modifier"] = "nomod", ["id"] = 61999, ["combat"] = true, ["nocombat"] = true},
 	},
 	["WARLOCK"] =
 	{
-		{["name"] = "Soulstone", ["modifier"] = "nomod", ["combat"] = true, ["gameVersion"] = CT_GAME_VERSION_RETAIL},	--TO DO: Make a classic version that uses the soulstone sitting in the bags
+		{["name"] = "Soulstone", ["modifier"] = "nomod", ["id"] = 5232, ["combat"] = true, ["gameVersion"] = CT_GAME_VERSION_RETAIL},	--TO DO: Make a classic version that uses the soulstone sitting in the bags
 	},
 	["PALADIN"] =
 	{
-		{["name"] = "Redemption", ["modifier"] = "nomod", ["nocombat"] = true},
+		{["name"] = "Redemption", ["modifier"] = "nomod", ["id"] = 7328, ["nocombat"] = true},
 	},	
 	["PRIEST"] =
 	{
-		{["name"] = "Resurrection", ["modifier"] = "nomod", ["nocombat"] = true},
+		{["name"] = "Resurrection", ["modifier"] = "nomod", ["id"] = 2006, ["nocombat"] = true},
 	},	
 	["SHAMAN"] =
 	{
-		{["name"] = "Ancestral Spirit", ["modifier"] = "nomod", ["nocombat"] = true},
+		{["name"] = "Ancestral Spirit", ["modifier"] = "nomod", ["id"] = 2008, ["nocombat"] = true},
 	},
 }
-
 
 ------------------------------------------------
 -- CTRA_Configuration_BossAuras
@@ -220,7 +222,6 @@ module.CTRA_Configuration_BossAuras =
 	[307399] = 5,		-- Ny'alotha - Maut: Arcane Wounds
 	[314337] = 1,		-- Ny'alotha - Maut: Ancient Curse
 }
-
 
 ------------------------------------------------
 -- CTRA_Configuration_Consumables
@@ -404,3 +405,24 @@ module.CTRA_Configuration_Consumables =
 	[297117] = 168315, -- Famine Evaluator And Snack Table (Int)
 	[297118] = 168315, -- Famine Evaluator And Snack Table (Str)
 } 
+
+
+
+------------------------------------------------
+-- Localization
+
+local function localizeClickCasting(table)
+	local class = select(2, UnitClass("player"));
+	if (table[class]) then
+		for i, details in ipairs(table[class]) do
+			if (C_Spell.DoesSpellExist(details.id) and (details.gameVersion == module:getGameVersion() or not details.gameVersion)) then
+				local spell = Spell:CreateFromSpellID(details.id);
+				spell:ContinueOnSpellLoad(function() details.name = GetSpellInfo(details.id) end);
+			end
+		end
+	end
+end
+
+localizeClickCasting(module.CTRA_Configuration_Buffs);
+localizeClickCasting(module.CTRA_Configuration_FriendlyRemoves);
+localizeClickCasting(module.CTRA_Configuration_RezAbilities);
