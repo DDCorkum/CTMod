@@ -19,7 +19,7 @@
 -----------------------------------------------
 -- Initialization
 
-local LIBRARY_VERSION = 8.301;
+local LIBRARY_VERSION = 8.303;
 local LIBRARY_NAME = "CT_Library";
 
 local _G = getfenv(0);
@@ -50,13 +50,21 @@ else
 	-- Create a new lib table.
 	lib = { };
 	_G[LIBRARY_NAME] = lib;
-	lib.text = lib.text or { };  -- this will be populated by localization.lua
-	L = lib.text
 end
 
 -- Set the variables used
 lib.name = LIBRARY_NAME;
 lib.version = LIBRARY_VERSION;
+
+-- see localization.lua
+local obj = select(2,...);
+obj.text = obj.text or { };
+local L = obj.text
+local metatable = getmetatable(L) or {}
+metatable.__index = function(table, missingKey)
+	return "[Not Found: " .. gsub(missingKey, "CT_Library/", "") .. "]";
+end
+setmetatable(L, metatable);
 
 -- End Initialization
 -----------------------------------------------
@@ -800,6 +808,20 @@ local function registerMeta(module)
 	setmetatable(module, module_meta);
 end
 
+local function registerLocalizationMeta(module)
+	-- most modules populate this table using localization.lua
+	module.text = module.text or {}
+	
+	-- gracefully handle errors, in case a localisation is missing
+	local meta = getmetatable(module.text) or {}
+	meta.__index = function(table, missingKey)
+		missingKey = gsub(missingKey, (module.name or "CT_Library") .. "/", "");
+		missingKey = gsub(missingKey, "Options/", "O/");
+		return "[Error: " .. missingKey .. "]";
+	end
+	setmetatable(module.text, meta);
+end
+
 local function registerModule(module, position)
 	for k, v in ipairs(modules) do
 		if (v.name == module.name) then
@@ -814,6 +836,7 @@ local function registerModule(module, position)
 		tinsert(modules, module);
 	end
 	registerMeta(module);
+	registerLocalizationMeta(module);
 	sort(modules, function(a, b)
 		if (a.ctposition and not b.ctposition) then
 			return true;
