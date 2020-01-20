@@ -1012,6 +1012,15 @@ local function setActionBindings(event)
 						if (key2) then
 							SetOverrideBinding(owner, false, key2, action);
 						end
+					else
+						-- This simulates CVar.GetCVarBool("ActionButtonUseKeyDown") found in protected function ActionButtonDown()
+						local key1, key2 = module.getBindingKey(baseNum + buttonNum );
+						if (key1) then
+							SetOverrideBinding(owner, false, key1, action);
+						end
+						if (key2) then
+							SetOverrideBinding(owner, false, key2, action);
+						end						
 					end
 				end
 			end

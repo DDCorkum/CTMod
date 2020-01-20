@@ -1012,9 +1012,9 @@ module.frame = function()
 				if (timeElapsed < 0.25) then return; end
 				timeElapsed = 0;
 				if (GetCVar("ActionButtonUseKeyDown") == "1") then
-					CT_BarMod_ToggleKeyFontString:SetText("Currently responding to |cFFFFFF99 mouse/key press down");
+					CT_BarMod_ToggleKeyFontString:SetText("Currently responds to mouse up & |cFFFFFF99 key down|n|cFF999999(only applies to bars 3-6 and the action bar)");
 				else
-					CT_BarMod_ToggleKeyFontString:SetText("Currently responding to |cFFFFFF99 mouse/key release up");
+					CT_BarMod_ToggleKeyFontString:SetText("Currently responds to mouse up & |cFFFFFF99 key up");
 				end
 			end);
 			optionsAddScript("onenter", function(button)
@@ -1023,12 +1023,14 @@ module.frame = function()
 					"Toggles console variable 'ActionButtonUseKeyDown' between 0 and 1", 
 					" ", 
 					"|cFFFFFF99Action on Key Release Up:", 
-					"- Same as typing /console ActionButtonUseKeyDown 0", 
-					"- Game buttons will respond when key/mouse released", 
+					"- Same as typing /console ActionButtonUseKeyDown |cFFFFFFFF0", 
+					"- |cFFFFFFFFAll|r buttons will respond to |cFFFFFFFFmouse-up|r and |cFFFFFFFFkey-up", 
 					" ", 
 					"|cFFFFFF99Action on Key Press Down:", 
-					"- Same as typing /console ActionButtonUseKeyDown 1", 
-					"- Game buttons will respond when key/mouse pressed (Game Default)", 
+					"- Same as typing /console ActionButtonUseKeyDown |cFFFFFFFF1", 
+					"- |cFFFFFFFFMost|r buttons will respond to |cFFFFFFFFpressing the key down", 
+					"- However, Blizzard restricts extra action bars (7 to 10) to key-up only",
+					"- All buttons will still respond to |cFFFFFFFFmouse-up|r (so you can drag)",
 					" ", 
 					"|cFF666666Console variables persist even if you get rid of addons",
 					"|cFF666666but can be reset by typing /console cvar_reset"

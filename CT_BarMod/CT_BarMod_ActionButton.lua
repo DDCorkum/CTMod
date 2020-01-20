@@ -392,7 +392,7 @@ end
 function actionButton:setClickDirection(down, clicks)
 	if (down) then
 		--if (clicks) then
-			self.button:RegisterForClicks("AnyDown");
+	--		self.button:RegisterForClicks("AnyDown");
 		--else
 		--	self.button:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp", "Button4Down", "Button5Down");
 		--end
@@ -400,7 +400,7 @@ function actionButton:setClickDirection(down, clicks)
 		--if (clicks) then
 		--	self.button:RegisterForClicks("LeftButtonDown");
 		--else
-			self.button:RegisterForClicks("AnyUp");
+	--		self.button:RegisterForClicks("AnyUp");
 		--end
 	end
 end
