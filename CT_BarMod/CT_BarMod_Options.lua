@@ -1040,8 +1040,7 @@ module.frame = function()
 					"|cFFFFFF99Action on Key Press Down:", 
 					"- Same as typing /console ActionButtonUseKeyDown |cFFFFFFFF1", 
 					"- Bars 2-6 and the action bar will respond to |cFFFFFFFFpressing the key down", 
-					"- Unlocks an option to also use mouse-click down",
-					"  -> This added option also allows bars 7-10 to use key press down",
+					"- Unlocks further options for mouse clicking and bars 7-10",
 					" ", 
 					"|cFF666666Console variables persist even if you get rid of addons",
 					"|cFF666666but can be reset by typing /console cvar_reset"
