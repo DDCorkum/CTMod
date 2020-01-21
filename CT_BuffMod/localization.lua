@@ -29,6 +29,7 @@ L["CT_BuffMod/TimeFormat/Minutes Plural"] = "%d minutes"
 L["CT_BuffMod/TimeFormat/Minutes Smaller"] = "%d min"
 L["CT_BuffMod/TimeFormat/Minutes Two Digits"] = "%.2dm"
 L["CT_BuffMod/TimeFormat/Off"] = "Off"
+L["CT_BuffMod/TimeFormat/Second Singular"] = "1 second"
 L["CT_BuffMod/TimeFormat/Seconds Abbreviated"] = "%ds"
 L["CT_BuffMod/TimeFormat/Seconds Plural"] = "%d seconds"
 L["CT_BuffMod/TimeFormat/Seconds Smaller"] = "%d sec"
@@ -185,7 +186,6 @@ L["CT_BuffMod/Options/WindowControls/WindowSelectedMessage"] = "Window %d select
 
 if (GetLocale() == "frFR") then
 
-
 L["CT_BuffMod/PRE_EXPIRATION_WARNING"] = "L'aura |cFFFFFFFF%s|r expire dans |cFFFFFFFF%s|r."
 L["CT_BuffMod/PRE_EXPIRATION_WARNING_KEYBINDING"] = "L'aura |cFFFFFFFF%s|r expire dans |cFFFFFFFF%s|r.  Appuyer sur |cFFFFFFFF%s|r pour le réappliquer"
 L["CT_BuffMod/TimeFormat/Day Singular"] = "1 jour"
@@ -205,6 +205,7 @@ L["CT_BuffMod/TimeFormat/Minutes Plural"] = "%d minutes"
 L["CT_BuffMod/TimeFormat/Minutes Smaller"] = "%d min"
 L["CT_BuffMod/TimeFormat/Minutes Two Digits"] = "%.2dm"
 L["CT_BuffMod/TimeFormat/Off"] = "Fermé"
+L["CT_BuffMod/TimeFormat/Second Singular"] = "1 seconde"
 L["CT_BuffMod/TimeFormat/Seconds Abbreviated"] = "%ds"
 L["CT_BuffMod/TimeFormat/Seconds Plural"] = "%d secondes"
 L["CT_BuffMod/TimeFormat/Seconds Smaller"] = "%d sec"
@@ -248,6 +249,7 @@ L["CT_BuffMod/Options/Window/Border/RightSliderValue"] = "La bordure droite = <v
 L["CT_BuffMod/Options/Window/Border/ShowBorderCheckbox"] = "Montrer les bordures"
 L["CT_BuffMod/Options/Window/Border/TopSliderValue"] = "La bordure supérieure = <value>"
 L["CT_BuffMod/Options/Window/Button/General/DebuffBorderColorCheckbox"] = "Changer la bordure des auras nocives"
+L["CT_BuffMod/Options/Window/Button/General/DebuffColorTooltip"] = "Légende : |cFF9600FFmalédiction|r, |cFF966400maladie|r,|cFF3296FFmagie|r, |cFF009600poison|r, et |cFFc80000d'autres (ie, physique)|r."
 L["CT_BuffMod/Options/Window/Button/General/IconSizeSliderLabel"] = "Le grandeur de l'icône :"
 L["CT_BuffMod/Options/Window/Button/General/ShowDaysCheckbox"] = "Montrer des jours si plus de 24 heures"
 L["CT_BuffMod/Options/Window/Button/General/TimeFormatLabel"] = "Le format :"
@@ -279,6 +281,13 @@ L["CT_BuffMod/Options/Window/General/PositionLockedCheckbox"] = "Verrouiller la 
 L["CT_BuffMod/Options/Window/General/PositionResetButton"] = "Remettre la fenêtre"
 L["CT_BuffMod/Options/Window/General/PositionResetTip"] = [=[Ceci place la fenêtre 
 au milieu de l'écran]=]
+L["CT_BuffMod/Options/Window/Layout/BuffSpacingSlider"] = "L'écartement des auras = <value>"
+L["CT_BuffMod/Options/Window/Layout/HorizontalMaxWrapsSlider"] = "Le nombre de rangs = <value>"
+L["CT_BuffMod/Options/Window/Layout/HorizontalWrapAfterSlider"] = "Auras dans chaque rang = <value>"
+L["CT_BuffMod/Options/Window/Layout/HorizontalWrapSpacingSlider"] = "L'écartement des rangs = <value>"
+L["CT_BuffMod/Options/Window/Layout/VerticalMaxWrapsSlider"] = "Le nombre de colonnes = <value>"
+L["CT_BuffMod/Options/Window/Layout/VerticalWrapAfterSlider"] = "Auras dans chaque colonne = <value>"
+L["CT_BuffMod/Options/Window/Layout/VerticalWrapSpacingSlider"] = "L'écartement des colonnes = <value>"
 L["CT_BuffMod/Options/Window/Sorting/Heading"] = "L'ordre des auras"
 L["CT_BuffMod/Options/Window/Sorting/NonExpiringBuffsDropdown"] = "#Avant des autre auras#Après des autre auras#Avec des autre auras"
 L["CT_BuffMod/Options/Window/Sorting/NonExpiringBuffsLabel"] = "Les auras permanents :"
@@ -433,11 +442,13 @@ L["CT_BuffMod/Options/Window/General/PositionClampedCheckbox"] = "Fenster innerh
 L["CT_BuffMod/Options/Window/General/PositionLockedCheckbox"] = "Fenster fixieren, sodass es nicht beweglich ist"
 L["CT_BuffMod/Options/Window/General/PositionResetButton"] = "Fensterposition zurücksetzen"
 L["CT_BuffMod/Options/Window/General/PositionResetTip"] = "Verschiebt das Fenster in die Bildschirmmitte."
+L["CT_BuffMod/Options/Window/Layout/BuffSpacingSlider"] = "Zauberabstand = <value>"
 L["CT_BuffMod/Options/Window/Layout/Heading"] = "Anordnung"
 L["CT_BuffMod/Options/Window/Layout/HorizontalLayoutTip"] = "Für diese Anordnung resultiert das Festlegen der Zeilenanzahl auf 0 in einer variablen Anzahl von Zeilen."
 L["CT_BuffMod/Options/Window/Layout/HorizontalMaxWrapsSlider"] = "Zeilenanzahl = <value>"
 L["CT_BuffMod/Options/Window/Layout/HorizontalWrapAfterSlider"] = "Zauber pro Zeile = <value>"
 L["CT_BuffMod/Options/Window/Layout/HorizontalWrapSpacingSlider"] = "Zeilenabstand = <value>"
+L["CT_BuffMod/Options/Window/Layout/LayoutDropdown"] = "#Oben nach unten. Nach rechts sortieren.#Oben nach unten. Nach links sortieren.#Unten nach oben. Nach rechts sortieren.#Unten nach oben. Nach links sortieren.#Links nach rechts. Abwärts sortieren.#Links nach rechts. Aufwärts sortieren.#Rechts nach links. Abwärts sortieren.#Rechts nach links. Aufwärts sortieren."
 L["CT_BuffMod/Options/Window/Layout/LayoutDropdownLabel"] = "Richtung:"
 L["CT_BuffMod/Options/Window/Layout/MaxWrapsSliderAuto"] = "0 (automatisch erweitern)"
 L["CT_BuffMod/Options/Window/Layout/Tooltip"] = [=[|cFFFFFFFFLegt die Anordnung der Zaubersymbole im Fenster fest. 
@@ -509,6 +520,15 @@ L["CT_BuffMod/Options/WindowControls/WindowClonedMessage"] = "Fenster %d mit Ein
 L["CT_BuffMod/Options/WindowControls/WindowDeletedMessage"] = "Fenster %d entfernt."
 L["CT_BuffMod/Options/WindowControls/WindowSelectedMessage"] = "Fenster %d ausgewählt."
 
+
+elseif (GetLocale() == "ruRU") then
+
+L["CT_BuffMod/Options/Blizzard Frames/Hide Buffs"] = "Скрыть стандартное окно бафов"
+L["CT_BuffMod/Options/General/Expiration/ChatMessageCheckbox"] = "Включить предупреждение в чате"
+L["CT_BuffMod/Options/General/Expiration/DurationHeading"] = "Длительность бафа"
+L["CT_BuffMod/Options/General/Expiration/FlashSliderLabel"] = [=[Мигать иконкой
+перед окончанием:]=]
+L["CT_BuffMod/Options/General/Expiration/PlaySoundCheckbox"] = "Проигрывать звук при предупреждении"
 
 
 end
