@@ -2404,7 +2404,6 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 							string:Hide();
 						end
 						if (owner:GetProperty("ShowReverseCooldown") and duration and duration >= 12 and expirationTime and expirationTime > 0) then
-							print(name .. " has duration " .. duration .. " and expires at " .. expirationTime);
 							cooldown:SetCooldown(expirationTime - duration * 0.4, duration * 0.4);
 						else
 							cooldown:Clear();
