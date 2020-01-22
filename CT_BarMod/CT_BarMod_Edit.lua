@@ -1,1 +1,0 @@
--- depreciated; this file will be removed in a future version of CT_BarMod

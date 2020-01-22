@@ -34,7 +34,7 @@ L["CT_BottomBar/Options/ClassicKeyRingButton"] = "Key Ring Button"
 L["CT_BottomBar/Options/ClassicPerformanceBar"] = "Performance Bar"
 L["CT_BottomBar/Options/ExpBar"] = "Experience Bar"
 L["CT_BottomBar/Options/FlightBar"] = "Stop Flying Button"
-L["CT_BottomBar/Options/FPSBar"] = "FPS Indicator (CTRL-R)"
+L["CT_BottomBar/Options/FPSBar"] = "FPS Indicator"
 L["CT_BottomBar/Options/General/BackgroundTextures/Heading"] = "Background Textures"
 L["CT_BottomBar/Options/General/BackgroundTextures/HideActionBarCheckButton"] = "Hide the action bar textures"
 L["CT_BottomBar/Options/General/BackgroundTextures/HideGryphonsCheckButton"] = "Hide the gryphons/lions"
@@ -64,7 +64,7 @@ L["CT_BottomBar/Options/ClassicKeyRingButton"] = "Le trousseau de clés"
 L["CT_BottomBar/Options/ClassicPerformanceBar"] = "La performance"
 L["CT_BottomBar/Options/ExpBar"] = "L'expérience"
 L["CT_BottomBar/Options/FlightBar"] = "Le bouton d'arrêt-vol"
-L["CT_BottomBar/Options/FPSBar"] = "Les images/seconde (CTRL-R)"
+L["CT_BottomBar/Options/FPSBar"] = "Les images/seconde"
 L["CT_BottomBar/Options/MovableBars/Activate"] = "Activer"
 L["CT_BottomBar/Options/MovableBars/Hide"] = "Cacher"
 L["CT_BottomBar/Options/MenuBar"] = "Le menu"
@@ -73,5 +73,16 @@ L["CT_BottomBar/Options/RepBar"] = "La réputation"
 L["CT_BottomBar/Options/StanceBar"] = "La position"
 L["CT_BottomBar/Options/StatusBar"] = "Les statuts (PX & rép)"
 L["CT_BottomBar/Options/TalkingHead"] = "Le discours de quête"
+
+
+-----------------------------------------------
+-- deDE (credit: 00jones00)
+
+elseif (GetLocale() == "deDE") then
+
+L["CT_BottomBar/Options/BagsBar"] = "Taschen Leiste"
+L["CT_BottomBar/Options/ClassBar"] = "Klassen Leiste"
+L["CT_BottomBar/Options/ExpBar"] = "Erfahrungsleiste"
+L["CT_BottomBar/Options/FPSBar"] = "FPS Anzeige"
 
 end

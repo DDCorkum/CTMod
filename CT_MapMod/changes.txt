@@ -1,3 +1,7 @@
+CT_MapMod (8.3.0.3) 2020-01-16
+- Fix to error inside WoD garrison
+- Adding more support for German herbs, ore
+
 CT_MapMod (8.2.5.9) 2019-12-18
 - TOC fix
 

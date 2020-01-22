@@ -1,3 +1,6 @@
+CT_BuffMod (8.3.0.3) 2020-01-20
+- Localization
+
 CT_BuffMod (8.3.0.1) 2019-01-01
 - Minor code cleanup; nothing substantive
 

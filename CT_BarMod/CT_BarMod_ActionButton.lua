@@ -340,7 +340,10 @@ function actionButton:constructor(buttonId, actionId, groupId, count, noInherit,
 
 	--self:setClickDirection( not not module:getOption("clickDirection"), not not module:getOption("clickIncluded") );
 	local GetCVar = GetCVar or C_CVar.GetCVar;
-	self:setClickDirection(GetCVar("ActionButtonUseKeyDown") == "1");		-- "1" is the default value, meaning activate abilities when you press DOWN
+	self:setClickDirection(
+		GetCVar("ActionButtonUseKeyDown") == "1",		-- "1" is the default value, meaning activate abilities when you press DOWN
+		module:getOption("onMouseDown")				-- this will be ignored if the CVar is disabled
+	);		
 	
 	button:RegisterForDrag("LeftButton", "RightButton");
 	button:SetAttribute("type", "action");
@@ -389,20 +392,14 @@ function actionButton:setMode(newMode)
 end
 
 -- Set if action is triggered on click up or click down.
-function actionButton:setClickDirection(down, clicks)
-	if (down) then
-		--if (clicks) then
-			self.button:RegisterForClicks("AnyDown");
-		--else
-		--	self.button:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp", "Button4Down", "Button5Down");
-		--end
+-- This affects the mouse for ALL bars, and also the keybind for extra bars (7-10).
+-- Keybinds for bars 2-6 and the action bar are handled elsewhere in a way that is integrated with console variable "ActionButtonUseKeyDown"
+function actionButton:setClickDirection(onKeyDown, alsoOnMouseDown)
+	if (onKeyDown and alsoOnMouseDown) then
+		self.button:RegisterForClicks("AnyDown");
 	else
-		--if (clicks) then
-		--	self.button:RegisterForClicks("LeftButtonDown");
-		--else
-			self.button:RegisterForClicks("AnyUp");
-		--end
-	end
+		self.button:RegisterForClicks("AnyUp");
+	end		
 end
 
 -- Change a button's scale

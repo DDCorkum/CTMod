@@ -131,14 +131,15 @@ local function updateClickDirection()
 	--local click = not not module:getOption("clickIncluded");
 	
 	local GetCVar = GetCVar or C_CVar.GetCVar;
-	local down = GetCVar("ActionButtonUseKeyDown") == "1";		-- 1 is the default value, meaning activate abilities when you press DOWN
+	local keydown = GetCVar("ActionButtonUseKeyDown") == "1";		-- 1 is the default value, meaning activate abilities when you press DOWN
+	local mousedown = module:getOption("onMouseDown");			-- defaults to false, and is ignored if keydown was 0
 
 	for gkey, group in pairs(groupList) do
 		local objects = group.objects;
 		if ( objects ) then
 			for bkey, object in ipairs(objects) do
 				--object:setClickDirection(down, click);
-				object:setClickDirection(down);
+				object:setClickDirection(keydown, mousedown);
 			end
 		end
 	end
@@ -1003,7 +1004,13 @@ module.frame = function()
 		local GetCVar = GetCVar or C_CVar.GetCVar;
 		optionsBeginFrame( 55,   30,  "button#t:0:%y#s:200:%s#v:GameMenuButtonTemplate#Toggle Action Key Up/Down")
 			optionsAddScript("onclick", function()
-				SetCVar("ActionButtonUseKeyDown", 1 - GetCVar("ActionButtonUseKeyDown"));	--toggles between 0 and 1
+				if (GetCVar("ActionButtonUseKeyDown") == "1") then
+					SetCVar("ActionButtonUseKeyDown", "0");
+					CT_BarMod_OnMouseDownCheckButton:Hide();
+				else
+					SetCVar("ActionButtonUseKeyDown", "1");
+					CT_BarMod_OnMouseDownCheckButton:Show();
+				end
 				updateClickDirection();
 			end);
 			local timeElapsed = 0;
@@ -1012,9 +1019,13 @@ module.frame = function()
 				if (timeElapsed < 0.25) then return; end
 				timeElapsed = 0;
 				if (GetCVar("ActionButtonUseKeyDown") == "1") then
-					CT_BarMod_ToggleKeyFontString:SetText("Currently responding to |cFFFFFF99 mouse/key press down");
+					if (module:getOption("onMouseDown")) then
+						CT_BarMod_ToggleKeyFontString:SetText("Currently responds to |cFFFFFF99mouse down|r & |cFFFFFF99 key down|n|cFF999999(applies to all bars equally)");
+					else
+						CT_BarMod_ToggleKeyFontString:SetText("Currently responds to |cFFFFFF99mouse up|r & |cFFFFFF99 key down|n|cFF999999(applies to bars 3-6 and the action bar)");
+					end
 				else
-					CT_BarMod_ToggleKeyFontString:SetText("Currently responding to |cFFFFFF99 mouse/key release up");
+					CT_BarMod_ToggleKeyFontString:SetText("Currently responds to |cFFFFFF99mouse up|r & |cFFFFFF99 key up");
 				end
 			end);
 			optionsAddScript("onenter", function(button)
@@ -1023,16 +1034,35 @@ module.frame = function()
 					"Toggles console variable 'ActionButtonUseKeyDown' between 0 and 1", 
 					" ", 
 					"|cFFFFFF99Action on Key Release Up:", 
-					"- Same as typing /console ActionButtonUseKeyDown 0", 
-					"- Game buttons will respond when key/mouse released", 
+					"- Same as typing /console ActionButtonUseKeyDown |cFFFFFFFF0", 
+					"- |cFFFFFFFFAll|r buttons will respond to |cFFFFFFFFmouse-up|r and |cFFFFFFFFkey-up", 
 					" ", 
 					"|cFFFFFF99Action on Key Press Down:", 
-					"- Same as typing /console ActionButtonUseKeyDown 1", 
-					"- Game buttons will respond when key/mouse pressed (Game Default)", 
+					"- Same as typing /console ActionButtonUseKeyDown |cFFFFFFFF1", 
+					"- Bars 2-6 and the action bar will respond to |cFFFFFFFFpressing the key down", 
+					"- Unlocks further options for mouse clicking and bars 7-10",
 					" ", 
 					"|cFF666666Console variables persist even if you get rid of addons",
 					"|cFF666666but can be reset by typing /console cvar_reset"
-				}, "CT_ABOVEBELOW", 0, 0, CT_CONTROLPANEL);
+				}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
+			end);
+		optionsEndFrame();
+		
+		optionsBeginFrame( -40, 26, "checkbutton#tl:50:%y#o:onMouseDown:false#n:CT_BarMod_OnMouseDownCheckButton#Also respond to mouse-down");
+			optionsAddScript("onenter", function(checkbutton)
+				module:displayTooltip(checkbutton, {
+					"Also respond to mouse-down",
+					"- Actions trigger when you press a mouse button, instead of release",
+					"- Caution!  It even triggers when you are dragging a button to a new slot",
+					"- Also allows the extra action bars (7-10) to respond to key-down",
+					" ",
+					"|cFF666666Why does this affect bars 7-10?  It's a Blizzard-imposed restriction"
+				}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
+			end);
+			optionsAddScript("onshow", function(checkbutton)
+				if (GetCVar("ActionButtonUseKeyDown") == "0") then
+					checkbutton:Hide();
+				end
 			end);
 		optionsEndFrame();
 		
@@ -1042,7 +1072,7 @@ module.frame = function()
 	-- Shifting options
 	----------
 
-	optionsBeginFrame(-30, 0, "frame#tl:0:%y#br:tr:0:%b");
+	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Shifting");
 
 		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:shiftParty:true#Shift default party frames to the right");
@@ -2381,6 +2411,9 @@ module.optionUpdate = function(self, optName, value)
 
 	--elseif ( optName == "clickIncluded" ) then
 	--	updateClickDirection();
+	
+	elseif ( optName == "onMouseDown" ) then
+		updateClickDirection();
 
 	elseif ( optName == "buttonLock" ) then
 		module:setAttributes();

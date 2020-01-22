@@ -18,9 +18,16 @@
 
 -- Please see CurseForge.com/Projects/CTMod/Localization to contribute additional translations
 
-local lib = _G["CT_Library"]
-lib.text = lib.text or { }
-local L = lib.text
+local module = select(2,...)
+module.text = module.text or { }
+local L = module.text
+
+--  Gracefully handle errors
+local metatable = getmetatable(L) or {}
+metatable.__index = function(table, missingKey)
+	return "[Not Found: " .. gsub(missingKey, "CT_Library/", "") .. "]";
+end
+setmetatable(L, metatable);
 
 
 -----------------------------------------------

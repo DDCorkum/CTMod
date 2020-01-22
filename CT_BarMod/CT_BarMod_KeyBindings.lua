@@ -949,7 +949,7 @@ local function setActionBindings(event)
 			local owner = groupObj.frame;
 			local showBar = module:getOption("showGroup" .. groupId) ~= false;
 			local useDefault;  -- Assign override bindings to CT_BarMod buttons using default UI's keys.
-			local overrideActions;  -- Assign override bindings to actions using CT_BarMod's keys.
+			--local overrideActions;  -- Assign override bindings to actions using CT_BarMod's keys.   -- removed in 8.3.0.3, see comment below
 
 			-- Clear the current override bindings for this bar.
 			ClearOverrideBindings(owner);
@@ -968,10 +968,13 @@ local function setActionBindings(event)
 					-- We are in a pet battle or the override bar is showing
 					-- 1. Leave the main action bar's override bindings cleared.
 					useDefault = false;
-					-- 2. Assign override bindings to the actions "ACTIONBUTTON1"
-					--    through "ACTIONBUTTON12" using the keys that are currently
-					--    assigned to the buttons on CT_BarMod's action bar (bar 12).
-					overrideActions = true;
+				
+					--[[ Removing in 8.3.0.3, see comment further below
+						-- 2. Assign override bindings to the actions "ACTIONBUTTON1"
+						--    through "ACTIONBUTTON12" using the keys that are currently
+						--    assigned to the buttons on CT_BarMod's action bar (bar 12).
+						--overrideActions = true;
+					--]]
 				end
 			elseif (groupId == 2) then
 				useDefault = module:getOption("bar3Bindings") ~= false;
@@ -996,13 +999,16 @@ local function setActionBindings(event)
 						local key1, key2 = GetBindingKey(action);
 						-- Assign override binding clicks to the CT_BarMod button.
 						if (key1) then
-							SetOverrideBindingClick(owner, false, key1, buttonObj.name);
+							SetOverrideBinding(owner, false, key1, action);
 						end
 						if (key2) then
-							SetOverrideBindingClick(owner, false, key2, buttonObj.name);
+							SetOverrideBinding(owner, false, key2, action);
 						end
 					end
-					if (overrideActions) then
+					-- if (overrideActions) then -- conditional removed in 8.3.0.3:
+								     -- previously this was only used going into a pet battle or vehicle,
+								     -- but now its always used to take advantage of Blizzard's secure implementation of console variable ActionButtonUseKeyDown
+					do
 						-- Get the key(s) currently assigned to the CT_BarMod button.
 						local key1, key2 = module.getBindingKey(baseNum + buttonNum );
 						-- Assign override bindings to the action.
@@ -1010,7 +1016,7 @@ local function setActionBindings(event)
 							SetOverrideBinding(owner, false, key1, action);
 						end
 						if (key2) then
-							SetOverrideBinding(owner, false, key2, action);
+							SetOverrideBinding(owner, false, key2, action);	
 						end
 					end
 				end

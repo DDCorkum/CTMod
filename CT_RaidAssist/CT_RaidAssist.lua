@@ -2481,8 +2481,8 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			local combatRezToCast = { };
 			local hasRez = nil;
 			for __, details in ipairs(module.CTRA_Configuration_RezAbilities[class]) do
-				if (GetSpellInfo(L["CT_RaidAssist/Spells/" .. details.name]) and details.combat and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and combatRezToCast[details.modifier] == nil) then
-					combatRezToCast[details.modifier] = L["CT_RaidAssist/Spells/" .. details.name];
+				if (GetSpellInfo(details.name) and details.combat and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and combatRezToCast[details.modifier] == nil) then
+					combatRezToCast[details.modifier] = details.name;
 					hasRez = true;
 				end
 			end
@@ -2500,8 +2500,8 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			local nocombatRezToCast = { };
 			local hasRez = nil;
 			for __, details in ipairs(module.CTRA_Configuration_RezAbilities[class]) do
-				if (GetSpellInfo(L["CT_RaidAssist/Spells/" .. details.name]) and details.nocombat and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and nocombatRezToCast[details.modifier] == nil) then
-					nocombatRezToCast[details.modifier] = L["CT_RaidAssist/Spells/" .. details.name];
+				if (GetSpellInfo(details.name) and details.nocombat and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and nocombatRezToCast[details.modifier] == nil) then
+					nocombatRezToCast[details.modifier] = details.name;
 					hasRez = true;
 				end
 			end
@@ -2512,9 +2512,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 		return nil;
 	end
 
-	-- returns two tables:
-	--    the first table has nomod, mod:shift, mod:ctrl or mod:alt as a key and then a valid spellName as a value
-	--    the second table is a simple list of debuffs the player can do something about where [1] is magic, [2] is curse, [3] is poison and [4] is disease, and the value is the name of the spell whose cooldown should be checked
+	-- returns a table with nomod, mod:shift, mod:ctrl or mod:alt as a key and then a valid spellName as a value
 	local canRemoveDebuff = function()				
 		local __, class = UnitClass("player");
 		local spec = GetInspectSpecialization("player");
@@ -2522,8 +2520,8 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			local friendlyRemovesToCast = { };
 			local hasFriendlyRemoves = nil;
 			for __, details in ipairs(module.CTRA_Configuration_FriendlyRemoves[class]) do
-				if (GetSpellInfo(L["CT_RaidAssist/Spells/" .. details.name]) and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and friendlyRemovesToCast[details.modifier] == nil and (details.spec == nil or spec == nil or details.spec == spec)) then
-					friendlyRemovesToCast[details.modifier] = L["CT_RaidAssist/Spells/" .. details.name];
+				if (GetSpellInfo(details.name) and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and friendlyRemovesToCast[details.modifier] == nil and (details.spec == nil or spec == nil or details.spec == spec)) then
+					friendlyRemovesToCast[details.modifier] = details.name;
 					hasFriendlyRemoves = true;
 				end
 			end
@@ -2543,8 +2541,8 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			local buffsToCast = { };
 			local hasBuffs = nil;
 			for __, details in ipairs(module.CTRA_Configuration_Buffs[class]) do
-				if (GetSpellInfo(L["CT_RaidAssist/Spells/" .. details.name]) and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and (buffsToCast[details.modifier] == nil)) then
-					buffsToCast[details.modifier] = L["CT_RaidAssist/Spells/" .. details.name];
+				if (GetSpellInfo(details.name) and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and (buffsToCast[details.modifier] == nil)) then
+					buffsToCast[details.modifier] = details.name;
 					hasBuffs = true;
 				end
 			end

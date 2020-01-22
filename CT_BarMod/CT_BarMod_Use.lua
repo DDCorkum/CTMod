@@ -1186,10 +1186,10 @@ end
 
 -- another cache to improve the performance of useButton:getBinding()
 local checkedBindingActions = {}
-local checkBindingAction = function(key, buttonId)
-	-- Confirms that the binding really does point to CT_BarMod and hasn't been overriden by some other addon
+local checkBindingAction = function(key, buttonId, actionExpected)
+	-- Confirms that the binding really does point to CT_BarMod and hasn't been overriden to something else
 	if (checkedBindingActions[key] == nil) then
-		checkedBindingActions[key] = ("CLICK CT_BarModActionButton" .. buttonId .. ":LeftButton" == GetBindingAction(key, true))
+		checkedBindingActions[key] = (actionExpected == GetBindingAction(key, true))
 	end
 	return checkedBindingActions[key]
 end
@@ -1253,9 +1253,9 @@ function useButton:getBinding()
 	if (showBar and showDef and self.actionName) then
 		-- Get the key used on the default action bar's corresponding button.
 		local key1, key2 = getActionBindingKey(self.actionName .. self.buttonNum);
-		if (key1 and checkBindingAction(key1, id)) then
+		if (key1 and checkBindingAction(key1, id, self.actionName .. self.buttonNum)) then
 			text = key1;
-		elseif (key2 and checkBindingAction(key2, id)) then
+		elseif (key2 and checkBindingAction(key2, id, self.actionName .. self.buttonNum)) then
 			text = key2;
 		end
 	end
@@ -1263,9 +1263,9 @@ function useButton:getBinding()
 	if (not text) then
 		-- Get the key assigned directly to this (our) button.
 		local key1, key2 = module.getBindingKey(id);
-		if (key1 and checkBindingAction(key1, id)) then			--checkBindingAction detects potential interference from other addons using SetOverrideBinding()
+		if (key1 and checkBindingAction(key1, id, (self.actionName and (self.actionName .. self.buttonNum)) or "CLICK CT_BarModActionButton" .. id .. ":LeftButton")) then			--checkBindingAction detects potential interference from other addons using SetOverrideBinding()
 			text = key1;
-		elseif (key2 and checkBindingAction(key2, id)) then
+		elseif (key2 and checkBindingAction(key2, id, (self.actionName and (self.actionName .. self.buttonNum)) or "CLICK CT_BarModActionButton" .. id .. ":LeftButton")) then
 			text = key2;
 		else
 			return;
