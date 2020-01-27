@@ -1,4 +1,3 @@
-
 ------------------------------------------------
 --                 CT_MapMod                  --
 --                                            --
@@ -8,9 +7,9 @@
 -- redistribute this without the consent of   --
 -- the CTMod Team. Thank you.                 --
 --					      --
--- Original credits to Cide and TS            --
+-- Original credits to Cide and TS (Vanilla)  --
 -- Maintained by Resike from 2014 to 2017     --
--- Rebuilt by Dahk Celes (ddc) in 2018        --
+-- Rebuilt by Dahk Celes (DDCorkum) in 2018   --
 ------------------------------------------------
 
 --------------------------------------------
@@ -1380,22 +1379,40 @@ do
 			if ((module:getOption("CT_MapMod_AutoGatherOre") or 1) == 1) then
 				for i, val in ipairs(oreskills) do
 					if (arg4 == val) then
-						-- Gets rid of modifiers, to determine the type of ore
-						if (GetLocale() == "enUS") then
-							if (arg2:sub(1,5) == "Rich " and arg2:len() > 5) then arg2 = arg2:sub(6); end
-							if (arg2:sub(-5) == " Vein" and arg2:len() > 5) then arg2 = arg2:sub(1,-6); end
-							if (arg2:sub(-8) == " Deposit" and arg2:len() > 8) then arg2 = arg2:sub(1,-9); end
-							if (arg2:sub(-5) == " Seam" and arg2:len() > 5) then arg2 = arg2:sub(1,-6); end
+						-- Convert from the name of a node to a type of ore (using rules for each localization)
+						if (GetLocale() == "enUS" or GetLocale() == "enGB") then
+							if (arg2:sub(1,5) == "Rich " and arg2:len() > 5) then arg2 = arg2:sub(6); end -- changes "Rich Thorium Vein" to "Thorium Vein"
+							if (arg2:sub(1,5) == "Small " and arg2:len() > 6) then arg2 = arg2:sub(7); end -- changes "Small Thorium Vein" to "Thorium Vein"
+							if (arg2:sub(-5) == " Vein" and arg2:len() > 5) then arg2 = arg2:sub(1,-6); end -- changes "Copper Vein" to "Copper"
+							if (arg2:sub(-8) == " Deposit" and arg2:len() > 8) then arg2 = arg2:sub(1,-9); end -- changes "Iron Deposit" to "Iron"
+							if (arg2:sub(-5) == " Seam" and arg2:len() > 5) then arg2 = arg2:sub(1,-6); end -- changes "Monelite Seam" to "Monelite"
 						elseif (GetLocale() == "frFR") then
 							if (arg2:sub(1,6) == "Riche " and arg2:len() > 7) then arg2 = arg2:sub(7,7):upper() .. arg2:sub(8); end -- changes "Riche filon de thorium" to "Filon de Thorium"
+							if (arg2:sub(1,6) == "Petit " and arg2:len() > 7) then arg2 = arg2:sub(7,7):upper() .. arg2:sub(8); end -- changes "Petit filon de thorium" to "Filon de Thorium"
 							if (arg2:sub(1,9) == "Filon de " and arg2:len() > 10) then arg2 = arg2:sub(10,10):upper() .. arg2:sub(11); end -- changes "Filon de cuivre" to "Cuivre"
 							if (arg2:sub(1,12) == "Gisement de " and arg2:len() > 13) then arg2 = arg2:sub(13,13):upper() .. arg2:sub(14); end -- changes "Gisement de fer" to "Fer"
 							if (arg2:sub(1,9) == "Veine de " and arg2:len() > 10) then arg2 = arg2:sub(10,10):upper() .. arg2:sub(11); end -- changes "Veine de gangreschiste" to "Gangreschiste"
 						elseif (GetLocale() == "deDE") then
 							if (arg2:sub(1,9) == "Reiches " and arg2:len() > 9) then arg2 = arg2:sub(10); end  -- changes "Reiches Thoriumvorkommen" to "Thoriumvorkommen"
+							if (arg2:sub(1,9) == "Kleines " and arg2:len() > 9) then arg2 = arg2:sub(10); end  -- changes "Kleines Thoriumvorkommen" to "Thoriumvorkommen"
 							if (arg2:sub(-9) == "vorkommen" and arg2:len() > 9) then arg2 = arg2:sub(1, -10); end -- changes "Kupfervorkommen" to "Kupfer"
+							if (arg2:sub(-4) == "flöz" and arg2:len() > 9) then arg2 = arg2:sub(1, -5); end -- changes "Monelitflöz" to Monelit"
+						elseif (GetLocale() == "esES" or GetLocale() == "esMX") then
+							if (arg2:sub(-9) == " enriquecido" and arg2:len() > 12) then arg2 = arg2:sub(1, -13); end -- changes "Filón de torio enriquecido" to "Filón de torio"
+							if (arg2:sub(1,9) == "Filón de " and arg2:len() > 10) then arg2 = arg2:sub(10,10):upper() .. arg2:sub(11); end -- changes "Filón de cobre" to "Cobre"
+							if (arg2:sub(1,17) == "Filón pequeño de " and arg2:len() > 17) then arg2 = arg2:sub(17,17):upper() .. arg2:sub(18); end -- changes "Filón pequeño de torio" to "Torio"
+							if (arg2:sub(1,9) == "Depósito de " and arg2:len() > 13) then arg2 = arg2:sub(13,13):upper() .. arg2:sub(14); end -- changes "Depósito de hierro" to "Hierro"
+							if (arg2:sub(1,9) == "Depósito rico en" and arg2:len() > 17) then arg2 = arg2:sub(17,17):upper() .. arg2:sub(18); end -- changes "Depósito rico en verahierro" to "Verahierro"
+							if (arg2:sub(1,9) == "Veta de " and arg2:len() > 9) then arg2 = arg2:sub(9,9):upper() .. arg2:sub(10); end -- changes "Veta de monalita" to "Monalita"
+						elseif (GetLocale() == "ptBR") then
+							if (arg2:sub(-10) == " Abundante" and arg2:len() > 10) then arg2 = arg2:sub(1,-11); end -- changes "Veio de Tório Abundante" to "Veio de Tório"
+							if (arg2:sub(-8) == " Escasso" and arg2:len() > 8) then arg2 = arg2:sub(1,-9); end -- changes "Veio de Tório Escasso" to "Veio de Tório"
+							if (arg2:sub(1,5) == "Veio de " and arg2:len() > 8) then arg2 = arg2:sub(9); end -- changes "Veio de Cobre" to "Cobre"
+							if (arg2:sub(1,5) == "Depósito de " and arg2:len() > 12) then arg2 = arg2:sub(13); end -- changes "Depósito de Ferro" to "Ferro"
+							if (arg2:sub(1,5) == "Jazida de " and arg2:len() > 10) then arg2 = arg2:sub(11); end -- changes "Jazida de Monelita" to "Monelita"
 						elseif (GetLocale() == "ruRU") then
 							if (arg2:sub(1,8) == "Богатая " and arg2:len() > 9) then arg2 = arg2:sub(9,9):upper() .. arg2:sub(10); end -- changes "Богатая ториевая жила" to "Ториевая жила"
+							if (arg2:sub(1,8) == "Малая " and arg2:len() > 7) then arg2 = arg2:sub(7,7):upper() .. arg2:sub(7); end -- changes "Малая ториевая жила" to "Ториевая жила"
 							if (arg2:sub(-5) == " жила" and arg2:len() > 5) then arg2 = arg2:sub(1,-6); end	--changes "Медная жила" to "Медная"
 							if (arg2:sub(1,7) == "Залежи " and arg2:len() > 8) then arg2 = arg2:sub(8,8):upper() .. arg2:sub(9); end -- changes "Залежи истинного серебра" to "Истинного серебра"
 						end

@@ -9,15 +9,21 @@
 --					      --
 -- Original credits to Cide and TS (Vanilla)  --
 -- Maintained by Resike from 2014 to 2017     --
--- Rebuilt by Dahk Celes in 2018              --
+-- Rebuilt by Dahk Celes (DDCorkum) in 2018   --
 ------------------------------------------------
 
 -- Please contribute new translations at <https://wow.curseforge.com/projects/ctmod/localization>
+-- Also see the auto-gathering section in CT_MapMod.lua, for converting mining nodes into types of ore
 
 local module = CT_MapMod
 module.text = { };
 
 local L = module.text
+
+
+-----------------------------------------------
+-- enUS (Default) Unlocalized Strings 
+
 L["CT_MapMod/Herb/Adder's Tongue"] = "Adder's Tongue"
 L["CT_MapMod/Herb/Aethril"] = "Aethril"
 L["CT_MapMod/Herb/Akunda's Bite"] = "Akunda's Bite"
@@ -69,10 +75,10 @@ L["CT_MapMod/Herb/Purple Lotus"] = "Purple Lotus"
 L["CT_MapMod/Herb/Ragveil"] = "Ragveil"
 L["CT_MapMod/Herb/Rain Poppy"] = "Rain Poppy"
 L["CT_MapMod/Herb/Riverbud"] = "Riverbud"
-L["CT_MapMod/Herb/Sea Stalk"] = "Sea Stalk"
+L["CT_MapMod/Herb/Sea Stalks"] = "Sea Stalks"
 L["CT_MapMod/Herb/Silkweed"] = "Silkweed"
 L["CT_MapMod/Herb/Silverleaf"] = "Silverleaf"
-L["CT_MapMod/Herb/Siren's Pollen"] = "Siren's Pollen"
+L["CT_MapMod/Herb/Siren's Sting"] = "Siren's Sting"
 L["CT_MapMod/Herb/Snow Lily"] = "Snow Lily"
 L["CT_MapMod/Herb/Sorrowmoss"] = "Sorrowmoss"
 L["CT_MapMod/Herb/Star Moss"] = "Star Moss"
@@ -139,6 +145,7 @@ L["CT_MapMod/Ore/Leystone"] = "Leystone"
 L["CT_MapMod/Ore/Mithril"] = "Mithril"
 L["CT_MapMod/Ore/Monelite"] = "Monelite"
 L["CT_MapMod/Ore/Osmenite"] = "Osmenite"
+L["CT_MapMod/Ore/Platinum"] = "Platinum"
 L["CT_MapMod/Ore/Pyrite"] = "Pyrite"
 L["CT_MapMod/Ore/Saronite"] = "Saronite"
 L["CT_MapMod/Ore/Silver"] = "Silver"
@@ -159,9 +166,11 @@ L["CT_MapMod/Pin/Shift-Click to Edit"] = "Shift-Click to Edit"
 L["CT_MapMod/Pin/Type"] = "Type"
 
 
+-----------------------------------------------
+-- frFR 
+-- Credits to ddc (and Sasmira before 2018 rewrite)
+
 if (GetLocale() == "frFR") then
-	-- Original CT_MapMod frFR translations before 2017 were creditted to Sasmira
-	-- Several herb translations were sourced from community-submitted translations to Wowpedia and other addons hosted on CurseForge
 L["CT_MapMod/Herb/Adder's Tongue"] = "Langue de serpent"
 L["CT_MapMod/Herb/Aethril"] = "Aethril"
 L["CT_MapMod/Herb/Akunda's Bite"] = "Mâche d’Akunda"
@@ -213,10 +222,10 @@ L["CT_MapMod/Herb/Purple Lotus"] = "Lotus pourpre"
 L["CT_MapMod/Herb/Ragveil"] = "Voile-misère"
 L["CT_MapMod/Herb/Rain Poppy"] = "Pavot de pluie"
 L["CT_MapMod/Herb/Riverbud"] = "Rivebulbe"
-L["CT_MapMod/Herb/Sea Stalk"] = "Brin-de-mer"
+L["CT_MapMod/Herb/Sea Stalks"] = "Brins-de-mer"
 L["CT_MapMod/Herb/Silkweed"] = "Herbe à soie"
 L["CT_MapMod/Herb/Silverleaf"] = "Feuillargent"
-L["CT_MapMod/Herb/Siren's Pollen"] = "Pollen de sirène"
+L["CT_MapMod/Herb/Siren's Sting"] = "Pollen de sirène"
 L["CT_MapMod/Herb/Snow Lily"] = "Lys des neiges"
 L["CT_MapMod/Herb/Sorrowmoss"] = "Chagrinelle"
 L["CT_MapMod/Herb/Star Moss"] = "Mousse étoilée"
@@ -263,22 +272,33 @@ L["CT_MapMod/Options/Pins/Icon Size"] = "Grandeur de l'icône"
 L["CT_MapMod/Options/Pins/User/Line 1"] = "Identifier les points d’intérêts sur la carte avec des épingles personnalisées"
 L["CT_MapMod/Options/Pins/User/UserNoteDisplayLabel"] = "Montres les épingles personnalisées"
 L["CT_MapMod/Options/Reset/Heading"] = "Réinitialiser les options"
-L["CT_MapMod/Options/Reset/Line 1"] = "Note: Ce bouton va réinitialiser les options aux valeurs défautes et recharger l'interface"
+L["CT_MapMod/Options/Reset/Line 1"] = "Note: Ce bouton réinitialise les options aux valeurs par défaut, et il recharge l'interface"
 L["CT_MapMod/Options/Reset/ResetAllCheckbox"] = "Réinitialiser les options pour tous les personnages"
 L["CT_MapMod/Options/Reset/ResetButton"] = "Réinitialiser"
 L["CT_MapMod/Options/Tips/Heading"] = "Des conseils"
 L["CT_MapMod/Options/Tips/Line 1"] = "Vous pouvez taper /ctmap ou /ctcarte pour accéder ces options."
 L["CT_MapMod/Options/Tips/Line 2"] = "Ajouter des épingles à la carte en appuyant le bouton 'Ajouter' dans le coin supérieur droit de la carte."
+L["CT_MapMod/Ore/Blackrock"] = "Rochenoire"
+L["CT_MapMod/Ore/Cobalt"] = "Cobalt"
 L["CT_MapMod/Ore/Copper"] = "Cuivre"
 L["CT_MapMod/Ore/Fel Iron"] = "Gangrefer"
+L["CT_MapMod/Ore/Felslate"] = "Gangreschiste"
+L["CT_MapMod/Ore/Ghost Iron"] = "Ectofer"
 L["CT_MapMod/Ore/Gold"] = "Or"
 L["CT_MapMod/Ore/Iron"] = "Fer"
 L["CT_MapMod/Ore/Khorium"] = "Khorium"
+L["CT_MapMod/Ore/Leystone"] = "Tellurium"
 L["CT_MapMod/Ore/Mithril"] = "Mithril"
-L["CT_MapMod/Ore/Osmenite"] = "osménite"
+L["CT_MapMod/Ore/Monelite"] = "Monélite"
+L["CT_MapMod/Ore/Osmenite"] = "Osménite"
+L["CT_MapMod/Ore/Platinum"] = "Platine"
+L["CT_MapMod/Ore/Pyrite"] = "Pyrite"
+L["CT_MapMod/Ore/Saronite"] = "Saronite"
 L["CT_MapMod/Ore/Silver"] = "Argent"
+L["CT_MapMod/Ore/Storm Silver"] = "Foudrargent"
 L["CT_MapMod/Ore/Thorium"] = "Thorium"
 L["CT_MapMod/Ore/Tin"] = "Etain"
+L["CT_MapMod/Ore/Trillium"] = "Trillium"
 L["CT_MapMod/Ore/Truesilver"] = "Vrai-argent"
 L["CT_MapMod/Pin/Cancel"] = "Annuler"
 L["CT_MapMod/Pin/Delete"] = "Supprimer"
@@ -290,13 +310,13 @@ L["CT_MapMod/Pin/Right-Click to Drag"] = "Clic droit pour faire glisser"
 L["CT_MapMod/Pin/Shift-Click to Edit"] = "<Maj>-Clic pour éditer"
 L["CT_MapMod/Pin/Type"] = "Type"
 
+
+-----------------------------------------------
+-- deDE
+-- Credits to dynaletik
+-- Contributions by ddc, taubenhaucher (and Hjörvarör before 2018 rewrite)
 	
 elseif (GetLocale() == "deDE") then
-
--- Original CT_MapMod deDE translations before 2017 were creditted to Hjörvarör
--- Several herb translations were sourced from community-submitted translations to Wowpedia and other addons hosted on CurseForge
--- Credits to CurseForge users dynaletic and taubenhaucher for several translations
-
 L["CT_MapMod/Herb/Adder's Tongue"] = "Schlangenzunge"
 L["CT_MapMod/Herb/Aethril"] = "Aethril"
 L["CT_MapMod/Herb/Akunda's Bite"] = "Akundas Biss"
@@ -348,10 +368,10 @@ L["CT_MapMod/Herb/Purple Lotus"] = "Lila Lotus"
 L["CT_MapMod/Herb/Ragveil"] = "Zottelkappe"
 L["CT_MapMod/Herb/Rain Poppy"] = "Regenmohn"
 L["CT_MapMod/Herb/Riverbud"] = "Flussknospe"
-L["CT_MapMod/Herb/Sea Stalk"] = "Meeresstängel"
+L["CT_MapMod/Herb/Sea Stalks"] = "Meeresstängel"
 L["CT_MapMod/Herb/Silkweed"] = "Seidenkraut"
 L["CT_MapMod/Herb/Silverleaf"] = "Silberblatt"
-L["CT_MapMod/Herb/Siren's Pollen"] = "Sirenenpollen"
+L["CT_MapMod/Herb/Siren's Sting"] = "Sirenendorn"
 L["CT_MapMod/Herb/Snow Lily"] = "Schneelilie"
 L["CT_MapMod/Herb/Sorrowmoss"] = "Trauermoos"
 L["CT_MapMod/Herb/Star Moss"] = "Sternmoos"
@@ -418,6 +438,7 @@ L["CT_MapMod/Ore/Leystone"] = "Leystein"
 L["CT_MapMod/Ore/Mithril"] = "Mithril"
 L["CT_MapMod/Ore/Monelite"] = "Monelit"
 L["CT_MapMod/Ore/Osmenite"] = "Osmenit"
+L["CT_MapMod/Ore/Platinum"] = "Platin"
 L["CT_MapMod/Ore/Pyrite"] = "Pyrit"
 L["CT_MapMod/Ore/Saronite"] = "Saronit"
 L["CT_MapMod/Ore/Silver"] = "Silber"
@@ -436,6 +457,114 @@ L["CT_MapMod/Pin/Okay"] = "Ok"
 L["CT_MapMod/Pin/Right-Click to Drag"] = "Rechtsklick zum Verschieben"
 L["CT_MapMod/Pin/Shift-Click to Edit"] = "Shift-Klick zum Bearbeiten"
 L["CT_MapMod/Pin/Type"] = "Art"
+
+
+-----------------------------------------------
+-- esES
+-- Contributions by valdesca, ddc
+
+elseif (GetLocale() == "esES" or GetLocale() == "esMX") then
+L["CT_MapMod/Herb/Akunda's Bite"] = "Mordisco de Akunda"
+L["CT_MapMod/Herb/Riverbud"] = "Brotarrío"
+L["CT_MapMod/Herb/Sea Stalks"] = "Tallomares"
+L["CT_MapMod/Herb/Siren's Sting"] = "Aguijón de sirena"
+L["CT_MapMod/Herb/Star Moss"] = "Musgo estelar"
+L["CT_MapMod/Herb/Winter's Kiss"] = "Beso gélido"
+L["CT_MapMod/Herb/Zin'anthid"] = "Zin'anthid"
+L["CT_MapMod/Map/Add a new pin to the map"] = "Añade un punto en el mapa."
+L["CT_MapMod/Options/Add Features/Coordinates/Line 1"] = "Las Coordinadas se muestran donde tu y el cursor están en el mapa."
+L["CT_MapMod/Options/Add Features/Coordinates/ShowCursorCoordsOnMapLabel"] = "Muestra las Coordenadas del cursor"
+L["CT_MapMod/Options/Add Features/Coordinates/ShowPlayerCoordsOnMapLabel"] = "Muestra las coordenadas del Jugador"
+L["CT_MapMod/Options/Add Features/Heading"] = "Añade Opciones al Mapa Mundo"
+L["CT_MapMod/Options/Add Features/WhereAmI/Line 1"] = "El botón \"Donde estoy yo?\" cambia el mapa a tu localización."
+L["CT_MapMod/Options/Add Features/WhereAmI/ShowMapResetButtonLabel"] = "Muestra el botón \"Donde estoy yo\""
+L["CT_MapMod/Options/Always"] = "Siempre mostrar"
+L["CT_MapMod/Options/At Top"] = "Arriba de todo"
+L["CT_MapMod/Options/At Top Left"] = "Arriba Izquierda"
+L["CT_MapMod/Options/Auto"] = "Auto"
+L["CT_MapMod/Options/Disabled"] = "Desactiva"
+L["CT_MapMod/Ore/Copper"] = "Cobre"
+L["CT_MapMod/Ore/Iron"] = "Hierro"
+L["CT_MapMod/Ore/Monelite"] = "Monalita"
+L["CT_MapMod/Ore/Osmenite"] = "Osmenita"
+L["CT_MapMod/Ore/Storm Silver"] = "Plata de tormenta"
+L["CT_MapMod/Pin/Cancel"] = "Cancelar"
+L["CT_MapMod/Pin/Delete"] = "Borrar"
+
+
+-----------------------------------------------
+-- ptBR
+-- Contributions by BansheeLyris, ddc
+
+elseif (GetLocale() == "ptBR") then
+L["CT_MapMod/Herb/Adder's Tongue"] = "Língua-de-áspide"
+L["CT_MapMod/Herb/Aethril"] = "Aethril"
+L["CT_MapMod/Herb/Akunda's Bite"] = "Mordida de Akunda"
+L["CT_MapMod/Herb/Anchor Weed"] = "Erva-ancorina"
+L["CT_MapMod/Herb/Ancient Lichen"] = "Líquen-antigo"
+L["CT_MapMod/Herb/Arthas' Tears"] = "Lágrimas-de-arthas"
+L["CT_MapMod/Herb/Astral Glory"] = "Glória-astral"
+L["CT_MapMod/Herb/Azshara's Veil"] = "Véu-de-azshara"
+L["CT_MapMod/Herb/Blindweed"] = "Ervacega"
+L["CT_MapMod/Herb/Riverbud"] = "Broto-do-rio"
+L["CT_MapMod/Herb/Sea Stalks"] = "Talo-marinho"
+L["CT_MapMod/Herb/Siren's Sting"] = "Picada da Sereia"
+L["CT_MapMod/Herb/Star Moss"] = "Musgo-estrela"
+L["CT_MapMod/Herb/Winter's Kiss"] = "Beijo-do-inverno"
+L["CT_MapMod/Herb/Zin'anthid"] = "Zin'antida"
+L["CT_MapMod/Map/Add a new pin to the map"] = "Adicione um novo marcador no mapa"
+L["CT_MapMod/Options/Add Features/Coordinates/Line 1"] = "Coordenadas mostram onde você e o seu mouse estão no mapa"
+L["CT_MapMod/Options/Add Features/Coordinates/ShowCursorCoordsOnMapLabel"] = "Mostrar coordenadas do mouse"
+L["CT_MapMod/Options/Add Features/Coordinates/ShowPlayerCoordsOnMapLabel"] = "Mostrar coordenadas do personagem"
+L["CT_MapMod/Options/Add Features/Heading"] = "Adicionar recursos ao Mapa-Múndi"
+L["CT_MapMod/Options/Add Features/WhereAmI/Line 1"] = "O botão 'Onde estou?' redefine o mapa para sua localização."
+L["CT_MapMod/Options/Add Features/WhereAmI/ShowMapResetButtonLabel"] = "Mostrar botão 'Onde estou?' "
+L["CT_MapMod/Options/Always"] = "Sempre"
+L["CT_MapMod/Options/Auto"] = "Automático"
+L["CT_MapMod/Ore/Blackrock"] = "Rocha Negra"
+L["CT_MapMod/Ore/Monelite"] = "Monelita"
+L["CT_MapMod/Ore/Osmenite"] = "Osmenita"
+L["CT_MapMod/Ore/Storm Silver"] = "Prata Procelosa"
+L["CT_MapMod/Pin/Cancel"] = "Cancelar"
+
+
+-----------------------------------------------
+-- ruRU
+-- Contributions by imposeren, ddc
+
+elseif (GetLocale() == "ruRU") then
+L["CT_MapMod/Herb/Akunda's Bite"] = "Укус Акунды"
+L["CT_MapMod/Herb/Peacebloom"] = "Мироцвет"
+L["CT_MapMod/Herb/Riverbud"] = "Речной горох"
+L["CT_MapMod/Herb/Sea Stalks"] = "Морской стебель"
+L["CT_MapMod/Herb/Silverleaf"] = "Сребролист"
+L["CT_MapMod/Herb/Siren's Sting"] = "Укус сирены"
+L["CT_MapMod/Herb/Star Moss"] = "Звездный мох"
+L["CT_MapMod/Herb/Wild Steelbloom"] = "Дикий сталецвет"
+L["CT_MapMod/Herb/Winter's Kiss"] = "Поцелуй зимы"
+L["CT_MapMod/Herb/Zin'anthid"] = "Зин'антария"
+L["CT_MapMod/Map/Add a new pin to the map"] = "Добавить новую точку на карту"
+L["CT_MapMod/Map/Click on the map where you want the pin"] = "Кликните на карте там где хотите добавить точку"
+L["CT_MapMod/Options/Add Features/Coordinates/Line 1"] = "Координаты показывают где находитесь вы и курсор над картой"
+L["CT_MapMod/Options/Always"] = "Всегда"
+L["CT_MapMod/Options/Auto"] = "Автоматически"
+L["CT_MapMod/Ore/Copper"] = "Медная"
+L["CT_MapMod/Ore/Monelite"] = "Монелита"
+L["CT_MapMod/Ore/Osmenite"] = "Осменита"
+L["CT_MapMod/Ore/Storm Silver"] = "Штормового серебра"
+L["CT_MapMod/Ore/Tin"] = "Оловянная"
+L["CT_MapMod/Ore/Truesilver"] = "Истинного серебра"
+L["CT_MapMod/Pin/Delete"] = "Удалить"
+L["CT_MapMod/Pin/Description"] = "Описание"
+
+
+
+-----------------------------------------------
+-- zhCN
+-- Contributions by cnzjs
+
+elseif (GetLocale() == "zhCN") then
+L["CT_MapMod/Map/Add a new pin to the map"] = "添加标记"
 
 
 end
