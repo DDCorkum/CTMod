@@ -1178,21 +1178,13 @@ function StaticCTRAFrames()
 	
 	-- public constructor
 	do
-		listener = CreateFrame("Frame", nil);
-		listener:RegisterEvent("PLAYER_ENTERING_WORLD");		-- defers creating the frames until the player is in the game
-		listener:RegisterEvent("GROUP_ROSTER_UPDATE");			-- the frames might enable only during raids, groups, or always!
-		listener:RegisterEvent("PLAYER_REGEN_ENABLED");			-- in case the player's membership in a group/raid changed during combat
-		listener:HookScript("OnEvent",
-			function(self, event)
-				obj:ToggleEnableState();
-				obj:Update();
-				if (event == "PLAYER_ENTERING_WORLD") then
-					-- a hack because SpellInfo() isn't quite ready at PLAYER_ENTERING_WORLD in Classic
-					C_Timer.After(1, function() obj:Update(); end);		-- in case SpellInfo() is a split second late loading
-					C_Timer.After(10, function() obj:Update(); end);	-- in case SpellInfo() is a few seconds late loading
-				end
-			end
-		);	
+		local function doUpdate()
+			obj:ToggleEnableState();
+			obj:Update();
+		end
+		module:regEvent("PLAYER_LOGIN", doUpdate);		-- defers creating the frames until the player is in the game
+		module:regEvent("GROUP_ROSTER_UPDATE", doUpdate);	-- the frames might enable only during raids, groups, or always!
+		module:regEvent("PLAYER_REGEN_ENABLED", doUpdate);	-- in case the player's membership in a group/raid changed during combat
 		return obj;
 	end
 end
@@ -2890,15 +2882,19 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 						elseif (event == "UNIT_AURA") then
 							updateAuras();
 							updateBackdrop();
-							if (not InCombatLockdown() and UnitAura(shownUnit,1,"HARMFUL RAID")) then
-								secureButtonDebuffFirst:Show();
-							else
-								secureButtonDebuffFirst:Hide();
+							if (not InCombatLockdown()) then
+								if (UnitAura(shownUnit,1,"HARMFUL RAID")) then
+									secureButtonDebuffFirst:Show();
+								else
+									secureButtonDebuffFirst:Hide();
+								end
 							end
 						elseif (event == "PLAYER_REGEN_DISABLED") then
+							updateAuras();
 							updateRightMacros();
 							secureButtonDebuffFirst:Hide();
 						elseif (event == "PLAYER_REGEN_ENABLED") then
+							updateAuras();
 							updateRightMacros();
 							if (UnitAura(shownUnit,1,"HARMFUL RAID")) then
 								secureButtonDebuffFirst:Show();
