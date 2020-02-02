@@ -1,5 +1,6 @@
-CT_MapMod (8.3.0.4) 2020-01-26
+CT_MapMod (8.3.0.5) 2020-02-02
 - Localization
+- Added platinum
 
 CT_MapMod (8.3.0.3) 2020-01-16
 - Fix to error inside WoD garrison

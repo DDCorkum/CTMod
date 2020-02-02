@@ -184,6 +184,7 @@ local function CT_MapMod_Initialize()		-- called via module.update("init") from 
 				-- Battle for Azeroth
 				{ ["name"] = "Monelite", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein" },
 				{ ["name"] = "Storm Silver", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_StormSilver" },
+				{ ["name"] = "Platinum", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Platinum" },
 				{ ["name"] = "Osmenite", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Elementium" },
 			},
 		},
