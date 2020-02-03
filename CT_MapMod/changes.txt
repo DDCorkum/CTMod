@@ -1,6 +1,8 @@
 CT_MapMod (8.3.0.5) 2020-02-02
+- Added options to track platinum and anchor's weed
+- Fix to manually editing an icon
+- Performance improvements
 - Localization
-- Added platinum
 
 CT_MapMod (8.3.0.3) 2020-01-16
 - Fix to error inside WoD garrison
