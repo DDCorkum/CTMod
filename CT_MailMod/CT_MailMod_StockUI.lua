@@ -93,6 +93,16 @@ do
 			
 	end
 	
+	local function secondsUntilAllowed()
+		if (C_Mail and C_Mail.CanCheckInbox) then
+			-- Introduced in WoW 8.3
+			return select(2, C_Mail.CanCheckInbox());
+		else
+			-- Classic compatibility
+			return 60;
+		end
+	end
+	
 	function module:inboxUpdateMailboxCount()
 		-- Update the button that shows the number of items still in the mailbox.
 		-- (the number of items that have not been downloaded to the inbox).
@@ -117,7 +127,7 @@ do
 			button:SetText(format(module.text["CT_MailMod/MAILBOX_OVERFLOW_COUNT"], totalCount - mailCount));
 			button:Show();
 			if (reloadmailtimer == nil) then
-				reloadmailtimer = GetTime() + 60;
+				reloadmailtimer = GetTime() + secondsUntilAllowed();
 			end
 		else
 			button:Hide();
