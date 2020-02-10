@@ -2629,7 +2629,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	
 	-- update click-casting on right click
 	local function updateRightMacros()
-		if (InCombatLockdown()) then return; end
+		if (InCombatLockdown() or not shownUnit) then return; end
 		local broker = StaticClickCastBroker();
 		local macroRight1, macroRight2 = clickCastBroker:GetMacros(shownUnit);
 		secureButton:SetAttribute("*macrotext2", macroRight1);
