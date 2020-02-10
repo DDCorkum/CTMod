@@ -16,7 +16,7 @@
 -- Also see the auto-gathering section in CT_MapMod.lua, for converting mining nodes into types of ore
 
 local module = select(2, ...);
-module.text = { };
+module.text = module.text or { };
 
 local L = module.text
 
