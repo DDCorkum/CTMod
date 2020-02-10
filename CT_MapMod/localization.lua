@@ -15,7 +15,7 @@
 -- Please contribute new translations at <https://wow.curseforge.com/projects/ctmod/localization>
 -- Also see the auto-gathering section in CT_MapMod.lua, for converting mining nodes into types of ore
 
-local module = CT_MapMod
+local module = select(2, ...);
 module.text = { };
 
 local L = module.text
@@ -98,8 +98,8 @@ L["CT_MapMod/Herb/Wild Steelbloom"] = "Wild Steelbloom"
 L["CT_MapMod/Herb/Winter's Kiss"] = "Winter's Kiss"
 L["CT_MapMod/Herb/Zin'anthid"] = "Zin'anthid"
 L["CT_MapMod/Map/Add a new pin to the map"] = "Add a new pin to the map"
-L["CT_MapMod/Map/Classic Miner"] = "Find Minerals"
-L["CT_MapMod/Map/ClassicHerbalist"] = "Find Herbs"
+--L["CT_MapMod/Map/Classic Miner"] = "Find Minerals"
+--L["CT_MapMod/Map/ClassicHerbalist"] = "Find Herbs"
 L["CT_MapMod/Map/Click on the map where you want the pin"] = "Click on the map where you want the pin"
 L["CT_MapMod/Map/New Pin"] = "New Pin"
 L["CT_MapMod/Map/Reset the map"] = "Reset the map"

@@ -1,3 +1,6 @@
+CT_Core (8.3.0.5) 2020-02-09
+- Small change to prevent conflicts with other addons
+
 CT_Core (8.3.0.1) 2020-01-01
 - Minor code cleanup; nothing substantive
 

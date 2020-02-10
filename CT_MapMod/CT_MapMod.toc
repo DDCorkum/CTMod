@@ -9,4 +9,5 @@
 
 CT_MapMod.xml
 CT_MapMod.lua
+CT_MapMod_ExpansionData.lua
 localization.lua

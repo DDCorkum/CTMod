@@ -15,7 +15,7 @@
 --------------------------------------------
 -- Initialization
 
-local module = { };
+local module = select(2, ...);
 local _G = getfenv(0);
 
 local MODULE_NAME = "CT_MapMod";
@@ -24,201 +24,251 @@ local MODULE_VERSION = strmatch(GetAddOnMetadata(MODULE_NAME, "version"), "^([%d
 module.name = MODULE_NAME;
 module.version = MODULE_VERSION;
 
-_G[MODULE_NAME] = module;
 CT_Library:registerModule(module);
+_G[MODULE_NAME] = module.publicInterface;
+local public = module.publicInterface; -- shorthand
 
-CT_MapMod_Notes = {}; 		-- Persistent storage of the actual pins
 
-
-local function CT_MapMod_Initialize()		-- called via module.update("init") from CT_Library
-	-- configure the hardcoded variables
-	module.NoteTypes =
-	{
-		["User"] =
-		{
-			{ ["name"] = "Grey Note", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Skin\\GreyNote" }, --1
-			{ ["name"] = "Blue Shield", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Skin\\BlueShield" }, --2
-			{ ["name"] = "Red Dot", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Skin\\RedDot" }, --3
-			{ ["name"] = "White Circle", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Skin\\WhiteCircle" }, --4
-			{ ["name"] = "Green Square", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Skin\\GreenSquare" }, --5
-			{ ["name"] = "Red Cross", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Skin\\RedCross" }, --6
-			{ ["name"] = "Diamond", ["icon"] = "Interface\\RaidFrame\\UI-RaidFrame-Threat" } -- added in 8.0
-		},			
-		["Herb"] =
-		{
-			["Classic"] = 
-			{
-				{ ["name"] = "Bruiseweed", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed", ["id"] = 2453 }, -- 1
-				{ ["name"] = "Arthas' Tears", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_ArthasTears" }, -- 2
-				{ ["name"] = "Black Lotus", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_BlackLotus", ["id"] = 13468 }, -- 3
-				{ ["name"] = "Blindweed", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Blindweed", ["id"] = 8839 }, -- 4
-				{ ["name"] = "Briarthorn", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Briarthorn", ["id"] = 2450 }, -- 5
-				{ ["name"] = "Dreamfoil", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Dreamfoil", ["id"] = 13463 }, -- 6
-				{ ["name"] = "Earthroot", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Earthroot", ["id"] = 2449 }, -- 7
-				{ ["name"] = "Fadeleaf", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Fadeleaf", ["id"] = 3818 }, -- 8
-				{ ["name"] = "Firebloom", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Firebloom", ["id"] = 4625 }, -- 9
-				{ ["name"] = "Ghost Mushroom", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_GhostMushroom", ["id"] = 8845 }, -- 10
-				{ ["name"] = "Golden Sansam", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_GoldenSansam", ["id"] = 13464 }, -- 11
-				{ ["name"] = "Goldthorn", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Goldthorn", ["id"] = 3821 }, -- 12
-				{ ["name"] = "Grave Moss", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_GraveMoss", ["id"] = 3369 }, -- 13
-				{ ["name"] = "Gromsblood", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Gromsblood", ["id"] = 8846 }, -- 14
-				{ ["name"] = "Icecap", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Icecap", ["id"] = 13467 }, -- 15
-				{ ["name"] = "Khadgars Whisker", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_KhadgarsWhisker", ["id"] = 3358 }, -- 16
-				{ ["name"] = "Kingsblood", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Kingsblood", ["id"] = 3356 }, -- 17
-				{ ["name"] = "Liferoot", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Liferoot", ["id"] = 3357 }, -- 18
-				{ ["name"] = "Mageroyal", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Mageroyal", ["id"] = 785 }, -- 19
-				{ ["name"] = "Mountain Silversage", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_MountainSilversage", ["id"] = 13465 }, -- 20
-				{ ["name"] = "Peacebloom", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Peacebloom", ["id"] = 2447 }, -- 21
-				{ ["name"] = "Plaguebloom", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Plaguebloom" }, -- 22
-				{ ["name"] = "Purple Lotus", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_PurpleLotus", ["id"] = 8831 }, -- 23
-				{ ["name"] = "Silverleaf", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Silverleaf", ["id"] = 765 }, -- 24
-				{ ["name"] = "Stranglekelp", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Stranglekelp", ["id"] = 3820 }, -- 25
-				{ ["name"] = "Sungrass", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Sungrass", ["id"] = 8838 }, -- 26
-				{ ["name"] = "Swiftthistle", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Swiftthistle" }, -- 27
-				{ ["name"] = "Wild Steelbloom", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_WildSteelbloom", ["id"] = 3355 }, -- 28
-				{ ["name"] = "Wintersbite", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Wintersbite" }, -- 29
-				{ ["name"] = "Dreaming Glory", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_DreamingGlory" }, -- 30
-			},
-			["Early Expansions"] = 
-			{
-				-- Burning Crusade
-				{ ["name"] = "Felweed", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Felweed" },
-				{ ["name"] = "Flame Cap", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_FlameCap" },
-				{ ["name"] = "Mana Thistle", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_ManaThistle" },
-				{ ["name"] = "Netherbloom", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Netherbloom" },
-				{ ["name"] = "Netherdust Bush", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_NetherdustBush" },
-				{ ["name"] = "Nightmare Vine", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_NightmareVine" },
-				{ ["name"] = "Ragveil", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Ragveil" },
-				{ ["name"] = "Terocone", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Terocone" },
-				-- Wrath of the Lich King
-				{ ["name"] = "Adders Tongue", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_AddersTongue" },
-				{ ["name"] = "Frost Lotus", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_FrostLotus" },
-				{ ["name"] = "Goldclover", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Goldclover" },
-				{ ["name"] = "Icethorn", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Icethorn" },
-				{ ["name"] = "Lichbloom", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Lichbloom" },
-				{ ["name"] = "Talandra's Rose", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_TalandrasRose" },
-				{ ["name"] = "Tiger Lily", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_TigerLily" },
-				{ ["name"] = "Frozen Herb", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_FrozenHerb" },
-				-- Cataclysm
-				{ ["name"] = "Cinderbloom", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
-				{ ["name"] = "Azshara's Veil", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
-				{ ["name"] = "Stormvein", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
-				{ ["name"] = "Heartblossom", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
-				{ ["name"] = "Whiptail", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
-				{ ["name"] = "Twilight Jasmine", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
-			},
-			["Recent Expansions"] =
-			{
-				-- Mists of Pandaria
-				{ ["name"] = "Green Tea Leaf", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
-				{ ["name"] = "Rain Poppy", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
-				{ ["name"] = "Silkweed", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
-				{ ["name"] = "Snow Lily", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
-				{ ["name"] = "Fool's Cap", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
-				{ ["name"] = "Sha-Touched Herb", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
-				{ ["name"] = "Golden Lotus", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
-				-- Warlords of Draenor
-				{ ["name"] = "Fireweed", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Fireweed" },
-				{ ["name"] = "Gorgrond Flytrap", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_GorgrondFlytrap" },
-				{ ["name"] = "Frostweed", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Frostweed" },
-				{ ["name"] = "Nagrand Arrowbloom", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_NagrandArrowbloom" },
-				{ ["name"] = "Starflower", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Starflower" },
-				{ ["name"] = "Talador Orchid", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_TaladorOrchid" },
-				{ ["name"] = "Withered Herb", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_FrozenHerb" },
-				-- Legion
-				{ ["name"] = "Aethril", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
-				{ ["name"] = "Astral Glory", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
-				{ ["name"] = "Dreamleaf", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
-				{ ["name"] = "Fel-Encrusted Herb", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
-				{ ["name"] = "Fjarnskaggl", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
-				{ ["name"] = "Foxflower", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
-				{ ["name"] = "Starlight Rose", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_StarlightRose" },
-				-- Battle for Azeroth
-				{ ["name"] = "Akunda's Bite", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_AkundasBite" },
-				{ ["name"] = "Anchor Weed", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_AnchorWeed", ["spawnsRandomly"] = true },
-				{ ["name"] = "Riverbud", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Riverbud" },
-				{ ["name"] = "Sea Stalks", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_SeaStalk" },
-				{ ["name"] = "Siren's Sting", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
-				{ ["name"] = "Star Moss", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_StarMoss" },
-				{ ["name"] = "Winter's Kiss", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_WintersKiss" },
-				{ ["name"] = "Zin'anthid", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Zinanthid" },
-			},
-		},
-		["Ore"] =
-		{ 
-			["Classic"] = 
-			{
-				{ ["name"] = "Copper", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein" }, --1
-				{ ["name"] = "Gold", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_GoldVein" }, --2
-				{ ["name"] = "Iron", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_IronVein" }, --3
-				{ ["name"] = "Mithril", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_MithrilVein" }, --4
-				{ ["name"] = "Silver", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_SilverVein" }, --5
-				{ ["name"] = "Thorium", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_ThoriumVein" }, --6
-				{ ["name"] = "Tin", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_TinVein" }, --7
-				{ ["name"] = "Truesilver", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_TruesilverVein" }, --8
-				{ ["name"] = "Adamantite", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_AdamantiteVein" }, --9
-			},
-			["Expansions"] = 
-			{
-				-- Burning Crusade
-				{ ["name"] = "Fel Iron", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_FelIronVein" }, --10
-				{ ["name"] = "Khorium", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_KhoriumVein" }, --11
-				-- Wrath of the Lich King
-				{ ["name"] = "Cobalt", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CobaltVein" }, --12
-				{ ["name"] = "Saronite", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_SaroniteVein" }, --13
-				{ ["name"] = "Titanium", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_TitaniumVein" }, --14
-				-- Cataclysm
-				{ ["name"] = "Elementium", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Elementium" }, -- 15
-				{ ["name"] = "Obsidian", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Obsidian" }, -- 16
-				{ ["name"] = "Pyrite", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Pyrite" }, -- 17
-				-- Mists of Pandaria
-				{ ["name"] = "Ghost Iron", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_GhostIron" }, -- 18
-				{ ["name"] = "Kyparite", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Kyparite" }, -- 19
-				{ ["name"] = "Trillium", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Trillium" }, -- 20
-				-- Warlords of Draenor
-				{ ["name"] = "Blackrock", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein" },
-				{ ["name"] = "True Iron", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein" },
-				-- Legion
-				{ ["name"] = "Leystone", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Leystone" },
-				{ ["name"] = "Felslate", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Felslate" },
-				-- Battle for Azeroth
-				{ ["name"] = "Monelite", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein" },
-				{ ["name"] = "Storm Silver", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_StormSilver" },
-				{ ["name"] = "Platinum", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Platinum", ["spawnsRandomly"] = true },
-				{ ["name"] = "Osmenite", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Elementium" },
-			},
-		},
-	};
-	
-	-- allows pins to appear at flight masters if there is a corresponding world-map that looks identical
-	-- key: GetTaxiMapID() when at a flight master using FlightMapFrame
-	-- val: GetMapID() when looking at a continent in the WorldMapFrame
-	module.FlightMaps = 
-	{
-		 [990] = 552, -- Draenor  -- never used, because WoD has the TaxiRouteFrame instead of FlightMapFrame
-		[1011] = 875, -- Zandalar
-		[1014] = 876, -- Kul Tiras
-		[1208] =  13, -- Eastern Kingdoms
-		[1209] =  12, -- Kalimdor
-		[1384] = 113, -- Northrend
-		[1467] = 101, -- Outland
-	};
+function module:Initialize()				-- called via module.update("init") from CT_Library
 
 	-- Convert notes from older versions of the addon to the most recent (using function defined near bottom)
-	CT_MapMod_ConvertOldNotes();
+	module:ConvertOldNotes();
 
 	-- load the DataProvider which has most of the horsepower
 	WorldMapFrame:AddDataProvider(CreateFromMixins(CT_MapMod_DataProviderMixin));
 	
-	-- flight path map in the retail version only
+	-- load an additional DataProvider to the FlightMapFrame in retail, so pins can appear on the continent flight map
 	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
 		if (not FlightMapFrame) then FlightMap_LoadUI(); end
 		FlightMapFrame:AddDataProvider(CreateFromMixins(CT_MapMod_DataProviderMixin));
 	end
 	
-	-- add UI elements to the map
-	CT_MapMod_AddUIElements();
+	-- add UI elements to the WorldMapFrame
+	module:AddUIElements();
 end
+
+--------------------------------------------
+-- Saved Variable: CT_MapMod_Notes
+-- Persistant storage of the actual pins, and a collection of public and private methods to manipulate the data
+
+CT_MapMod_Notes = {}; 		-- Account-wide saved variable containing all of the information about pins
+
+-- Inserts a new pin on a map; however, if an identical pin exists then it will simple refresh the existing one to prevent duplicates
+function module:InsertPin(mapid, x, y, name, set, subset, descript)
+	CT_MapMod_Notes[mapid] = CT_MapMod_Notes[mapid] or {}
+	for i, note in ipairs(CT_MapMod_Notes[mapid]) do
+		if (note.x == x and note.y == y and note.name == name and note.set == set and note.subset == subset and note.descript == descript) then
+			note.datemodified = date("%Y%m%d");
+			note.version = MODULE_VERSION;
+			return;
+		end
+	end
+	tinsert(CT_MapMod_Notes[mapid], {
+		["x"] = x,
+		["y"] = y,
+		["name"] = name,
+		["set"] = set,
+		["subset"] = subset,
+		["descript"] = descript,
+		["datemodified"] = date("%Y%m%d"),
+		["version"] = MODULE_VERSION
+	});
+end
+
+-- Deletes a pin from the i'th position on mapid, taking the very last remaining one and inserting it into the current position rather than shifting all the other notes down by one
+-- (This is an alternative to using tremove in the middle of a big table, for performance reasons only)
+function module:DeletePin(mapid, i)
+	if (CT_MapMod_Notes[mapid] and CT_MapMod_Notes[mapid][i]) then
+		if (i == #CT_MapMod_Notes[mapid]) then
+			tremove(CT_MapMod_Notes[mapid], i);
+		else
+			local lastNoteInStack = tremove(CT_MapMod_Notes[mapid], #CT_MapMod_Notes[mapid]);
+			CT_MapMod_Notes[mapid] = lastNoteInStack;
+		end
+	end
+end
+
+-- Inserts a new herb node on the map, but subject to rules imposed by CT_MapMod to prevent duplication
+-- Parameters:
+--	mapid		Number, Required	Corresponding to a uiMapID upon which the pin should appear
+--	x, y		Numbers, Required	Absolute coordinates on the map between 0 and 1
+--	herb		String, Required	Localized or non-localized name of the herbalism node or kind of herb (silently fails if it is a string that simply isn't recognized)
+--	descript	String			Optional text to include (defaults to nil)
+--	name		String			Optional name for the pin (defaults to a localized version of the herb)
+function public:InsertHerb(mapid, x, y, herb, descript, name)
+	assert(type(mapid) == "number", "An AddOn is creating a CT_MapMod pin without identifying a valid map")
+	assert(type(x) == "number" and type(y) == "number" and x >= 0 and y >= 0 and x <= 1 and y <= 1, "An AddOn is creating a CT_MapMod pin without specifying valid cordinates");
+	assert(type(herb) == "string", "An AddOn is creating a CT_MapMod herbalism pin without identifying a kind of herbalism node")
+	if (type(descript) ~= "string") then
+		descript = nil
+	end
+	if (type(name) ~= "string") then
+		name = nil;
+	end
+	for __, expansion in pairs(module.pinTypes["Herb"]) do
+		for __, kind in ipairs(expansion) do
+			if (module.text["CT_MapMod/Herb/" .. kind.name] == herb) then
+				herb = kind.name
+			end
+			if (kind.name == herb) then
+				if (kind.spawnsRandomly and not module:getOption("CT_MapMod_IncludeRandomSpawns")) then
+					-- this is an herb that appears randomly throughout the zone in place of others, such as Anchor's Weed
+					return;
+				end
+				CT_MapMod_Notes[mapid] = CT_MapMod_Notes[mapid] or { };
+				for __, note in ipairs(CT_MapMod_Notes[mapid]) do
+					if ((note["name"] == herb) and (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.02)) then
+						--two herbs of the same kind not far apart
+						return;
+					elseif ((note["set"] == "Herb") and (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.01)) then
+						--two herbs of different kinds very close together
+						if (module:getOption("CT_MapMod_OverwriteGathering")) then
+							note["x"] = x;
+							note["y"] = y;
+							if (note["descript"] == "") then
+								note["descript"] = "Nearby: " .. module.text["CT_MapMod/Herb/" .. note["subset"]];
+							elseif (note["descript"]:sub(1,8) == "Nearby: " and not note["descript"]:find(module.text["CT_MapMod/Herb/" .. note["subset"]],9)) then
+								note["descript"] = note["descript"] .. ", " .. module.text["CT_MapMod/Herb/" .. note["subset"]];
+							end
+							note["name"] = module.text["CT_MapMod/Herb/" .. herb];
+							note["subset"] = herb;
+							note["datemodified"] = date("%Y%m%d");
+							note["version"] = MODULE_VERSION
+						else
+							-- leave the existing note, but add details in the description
+							if (note["descript"] == "") then
+								note["descript"] = "Nearby: " .. module.text["CT_MapMod/Herb/" .. herb];
+							elseif (note["descript"]:sub(1,8) == "Nearby: " and not note["descript"]:find(module.text["CT_MapMod/Herb/" .. herb],9)) then
+								note["descript"] = note["descript"] .. ", " .. module.text["CT_MapMod/Herb/" .. herb];
+							end											
+						end
+						return;
+					elseif (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.005) then 		--two notes of completely different kinds EXTREMELY close together
+						return;
+					end
+				end
+				if (not name) then
+					name = module.text["CT_MapMod/Herb/" .. herb];
+				end
+				-- this point will not have been reached if the earlier rules were triggered, causing the function to return early
+				module:InsertPin(mapid, x, y, name, "Herb", herb, descript);
+				return; -- breaks the for loops
+			end
+		end
+	end
+end
+
+-- Inserts a new ore node on the map, but subject to rules imposed by CT_MapMod to prevent duplication
+-- Parameters:
+--	mapid		Number, Required	Corresponding to a uiMapID upon which the pin should appear
+--	x, y		Numbers, Required	Absolute coordinates on the map between 0 and 1
+--	ore		String			Localized or non-localized name of the mining node or kind of ore (silently fails if it is a string that simply isn't recognized)
+--	descript	String			Optional text to include (defaults to nil)
+--	name		String			Optional name for the pin (defaults to a localized version of the ore)
+function public:InsertOre(mapid, x, y, ore, descript, name)
+	assert(type(mapid) == "number", "An AddOn is creating a CT_MapMod pin without identifying a valid map")
+	assert(type(x) == "number" and type(y) == "number" and x >= 0 and y >= 0 and x <= 1 and y <= 1, "An AddOn is creating a CT_MapMod pin without specifying valid cordinates");
+	assert(type(herb) == "string", "An AddOn is creating a CT_MapMod mining pin without identifying a kind of mining node")
+	if (type(descript) ~= "string") then
+		descript = nil
+	end
+	if (type(name) ~= "string") then
+		name = nil;
+	end
+	-- Convert from the name of a node to a type of ore (using rules for each localization)
+	if (GetLocale() == "enUS" or GetLocale() == "enGB") then
+		if (ore:sub(1,5) == "Rich " and ore:len() > 5) then ore = ore:sub(6); end -- changes "Rich Thorium Vein" to "Thorium Vein"
+		if (ore:sub(1,5) == "Small " and ore:len() > 6) then ore = ore:sub(7); end -- changes "Small Thorium Vein" to "Thorium Vein"
+		if (ore:sub(-5) == " Vein" and ore:len() > 5) then ore = ore:sub(1,-6); end -- changes "Copper Vein" to "Copper"
+		if (ore:sub(-8) == " Deposit" and ore:len() > 8) then ore = ore:sub(1,-9); end -- changes "Iron Deposit" to "Iron"
+		if (ore:sub(-5) == " Seam" and ore:len() > 5) then ore = ore:sub(1,-6); end -- changes "Monelite Seam" to "Monelite"
+	elseif (GetLocale() == "frFR") then
+		if (ore:sub(1,6) == "Riche " and ore:len() > 7) then ore = ore:sub(7,7):upper() .. ore:sub(8); end -- changes "Riche filon de thorium" to "Filon de Thorium"
+		if (ore:sub(1,6) == "Petit " and ore:len() > 7) then ore = ore:sub(7,7):upper() .. ore:sub(8); end -- changes "Petit filon de thorium" to "Filon de Thorium"
+		if (ore:sub(1,9) == "Filon de " and ore:len() > 10) then ore = ore:sub(10,10):upper() .. ore:sub(11); end -- changes "Filon de cuivre" to "Cuivre"
+		if (ore:sub(1,12) == "Gisement de " and ore:len() > 13) then ore = ore:sub(13,13):upper() .. ore:sub(14); end -- changes "Gisement de fer" to "Fer"
+		if (ore:sub(1,9) == "Veine de " and ore:len() > 10) then ore = ore:sub(10,10):upper() .. ore:sub(11); end -- changes "Veine de gangreschiste" to "Gangreschiste"
+	elseif (GetLocale() == "deDE") then
+		if (ore:sub(1,9) == "Reiches " and ore:len() > 9) then ore = ore:sub(10); end  -- changes "Reiches Thoriumvorkommen" to "Thoriumvorkommen"
+		if (ore:sub(1,9) == "Kleines " and ore:len() > 9) then ore = ore:sub(10); end  -- changes "Kleines Thoriumvorkommen" to "Thoriumvorkommen"
+		if (ore:sub(-9) == "vorkommen" and ore:len() > 9) then ore = ore:sub(1, -10); end -- changes "Kupfervorkommen" to "Kupfer"
+		if (ore:sub(-4) == "flöz" and ore:len() > 9) then ore = ore:sub(1, -5); end -- changes "Monelitflöz" to Monelit"
+	elseif (GetLocale() == "esES" or GetLocale() == "esMX") then
+		if (ore:sub(-9) == " enriquecido" and ore:len() > 12) then ore = ore:sub(1, -13); end -- changes "Filón de torio enriquecido" to "Filón de torio"
+		if (ore:sub(1,9) == "Filón de " and ore:len() > 10) then ore = ore:sub(10,10):upper() .. ore:sub(11); end -- changes "Filón de cobre" to "Cobre"
+		if (ore:sub(1,17) == "Filón pequeño de " and ore:len() > 17) then ore = ore:sub(17,17):upper() .. ore:sub(18); end -- changes "Filón pequeño de torio" to "Torio"
+		if (ore:sub(1,9) == "Depósito de " and ore:len() > 13) then ore = ore:sub(13,13):upper() .. ore:sub(14); end -- changes "Depósito de hierro" to "Hierro"
+		if (ore:sub(1,9) == "Depósito rico en" and ore:len() > 17) then ore = ore:sub(17,17):upper() .. ore:sub(18); end -- changes "Depósito rico en verahierro" to "Verahierro"
+		if (ore:sub(1,9) == "Veta de " and ore:len() > 9) then ore = ore:sub(9,9):upper() .. ore:sub(10); end -- changes "Veta de monalita" to "Monalita"
+	elseif (GetLocale() == "ptBR") then
+		if (ore:sub(-10) == " Abundante" and ore:len() > 10) then ore = ore:sub(1,-11); end -- changes "Veio de Tório Abundante" to "Veio de Tório"
+		if (ore:sub(-8) == " Escasso" and ore:len() > 8) then ore = ore:sub(1,-9); end -- changes "Veio de Tório Escasso" to "Veio de Tório"
+		if (ore:sub(1,5) == "Veio de " and ore:len() > 8) then ore = ore:sub(9); end -- changes "Veio de Cobre" to "Cobre"
+		if (ore:sub(1,5) == "Depósito de " and ore:len() > 12) then ore = ore:sub(13); end -- changes "Depósito de Ferro" to "Ferro"
+		if (ore:sub(1,5) == "Jazida de " and ore:len() > 10) then ore = ore:sub(11); end -- changes "Jazida de Monelita" to "Monelita"
+	elseif (GetLocale() == "ruRU") then
+		if (ore:sub(1,8) == "Богатая " and ore:len() > 9) then ore = ore:sub(9,9):upper() .. ore:sub(10); end -- changes "Богатая ториевая жила" to "Ториевая жила"
+		if (ore:sub(1,8) == "Малая " and ore:len() > 7) then ore = ore:sub(7,7):upper() .. ore:sub(7); end -- changes "Малая ториевая жила" to "Ториевая жила"
+		if (ore:sub(-5) == " жила" and ore:len() > 5) then ore = ore:sub(1,-6); end	--changes "Медная жила" to "Медная"
+		if (ore:sub(1,7) == "Залежи " and ore:len() > 8) then ore = ore:sub(8,8):upper() .. ore:sub(9); end -- changes "Залежи истинного серебра" to "Истинного серебра"
+	end
+
+	-- Now process the mining node
+	for __, expansion in pairs(module.pinTypes["Ore"]) do
+		for __, kind in ipairs(expansion) do
+			if (module.text["CT_MapMod/Ore/" .. kind.name] == ore) then
+				ore = kind.name
+			end
+			if (kind.name == ore) then
+				if (kind.spawnsRandomly and not module:getOption("CT_MapMod_IncludeRandomSpawns")) then
+					-- this is an herb that appears randomly throughout the zone in place of others, such as Anchor's Weed
+					return;
+				end
+				CT_MapMod_Notes[mapid] = CT_MapMod_Notes[mapid] or { };
+				for __, note in ipairs(CT_MapMod_Notes[mapid]) do
+					if ((note["name"] == ore) and (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.02)) then 
+						--two veins of the same kind not far apart
+						return;
+					elseif ((note["set"] == "Ore") and (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.01)) then
+						--two veins of different kinds very close together
+						if (module:getOption("CT_MapMod_OverwriteGathering")) then
+							-- overwrite the existing note
+							note["x"] = x;
+							note["y"] = y;
+							if (note["descript"] == "") then
+								note["descript"] = "Nearby: " .. module.text["CT_MapMod/Ore/" .. note["subset"]];
+							elseif (note["descript"]:sub(1,8) == "Nearby: " and not note["descript"]:find(module.text["CT_MapMod/Ore/" .. note["subset"]],9)) then
+								note["descript"] = note["descript"] .. ", " .. module.text["CT_MapMod/Ore/" .. note["subset"]];
+							end
+							note["name"] = module.text["CT_MapMod/Ore/" .. ore];
+							note["subset"] = ore;
+						else
+							-- leave the existing note, but add details in the description
+							if (note["descript"] == "") then
+								note["descript"] = "Nearby: " .. (module.text["CT_MapMod/Ore/" .. ore]);
+							elseif (note["descript"]:sub(1,8) == "Also nearby: " and not note["descript"]:find(module.text["CT_MapMod/Ore/" .. ore],9)) then
+								note["descript"] = note["descript"] .. ", " .. module.text["CT_MapMod/Ore/" .. ore];
+							end
+						end
+						note["datemodified"] = date("%Y%m%d");
+						note["version"] = MODULE_VERSION
+						return;
+					elseif (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.005) then
+						--two notes of completely different kinds EXTREMELY close together
+						return;
+					end
+				end
+				if (not name) then
+					name = module.text["CT_MapMod/Ore/" .. ore];
+				end
+				-- this point will not have been reached if the earlier rules were triggered, causing the function to return early
+				module:InsertPin(mapid, x, y, name, "Ore", ore, descript);
+				return; -- breaks the for loops
+			end
+		end
+	end
+end
+
 --------------------------------------------
 -- DataProvider
 -- Manages the adding, updating, and removing of data like icons, blobs or text to the map canvas
@@ -269,7 +319,7 @@ function CT_MapMod_DataProviderMixin:RefreshAllData(fromOnShow)
 	-- Fetch and push the pins to be used for this map
 	local mapid = self:GetMap():GetMapID();
 	if ( (mapid) and ((module:getOption("CT_MapMod_ShowOnFlightMaps") or 1) == 1) ) then
-		for key, val in pairs(module.FlightMaps) do   --continent pins will appear in corresponding flight maps
+		for key, val in pairs(module.flightMaps) do   --continent pins will appear in corresponding flight maps
 			if (mapid == key) then
 				mapid = val;
 			end
@@ -323,7 +373,7 @@ function CT_MapMod_PinMixin:OnAcquired(...) -- the arguments here are anything t
 	if (self.set and self.subset) then
 		if (self.set == "Herb" or self.set == "Ore") then
 			-- The herb and ore lists are long, so they are subdivided between classic and expansions
-			for key, expansion in pairs(module.NoteTypes[self.set]) do
+			for key, expansion in pairs(module.pinTypes[self.set]) do
 				for j, val in ipairs(expansion) do
 					if (val["name"] == self.subset) then
 						self.texture:SetTexture(val["icon"]);
@@ -332,7 +382,7 @@ function CT_MapMod_PinMixin:OnAcquired(...) -- the arguments here are anything t
 			end
 		else
 			-- presumably self.set == "User"
-			for i, val in ipairs(module.NoteTypes[self.set]) do
+			for i, val in ipairs(module.pinTypes[self.set]) do
 				if (val["name"] == self.subset) then
 					self.texture:SetTexture(val["icon"]);
 				end
@@ -423,7 +473,7 @@ end
 function CT_MapMod_PinMixin:OnMouseEnter()
 	local icon = "";
 	if (self.set == "Herb" or self.set == "Ore") then
-		for key, expansion in pairs(module.NoteTypes[self.set]) do
+		for key, expansion in pairs(module.pinTypes[self.set]) do
 			for i, type in ipairs(expansion) do
 				if (type["name"] == self.subset) then
 					icon = type["icon"]
@@ -432,7 +482,7 @@ function CT_MapMod_PinMixin:OnMouseEnter()
 		end
 	else
 		-- presumably self.set == "User"
-		for i, type in ipairs(module.NoteTypes[self.set]) do
+		for i, type in ipairs(module.pinTypes[self.set]) do
 			if (type["name"] == self.subset) then
 				icon = type["icon"]
 			end
@@ -531,23 +581,23 @@ function  CT_MapMod_PinMixin:UpdateNotePanel()
 		self.notepanel.oresubsetdropdown:Hide();
 		UIDropDownMenu_SetText(self.notepanel.setdropdown,"User");
 		UIDropDownMenu_SetText(self.notepanel.usersubsetdropdown,self.subset);
-		UIDropDownMenu_SetText(self.notepanel.herbsubsetdropdown,module.NoteTypes["Herb"]["Classic"][1]["name"]);
-		UIDropDownMenu_SetText(self.notepanel.oresubsetdropdown,module.NoteTypes["Ore"]["Classic"][1]["name"]);
+		UIDropDownMenu_SetText(self.notepanel.herbsubsetdropdown,module.pinTypes["Herb"]["Classic"][1]["name"]);
+		UIDropDownMenu_SetText(self.notepanel.oresubsetdropdown,module.pinTypes["Ore"]["Classic"][1]["name"]);
 	elseif (self.set == "Herb") then
 		self.notepanel.usersubsetdropdown:Hide();
 		self.notepanel.herbsubsetdropdown:Show();
 		self.notepanel.oresubsetdropdown:Hide();
 		UIDropDownMenu_SetText(self.notepanel.setdropdown,"Herb");
-		UIDropDownMenu_SetText(self.notepanel.usersubsetdropdown,module.NoteTypes["User"][1]["name"]);
+		UIDropDownMenu_SetText(self.notepanel.usersubsetdropdown,module.pinTypes["User"][1]["name"]);
 		UIDropDownMenu_SetText(self.notepanel.herbsubsetdropdown,self.subset);
-		UIDropDownMenu_SetText(self.notepanel.oresubsetdropdown,module.NoteTypes["Ore"]["Classic"][1]["name"]);
+		UIDropDownMenu_SetText(self.notepanel.oresubsetdropdown,module.pinTypes["Ore"]["Classic"][1]["name"]);
 	elseif (self.set == "Ore") then
 		self.notepanel.usersubsetdropdown:Hide();
 		self.notepanel.herbsubsetdropdown:Hide();
 		self.notepanel.oresubsetdropdown:Show();
 		UIDropDownMenu_SetText(self.notepanel.setdropdown,"Ore");
-		UIDropDownMenu_SetText(self.notepanel.usersubsetdropdown,module.NoteTypes["User"][1]["name"]);
-		UIDropDownMenu_SetText(self.notepanel.herbsubsetdropdown,module.NoteTypes["Herb"]["Classic"][1]["name"]);
+		UIDropDownMenu_SetText(self.notepanel.usersubsetdropdown,module.pinTypes["User"][1]["name"]);
+		UIDropDownMenu_SetText(self.notepanel.herbsubsetdropdown,module.pinTypes["Herb"]["Classic"][1]["name"]);
 		UIDropDownMenu_SetText(self.notepanel.oresubsetdropdown,self.subset);
 
 	end
@@ -711,7 +761,7 @@ function CT_MapMod_PinMixin:CreateNotePanel()
 				notepanel.oresubsetdropdown:Hide();
 				pin:SetHeight(module:getOption("CT_MapMod_UserNoteSize") or 24);
 				pin:SetWidth(module:getOption("CT_MapMod_UserNoteSize") or 24);
-				for i, val in ipairs(module.NoteTypes["User"]) do
+				for i, val in ipairs(module.pinTypes["User"]) do
 					if (val["name"] == UIDropDownMenu_GetText(notepanel.usersubsetdropdown)) then
 						pin.texture:SetTexture(val["icon"]);
 					end
@@ -722,7 +772,7 @@ function CT_MapMod_PinMixin:CreateNotePanel()
 				notepanel.oresubsetdropdown:Hide();
 				pin:SetHeight(module:getOption("CT_MapMod_HerbNoteSize") or 14);
 				pin:SetWidth(module:getOption("CT_MapMod_HerbNoteSize") or 14);
-				for key, expansion in pairs(module.NoteTypes["Herb"]) do
+				for key, expansion in pairs(module.pinTypes["Herb"]) do
 					-- herbs are divided into expansions, because there are so many
 					for i, val in ipairs(expansion) do
 						if (val["name"] == UIDropDownMenu_GetText(notepanel.herbsubsetdropdown)) then
@@ -736,7 +786,7 @@ function CT_MapMod_PinMixin:CreateNotePanel()
 				notepanel.oresubsetdropdown:Show();
 				pin:SetHeight(module:getOption("CT_MapMod_OreNoteSize") or 14);
 				pin:SetWidth(module:getOption("CT_MapMod_OreNoteSize") or 14);
-				for key, expansion in pairs(module.NoteTypes["Ore"]) do
+				for key, expansion in pairs(module.pinTypes["Ore"]) do
 					-- ore are divided into expansions, because there are so many
 					for i, val in ipairs(expansion) do
 						if (val["name"] == UIDropDownMenu_GetText(notepanel.oresubsetdropdown)) then
@@ -782,7 +832,7 @@ function CT_MapMod_PinMixin:CreateNotePanel()
 			local pin = dropdown:GetParent().pin;
 			pin.texture:SetHeight(module:getOption("CT_MapMod_UserNoteSize") or 24);
 			pin.texture:SetWidth(module:getOption("CT_MapMod_UserNoteSize") or 24);
-			for i, val in ipairs(module.NoteTypes["User"]) do
+			for i, val in ipairs(module.pinTypes["User"]) do
 				if (val["name"] == entry.value) then
 					pin.texture:SetTexture(val["icon"]);
 				end
@@ -790,7 +840,7 @@ function CT_MapMod_PinMixin:CreateNotePanel()
 		end
 
 		-- properties unique to each option
-		for i, type in ipairs(module.NoteTypes["User"]) do
+		for i, type in ipairs(module.pinTypes["User"]) do
 			dropdownEntry.text = module.text["CT_MapMod/User/" .. type["name"]] or type["name"];
 			dropdownEntry.value = type["name"];
 			dropdownEntry.icon = type["icon"];
@@ -817,7 +867,7 @@ function CT_MapMod_PinMixin:CreateNotePanel()
 			local pin = dropdown:GetParent().pin;
 			pin.texture:SetHeight(module:getOption("CT_MapMod_HerbNoteSize") or 14);
 			pin.texture:SetWidth(module:getOption("CT_MapMod_HerbNoteSize") or 14);
-			for key, expansion in pairs(module.NoteTypes["Herb"]) do
+			for key, expansion in pairs(module.pinTypes["Herb"]) do
 				for i, val in ipairs(expansion) do 
 					if (val["name"] == entry.value) then
 						pin.texture:SetTexture(val["icon"]);
@@ -828,7 +878,7 @@ function CT_MapMod_PinMixin:CreateNotePanel()
 
 		-- properties unique to each option
 		if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
-			for key, expansion in pairs(module.NoteTypes["Herb"]) do
+			for key, expansion in pairs(module.pinTypes["Herb"]) do
 				if (level == 1) then
 					dropdownEntry.text = key;
 					dropdownEntry.hasArrow = true;
@@ -855,7 +905,7 @@ function CT_MapMod_PinMixin:CreateNotePanel()
 				end
 			end
 		elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-			for i, type in ipairs(module.NoteTypes["Herb"]["Classic"]) do
+			for i, type in ipairs(module.pinTypes["Herb"]["Classic"]) do
 				dropdownEntry.text = module.text["CT_MapMod/Herb/" .. type["name"]] or type["name"];
 				dropdownEntry.value = type["name"];
 				dropdownEntry.icon = type["icon"];
@@ -885,7 +935,7 @@ function CT_MapMod_PinMixin:CreateNotePanel()
 			local pin = dropdown:GetParent().pin;
 			pin.texture:SetHeight(module:getOption("CT_MapMod_OreNoteSize") or 14);
 			pin.texture:SetWidth(module:getOption("CT_MapMod_OreNoteSize") or 14);
-			for key, expansion in pairs(module.NoteTypes["Ore"]) do
+			for key, expansion in pairs(module.pinTypes["Ore"]) do
 				for i, val in ipairs(expansion) do 
 					if (val["name"] == entry.value) then
 						pin.texture:SetTexture(val["icon"]);
@@ -896,7 +946,7 @@ function CT_MapMod_PinMixin:CreateNotePanel()
 
 		-- properties unique to each option
 		if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
-			for key, expansion in pairs(module.NoteTypes["Ore"]) do
+			for key, expansion in pairs(module.pinTypes["Ore"]) do
 				if (level == 1) then
 					dropdownEntry.text = key;
 					dropdownEntry.hasArrow = true;
@@ -923,7 +973,7 @@ function CT_MapMod_PinMixin:CreateNotePanel()
 				end
 			end
 		elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-			for i, type in ipairs(module.NoteTypes["Ore"]["Classic"]) do
+			for i, type in ipairs(module.pinTypes["Ore"]["Classic"]) do
 				dropdownEntry.text = module.text["CT_MapMod/Ore/" .. type["name"]] or type["name"];
 				dropdownEntry.value = type["name"];
 				dropdownEntry.icon = type["icon"];
@@ -948,7 +998,7 @@ end
 --------------------------------------------
 -- UI elements added to the world map title bar
 
-function CT_MapMod_AddUIElements()
+function module:AddUIElements()
 	local newpinmousestart = nil;
 	module:getFrame	(
 		{
@@ -991,25 +1041,15 @@ function CT_MapMod_AddUIElements()
 					WorldMapFrame:AddCanvasClickHandler(function(canvas, button)
 						if (not module.isCreatingNote) then return; end
 						module.isCreatingNote = nil;
+						GameTooltip:Hide();
 						if (InCombatLockdown()) then return; end
 						local mapid = WorldMapFrame:GetMapID();
 						local x,y = WorldMapFrame:GetNormalizedCursorPosition();
-						if (not mapid or not x or not y) then return; end
-						local newnote = {
-							["x"] = x,
-							["y"] = y,
-							["name"] = "New Note",
-							["set"] = "User",
-							["subset"] = "Grey Note",
-							["descript"] = "New note at cursor",
-							["datemodified"] = date("%Y%m%d"),
-							["version"] = MODULE_VERSION,
-						}
-						if (not CT_MapMod_Notes[mapid]) then CT_MapMod_Notes[mapid] = { }; end
-						tinsert(CT_MapMod_Notes[mapid],newnote);
-						C_Timer.After(0.01,function() if (WorldMapFrame:GetMapID() ~= mapid) then WorldMapFrame:SetMapID(mapid) end end); --to add pins on the parts of a map in other zones
-						WorldMapFrame:RefreshAllDataProviders();
-						GameTooltip:Hide();
+						if (mapid and x and y and x>=0 and y>=0 and x<=1 and y<=1 and (x~=0 or y~=0)) then
+							module:InsertPin(mapid, x, y, "New Note", "User", "Grey Note", "New note at cursor");
+							C_Timer.After(0.01,function() if (WorldMapFrame:GetMapID() ~= mapid) then WorldMapFrame:SetMapID(mapid) end end); --to add pins on the parts of a map in other zones
+							WorldMapFrame:RefreshAllDataProviders();
+						end
 					end);
 					self:RegisterForDrag("RightButton");
 					self:HookScript("OnDragStart", function()
@@ -1186,12 +1226,12 @@ function CT_MapMod_AddUIElements()
 					end);
 				end
 			},
-		["frame#n:CT_MapMod_px#s:40:16#bl:b:-140:0"] = { 
+		["frame#n:CT_MapMod_pxy#s:80:16#b:b:-100:0"] = { 
 				["onload"] = function(self)
 					if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
 						self:SetFrameStrata("FULLSCREEN_DIALOG");
 					end
-					module.px = self
+					module.pxy = self
 					self.text = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
 				end,
 				["onenter"] = function(self)
@@ -1208,53 +1248,13 @@ function CT_MapMod_AddUIElements()
 					GameTooltip:Hide();
 				end
 			},
-		["frame#n:CT_MapMod_py#s:40:16#bl:b:-100:0"] =  { 
+		["frame#n:CT_MapMod_cxy#s:80:16#b:b:100:0"] =  { 
 				["onload"] = function(self)
 					if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
 						self:SetFrameStrata("FULLSCREEN_DIALOG");
 					end
-					module.py = self
+					module.cxy = self
 					self.text = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
-				end,
-				["onenter"] = function(self)
-					GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, 15);
-					local playerposition = C_Map.GetPlayerMapPosition(WorldMapFrame:GetMapID(),"player");
-					if (playerposition) then
-						GameTooltip:SetText("CT: Player Coords");
-					else
-						GameTooltip:SetText("Player coords not available here");
-					end
-					GameTooltip:Show();
-				end,
-				["onleave"] = function(self)
-					GameTooltip:Hide();
-				end
-			},
-		["frame#n:CT_MapMod_cx#s:40:16#bl:b:70:0"] =  { 
-				["onload"] = function(self)
-					if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-						self:SetFrameStrata("FULLSCREEN_DIALOG");
-					end
-					module.cx = self
-					self.text = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
-				end,
-				["onenter"] = function(self)
-					GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, 15);
-					GameTooltip:SetText("CT: Cursor Coords");
-					GameTooltip:Show();
-				end,
-				["onleave"] = function(self)
-					GameTooltip:Hide();
-				end
-			},
-		["frame#n:CT_MapMod_cy#s:40:16#bl:b:110:0"] =  { 
-				["onload"] = function(self)
-					if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-						self:SetFrameStrata("FULLSCREEN_DIALOG");
-					end
-					module.cy = self
-					self.text = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
-
 				end,
 				["onenter"] = function(self)
 					GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, 15);
@@ -1281,21 +1281,17 @@ function CT_MapMod_AddUIElements()
 				local px, py = playerposition:GetXY();
 				px = math.floor(px*1000)/10;
 				py = math.floor(py*1000)/10;
-				module.px.text:SetText("x:" .. px);
-				module.py.text:SetText("y:" .. py);
+				module.pxy.text:SetText(format("P: %.1f, %.1f", px, py));
 			else
-				module.px.text:SetText("x: -");
-				module.py.text:SetText("y: -");
+				module.pxy.text:SetText("-");
 			end
 			if (mapid == C_Map.GetBestMapForUnit("player")) then
-				module.px.text:SetTextColor(1,1,1,1);
-				module.py.text:SetTextColor(1,1,1,1);
+				module.pxy.text:SetTextColor(1,1,1,1);
 				if ((module:getOption("CT_MapMod_ShowMapResetButton") or 1) == 1) then
 					_G["CT_MapMod_WhereAmIButton"]:Hide();
 				end			
 			else
-				module.px.text:SetTextColor(1,1,1,.3);			
-				module.py.text:SetTextColor(1,1,1,.3);
+				module.pxy.text:SetTextColor(1,1,1,.3);			
 				if ((module:getOption("CT_MapMod_ShowMapResetButton") or 1) == 1) then
 					_G["CT_MapMod_WhereAmIButton"]:Show();
 				end				
@@ -1304,19 +1300,15 @@ function CT_MapMod_AddUIElements()
 		local cx, cy = WorldMapFrame:GetNormalizedCursorPosition();
 		if (cx and cy) then
 			if (cx > 0 and cx < 1 and cy > 0 and cy < 1) then
-				module.cx.text:SetTextColor(1,1,1,1);
-				module.cy.text:SetTextColor(1,1,1,1);
+				module.cxy.text:SetTextColor(1,1,1,1);
 			else
-				module.cx.text:SetTextColor(1,1,1,.3);			
-				module.cy.text:SetTextColor(1,1,1,.3);
+				module.cxy.text:SetTextColor(1,1,1,.3);			
 			end
 			cx = math.floor(cx*1000)/10;
 			cx = math.max(math.min(cx,100),0);
 			cy = math.floor(cy*1000)/10;
 			cy = math.max(math.min(cy,100),0);				
-			module.cx.text:SetText("x:" .. cx);
-			module.cy.text:SetText("y:" .. cy);
-			
+			module.cxy.text:SetText(format("C: %.1f, %.1f", cx, cy));
 		end
 	end);
 end
@@ -1325,52 +1317,7 @@ end
 --------------------------------------------
 -- Auto-Gathering
 
-do
-	-- Update this every expansion
-	local herbskills =
-	{
-		[2366] = true,
-		[2368] = true,
-		[3570] = true,
-		[11993] = true,
-		[28695] = true,
-		[50300] = true,
-		[74519] = true,
-		[110413] = true,
-		[158745] = true,
-		[265819] = true,
-		[265821] = true,
-		[265823] = true,
-		[265825] = true,
-		[265827] = true,
-		[265829] = true,
-		[265831] = true,
-		[265834] = true,
-		[265835] = true,
-	}
-	local oreskills = 
-	{
-		[2575] = true,
-		[2576] = true,
-		[3564] = true,
-		[10248] = true,
-		[29354] = true,
-		[50310] = true,
-		[74517] = true,
-		[102161] = true,
-		[158754] = true,
-		[195122] = true,
-		[265837] = true,
-		[265839] = true,
-		[265841] = true,
-		[265843] = true,
-		[265845] = true,
-		[265847] = true,
-		[265849] = true,
-		[265851] = true,
-		[265854] = true,
-	}
-	
+do	
 	-- Outside combat, monitor the player's actions to detect herbalism and mining
 	local frame = CreateFrame("Frame")
 	frame:RegisterEvent("UNIT_SPELLCAST_SENT");
@@ -1390,167 +1337,18 @@ do
 			local x,y = position:GetXY();
 			if (not x or not y or (x == 0 and y == 0)) then return; end	-- could be nil or 0 in dungeons and raids to prevent cheating
 
-			-- Herbalism
-			if ((module:getOption("CT_MapMod_AutoGatherHerbs") or 1) == 1) then
-				if (herbskills[arg4]) then
-					for key, expansion in pairs(module.NoteTypes["Herb"]) do
-						for j, type in ipairs(expansion) do
-							if ( ((module.text["CT_MapMod/Herb/" .. type["name"]] or type["name"]) == arg2) and (module:getOption("CT_MapMod_IncludeRandomSpawns") or not type["spawnsRandomly"]) ) then
-								local istooclose = nil;
-								if (not CT_MapMod_Notes[mapid]) then CT_MapMod_Notes[mapid] = { }; end
-								for k, note in ipairs(CT_MapMod_Notes[mapid]) do
-									if ((note["name"] == arg2) and (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.02)) then   --two herbs of the same kind not far apart
-										istooclose = true;
-									end
-									if ((note["set"] == "Herb") and (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.01)) then 	--two herbs of different kinds very close together
-										if (module:getOption("CT_MapMod_OverwriteGathering") and not istooclose) then
-											-- overwrite the existing note
-											note["x"] = x;
-											note["y"] = y;
-											if (note["descript"] == "") then
-												note["descript"] = "Nearby: " .. note["name"];
-											elseif (note["descript"]:sub(1,8) == "Nearby: " and not note["descript"]:find(note["name"],9)) then
-												note["descript"] = note["descript"] .. ", " .. note["name"];
-											end
-											note["name"] = module.text["CT_MapMod/Herb/" .. type["name"]] or arg2;
-											note["subset"] = type["name"];
-											note["datemodified"] = date("%Y%m%d");
-											note["version"] = MODULE_VERSION
-										else
-											-- leave the existing note, but add details in the description
-											if (note["descript"] == "") then
-												note["descript"] = "Nearby: " .. (module.text["CT_MapMod/Herb/" .. type["name"]] or arg2);
-											elseif (note["descript"]:sub(1,8) == "Nearby: " and not note["descript"]:find(module.text["CT_MapMod/Herb/" .. type["name"]] or arg2,9)) then
-												note["descript"] = note["descript"] .. ", " .. (module.text["CT_MapMod/Herb/" .. type["name"]] or arg2);
-											end											
-										end
-										istooclose = true;
-									end
-									if (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.005) then 		--two notes of completely different kinds EXTREMELY close together
-										istooclose = true;
-									end
-								end
-								if (not istooclose) then
-									local newnote = {
-										["x"] = x,
-										["y"] = y,
-										["name"] = module.text["CT_MapMod/Herb/" .. type["name"]] or arg2,
-										["set"] = "Herb",
-										["subset"] = type["name"],
-										["descript"] = "",
-										["datemodified"] = date("%Y%m%d"),
-										["version"] = MODULE_VERSION,
-									};
-									tinsert(CT_MapMod_Notes[mapid],newnote);
-								end
-								return;
-							end
-						end
-					end
-					return;
-				end
+			-- Herbalism and Mining
+			if (module.herbalismSkills[arg4] and (module:getOption("CT_MapMod_AutoGatherHerbs") or 1) == 1) then
+				module:InsertHerb(mapid, x, y, arg2);
+			elseif (module.miningSkills[arg4] and (module:getOption("CT_MapMod_AutoGatherOre") or 1) == 1) then
+				module:InsertOre(mapid, x, y, arg2);
 			end
-
-			--Mining
-			if ((module:getOption("CT_MapMod_AutoGatherOre") or 1) == 1) then
-				if (oreskills[arg4]) then
-					-- Convert from the name of a node to a type of ore (using rules for each localization)
-					if (GetLocale() == "enUS" or GetLocale() == "enGB") then
-						if (arg2:sub(1,5) == "Rich " and arg2:len() > 5) then arg2 = arg2:sub(6); end -- changes "Rich Thorium Vein" to "Thorium Vein"
-						if (arg2:sub(1,5) == "Small " and arg2:len() > 6) then arg2 = arg2:sub(7); end -- changes "Small Thorium Vein" to "Thorium Vein"
-						if (arg2:sub(-5) == " Vein" and arg2:len() > 5) then arg2 = arg2:sub(1,-6); end -- changes "Copper Vein" to "Copper"
-						if (arg2:sub(-8) == " Deposit" and arg2:len() > 8) then arg2 = arg2:sub(1,-9); end -- changes "Iron Deposit" to "Iron"
-						if (arg2:sub(-5) == " Seam" and arg2:len() > 5) then arg2 = arg2:sub(1,-6); end -- changes "Monelite Seam" to "Monelite"
-					elseif (GetLocale() == "frFR") then
-						if (arg2:sub(1,6) == "Riche " and arg2:len() > 7) then arg2 = arg2:sub(7,7):upper() .. arg2:sub(8); end -- changes "Riche filon de thorium" to "Filon de Thorium"
-						if (arg2:sub(1,6) == "Petit " and arg2:len() > 7) then arg2 = arg2:sub(7,7):upper() .. arg2:sub(8); end -- changes "Petit filon de thorium" to "Filon de Thorium"
-						if (arg2:sub(1,9) == "Filon de " and arg2:len() > 10) then arg2 = arg2:sub(10,10):upper() .. arg2:sub(11); end -- changes "Filon de cuivre" to "Cuivre"
-						if (arg2:sub(1,12) == "Gisement de " and arg2:len() > 13) then arg2 = arg2:sub(13,13):upper() .. arg2:sub(14); end -- changes "Gisement de fer" to "Fer"
-						if (arg2:sub(1,9) == "Veine de " and arg2:len() > 10) then arg2 = arg2:sub(10,10):upper() .. arg2:sub(11); end -- changes "Veine de gangreschiste" to "Gangreschiste"
-					elseif (GetLocale() == "deDE") then
-						if (arg2:sub(1,9) == "Reiches " and arg2:len() > 9) then arg2 = arg2:sub(10); end  -- changes "Reiches Thoriumvorkommen" to "Thoriumvorkommen"
-						if (arg2:sub(1,9) == "Kleines " and arg2:len() > 9) then arg2 = arg2:sub(10); end  -- changes "Kleines Thoriumvorkommen" to "Thoriumvorkommen"
-						if (arg2:sub(-9) == "vorkommen" and arg2:len() > 9) then arg2 = arg2:sub(1, -10); end -- changes "Kupfervorkommen" to "Kupfer"
-						if (arg2:sub(-4) == "flöz" and arg2:len() > 9) then arg2 = arg2:sub(1, -5); end -- changes "Monelitflöz" to Monelit"
-					elseif (GetLocale() == "esES" or GetLocale() == "esMX") then
-						if (arg2:sub(-9) == " enriquecido" and arg2:len() > 12) then arg2 = arg2:sub(1, -13); end -- changes "Filón de torio enriquecido" to "Filón de torio"
-						if (arg2:sub(1,9) == "Filón de " and arg2:len() > 10) then arg2 = arg2:sub(10,10):upper() .. arg2:sub(11); end -- changes "Filón de cobre" to "Cobre"
-						if (arg2:sub(1,17) == "Filón pequeño de " and arg2:len() > 17) then arg2 = arg2:sub(17,17):upper() .. arg2:sub(18); end -- changes "Filón pequeño de torio" to "Torio"
-						if (arg2:sub(1,9) == "Depósito de " and arg2:len() > 13) then arg2 = arg2:sub(13,13):upper() .. arg2:sub(14); end -- changes "Depósito de hierro" to "Hierro"
-						if (arg2:sub(1,9) == "Depósito rico en" and arg2:len() > 17) then arg2 = arg2:sub(17,17):upper() .. arg2:sub(18); end -- changes "Depósito rico en verahierro" to "Verahierro"
-						if (arg2:sub(1,9) == "Veta de " and arg2:len() > 9) then arg2 = arg2:sub(9,9):upper() .. arg2:sub(10); end -- changes "Veta de monalita" to "Monalita"
-					elseif (GetLocale() == "ptBR") then
-						if (arg2:sub(-10) == " Abundante" and arg2:len() > 10) then arg2 = arg2:sub(1,-11); end -- changes "Veio de Tório Abundante" to "Veio de Tório"
-						if (arg2:sub(-8) == " Escasso" and arg2:len() > 8) then arg2 = arg2:sub(1,-9); end -- changes "Veio de Tório Escasso" to "Veio de Tório"
-						if (arg2:sub(1,5) == "Veio de " and arg2:len() > 8) then arg2 = arg2:sub(9); end -- changes "Veio de Cobre" to "Cobre"
-						if (arg2:sub(1,5) == "Depósito de " and arg2:len() > 12) then arg2 = arg2:sub(13); end -- changes "Depósito de Ferro" to "Ferro"
-						if (arg2:sub(1,5) == "Jazida de " and arg2:len() > 10) then arg2 = arg2:sub(11); end -- changes "Jazida de Monelita" to "Monelita"
-					elseif (GetLocale() == "ruRU") then
-						if (arg2:sub(1,8) == "Богатая " and arg2:len() > 9) then arg2 = arg2:sub(9,9):upper() .. arg2:sub(10); end -- changes "Богатая ториевая жила" to "Ториевая жила"
-						if (arg2:sub(1,8) == "Малая " and arg2:len() > 7) then arg2 = arg2:sub(7,7):upper() .. arg2:sub(7); end -- changes "Малая ториевая жила" to "Ториевая жила"
-						if (arg2:sub(-5) == " жила" and arg2:len() > 5) then arg2 = arg2:sub(1,-6); end	--changes "Медная жила" to "Медная"
-						if (arg2:sub(1,7) == "Залежи " and arg2:len() > 8) then arg2 = arg2:sub(8,8):upper() .. arg2:sub(9); end -- changes "Залежи истинного серебра" to "Истинного серебра"
-					end
-					for key, expansion in pairs(module.NoteTypes["Ore"]) do
-						for j, type in ipairs(expansion) do
-							if ( ((module.text["CT_MapMod/Ore/" .. type["name"]] or type["name"]) == arg2) and (module:getOption("CT_MapMod_IncludeRandomSpawns") or not type["spawnsRandomly"]) ) then
-								local istooclose = nil;
-								if (not CT_MapMod_Notes[mapid]) then CT_MapMod_Notes[mapid] = { }; end
-								for k, note in ipairs(CT_MapMod_Notes[mapid]) do
-									if ((note["name"] == arg2) and (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.02)) then   --two veins of the same kind not far apart
-										istooclose = true;
-									end
-									if ((note["set"] == "Ore") and (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.01)) then 	--two veins of different kinds very close together
-										if (module:getOption("CT_MapMod_OverwriteGathering") and not istooclose) then
-											-- overwrite the existing note
-											note["x"] = x;
-											note["y"] = y;
-											if (note["descript"] == "") then
-												note["descript"] = "Nearby: " .. note["name"];
-											elseif (note["descript"]:sub(1,8) == "Nearby: " and not note["descript"]:find(note["name"],9)) then
-												note["descript"] = note["descript"] .. ", " .. note["name"];
-											end
-											note["name"] = module.text["CT_MapMod/Ore/" .. type["name"]] or arg2;
-											note["subset"] = type["name"];
-											note["datemodified"] = date("%Y%m%d");
-											note["version"] = MODULE_VERSION
-										else
-											-- leave the existing note, but add details in the description
-											if (note["descript"] == "") then
-												note["descript"] = "Nearby: " .. (module.text["CT_MapMod/Ore/" .. type["name"]] or arg2);
-											elseif (note["descript"]:sub(1,8) == "Also nearby: " and not note["descript"]:find(module.text["CT_MapMod/Ore/" .. type["name"]] or arg2,9)) then
-												note["descript"] = note["descript"] .. ", " .. (module.text["CT_MapMod/Ore/" .. type["name"]] or arg2);
-											end
-										end											
-										istooclose = true;
-									end
-									if (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.005) then 		--two notes of completely different kinds EXTREMELY close together
-										istooclose = true;
-									end
-								end
-								if (not istooclose) then
-									local newnote = {
-										["x"] = x,
-										["y"] = y,
-										["name"] = module.text["CT_MapMod/Ore/" .. type["name"]] or arg2,
-										["set"] = "Ore",
-										["subset"] = type["name"],
-										["descript"] = "",
-										["datemodified"] = date("%Y%m%d"),
-										["version"] = MODULE_VERSION,
-									};
-									tinsert(CT_MapMod_Notes[mapid],newnote);
-								end
-								return;
-							end
-						end
-					end
-					return;
-				end
-			end
+			
 		elseif (event == "PLAYER_REGEN_DISABLED") then
+			-- Improve performance by not even looking for herbs/mining during combat
 			frame:UnregisterEvent("UNIT_SPELLCAST_SENT");
 		elseif (event == "PLAYER_REGEN_ENABLED") then
+			-- Restore searching for herbs/mining out of combat
 			frame:RegisterEvent("UNIT_SPELLCAST_SENT");
 		end
 	end);
@@ -1562,37 +1360,27 @@ end
 
 module.update = function(self, optName, value)
 	if (optName == "init") then		
-		CT_MapMod_Initialize();  -- handles things that arn't related to options
-		module.px:ClearAllPoints();
-		module.py:ClearAllPoints();
-		module.cx:ClearAllPoints();
-		module.cy:ClearAllPoints();
+		module:Initialize();  -- handles things that arn't related to options
+		module.pxy:ClearAllPoints();
+		module.cxy:ClearAllPoints();
 		local position = module:getOption("CT_MapMod_ShowPlayerCoordsOnMap") or 2;
 		if (position == 1) then
-			module.px:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-145,-3);
-			module.py:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-105,-3);
+			module.pxy:SetPoint("TOP",WorldMapFrame.BorderFrame,"TOP",-105,-3);
 		elseif (position == 2) then
-			module.px:SetPoint("BOTTOMLEFT",WorldMapFrame.ScrollContainer,"BOTTOM",-140,3);
-			module.py:SetPoint("BOTTOMLEFT",WorldMapFrame.ScrollContainer,"BOTTOM",-100,3);
+			module.pxy:SetPoint("BOTTOM",WorldMapFrame.ScrollContainer,"BOTTOM",-100,3);
 		else
-			module.px:Hide();
-			module.py:Hide();
+			module.pxy:Hide();
 		end
-		module.px.text:SetAllPoints();
-		module.py.text:SetAllPoints();
+		module.pxy.text:SetAllPoints();
 		position = module:getOption("CT_MapMod_ShowCursorCoordsOnMap") or 2;
 		if (position == 1) then
-			module.cx:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",65,-3);
-			module.cy:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",105,-3);
+			module.cxy:SetPoint("TOP",WorldMapFrame.BorderFrame,"TOP",95,-3);
 		elseif (position == 2) then
-			module.cx:SetPoint("BOTTOMLEFT",WorldMapFrame.ScrollContainer,"BOTTOM",70,3);
-			module.cy:SetPoint("BOTTOMLEFT",WorldMapFrame.ScrollContainer,"BOTTOM",110,3);
+			module.cxy:SetPoint("BOTTOM",WorldMapFrame.ScrollContainer,"BOTTOM",100,3);
 		else
-			module.cx:Hide();
-			module.cy:Hide();
+			module.cxy:Hide();
 		end		
-		module.cx.text:SetAllPoints();
-		module.cy.text:SetAllPoints();
+		module.cxy.text:SetAllPoints();
 
 		CT_MapMod_CreateNoteButton:ClearAllPoints();
 		CT_MapMod_CreateNoteButton:SetPoint("TOPRIGHT",WorldMapFrame.BorderFrame,"TOPRIGHT",module:getOption("CT_MapMod_CreateNoteButtonX") or -125,-3)
@@ -1601,48 +1389,31 @@ module.update = function(self, optName, value)
 		if (showmapresetbutton == 3) then _G["CT_MapMod_WhereAmIButton"]:Hide(); end
 		
 	elseif (optName == "CT_MapMod_ShowPlayerCoordsOnMap") then
-		if (not module.px or not module.py) then return; end
-		module.px:ClearAllPoints();
-		module.py:ClearAllPoints();
+		if (not module.pxy) then return; end
+		module.pxy:ClearAllPoints();
 		if (value == 1) then
-			module.px:Show();
-			module.py:Show();
-			module.px:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-145,-3);
-			module.py:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",-105,-3);
+			module.pxy:Show();
+			module.pxy:SetPoint("TOP",WorldMapFrame.BorderFrame,"TOP",-105,-3);
 		elseif (value == 2) then
-			module.px:Show();
-			module.py:Show();
-			module.px:SetPoint("BOTTOMLEFT",WorldMapFrame.ScrollContainer,"BOTTOM",-140,3);
-			module.py:SetPoint("BOTTOMLEFT",WorldMapFrame.ScrollContainer,"BOTTOM",-100,3);		
+			module.pxy:Show();
+			module.pxy:SetPoint("BOTTOM",WorldMapFrame.ScrollContainer,"BOTTOM",-100,3);	
 		else
-			module.px:Hide();
-			module.py:Hide();
+			module.pxy:Hide();
 		end
-		module.px.text:SetAllPoints();
-		module.py.text:SetAllPoints();
+		module.pxy.text:SetAllPoints();
 	elseif (optName == "CT_MapMod_ShowCursorCoordsOnMap") then
-		if (not module.cx or not module.cy) then return; end
-
+		if (not module.cxy) then return; end
+		module.cxy:ClearAllPoints();
 		if (value == 1) then
-			module.cx:Show();
-			module.cy:Show();
-			module.cx:ClearAllPoints();
-			module.cy:ClearAllPoints();
-			module.cx:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",65,-3);
-			module.cy:SetPoint("TOPLEFT",WorldMapFrame.BorderFrame,"TOP",105,-3);
+			module.cxy:Show();
+			module.cxy:SetPoint("TOP",WorldMapFrame.BorderFrame,"TOP",65,-3);
 		elseif (value == 2) then
-			module.cx:Show();
-			module.cy:Show();
-			module.cx:ClearAllPoints();
-			module.cy:ClearAllPoints();
-			module.cx:SetPoint("BOTTOMLEFT",WorldMapFrame.ScrollContainer,"BOTTOM",60,3);
-			module.cy:SetPoint("BOTTOMLEFT",WorldMapFrame.ScrollContainer,"BOTTOM",100,3);		
+			module.cxy:Show();
+			module.cxy:SetPoint("BOTTOM",WorldMapFrame.ScrollContainer,"BOTTOM",100,3);		
 		else
-			module.cx:Hide();
-			module.cy:Hide();
+			module.cxy:Hide();
 		end
-		module.cx.text:SetAllPoints();
-		module.cy.text:SetAllPoints();
+		module.cxy.text:SetAllPoints();
 	elseif (optName == "CT_MapMod_ShowMapResetButton") then
 		if (not _G["CT_MapMod_WhereAmIButton"]) then return; end
 		if (value == 2) then _G["CT_MapMod_WhereAmIButton"]:Show();
@@ -1837,7 +1608,7 @@ end
 -- Converting notes from older addon versions into the latest one
 
 
-function CT_MapMod_ConvertOldNotes()
+function module:ConvertOldNotes()
 
 	-- Correcting mis-labelled herbs and removing anchor's weed
 	for mapid, notetable in pairs(CT_MapMod_Notes) do
