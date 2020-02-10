@@ -1,15 +1,22 @@
 ------------------------------------------------
 --                  CT_Timer                  --
 --                                            --
+-- Provides a simple timer that counts up or  --
+-- down using /timer slash commands.
+--					      --
 -- Please do not modify or otherwise          --
 -- redistribute this without the consent of   --
 -- the CTMod Team. Thank you.                 --
+--					      --
+-- Original credits to Cide and TS            --
+-- Maintained by Resike from 2014 to 2017     --
+-- and by Dahk Celes (DDCorkum) since 2019    --
 ------------------------------------------------
 
 --------------------------------------------
 -- Initialization
 
-local module = { };
+local module = select(2, ...);
 local _G = getfenv(0);
 
 local MODULE_NAME = "CT_Timer";
@@ -23,14 +30,16 @@ module.version = MODULE_VERSION;
 _G[MODULE_NAME] = module;
 CT_Library:registerModule(module);
 
+-- see Localization.lua
+module.text = module.text or {};
+local L = module.text;
+
 --------------------------------------------
 
 local opts = {};
 
 -- CT_TimerData
 -- .alpha
--- .alphaUpdate
--- .alphaWait
 -- .color -- table of colors (3 values)
 -- .countfrom -- descriptive text version of .time (eg. "3 minutes")
 -- .status -- nil == stopped, 0 == paused, 1 == counting
@@ -39,8 +48,6 @@ local opts = {};
 
 -- Clear old data values if still present
 CT_Timer.alpha = nil;
-CT_Timer.alphaUpdate = nil;
-CT_Timer.alphaWait = nil;
 CT_Timer.color = nil;
 CT_Timer.countfrom = nil;
 CT_Timer.hideBG = nil;
@@ -65,12 +72,56 @@ CT_Timer_CallFunctions = { };
 
 --------------------------------------------
 
-function CT_Timer_OnMouseOver()
-	CT_TimerFrameDragClickFrame.step = 0.05;
+
+local bgFadeIn, bgFadeOut;	-- these functions are called to make the background textures appear or disappear
+
+do
+	local function updateAlpha()
+		CT_TimerFrameHeaderTexture:SetAlpha(CT_Timer.alpha);
+		CT_TimerFrameScrollDownHour:SetAlpha(CT_Timer.alpha);
+		CT_TimerFrameScrollDownMin:SetAlpha(CT_Timer.alpha);
+		CT_TimerFrameScrollUpHour:SetAlpha(CT_Timer.alpha);
+		CT_TimerFrameScrollUpMin:SetAlpha(CT_Timer.alpha);
+	end
+
+	bgFadeIn = function()
+		if ( opts.hideBG ) then
+			CT_Timer.alpha = CT_Timer.alpha or 0;
+			if ( CT_Timer.isMouseOver and CT_Timer.alpha < 1) then
+				CT_Timer.alpha = CT_Timer.alpha + 0.05;
+				C_Timer.After(0.05, bgFadeIn);
+			end
+		else
+			CT_Timer.alpha = 1;	
+		end
+		updateAlpha();
+	end
+
+	bgFadeOut = function()
+		if ( opts.hideBG ) then
+			CT_Timer.alpha = CT_Timer.alpha or 0;
+			if ( (not CT_Timer.isMouseOver) and CT_Timer.alpha > 0) then
+				CT_Timer.alpha = CT_Timer.alpha - 0.05;
+				C_Timer.After(0.05, bgFadeOut);
+			end
+		else
+			CT_Timer.alpha = 1;
+		end
+		updateAlpha();
+	end
+end
+
+function CT_Timer_OnMouseOver(frame)
+	CT_Timer.isMouseOver = true;
+	bgFadeIn();
+	if (frame) then
+		module:displayTooltip(frame, {"CT_Timer", L["CT_Timer/DRAG1"] .. "#0.9:0.9:0.9", L["CT_Timer/DRAG2"] .. "#0.9:0.9:0.9", L["CT_Timer/DRAG3"] .. "#0.9:0.9:0.9"}, "CT_ABOVEBELOW");
+	end
 end
 
 function CT_Timer_OnMouseOut()
-	CT_TimerFrameDragClickFrame.step = -0.05;
+	CT_Timer.isMouseOver = nil;
+	bgFadeOut();
 end
 
 function CT_Timer_Toggle(frame)
@@ -94,41 +145,6 @@ function CT_Timer_Toggle(frame)
 end
 
 function CT_Timer_UpdateTime(self, elapsed)
-	if ( opts.hideBG ) then
-		CT_TimerData.alphaUpdate = ( CT_TimerData.alphaUpdate or 0 ) + elapsed;
-		if ( CT_TimerData.alphaUpdate > 0.05 ) then
-			if ( ( not CT_TimerData.alphaWait or CT_TimerData.alphaWait < 1 ) and ( CT_TimerFrameDragClickFrame.step or 0 ) > 0 ) then
-				CT_TimerData.alphaWait = ( CT_TimerData.alphaWait or 0 ) + elapsed;
-				CT_TimerFrameHeaderTexture:SetAlpha(0);
-				CT_TimerFrameScrollDownHour:SetAlpha(0);
-				CT_TimerFrameScrollDownMin:SetAlpha(0);
-				CT_TimerFrameScrollUpHour:SetAlpha(0);
-				CT_TimerFrameScrollUpMin:SetAlpha(0);
-			else
-				CT_TimerData.alpha = ( CT_TimerData.alpha or 0 ) + ( CT_TimerFrameDragClickFrame.step or 0 );
-				if ( CT_TimerData.alpha < 0 ) then
-					CT_TimerData.alpha = 0;
-					CT_TimerData.alphaWait = nil;
-				elseif ( CT_TimerData.alpha > 1 ) then
-					CT_TimerData.alpha = 1;
-				end
-				CT_TimerFrameHeaderTexture:SetAlpha(CT_TimerData.alpha);
-				CT_TimerFrameScrollDownHour:SetAlpha(CT_TimerData.alpha);
-				CT_TimerFrameScrollDownMin:SetAlpha(CT_TimerData.alpha);
-				CT_TimerFrameScrollUpHour:SetAlpha(CT_TimerData.alpha);
-				CT_TimerFrameScrollUpMin:SetAlpha(CT_TimerData.alpha);
-			end
-		end
-	else
-		CT_TimerData.alpha = nil;
-		CT_TimerData.alphaWait = nil;
-		CT_TimerData.alphaUpdate = nil;
-		CT_TimerFrameHeaderTexture:SetAlpha(1);
-		CT_TimerFrameScrollDownHour:SetAlpha(1);
-		CT_TimerFrameScrollDownMin:SetAlpha(1);
-		CT_TimerFrameScrollUpHour:SetAlpha(1);
-		CT_TimerFrameScrollUpMin:SetAlpha(1);
-	end
 	if ( not CT_TimerData.status or CT_TimerData.status == 0 ) then
 		if ( CT_TimerData.color ) then
 			CT_TimerFrameTime:SetTextColor(CT_TimerData.color[1], CT_TimerData.color[2], CT_TimerData.color[3]);
@@ -150,7 +166,7 @@ function CT_Timer_UpdateTime(self, elapsed)
 		end
 
 		if ( CT_TimerData.time == 0 ) then
-			DEFAULT_CHAT_FRAME:AddMessage(format(CT_TIMER_FINISHCOUNT, CT_TimerData.countfrom), 1, 0.5, 0);
+			DEFAULT_CHAT_FRAME:AddMessage(format(L["CT_Timer/FINISHCOUNT"], CT_TimerData.countfrom), 1, 0.5, 0);
 			PlaySound(3081);
 			CT_Timer_Reset();
 		else
@@ -255,23 +271,23 @@ function CT_Timer_GetTimeString(num)
 
 	if ( hours == 0 ) then
 		if ( mins == 1 ) then
-			return "1 " .. CT_TIMER_MIN;
+			return "1 " .. L["CT_Timer/MIN"];
 		else
-			return mins .. " " .. CT_TIMER_MINS;
+			return mins .. " " .. L["CT_Timer/MINS"];
 		end
 	else
 		local str;
 		if ( hours == 1 ) then
-			str = "1 " .. CT_TIMER_HOUR;
+			str = "1 " .. L["CT_Timer/HOUR"];
 		else
-			str = hours .. " " .. CT_TIMER_HOURS;
+			str = hours .. " " .. L["CT_Timer/HOURS"];
 		end
 		if ( mins == 0 ) then
 			return str;
 		elseif ( mins == 1 ) then
-			return str .. " and 1 " .. CT_TIMER_MIN;
+			return str .. " and 1 " .. L["CT_Timer/MIN"];
 		else
-			return str .. " and " .. mins .. CT_TIMER_MINS;
+			return str .. " and " .. mins .. L["CT_Timer/MINS"];
 		end
 	end
 end
@@ -317,36 +333,29 @@ SlashCmdList["TIMER"] = function(msg)
 	msg = strlower(msg);
 
 	if ( msg == "" ) then
-		DEFAULT_CHAT_FRAME:AddMessage("<CTMod> " .. CT_TIMER_HELP[1], 1, 1, 0);
-		DEFAULT_CHAT_FRAME:AddMessage("<CTMod> " .. CT_TIMER_HELP[2], 1, 1, 0);
-		DEFAULT_CHAT_FRAME:AddMessage("<CTMod> " .. CT_TIMER_HELP[3], 1, 1, 0);
-		DEFAULT_CHAT_FRAME:AddMessage("<CTMod> " .. CT_TIMER_HELP[4], 1, 1, 0);
-		DEFAULT_CHAT_FRAME:AddMessage("<CTMod> " .. CT_TIMER_HELP[5], 1, 1, 0);
-		DEFAULT_CHAT_FRAME:AddMessage("<CTMod> " .. CT_TIMER_HELP[6], 1, 1, 0);
-		DEFAULT_CHAT_FRAME:AddMessage("<CTMod> " .. CT_TIMER_HELP[7], 1, 1, 0);
-		DEFAULT_CHAT_FRAME:AddMessage("<CTMod> " .. CT_TIMER_HELP[8], 1, 1, 0);
-		DEFAULT_CHAT_FRAME:AddMessage("<CTMod> " .. CT_TIMER_HELP[9], 1, 1, 0);
-		DEFAULT_CHAT_FRAME:AddMessage("<CTMod> " .. CT_TIMER_HELP[10], 1, 1, 0);
+		for __, msg in ipairs(L["CT_Timer/HELP"]) do
+			DEFAULT_CHAT_FRAME:AddMessage("<CTMod> " .. msg, 1, 1, 0);
+		end
 
 	elseif ( msg == "show" ) then
-		DEFAULT_CHAT_FRAME:AddMessage("<CTMod> " .. CT_TIMER_SHOW_ON, 1, 1, 0);
+		DEFAULT_CHAT_FRAME:AddMessage("<CTMod> " .. L["CT_Timer/SHOW_ON"], 1, 1, 0);
 		CT_TimerFrame:Show();
 		opts.showTimer = 1;
 
 	elseif ( msg == "hide" ) then
-		DEFAULT_CHAT_FRAME:AddMessage("<CTMod> " .. CT_TIMER_SHOW_OFF, 1, 1, 0);
+		DEFAULT_CHAT_FRAME:AddMessage("<CTMod> " .. L["CT_Timer/SHOW_OFF"], 1, 1, 0);
 		CT_TimerFrame:Hide();
 		opts.showTimer = nil;
 		CT_Timer_ShowTimer = 0;
 
 	elseif ( msg == "secs on" ) then
 		opts.showSeconds = 1;
-		DEFAULT_CHAT_FRAME:AddMessage("<CTMod> " .. CT_TIMER_SHOWSECS_ON, 1, 1, 0);
+		DEFAULT_CHAT_FRAME:AddMessage("<CTMod> " .. L["CT_Timer/SHOWSECS_ON"], 1, 1, 0);
 		CT_Timer_SetTime(CT_TimerData.time, CT_TimerFrame);
 
 	elseif ( msg == "secs off" ) then
 		opts.showSeconds = nil;
-		DEFAULT_CHAT_FRAME:AddMessage("<CTMod> " .. CT_TIMER_SHOWSECS_OFF, 1, 1, 0);
+		DEFAULT_CHAT_FRAME:AddMessage("<CTMod> " .. L["CT_Timer/SHOWSECS_OFF"], 1, 1, 0);
 		CT_Timer_SetTime(CT_TimerData.time, CT_TimerFrame);
 
 	elseif ( msg == "start" ) then
@@ -359,12 +368,16 @@ SlashCmdList["TIMER"] = function(msg)
 		CT_Timer_Reset();
 
 	elseif ( msg == "bg on" ) then
-		opts.hideBG = nil;
-		CT_TimerData.alphaUpdate = 5; -- Force redraw
+		module:setOption("hideBG", nil, true);
+		if (HideBackgroundCheckButton) then
+			HideBackgroundCheckButton:SetChecked(false);
+		end
 
 	elseif ( msg == "bg off" ) then
-		opts.hideBG = 1;
-		CT_TimerData.alphaUpdate = 5; -- Force redraw
+		module:setOption("hideBG", true, true);
+		if (HideBackgroundCheckButton) then
+			HideBackgroundCheckButton:SetChecked(true);
+		end
 
 	elseif ( string.find(msg, "^%d+$") ) then
 		local _, _, mins = string.find(msg, "^(%d+)$");
@@ -491,9 +504,9 @@ module.frame = function()
 	optionsBeginFrame(-20, 0, "frame#tl:0:%y#r");
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#General");
 
-		optionsAddObject( -5,   26, "checkbutton#tl:30:%y#o:showTimer#Show timer");
-		optionsAddObject(  6,   26, "checkbutton#tl:30:%y#o:showSeconds#Show seconds");
-		optionsAddObject(  6,   26, "checkbutton#tl:30:%y#o:hideBG#Hide background");
+		optionsAddObject( -5,   26, "checkbutton#tl:30:%y#n:ShowTimerCheckButton#o:showTimer#Show timer");
+		optionsAddObject(  6,   26, "checkbutton#tl:30:%y#n:ShowSecondsCheckButton#o:showSeconds#Show seconds");
+		optionsAddObject(  6,   26, "checkbutton#tl:30:%y#n:HideBackgroundCheckButton#o:hideBG#Hide background");
 
 		optionsBeginFrame( -5,   30, "button#t:0:%y#s:180:%s#n:CT_Timer_ResetPosition_Button#v:GameMenuButtonTemplate#Reset window position");
 			optionsAddScript("onclick",
@@ -528,7 +541,7 @@ module.frame = function()
 	-- Slash command details
 	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Commands");
-		for i, text in ipairs(CT_TIMER_HELP) do
+		for i, text in ipairs(L["CT_Timer/HELP"]) do
 			optionsAddObject( -2, 3*14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. text .. "#" .. textColor2 .. ":l");
 		end
 	optionsEndFrame();
@@ -552,7 +565,11 @@ end
 
 local function optHideBG(value)
 	opts.hideBG = value;
-	CT_TimerData.alphaUpdate = 5; -- Force redraw
+	if (value) then
+		bgFadeOut();
+	else
+		bgFadeIn();
+	end
 end
 
 local function optsInit(value)
