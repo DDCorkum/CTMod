@@ -1832,13 +1832,16 @@ function StaticClickCastBroker()
 	
 	-- CTRA frames register themselves to be informed when their macros may be out of date
 	function obj:Register(callbackFunc)
-		tinsert(registeredPlayerFrames, callbackFunc);
+		if (type(callbackFunc) == "function") then
+			tinsert(registeredPlayerFrames, callbackFunc);
+		end
 	end
 	
 	-- returns two macros, one to be used ordinarily and the other to be used exclusively out of combat when there is a removable debuff
 	-- the first macro is nil if click-casting if this class has no click casting
 	-- the second macro is nil if this class should not do anything different outside combat
 	function obj:GetMacros(unit)
+		if (not unit) then return; end
 		if (not isCached[unit]) then
 			draftMacros(unit);
 		end
