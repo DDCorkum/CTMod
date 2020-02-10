@@ -1872,8 +1872,10 @@ function StaticClickCastBroker()
 	do
 		updateSpells();
 		module:regEvent("PLAYER_LOGIN", updateSpells);
-		module:regEvent("ACTIVE_TALENT_GROUP_CHANGED", updateSpells);
 		module:regEvent("LEARNED_SPELL_IN_TAB", updateSpells);
+		if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+			module:regEvent("ACTIVE_TALENT_GROUP_CHANGED", updateSpells);
+		end
 		return obj;
 	end
 end
