@@ -168,7 +168,7 @@ end
 function public:InsertOre(mapid, x, y, ore, descript, name)
 	assert(type(mapid) == "number", "An AddOn is creating a CT_MapMod pin without identifying a valid map")
 	assert(type(x) == "number" and type(y) == "number" and x >= 0 and y >= 0 and x <= 1 and y <= 1, "An AddOn is creating a CT_MapMod pin without specifying valid cordinates");
-	assert(type(herb) == "string", "An AddOn is creating a CT_MapMod mining pin without identifying a kind of mining node")
+	assert(type(ore) == "string", "An AddOn is creating a CT_MapMod mining pin without identifying a kind of mining node")
 	if (type(descript) ~= "string") then
 		descript = nil
 	end
@@ -192,7 +192,8 @@ function public:InsertOre(mapid, x, y, ore, descript, name)
 		if (ore:sub(1,9) == "Reiches " and ore:len() > 9) then ore = ore:sub(10); end  -- changes "Reiches Thoriumvorkommen" to "Thoriumvorkommen"
 		if (ore:sub(1,9) == "Kleines " and ore:len() > 9) then ore = ore:sub(10); end  -- changes "Kleines Thoriumvorkommen" to "Thoriumvorkommen"
 		if (ore:sub(-9) == "vorkommen" and ore:len() > 9) then ore = ore:sub(1, -10); end -- changes "Kupfervorkommen" to "Kupfer"
-		if (ore:sub(-4) == "flöz" and ore:len() > 9) then ore = ore:sub(1, -5); end -- changes "Monelitflöz" to Monelit"
+		if (ore:sub(-4) == "flöz" and ore:len() > 4) then ore = ore:sub(1, -5); end -- changes "Monelitflöz" to Monelit"
+		if (ore:sub(-4) == "ader" and ore:len() > 4) then ore = ore:sub(1, -5); end -- changes "Zinnader" to "Zinn"
 	elseif (GetLocale() == "esES" or GetLocale() == "esMX") then
 		if (ore:sub(-9) == " enriquecido" and ore:len() > 12) then ore = ore:sub(1, -13); end -- changes "Filón de torio enriquecido" to "Filón de torio"
 		if (ore:sub(1,9) == "Filón de " and ore:len() > 10) then ore = ore:sub(10,10):upper() .. ore:sub(11); end -- changes "Filón de cobre" to "Cobre"
