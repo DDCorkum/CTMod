@@ -224,7 +224,6 @@ function public:InsertOre(mapid, x, y, ore, descript, name)
 			ore = ore:sub(10,10):upper() .. ore:sub(11);	-- "Veine de gangreschiste" to "Gangreschiste"
 		end
 	elseif (GetLocale() == "deDE") then
-		local oldOre = ore;
 		-- adjectives
 		if (ore:sub(1,8) == "Reiches " and ore:len() > 8) then
 			ore = ore:sub(9); 				-- "Reiches Thoriumvorkommen" to "Thoriumvorkommen"
@@ -239,7 +238,6 @@ function public:InsertOre(mapid, x, y, ore, descript, name)
 		elseif (ore:sub(-4) == "ader" and ore:len() > 4) then
 			ore = ore:sub(1, -5); 				-- "Zinnader" to "Zinn"
 		end
-		print (oldOre .. " becomes " .. ore .. "; and do its last four chars, " .. ore:sub(-4) .. ", == flöz? " .. tostring(ore:sub(-4) == "flöz"));
 	elseif (GetLocale() == "esES" or GetLocale() == "esMX") then
 		-- following adjective
 		if (ore:sub(-9) == " enriquecido" and ore:len() > 12) then
