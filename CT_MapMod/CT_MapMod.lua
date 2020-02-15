@@ -1158,8 +1158,10 @@ function module:AddUIElements()
 							alreadyInPosition = true;
 							if (not WorldMapFrame.ctMaxMinHooked) then
 								WorldMapFrame.ctMaxMinHooked = true;
-								hooksecurefunc(WorldMapFrame.BorderFrame.MaximizeMinimizeFrame, "Maximize", function() alreadyInPosition = nil; end);
-								hooksecurefunc(WorldMapFrame.BorderFrame.MaximizeMinimizeFrame, "Minimize", function() alreadyInPosition = nil; end);
+								if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+									hooksecurefunc(WorldMapFrame.BorderFrame.MaximizeMinimizeFrame, "Maximize", function() alreadyInPosition = nil; end);
+									hooksecurefunc(WorldMapFrame.BorderFrame.MaximizeMinimizeFrame, "Minimize", function() alreadyInPosition = nil; end);
+								end
 							end
 							if (module:getGameVersion() == CT_GAME_VERSION_RETAIL and not WorldMapFrame:IsMaximized() and WorldMapFrame.SidePanelToggle.OpenButton:IsShown()) then
 								-- Minimized without quest frame
