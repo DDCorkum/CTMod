@@ -1,8 +1,6 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 	<Script file="localization.lua"/>
-	<Script file="localization.ge.lua"/>
-	<Script file="localization.fr.lua"/>
 	<Script file="CT_Timer.lua"/>
 	<Frame name="CT_TimerFrame" movable="true" hidden="true" parent="UIParent" clampedToScreen="true">
 		<Size>
@@ -126,12 +124,9 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				</Size>
 				<Scripts>
 					<OnEnter>
-						GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-						GameTooltip:SetText(CT_TIMER_DRAG1 .. "\n" .. CT_TIMER_DRAG2 .. "\n" .. CT_TIMER_DRAG3);
-						CT_Timer_OnMouseOver();
+						CT_Timer_OnMouseOver(self);	-- self used for the gametooltip
 					</OnEnter>
 					<OnLeave>
-						GameTooltip:Hide();
 						CT_Timer_OnMouseOut();
 					</OnLeave>
 					<OnMouseDown>

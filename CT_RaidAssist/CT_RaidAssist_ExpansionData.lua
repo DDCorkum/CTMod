@@ -414,7 +414,7 @@ module.CTRA_Configuration_Consumables =
 local function localizeClickCasting(table)
 	local class = select(2, UnitClass("player"));
 	if (table[class]) then
-		for i, details in ipairs(table[class]) do
+		for __, details in ipairs(table[class]) do
 			if (C_Spell.DoesSpellExist(details.id) and (details.gameVersion == module:getGameVersion() or not details.gameVersion)) then
 				local spell = Spell:CreateFromSpellID(details.id);
 				spell:ContinueOnSpellLoad(function() details.name = GetSpellInfo(details.id) end);

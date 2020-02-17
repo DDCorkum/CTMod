@@ -1,3 +1,6 @@
+CT_RaidAssist (8.3.0.5) 2020-02-10
+- Click-cast decursing also available outside combat
+
 CT_RaidAssist (8.3.0.4) 2020-01-21
 - Removed a message that spammed in boss fights
 

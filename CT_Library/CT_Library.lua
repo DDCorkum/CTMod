@@ -19,52 +19,42 @@
 -----------------------------------------------
 -- Initialization
 
-local LIBRARY_VERSION = 8.303;
+local LIBRARY_VERSION = 8.305;		-- Once upon a time this was to differentiate between different versions of CT_Library... but its now 2020 and CT_Library has stood as its own AddOn for more than a decade.
 local LIBRARY_NAME = "CT_Library";
 
+-- Create tables for all the PROTECTED contents and PUBLIC interface of CTMod
 local _G = getfenv(0);
-local lib = _G[LIBRARY_NAME];
+local lib = select(2, ...);	-- Protected attributes and methods that any CT module may access by calling CT_Library:RegisterModule(module) with its own table as a parameter
+local libPublic = {}		-- Public attributes and methods that any AddOn, including CT modules, may access at time by calling _G["CT_Library"] or via the special table module.publicInterface that is created by CT_Library(RegisterModule.module)
 
--- Abort if we have this version installed already
-if ( lib and lib.version >= LIBRARY_VERSION ) then
-	return;
-end
+-- Associate lib and libPublic, so that code written for the protected lib can also access the public libPublic without being aware of the difference
+setmetatable(lib, { __index = libPublic });
 
-local modules, movables, frame, eventTable;
+-- Publicly expose the public interface
+_G[LIBRARY_NAME] = libPublic;
+
+-- Private attributes
+local modules = {};		-- Collection of registered CT modules
+local movables, frame, eventTable;
 local timerRepeatedTimes, timerRepeatedFuncs, timerRepeatedStarts, timerTimes, timerFuncs;
 local numSlashCmds, localizations, tableList, defaultValues;
 local frameCache;
----- Clear the lib if necessary, otherwise create it
-if ( lib ) then
-	-- Use the existing lib table.
-	-- Get the data to preserve from the earlier version of CT_Library.
-	-- Note: Previous versions of CT_Library may not have handled all of these values,
-	-- so they will be nil after the call to the earlier CT_Library's lib:getData().
-		modules, movables, eventTable, timerRepeatedTimes, timerRepeatedFuncs,
-		timerRepeatedStarts, timerTimes, timerFuncs, frame,
-		-- Added handling of the following in 5.0002
-		numSlashCmds, localizations, tableList, defaultValues, frameCache = lib:getData();
-	-- Clear the existing lib table.
-	lib:unload();
-else
-	-- Create a new lib table.
-	lib = { };
-	_G[LIBRARY_NAME] = lib;
-end
 
 -- Set the variables used
 lib.name = LIBRARY_NAME;
 lib.version = LIBRARY_VERSION;
 
 -- see localization.lua
-local obj = select(2,...);
-obj.text = obj.text or { };
-local L = obj.text
-local metatable = getmetatable(L) or {}
-metatable.__index = function(table, missingKey)
-	return "[Not Found: " .. gsub(missingKey, "CT_Library/", "") .. "]";
+local L;
+do
+	lib.text = lib.text or { };
+	L = lib.text
+	local metatable = getmetatable(L) or {}
+	metatable.__index = function(table, missingKey)
+		return "[Not Found: " .. gsub(missingKey, "CT_Library/", "") .. "]";
+	end
+	setmetatable(L, metatable);
 end
-setmetatable(L, metatable);
 
 -- End Initialization
 -----------------------------------------------
@@ -113,6 +103,11 @@ local getSpellName = GetSpellBookItemName;
 -----------------------------------------------
 -- Generic Functions
 
+-- Return's the library's version, as a number with the main version before the decimal and subversions as fractions (usually tenths and thousandths, but not guaranteed)
+function libPublic:getLibVersion()
+	return LIBRARY_VERSION;
+end
+
 local function printText(frame, r, g, b, text)
 	frame:AddMessage(text, r, g, b);
 end
@@ -143,7 +138,7 @@ end
 CT_GAME_VERSION_UNKNOWN = 0;
 CT_GAME_VERSION_RETAIL  = 1;
 CT_GAME_VERSION_CLASSIC = 2;
-function lib:getGameVersion()
+function libPublic:getGameVersion()
 	local version = CT_GAME_VERSION_UNKNOWN;
 	if (MainMenuBarArtFrame and MainMenuBarArtFrame.LeftEndCap) then
 		-- The gryphons were changed in WoW 8.0
@@ -801,11 +796,23 @@ end
 -- Module Handling
 
 -- Register a module with the library
-local module_meta = { __index = lib };
+local module_meta =
+{
+	__index = function(module, key)
+		return module.publicInterface[key] or lib[key];
+	end
+}
+local module_metaPublic = { __index = libPublic };
 
 local function registerMeta(module)
-	-- Set the module's metatable
+	-- Creates a public interface used by some CTMod modules to publicly expose only a subset of library functions
+	module.publicInterface = module.publicInterface or {};
+	setmetatable(module.publicInterface, module_metaPublic);
+
+	-- Set the module's metatable, used by all CTMod modules to access private library functions
 	setmetatable(module, module_meta);
+	
+
 end
 
 local function registerLocalizationMeta(module)
@@ -854,25 +861,12 @@ local function registerModule(module, position)
 	end);
 end
 
-function lib:registerModule(module)
+-- Integrates the module into the CT Control Panel, and makes the module an extension of CTMod's public interface and protected content by configuring its metatable __index property
+-- Furthermore, creates sub-table module.publicInterface that may be used by modules to limit their public exposure
+-- 
+function libPublic:registerModule(module)
+	assert(type(module) == "table", "An AddOn attempted to register itself with CTMod without providing the necessary parameter");
 	registerModule(module);
-end
-
--- Return values that need to be preserved when a newer version of CT_Library is encountered.
-function lib:getData()
-	return modules, movables, eventTable, timerRepeatedTimes, timerRepeatedFuncs,
-		timerRepeatedStarts, timerTimes, timerFuncs, frame,
-		numSlashCmds, localizations, tableList, defaultValues,
-		frameCache;
-end
-
-if ( modules ) then
-	-- Re-register already loaded modules
-	for key, value in ipairs(modules) do
-		registerMeta(value);
-	end
-else
-	modules = { };
 end
 
 -- End Module Handling
@@ -2457,10 +2451,11 @@ end
 --------------------------------------------
 -- AddOn Conflict Resolution
 
-local addOnConflictResolutions = {}
-local addOnConflictRequests = {}
+local addOnConflictResolutions = {}		-- A collection of private functions that other AddOns may trigger to resolve conflict with CTMod
+local addOnConflictRequests = {}		-- A list of requests made by other AddOns for CTMod to execute private code to resolve conflict
 
--- used by CTMod to set aside functions that may be executed at the request of other addons for resolving conflict
+-- Registers a CT Module's private function to be executed upon request by any AddOn.
+-- The function will be called with parameters
 function lib:registerConflictResolution(conflict, version, func)
 	addOnConflictResolutions[conflict] = addOnConflictResolutions[conflict] or {};
 	addOnConflictResolutions[conflict][version] = addOnConflictResolutions[conflict][version] or {};
@@ -2470,16 +2465,22 @@ function lib:registerConflictResolution(conflict, version, func)
 	end
 end
 
--- used by other addons to request CTMod to resolve conflict
-function lib:requestAddOnConflictResolution(conflict, version, ...)
+-- Public method that any AddOn may use to request CTMod to change its behaviour using a private function
+-- Even if the private function does not exist, the request will be stored in memory and later applied should the private function be registered
+-- Parameters
+--	conflict	String, Required		Descriptive name of a particular conflict that needs resolving
+--	version		String or Number, Required	Future-proofs this conflict resolution, by allowing for code changes to be called up using a different version parameter
+--	...		Any Type, Optional		Anything that should be passed to the private function, such as objects to manipulate or a callback function
+function libPublic:requestAddOnConflictResolution(conflict, version, ...)
+	assert(type(conflict) == "string", "An AddOn asked CTMod to resolve a conflict, but did not provide a string as the name of the conflict")
+	assert(version, "An AddOn asked CTMod to resolve a conflict, but did not provide a version number to ensure future-proofing of this AddOn conflict resolution")
 	if (addOnConflictResolutions[conflict] and addOnConflictResolutions[conflict][version]) then
 		for __, func in ipairs(addOnConflictResolutions[conflict][version]) do
 			func(...);
 		end
-		addOnConflictRequests[conflict] = addOnConflictRequests[conflict] or {};
-		addOnConflictRequests[conflict][version] = {...}
 	end
-	return false;
+	addOnConflictRequests[conflict] = addOnConflictRequests[conflict] or {};
+	addOnConflictRequests[conflict][version] = {...}
 end
 
 
@@ -2797,7 +2798,7 @@ local function displayControlPanel()
 	controlPanelFrame:Show();
 end
 
-function lib:showControlPanel(show)
+function libPublic:showControlPanel(show)
 	if ( show == "toggle" ) then
 		if ( controlPanelFrame and controlPanelFrame:IsVisible() ) then
 			show = false;
@@ -2813,7 +2814,7 @@ end
 
 -- Show the CTMod control panel options for the specified addon name.
 -- if useCustomFunction is true then an attempt will be made to open a module's custom options function instead
-function lib:showModuleOptions(modname, useCustomFunction)
+function libPublic:showModuleOptions(modname, useCustomFunction)
 	self:showControlPanel(true);
 	if (not lib:isControlPanelShown()) then	-- this might happen if the panel is forced off during combat
 		return;
@@ -2848,7 +2849,7 @@ function lib:showModuleOptions(modname, useCustomFunction)
 	end
 end
 
-function lib:isControlPanelShown()
+function libPublic:isControlPanelShown()
 	if (controlPanelFrame and controlPanelFrame:IsVisible()) then
 		return true;
 	else

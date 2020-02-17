@@ -80,6 +80,7 @@ local strsplit = strsplit;
 local StaticCTRAReadyCheck;		-- Adds features to help you share your ready check status with raid members
 local StaticCTRAFrames;			-- Wrapper over all raid-frame portions of the addon
 local NewCTRAWindow;			-- Set of player frames (and optionally labels or target frames) sharing a common appearance and anchor point
+local StaticClickCastBroker;		-- Brokers what spells a CTRAPlayerFrame object should cast when right-clicked
 local NewCTRAPlayerFrame;		-- A single, interactive player frame that is contained in a window
 local NewCTRATargetFrame;		-- A single, interactive target frame that is contained in a window
 
@@ -1177,21 +1178,13 @@ function StaticCTRAFrames()
 	
 	-- public constructor
 	do
-		listener = CreateFrame("Frame", nil);
-		listener:RegisterEvent("PLAYER_ENTERING_WORLD");		-- defers creating the frames until the player is in the game
-		listener:RegisterEvent("GROUP_ROSTER_UPDATE");			-- the frames might enable only during raids, groups, or always!
-		listener:RegisterEvent("PLAYER_REGEN_ENABLED");			-- in case the player's membership in a group/raid changed during combat
-		listener:HookScript("OnEvent",
-			function(self, event)
-				obj:ToggleEnableState();
-				obj:Update();
-				if (event == "PLAYER_ENTERING_WORLD") then
-					-- a hack because SpellInfo() isn't quite ready at PLAYER_ENTERING_WORLD in Classic
-					C_Timer.After(1, function() obj:Update(); end);		-- in case SpellInfo() is a split second late loading
-					C_Timer.After(10, function() obj:Update(); end);	-- in case SpellInfo() is a few seconds late loading
-				end
-			end
-		);	
+		local function doUpdate()
+			obj:ToggleEnableState();
+			obj:Update();
+		end
+		module:regEvent("PLAYER_LOGIN", doUpdate);		-- defers creating the frames until the player is in the game
+		module:regEvent("GROUP_ROSTER_UPDATE", doUpdate);	-- the frames might enable only during raids, groups, or always!
+		module:regEvent("PLAYER_REGEN_ENABLED", doUpdate);	-- in case the player's membership in a group/raid changed during combat
 		return obj;
 	end
 end
@@ -1733,7 +1726,169 @@ function NewCTRAWindow(owningCTRAFrames)
 end
 
 --------------------------------------------
+-- Spells
+
+local clickCastBroker;
+function StaticClickCastBroker()
+
+	-- STATIC PUBLIC INTERFACE
+	if (clickCastBroker) then
+		return clickCastBroker;
+	end
+	local obj = { };
+	clickCastBroker = obj;
+
+	-- PRIVATE PROPERTIES
+
+	local class = select(2,UnitClass("player"));
+	local canBuff = { };
+	local canRemoveDebuff = { };
+	local canRezCombat = { };
+	local canRezNoCombat = { };
+	local isCached = {};				-- true (value) for each unit (key) that has been cached already
+	local cachedMacros = {};			-- a macro (value) for each unit (key) if this class can click-cast, or nil
+	local cachedNoCombatMacros = {};		-- a macro (value) for each unit (key) if this class can remove debuffs outside combat, or nil
+	local registeredPlayerFrames = {};
+
+	-- PRIVATE METHODS
+	
+	local function updateSpells()
+		-- STEP 1: wipe all existing spell data
+		-- STEP 2: record which spells the player can cast
+		-- STEP 3: wipe all cached macros (to ensure they are refreshed with the newest spell data)
+		-- STEP 4: direct all registered CTRAPlayerFrames to update their macros
+
+		-- STEP 1:
+		wipe(canBuff);
+		wipe(canRemoveDebuff);
+		wipe(canRezCombat);
+		wipe(canRezNoCombat);
+		
+		-- STEP 2:
+		-- canBuff
+		if (module.CTRA_Configuration_Buffs[class]) then
+			for __, details in ipairs(module.CTRA_Configuration_Buffs[class]) do
+				if (GetSpellInfo(details.name) and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and (canBuff[details.modifier] == nil)) then
+					canBuff[details.modifier] = details.name;
+				end
+			end
+		end
+
+		-- canRemoveDebuff
+		if (module.CTRA_Configuration_FriendlyRemoves[class]) then
+			for __, details in ipairs(module.CTRA_Configuration_FriendlyRemoves[class]) do
+				if (GetSpellInfo(details.name) and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and canRemoveDebuff[details.modifier] == nil and (details.spec == nil or spec == nil or details.spec == spec)) then
+					canRemoveDebuff[details.modifier] = details.name;
+				end
+			end
+		end
+		-- canRezCombat and canRezNoCombat
+		if (module.CTRA_Configuration_RezAbilities[class]) then
+			for __, details in ipairs(module.CTRA_Configuration_RezAbilities[class]) do
+				if (GetSpellInfo(details.name) and details.combat and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and canRezCombat[details.modifier] == nil) then
+					canRezCombat[details.modifier] = details.name;
+				end
+				if (GetSpellInfo(details.name) and details.nocombat and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and canRezNoCombat[details.modifier] == nil) then
+					canRezNoCombat[details.modifier] = details.name;
+				end
+			end
+		end
+		
+		-- STEP 3:
+		wipe(isCached);
+		wipe(cachedMacros);
+		wipe(cachedNoCombatMacros);
+		
+		-- STEP 4:
+		for __, func in pairs(registeredPlayerFrames) do
+			func();
+		end
+	end
+	
+	local function draftMacros(unit)
+		local macroRight1, macroRight2;
+		local hasDebuffs;
+		for modifier, spellName in pairs(canRemoveDebuff) do		-- [@party1, exists, nodead, combat, nomod] Abolish Poison; [@party1, nodead, combat, mod:shift] Remove Curse;
+			macroRight1 = (macroRight1 or "/cast") .. " [@" .. unit .. ", exists, nodead, combat, " .. modifier .. "] " .. spellName .. ";";
+			macroRight2 = (macroRight2 or "/cast") .. " [@" .. unit .. ", exists, nodead, " .. modifier .. "] " .. spellName .. ";";
+			hasDebuffs = true;
+		end				
+		for modifier, spellName in pairs(canBuff) do			-- [@party1, exists, nodead, nocombat, nomod] Arcane Intellect; [@party1, nodead, nocombat, mod:shift] Arcane Brilliance;
+			macroRight1 = (macroRight1 or "/cast") .. " [@" .. unit .. ", exists, nodead, nocombat, " .. modifier .. "] " .. spellName .. ";";
+			macroRight2 = (macroRight2 or "/cast") .. " [@" .. unit .. ", exists, nodead, nocombat, " .. modifier .. "] " .. spellName .. ";";
+		end	
+		for modifier, spellName in pairs(canRezCombat) do			-- [@party1, exists, dead, combat, nomod] Rebirth;
+			macroRight1 = (macroRight1 or "/cast") .. " [@" .. unit .. ", exists, dead, combat, " .. modifier .. "] " .. spellName .. ";";
+			macroRight2 = (macroRight2 or "/cast") .. " [@" .. unit .. ", exists, dead, combat, " .. modifier .. "] " .. spellName .. ";";
+		end							
+		for modifier, spellName in pairs(canRezNoCombat) do		-- [@party1, exists, dead, nocombat, nomod] Resurrection;
+			macroRight1 = (macroRight1 or "/cast") .. " [@" .. unit .. ", exists, dead, nocombat, " .. modifier .. "] " .. spellName .. ";";
+			macroRight2 = (macroRight2 or "/cast") .. " [@" .. unit .. ", exists, dead, nocombat, " .. modifier .. "] " .. spellName .. ";";
+		end
+		isCached[unit], cachedMacros[unit], cachedNoCombatMacros[unit] = true, macroRight1, hasDebuffs and macroRight2;
+	end
+	
+	-- PUBLIC METHODS
+	
+	-- CTRA frames register themselves to be informed when their macros may be out of date
+	function obj:Register(callbackFunc)
+		if (type(callbackFunc) == "function") then
+			tinsert(registeredPlayerFrames, callbackFunc);
+		end
+	end
+	
+	-- returns two macros, one to be used ordinarily and the other to be used exclusively out of combat when there is a removable debuff
+	-- the first macro is nil if click-casting if this class has no click casting
+	-- the second macro is nil if this class should not do anything different outside combat
+	function obj:GetMacros(unit)
+		if (not unit) then return; end
+		if (not isCached[unit]) then
+			draftMacros(unit);
+		end
+		return cachedMacros[unit], cachedNoCombatMacros[unit];
+	end
+	
+	-- adds several double-lines to the tooltip (default: GameTooltip) describing each spell and how to click-cast it
+	-- also adds a single line that saying "Right click..." if there is at least one click-castable spell
+	function obj:PopulateTooltip(tooltip)
+		tooltip = tooltip or GameTooltip;
+		local needFirstLine = true;
+		for modifier, spellName in pairs(canBuff) do
+			if needFirstLine then tooltip:AddLine("|nRight click..."); needFirstLine = false; end
+			tooltip:AddDoubleLine("|cFF33CC66nocombat" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFF33CC66"  .. spellName);
+		end
+		for modifier, spellName in pairs(canRemoveDebuff) do
+			if needFirstLine then tooltip:AddLine("|nRight click..."); needFirstLine = false; end
+			tooltip:AddDoubleLine("|cFFCC6666combat" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFCC6666" .. spellName);
+		end
+		for modifier, spellName in pairs(canRezCombat) do 
+			if needFirstLine then tooltip:AddLine("|nRight click..."); needFirstLine = false; end
+			tooltip:AddDoubleLine("|cFFCC6666combat, dead" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFCC6666" .. spellName);
+		end
+		for modifier, spellName in pairs(canRezNoCombat) do 
+			if needFirstLine then tooltip:AddLine("|nRight click..."); needFirstLine = false; end
+			tooltip:AddDoubleLine("|cFF999999nocombat, dead" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFF999999" .. spellName);
+		end
+	end
+	
+	-- CONSTRUCTOR
+	do
+		updateSpells();
+		module:regEvent("PLAYER_LOGIN", updateSpells);
+		module:regEvent("LEARNED_SPELL_IN_TAB", updateSpells);
+		if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+			module:regEvent("ACTIVE_TALENT_GROUP_CHANGED", updateSpells);
+		end
+		return obj;
+	end
+end
+
+
+
+
+--------------------------------------------
 -- CTRAPlayerFrame
+
 
 function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	
@@ -1746,7 +1901,9 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	local owner;			-- pointer to the CTRAWindow interface for calling functions like :GetProperty()
 	local parent;			-- pointer to the CTRAWindow's frame object that is a parent for the visualFrame
 	local visualFrame;		-- generic frame that shows various textures
-	local secureButton;		-- SecureUnitActionButton that sits in front and responds to mouseclicks
+	local secureButton;	-- SecureUnitActionButton that sits in front and responds to mouseclicks
+	local secureButtonDebuffFirst;	-- SecureUnitActionButton that sits in front and responds to mouseclicks
+	local macroRight;		-- copy of the macro currently used when right-clicking secureButton to click-cast
 	local listenerFrame;		-- generic frame that listens to various events
 	local requestedUnit;		-- the unit that this object is requested to display at the next opportunity
 	local requestedXOff;		-- the x coordinate to position this object's frames at the next opportunity (relative to parent's left)w
@@ -2473,122 +2630,13 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 		end
 	end
 	
-	-- returns a table with nomod, mod:shift, mod:ctrl or mod:alt as a key and then a valid spellName as a value
-	local canRezCombat = function()
-		local __, class = UnitClass("player");
-		if (module.CTRA_Configuration_RezAbilities[class]) then
-			local combatRezToCast = { };
-			local hasRez = nil;
-			for __, details in ipairs(module.CTRA_Configuration_RezAbilities[class]) do
-				if (GetSpellInfo(details.name) and details.combat and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and combatRezToCast[details.modifier] == nil) then
-					combatRezToCast[details.modifier] = details.name;
-					hasRez = true;
-				end
-			end
-			if (hasRez) then
-				return combatRezToCast;
-			end
-		end
-		return nil;
-	end
-	
-	-- returns a table with nomod, mod:shift, mod:ctrl or mod:alt as a key and then a valid spellName as a value
-	local canRezNoCombat = function()
-		local __, class = UnitClass("player");
-		if (module.CTRA_Configuration_RezAbilities[class]) then
-			local nocombatRezToCast = { };
-			local hasRez = nil;
-			for __, details in ipairs(module.CTRA_Configuration_RezAbilities[class]) do
-				if (GetSpellInfo(details.name) and details.nocombat and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and nocombatRezToCast[details.modifier] == nil) then
-					nocombatRezToCast[details.modifier] = details.name;
-					hasRez = true;
-				end
-			end
-			if (hasRez) then
-				return nocombatRezToCast;
-			end
-		end
-		return nil;
-	end
-
-	-- returns a table with nomod, mod:shift, mod:ctrl or mod:alt as a key and then a valid spellName as a value
-	local canRemoveDebuff = function()				
-		local __, class = UnitClass("player");
-		local spec = GetInspectSpecialization("player");
-		if (module.CTRA_Configuration_FriendlyRemoves[class]) then
-			local friendlyRemovesToCast = { };
-			local hasFriendlyRemoves = nil;
-			for __, details in ipairs(module.CTRA_Configuration_FriendlyRemoves[class]) do
-				if (GetSpellInfo(details.name) and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and friendlyRemovesToCast[details.modifier] == nil and (details.spec == nil or spec == nil or details.spec == spec)) then
-					friendlyRemovesToCast[details.modifier] = details.name;
-					hasFriendlyRemoves = true;
-				end
-			end
-			if (hasFriendlyRemoves) then
-				return friendlyRemovesToCast;
-			end
-		end
-		return nil;
-	end
-
-	-- returns two tables:
-	--    the first table has nomod, mod:shift, mod:ctrl or mod:alt as a key and then a valid spellName as a value
-	--    the second table are a list of spells that should be checked to ensure they are not missing, using spellName as key and then a table with 'scope' (default: "raid") and 'noStack' (default: nil)
-	local canBuff = function()				
-		local __, class = UnitClass("player");
-		if (module.CTRA_Configuration_Buffs[class]) then
-			local buffsToCast = { };
-			local hasBuffs = nil;
-			for __, details in ipairs(module.CTRA_Configuration_Buffs[class]) do
-				if (GetSpellInfo(details.name) and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and (buffsToCast[details.modifier] == nil)) then
-					buffsToCast[details.modifier] = details.name;
-					hasBuffs = true;
-				end
-			end
-			if (hasBuffs) then
-				return buffsToCast;
-			end
-		end
-		return nil;
-	end
-	
-	-- updates secureButton macros once out of combat
-	local updateMacros = function()
-		if (InCombatLockdown()) then return; end
-		
-		-- left click just targets
-		secureButton:SetAttribute("*macrotext1", "/target " .. shownUnit);
-		
-		-- right click does several things
-		local macroRight = ""
-		local rezCombat = canRezCombat();
-		local rezNoCombat = canRezNoCombat();
-		local removeDebuff = canRemoveDebuff();
-		local applyBuff = canBuff();
-		if (rezCombat or rezNoCombat or removeDebuff or applyBuff) then
-			macroRight = macroRight .. "/cast";
-			if (rezCombat) then						-- [@party1, exists, dead, combat, nomod] Rebirth;
-				for modifier, spellName in pairs(rezCombat) do
-					macroRight = macroRight .. " [@" .. shownUnit .. ", exists, dead, combat, " .. modifier .. "] " .. spellName .. ";";
-				end
-			end			
-			if (rezNoCombat) then						-- [@party1, exists, dead, nocombat, nomod] Resurrection;
-				for modifier, spellName in pairs(rezNoCombat) do
-					macroRight = macroRight .. " [@" .. shownUnit .. ", exists, dead, nocombat, " .. modifier .. "] " .. spellName .. ";";
-				end
-			end
-			if (removeDebuff) then						-- [@party1, exists, nodead, combat, nomod] Abolish Poison; [@party1, nodead, combat, mod:shift] Remove Curse;
-				for modifier, spellName in pairs(removeDebuff) do
-					macroRight = macroRight .. " [@" .. shownUnit .. ", exists, nodead, combat, " .. modifier .. "] " .. spellName .. ";";
-				end
-			end	
-			if (applyBuff) then						-- [@party1, exists, nodead, nocombat, nomod] Arcane Intellect; [@party1, nodead, nocombat, mod:shift] Arcane Brilliance;
-				for modifier, spellName in pairs(applyBuff) do
-					macroRight = macroRight .. " [@" .. shownUnit .. ", exists, nodead, nocombat, " .. modifier .. "] " .. spellName .. ";";
-				end
-			end
-		end
-		secureButton:SetAttribute("*macrotext2", macroRight);
+	-- update click-casting on right click
+	local function updateRightMacros()
+		if (InCombatLockdown() or not shownUnit) then return; end
+		local broker = StaticClickCastBroker();
+		local macroRight1, macroRight2 = clickCastBroker:GetMacros(shownUnit);
+		secureButton:SetAttribute("*macrotext2", macroRight1);
+		secureButtonDebuffFirst:SetAttribute("*macrotext2", macroRight2);
 	end
 	
 	local function updateDurability(percent, broken, sender, __)
@@ -2602,6 +2650,104 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	
 	local function clearDurability()
 		durabilityAverage, durabilityBroken, durabilityTime = nil, nil, nil;
+	end
+	
+	local function displayTooltip()
+		if (UnitExists(shownUnit)) then
+			GameTooltip:SetOwner(parent, (owner:GetProperty("GrowUpward") and "ANCHOR_BOTTOMRIGHT") or "ANCHOR_TOPLEFT");
+			local className, classFilename = UnitClass(shownUnit);
+			local r,g,b = GetClassColor(classFilename);
+			GameTooltip:AddDoubleLine(UnitName(shownUnit) or "", UnitLevel(shownUnit) or "", r,g,b, 1,1,1);
+			local mapid = C_Map.GetBestMapForUnit(shownUnit);
+			GameTooltip:AddDoubleLine((UnitRace(shownUnit) or "") .. " " .. (className or ""), (not UnitInRange(shownUnit) and mapid and C_Map.GetMapInfo(mapid).name) or "", 1, 1, 1, 0.5, 0.5, 0.5);
+			if (auraBoss1Texture:IsShown()) then
+				local color = DebuffTypeColor[auraBoss1Texture.debuffType or ""];
+				GameTooltip:AddLine("|T" .. auraBoss1Texture:GetTexture() .. ":0|t " .. (auraBoss1Texture.name or "") .. ((auraBoss1Texture.count or 0) > 1 and (" (" .. auraBoss1Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+				if (auraBoss2Texture:IsShown()) then
+					color = DebuffTypeColor[auraBoss2Texture.debuffType or ""];
+					GameTooltip:AddLine("|T" .. auraBoss2Texture:GetTexture() .. ":0|t " .. (auraBoss2Texture.name or "") .. ((auraBoss2Texture.count or 0) > 1 and (" (" .. auraBoss2Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+					if (auraBoss3Texture:IsShown()) then
+						color = DebuffTypeColor[auraBoss3Texture.debuffType or ""];
+						GameTooltip:AddLine("|T" .. auraBoss3Texture:GetTexture() .. ":0|t " .. (auraBoss3Texture.name or "") .. ((auraBoss3Texture.count or 0) > 1 and (" (" .. auraBoss3Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+					end
+				end
+			end
+			if (aura1Texture:IsShown()) then
+				local color = DebuffTypeColor[aura1Texture.debuffType or ""];
+				GameTooltip:AddLine("|T" .. aura1Texture:GetTexture() .. ":0|t " .. (aura1Texture.name or "") .. ((aura1Texture.count or 0) > 1 and (" (" .. aura1Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+				if (aura2Texture:IsShown()) then
+					color = DebuffTypeColor[aura2Texture.debuffType or ""];
+					GameTooltip:AddLine("|T" .. aura2Texture:GetTexture() .. ":0|t " .. (aura2Texture.name or "") .. ((aura2Texture.count or 0) > 1 and (" (" .. aura2Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+					if (aura3Texture:IsShown()) then
+						color = DebuffTypeColor[aura3Texture.debuffType or ""];
+						GameTooltip:AddLine("|T" .. aura3Texture:GetTexture() .. ":0|t " .. (aura3Texture.name or "") .. ((aura3Texture.count or 0) > 1 and (" (" .. aura3Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+						if (aura4Texture:IsShown()) then
+							color = DebuffTypeColor[aura4Texture.debuffType or ""];
+							GameTooltip:AddLine("|T" .. aura4Texture:GetTexture() .. ":0|t " .. (aura4Texture.name or "") .. ((aura4Texture.count or 0) > 1 and (" (" .. aura4Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+							if (aura5Texture:IsShown()) then
+								color = DebuffTypeColor[aura5Texture.debuffType or ""];
+								GameTooltip:AddLine("|T" .. aura5Texture:GetTexture() .. ":0|t " .. (aura5Texture.name or "") .. ((aura5Texture.count or 0) > 1 and (" (" .. aura5Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+							end
+						end
+					end
+				end
+			end
+
+			if (not module.GameTooltipExtraLine) then
+				module.GameTooltipExtraLine = GameTooltip:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall");
+				module.GameTooltipExtraLine:SetPoint("BOTTOM", 0, 6);
+				module.GameTooltipExtraLine:SetText(L["CT_RaidAssist/PlayerFrame/TooltipFooter"]);
+				module.GameTooltipExtraLine:SetScale(0.90);
+			end	
+			if (not InCombatLockdown()) then
+				-- Durability
+				if (durabilityAverage) then
+					local time = GetTime() - (durabilityTime or 0);
+					if (durabilityBroken > 0) then
+						GameTooltip:AddLine(format(L["CT_RaidAssist/PlayerFrame/TooltipItemsBroken"],durabilityBroken, durabilityAverage, floor(time/60),time - floor(time/60) * 60), 1.0, 1.0, 0.0);
+					else
+						GameTooltip:AddLine(format(L["CT_RaidAssist/PlayerFrame/TooltipItemsNotBroken"],durabilityAverage,  floor(time/60),time - floor(time/60) * 60), 0.9, 0.9, 0.9);
+					end
+				end
+
+				-- Consumables
+				for i=1, 40 do
+					local name, icon, __, __, __, __, __, __, __, spellId = UnitAura(shownUnit, i, "HELPFUL CANCELABLE");
+					if (not name or not spellId) then
+						break;
+					end
+					local isConsumable = module.CTRA_Configuration_Consumables[spellId];
+					if (isConsumable) then
+						if (type(isConsumable) == "number") then
+							local itemName, __, __, __, __, __, __, __, __, itemIcon = GetItemInfo(isConsumable);
+							if (itemName and itemIcon) then
+								GameTooltip:AddLine("|T" .. icon .. ":0|t " .. name .. " from " .. "|T" .. itemIcon .. ":0|t " .. itemName, 0.9, 0.9, 0.9);
+							else
+								GameTooltip:AddLine("|T" .. icon .. ":0|t " .. name, 0.9, 0.9, 0.9);
+							end
+						else
+							GameTooltip:AddLine("|T" .. icon .. ":0|t " .. name, 0.9, 0.9, 0.9);
+						end
+					end
+				end
+
+				-- Click-Casting
+				StaticClickCastBroker():PopulateTooltip();
+
+				-- CTRA Footer
+				GameTooltip:Show();
+				module.GameTooltipExtraLine:Show();
+				GameTooltip:SetHeight(GameTooltip:GetHeight()+5);
+				GameTooltip:SetWidth(max(150,GameTooltip:GetWidth()));
+				if (owner.GetWindowID and module:getOption("MOVABLE-CTRAWindow" .. owner:GetWindowID())) then
+					module.GameTooltipExtraLine:SetTextColor(0.50, 0.50, 0.50);
+				else
+					module.GameTooltipExtraLine:SetTextColor(1,1,1);
+				end
+			else
+				GameTooltip:Show();
+			end
+		end
 	end
 	
 	-- PUBLIC FUNCTIONS
@@ -2633,10 +2779,9 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	end
 	
 	function obj:Update(option, value)
-		-- STEP 1: Construct the secureButton and visualFrame if required, but only while out of combat, before proceeding to any of the following steps
+		-- STEP 1: Construct the secureButton, secureButtonDebuffFirst and visualFrame if required, but only while out of combat, before proceeding to any of the following steps
 		-- STEP 2: Respond to changes in the CTRA options affecting how the frames should appear and behaive, but only while out of combat
 		-- STEP 3: Respond to changes directed by the parent window (requestedUnit, requestedXOff, requestedYOff) while respecting combat limitations
-
 
 		-- STEP 1
 		if not visualFrame or not secureButton then
@@ -2648,128 +2793,30 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				visualFrame:SetSize(90, 40);
 				visualFrame:SetScale(owner:GetProperty("PlayerFrameScale")/100);
 								
-				-- overlay button that can be clicked to do stuff in combat (the secure configuration is made later in step 3)
+				-- overlay button that can be clicked to do stuff (the secure configuration is made later in step 3)
 				secureButton = CreateFrame("Button", nil, visualFrame, "SecureUnitButtonTemplate");
 				secureButton:SetAllPoints();
 				secureButton:RegisterForClicks("AnyDown");
-				secureButton:SetAttribute("*type1", "macro");
+				secureButton:SetAttribute("*type1", "target");
+				secureButton:SetAttribute("target", "unit");
 				secureButton:SetAttribute("*type2", "macro");
-				secureButton:HookScript("OnEnter",
+				secureButton:HookScript("OnEnter", displayTooltip);
+				secureButton:HookScript("OnLeave",
 					function()
-						if (UnitExists(shownUnit)) then
-							GameTooltip:SetOwner(parent, (owner:GetProperty("GrowUpward") and "ANCHOR_BOTTOMRIGHT") or "ANCHOR_TOPLEFT");
-							local className, classFilename = UnitClass(shownUnit);
-							local r,g,b = GetClassColor(classFilename);
-							GameTooltip:AddDoubleLine(UnitName(shownUnit) or "", UnitLevel(shownUnit) or "", r,g,b, 1,1,1);
-							local mapid = C_Map.GetBestMapForUnit(shownUnit);
-							GameTooltip:AddDoubleLine((UnitRace(shownUnit) or "") .. " " .. (className or ""), (not UnitInRange(shownUnit) and mapid and C_Map.GetMapInfo(mapid).name) or "", 1, 1, 1, 0.5, 0.5, 0.5);
-							if (auraBoss1Texture:IsShown()) then
-								local color = DebuffTypeColor[auraBoss1Texture.debuffType or ""];
-								GameTooltip:AddLine("|T" .. auraBoss1Texture:GetTexture() .. ":0|t " .. (auraBoss1Texture.name or "") .. ((auraBoss1Texture.count or 0) > 1 and (" (" .. auraBoss1Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
-								if (auraBoss2Texture:IsShown()) then
-									color = DebuffTypeColor[auraBoss2Texture.debuffType or ""];
-									GameTooltip:AddLine("|T" .. auraBoss2Texture:GetTexture() .. ":0|t " .. (auraBoss2Texture.name or "") .. ((auraBoss2Texture.count or 0) > 1 and (" (" .. auraBoss2Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
-									if (auraBoss3Texture:IsShown()) then
-										color = DebuffTypeColor[auraBoss3Texture.debuffType or ""];
-										GameTooltip:AddLine("|T" .. auraBoss3Texture:GetTexture() .. ":0|t " .. (auraBoss3Texture.name or "") .. ((auraBoss3Texture.count or 0) > 1 and (" (" .. auraBoss3Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
-									end
-								end
-							end
-							if (aura1Texture:IsShown()) then
-								local color = DebuffTypeColor[aura1Texture.debuffType or ""];
-								GameTooltip:AddLine("|T" .. aura1Texture:GetTexture() .. ":0|t " .. (aura1Texture.name or "") .. ((aura1Texture.count or 0) > 1 and (" (" .. aura1Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
-								if (aura2Texture:IsShown()) then
-									color = DebuffTypeColor[aura2Texture.debuffType or ""];
-									GameTooltip:AddLine("|T" .. aura2Texture:GetTexture() .. ":0|t " .. (aura2Texture.name or "") .. ((aura2Texture.count or 0) > 1 and (" (" .. aura2Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
-									if (aura3Texture:IsShown()) then
-										color = DebuffTypeColor[aura3Texture.debuffType or ""];
-										GameTooltip:AddLine("|T" .. aura3Texture:GetTexture() .. ":0|t " .. (aura3Texture.name or "") .. ((aura3Texture.count or 0) > 1 and (" (" .. aura3Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
-										if (aura4Texture:IsShown()) then
-											color = DebuffTypeColor[aura4Texture.debuffType or ""];
-											GameTooltip:AddLine("|T" .. aura4Texture:GetTexture() .. ":0|t " .. (aura4Texture.name or "") .. ((aura4Texture.count or 0) > 1 and (" (" .. aura4Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
-											if (aura5Texture:IsShown()) then
-												color = DebuffTypeColor[aura5Texture.debuffType or ""];
-												GameTooltip:AddLine("|T" .. aura5Texture:GetTexture() .. ":0|t " .. (aura5Texture.name or "") .. ((aura5Texture.count or 0) > 1 and (" (" .. aura5Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
-											end
-										end
-									end
-								end
-							end
-
-							if (not module.GameTooltipExtraLine) then
-								module.GameTooltipExtraLine = GameTooltip:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall");
-								module.GameTooltipExtraLine:SetPoint("BOTTOM", 0, 6);
-								module.GameTooltipExtraLine:SetText(L["CT_RaidAssist/PlayerFrame/TooltipFooter"]);
-								module.GameTooltipExtraLine:SetScale(0.90);
-							end	
-							if (not InCombatLockdown()) then
-								-- Durability
-								if (durabilityAverage) then
-									local time = GetTime() - (durabilityTime or 0);
-									if (durabilityBroken > 0) then
-										GameTooltip:AddLine(format(L["CT_RaidAssist/PlayerFrame/TooltipItemsBroken"],durabilityBroken, durabilityAverage, floor(time/60),time - floor(time/60) * 60), 1.0, 1.0, 0.0);
-									else
-										GameTooltip:AddLine(format(L["CT_RaidAssist/PlayerFrame/TooltipItemsNotBroken"],durabilityAverage,  floor(time/60),time - floor(time/60) * 60), 0.9, 0.9, 0.9);
-									end
-								end
-								
-								-- Consumables
-								for i=1, 40 do
-									local name, icon, __, __, __, __, __, __, __, spellId = UnitAura(shownUnit, i, "HELPFUL CANCELABLE");
-									if (not name or not spellId) then
-										break;
-									end
-									local isConsumable = module.CTRA_Configuration_Consumables[spellId];
-									if (isConsumable) then
-										if (type(isConsumable) == "number") then
-											local itemName, __, __, __, __, __, __, __, __, itemIcon = GetItemInfo(isConsumable);
-											if (itemName and itemIcon) then
-												GameTooltip:AddLine("|T" .. icon .. ":0|t " .. name .. " from " .. "|T" .. itemIcon .. ":0|t " .. itemName, 0.9, 0.9, 0.9);
-											else
-												GameTooltip:AddLine("|T" .. icon .. ":0|t " .. name, 0.9, 0.9, 0.9);
-											end
-										else
-											GameTooltip:AddLine("|T" .. icon .. ":0|t " .. name, 0.9, 0.9, 0.9);
-										end
-									end
-								end
-
-								-- Guide to spells that can be cast
-								local buff = canBuff();
-								local remove = canRemoveDebuff();
-								local rezCombat = canRezCombat();
-								local rezNoCombat = canRezNoCombat();
-								if (buff or remove or rezCombat or rezNoCombat) then
-									GameTooltip:AddLine("|nRight click...");
-									if buff then for modifier, spellName in pairs(buff) do
-										GameTooltip:AddDoubleLine("|cFF33CC66nocombat" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFF33CC66"  .. spellName);
-									end end
-									if remove then for modifier, spellName in pairs(remove) do
-										GameTooltip:AddDoubleLine("|cFFCC6666combat" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFCC6666" .. spellName);
-									end end
-									if rezCombat then for modifier, spellName in pairs(rezCombat) do 
-										GameTooltip:AddDoubleLine("|cFFCC6666combat, dead" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFFCC6666" .. spellName);
-									end end
-									if rezNoCombat then for modifier, spellName in pairs(rezNoCombat) do 
-										GameTooltip:AddDoubleLine("|cFF999999nocombat, dead" .. ((modifier ~= "nomod" and (", " .. modifier)) or ""), "|cFF999999" .. spellName);
-									end end
-								end
-								GameTooltip:Show();
-								module.GameTooltipExtraLine:Show();
-								GameTooltip:SetHeight(GameTooltip:GetHeight()+5);
-								GameTooltip:SetWidth(max(150,GameTooltip:GetWidth()));
-								if (owner.GetWindowID and module:getOption("MOVABLE-CTRAWindow" .. owner:GetWindowID())) then
-									module.GameTooltipExtraLine:SetTextColor(0.50, 0.50, 0.50);
-								else
-									module.GameTooltipExtraLine:SetTextColor(1,1,1);
-								end
-							else
-								GameTooltip:Show();
-							end
-						end
+						module.GameTooltipExtraLine:Hide();
+						GameTooltip:Hide();
 					end
 				);
-				secureButton:HookScript("OnLeave",
+				
+				-- overlay button that prioritizes decursing outside combat (the secure configuration is made later in step 3)
+				secureButtonDebuffFirst = CreateFrame("Button", nil, secureButton, "SecureUnitButtonTemplate");
+				secureButtonDebuffFirst:SetAllPoints();
+				secureButtonDebuffFirst:RegisterForClicks("AnyDown");
+				secureButtonDebuffFirst:SetAttribute("*type1", "target");
+				secureButtonDebuffFirst:SetAttribute("target", "unit");
+				secureButtonDebuffFirst:SetAttribute("*type2", "macro");
+				secureButtonDebuffFirst:HookScript("OnEnter", displayTooltip);
+				secureButtonDebuffFirst:HookScript("OnLeave",
 					function()
 						module.GameTooltipExtraLine:Hide();
 						GameTooltip:Hide();
@@ -2828,9 +2875,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				listenerFrame = CreateFrame("Frame", nil);
 				listenerFrame:SetScript("OnEvent",
 					function(__, event)
-						if (event == "SPELLS_CHANGED") then
-							updateMacros();
-						elseif (event == "UNIT_NAME_UPDATE") then
+						if (event == "UNIT_NAME_UPDATE") then
 							updateUnitNameFontString();
 						elseif (event == "UNIT_HEALTH" or event == "UNIT_MAXHEALTH" or event == "UNIT_ABSORB_AMOUNT_CHANGED") then
 							updateHealthBar();
@@ -2842,8 +2887,25 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 						elseif (event == "UNIT_AURA") then
 							updateAuras();
 							updateBackdrop();
+							if (not InCombatLockdown()) then
+								if (UnitAura(shownUnit,1,"HARMFUL RAID")) then
+									secureButtonDebuffFirst:Show();
+								else
+									secureButtonDebuffFirst:Hide();
+								end
+							end
 						elseif (event == "PLAYER_REGEN_DISABLED") then
-							updateMacros();
+							updateAuras();
+							updateRightMacros();
+							secureButtonDebuffFirst:Hide();
+						elseif (event == "PLAYER_REGEN_ENABLED") then
+							updateAuras();
+							updateRightMacros();
+							if (UnitAura(shownUnit,1,"HARMFUL RAID")) then
+								secureButtonDebuffFirst:Show();
+							else
+								secureButtonDebuffFirst:Hide();
+							end
 						elseif (event == "READY_CHECK") then
 							local LD = LibStub:GetLibrary("LibDurability", true);
 							if (LD) then LD:RequestDurability(); end
@@ -2892,7 +2954,9 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				listenerFrame:RegisterUnitEvent("UNIT_MAXHEALTH", shownUnit);			-- updateHealthBar(); updateBackdrop();
 				listenerFrame:RegisterUnitEvent("UNIT_POWER_UPDATE", shownUnit);		-- updatePowerBar();
 				listenerFrame:RegisterUnitEvent("UNIT_DISPLAYPOWER", shownUnit);		-- configurePowerBar();
-				listenerFrame:RegisterUnitEvent("UNIT_AURA", shownUnit);			-- updateAuras();
+				listenerFrame:RegisterUnitEvent("UNIT_AURA", shownUnit);			-- updateAuras();   also toggles secureButtonDebuffFirst:IsShown() if appropriate
+				listenerFrame:RegisterEvent("PLAYER_REGEN_ENABLED");				-- updateRightMacros();   also toggles secureButtonDebuffFirst:IsShown() if appropriate
+				listenerFrame:RegisterEvent("PLAYER_REGEN_DISABLED");				-- updateRightMacros();
 				listenerFrame:RegisterEvent("READY_CHECK");					-- updateStatusIndicators();
 				listenerFrame:RegisterUnitEvent("READY_CHECK_CONFIRM", shownUnit);		-- updateStatusIndicators();
 				listenerFrame:RegisterEvent("READY_CHECK_FINISHED");				-- updateStatusIndicators();
@@ -2918,7 +2982,13 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 
 			-- configure the secureButton for the new unit
 			secureButton:SetAttribute("unit", shownUnit);
-			updateMacros();
+			secureButtonDebuffFirst:SetAttribute("unit", shownUnit);
+			if (UnitAura(shownUnit, 1, "RAID HARMFUL")) then
+				secureButtonDebuffFirst:Show();
+			else
+				secureButtonDebuffFirst:Hide();
+			end
+			updateRightMacros();
 		end
 		-- visualFrame's children must be updated whenever group composition changes in case the players have changed position within the group or raid.
 		-- if shownUnit exists then it can be assumed the previous conditional evaluated to true at some point and therefore the configure___() funcs have been used
@@ -2930,7 +3000,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			updateUnitNameFontString();
 			updateAuras();
 			updateStatusIndicators();
-			updateMacros();
+			updateRightMacros();
 			clearDurability();
 		end
 	end
@@ -2944,6 +3014,9 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 		if (LD) then
 			LD:Register(obj,updateDurability)
 		end
+		
+		local spellBroker = StaticClickCastBroker();
+		spellBroker:Register(updateRightMacros);
 		
 		return obj;			-- that's it!  nothing else is done until obj:Enable()
 	end
@@ -3030,12 +3103,6 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 			end
 		end
 	end
-
-	-- updates secureButton macros once out of combat, based on the last call of configureMacros
-	local updateMacros = function()
-		if (InCombatLockdown()) then return; end
-		secureButton:SetAttribute("*macrotext1", "/target " .. shownUnit);
-	end
 	
 	-- PUBLIC FUNCTIONS
 	
@@ -3085,7 +3152,8 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 				secureButton = CreateFrame("Button", nil, visualFrame, "SecureUnitButtonTemplate");
 				secureButton:SetAllPoints();
 				secureButton:RegisterForClicks("LeftButtonDown");
-				secureButton:SetAttribute("*type1", "macro");
+				secureButton:SetAttribute("*type1", "target");
+				secureButton:SetAttribute("target", "unit");
 				secureButton:HookScript("OnEnter",
 					function()
 						if (UnitExists(shownUnit)) then
@@ -3175,7 +3243,6 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 
 			-- configure the secureButton for the new unit
 			secureButton:SetAttribute("unit", shownUnit);
-			updateMacros();
 		end
 		
 		-- visualFrame's children must be updated whenever group composition changes in case the players have changed position within the group or raid.

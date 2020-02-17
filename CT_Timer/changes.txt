@@ -1,3 +1,7 @@
+CT_Timer (8.3.0.5) 2019-02-10
+- Reduced CPU usage
+- Localization
+
 CT_Timer (8.0.1.0) 2018-07-17
 - Updated for 8.0.1
 

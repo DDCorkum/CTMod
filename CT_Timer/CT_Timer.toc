@@ -1,5 +1,5 @@
 ## Interface: 80300
-## Version: 8.2.0.1
+## Version: 8.3.0.5
 ## Title: CT_Timer |cFF333333(BFA)
 ## Notes: Shows a timer that counts both up and down.
 ## DefaultState: Enabled
