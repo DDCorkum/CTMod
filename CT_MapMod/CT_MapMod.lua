@@ -1701,6 +1701,8 @@ function module:ConvertOldNotes()
 					note["version"] == "8.1.5.1"
 				) then
 					tremove(notetable,i);
+				else
+					i = i + 1;
 				end
 			
 			else
