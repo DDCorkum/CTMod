@@ -1,3 +1,6 @@
+CT_MapMod (8.3.0.6) 2020-02-17
+- Fixed an issue affecting players with Anchor's Weed pins
+
 CT_MapMod (8.3.0.5) 2020-02-14
 - Added options to track platinum and anchor's weed
 - Cleaner integration of the note edit panel with the pins themselves
