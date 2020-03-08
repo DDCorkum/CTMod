@@ -1,3 +1,6 @@
+CT_BarMod (8.3.0.7) 2020-02-22
+- Further integration, reducing cpu usage and showing pushed textures
+
 CT_BarMod (8.3.0.3) 2020-01-20
 - Further integration with /console ActionButtonUseKeyDown
 

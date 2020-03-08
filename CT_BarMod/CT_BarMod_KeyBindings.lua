@@ -985,7 +985,7 @@ local function setActionBindings(event)
 			elseif (groupId == 5) then
 				useDefault = module:getOption("bar6Bindings") ~= false;
 			end
-
+			
 			if (showBar) then
 				local buttonObjs = groupObj.objects;
 				local action;

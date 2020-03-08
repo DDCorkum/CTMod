@@ -2082,28 +2082,6 @@ end
 -------------------
 -- Handle options
 
-local function CT_BarMod_UpdateMouseoverSchedule()
-	local moFlag;
-	for num, group in pairs(groupList) do
-		local show = (module:getOption("showGroup" .. group.groupId) ~= false);
-		if (show and group.barMouseover) then
-			moFlag = true;
-			break;
-		end
-	end
-	if (moFlag) then
-		if (not module.groupFrameOnUpdate) then
-			module.groupFrameOnUpdate = module.checkMouseover;
-			module:schedule(0.03, true, module.groupFrameOnUpdate);
-		end
-	else
-		if (module.groupFrameOnUpdate) then
-			module:unschedule(module.groupFrameOnUpdate, true);
-			module.groupFrameOnUpdate = nil;
-		end
-	end
-end
-
 module.optionUpdate = function(self, optName, value)
 	-- Update an option.
 
@@ -2183,12 +2161,6 @@ module.optionUpdate = function(self, optName, value)
 		end
 
 		updateGroupWidgets_ShowGroup(localGroupId);
-
-		-- Update opacity.
-		CT_BarMod_UpdateMouseoverSchedule();
-		if (group) then
-			group:updateOpacity();
-		end
 
 		-- Update visibility.
 		if (group) then
@@ -2321,20 +2293,6 @@ module.optionUpdate = function(self, optName, value)
 			-- Update the "barColumns" slider.
 			updateGroupWidgets_Columns(localGroupId);
 
-		end
-
-		-- Update opacity.
-		if (
-			optName == "barOpacity" or
-			optName == "barFaded" or
-			optName == "barMouseover" or
-			optName == "barVisibility" or
-			optName == "barCondition"
-		) then
-			CT_BarMod_UpdateMouseoverSchedule();
-			if (group) then
-				group:updateOpacity();
-			end
 		end
 
 		-- Update visibility.
@@ -2545,8 +2503,6 @@ module.optionUpdate = function(self, optName, value)
 		updateCooldownFont();
 		updateGroups();
 		updateGroupWidgets(localGroupId);
-
-		CT_BarMod_UpdateMouseoverSchedule();
 
 		module:setDragOnTop(module:getOption("dragOnTop"));
 		module:setDragTransparent(module:getOption("dragTransparent"));

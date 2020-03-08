@@ -642,6 +642,11 @@ function useButton:update()
 	self.hasAction = hasAction;
 	self.hasRange = ActionHasRange(actionId);
 	
+	self.isConsumable = IsConsumableAction(actionId);
+	self.isStackable = IsStackableAction(actionId);
+	self.isItem = IsItemAction(actionId);
+	
+	
 --	self:updateCount();
 	self:updateBinding();
 	self:updateTexture();
@@ -711,7 +716,7 @@ function useButton:update()
 	end
 	
 	-- Action text
-	if ( displayActionText and not IsConsumableAction(actionId) and not IsStackableAction(actionId) and (IsItemAction(actionId) or GetActionCount(actionId) == 0) ) then
+	if ( displayActionText and not self.isConsumable and not self.isStackable and (self.isItem or GetActionCount(actionId) == 0) ) then
 		button.name:SetText(GetActionText(actionId));
 	else
 		button.name:SetText("");
@@ -954,8 +959,8 @@ function useButton:updateUsable()
 		isUsable
 		and (
 			module:getGameVersion() == CT_GAME_VERSION_RETAIL
-			or not IsConsumableAction(self.actionId)	-- reagents behave differently in classic
-			or IsItemAction(self.actionId)
+			or not self.isConsumable	-- reagents behave differently in classic
+			or self.isItem
 			or GetActionCount(self.actionId) > 0
 		)
 	) then
@@ -1066,7 +1071,10 @@ function useButton:updateBinding()
 		hotkey:SetText("");
 		return;
 	end
-	local isInRange = IsActionInRange(actionId)
+	local isInRange;
+	if (self.hasRange) then
+		isInRange = IsActionInRange(actionId)
+	end
 	if ( isInRange == false ) then
 		self.outOfRange = true;
 		hotkey:SetVertexColor(1.0, 0.1, 0.1);
@@ -1079,11 +1087,11 @@ function useButton:updateBinding()
 		text = self:getBinding();
 	end
 	if (text) then
-			hotkey:SetText(text);
+		hotkey:SetText(text);
 	elseif (displayRangeDot and isInRange) then
-			hotkey:SetText(rangeIndicator);
+		hotkey:SetText(rangeIndicator);
 	else
-			hotkey:SetText("");
+		hotkey:SetText("");
 	end
 end
 
@@ -1105,9 +1113,9 @@ function useButton:updateCount()
 	else
 		
 		if (
-			IsConsumableAction(actionId)
-			or IsStackableAction(actionId)
-			or (not IsItemAction(actionId) and GetActionCount(actionId) > 0)
+			self.isConsumable
+			or self.isStackable
+			or (not self.isItem and GetActionCount(actionId) > 0)
 			
 		) then
 			text:SetText((GetActionCount(actionId) < 1000 and GetActionCount(actionId)) or "*");
@@ -1639,8 +1647,7 @@ end
 
 -- Range checker
 local function rangeUpdater()
-	local exists = UnitExists("target");
-	if exists then
+	if UnitExists("target") then
 		actionButtonList:updateRange();
 	else
 		-- don't do a full range checking, but still update keybindings
@@ -1703,7 +1710,7 @@ do
 		end
 		local rangeTimer = self.rangeTimer;
 		if ( rangeTimer and rangeTimer == TOOLTIP_UPDATE_TIME ) then
-			if ( colorLack and IsActionInRange(ActionButton_GetPagedID(self)) == false ) then
+			if ( colorLack and self.hasAction and IsActionInRange(ActionButton_GetPagedID(self)) == false ) then
 				local icon = _G[self:GetName().."Icon"];
 				if ( colorLack == 2 ) then
 					icon:SetVertexColor(0.5, 0.5, 0.5);
@@ -1723,7 +1730,7 @@ do
 		if (not defbarShowRange) then
 			return;
 		end
-		if ( colorLack and IsActionInRange(ActionButton_GetPagedID(self)) == false ) then
+		if ( colorLack and self.hasRange and IsActionInRange(ActionButton_GetPagedID(self)) == false ) then
 			local icon = _G[self:GetName().."Icon"];
 			if ( colorLack == 2 ) then
 				icon:SetVertexColor(0.5, 0.5, 0.5);
@@ -1929,7 +1936,7 @@ do
 		local name = _G[self:GetName() .. "Name"];
 		if (name) then
 			local actionId = self.action;
-			if ( displayActionText and not IsConsumableAction(actionId) and not IsStackableAction(actionId) ) then
+			if ( displayActionText and not self.isConsumable and not self.isStackable ) then
 				name:SetText(GetActionText(actionId));
 			else
 				name:SetText("");
@@ -1944,7 +1951,7 @@ do
 		local name = _G[self:GetName() .. "Name"];
 		if (name) then
 			local actionId = self.action;
-			if ( not IsConsumableAction(actionId) and not IsStackableAction(actionId) ) then
+			if ( not self.isConsumable and not self.isStackable ) then
 				name:SetText(GetActionText(actionId));
 			else
 				name:SetText("");

@@ -138,6 +138,7 @@ end
 local function actionbuttonOnEnter(self, ...)
 	updateHover(nil, self);
 	module:schedule(1, true, updateHover);
+	module.groupOnEnter(self.object);
 	self.object:onenter(self, ...);
 end
 			
@@ -151,6 +152,7 @@ local function actionbuttonOnLeave(self, ...)
 	GameTooltip:Hide();
 	currentHover = nil;
 	module:unschedule(updateHover, true);
+	module.groupOnLeave(self.object);
 	self.object:onleave(self, ...);
 end
 
