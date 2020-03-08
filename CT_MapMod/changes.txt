@@ -1,3 +1,6 @@
+CT_MapMod (8.3.0.7) 2020-03-07
+- Fixed a logic error affecting herbs and ore without a description
+
 CT_MapMod (8.3.0.6) 2020-02-17
 - Fixed an issue affecting players with Anchor's Weed pins
 

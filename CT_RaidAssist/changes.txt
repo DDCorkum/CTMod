@@ -1,3 +1,7 @@
+CT_RaidAssist (8.3.0.7) 2020-02-24
+- Reduced CPU usage using C_Timer
+- Tweak to "modern" health bar opacity while outside combat
+
 CT_RaidAssist (8.3.0.5) 2020-02-10
 - Click-cast decursing also available outside combat
 

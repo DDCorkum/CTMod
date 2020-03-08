@@ -573,30 +573,16 @@ end
 
 local tooltipMouseAnchor = CreateFrame("Frame", nil, UIParent);
 tooltipMouseAnchor:SetSize(0.00001, 0.00001);
-tooltipMouseAnchor:SetPoint("CENTER");
+tooltipMouseAnchor:SetIgnoreParentScale(true);
 
-
-tooltipMouseAnchor:SetScript("OnUpdate",
-	function()	
-		local uiScale, cx, cy = UIParent:GetEffectiveScale(), GetCursorPosition();		
-		if (not uiScale or not cx or not cy) then
-			return;
-		end
-		
-		if (module:getOption("tooltipRelocation") == 4 or tooltipMouseAnchor.status == 2) then
-			-- this happens EVERY frame during mouse(following), but only ONCE during mouse(stationary)
-			if (GameTooltip:GetUnit()) then
-				tooltipMouseAnchor:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", (cx/uiScale), (cy/uiScale) + (tooltipMouseAnchor.offsetIfUnit or 0) );
-			else
-				tooltipMouseAnchor:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", (cx/uiScale), (cy/uiScale) );
-			end
-			tooltipMouseAnchor.status = nil;
-		end
-		
+local mouseUnitOffset = 0;
+local function updateMousePosition()	
+	local cx, cy = GetCursorPosition();		
+	if (cy) then	
+		tooltipMouseAnchor:SetPoint("BOTTOMLEFT", cx, cy + mouseUnitOffset );
 	end
-);
+end
 
-local hookedTooltips = { }
 -- position the tooltip when it is not owned by something else
 hooksecurefunc("GameTooltip_SetDefaultAnchor",
 	function (tooltip, text, x, y, wrap)
@@ -609,22 +595,32 @@ hooksecurefunc("GameTooltip_SetDefaultAnchor",
 				return;
 			end
 
-			-- adds a hook once to each GameTooltip only (there could be several if addons use their own versions)
-			if (not tContains(hookedTooltips, tooltip)) then
-				tinsert(hookedTooltips, tooltip);
+			-- adds hooks once to each GameTooltip only (there could be several if addons use their own versions)
+			if (not tooltip.ctIsHooked) then
+				tooltip.ctIsHooked = true;
+				local mouseTicker, fadeTicker;
 				tooltip:HookScript("OnShow",
 					function()
 						-- this allows the next OnUpdate call to control the tooltip
-						if (tooltipMouseAnchor.status == 1) then
-							tooltipMouseAnchor.status = 2;
+						local option = module:getOption("tooltipRelocation");
+						if (not tooltip:GetUnit()) then
+							mouseUnitOffset = 0;
+						end
+						updateMousePosition();
+						if (option == 4) then
+							mouseTicker = mouseTicker or C_Timer.NewTicker(0.06, updateMousePosition);
 						end
 					end
 				);
-
+				tooltip:HookScript("OnHide",
+					function() 
+						if (mouseTicker) then 
+							mouseTicker:Cancel(); 
+							mouseTicker = nil; 
+						end
+					end
+				);
 			end
-			
-			-- with the hook added above, this causes the next OnShow(tooltip) to trigger behaviour in OnUpdate(tooltipMouseAnchor)
-			tooltipMouseAnchor.status = 1;						-- the OnShow will now trigger
 			
 			-- anchor the tooltip itself, because it has to be done now and no later to avoid taint (if it is the GameTooltip)
 			if (cx/uiScale > UIParent:GetWidth()/2) then
@@ -635,7 +631,7 @@ hooksecurefunc("GameTooltip_SetDefaultAnchor",
 						-(module:getOption("tooltipDistance") or 0),
 						-(module:getOption("tooltipDistance") or 0)
 					);
-					tooltipMouseAnchor.offsetIfUnit = 0;
+					mouseUnitOffset = 0;
 				else								-- mouse is in bottom-right quadrant.
 					tooltip:SetOwner(
 						tooltipMouseAnchor,
@@ -643,7 +639,7 @@ hooksecurefunc("GameTooltip_SetDefaultAnchor",
 						-(module:getOption("tooltipDistance") or 0),
 						(module:getOption("tooltipDistance") or 0) 
 					);
-					tooltipMouseAnchor.offsetIfUnit = 10;
+					mouseUnitOffset = 10;
 				end
 			else
 				if (cy/uiScale > UIParent:GetHeight()/2) then			-- mouse is in top-left quadrant
@@ -653,7 +649,7 @@ hooksecurefunc("GameTooltip_SetDefaultAnchor",
 						 20 + (module:getOption("tooltipDistance") or 0),
 						-20 - (module:getOption("tooltipDistance") or 0)
 					);
-					tooltipMouseAnchor.offsetIfUnit = 0;
+					mouseUnitOffset = 0;
 				else								-- mouse is in bottom-left quadrant
 					tooltip:SetOwner(
 						tooltipMouseAnchor,
@@ -661,7 +657,7 @@ hooksecurefunc("GameTooltip_SetDefaultAnchor",
 						(module:getOption("tooltipDistance") or 0),
 						(module:getOption("tooltipDistance") or 0)
 					);
-					tooltipMouseAnchor.offsetIfUnit = 10;
+					mouseUnitOffset = 10;
 				end
 			end	
 		elseif (module:getOption("tooltipRelocation") == 3) then
@@ -686,16 +682,25 @@ hooksecurefunc("GameTooltip_SetDefaultAnchor",
 	end
 );
 
-
--- make the tooltip go away faster
-GameTooltip:HookScript("OnUpdate",
-	function()
-		if (GameTooltip:GetAlpha() < 0.99 and module:getOption("tooltipDisableFade")) then
-			GameTooltip:Hide();
-		end
+local function accelerateFade()
+	if (GameTooltip:GetAlpha() < 1) then
+		GameTooltip:Hide();
 	end
-);
+end
 
+local tooltipFadeTicker;
+
+GameTooltip:HookScript("OnShow", function()
+	if (module:getOption("tooltipDisableFade")) then
+		tooltipFadeTicker = tooltipFadeTicker or C_Timer.NewTicker(0.1, accelerateFade);
+	end
+end);
+GameTooltip:HookScript("OnHide", function()
+	if (tooltipFadeTicker) then
+		tooltipFadeTicker:Cancel();
+		tooltipFadeTicker = nil;
+	end
+end);
 
 
 --------------------------------------------
@@ -712,33 +717,34 @@ local tickFormatMana_2 = "MP/Tick: %d";
 local tickFormatMana_3 = "MP: %d";
 
 local tickFrameWidth;
-local tickCounter = 0.05;
+local tickFadeFunc, tickFading;
 local lastTickHealth, lastTickMana;
+
+local healthString, manaString
 
 local function fadeObject(self)
 	local alpha = self.alpha;
 	if ( alpha and alpha > 0.25 ) then
-		alpha = alpha - 0.03;
+		alpha = alpha - 0.036;
 		self.alpha = alpha;
 		self:SetAlpha(alpha);
 		return true;
 	end
 end
 
-local function fadeTicks(self, elapsed)
-	tickCounter = tickCounter - elapsed;
-	if ( tickCounter < 0 ) then
-		local fadedHealth = fadeObject(self.health);
-		local fadedMana = fadeObject(self.mana);
-		if ( not fadedHealth and not fadedMana ) then
-			self:SetScript("OnUpdate", nil);
-		end
-		tickCounter = 0.05;
+local fadeTicks;
+function fadeTicks()
+	local fadedHealth = fadeObject(healthString);
+	local fadedMana = fadeObject(manaString);
+	if (fadedHealth or fadedMana ) then
+		tickFading = true;
+		C_Timer.After(0.06, fadeTicks);
+	else
+		tickFading = false;
 	end
 end
 
-local function updateTickDisplay(key, diff)
-	local obj = tickFrame[key];
+local function updateTickDisplay(obj, diff)
 	obj:SetText(format(obj.strFormat, diff));
 	obj:SetAlpha(1);
 	obj.alpha = 1;
@@ -747,8 +753,10 @@ local function updateTickDisplay(key, diff)
 		tickFrame:SetWidth(tickFrameWidth);
 	end
 
-	tickCounter = 0.05;
-	tickFrame:SetScript("OnUpdate", fadeTicks);
+	if (not tickFading) then
+		tickFading = true;
+		C_Timer.After(0.06, fadeTicks);
+	end
 end
 
 local function tickFrameSkeleton()
@@ -768,14 +776,14 @@ local function tickFrameSkeleton()
 					local health = UnitHealth("player");
 					local diff = health-lastTickHealth;
 					if ( diff > 0 ) then
-						updateTickDisplay("health", diff);
+						updateTickDisplay(healthString, diff);
 					end
 					lastTickHealth = health;
 				elseif ( event == "UNIT_POWER_UPDATE" and arg2 == "MANA" ) then
 					local mana = UnitPower("player");
 					local diff = mana-lastTickMana;
 					if ( diff > 0 ) then
-						updateTickDisplay("mana", diff);
+						updateTickDisplay(manaString, diff);
 					end
 					lastTickMana = mana;
 				end
@@ -834,6 +842,8 @@ local function toggleTick(enable)
 	if ( enable ) then
 		if ( not tickFrame ) then
 			tickFrame = module:getFrame(tickFrameSkeleton);
+			healthString = tickFrame["health"]
+			manaString = tickFrame["mana"]
 		end
 		tickFrame:Show();
 		updateTickFrameOptions();
@@ -855,35 +865,34 @@ end
 local displayTimers;
 local castingBarFrames = { "CastingBarFrame", "TargetFrameSpellBar", "FocusFrameSpellBar", "CT_CastingBarFrame" };
 
+function foofoo(self, secondsElapsed)
+
+end
+
 local function castingtimer_createFS(castBarFrame)
-	castBarFrame.countDownText = castBarFrame:CreateFontString(nil, "ARTWORK", "GameFontHighlight");
-	castBarFrame.ctElapsed = 0;
-	castBarFrame:HookScript("OnUpdate",
-		function(self, secondsElapsed)
-			if (not self.ctElapsed) then
-				return;
-			end
-		
-			local elapsed = ( self.ctElapsed or 0 ) - secondsElapsed;
-			if ( elapsed < 0 ) then
-				if ( displayTimers ) then
-					-- We need to update
-					if ( self.casting ) then
-						self.countDownText:SetText(format("%0.1fs", max(self.maxValue - self.value, 0)));
-					elseif ( self.channeling ) then
-						self.countDownText:SetText(format("%0.1fs", max(self.value, 0)));
-					else
-						self.countDownText:SetText("");
-					end
-				end
-				self.ctElapsed = 0.1;
-				
-			else
-				self.ctElapsed = elapsed;
-			end
+	local countDownText = castBarFrame:CreateFontString(nil, "ARTWORK", "GameFontHighlight");
+	castBarFrame.countDownText = countDownText;
+	castBarFrame.ctTickerFunc = castBarFrame.ctTickerFunc or function()
+		-- We need to update
+		if ( castBarFrame.casting ) then
+			countDownText:SetText(format("%0.1fs", max(castBarFrame.maxValue - castBarFrame.value, 0)));
+		elseif ( castBarFrame.channeling ) then
+			countDownText:SetText(format("%0.1fs", max(castBarFrame.value, 0)));
+		else
+			countDownText:SetText("");
 		end
-	);
-	
+	end
+	castBarFrame:HookScript("OnShow", function()
+		if(displayTimers) then
+			castBarFrame.ctTickerHandle = castBarFrame.ctTickerHandle or C_Timer.NewTicker(0.1, castBarFrame.ctTickerFunc);
+		end
+	end);
+	castBarFrame:HookScript("OnHide", function()
+		if(castBarFrame.ctTickerHandle) then
+			castBarFrame.ctTickerHandle:Cancel();
+			castBarFrame.ctTickerHandle = nil;
+		end
+	end);	
 end
 
 for i, frameName in ipairs(castingBarFrames) do
@@ -1067,7 +1076,7 @@ do
 
 		prepareTrade = function(bag, item, player) -- Local
 			prepBag, prepItem, prepPlayer = bag, item, player;
-			module:schedule(3, clearTrade);
+			C_After.Timer(3, clearTrade);
 		end
 
 		addItemToTrade = function(bag, item)

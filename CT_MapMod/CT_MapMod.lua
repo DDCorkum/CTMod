@@ -142,7 +142,7 @@ function public:InsertHerb(mapid, x, y, herb, descript, name)
 						if (module:getOption("CT_MapMod_OverwriteGathering")) then
 							note["x"] = x;
 							note["y"] = y;
-							if (note["descript"] == "") then
+							if (note["descript"] == "" or not note["descript"]) then
 								note["descript"] = "Nearby: " .. L["CT_MapMod/Herb/" .. note["subset"]];
 							elseif (note["descript"]:sub(1,8) == "Nearby: " and not note["descript"]:find(L["CT_MapMod/Herb/" .. note["subset"]],9)) then
 								note["descript"] = note["descript"] .. ", " .. L["CT_MapMod/Herb/" .. note["subset"]];
@@ -153,7 +153,7 @@ function public:InsertHerb(mapid, x, y, herb, descript, name)
 							note["version"] = MODULE_VERSION
 						else
 							-- leave the existing note, but add details in the description
-							if (note["descript"] == "") then
+							if (note["descript"] == "" or not note["descript"]) then
 								note["descript"] = "Nearby: " .. L["CT_MapMod/Herb/" .. herb];
 							elseif (note["descript"]:sub(1,8) == "Nearby: " and not note["descript"]:find(L["CT_MapMod/Herb/" .. herb],9)) then
 								note["descript"] = note["descript"] .. ", " .. L["CT_MapMod/Herb/" .. herb];
@@ -310,7 +310,7 @@ function public:InsertOre(mapid, x, y, ore, descript, name)
 							-- overwrite the existing note
 							note["x"] = x;
 							note["y"] = y;
-							if (note["descript"] == "") then
+							if (note["descript"] == "" or not note["descript"]) then
 								note["descript"] = "Nearby: " .. L["CT_MapMod/Ore/" .. note["subset"]];
 							elseif (note["descript"]:sub(1,8) == "Nearby: " and not note["descript"]:find(L["CT_MapMod/Ore/" .. note["subset"]],9)) then
 								note["descript"] = note["descript"] .. ", " .. L["CT_MapMod/Ore/" .. note["subset"]];
@@ -319,7 +319,7 @@ function public:InsertOre(mapid, x, y, ore, descript, name)
 							note["subset"] = ore;
 						else
 							-- leave the existing note, but add details in the description
-							if (note["descript"] == "") then
+							if (note["descript"] == "" or not note["descript"]) then
 								note["descript"] = "Nearby: " .. (L["CT_MapMod/Ore/" .. ore]);
 							elseif (note["descript"]:sub(1,8) == "Also nearby: " and not note["descript"]:find(L["CT_MapMod/Ore/" .. ore],9)) then
 								note["descript"] = note["descript"] .. ", " .. L["CT_MapMod/Ore/" .. ore];
@@ -363,9 +363,8 @@ function CT_MapMod_DataProviderMixin:RefreshAllData(fromOnShow)
 	-- determine if the player is an herbalist or miner, for automatic showing of those kinds of notes
 	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
 		local prof1, prof2 = GetProfessions();
-		local name, icon, skillLevel, maxSkillLevel, numAbilities, spellOffset, skillLine, skillModifier, specializationIndex, specializationOffset;
 		if (prof1) then 
-			name, icon, skillLevel, maxSkillLevel, numAbilities, spellOffset, skillLine, skillModifier, specializationIndex, specializationOffset = GetProfessionInfo(prof1)
+			local __, icon = GetProfessionInfo(prof1)
 			if (icon == 136246) then 
 				module.isHerbalist = true;
 			elseif (icon == 134708) then 
@@ -373,7 +372,7 @@ function CT_MapMod_DataProviderMixin:RefreshAllData(fromOnShow)
 			end
 		end
 		if (prof2) then 
-			name, icon, skillLevel, maxSkillLevel, numAbilities, spellOffset, skillLine, skillModifier, specializationIndex, specializationOffset = GetProfessionInfo(prof2)
+			local __, icon = GetProfessionInfo(prof2)
 			if (icon == 136246) then 
 				module.isHerbalist = true;
 			elseif (icon == 134708) then 

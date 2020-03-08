@@ -1,3 +1,6 @@
+CT_Core (8.3.0.7) 2020-02-25
+- Performance improvements using C_Timer instead of OnUpdate
+
 CT_Core (8.3.0.5) 2020-02-09
 - Small change to prevent conflicts with other addons
 

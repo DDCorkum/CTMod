@@ -1,3 +1,6 @@
+CT_Timer (8.3.0.7) 2019-02-24
+- Reduced CPU usage using C_Timer
+
 CT_Timer (8.3.0.5) 2019-02-10
 - Reduced CPU usage
 - Localization

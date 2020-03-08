@@ -1027,7 +1027,7 @@ function StaticCTRAFrames()
 								["ColorUnitFullHealthCombat"] = {0.00, 1.00, 0.00, 0.50},
 								["ColorUnitZeroHealthCombat"] = {1.00, 0.00, 0.00, 1.00},
 								["ColorUnitFullHealthNoCombat"] = {0.00, 1.00, 0.00, 0.00},
-								["ColorUnitZeroHealthNoCombat"] = {1.00, 0.00, 0.00, 0.25},
+								["ColorUnitZeroHealthNoCombat"] = {1.00, 0.00, 0.00, 1.00},
 								["ColorReadyCheckWaiting"] = {0.35, 0.35, 0.35, 0.65},
 								["ColorReadyCheckNotReady"] = {0.80, 0.35, 0.35, 0.65},
 								["ColorBackground"] = {0.00, 0.00, 0.60, 0.60},
@@ -2925,16 +2925,10 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 						end
 					end
 				);
-				local timeElapsed = 0;
-				listenerFrame:SetScript("OnUpdate",
-					function(__, elapsed)
-						timeElapsed = timeElapsed + elapsed;
-						if (timeElapsed < 2.5) then return; end
-						timeElapsed = 0;
-						updateBackdrop();
-						updateStatusIndicators();
-					end
-				);
+				C_Timer.NewTicker(2, function() 
+					updateBackdrop()
+					updateStatusIndicators()
+				end);
 			end
 
 			-- configure the visualFrame and its children

@@ -19,7 +19,7 @@
 -----------------------------------------------
 -- Initialization
 
-local LIBRARY_VERSION = 8.305;		-- Once upon a time this was to differentiate between different versions of CT_Library... but its now 2020 and CT_Library has stood as its own AddOn for more than a decade.
+local LIBRARY_VERSION = 8.307;		-- Once upon a time this was to differentiate between different versions of CT_Library... but its now 2020 and CT_Library has stood as its own AddOn for more than a decade.
 local LIBRARY_NAME = "CT_Library";
 
 -- Create tables for all the PROTECTED contents and PUBLIC interface of CTMod
@@ -36,7 +36,7 @@ _G[LIBRARY_NAME] = libPublic;
 -- Private attributes
 local modules = {};		-- Collection of registered CT modules
 local movables, frame, eventTable;
-local timerRepeatedTimes, timerRepeatedFuncs, timerRepeatedStarts, timerTimes, timerFuncs;
+local timerRepeatingFuncs, timerFuncs = {}, {};
 local numSlashCmds, localizations, tableList, defaultValues;
 local frameCache;
 
@@ -638,87 +638,38 @@ function lib:schedule(time, func, repeatFunc)
 	end
 
 	if ( repeatFunc ) then
-		if ( not timerRepeatedTimes ) then
-			timerRepeatedTimes, timerRepeatedFuncs, timerRepeatedStarts = { }, { }, { };
+		if (timerRepeatingFuncs[repeatFunc]) then
+			timerRepeatingFuncs[repeatFunc]:Cancel();
 		end
-		tinsert(timerRepeatedTimes, time);
-		tinsert(timerRepeatedStarts, time);
-		tinsert(timerRepeatedFuncs, repeatFunc);
+		timerRepeatingFuncs[repeatFunc] = C_Timer.NewTicker(time, repeatFunc);
 	else
-		if ( not timerTimes ) then
-			timerTimes, timerFuncs = { }, { };
+		if (timerFuncs[func]) then
+			timerFuncs[func]:Cancel();	--clears the timer if it was already counting
 		end
-		tinsert(timerTimes, time);
-		tinsert(timerFuncs, func);
+		timerFuncs[func] = C_Timer.NewTimer(time, func);
 	end
-	frame:Show();
 end
 
+-- Schedule timers
+ -- Usage:	unschedule(func) to cancel a one-time callback
+ --		unschedule(func, true) to cancel a repeating function
 function lib:unschedule(func, isRepeat)
 	if ( not func ) then
 		return;
 	end
 
 	if ( isRepeat ) then
-		if ( timerRepeatedFuncs ) then
-			for key, value in ipairs(timerRepeatedFuncs) do
-				if ( value == func ) then
-					tremove(timerRepeatedTimes, key);
-					tremove(timerRepeatedStarts, key);
-					tremove(timerRepeatedFuncs, key);
-					break;
-				end
-			end
+		if ( timerRepeatingFuncs[func] ) then
+			timerRepeatingFuncs[func]:Cancel();
+			timerRepeatingFuncs[func] = nil;
 		end
 	else
-		if ( timerFuncs ) then
-			for key, value in ipairs(timerFuncs) do
-				if ( value == func ) then
-					tremove(timerTimes, key);
-					tremove(timerFuncs, key);
-					break;
-				end
-			end
+		if ( timerFuncs[func] ) then
+			timerFuncs[func]:Cancel();
+			timerFuncs[func] = nil;
 		end
 	end
 end
-
-frame:Hide();
-frame:SetScript("OnUpdate", function(self, elapsed)
-	-- Normal times
-	local found = false;
-	local val;
-
-	if ( timerTimes ) then
-		for i = #timerTimes, 1, -1 do
-			val = timerTimes[i] - elapsed;
-			timerTimes[i] = val;
-			if ( val <= 0 ) then
-				tremove(timerFuncs, i)(val);
-				tremove(timerTimes, i);
-			else
-				found = true;
-			end
-		end
-	end
-
-	if ( timerRepeatedTimes ) then
-		for key, value in ipairs(timerRepeatedTimes) do
-			found = true;
-			value = value - elapsed;
-			if ( value <= 0 ) then
-				timerRepeatedFuncs[key](value);
-				timerRepeatedTimes[key] = timerRepeatedStarts[key];
-			else
-				timerRepeatedTimes[key] = value;
-			end
-		end
-	end
-
-	if ( not found ) then
-		frame:Hide();
-	end
-end);
 
 function lib:unload()
 	self:clearTable(self);
