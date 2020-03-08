@@ -722,6 +722,8 @@ local lastTickHealth, lastTickMana;
 
 local healthString, manaString
 
+local tickFrameLocked, tickFrameLockedMessageSent;
+
 local function fadeObject(self)
 	local alpha = self.alpha;
 	if ( alpha and alpha > 0.25 ) then
@@ -790,20 +792,31 @@ local function tickFrameSkeleton()
 			end
 		end,
 		["onenter"] = function(self)
-			module:displayPredefinedTooltip(self, "DRAG");
+			if (not tickFrameLocked) then
+				module:displayPredefinedTooltip(self, "DRAG");
+			end
 		end,
 		["onmousedown"] = function(self, button)
-			if ( button == "LeftButton" ) then
-				module:moveMovable("TICKMOD");
+			if (tickFrameLocked) then
+				if (not tickFrameLockedMessageSent) then
+					print("Type /ctcore to unlock and configure the regen tracker");
+					tickFrameLockedMessageSent = true;
+				end
+			else
+				if ( button == "LeftButton" ) then
+					module:moveMovable("TICKMOD");
+				end
 			end
 		end,
 		["onmouseup"] = function(self, button)
-			if ( button == "LeftButton" ) then
-				module:stopMovable("TICKMOD");
-			elseif ( button == "RightButton" ) then
-				module:resetMovable("TICKMOD");
-				self:ClearAllPoints();
-				self:SetPoint("CENTER", UIParent);
+			if (not tickFrameLocked) then
+				if ( button == "LeftButton" ) then
+					module:stopMovable("TICKMOD");
+				elseif ( button == "RightButton" ) then
+					module:resetMovable("TICKMOD");
+					self:ClearAllPoints();
+					self:SetPoint("CENTER", UIParent);
+				end
 			end
 		end
 	};
@@ -857,6 +870,10 @@ end
 local function setTickDisplayType(mode)
 	tickDisplayType = mode;
 	updateTickFrameOptions();
+end
+
+local function setTickLocked(enable)
+	tickFrameLocked = enable;
 end
 
 --------------------------------------------
@@ -2581,6 +2598,7 @@ local modFunctions = {
 	["blockBankTrades"] = module.configureBlockTradesBank,
 	["tickMod"] = toggleTick,
 	["tickModFormat"] = setTickDisplayType,
+	["tickModLock"] = setTickLocked,
 	["tooltipAnchorUnlock"] = tooltip_toggleAnchor,
 	["tooltipRelocation"] = tooltip_toggleAnchor,
 	["hideWorldMap"] = toggleWorldMap,
