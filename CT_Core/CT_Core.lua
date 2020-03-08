@@ -102,25 +102,21 @@ local function minimapFrameSkeleton()    -- note: one of the images is embedded 
 						minimapdropdown,
 						function()
 							if (UIDROPDOWNMENU_MENU_LEVEL == 1) then
-								local CT = _G["CT_Library"];
-								if (not CT) then return; end
-
-								local modules = CT:getData();
-								for i, module in ipairs(modules) do
+								for i, mod in ipairs(module:getInstalledModules()) do
 									if (i>2) then
 										info = {};
-										info.text = module.name;
+										info.text = mod.name;
 
 
 										info.notCheckable = 1;
-										if (module.externalDropDown_Initialize) then
+										if (mod.externalDropDown_Initialize) then
 											-- shows a custom dropdown provided by the module
 											info.hasArrow = 1;
-											info.value = module.name;
+											info.value = mod.name;
 										else
 											-- opens the customOpenFunction() if it exists, or just opens the standard module options
-											info.func = module.customOpenFunction or function()
-												CT:showModuleOptions(module.name);
+											info.func = mod.customOpenFunction or function()
+												module:showModuleOptions(mod.name);
 											end;
 										end
 										UIDropDownMenu_AddButton(info);

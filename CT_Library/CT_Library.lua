@@ -122,6 +122,10 @@ local function getPrintText(...)
 	return str;
 end
 
+function lib:getInstalledModules()
+	return modules;
+end
+
 -- Clears a table
 local emptyMeta = { };
 function lib:clearTable(tbl, clearMeta)

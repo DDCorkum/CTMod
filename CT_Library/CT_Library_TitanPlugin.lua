@@ -20,6 +20,7 @@
 CTModTitanPlugin = {}
 -- Reduce the chance of functions and variables colliding with another addon.
 local TS = CTModTitanPlugin
+local CT = select(2, ...);
 
 TS.id = "CTMod";
 TS.addon = "TitanCTMod";
@@ -93,10 +94,7 @@ For this example plugin, we show the standard Titan buttons plus options to dete
 	-- level 1 menu
 	if L_UIDROPDOWNMENU_MENU_LEVEL == 1 then
 		TitanPanelRightClickMenu_AddTitle(TitanPlugins[TS.id].menuText);
-		local CT = _G["CT_Library"];
-		if (not CT) then return; end
-
-		local modules = CT:getData();
+		local modules = CT:getInstalledModules();
 		for i, module in ipairs(modules) do
 			if (i>2) then
 				info = {};

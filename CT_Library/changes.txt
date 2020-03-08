@@ -1,5 +1,6 @@
 CT_Library (8.3.0.7) 2020-02-24
 - Performance improvements using C_Timer to replace OnUpdate
+- Fix to titan plugin and minimap button using protected-visibility code
 
 CT_Library (8.3.0.5) 2020-02-09
 - Changes to help other modules use code that mimics "public", "protected" and "public" visibility
