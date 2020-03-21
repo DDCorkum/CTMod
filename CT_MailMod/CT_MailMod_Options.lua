@@ -132,6 +132,12 @@ module.frame = function()
 				" - " .. L["CT_MailMod/AutoCompleteFilter/Recent"] .. "#" .. textColor2,				
 			}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
 		optionsEndFrame();
+		optionsBeginFrame(6, 26, "checkbutton#tl:10:%y#o:sendmailProtectFocus:true#Prevent panel from losing keybaord focus");
+			optionsAddTooltip({
+				"Prevent panel from losing keybaord focus",
+				"Returns the keyboard cursor after common tasks, like splitting stacks"
+			}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
+		optionsEndFrame();
 
 		-- Mail Log Options
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_MailMod/Options/MailLog/Heading"]);

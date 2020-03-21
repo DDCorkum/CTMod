@@ -1200,3 +1200,83 @@ do
 		GameTooltip:Hide();
 	end);
 end
+
+
+--------------------------------------------
+-- Changes to other frames
+
+do
+	local currentFocus, isProtected, lostFocus;
+	
+	local function onEditFocusGained(editbox)
+		currentFocus = editbox;
+	end
+	
+	local function restoreFocus()
+		if (lostFocus and not currentFocus) then
+			lostFocus:SetFocus();
+		end
+		lostFocus = nil;
+	end
+	
+	local function onEditFocusLost(editbox)
+		currentFocus = nil;
+		if (isProtected) then
+			lostFocus = editbox;
+			C_Timer.After(0.00005, restoreFocus);
+		end
+	end
+	
+	local function protect()
+		if (module:getOption("sendmailProtectFocus") ~= false) then
+			isProtected = true;
+		end
+	end
+	
+	local function unprotect()
+		isProtected = nil;
+	end
+	
+	local function unprotectAfter5()
+		C_Timer.After(5, unprotect);
+	end
+	
+	local function trigger()
+		if (mailFocus and isProtected) then
+			mailFocus:SetFocus();
+		end
+	end
+	
+	SendMailNameEditBox:HookScript("OnEditFocusGained", onEditFocusGained);
+	SendMailSubjectEditBox:HookScript("OnEditFocusGained", onEditFocusGained);
+	SendMailBodyEditBox:HookScript("OnEditFocusGained", onEditFocusGained);
+	SendMailMoneyGold:HookScript("OnEditFocusGained", onEditFocusGained);
+	SendMailMoneySilver:HookScript("OnEditFocusGained", onEditFocusGained);
+	SendMailMoneyCopper:HookScript("OnEditFocusGained", onEditFocusGained);
+
+	SendMailNameEditBox:HookScript("OnEditFocusLost", onEditFocusLost);
+	SendMailSubjectEditBox:HookScript("OnEditFocusLost", onEditFocusLost);
+	SendMailBodyEditBox:HookScript("OnEditFocusLost", onEditFocusLost);
+	SendMailMoneyGold:HookScript("OnEditFocusLost", onEditFocusLost);
+	SendMailMoneySilver:HookScript("OnEditFocusLost", onEditFocusLost);
+	SendMailMoneyCopper:HookScript("OnEditFocusLost", onEditFocusLost);
+	
+	StackSplitFrame:HookScript("OnShow", protect);
+	StackSplitFrame:HookScript("OnHide", unprotectAfter5);
+	
+	SendMailSendMoneyButton:HookScript("OnEnter", protect);
+	SendMailCODButton:HookScript("OnEnter", protect);
+	SendMailSendMoneyButton:HookScript("OnLeave", unprotect);
+	SendMailCODButton:HookScript("OnLeave", unprotect);
+	
+	for i=1, ATTACHMENTS_MAX_RECEIVE do
+		local frame = _G["SendMailAttachment"..i];
+		if (frame) then
+			frame:HookScript("OnEnter", protect);
+			frame:HookScript("OnLeave", unprotect);
+		else
+			break;
+		end
+	end
+
+end
