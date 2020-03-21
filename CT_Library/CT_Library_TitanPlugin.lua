@@ -73,7 +73,7 @@ function TitanPanelRightClickMenu_PrepareCTModMenu()
 -- SDK : This is a routine that Titan 'assumes' will exist. The name is a specific format
 --       "TitanPanelRightClickMenu_Prepare"..ID.."Menu"
 --       where ID is the "id" from "registry"
-	local info
+	local info, info1, info2;
 --[[ NOTE :
 Titan does not use the Blizzard UI drop down menu because it can cause taint issues. 
 Instead it uses a custom library provided by arith. It uses the Blizzard routines but
@@ -96,25 +96,32 @@ For this example plugin, we show the standard Titan buttons plus options to dete
 		TitanPanelRightClickMenu_AddTitle(TitanPlugins[TS.id].menuText);
 		local modules = CT:getInstalledModules();
 		for i, module in ipairs(modules) do
-			if (i>2) then
-				info = {};
-				info.text = module.name;
-				
+			info = {};
+			info.text = module.name;
 
-				info.notCheckable = 1;
-				if (module.externalDropDown_Initialize) then
-					-- shows a custom dropdown provided by the module
-					info.hasArrow = 1;
-					info.value = module.name;
-				else
-					-- opens the customOpenFunction() if it exists, or just opens the standard module options
-					info.func = module.customOpenFunction or function()
-						CT:showModuleOptions(module.name);
-					end;
-				end
+
+			info.notCheckable = 1;
+			if (module.externalDropDown_Initialize) then
+				-- shows a custom dropdown provided by the module
+				info.hasArrow = 1;
+				info.value = module.name;
+			else
+				-- opens the customOpenFunction() if it exists, or just opens the standard module options
+				info.func = module.customOpenFunction or function()
+					CT:showModuleOptions(module.name);
+				end;
+			end		
+			if (i > 2) then
 				L_UIDropDownMenu_AddButton(info);
+			elseif (i == 1) then
+				info1 = info;
+			else
+				info2 = info;
 			end
 		end
+		L_UIDropDownMenu_AddSeparator(1);
+		L_UIDropDownMenu_AddButton(info1);
+		L_UIDropDownMenu_AddButton(info2);
 		
 		-- SDK : "TitanPanelRightClickMenu_AddSpacer" is used to put a blank line in the menu
 		TitanPanelRightClickMenu_AddSpacer();     

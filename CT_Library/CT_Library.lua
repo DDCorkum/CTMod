@@ -2456,34 +2456,29 @@ end
 local controlPanelFrame;
 local selectedModule;
 local previousModule;
+local minWidth, minHeight, maxWidth, maxHeight = 300, 30, 635, 495;
 
 -- Resizes the frame smoothly
-local combatWarningPrinted;
 local function resizer(self, elapsed)
-	local width = self.width;
-	if ( width < 635 ) then
-		if (InCombatLockdown()) then
-			if (not combatWarningPrinted) then
-				print(L["CT_Library/ControlPanelCannotOpen"]);
-				combatWarningPrinted = true;
-			end
-		else
-			local newWidth = min(width + 837.5 * elapsed, 635); -- Resize to 635 over 0.4 sec
-			self:SetWidth(newWidth);
-			self.width = newWidth;
-		end
+	if (self.height > minHeight and self.isMinimized) then
+		local newHeight = max(self.height + (minHeight-maxHeight)/0.4*elapsed, minHeight);
+		self:SetHeight(newHeight);
+		self.height = newHeight;
+	elseif (self.height < maxHeight and not self.isMinimized) then
+		local newHeight = min(self.height + (maxHeight-minHeight)/0.4*elapsed, maxHeight);
+		self:SetHeight(newHeight);
+		self.height = newHeight;		
+	elseif (self.options and self.options:IsShown() and self.width < maxWidth) then
+		local newWidth = min(self.width + (maxWidth-minWidth)/0.4*elapsed, maxWidth);
+		self:SetWidth(newWidth);
+		self.width = newWidth;
+	elseif (self.options and self.options:IsShown() and self.alpha < 1 and not self.isMinimized) then
+		local newAlpha = min(self.alpha + 5 * elapsed, 1); -- Set to 100% opacity over 0.2 sec
+		self.options:SetAlpha(newAlpha);
+		self.alpha = newAlpha;
 	else
-		-- Set Alpha
-		local alpha = self.alpha;
-		if ( alpha < 1 ) then
-			local newAlpha = min(alpha + 5 * elapsed, 1); -- Set to 100% opacity over 0.2 sec
-
-			self.options:SetAlpha(newAlpha);
-			self.alpha = newAlpha;
-		else
-			-- We're done, disable the function
-			self:SetScript("OnUpdate", nil);
-		end
+		-- We're done, disable the function
+		self:SetScript("OnUpdate", nil);
 	end
 end
 
@@ -2763,8 +2758,8 @@ local function controlPanelSkeleton()
 end
 
 local function maximizeControlPanel()
-	controlPanelFrame:SetHeight(495);
 	controlPanelFrame.isMinimized = nil;
+	controlPanelFrame:SetScript("OnUpdate", resizer);
 	CTControlPanelMinimizeButton:SetNormalTexture("Interface\\Buttons\\UI-Panel-SmallerButton-Up");
 	CTControlPanelMinimizeButton:SetDisabledTexture("Interface\\Buttons\\UI-Panel-SmallerButton-Up");
 	CTControlPanelMinimizeButton:SetPushedTexture("Interface\\Buttons\\UI-Panel-SmallerButton-Down");
@@ -2775,8 +2770,8 @@ local function maximizeControlPanel()
 end
 
 local function minimizeControlPanel()
-	controlPanelFrame:SetHeight(30);
 	controlPanelFrame.isMinimized = true;
+	controlPanelFrame:SetScript("OnUpdate", resizer);
 	controlPanelFrame:SetClipsChildren(true);
 	CTControlPanelMinimizeButton:SetNormalTexture("Interface\\Buttons\\UI-Panel-BiggerButton-Up");
 	CTControlPanelMinimizeButton:SetDisabledTexture("Interface\\Buttons\\UI-Panel-BiggerButton-Up");
@@ -2791,6 +2786,9 @@ local function displayControlPanel()
 	if ( not controlPanelFrame ) then
 		controlPanelFrame = lib:getFrame(controlPanelSkeleton);
 		tinsert(UISpecialFrames, controlPanelFrame:GetName());
+		controlPanelFrame.height = maxHeight;	-- tracking variables used by resizer()
+		controlPanelFrame.width = minWidth;
+		controlPanelFrame.alpha = 0;
 	end
 	maximizeControlPanel();
 	controlPanelFrame:Show();

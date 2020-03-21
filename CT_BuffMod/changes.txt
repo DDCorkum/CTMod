@@ -1,4 +1,5 @@
-CT_BuffMod (8.3.0.7) 2020-03-20
+CT_BuffMod (8.3.0.7) 2020-03-21
+- Performance improvements using C_Timer to replace OnUpdate
 - Code updates corresponding to CT_Library
 
 CT_BuffMod (8.3.0.3) 2020-01-20

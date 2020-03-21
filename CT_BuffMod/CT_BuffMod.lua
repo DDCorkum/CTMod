@@ -1698,14 +1698,19 @@ local function getTemporaryEnchantInfo(index, slot, unit)
 	return hasEnchant, name, texture, count or 0, timeRemaining, expirationTime;
 end
 
+
+local oldNumEnchants;
 function unitClass:updateEnchants()
 	-- Update enchant objects for this unit.
 	-- Returns the number of enchants.
 
 	local slot, enchanted, timeRemaining, count, name, texture, expirationTime;
 	local auraObject;
-	local unit = self.unitId;
 	local numEnchants = 0;
+
+	if (self.unitId ~= "player") then
+		return 0;
+	end
 
 	for index = 1, #(constants.ENCHANT_SLOTS) do
 		auraObject = self:findEnchant(index);
@@ -1735,11 +1740,21 @@ function unitClass:updateEnchants()
 					name = UNKNOWN;
 				end
 			end
-
-			if (name == UNKNOWN) then
-				needEnchantRescan = 1;  -- time until enchant rescan is performed
+			
+			self.rescanEnchantsFunc = self.rescanEnchantsFunc or function()
+				local newNumEnchants = self:updateEnchants();
+				if (newNumEnchants ~= oldNumEnchants or newNumEnchants > 0) then
+					oldNumEnchants = newNumEnchants;
+					globalObject.windowListObject:refreshWeaponButtons();
+				end
 			end
-
+				
+			if (name == UNKNOWN) then
+				C_Timer.After(1, self.rescanEnchantsFunc);
+			else
+				C_Timer.After(2, self.rescanEnchantsFunc);
+			end
+			
 			-- If we previously recorded an enchant for this slot...
 			if (auraObject) then
 
@@ -2062,8 +2077,6 @@ end
 
 local mindetailWidth1 = 1;  -- Minimum width of detail frame before hiding font strings.
 
-local buttonTooltipRefresh;
-
 local function auraButton_updateFlashing(button)
 	local frameObject = button.frameObject;
 	local auraObject = button.auraObject;
@@ -2269,35 +2282,27 @@ local function auraButton_updateTimeDisplay(button)
 	end
 end
 
-local function auraButton_OnUpdate(self, elapsed)
+local function auraButton_Update(self)
 	local auraObject = self.auraObject;
 	if (not auraObject) then
+		if (self.ticker) then
+			self.ticker:Cancel();
+			self.ticker = nil;
+		end
 		return;
 	end
-	local update = (self.update or 0) - elapsed;
-	if (update <= 0) then
-		auraButton_updateTimerBar(self);
-		auraButton_updateTimeDisplay(self);
-		auraButton_updateFlashing(self);
-
-		if (auraObject.isFlashing) then
-			self.update = 0.02;
-		else
-			self.update = auraObject.updateInterval;
-		end
-	else
-		self.update = update;
-	end
-	if ( GameTooltip:IsOwned(self) ) then
-		if (not buttonTooltipRefresh) then
-			buttonTooltipRefresh = 0.5;
-		end
-		buttonTooltipRefresh = buttonTooltipRefresh - elapsed;
-		if (buttonTooltipRefresh < 0) then
-			buttonTooltipRefresh = nil;
-			-- Refresh tooltip
-			CT_BuffMod_AuraButton_OnEnter(self);
-		end
+	auraButton_updateTimerBar(self);
+	auraButton_updateTimeDisplay(self);
+	auraButton_updateFlashing(self);
+	local interval = (auraObject.isFlashing and 0.05) or auraObject.updateInterval or 1;
+	self.onUpdate = self.onUpdate or function() auraButton_Update(self) end;
+	if (self.ticker == nil) then
+		self.ticker = C_Timer.NewTicker(interval, self.onUpdate);
+		self.tickerTime = interval;
+	elseif (self.tickerTime ~= interval) then
+		self.ticker:Cancel();
+		self.ticker = C_Timer.NewTicker(interval, self.onUpdate);
+		self.tickerTime = interval;
 	end
 end
 
@@ -2876,7 +2881,7 @@ local function auraButton_updateAppearance(button)
 	end
 
 	-- Force an update of the frequently changing properties.
-	auraButton_OnUpdate(button, 9999);
+	auraButton_Update(button);
 end
 
 -- The following CT_BuffMod_AuraButton_* functions need to be global since they are called from the .xml templates.
@@ -2885,7 +2890,14 @@ function CT_BuffMod_AuraButton_OnShow(self)
 	if (not self.ctinit) then
 		self.ctinit = true;
 		self:RegisterForClicks("LeftButton", "RightButtonUp");
-		self:SetScript("OnUpdate", auraButton_OnUpdate);
+		auraButton_Update(self);
+	end
+end
+
+function CT_BuffMod_AuraButton_OnHide(self)
+	if (self.ticker) then
+		self.ticker:Cancel();
+		self.ticker = nil;
 	end
 end
 
@@ -2964,6 +2976,12 @@ function CT_BuffMod_AuraButton_OnEnter(self)
 		end
 		GameTooltip:SetSize(max(GameTooltip:GetWidth(),180),GameTooltip:GetHeight()+5);
 	end
+	
+	C_Timer.After(0.5, function()
+		if (GameTooltip:IsOwned(self)) then
+			CT_BuffMod_AuraButton_OnEnter(self);
+		end
+	end);
 end
 
 function CT_BuffMod_AuraButton_OnLeave(self)
@@ -4904,7 +4922,7 @@ local function consolidatedAuraFrame_OnEvent(auraFrame, event, arg1)
 			-- We don't need to reconfigure the buttons, since the
 			-- Secure Aura routines already do that for this event.
 			-- We just need to perform a visual update of the buttons.
-			frameObject.needUpdate = true;
+			frameObject:refreshAuraButtons();
 		end
 	elseif (event == "PLAYER_REGEN_ENABLED") then
 		-- Leaving combat.
@@ -4914,27 +4932,13 @@ local function consolidatedAuraFrame_OnEvent(auraFrame, event, arg1)
 	end
 end
 
-local function consolidatedAuraFrame_OnUpdate(auraFrame)
-	local frameObject = auraFrame.frameObject;
-
-	if (not frameObject) then
-		return;
-	end
-
-	if (frameObject.needUpdate) then
-		-- Refresh the appearance of the buttons.
-		frameObject.needUpdate = false;
-		frameObject:refreshAuraButtons();
-	end
-end
-
 local function consolidatedAuraFrame_OnShow(auraFrame)
 	local frameObject = auraFrame.frameObject;
 	if (not frameObject) then
 		return;
 	end
 
-	frameObject.needUpdate = true;
+	frameObject:refreshAuraButtons();
 
 	if (auraFrame.altFrame) then
 		auraFrame.altFrame:Show();
@@ -4966,7 +4970,6 @@ function consolidatedClass:setAuraFrameScripts()
 	auraFrame:HookScript("OnEvent", consolidatedAuraFrame_OnEvent);
 	auraFrame:HookScript("OnShow", consolidatedAuraFrame_OnShow);
 	auraFrame:HookScript("OnHide", consolidatedAuraFrame_OnHide);
-	auraFrame:HookScript("OnUpdate", consolidatedAuraFrame_OnUpdate);
 
 	auraFrame.scriptsHooked = true;
 end
@@ -5086,10 +5089,7 @@ end
 --
 --	.needApplyProtected -- Flag check after combat ends to see if :applyProtectedOptions() needs to be called.
 --	.needReconfigure -- Flag checked in aura frame's OnUpdate script to force call to primaryClass:reconfigureButtons(). (true == yes, nil or false == no)
---	.needRescanCount -- Flag checked in aura frame's OnUpdate script to force rescan of a unit's buffs (true == yes, nil or false == no)
---	.needRescanEvery -- Number of seconds between scans (requires .needRescanCount).
---	.needRescanTimer -- The countdown timer (requires .needRescanCount).
---	.needRescanUnit  -- The unit we are going to scan buffs for (requires .needRescanCount).
+--	.needRescanTicker -- C_Timer.NewTicker that checks for buffs which are known to be late updating in the game when switch from a vehicle or pet
 --	.needSetSpecial -- Flag used to indicate that speciall attributes need to be set
 --	.unitNormal -- The normal unit id for this window (string, determined using .unitType) (one of: "player", "vehicle", "pet", "target", "focus")
 --
@@ -5129,7 +5129,6 @@ end
 --	:updateWeaponButtons(func)
 --	:updateAuraButtons(func)
 --
---	primaryAuraFrame_OnUpdate(auraFrame, elapsed)
 --	primaryAuraFrame_OnEvent(auraFrame, event, arg1)
 --	primaryAuraFrame_OnAttributeChanged(auraFrame, name, value)
 --	primaryAuraFrame_OnShow(auraFrame)
@@ -6211,62 +6210,6 @@ function primaryClass:updateAuraButtons(func)
 	end
 end
 
-local function primaryAuraFrame_OnUpdate(auraFrame, elapsed)
-	local frameObject = auraFrame.frameObject;
-
-	if (not frameObject) then
-		return;
-	end
-
-	if (frameObject.needRescanCount) then
-		-- We want to scan a unit's buffs.
-		-- .needRescanCount == Number of times we want to scan before stopping.
-		-- .needRescanEvery == Number of seconds between scans.
-		-- .needRescanTimer == The countdown timer.
-		-- .needRescanUnit  == The unit we are going to scan buffs for.
-		frameObject.needRescanTimer = frameObject.needRescanTimer - elapsed;
-
-		if (frameObject.needRescanTimer < 0) then
-			-- Reset the countdown timer.
-			frameObject.needRescanTimer = frameObject.needRescanEvery;
-
-			-- If the frame's unit is still the same...
-			if (frameObject:getUnitId() == frameObject.needRescanUnit) then
-				-- Update spells and enchantments for the unit
-				globalObject.unitListObject:updateSpellsAndEnchants(frameObject.needRescanUnit);
-
-				-- We want to force a full button reconfiguration.
-				frameObject.needReconfigure = true;
-
-				-- Decrease the number of times remaining to do the scan.
-				frameObject.needRescanCount = frameObject.needRescanCount - 1;
-				if (frameObject.needRescanCount <= 0) then
-					-- No more scans to do.
-					frameObject.needRescanCount = nil;
-				end
-			else
-				-- The unit assigned to the frame has changed, so stop the scans.
-				frameObject.needRescanCount = nil;
-			end
-		end
-	end
-
-	if (frameObject.needReconfigure) then
-		-- We want to reconfigure the buttons.
-		if (frameObject:reconfigureButtons()) then
-			-- We were able to reconfigure them.
-			frameObject.needReconfigure = false;
-			frameObject.needUpdate = true;
-		end
-	end
-
-	if (frameObject.needUpdate) then
-		-- Refresh the appearance of the buttons.
-		frameObject.needUpdate = false;
-		frameObject:refreshAuraButtons();
-	end
-end
-
 local function primaryAuraFrame_OnEvent(auraFrame, event, arg1)
 	local frameObject = auraFrame.frameObject;
 
@@ -6284,12 +6227,16 @@ local function primaryAuraFrame_OnEvent(auraFrame, event, arg1)
 			-- Secure Aura routines already do that for this event.
 			-- The global frame does the buff rescan.
 			-- Set the flag to indicate we need a visual update.
-			frameObject.needUpdate = true;
+			C_Timer.After(0.0005, auraFrame.refreshTickerFunc);
 		end
 
 	elseif (event == "UNIT_PET") then
 		if (arg1 == "player" and frameObject:getUnitId() == "pet") then
-			frameObject.needReconfigure = true;
+			if (frameObject:reconfigureButtons()) then
+				C_Timer.After(0.0005, auraFrame.refreshTickerFunc);
+			else
+				frameObject.needReconfigure = true;
+			end
 		end
 
 	elseif (event == "PLAYER_REGEN_DISABLED") then
@@ -6301,9 +6248,10 @@ local function primaryAuraFrame_OnEvent(auraFrame, event, arg1)
 
 		-- For a protected frame...
 		if (auraFrame:IsProtected()) then
-			-- Make a call to our OnUpdate function before we enter lockdown
-			-- in case anything needs to be reconfigured or updated.
-			primaryAuraFrame_OnUpdate(auraFrame, 0);
+			-- Update anything that might need to be done before it gets locked down
+			if (frameObject:reconfigureButtons()) then
+				C_Timer.After(0.0005, auraFrame.refreshTickerFunc);
+			end
 		end
 
 	elseif (event == "PLAYER_REGEN_ENABLED") then
@@ -6325,19 +6273,33 @@ local function primaryAuraFrame_OnEvent(auraFrame, event, arg1)
 		if (frameObject.needSetSpecial) then
 			frameObject:setSpecialAttributes();
 		end
+		
+		if (frameObject.needReconfigure and frameObject:reconfigureButtons()) then
+			C_Timer.After(0.0005, auraFrame.refreshTickerFunc);
+			frameObject.needReconfigure = nil;
+		end
+			
 
 	elseif (event == "PLAYER_TARGET_CHANGED") then
 		if (frameObject:getUnitId() == "target") then
 			-- The global frame does the buff rescan.
 			-- Set the flag to indicate we need a reconfiguration.
-			frameObject.needReconfigure = true;
+			if (frameObject:reconfigureButtons()) then
+				C_Timer.After(0.0005, auraFrame.refreshTickerFunc);
+			else
+				frameObject.needReconfigure = true;
+			end
 		end
 
 	elseif (event == "PLAYER_FOCUS_CHANGED") then
 		if (frameObject:getUnitId() == "focus") then
 			-- The global frame does the buff rescan.
 			-- Set the flag to indicate we need a reconfiguration.
-			frameObject.needReconfigure = true;
+			if (frameObject:reconfigureButtons()) then
+				C_Timer.After(0.0005, auraFrame.refreshTickerFunc);
+			else
+				frameObject.needReconfigure = true;
+			end
 		end
 
 	elseif (event == "UNIT_ENTERED_VEHICLE") then
@@ -6422,10 +6384,25 @@ local function primaryAuraFrame_OnEvent(auraFrame, event, arg1)
 					-- At the time of this event, the game may still tell us that
 					-- there are buffs assigned to the vehicle, so we have to do the
 					-- scans via a timer.
-					frameObject.needRescanCount = 10;
-					frameObject.needRescanEvery = 2;
-					frameObject.needRescanTimer = 1;
-					frameObject.needRescanUnit = unitNormal;
+					frameObject.rescanTickerFunc = frameObject.rescanTickerFunc or function()
+						if (frameObject:getUnitId() ~= unitNormal or frameObject.rescanTicks == 10) then
+							frameObject.rescanTicker:Cancel()
+							frameObject.rescanTicker = nil;
+						else
+							-- Try to update spells and enchantments for the unit
+							globalObject.unitListObject:updateSpellsAndEnchants(frameObject.needRescanUnit);
+							
+							-- Try to force a full button reconfiguration.
+							if (frameObject:reconfigureButtons()) then
+								C_Timer.After(0.0005, auraFrame.refreshTickerFunc);
+							else
+								frameObject.needReconfigure = true;
+							end
+							frameObject.rescanTicks = frameObject.rescanTicks  + 1;
+						end
+					end
+					frameObject.rescanTicks = 0;
+					frameObject.rescanTicker = frameObject.rescanTicker or C_Timer.NewTicker(2, frameObject.rescanTickerFunc);
 				end
 			end
 		end
@@ -6466,12 +6443,12 @@ local function primaryAuraFrame_OnAttributeChanged(auraFrame, name, value)
 		-- Rescan the enchants and then request a visual update.
 		-- Bug: Blizzard does not detect if a weapon buff is applied onto an already buffed weapon.
 		frameObject:updateEnchants();
-		frameObject.needUpdate = true;
+		C_Timer.After(0.0005, auraFrame.refreshTickerFunc);
 	else
 		-- An attribute was changed on the primary aura frame.
 		-- The Secure Aura Header has reconfigured the buttons.
 		-- We need to perform a visual update.
-		frameObject.needUpdate = true;
+		C_Timer.After(0.0005, auraFrame.refreshTickerFunc);
 	end
 end
 
@@ -6487,7 +6464,7 @@ local function primaryAuraFrame_OnShow(auraFrame)
 
 	-- Update spells and enchants, then request a visual update.
 	frameObject:updateSpellsAndEnchants();
-	frameObject.needUpdate = true;
+	C_Timer.After(0.0005, auraFrame.refreshTickerFunc);
 
 	if (auraFrame.altFrame) then
 		auraFrame.altFrame:Show();
@@ -6520,11 +6497,11 @@ function primaryClass:setAuraFrameScripts()
 
 	-- Some of these scripts are already in use by the secure aura
 	-- routines so we can't just use :SetScript().
+	auraFrame.refreshTickerFunc = function() local frame = auraFrame.frameObject; if frame then frame:refreshAuraButtons() end end;
 	auraFrame:HookScript("OnEvent", primaryAuraFrame_OnEvent);
 	auraFrame:HookScript("OnAttributeChanged", primaryAuraFrame_OnAttributeChanged);
 	auraFrame:HookScript("OnShow", primaryAuraFrame_OnShow);
 	auraFrame:HookScript("OnHide", primaryAuraFrame_OnHide);
-	auraFrame:HookScript("OnUpdate", primaryAuraFrame_OnUpdate);
 
 	auraFrame.scriptsHooked = true;
 end
@@ -7249,7 +7226,10 @@ function primaryClass:deleteBuffFrame()
 
 	-- Clear some other values.
 	self.needReconfigure = nil;
-	self.needRescanCount = nil;
+	if (self.rescanTicker) then
+		self.rescanTicker:Cancel();
+		self.rescanTicker = nil;
+	end
 
 	return true;
 end
@@ -10596,65 +10576,6 @@ end
 --------------------------------------------
 -- Global frame
 
-local expireUpdate = 0;
-local expireUpdateInterval = 1;
-local previousNumEnchants;
-local auraFlashTime = 0;
-local auraAlpha = 1;
-
-local function globalFrame_OnUpdate(self, elapsed)
-	if (needEnchantRescan) then
-		needEnchantRescan = needEnchantRescan - elapsed;
-		if (needEnchantRescan < 0) then
-			needEnchantRescan = nil;
-			local numEnchants = globalObject.unitListObject:updateEnchants();
-			if (numEnchants ~= previousNumEnchants or numEnchants > 0) then
-				previousNumEnchants = numEnchants;
-				globalObject.windowListObject:refreshWeaponButtons();
-			end
-		end
-	else
-		-- Bug: Since Blizzard only notifies us when a weapon loses a weapon buff,
-		--      or gains a weapon buff when it does not already have one,
-		--      we need to constantly scan for weapon buff changes in case the user
-		--      applies the same or a different weapon buff to a weapon which already
-		--      has a weapon buff on it.
-		normalEnchantRescan = normalEnchantRescan - elapsed;
-		if (normalEnchantRescan < 0) then
-			normalEnchantRescan = 2;  -- rescan time in seconds
-			local numEnchants = globalObject.unitListObject:updateEnchants();
-			if (numEnchants ~= previousNumEnchants or numEnchants > 0) then
-				previousNumEnchants = numEnchants;
-				globalObject.windowListObject:refreshWeaponButtons();
-			end
-		end
-	end
-
-	-- Adjust alpha value to use for flashing auras.
-	auraFlashTime = auraFlashTime - elapsed;
-	if (auraFlashTime < 0) then
-		local overtime = -auraFlashTime;
-		auraFlashTime = 2;
-		if (overtime < auraFlashTime) then
-			auraFlashTime = auraFlashTime - overtime;
-		end
-	end
-	local newTime = auraFlashTime % 2;
-	if (newTime > 1) then
-		auraAlpha = 2 - newTime;
-	else
-		auraAlpha = newTime;
-	end
-	module.auraAlpha = auraAlpha;
-
-	-- Check if any of the auras are expiring.
-	expireUpdate = expireUpdate - elapsed;
-	if (expireUpdate <= 0) then
-		expireUpdate = expireUpdateInterval;
-		globalObject.unitListObject:checkExpiration();
-	end
-end
-
 local function globalFrame_Init(self)
 	-- Perform initialization
 
@@ -10674,9 +10595,6 @@ local function globalFrame_Init(self)
 	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
 		self:RegisterEvent("PLAYER_FOCUS_CHANGED");
 	end
-
-	-- OnUpdate handler
-	self:SetScript("OnUpdate", globalFrame_OnUpdate);
 
 	-- Create the initial frame objects.
 	local windowListObject = globalObject.windowListObject;
@@ -10718,6 +10636,34 @@ local function globalFrame_Init(self)
 		windowListObject:updateSpellsAndEnchants();
 		windowListObject:refreshAuraButtons();
 	end
+	
+	-- Start a ticker to synchronize flashing across all windows
+	local flashDirection;
+	local function synchronizeFlashing()
+		-- Adjust alpha value to use for flashing auras.
+		if (flashDirection) then
+			module.auraAlpha = module.auraAlpha - 0.05;
+			if (module.auraAlpha <= 0) then
+				flashDirection = false;
+			end
+		else
+			module.auraAlpha = module.auraAlpha + 0.05;
+			if (module.auraAlpha >= 1) then
+				flashDirection = true;
+			end
+		end
+		C_Timer.After(0.05, synchronizeFlashing);
+	end
+	module.auraAlpha = 0;
+	synchronizeFlashing();
+
+	-- Start a ticker to monitor for expiring buffs every second
+	local function checkExpiration()
+		globalObject.unitListObject:checkExpiration();
+		C_Timer.After(1, checkExpiration);
+	end
+	checkExpiration();
+	
 end
 
 local function globalFrame_OnEvent(self, event, arg1)
