@@ -1333,9 +1333,9 @@ function module:AddUIElements()
 			local playerposition = C_Map.GetPlayerMapPosition(mapid,"player");
 			if (playerposition) then
 				local px, py = playerposition:GetXY();
-				px = math.floor(px*1000)/10;
-				py = math.floor(py*1000)/10;
-				module.pxy.text:SetText(format("P: %.1f, %.1f", px, py));
+				--px = math.floor(px*1000)/10;
+				--py = math.floor(py*1000)/10;
+				module.pxy.text:SetText(format("P: %.1f, %.1f", px*100, py*100));
 			else
 				module.pxy.text:SetText("-");
 			end
@@ -1356,17 +1356,17 @@ function module:AddUIElements()
 			if (cx and cy) then
 				if (cx > 0 and cx < 1 and cy > 0 and cy < 1) then
 					module.cxy.text:SetTextColor(1,1,1,1);
+					module.cxy.text:SetText(format("C: %.1f, %.1f", cx*100, cy*100));
 				else
-					module.cxy.text:SetTextColor(1,1,1,.3);			
+					module.cxy.text:SetTextColor(1,1,1,.3);
+					cx = math.max(math.min(cx,1),0);
+					cy = math.max(math.min(cy,1),0);				
+					module.cxy.text:SetText(format("C: %d, %d", cx*100, cy*100));
 				end
-				cx = math.floor(cx*1000)/10;
-				cx = math.max(math.min(cx,100),0);
-				cy = math.floor(cy*1000)/10;
-				cy = math.max(math.min(cy,100),0);				
-				module.cxy.text:SetText(format("C: %.1f, %.1f", cx, cy));
+
 			end
 		end
-		C_Timer.After(0.1, updateXYCoords);
+		C_Timer.After(0.10, updateXYCoords);
 	end
 	WorldMapFrame.ScrollContainer:HookScript("OnShow", function() isShown = true; updateXYCoords() end);
 	WorldMapFrame.ScrollContainer:HookScript("OnHide", function() isShown = false; end);

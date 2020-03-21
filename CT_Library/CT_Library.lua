@@ -2120,8 +2120,15 @@ local function generalObjectHandler(self, specializedHandler, str, parent, initi
 	end
 
 	-- Check override name
-	name = overrideName or name or identifier or option;  -- Added "or identifier or option" in WoW 8.0 (Battle for Azeroth) because sliders now need unique global names
-
+	if (overrideName or name) then
+		name = overrideName or name;
+	elseif (identifier and parent and parent ~= UIParent) then
+		name = (parent:GetName() or "") .. identifier;
+	else
+		name = identifier or option;
+	end
+	
+	-- Ensure at least one valid anchor
 	anch1 = anch1 or "mid";
 
 	-- Set default value
@@ -2601,7 +2608,7 @@ local function controlPanelSkeleton()
 			-- Prepare the frame
 			local selectedModuleFrame = self.selectedModuleFrame;
 			selectedModule = nil;
-
+			
 			self:SetWidth(300);
 			self.options:Hide();
 			self.selectedModuleFrame = nil;
@@ -2660,15 +2667,29 @@ local function controlPanelSkeleton()
 		["button#tl:4:-5#br:tr:-4:-25"] = {
 			"font#tl#br:bl:296:0#CTMod Control Panel v"..LIBRARY_VERSION,
 			"texture#i:bg#all#1:1:1:0.25#BACKGROUND",
-			["button#tr:3:6#s:32:32#v:SecureHandlerClickTemplate"] = {
+			["button#tr:3:6#s:32:32#"] = {
 				["onload"] = function(button)
 					button:SetNormalTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Up");
 					button:SetDisabledTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Up");
 					button:SetPushedTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Down");
 					button:SetHighlightTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight");
-					button:SetAttribute("_onclick", [=[ self:GetParent():GetParent():Hide(); ]=]);
-				end
-				--  NON SECURE, NOT ALLOWED SINCE 2.0.1  --  ["onclick"] = function(self) HideUIPanel(self.parent.parent); end
+				end,
+				["onclick"] = function()
+					PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+					CTCONTROLPANEL:Hide();
+				end,
+			},
+			["button#tr:-18:6#s:32:32#n:CTControlPanelMinimizeButton"] = {
+				["onload"] = function(button)
+					button:SetNormalTexture("Interface\\Buttons\\UI-Panel-SmallerButton-Up");
+					button:SetDisabledTexture("Interface\\Buttons\\UI-Panel-SmallerButton-Up");
+					button:SetPushedTexture("Interface\\Buttons\\UI-Panel-SmallerButton-Down");
+					button:SetHighlightTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight");
+				end,
+				["onclick"] = function(button)
+					PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+					lib:toggleMinimizeControlPanel();
+				end,
 			},
 			["onenter"] = function(self)
 				lib:displayPredefinedTooltip(self, "DRAG");
@@ -2715,7 +2736,7 @@ local function controlPanelSkeleton()
 			["button#i:701#hidden#s:263:25#tl:17:-410"] = modListButtonTemplate, -- Settings Import, 701
 			["button#i:702#hidden#s:263:25#tl:17:-435"] = modListButtonTemplate, -- Help, 702
 		},
-		["frame#s:315:0#tr:-15:-30#b:0:15#i:options#hidden"] = {
+		["frame#s:315:0#tr:-15:-30#b:t:15:-480#i:options#hidden"] = {
 			["onload"] = function(self)
 				local child = CreateFrame("Frame", nil, self);
 				child:SetPoint("TOPLEFT", self);
@@ -2741,15 +2762,37 @@ local function controlPanelSkeleton()
 	};
 end
 
+local function maximizeControlPanel()
+	controlPanelFrame:SetHeight(495);
+	controlPanelFrame.isMinimized = nil;
+	CTControlPanelMinimizeButton:SetNormalTexture("Interface\\Buttons\\UI-Panel-SmallerButton-Up");
+	CTControlPanelMinimizeButton:SetDisabledTexture("Interface\\Buttons\\UI-Panel-SmallerButton-Up");
+	CTControlPanelMinimizeButton:SetPushedTexture("Interface\\Buttons\\UI-Panel-SmallerButton-Down");
+	CT_LibraryOptionsScrollFrameScrollBar:Show();
+	CTCONTROLPANELlisting:Show();
+	CT_LibraryOptionsScrollFrame:SetScale(1);
+	CT_LibraryOptionsScrollFrame:SetAlpha(1);
+end
+
+local function minimizeControlPanel()
+	controlPanelFrame:SetHeight(30);
+	controlPanelFrame.isMinimized = true;
+	controlPanelFrame:SetClipsChildren(true);
+	CTControlPanelMinimizeButton:SetNormalTexture("Interface\\Buttons\\UI-Panel-BiggerButton-Up");
+	CTControlPanelMinimizeButton:SetDisabledTexture("Interface\\Buttons\\UI-Panel-BiggerButton-Up");
+	CTControlPanelMinimizeButton:SetPushedTexture("Interface\\Buttons\\UI-Panel-BiggerButton-Down");
+	CT_LibraryOptionsScrollFrameScrollBar:Hide();
+	CTCONTROLPANELlisting:Hide();
+	CT_LibraryOptionsScrollFrame:SetScale(0.00001);
+	CT_LibraryOptionsScrollFrame:SetAlpha(0);
+end
+
 local function displayControlPanel()
-	if (InCombatLockdown()) then
-		print(L["CT_Library/ControlPanelCannotOpen"]);
-		return;
-	end
 	if ( not controlPanelFrame ) then
 		controlPanelFrame = lib:getFrame(controlPanelSkeleton);
 		tinsert(UISpecialFrames, controlPanelFrame:GetName());
 	end
+	maximizeControlPanel();
 	controlPanelFrame:Show();
 end
 
@@ -2762,8 +2805,18 @@ function libPublic:showControlPanel(show)
 
 	if ( show ~= false ) then
 		displayControlPanel();
-	elseif ( controlPanelFrame and not InCombatLockdown()) then
+	elseif ( controlPanelFrame) then 
 		controlPanelFrame:Hide();
+	end
+end
+
+function libPublic:toggleMinimizeControlPanel()
+	if (controlPanelFrame) then
+		if (controlPanelFrame.isMinimized) then
+			maximizeControlPanel();
+		else
+			minimizeControlPanel();
+		end
 	end
 end
 

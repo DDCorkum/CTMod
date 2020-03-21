@@ -10284,45 +10284,45 @@ CONSOLIDATION REMOVED FROM GAME--]]
 						-- maximize Style 1 options, minimize Style 2 options
 						CT_BuffMod_Style1Label:Show();
 						CT_BuffMod_Style1SizeLabel:Show();
-						buffSize1:Show();
+						frameOptionsbuffSize1:Show();
 						CT_BuffMod_Style1PositionLabel:Show();
 						CT_BuffModDropdown_rightAlign1:Show();
-						colorCodeIcons1:Show();
-						detailWidth1:Show();
-						colorBuffs1:Show();
-						colorCodeBackground1:Show();
-						showNames1:Show();
-						colorCodeDebuffs1:Show();
+						frameOptionscolorCodeIcons1:Show();
+						frameOptionsdetailWidth1:Show();
+						frameOptionscolorBuffs1:Show();
+						frameOptionscolorCodeBackground1:Show();
+						frameOptionsshowNames1:Show();
+						frameOptionscolorCodeDebuffs1:Show();
 						CT_BuffMod_Style1JustifyLabel1:Show();
 						CT_BuffModDropdown_nameJustifyWithTime1:Show();
 						CT_BuffMod_Style1JustifyLabel2:Show();
 						CT_BuffModDropdown_nameJustifyNoTime1:Show();
-						showTimers1:Show();
+						frameOptionsshowTimers1:Show();
 						CT_BuffMod_Style1FormatLabel:Show();
 						CT_BuffModDropdown_durationFormat1:Show();
-						CTBuffMod_showDaysFormat1	:Show();
+						CT_BuffMod_showDaysFormat1:Show();
 						CT_BuffMod_Style1LocationLabel:Show();
 						CT_BuffModDropdown_durationLocation1:Show();
 						CT_BuffMod_Style1JustifyLabel3:Show();
 						CT_BuffModDropdown_timeJustifyNoName1:Show();
-						showBuffTimer1:Show();
-						showTimerBackground1:Show();
+						frameOptionsshowBuffTimer1:Show();
+						frameOptionsshowTimerBackground1:Show();
 						CT_BuffMod_Style1OffsetLabel1:Show();
-						spacingOnLeft1:Show();
+						frameOptionsspacingOnLeft1:Show();
 						CT_BuffMod_Style1OffsetLabel2:Show();
-						spacingOnRight1:Show();
+						frameOptionsspacingOnRight1:Show();
 						CT_BuffMod_Style2Label:Hide();
 						CT_BuffMod_Style2SizeLabel:Hide();
-						buffSize2:Hide();
-						colorCodeIcons2:Hide();
-						showTimers2:Hide();
+						frameOptionsbuffSize2:Hide();
+						frameOptionscolorCodeIcons2:Hide();
+						frameOptionsshowTimers2:Hide();
 						CT_BuffMod_Style2FormatLabel:Hide();
 						CT_BuffModDropdown_durationFormat2:Hide();
-						CTBuffMod_showDaysFormat2:Hide();
+						CT_BuffMod_showDaysFormat2:Hide();
 						CT_BuffMod_Style2LocationLabel:Hide();
 						CT_BuffModDropdown_dataSide2:Hide();
 						CT_BuffMod_Style2OffsetLabel:Hide();
-						spacingFromIcon2:Hide();
+						frameOptionsspacingFromIcon2:Hide();
 						CT_BuffMod_Style2ContinueLabel:Hide();
 						
 						
@@ -10330,45 +10330,45 @@ CONSOLIDATION REMOVED FROM GAME--]]
 						-- minimize Style 1 options, maximize Style 2 options
 						CT_BuffMod_Style1Label:Hide();
 						CT_BuffMod_Style1SizeLabel:Hide();
-						buffSize1:Hide();
+						frameOptionsbuffSize1:Hide();
 						CT_BuffMod_Style1PositionLabel:Hide();
 						CT_BuffModDropdown_rightAlign1:Hide();
-						colorCodeIcons1:Hide();
-						detailWidth1:Hide();
-						colorBuffs1:Hide();
-						colorCodeBackground1:Hide();
-						showNames1:Hide();
-						colorCodeDebuffs1:Hide();
+						frameOptionscolorCodeIcons1:Hide();
+						frameOptionsdetailWidth1:Hide();
+						frameOptionscolorBuffs1:Hide();
+						frameOptionscolorCodeBackground1:Hide();
+						frameOptionsshowNames1:Hide();
+						frameOptionscolorCodeDebuffs1:Hide();
 						CT_BuffMod_Style1JustifyLabel1:Hide();
 						CT_BuffModDropdown_nameJustifyWithTime1:Hide();
 						CT_BuffMod_Style1JustifyLabel2:Hide();
 						CT_BuffModDropdown_nameJustifyNoTime1:Hide();
-						showTimers1:Hide();
+						frameOptionsshowTimers1:Hide();
 						CT_BuffMod_Style1FormatLabel:Hide();
 						CT_BuffModDropdown_durationFormat1:Hide();
-						CTBuffMod_showDaysFormat1:Hide();
+						CT_BuffMod_showDaysFormat1:Hide();
 						CT_BuffMod_Style1LocationLabel:Hide();
 						CT_BuffModDropdown_durationLocation1:Hide();
 						CT_BuffMod_Style1JustifyLabel3:Hide();
 						CT_BuffModDropdown_timeJustifyNoName1:Hide();
-						showBuffTimer1:Hide();
-						showTimerBackground1:Hide();
+						frameOptionsshowBuffTimer1:Hide();
+						frameOptionsshowTimerBackground1:Hide();
 						CT_BuffMod_Style1OffsetLabel1:Hide();
-						spacingOnLeft1:Hide();
+						frameOptionsspacingOnLeft1:Hide();
 						CT_BuffMod_Style1OffsetLabel2:Hide();
-						spacingOnRight1:Hide();
+						frameOptionsspacingOnRight1:Hide();
 						CT_BuffMod_Style2Label:Show();
 						CT_BuffMod_Style2SizeLabel:Show();
-						buffSize2:Show();
-						colorCodeIcons2:Show();
-						showTimers2:Show();
+						frameOptionsbuffSize2:Show();
+						frameOptionscolorCodeIcons2:Show();
+						frameOptionsshowTimers2:Show();
 						CT_BuffMod_Style2FormatLabel:Show();
 						CT_BuffModDropdown_durationFormat2:Show();
-						CTBuffMod_showDaysFormat2:Show();
+						CT_BuffMod_showDaysFormat2:Show();
 						CT_BuffMod_Style2LocationLabel:Show();
 						CT_BuffModDropdown_dataSide2:Show();
 						CT_BuffMod_Style2OffsetLabel:Show();
-						spacingFromIcon2:Show();
+						frameOptionsspacingFromIcon2:Show();
 						CT_BuffMod_Style2ContinueLabel:Show();
 					end
 				end
@@ -10439,7 +10439,7 @@ CONSOLIDATION REMOVED FROM GAME--]]
 		optionsAddObject( -3,   15, "font#tl:48:%y#v:ChatFontNormal#n:CT_BuffMod_Style1FormatLabel#Format:");
 		optionsAddObject( 15,   20, "dropdown#tl:115:%y#s:145:%s#n:CT_BuffModDropdown_durationFormat1#i:durationFormat1#o:durationFormat1:1#" .. L["CT_BuffMod/Options/Window/Time Remaining/Duration Format Dropdown"]);
 		
-		optionsAddObject(  6,   26, "checkbutton#tl:44:%y#i:CTBuffMod_showDaysFormat1#o:showDays1:true#" .. L["CT_BuffMod/Options/Window/Button/General/ShowDaysCheckbox"]);
+		optionsAddObject(  6,   26, "checkbutton#tl:44:%y#n:CT_BuffMod_showDaysFormat1#o:showDays1:true#" .. L["CT_BuffMod/Options/Window/Button/General/ShowDaysCheckbox"]);
 		
 		optionsAddObject( -5,   15, "font#tl:48:%y#v:ChatFontNormal#n:CT_BuffMod_Style1LocationLabel#" .. L["CT_BuffMod/Options/Window/Button/General/TimeLocationLabel"]);
 		optionsAddObject( 15,   20, "dropdown#tl:115:%y#s:145:%s#n:CT_BuffModDropdown_durationLocation1#i:durationLocation1#o:durationLocation1:" .. constants.DURATION_LOCATION_DEFAULT .. "#Default#Left of the name#Right of the name#Above the name#Below the name");
@@ -10485,7 +10485,7 @@ CONSOLIDATION REMOVED FROM GAME--]]
 		optionsAddObject( -2,   15, "font#tl:70:%y#n:CT_BuffMod_Style2FormatLabel#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Button/General/TimeFormatLabel"]);
 		optionsAddObject( 12,   20, "dropdown#tl:115:%y#s:145:%s#n:CT_BuffModDropdown_durationFormat2#i:durationFormat2#o:durationFormat2:1#" .. L["CT_BuffMod/Options/Window/Time Remaining/Duration Format Dropdown"]);
 		
-		optionsAddObject(  6,   26, "checkbutton#tl:44:%y#i:CTBuffMod_showDaysFormat2#o:showDays2:true#" .. L["CT_BuffMod/Options/Window/Button/General/ShowDaysCheckbox"]);
+		optionsAddObject(  6,   26, "checkbutton#tl:44:%y#n:CT_BuffMod_showDaysFormat2#o:showDays2:true#" .. L["CT_BuffMod/Options/Window/Button/General/ShowDaysCheckbox"]);
 		
 		optionsAddObject( -6,   15, "font#tl:48:%y#n:CT_BuffMod_Style2LocationLabel#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Button/General/TimeLocationLabel"]);
 		optionsAddObject( 12,   20, "dropdown#tl:115:%y#s:145:%s#n:CT_BuffModDropdown_dataSide2#i:dataSide2#o:dataSide2:" .. constants.DATA_SIDE_BOTTOM .. L["CT_BuffMod/Options/Window/Button/Style2/TimeLocationDropdown"]);
@@ -10497,14 +10497,14 @@ CONSOLIDATION REMOVED FROM GAME--]]
 				function(self)
 					if (UIDropDownMenu_GetSelectedID(CT_BuffModDropdown_dataSide2) == constants.DATA_SIDE_CENTER) then
 						self:Disable();
-						spacingFromIcon2Low:SetTextColor(.5,.5,.5)
-						spacingFromIcon2Text:SetTextColor(.5,.5,.5)
-						spacingFromIcon2High:SetTextColor(.5,.5,.5)
+						frameOptionsspacingFromIcon2Low:SetTextColor(.5,.5,.5)
+						frameOptionsspacingFromIcon2Text:SetTextColor(.5,.5,.5)
+						frameOptionsspacingFromIcon2High:SetTextColor(.5,.5,.5)
 					else
 						self:Enable();
-						spacingFromIcon2Low:SetTextColor(1,1,1);
-						spacingFromIcon2Text:SetTextColor(1,1,1)
-						spacingFromIcon2High:SetTextColor(1,1,1)
+						frameOptionsspacingFromIcon2Low:SetTextColor(1,1,1);
+						frameOptionsspacingFromIcon2Text:SetTextColor(1,1,1)
+						frameOptionsspacingFromIcon2High:SetTextColor(1,1,1)
 					end
 				end
 			);
