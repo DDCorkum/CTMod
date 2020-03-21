@@ -1,3 +1,6 @@
+CT_UnitFrames (8.3.0.7) 2020-03-08
+- Performance improvements when showing player coordinates
+
 CT_UnitFrames (8.3.0.2) 2020-01-15
 - Fix to CT_PartyFrame.lua:167 missing global "module"
 
