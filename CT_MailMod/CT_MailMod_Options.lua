@@ -284,7 +284,9 @@ module.update = function(self, optName, value)
 			module:setOption("sendmailAutoCompleteOnline", true, false);
 			module:setOption("sendmailAutoCompleteAccount", true, false);
 		end
-		module.protectFocus(module:getOption("sendmailProtectFocus") ~= false);
+		if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+			module.protectFocus(module:getOption("sendmailProtectFocus") ~= false);
+		end
 
 	-- General options
 	else
