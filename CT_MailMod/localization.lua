@@ -161,6 +161,11 @@ L["CT_MailMod/Options/SendMail/AltClickCheckButton"] = "Alt left-click adds item
 L["CT_MailMod/Options/SendMail/FilterAutoCompleteCheckButton"] = "Filter auto-completion of Send To field"
 L["CT_MailMod/Options/SendMail/FilterAutoCompleteTip"] = "When enabled, click on the button next to the recipient field to filter by:"
 L["CT_MailMod/Options/SendMail/Heading"] = "Send Mail"
+L["CT_MailMod/Options/SendMail/ProtectEditFocusCheckButton"] = "Prevent mailbox from losing keyboard focus"
+L["CT_MailMod/Options/SendMail/ProtectEditFocusTip"] = [=[Returns the keyboard cursor to the mailbox after clicking on:
+- Backpack and bag slots
+- Mail attachment slots
+- COD or Send Money buttons]=]
 L["CT_MailMod/Options/SendMail/ReplaceSubjectCheckButton"] = "Replace blank subject with money amount"
 L["CT_MailMod/Options/Tips/Heading"] = "Tips"
 L["CT_MailMod/Options/Tips/Line1"] = "You can write /ctmail or /ctmailmod to open this options window directly."
@@ -188,6 +193,7 @@ L["CT_MailMod/MAIL_DELETE_OK"] = "Supprimant le courrier"
 L["CT_MailMod/MAIL_DOWNLOAD_BEGIN"] = "Attendant du courrier d'arriver à la boîte de réception"
 L["CT_MailMod/MAIL_DOWNLOAD_END"] = "Du courrier a arrivé à la boîte de réception"
 L["CT_MailMod/MAIL_LOG"] = "Journ."
+L["CT_MailMod/MAIL_LOOT_ERROR"] = "Objet non reçu:"
 L["CT_MailMod/MAIL_OPEN_CLICK"] = "Appuyez sur |c0080A0FFAlt-clic|r pour prendre les contenus."
 L["CT_MailMod/MAIL_OPEN_IS_COD"] = "Ce courrier demande un paiement à la livraison."
 L["CT_MailMod/MAIL_OPEN_IS_GM"] = "Ce courrier est envoyé par Blizzard."
@@ -301,13 +307,18 @@ L["CT_MailMod/Options/MailLog/Tip"] = [=[Tapez /maillog pour voir un journal de 
 Changer la grandeur par glisser les bordures gauche et droite,
 ou en utilisant la glissière d’échelle en-bas.]=]
 L["CT_MailMod/Options/Reset/Heading"] = "Réinitialiser les options"
-L["CT_MailMod/Options/Reset/Line 1"] = "Note: Ce bouton va réinitialiser les options aux valeurs défauts et recharger l'interface"
+L["CT_MailMod/Options/Reset/Line 1"] = "Note: Ce bouton réinitialise les options aux valeurs par défaut, et il recharge l'interface"
 L["CT_MailMod/Options/Reset/ResetAllCheckbox"] = "Réinitialiser les options pour tous les personnages"
 L["CT_MailMod/Options/Reset/ResetButton"] = "Réinitialiser"
 L["CT_MailMod/Options/SendMail/AltClickCheckButton"] = "Alt-clic-gauche ajoute des objets à l'onglet Envoyer un Message"
 L["CT_MailMod/Options/SendMail/FilterAutoCompleteCheckButton"] = "Filtrer la saisie automatique du destinataire"
 L["CT_MailMod/Options/SendMail/FilterAutoCompleteTip"] = "Ajouter un menu à côté du destinataire pour filtrer la saisie automatique par :"
 L["CT_MailMod/Options/SendMail/Heading"] = "Envoyer un message"
+L["CT_MailMod/Options/SendMail/ProtectEditFocusCheckButton"] = "Maintenir le curseur sur les saisies"
+L["CT_MailMod/Options/SendMail/ProtectEditFocusTip"] = [=[Retourner le curseur aux saisies de l'onglet Envoyer un Message après qu'on appuie sur:
+- Des objets dans les sacs 
+- Des pièces jointes
+- Les boutons "C.R." ou "Env. Argent"]=]
 L["CT_MailMod/Options/SendMail/ReplaceSubjectCheckButton"] = "Remplir le sujet vide avec le montant d'argent"
 L["CT_MailMod/Options/Tips/Heading"] = "Des conseils"
 L["CT_MailMod/Options/Tips/Line1"] = "Vous pouvez écrire /ctcourrier or /ctmailmod pour ouvrir ces options."
@@ -361,6 +372,16 @@ L["CT_MailMod/MAILBOX_OPTIONS_TIP1"] = [=[Klicke diese Schaltfläche oder gebe /
 
 Rechtsklick oder /maillog eingeben um Protokollfenster ein-/auszublenden.]=]
 L["CT_MailMod/MAILBOX_OVERFLOW_COUNT"] = "Überlauf: %d"
+L["CT_MailMod/MailLog/Date"] = "Datum"
+L["CT_MailMod/MailLog/Delete"] = "Löschen"
+L["CT_MailMod/MailLog/Items"] = "Gegenstände"
+L["CT_MailMod/MailLog/Money"] = "Geld"
+L["CT_MailMod/MailLog/Open"] = "Öffnen"
+L["CT_MailMod/MailLog/Receiver"] = "Empfänger"
+L["CT_MailMod/MailLog/Return"] = "Zurücksenden"
+L["CT_MailMod/MailLog/Send"] = "Senden"
+L["CT_MailMod/MailLog/Sender"] = "Absender"
+L["CT_MailMod/MailLog/Subject"] = "Betreff"
 L["CT_MailMod/MONEY_DECREASED"] = "Geld verringert um: %s"
 L["CT_MailMod/MONEY_INCREASED"] = "Geld erhöht um: %s"
 L["CT_MailMod/NOTHING_SELECTED"] = "Es sind keine Briefe ausgewählt."
@@ -444,7 +465,7 @@ L["CT_MailMod/Options/Tips/Line1"] = "Durch Eingabe von  /ctmail oder /ctmailmod
 
 --esES (credits: n/a)
 
-elseif (GetLocale() == "esES") then
+elseif (GetLocale() == "esES" or GetLocale() == "esMX") then
 
 L["CT_MailMod/DELETE_POPUP2"] = "algún dinero y %s"
 L["CT_MailMod/DELETE_POPUP3"] = "algún dinero y %d objetos incluyendo %s"
@@ -465,5 +486,170 @@ L["CT_MailMod/Options/General/BlockTradesCheckButton"] = "Блокировать
 L["CT_MailMod/Options/General/NetIncomeCheckButton"] = "Показывать общую прибыль по закрытию почты"
 L["CT_MailMod/Options/Inbox/Checkboxes/Line1"] = "Наведите мышь на '?' для доп. информации"
 
+
+-- ptBR (credits: BansheeLyris )
+
+elseif (GetLocale() == "ptBR") then
+
+L = L or {}
+L["CT_MailMod/AutoCompleteFilter/Account"] = "Reconhecer personagens nessa conta"
+L["CT_MailMod/AutoCompleteFilter/Friends"] = "Lista de amigos (incluindo offline)"
+L["CT_MailMod/AutoCompleteFilter/Group"] = "Grupo atual"
+L["CT_MailMod/AutoCompleteFilter/Guild"] = "Lista da Guilda (incluindo offline)"
+L["CT_MailMod/AutoCompleteFilter/Online"] = "Online e/ou personagems próximos"
+L["CT_MailMod/AutoCompleteFilter/Recent"] = "Interagido recentemente"
+L["CT_MailMod/Options/Bags/CloseAllCheckButton"] = "Fechar todas as bolsas"
+L["CT_MailMod/Options/Bags/CloseLabel"] = "Quando o correio é fechado: "
+L["CT_MailMod/Options/Bags/Heading"] = "Bolsas do inventório "
+L["CT_MailMod/Options/Bags/Line1"] = "A desativação dessas opções pode ser necessária para compatibilidade com outros addons de gerenciamento de bolsas"
+L["CT_MailMod/Options/Bags/OpenAllCheckButton"] = "Abrir todas as bolsas"
+L["CT_MailMod/Options/Bags/OpenLabel"] = "Quando a caixa de correio é aberta:"
+
+
+--zhCN (credits: 萌丶汉丶纸 )
+
+elseif (GetLocale() == "zhCN") then
+
+L["CT_MailMod/AutoCompleteFilter/Account"] = "此战网上的自己的角色"
+L["CT_MailMod/AutoCompleteFilter/Friends"] = "好友列表 (包括离线)"
+L["CT_MailMod/AutoCompleteFilter/Group"] = "当前组"
+L["CT_MailMod/AutoCompleteFilter/Guild"] = "公会名单 (包括离线)"
+L["CT_MailMod/AutoCompleteFilter/Online"] = "在线和/或附近的人物"
+L["CT_MailMod/AutoCompleteFilter/Recent"] = "最近互动"
+L["CT_MailMod/DELETE_POPUP1"] = "%d 物品包括 %s"
+L["CT_MailMod/DELETE_POPUP2"] = "一些钱和 %s"
+L["CT_MailMod/DELETE_POPUP3"] = "一些钱和 %d 物品包括 %s"
+L["CT_MailMod/Inbox/OpenSelectedButton"] = "打开"
+L["CT_MailMod/Inbox/OpenSelectedTip"] = "打开选择消息"
+L["CT_MailMod/Inbox/ReturnSelectedButton"] = "退回"
+L["CT_MailMod/Inbox/ReturnSelectedTip"] = "退回选定消息"
+L["CT_MailMod/MAIL_DELETE_NO"] = "不删除."
+L["CT_MailMod/MAIL_DELETE_OK"] = "删除邮件."
+L["CT_MailMod/MAIL_DOWNLOAD_BEGIN"] = "等待邮件下载到收件箱中."
+L["CT_MailMod/MAIL_DOWNLOAD_END"] = "邮件已下载到收件箱."
+L["CT_MailMod/MAIL_LOG"] = "日志"
+L["CT_MailMod/MAIL_LOOT_ERROR"] = "物品未拿走:"
+L["CT_MailMod/MAIL_OPEN_CLICK"] = "|c0080A0FFAlt+左键|r 取东西."
+L["CT_MailMod/MAIL_OPEN_IS_COD"] = "邮件是货到付款."
+L["CT_MailMod/MAIL_OPEN_IS_GM"] = "邮件来自暴雪."
+L["CT_MailMod/MAIL_OPEN_NO"] = "未开启."
+L["CT_MailMod/MAIL_OPEN_NO_ITEMS_MONEY"] = "邮件没有任何物品或钱."
+L["CT_MailMod/MAIL_OPEN_OK"] = "打开邮件."
+L["CT_MailMod/MAIL_RETURN_CLICK"] = "|c0080A0FFCtrl+左键|r 退回消息."
+L["CT_MailMod/MAIL_RETURN_IS_GM"] = "邮件来自暴雪."
+L["CT_MailMod/MAIL_RETURN_IS_RETURNED"] = "邮件退回给你."
+L["CT_MailMod/MAIL_RETURN_NO"] = "没退回."
+L["CT_MailMod/MAIL_RETURN_NO_ITEMS_MONEY"] = "邮件没有任何物品或钱."
+L["CT_MailMod/MAIL_RETURN_NO_REPLY"] = "邮件无法回复."
+L["CT_MailMod/MAIL_RETURN_NO_SENDER"] = "邮件没有发件人."
+L["CT_MailMod/MAIL_RETURN_OK"] = "退回邮件."
+L["CT_MailMod/MAIL_SEND_OK"] = "邮件已发送."
+L["CT_MailMod/MAIL_TAKE_ITEM_OK"] = "拿附件."
+L["CT_MailMod/MAIL_TAKE_MONEY_OK"] = "拿钱."
+L["CT_MailMod/MAIL_TIMEOUT"] = "操作超时."
+L["CT_MailMod/MAILBOX_BUTTON_TIP1"] = "下载邮件"
+L["CT_MailMod/MAILBOX_DOWNLOAD_MORE_NOW"] = "下载更多邮件"
+L["CT_MailMod/MAILBOX_DOWNLOAD_MORE_SOON"] = [=[下载更多邮件
+在 %d 秒内]=]
+L["CT_MailMod/MAILBOX_OPTIONS_TIP1"] = [=[要访问CT_MailMod选项和提示, 单击此按钮或键入 /ctmail.
+右键单击可切换邮件日志窗口或键入 /maillog.]=]
+L["CT_MailMod/MAILBOX_OVERFLOW_COUNT"] = "溢出: %d"
+L["CT_MailMod/MailLog/Date"] = "日期"
+L["CT_MailMod/MailLog/Delete"] = "删除"
+L["CT_MailMod/MailLog/Items"] = "物品"
+L["CT_MailMod/MailLog/Money"] = "钱"
+L["CT_MailMod/MailLog/Open"] = "打开"
+L["CT_MailMod/MailLog/Receiver"] = "接收者"
+L["CT_MailMod/MailLog/Return"] = "退回"
+L["CT_MailMod/MailLog/Send"] = "发送"
+L["CT_MailMod/MailLog/Sender"] = "发送者"
+L["CT_MailMod/MailLog/Subject"] = "主题"
+L["CT_MailMod/MONEY_DECREASED"] = "你的钱减少了: %s"
+L["CT_MailMod/MONEY_INCREASED"] = "你的钱增加了: %s"
+L["CT_MailMod/NOTHING_SELECTED"] = "未选择任何消息."
+L["CT_MailMod/NUMBER_SELECTED_PLURAL"] = "%d 已选择"
+L["CT_MailMod/NUMBER_SELECTED_SINGLE"] = "%d 已选择"
+L["CT_MailMod/NUMBER_SELECTED_ZERO"] = "%d 已选择"
+L["CT_MailMod/PROCESSING_CANCELLED"] = "邮箱处理已取消."
+L["CT_MailMod/QUICK_DELETE_TIP1"] = "立即清除消息"
+L["CT_MailMod/QUICK_RETURN_TIP1"] = "立即退回消息"
+L["CT_MailMod/SELECT_ALL"] = "选择所有"
+L["CT_MailMod/SELECT_MESSAGE_TIP1"] = "更新消息选择"
+L["CT_MailMod/SELECT_MESSAGE_TIP2"] = [=[|c0080A0FF左键:|r 选择或取消选择单个
+
+|c0080A0FFAlt+左键:|r 选择相似的主题
+|c0080A0FFAlt+右键:|r 取消选择相似的主题
+
+|c0080A0FFCtrl+左键:|r 选择相同发件人
+|c0080A0FFCtrl+右键:|r 取消选择相同发件人
+
+|c0080A0FFShift+左键:|r 标记范围的开始
+|c0080A0FFShift+左键:|r 结束范围并选择邮件
+|c0080A0FFShift+右键:|r 结束范围并取消选择邮件]=]
+L["CT_MailMod/Send/AutoComplete/Heading"] = "自动完成设置"
+L["CT_MailMod/Send/AutoComplete/Tip"] = "选择向下箭头以更改过滤器"
+L["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_COPPER"] = "%d 铜"
+L["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_GOLD"] = "%d 金 %d 银 %d 铜"
+L["CT_MailMod/SEND_MAIL_MONEY_SUBJECT_SILVER"] = "%d 银 %d 铜"
+L["CT_MailMod/STOP_SELECTED"] = "取消"
+L["CT_MailMod/Options/Bags/CloseAllCheckButton"] = "关闭所有背包"
+L["CT_MailMod/Options/Bags/CloseLabel"] = "邮箱关闭时:"
+L["CT_MailMod/Options/Bags/Heading"] = "背包清单"
+L["CT_MailMod/Options/Bags/Line1"] = "要与其他背包管理插件兼容，可能需要禁用这些选项"
+L["CT_MailMod/Options/Bags/OpenAllCheckButton"] = "打开所有背包"
+L["CT_MailMod/Options/Bags/OpenBackpackCheckButton"] = "打开背包"
+L["CT_MailMod/Options/Bags/OpenLabel"] = "邮箱打开时:"
+L["CT_MailMod/Options/General/BlockTradesCheckButton"] = "使用邮箱时阻止交易"
+L["CT_MailMod/Options/General/Heading"] = "常规选项"
+L["CT_MailMod/Options/General/NetIncomeCheckButton"] = "在邮箱关闭时显示净收入"
+L["CT_MailMod/Options/Inbox/Checkboxes/Heading"] = "消息复选框"
+L["CT_MailMod/Options/Inbox/Checkboxes/Line1"] = "将鼠标悬停在 '?' 上显示有关其他信息"
+L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewCheckButton"] = "按住Shift并单击范围时清除选择"
+L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewTip"] = [=[按住Shift两次单击以选择范围, 
+或通过再次右击鼠标来移除范围. 
+
+这样做时，此选项会清除先前的选择.]=]
+L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewCheckButton"] = "按住Ctrl键单击发件人时清除选择"
+L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewTip"] = [=[按住Shift键单击以选择来自同一发件人的所有邮件; 
+或Shift右键单击以选择来自其他发件人的所有消息. 
+
+此选项会清除之前的先前选择.]=]
+L["CT_MailMod/Options/Inbox/Checkboxes/ShowCheckboxesCheckButton"] = "显示复选框和打开/关闭按钮"
+L["CT_MailMod/Options/Inbox/Checkboxes/ShowNumbersCheckButton"] = "显示消息数量"
+L["CT_MailMod/Options/Inbox/Heading"] = "收件箱"
+L["CT_MailMod/Options/Inbox/HideLogCheckButton"] = "|cFFFF9999隐藏|r'邮件日志' 按钮"
+L["CT_MailMod/Options/Inbox/MouseWheelCheckButton"] = "启用鼠标滚轮滚动"
+L["CT_MailMod/Options/Inbox/MultipleItemsCheckButton"] = "在消息鼠标提示中显示所有附件"
+L["CT_MailMod/Options/Inbox/SelectMsgCheckButton"] = "显示消息复选框的鼠标提示"
+L["CT_MailMod/Options/Inbox/ShowExpiryCheckButton"] = "显示消息到期按钮"
+L["CT_MailMod/Options/Inbox/ShowInboxCheckButton"] = "在收件箱中显示消息数"
+L["CT_MailMod/Options/Inbox/ShowLongCheckButton"] = "两行显示较长的主题"
+L["CT_MailMod/Options/Inbox/ShowMailboxCheckButton"] = "显示收件箱中未显示的消息数"
+L["CT_MailMod/Options/MailLog/BackgroundLabel"] = "背景颜色"
+L["CT_MailMod/Options/MailLog/Delete/Button"] = "删除日志"
+L["CT_MailMod/Options/MailLog/Delete/ConfirmationCheckButton"] = "我想删除所有日志条目"
+L["CT_MailMod/Options/MailLog/Delete/Heading"] = "删除日志条目"
+L["CT_MailMod/Options/MailLog/Heading"] = "邮件日志"
+L["CT_MailMod/Options/MailLog/LogDeletedButton"] = "记录已删除的邮件"
+L["CT_MailMod/Options/MailLog/LogOpennedCheckButton"] = "记录打开的邮件"
+L["CT_MailMod/Options/MailLog/LogReturnedCheckButton"] = "记录退回的邮件"
+L["CT_MailMod/Options/MailLog/LogSentCheckButton"] = "记录发送邮件"
+L["CT_MailMod/Options/MailLog/PrintCheckButton"] = "打印日志消息到聊天"
+L["CT_MailMod/Options/MailLog/SaveCheckButton"] = "将日志消息保存在邮件日志中"
+L["CT_MailMod/Options/MailLog/ScaleSliderLabel"] = "邮件日志规模 = <数值>"
+L["CT_MailMod/Options/MailLog/Tip"] = [=[键入/maillog 查看发送/接收的每个信件的日志.
+
+通过拖动日志的左边缘或右边缘或使用下面的缩放滑块将其放大或缩小来调整日志大小]=]
+L["CT_MailMod/Options/Reset/Heading"] = "重置设置"
+L["CT_MailMod/Options/Reset/Line 1"] = "注意: 这会将选项重置为默认值然后重新加载UI."
+L["CT_MailMod/Options/Reset/ResetAllCheckbox"] = "重置所有角色的选项"
+L["CT_MailMod/Options/Reset/ResetButton"] = "重置设置"
+L["CT_MailMod/Options/SendMail/AltClickCheckButton"] = "Alt左键单击将物品添加到发送邮件"
+L["CT_MailMod/Options/SendMail/FilterAutoCompleteCheckButton"] = "自动完成筛选发送到字段"
+L["CT_MailMod/Options/SendMail/FilterAutoCompleteTip"] = "启用后, 单击收件人字段旁边的按钮进行筛选:"
+L["CT_MailMod/Options/SendMail/Heading"] = "发送邮件"
+L["CT_MailMod/Options/SendMail/ReplaceSubjectCheckButton"] = "用金额替换空白主题"
+L["CT_MailMod/Options/Tips/Heading"] = "提示"
+L["CT_MailMod/Options/Tips/Line1"] = "你可以键入 /ctmail 或 /ctmailmod 直接打开设置窗口."
 
 end

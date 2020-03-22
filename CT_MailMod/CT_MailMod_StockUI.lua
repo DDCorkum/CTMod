@@ -1203,47 +1203,35 @@ end
 
 
 --------------------------------------------
--- Changes to other frames
+-- Preventing the send-mail frame's edit boxes from losing focus during common tasks
 
-do
-	local currentFocus, isProtected, lostFocus;
+
+if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then		-- this resolves a nuisance introduced in WoW 8.3; not present in Classic (yet)
+	local focus;
+	local enabled = true;	-- by default, this feature is on
+	
+	function module.protectFocus(enable)
+		enabled = enable;
+	end
+	
+	local function wipeFocus()
+		focus = nil;
+	end
 	
 	local function onEditFocusGained(editbox)
-		currentFocus = editbox;
+		focus = nil;
 	end
-	
-	local function restoreFocus()
-		if (lostFocus and not currentFocus) then
-			lostFocus:SetFocus();
-		end
-		lostFocus = nil;
-	end
-	
+		
 	local function onEditFocusLost(editbox)
-		currentFocus = nil;
-		if (isProtected) then
-			lostFocus = editbox;
-			C_Timer.After(0.00005, restoreFocus);
+		if (enabled) then
+			focus = editbox;
+			C_Timer.After(0.0001, wipeFocus);
 		end
 	end
-	
-	local function protect()
-		if (module:getOption("sendmailProtectFocus") ~= false) then
-			isProtected = true;
-		end
-	end
-	
-	local function unprotect()
-		isProtected = nil;
-	end
-	
-	local function unprotectAfter5()
-		C_Timer.After(5, unprotect);
-	end
-	
+		
 	local function trigger()
-		if (mailFocus and isProtected) then
-			mailFocus:SetFocus();
+		if (focus) then
+			focus:SetFocus();
 		end
 	end
 	
@@ -1260,23 +1248,37 @@ do
 	SendMailMoneyGold:HookScript("OnEditFocusLost", onEditFocusLost);
 	SendMailMoneySilver:HookScript("OnEditFocusLost", onEditFocusLost);
 	SendMailMoneyCopper:HookScript("OnEditFocusLost", onEditFocusLost);
-	
-	StackSplitFrame:HookScript("OnShow", protect);
-	StackSplitFrame:HookScript("OnHide", unprotectAfter5);
-	
-	SendMailSendMoneyButton:HookScript("OnEnter", protect);
-	SendMailCODButton:HookScript("OnEnter", protect);
-	SendMailSendMoneyButton:HookScript("OnLeave", unprotect);
-	SendMailCODButton:HookScript("OnLeave", unprotect);
+
+	for __, button in pairs({
+		StackSplitFrame.OkayButton,
+		StackSplitFrame.CancelButton,
+		SendMailSendMoneyButton,
+		SendMailCODButton,
+	}) do
+		button:HookScript("OnMouseDown", trigger);
+	end
 	
 	for i=1, ATTACHMENTS_MAX_RECEIVE do
 		local frame = _G["SendMailAttachment"..i];
 		if (frame) then
-			frame:HookScript("OnEnter", protect);
-			frame:HookScript("OnLeave", unprotect);
+			frame:HookScript("OnMouseDown", trigger)
 		else
 			break;
 		end
 	end
+	
+	local listener = CreateFrame("Frame")
+	local bagsDone = {}
+	listener:SetScript("OnEvent", function()
+		for bag=1, 5 do
+			for slot=1, MAX_CONTAINER_ITEMS do
+				local frame = _G["ContainerFrame" .. bag .. "Item" .. slot];
+				if (frame) then
+					frame:HookScript("OnMouseDown", trigger);
+				end
+			end
+		end
+	end);
+	listener:RegisterEvent("PLAYER_LOGIN");
 
 end
