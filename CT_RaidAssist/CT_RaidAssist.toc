@@ -10,6 +10,8 @@
 
 Libs/LibDurability.lua
 
+#LibHealComm-4.0 is classic only
+
 CT_RaidAssist.lua
 CT_RaidAssist_ExpansionData.lua
 localization.lua

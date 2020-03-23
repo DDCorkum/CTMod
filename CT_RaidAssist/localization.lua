@@ -37,6 +37,14 @@ L["CT_RaidAssist/Options/Frames/HideBlizzardDefaultTooltip"] = [=[Prevents defau
 Has no effect if CTRA frames are disabled.
 
 Note: some other addons may also disable the default frames.]=]
+L["CTRA_RaidAssist/Options/Frames/ShareClassicHealPredictionCheckButton"] = "Let CTRA share your healing with the raid"
+L["CTRA_RaidAssist/Options/Frames/ShareClassicHealPredictionTip"] = [=[ Share your outgoing heals with peers using addons like CTRA, Shadowed, Grid or IceHUD
+
+Notes:
+- This Classic-only option mimics a Retail feature
+- Info about your heals will be transmitted to raid members
+- Other addons may enable sharing even if you opt out with CTRA
+- This requires a /reload to disable]=]
 L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksCheckButton"] = "Extend missed ready checks"
 L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksTooltip"] = [=[Provides a button to announce returning 
 after missing a /readycheck]=]
@@ -50,7 +58,7 @@ L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityTooltip"] = [=[Share y
 
 Notes:
 - Other addons may enable sharing even if you opt out with CTRA
-- This requires a /reload to take effect]=]
+- This requires a /reload to disable]=]
 L["CT_RaidAssist/Options/ReadyCheckMonitor/Tooltip"] = "These settings are meant for raiding guilds using CT"
 L["CT_RaidAssist/Options/Window/Appearance/EnablePowerBarCheckButton"] = "Show power bar?"
 L["CT_RaidAssist/Options/Window/Appearance/EnablePowerBarTooltip"] = "Show the mana, energy, rage, etc. at the bottom"
