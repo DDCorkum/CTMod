@@ -1971,7 +1971,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	local colorBorderBeyondRangeRed, colorBorderBeyondRangeGreen, colorBorderBeyondRangeBlue, colorBorderBeyondRangeAlpha;
 	local healthBarFullCombat, healthBarZeroCombat, healthBarFullNoCombat, healthBarZeroNoCombat;
 	local absorbBarFullCombat, absorbBarZeroCombat, absorbBarFullNoCombat, absorbBarZeroNoCombat, absorbBarOverlay;
-	local incomingBarFullCombat, incomingZeroCombat, incomingFullNoCombat, incomingZeroNoCombat;
+	local incomingBarFullCombat, incomingBarZeroCombat, incomingBarFullNoCombat, incomingBarZeroNoCombat;
 	local healthBarWidth;
 	local powerBar, powerBarWidth;
 	local roleTexture;
@@ -2197,8 +2197,8 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			if (UnitExists(shownUnit) and not UnitIsDeadOrGhost(shownUnit)) then
 				-- the unit is alive and should have a health bar
 				local healthRatio = UnitHealth(shownUnit) / UnitHealthMax(shownUnit);
-				local absorbRatio = (UnitGetTotalAbsorbs(shownUnit, absorbSetting) / UnitHealthMax(shownUnit));
-				local incomingRatio = (UnitGetIncomingHeals(shownUnit, incomingSetting) / UnitHealthMax(shownUnit));
+				local absorbRatio = (UnitGetTotalAbsorbs(shownUnit, absorbSetting) or 0) / UnitHealthMax(shownUnit);
+				local incomingRatio = (UnitGetIncomingHeals(shownUnit, incomingSetting) or 0) / UnitHealthMax(shownUnit);
 				if (healthRatio > 1) then
 					healthRatio = 1;
 				elseif (healthRatio < 0.001) then
