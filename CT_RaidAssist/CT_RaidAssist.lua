@@ -1080,6 +1080,18 @@ function StaticCTRAFrames()
 					optionsWindowizeObject("EnableTargetFrame");
 					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Appearance/EnableTargetFrameCheckButton"],L["CT_RaidAssist/Options/Window/Appearance/EnableTargetFrameTooltip"] .. "#" .. textColor1});
 				optionsEndFrame();
+				if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+					optionsAddObject(-21,   20, "font#l:tl:13:%y#" .. L["CT_RaidAssist/Options/Window/Appearance/ShowTotalAbsorbsLabel"] .. "#" .. textColor1 .. ":l");
+					optionsBeginFrame(26,   20, "dropdown#tl:140:%y#s:110:%s#n:CTRAWindow_ShowTotalAbsorbsDropDown" .. L["CT_RaidAssist/Options/Window/Appearance/ShowTotalAbsorbsDropDown"]);
+						optionsWindowizeObject("ShowTotalAbsorbs");
+						optionsAddTooltip({L["CT_RaidAssist/Options/Window/Appearance/ShowTotalAbsorbsLabel"],L["CT_RaidAssist/Options/Window/Appearance/ShowTotalAbsorbsTip"] .. "#" .. textColor1});
+					optionsEndFrame();	
+				end
+				optionsAddObject(-21,   20, "font#l:tl:13:%y#" .. L["CT_RaidAssist/Options/Window/Appearance/ShowIncomingHealsLabel"] .. "#" .. textColor1 .. ":l");
+				optionsBeginFrame(26,   20, "dropdown#tl:140:%y#s:110:%s#n:CTRAWindow_ShowIncomingHealsDropDown" .. L["CT_RaidAssist/Options/Window/Appearance/ShowIncomingHealsDropDown"]);
+					optionsWindowizeObject("ShowIncomingHeals");
+					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Appearance/ShowIncomingHealsLabel"],L["CT_RaidAssist/Options/Window/Appearance/ShowIncomingHealsTip"] .. "#" .. textColor1});
+				optionsEndFrame();	
 				
 				-- Buffs and Debuffs
 				optionsAddObject(-10,   17, "font#tl:5:%y#v:GameFontNormal#" .. L["CT_RaidAssist/Options/Window/Auras/Heading"]);
@@ -1119,8 +1131,6 @@ function StaticCTRAFrames()
 										end
 										if (property) then
 											return windows[selectedWindow]:GetProperty(property);
-										--elseif (windows[1]) then
-										--	return windows[1]:GetProperty(property);
 										else
 											return nil;
 										end
@@ -1294,6 +1304,8 @@ function NewCTRAWindow(owningCTRAFrames)
 		["ShowBossAuras"] = true,
 		["ShowReverseCooldown"] = true,
 		["EnableTargetFrame"] = false,
+		["ShowTotalAbsorbs"] = 1,
+		["ShowIncomingHeals"] = 1,
 	};
 
 	-- private methods
@@ -1737,6 +1749,7 @@ function NewCTRAWindow(owningCTRAFrames)
 		if (dummyFrame) then
 			dummyFrame:Enable("player", 0, 0 + 0.00001 * windowID);
 			dummyFrame:Update("PlayerFrameScale", self:GetProperty("PlayerFrameScale"));
+			dummyFrame:Update("DisableSecureFrame", true); -- not a real option; this is a hack to prevent the dummy-frame from causing the options menu to be protected
 		end
 	end
 	
@@ -1935,7 +1948,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	local owner;			-- pointer to the CTRAWindow interface for calling functions like :GetProperty()
 	local parent;			-- pointer to the CTRAWindow's frame object that is a parent for the visualFrame
 	local visualFrame;		-- generic frame that shows various textures
-	local secureButton;	-- SecureUnitActionButton that sits in front and responds to mouseclicks
+	local secureButton;		-- SecureUnitActionButton that sits in front and responds to mouseclicks
 	local secureButtonDebuffFirst;	-- SecureUnitActionButton that sits in front and responds to mouseclicks
 	local macroRight;		-- copy of the macro currently used when right-clicking secureButton to click-cast
 	local listenerFrame;		-- generic frame that listens to various events
@@ -1947,15 +1960,17 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	local shownYOff;		-- the y coordinate this frame is currently showing
 	local optionsWaiting = { };	-- a list of options that need to be triggered once combat ends
 	local healCommRegistered;	-- a flag on Classic to avoid registering multiple times.
+	local absorbSetting;		-- a flag to control the behaviour of the total-absorb bar
+	local incomingSetting;		-- a flag to control the behaviour of the incoming-heal bar (aka prediction bar)
 	
 	-- graphical textures and fontstrings of visualFrame
 	local background;
 	local colorBackgroundRed, colorBackgroundGreen, colorBackgroundBlue, colorBackgroundAlpha;
 	local colorBackgroundDeadOrGhostRed, colorBackgroundDeadOrGhostGreen, colorBackgroundDeadOrGhostBlue, colorBackgroundDeadOrGhostAlpha;
 	local colorBorderRed, colorBorderGreen, colorBorderBlue, colorBorderAlpha;
-	local colorBorderBeyondRangeRed, colorBorderBeyondRangeGreen, colorBorderBeyondRangeBlue, colorBorderBeyondRangeAlpha
+	local colorBorderBeyondRangeRed, colorBorderBeyondRangeGreen, colorBorderBeyondRangeBlue, colorBorderBeyondRangeAlpha;
 	local healthBarFullCombat, healthBarZeroCombat, healthBarFullNoCombat, healthBarZeroNoCombat;
-	local absorbBarFullCombat, absorbBarZeroCombat, absorbBarFullNoCombat, absorbBarZeroNoCombat;
+	local absorbBarFullCombat, absorbBarZeroCombat, absorbBarFullNoCombat, absorbBarZeroNoCombat, absorbBarOverlay;
 	local incomingBarFullCombat, incomingZeroCombat, incomingFullNoCombat, incomingZeroNoCombat;
 	local healthBarWidth;
 	local powerBar, powerBarWidth;
@@ -2037,23 +2052,25 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 		healthBarZeroCombat = healthBarZeroCombat or visualFrame:CreateTexture(nil, "ARTWORK");
 		healthBarFullNoCombat = healthBarFullNoCombat or visualFrame:CreateTexture(nil, "ARTWORK");
 		healthBarZeroNoCombat = healthBarZeroNoCombat or visualFrame:CreateTexture(nil, "ARTWORK");
-		absorbBarFullCombat = absorbBarFullCombat or visualFrame:CreateTexture(nil, "ARTWORK", healthBarFullCombat);
-		absorbBarZeroCombat = absorbBarZeroCombat or visualFrame:CreateTexture(nil, "ARTWORK", healthBarZeroCombat);
-		absorbBarFullNoCombat = absorbBarFullNoCombat or visualFrame:CreateTexture(nil, "ARTWORK", healthBarFullNoCombat);
-		absorbBarZeroNoCombat = absorbBarZeroNoCombat or visualFrame:CreateTexture(nil, "ARTWORK", healthBarZeroNoCombat);
-		incomingBarFullCombat = incomingBarFullCombat or visualFrame:CreateTexture(nil, "ARTWORK", healthBarFullCombat);
-		incomingBarZeroCombat = incomingBarZeroCombat or visualFrame:CreateTexture(nil, "ARTWORK", healthBarZeroCombat);
-		incomingBarFullNoCombat = incomingBarFullNoCombat or visualFrame:CreateTexture(nil, "ARTWORK", healthBarFullNoCombat);
-		incomingBarZeroNoCombat = incomingBarZeroNoCombat or visualFrame:CreateTexture(nil, "ARTWORK", healthBarZeroNoCombat);		
+		absorbBarFullCombat = absorbBarFullCombat or visualFrame:CreateTexture(nil, "ARTWORK");
+		absorbBarZeroCombat = absorbBarZeroCombat or visualFrame:CreateTexture(nil, "ARTWORK");
+		absorbBarFullNoCombat = absorbBarFullNoCombat or visualFrame:CreateTexture(nil, "ARTWORK");
+		absorbBarZeroNoCombat = absorbBarZeroNoCombat or visualFrame:CreateTexture(nil, "ARTWORK");
+		absorbBarOverlay = absorbBarOverlay or visualFrame:CreateTexture(nil, "ARTWORK", nil, 1);
+		incomingBarFullCombat = incomingBarFullCombat or visualFrame:CreateTexture(nil, "ARTWORK");
+		incomingBarZeroCombat = incomingBarZeroCombat or visualFrame:CreateTexture(nil, "ARTWORK");
+		incomingBarFullNoCombat = incomingBarFullNoCombat or visualFrame:CreateTexture(nil, "ARTWORK");
+		incomingBarZeroNoCombat = incomingBarZeroNoCombat or visualFrame:CreateTexture(nil, "ARTWORK");		
 
 		healthBarFullCombat:SetTexture("Interface\\TargetingFrame\\UI-StatusBar");
 		healthBarZeroCombat:SetTexture("Interface\\TargetingFrame\\UI-StatusBar");
 		healthBarFullNoCombat:SetTexture("Interface\\TargetingFrame\\UI-StatusBar");
 		healthBarZeroNoCombat:SetTexture("Interface\\TargetingFrame\\UI-StatusBar");
-		absorbBarFullCombat:SetTexture("Interface\\TargetingFrame\\UI-StatusBar");
-		absorbBarZeroCombat:SetTexture("Interface\\TargetingFrame\\UI-StatusBar");
-		absorbBarFullNoCombat:SetTexture("Interface\\TargetingFrame\\UI-StatusBar");
-		absorbBarZeroNoCombat:SetTexture("Interface\\TargetingFrame\\UI-StatusBar");
+		absorbBarFullCombat:SetTexture("Interface\\RaidFrame\\Shield-Fill");
+		absorbBarZeroCombat:SetTexture("Interface\\RaidFrame\\Shield-Fill");
+		absorbBarFullNoCombat:SetTexture("Interface\\RaidFrame\\Shield-Fill");
+		absorbBarZeroNoCombat:SetTexture("Interface\\RaidFrame\\Shield-Fill");
+		absorbBarOverlay:SetTexture("Interface\\RaidFrame\\Shield-Overlay");
 		incomingBarFullCombat:SetTexture("Interface\\TargetingFrame\\UI-StatusBar");
 		incomingBarZeroCombat:SetTexture("Interface\\TargetingFrame\\UI-StatusBar");
 		incomingBarFullNoCombat:SetTexture("Interface\\TargetingFrame\\UI-StatusBar");
@@ -2088,6 +2105,9 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 		absorbBarFullNoCombat:SetPoint("TOPLEFT", absorbBarFullCombat);
 		absorbBarFullNoCombat:SetPoint("BOTTOMRIGHT", absorbBarFullCombat);
 		
+		absorbBarOverlay:SetPoint("TOPLEFT", absorbBarFullCombat);
+		absorbBarOverlay:SetPoint("BOTTOMRIGHT", absorbBarFullCombat);
+		
 		incomingBarZeroNoCombat:SetPoint("TOPLEFT", incomingBarFullCombat);	
 		incomingBarZeroNoCombat:SetPoint("BOTTOMRIGHT", incomingBarFullCombat);
 		
@@ -2106,35 +2126,69 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 		local r,g,b,a;
 		r,g,b,a = unpack(owner:GetProperty("ColorUnitFullHealthCombat"));
 		healthBarFullCombat:SetVertexColor(r,g,b);
-		absorbBarFullCombat:SetVertexColor(r*0.9+0.1,g*0.9+0.1,b*0.8+0.2);
-		incomingBarFullCombat:SetVertexColor(r*0.9+0.1,g*0.8+0.2,b*0.9+0.1);
+		absorbBarFullCombat:SetVertexColor(r*0.5+0.5,g*0.5+0.5,b*0.5+0.5);
+		incomingBarFullCombat:SetVertexColor(r,g,b);
 		healthBarFullCombat.maxAlpha = a;
-		absorbBarFullCombat:SetAlpha(0.6);
-		incomingBarFullCombat:SetAlpha(0.3);
 
 		r,g,b,a = unpack(owner:GetProperty("ColorUnitZeroHealthCombat"));
 		healthBarZeroCombat:SetVertexColor(r,g,b);
-		absorbBarZeroCombat:SetVertexColor(r*0.9+0.1,g*0.9+0.1,b*0.8+0.2);
-		incomingBarZeroCombat:SetVertexColor(r*0.9+0.1,g*0.8+0.2,b*0.9+0.1);
+		absorbBarZeroCombat:SetVertexColor(r*0.5+0.5,g*0.5+0.5,b*0.5+0.5);
+		incomingBarZeroCombat:SetVertexColor(r,g,b);
 		healthBarZeroCombat.maxAlpha = a;
-		absorbBarZeroCombat:SetAlpha(0.5);
-		incomingBarZeroCombat:SetAlpha(0.25);
 		
 		r,g,b,a = unpack(owner:GetProperty("ColorUnitFullHealthNoCombat"));
 		healthBarFullNoCombat:SetVertexColor(r,g,b);
-		absorbBarFullNoCombat:SetVertexColor(r*0.9+0.1,g*0.9+0.1,b*0.8+0.2);
-		incomingBarFullNoCombat:SetVertexColor(r*0.9+0.1,g*0.8+0.2,b*0.9+0.1);
+		absorbBarFullNoCombat:SetVertexColor(r*0.5+0.5,g*0.5+0.5,b*0.5+0.5);
+		incomingBarFullNoCombat:SetVertexColor(r,g,b);
 		healthBarFullNoCombat.maxAlpha = a;
-		absorbBarFullNoCombat:SetAlpha(0.5);
-		incomingBarFullNoCombat:SetAlpha(0.25);
 		
 		r,g,b,a = unpack(owner:GetProperty("ColorUnitZeroHealthNoCombat"));
 		healthBarZeroNoCombat:SetVertexColor(r,g,b);
-		absorbBarZeroNoCombat:SetVertexColor(r*0.9+0.1,g*0.9+0.1,b*0.8+0.2);
-		incomingBarZeroNoCombat:SetVertexColor(r*0.9+0.1,g*0.8+0.2,b*0.9+0.1);
+		absorbBarZeroNoCombat:SetVertexColor(r*0.5+0.5,g*0.5+0.5,b*0.5+0.5);
+		incomingBarZeroNoCombat:SetVertexColor(r,g,b);
 		healthBarZeroNoCombat.maxAlpha = a;
-		absorbBarZeroNoCombat:SetAlpha(0.5);
-		incomingBarZeroNoCombat:SetAlpha(0.25);
+		
+		--absorbBarOverlay:SetVertexColor(1,1,1);
+		absorbBarOverlay:SetVertTile(true);
+		absorbBarOverlay:SetHorizTile(true);
+		
+		if (owner:GetProperty("ShowTotalAbsorbs") == 1) then
+			absorbSetting = nil;
+			absorbBarFullCombat:Show();
+			absorbBarZeroCombat:Show();
+			absorbBarFullNoCombat:Show();
+			absorbBarFullNoCombat:Show();	
+		elseif (owner:GetProperty("ShowTotalAbsorbs") == 3) then
+			absorbBarFullCombat:Hide();
+			absorbBarZeroCombat:Hide();
+			absorbBarFullNoCombat:Hide();
+			absorbBarFullNoCombat:Hide();
+			incomingBarZeroNoCombat:SetPoint("TOPLEFT", healthBarFullCombat);	
+			incomingBarZeroNoCombat:SetPoint("BOTTOMRIGHT", healthBarFullCombat);
+		else
+			absorbBarFullCombat:Show();
+			absorbBarZeroCombat:Show();
+			absorbBarFullNoCombat:Show();
+			absorbBarFullNoCombat:Show();		
+		end
+		
+		if (owner:GetProperty("ShowIncomingHeals") == 1) then
+			incomingSetting = nil;
+			incomingBarFullCombat:Show();
+			incomingBarZeroCombat:Show();
+			incomingBarFullNoCombat:Show();
+			incomingBarFullNoCombat:Show();	
+		elseif (owner:GetProperty("ShowIncomingHeals") == 3) then
+			incomingBarFullCombat:Hide();
+			incomingBarZeroCombat:Hide();
+			incomingBarFullNoCombat:Hide();
+			incomingBarFullNoCombat:Hide();
+		else
+			incomingBarFullCombat:Show();
+			incomingBarZeroCombat:Show();
+			incomingBarFullNoCombat:Show();
+			incomingBarFullNoCombat:Show();		
+		end
 	end
 	
 	-- updates the health and absorb bars, but must only be called after configureHealthBar has been used at least once
@@ -2143,8 +2197,8 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			if (UnitExists(shownUnit) and not UnitIsDeadOrGhost(shownUnit)) then
 				-- the unit is alive and should have a health bar
 				local healthRatio = UnitHealth(shownUnit) / UnitHealthMax(shownUnit);
-				local absorbRatio = (UnitGetTotalAbsorbs(shownUnit) / UnitHealthMax(shownUnit));
-				local incomingRatio = (UnitGetIncomingHeals(shownUnit) / UnitHealthMax(shownUnit));
+				local absorbRatio = (UnitGetTotalAbsorbs(shownUnit, absorbSetting) / UnitHealthMax(shownUnit));
+				local incomingRatio = (UnitGetIncomingHeals(shownUnit, incomingSetting) / UnitHealthMax(shownUnit));
 				if (healthRatio > 1) then
 					healthRatio = 1;
 				elseif (healthRatio < 0.001) then
@@ -2152,14 +2206,12 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				end
 				if (healthRatio + absorbRatio > 1) then
 					absorbRatio = 1.001 - healthRatio;
-				end
-				if (absorbRatio < 0.001) then
+				elseif (absorbRatio < 0.001) then
 					absorbRatio = 0.001;
 				end
-				if (healthRatio + absorbRatio + incomingRatio > 1.001) then
+				if (healthRatio + absorbRatio + incomingRatio > 1.002) then
 					incomingRatio = 1.002 - healthRatio - absorbRatio;
-				end
-				if (incomingRatio < 0.001) then
+				elseif (incomingRatio < 0.001) then
 					incomingRatio = 0.001;
 				end
 				healthBarFullCombat:SetWidth(healthBarWidth * healthRatio)
@@ -2170,11 +2222,27 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 					healthBarZeroCombat:SetAlpha((1 - healthRatio)  * healthBarZeroCombat.maxAlpha);
 					healthBarFullNoCombat:SetAlpha(0);
 					healthBarZeroNoCombat:SetAlpha(0);
+					absorbBarFullCombat:SetAlpha(healthRatio * healthBarFullCombat.maxAlpha * 0.8);
+					absorbBarZeroCombat:SetAlpha((1 - healthRatio)  * healthBarZeroCombat.maxAlpha * 0.8);
+					absorbBarFullNoCombat:SetAlpha(0);
+					absorbBarZeroNoCombat:SetAlpha(0);
+					incomingBarFullCombat:SetAlpha(healthRatio * healthBarFullCombat.maxAlpha * 0.4);
+					incomingBarZeroCombat:SetAlpha((1 - healthRatio)  * healthBarZeroCombat.maxAlpha * 0.4);
+					incomingBarFullNoCombat:SetAlpha(0);
+					incomingBarZeroNoCombat:SetAlpha(0);
 				else
 					healthBarFullNoCombat:SetAlpha(healthRatio * healthBarFullNoCombat.maxAlpha);
 					healthBarZeroNoCombat:SetAlpha((1 - healthRatio)  * healthBarZeroNoCombat.maxAlpha);				
 					healthBarFullCombat:SetAlpha(0);
 					healthBarZeroCombat:SetAlpha(0);
+					absorbBarFullNoCombat:SetAlpha(healthRatio * healthBarFullCombat.maxAlpha * 0.8);
+					absorbBarZeroNoCombat:SetAlpha((1 - healthRatio)  * healthBarZeroCombat.maxAlpha * 0.8);
+					absorbBarFullCombat:SetAlpha(0);
+					absorbBarZeroCombat:SetAlpha(0);
+					incomingBarFullNoCombat:SetAlpha(healthRatio * healthBarFullCombat.maxAlpha * 0.4);
+					incomingBarZeroNoCombat:SetAlpha((1 - healthRatio)  * healthBarZeroCombat.maxAlpha * 0.4);
+					incomingBarFullCombat:SetAlpha(0);
+					incomingBarZeroCombat:SetAlpha(0);
 				end
 			else
 				-- the unit is dead, or maybe doesn't even exist, so show nothing!
@@ -2595,7 +2663,6 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			aurasLastUpdated = GetTime();
 		end
 --]]		
-		
 		if (shownUnit) then
 			
 			-- STEP 2:
@@ -2921,6 +2988,17 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 					or key == "ColorBorder"
 				) then
 					configureBackdrop();
+				elseif (
+					key == "DisableSecureFrame"
+				) then
+					-- This isn't a real option!  Its used only by the dummy-frame in the options to prevent the options menu from becoming a secure frame.
+					if (val) then
+						secureButton:ClearAllPoints();
+						secureButton:SetParent(UIParent);
+					else
+						secureButton:SetParent(visualFrame);
+						secureButton:SetAllPoints();
+					end
 				end
 			end
 			optionsWaiting = { };
@@ -2940,7 +3018,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 					function(__, event)
 						if (event == "UNIT_NAME_UPDATE") then
 							updateUnitNameFontString();
-						elseif (event == "UNIT_HEALTH" or event == "UNIT_MAXHEALTH" or event == "UNIT_ABSORB_AMOUNT_CHANGED") then
+						elseif (event == "UNIT_HEALTH" or event == "UNIT_MAXHEALTH" or event == "UNIT_ABSORB_AMOUNT_CHANGED" or event == "UNIT_HEAL_PREDICTION") then
 							updateHealthBar();
 							updateBackdrop();
 						elseif (event == "UNIT_POWER_UPDATE") then
@@ -3025,6 +3103,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
 					listenerFrame:RegisterUnitEvent("INCOMING_SUMMON_CHANGED", shownUnit);		-- updateStatusIndicators();
 					listenerFrame:RegisterUnitEvent("UNIT_ABSORB_AMOUNT_CHANGED", shownUnit);	-- updateHealthBar; updateBackdrop();
+					listenerFrame:RegisterUnitEvent("UNIT_HEAL_PREDICTION", shownUnit);		-- updateHealthBar; updateBackdrop();
 				elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC and not healCommRegistered) then
 					local healComm = LibStub("LibHealComm-4.0", true);
 					if (healComm) then

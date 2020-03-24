@@ -1,6 +1,9 @@
-CT_RaidAssist (8.3.0.7) 2020-02-24
-- Reduced CPU usage using C_Timer
+CT_RaidAssist (8.3.0.7) 2020-03-23
+- Now shows incoming (predicted) heals on retail and classic
+- Options to configure the total-absorb and incoming-heal bars
 - Tweak to "modern" health bar opacity while outside combat
+- Reduced CPU usage using C_Timer
+- zhCN localization (credit: 萌丶汉丶纸)
 
 CT_RaidAssist (8.3.0.5) 2020-02-10
 - Click-cast decursing also available outside combat

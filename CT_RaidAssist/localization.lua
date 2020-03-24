@@ -37,13 +37,13 @@ L["CT_RaidAssist/Options/Frames/HideBlizzardDefaultTooltip"] = [=[Prevents defau
 Has no effect if CTRA frames are disabled.
 
 Note: some other addons may also disable the default frames.]=]
-L["CTRA_RaidAssist/Options/Frames/ShareClassicHealPredictionCheckButton"] = "Let CTRA share your healing with the raid"
-L["CTRA_RaidAssist/Options/Frames/ShareClassicHealPredictionTip"] = [=[ Share your outgoing heals with peers using addons like CTRA, Shadowed, Grid or IceHUD
+L["CT_RaidAssist/Options/Frames/ShareClassicHealPredictionCheckButton"] = "Let CTRA share your healing with the raid"
+L["CT_RaidAssist/Options/Frames/ShareClassicHealPredictionTip"] = [=[Share your outgoing heals with peers using addons like CTRA, Shadowed, Grid or IceHud.
 
 Notes:
 - This Classic-only option mimics a Retail feature
 - Info about your heals will be transmitted to raid members
-- Other addons may enable sharing even if you opt out with CTRA
+- Other addons may enable sharing even if CTRA does not
 - This requires a /reload to disable]=]
 L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksCheckButton"] = "Extend missed ready checks"
 L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksTooltip"] = [=[Provides a button to announce returning 
@@ -58,7 +58,7 @@ L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityTooltip"] = [=[Share y
 
 Notes:
 - Other addons may enable sharing even if you opt out with CTRA
-- This requires a /reload to disable]=]
+- This requires a /reload to take effect]=]
 L["CT_RaidAssist/Options/ReadyCheckMonitor/Tooltip"] = "These settings are meant for raiding guilds using CT"
 L["CT_RaidAssist/Options/Window/Appearance/EnablePowerBarCheckButton"] = "Show power bar?"
 L["CT_RaidAssist/Options/Window/Appearance/EnablePowerBarTooltip"] = "Show the mana, energy, rage, etc. at the bottom"
@@ -68,6 +68,14 @@ L["CT_RaidAssist/Options/Window/Appearance/Heading"] = "Appearance"
 L["CT_RaidAssist/Options/Window/Appearance/HealthBarAsBackgroundCheckButton"] = "Show health as full-size background"
 L["CT_RaidAssist/Options/Window/Appearance/HealthBarAsBackgroundTooltip"] = "Fill the entire background as one large health metre.  Otherwise, health is just a small bar at the bottom"
 L["CT_RaidAssist/Options/Window/Appearance/Line1"] = "Do you want the retro CTRA feel, or more a modern look?"
+L["CT_RaidAssist/Options/Window/Appearance/ShowIncomingHealsDropDown"] = "#Yes#My heals only#No"
+L["CT_RaidAssist/Options/Window/Appearance/ShowIncomingHealsLabel"] = "Show incoming heals"
+L["CT_RaidAssist/Options/Window/Appearance/ShowIncomingHealsTip"] = [=[Lengthens the health bar (but not beyond full health) to show incoming heals from...
+- On Retail, everyone
+- On Classic, players with a compatible addon (CTRA, Shadowed, Grid, IceHUD, etc.)]=]
+L["CT_RaidAssist/Options/Window/Appearance/ShowTotalAbsorbsDropDown"] = "#Yes#My shields only#No"
+L["CT_RaidAssist/Options/Window/Appearance/ShowTotalAbsorbsLabel"] = "Show total absorbs:"
+L["CT_RaidAssist/Options/Window/Appearance/ShowTotalAbsorbsTip"] = "Lengthens the health bar (but not beyond full health) to show how much damage can be absorbed before further health is lost."
 L["CT_RaidAssist/Options/Window/Auras/CombatLabel"] = "Show during combat:"
 L["CT_RaidAssist/Options/Window/Auras/DropDown"] = "#Group buffs I can apply#Debuffs I can remove#All group buffs#All debuffs#Group buffs I applied#Nothing"
 L["CT_RaidAssist/Options/Window/Auras/Heading"] = "Buffs and Debuffs"
@@ -337,7 +345,7 @@ L["CT_RaidAssist/Spells/Soulstone"] = "Seelenstein"
 L["CT_RaidAssist/Spells/Trueshot Aura"] = "Aura des Volltreffers"
 
 
-elseif (GetLocale() == "esES") then
+elseif (GetLocale() == "esES" or GetLocale() == "esMX") then
 
 L["CT_RaidAssist/AfterNotReadyFrame/MissedCheck"] = "Puede que hayas omitido un \"Estas Listo\" de la Raid."
 L["CT_RaidAssist/AfterNotReadyFrame/WasAFK"] = "Estabas lejos del teclado, Has vuelto ya?"
@@ -358,16 +366,148 @@ L["CT_RaidAssist/Spells/Arcane Intellect"] = "Чародейский интел�
 L["CT_RaidAssist/Spells/Cleanse"] = "Очищение"
 L["CT_RaidAssist/Spells/Power Word: Fortitude"] = "Слово силы: Стойкость"
 
+
 elseif (GetLocale() == "koKR") then
+
 
 L["CT_RaidAssist/Spells/Arcane Intellect"] = "신비한 지능"
 L["CT_RaidAssist/Spells/Cleanse"] = "정화"
 L["CT_RaidAssist/Spells/Power Word: Fortitude"] = "신의 권능: 인내"
 
+
+-- zhCN (Credits: 萌丶汉丶纸)
+
 elseif (GetLocale() == "zhCN") then
 
+L["CT_RaidAssist/AfterNotReadyFrame/MissedCheck"] = "你可能错过了就位确认!"
+L["CT_RaidAssist/AfterNotReadyFrame/WasAFK"] = "你已经暂离, 现在要回来么?"
+L["CT_RaidAssist/AfterNotReadyFrame/WasNotReady"] = "你准备好了么?"
+L["CT_RaidAssist/PlayerFrame/TooltipFooter"] = "/ctra 来移动和设置"
+L["CT_RaidAssist/PlayerFrame/TooltipItemsBroken"] = "%d%% 耐久, 有%d 破损装备 (截止 %d:%02d 分钟前)"
+L["CT_RaidAssist/PlayerFrame/TooltipItemsNotBroken"] = "%d%% 耐久 (截止 %d:%02d 分钟前)"
+L["CT_RaidAssist/WindowTitle"] = "%d窗"
+L["CT_RaidAssist/Options/Frames/HideBlizzardDefaultCheckButton"] = "隐藏暴雪的默认团队框架"
+L["CT_RaidAssist/Options/Frames/HideBlizzardDefaultTooltip"] = [=[防止在出现自定义CTRA框架时出现默认团队框架.
+如果禁用CTRA框架则无效.
+
+注意: 其他一些插件也可能禁用默认框架.]=]
+L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksCheckButton"] = "延长错过就位确认"
+L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksTooltip"] = "提供在缺少/readycheck后通知返回的按钮"
+L["CT_RaidAssist/Options/ReadyCheckMonitor/Heading"] = "就位确认功能"
+L["CT_RaidAssist/Options/ReadyCheckMonitor/MonitorDurabilityLabel"] = "如果你装备的耐久度过低则提供警告"
+L["CT_RaidAssist/Options/ReadyCheckMonitor/MonitorDurabilityMessage"] = [=[键入 /reload 为CTRA停止共享耐久度.
+其他团队插件如DBM和oRA可能会重新激活此功能.]=]
+L["CT_RaidAssist/Options/ReadyCheckMonitor/MonitorDurabilitySlider"] = "当装备低于<数值>%时发出警告:关闭:50%"
+L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityCheckButton"] = "让CTRA与团队分享你装备的耐久度"
+L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityTooltip"] = [=[使用CTRA, DBM 或 oRA等插件与队友分享你装备的耐久度.
+
+注意:
+- 即使你选择退出CTRA，其他插件也可以启用共享功能
+- 这需要 /reload才能生效]=]
+L["CT_RaidAssist/Options/ReadyCheckMonitor/Tooltip"] = "这些设置适用于使用CT团队公会"
+L["CT_RaidAssist/Options/Window/Appearance/EnablePowerBarCheckButton"] = "显示能量条?"
+L["CT_RaidAssist/Options/Window/Appearance/EnablePowerBarTooltip"] = "在底部显示法力, 能量, 怒气等"
+L["CT_RaidAssist/Options/Window/Appearance/EnableTargetFrameCheckButton"] = "在下方显示目标?"
+L["CT_RaidAssist/Options/Window/Appearance/EnableTargetFrameTooltip"] = "在每个玩家下方添加一个带有其目标名称的框架 (通常用于坦克)"
+L["CT_RaidAssist/Options/Window/Appearance/Heading"] = "显示"
+L["CT_RaidAssist/Options/Window/Appearance/HealthBarAsBackgroundCheckButton"] = "以全尺寸背景显示血量"
+L["CT_RaidAssist/Options/Window/Appearance/HealthBarAsBackgroundTooltip"] = "将整个背景填充为一大血条.  否则血条只是底部的一个小条"
+L["CT_RaidAssist/Options/Window/Appearance/Line1"] = "你想要复古的CTRA感觉还是更现代的外观?"
+L["CT_RaidAssist/Options/Window/Auras/CombatLabel"] = "在战斗中显示:"
+L["CT_RaidAssist/Options/Window/Auras/DropDown"] = "#我可以施放的团队Buff#我可以驱散的Debuffs#所有团队buffs#所有debuffs#我施放过的Group buffs#无"
+L["CT_RaidAssist/Options/Window/Auras/Heading"] = "Buffs 和 Debuffs"
+L["CT_RaidAssist/Options/Window/Auras/NoCombatLabel"] = "退出战斗显示:"
+L["CT_RaidAssist/Options/Window/Auras/RemovableDebuffColorCheckButton"] = "为可移除debuffs添加颜色"
+L["CT_RaidAssist/Options/Window/Auras/RemovableDebuffColorTip"] = "当你可以移除一个有害debuff时改变背景和边框."
+L["CT_RaidAssist/Options/Window/Auras/ShowBossCheckButton"] = "在中间显示重要的BOSS光环"
+L["CT_RaidAssist/Options/Window/Auras/ShowBossTip"] = [=[某些BOSS战会产生对战斗至关重要的buffs/debuffs.
+这些将在中间显示较大以进行强调.]=]
+L["CT_RaidAssist/Options/Window/Auras/ShowReverseCooldownCheckButton"] = "识别即将到期的光环"
+L["CT_RaidAssist/Options/Window/Auras/ShowReverseCooldownTip"] = [=[在剩余时间少于50%的情况下为光环添加CD动画
+注意: 由于游戏限制此功能仅限于怀旧服]=]
+L["CT_RaidAssist/Options/Window/Color/BackgroundClassHeading"] = "职业背景颜色"
+L["CT_RaidAssist/Options/Window/Color/BackgroundClassSlider"] = "背景 = <数值>%"
+L["CT_RaidAssist/Options/Window/Color/BackgroundClassTip"] = [=[按比例更改背景颜色.
+但是使用与标准背景色相同的透明度.]=]
+L["CT_RaidAssist/Options/Window/Color/BorderClassHeading"] = "职业边框颜色"
+L["CT_RaidAssist/Options/Window/Color/BorderClassSlider"] = "边框 = <数值>%"
+L["CT_RaidAssist/Options/Window/Color/BorderClassTip"] = [=[按比例更改边框颜色.
+但是使用与标准边框颜色相同的透明度.]=]
+L["CT_RaidAssist/Options/Window/Color/Line1"] = "首先, 设置标准调色板:"
+L["CT_RaidAssist/Options/Window/Color/Line2"] = "然后, 融入职业颜色:"
+L["CT_RaidAssist/Options/Window/Groups/ClassHeader"] = "职业"
+L["CT_RaidAssist/Options/Window/Groups/GroupHeader"] = "组"
+L["CT_RaidAssist/Options/Window/Groups/GroupTooltipContent"] = [=[0.9:0.9:0.9#|cFFFFFF99在团队中: |r
+- 不言而喻
+
+|cFFFFFF99团队之外: |r
+- Gp 1 是你和你的队伍]=]
+L["CT_RaidAssist/Options/Window/Groups/GroupTooltipHeader"] = "组 1 到 8"
+L["CT_RaidAssist/Options/Window/Groups/Header"] = "组和职业选择"
+L["CT_RaidAssist/Options/Window/Groups/Line1"] = "此窗口应显示哪些组, 角色或职业?"
+L["CT_RaidAssist/Options/Window/Groups/RoleHeader"] = "角色"
+L["CT_RaidAssist/Options/Window/Layout/Heading"] = "布局"
+L["CT_RaidAssist/Options/Window/Layout/OrientationDropdown"] = "#每个组的新 |cFFFFFF00列|r#每个组的新 |cFFFFFF00行|r #将团队合并到 |cFFFFFF00单个列|r (以换行为准)#将团队合并到 |cFFFFFF00单个行|r (以换行为准)"
+L["CT_RaidAssist/Options/Window/Layout/OrientationLabel"] = "使用行或列?"
+L["CT_RaidAssist/Options/Window/Layout/Tip"] = "使用这些设置团队框架将扩展/收缩成行和列"
+L["CT_RaidAssist/Options/Window/Layout/WrapLabel"] = "行/列大小:"
+L["CT_RaidAssist/Options/Window/Layout/WrapSlider"] = "在<数值>后面换行"
+L["CT_RaidAssist/Options/Window/Layout/WrapTooltipContent"] = [=[0.9:0.9:0.9#当新行或列太长时启动它
+
+|cFFFFFF99比如:|r 
+- 设置前面的复选框以显示所有八个组
+- 将前面的下拉列表设置为 '将团队合并为一行'
+- 将此滑块设置为在10名玩家之后换行
+- 现在一个40人的团队出现了4排10人]=]
+L["CT_RaidAssist/Options/Window/Layout/WrapTooltipHeader"] = "换行/换列大小:"
+L["CT_RaidAssist/Options/WindowControls/AddButton"] = "添加"
+L["CT_RaidAssist/Options/WindowControls/AddTooltip"] = "使用默认设置添加新窗口."
+L["CT_RaidAssist/Options/WindowControls/CloneButton"] = "克隆"
+L["CT_RaidAssist/Options/WindowControls/CloneTooltip"] = "添加一个具有与当前所选窗口重复的设置的新窗口."
+L["CT_RaidAssist/Options/WindowControls/DeleteButton"] = "删除"
+L["CT_RaidAssist/Options/WindowControls/DeleteTooltip"] = "|cFFFFFF00Shift+左键|r 该按钮删除当前选择的窗口."
+L["CT_RaidAssist/Options/WindowControls/Heading"] = "窗口"
+L["CT_RaidAssist/Options/WindowControls/Line1"] = "每个窗口都有自己的外观, 可在下面配置."
+L["CT_RaidAssist/Options/WindowControls/SelectionLabel"] = "选择窗口:"
+L["CT_RaidAssist/Options/WindowControls/WindowAddedMessage"] = "窗口 %d 已添加."
+L["CT_RaidAssist/Options/WindowControls/WindowClonedMessage"] = "窗口 %d 已添加, 从%d复制的设置."
+L["CT_RaidAssist/Options/WindowControls/WindowDeletedMessage"] = "窗口 %d 已删除."
+L["CT_RaidAssist/Options/WindowControls/WindowSelectedMessage"] = "窗口 %d 已选择."
 L["CT_RaidAssist/Spells/Abolish Poison"] = "驱毒术"
+L["CT_RaidAssist/Spells/Amplify Magic"] = "魔法增效"
+L["CT_RaidAssist/Spells/Ancestral Spirit"] = "先祖之魂"
+L["CT_RaidAssist/Spells/Arcane Brilliance"] = "奥术光辉"
 L["CT_RaidAssist/Spells/Arcane Intellect"] = "奥术智慧"
+L["CT_RaidAssist/Spells/Battle Shout"] = "战斗怒吼"
+L["CT_RaidAssist/Spells/Blessing of Kings"] = "王者祝福"
+L["CT_RaidAssist/Spells/Blessing of Might"] = "力量祝福"
+L["CT_RaidAssist/Spells/Blessing of Salvation"] = "拯救祝福"
+L["CT_RaidAssist/Spells/Blessing of Wisdom"] = "智慧祝福"
 L["CT_RaidAssist/Spells/Cleanse"] = "清洁术"
+L["CT_RaidAssist/Spells/Cleanse Spirit"] = "净化灵魂"
+L["CT_RaidAssist/Spells/Cleanse Toxins"] = "清毒术"
+L["CT_RaidAssist/Spells/Cure Disease"] = "治愈疾病"
+L["CT_RaidAssist/Spells/Cure Poison"] = "疗毒"
+L["CT_RaidAssist/Spells/Dampen Magic"] = "抑制魔法"
+L["CT_RaidAssist/Spells/Detox"] = "清创生血"
+L["CT_RaidAssist/Spells/Dispel Magic"] = "驱散魔法"
+L["CT_RaidAssist/Spells/Nature's Cure"] = "自然之愈"
+L["CT_RaidAssist/Spells/Power Word: Fortitude"] = "真言术:韧"
+L["CT_RaidAssist/Spells/Prayer of Fortitude"] = "坚韧祷言"
+L["CT_RaidAssist/Spells/Purify"] = "纯净术"
+L["CT_RaidAssist/Spells/Purify Disease"] = "净化疾病"
+L["CT_RaidAssist/Spells/Purify Spirit"] = "净化灵魂"
+L["CT_RaidAssist/Spells/Raise Ally"] = "复活盟友"
+L["CT_RaidAssist/Spells/Rebirth"] = "复生"
+L["CT_RaidAssist/Spells/Redemption"] = "救赎"
+L["CT_RaidAssist/Spells/Remove Corruption"] = "清除腐蚀"
+L["CT_RaidAssist/Spells/Remove Curse"] = "解除诅咒"
+L["CT_RaidAssist/Spells/Remove Lesser Curse"] = "消除小诅咒"
+L["CT_RaidAssist/Spells/Resurrection"] = "复活术"
+L["CT_RaidAssist/Spells/Revival"] = "还魂术"
+L["CT_RaidAssist/Spells/Revive"] = "起死回生"
+L["CT_RaidAssist/Spells/Soulstone"] = "灵魂石"
+L["CT_RaidAssist/Spells/Trueshot Aura"] = "强击光环"
+
 
 end
