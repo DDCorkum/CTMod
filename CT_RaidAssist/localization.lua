@@ -174,7 +174,9 @@ L["CT_RaidAssist/Spells/Soulstone"] = "Soulstone"
 L["CT_RaidAssist/Spells/Trueshot Aura"] = "Trueshot Aura"
 
 
--- frFR (Credits: ddc)
+-----------------------------------------------
+-- frFR
+-- Credits to ddc, FTB_Exper
 
 if (GetLocale() == "frFR") then
 
@@ -200,20 +202,24 @@ L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksTooltip"] = "Fournir
 L["CT_RaidAssist/Options/ReadyCheckMonitor/Heading"] = "Améliorations de Ready Check"
 L["CT_RaidAssist/Options/ReadyCheckMonitor/MonitorDurabilityLabel"] = "Fournir des avertissements si votre durabilité est faible"
 L["CT_RaidAssist/Options/ReadyCheckMonitor/MonitorDurabilityMessage"] = "Veuillez /reload pour que CTRA cesse de partager la durabilité. D'autres extensions de raid comme DBM et oRA peuvent réactiver cette fonctionnalité."
-L["CT_RaidAssist/Options/ReadyCheckMonitor/MonitorDurabilitySlider"] = "Avertir si la durabilité est inférieure à <valeur>%: désactivé: 50%"
-L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityCheckButton"] = "Laissez CTRA partager votre durabilité avec le raid"
-L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityTooltip"] = "Partagez votre durabilité avec les membres du groupe à l'aide d'addons comme CTRA, DBM ou oRA. Remarques: - D'autres extensions peuvent permettre le partage même si vous vous désabonnez avec CTRA - Cela nécessite un /reload pour prendre effet"
+L["CT_RaidAssist/Options/ReadyCheckMonitor/MonitorDurabilitySlider"] = "Avertir si la durabilité est inférieure à <value>%:désactivé:50%"
+L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityCheckButton"] = "Permettre CTRA de partager votre durabilité avec le raid"
+L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityTooltip"] = [=[Partager votre durabilité avec les membres du groupe à l'aide d'addons comme CTRA, DBM ou oRA.
+
+Remarques: 
+- D'autres extensions peuvent permettre le partage même si vous vous désabonnez avec CTRA 
+- Cela nécessite un /reload pour prendre effet]=]
 L["CT_RaidAssist/Options/ReadyCheckMonitor/Tooltip"] = "Ces paramètres sont destinés aux raids en guilde utilisant CT"
 L["CT_RaidAssist/Options/Window/Appearance/EnablePowerBarCheckButton"] = "Afficher la barre de ressource?"
 L["CT_RaidAssist/Options/Window/Appearance/EnablePowerBarTooltip"] = "Montrez le mana, l'énergie, la rage, etc. en bas"
-L["CT_RaidAssist/Options/Window/Appearance/EnableTargetFrameCheckButton"] = "Montrez la cible en dessous?"
-L["CT_RaidAssist/Options/Window/Appearance/EnableTargetFrameTooltip"] = "Ajoutez un cadre sous chaque joueur avec le nom de sa cible (souvent utilisé pour les tanks)"
+L["CT_RaidAssist/Options/Window/Appearance/EnableTargetFrameCheckButton"] = "Montrer la cible en dessous?"
+L["CT_RaidAssist/Options/Window/Appearance/EnableTargetFrameTooltip"] = "Ajouter un cadre sous chaque joueur avec le nom de sa cible (souvent utilisé pour les tanks)"
 L["CT_RaidAssist/Options/Window/Appearance/Heading"] = "Apparence"
 L["CT_RaidAssist/Options/Window/Appearance/HealthBarAsBackgroundCheckButton"] = "Afficher la santé en arrière-plan en taille réelle"
-L["CT_RaidAssist/Options/Window/Appearance/HealthBarAsBackgroundTooltip"] = "Remplissez tout l'arrière-plan comme un grand compteur de santé. Sinon, la santé n'est qu'une petite barre en bas"
+L["CT_RaidAssist/Options/Window/Appearance/HealthBarAsBackgroundTooltip"] = "Remplisser tout l'arrière-plan comme un grand compteur de santé. Sinon, la santé n'est qu'une petite barre en bas"
 L["CT_RaidAssist/Options/Window/Appearance/Line1"] = "Voulez-vous un style rétro CTRA, ou plutôt un look moderne?"
 L["CT_RaidAssist/Options/Window/Appearance/ShowIncomingHealsDropDown"] = "#Oui#Mes sorts de soins#Non"
-L["CT_RaidAssist/Options/Window/Appearance/ShowIncomingHealsLabel"] = "Permettre CTRA de partager vos sorts de protection"
+L["CT_RaidAssist/Options/Window/Appearance/ShowIncomingHealsLabel"] = "Montrer les soins en progrès :"
 L["CT_RaidAssist/Options/Window/Appearance/ShowIncomingHealsTip"] = [=[Allonger la barre de santé (pas dépasser plein santé) pour montrer les sorts de soins en progrès, de...
 - sur WoW moderne, tout le monde
 - sur WoW classique, les joueurs avec un addon compatible (CTRA, Shadowed, Grid, IceHUD, etc.)]=]
@@ -225,12 +231,16 @@ le combat :]=]
 L["CT_RaidAssist/Options/Window/Auras/DropDown"] = "#Les auras utiles que je peux appliquer aux autres#Les auras nocives que je peux retirer#Tous les auras utiles de groupe#Tous les auras nocives#Les auras utiles de groupe que j'ai appliqué#Rien"
 L["CT_RaidAssist/Options/Window/Auras/Heading"] = "Les auras"
 L["CT_RaidAssist/Options/Window/Auras/NoCombatLabel"] = "Montrer hors combat :"
-L["CT_RaidAssist/Options/Window/Auras/RemovableDebuffColorCheckButton"] = "Ajoutez de la couleur aux debuffs amovibles"
+L["CT_RaidAssist/Options/Window/Auras/RemovableDebuffColorCheckButton"] = "Ajouter de la couleur aux debuffs amovibles"
 L["CT_RaidAssist/Options/Window/Auras/RemovableDebuffColorTip"] = "Changer le fond et bordure quand vous pouvez réduire un aura nocive."
 L["CT_RaidAssist/Options/Window/Auras/ShowBossCheckButton"] = "Montrer les auras de combat de boss au milieu"
 L["CT_RaidAssist/Options/Window/Auras/ShowBossTip"] = "Souligner les mécaniques des combats de boss en mettre l'aura au milieu avec plus grandeur."
 L["CT_RaidAssist/Options/Window/Auras/ShowReverseCooldownCheckButton"] = "Indiquer les auras qui expirent bientôt"
-L["CT_RaidAssist/Options/Window/Auras/ShowReverseCooldownTip"] = "Ajouter une animation de temps de recharge aux auras avec moins de 50% de temps resté"
+L["CT_RaidAssist/Options/Window/Auras/ShowReverseCooldownTip"] = [=[Ajouter une animation de temps de recharge aux auras avec moins de 50% de temps resté.
+
+Avis: cette option est limité sur WoW classique à cause des restrictions de jeu.]=]
+L["CT_RaidAssist/Options/Window/Color/Line1"] = "Premièrement, choisissez une palette de couleurs :"
+L["CT_RaidAssist/Options/Window/Color/Line2"] = "Après, mélangez les couleurs de classe :"
 L["CT_RaidAssist/Options/Window/Groups/ClassHeader"] = "Classes"
 L["CT_RaidAssist/Options/Window/Groups/GroupHeader"] = "Groupes"
 L["CT_RaidAssist/Options/Window/Groups/GroupTooltipContent"] = [=[0.9:0.9:0.9#|cFFFFFF99Pendent un raid: |r
@@ -295,7 +305,9 @@ L["CT_RaidAssist/Spells/Soulstone"] = "Pierre d'âme"
 L["CT_RaidAssist/Spells/Trueshot Aura"] = "Aura de précision"
 
 
--- deDE (Credits: dynaletik)
+-----------------------------------------------
+-- deDE
+-- Credits to dynaletik
 
 elseif (GetLocale() == "deDE") then
 
@@ -308,6 +320,8 @@ L["CT_RaidAssist/PlayerFrame/TooltipItemsNotBroken"] = "%d%% Haltbarkeit (vor %d
 L["CT_RaidAssist/WindowTitle"] = "Fenster %d"
 L["CT_RaidAssist/Options/Frames/HideBlizzardDefaultCheckButton"] = "Blizzard's Standard-Schlachtzugfemster ausblenden"
 L["CT_RaidAssist/Options/Frames/HideBlizzardDefaultTooltip"] = "Blendet die Standard-Schlachtzugsgruppen aus sobald CTRA Fenster aktiv sind. Hat keine Auswirkungen, wenn CTRA Fenster deaktiviert sind. Hinweis: Einige andere Addons können die Standard Fenster ebenfalls ausblenden."
+L["CT_RaidAssist/Options/Frames/ShareClassicHealPredictionCheckButton"] = "Deine Heilung über CTRA mit dem Schlachtzug teilen"
+L["CT_RaidAssist/Options/Frames/ShareClassicHealPredictionTip"] = "Ausgehende Heilung mit Nutzern von Addons wie CTRA, Shadowed, Grid oder IceHud teilen. Hinweise: - Diese auf Classic beschränkte Option imitiert eine Retail Funktion - Infos über Deine Heilung werden an den Schlachtzug gesendet. - Weitere Addons können das Senden aktivieren, auch wenn CTRA dies nicht tut - Benötigt /reload zum Deaktivieren"
 L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksCheckButton"] = "Erweiterte Bereitschaftschecks anzeigen"
 L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksTooltip"] = "Zeigt nach Verpassen eines Bereitschaftschecks eine Schaltfläche an um mitzuteilen, dass man wieder da ist"
 L["CT_RaidAssist/Options/ReadyCheckMonitor/Heading"] = "Erweiterter Bereitschaftscheck"
@@ -327,8 +341,11 @@ L["CT_RaidAssist/Options/Window/Appearance/HealthBarAsBackgroundTooltip"] = "Fü
 L["CT_RaidAssist/Options/Window/Appearance/Line1"] = "Soll CTRA im alten oder neueren Design angezeigt werden?"
 L["CT_RaidAssist/Options/Window/Appearance/ShowIncomingHealsDropDown"] = "#Ja#Nur meine Heilung#Nein"
 L["CT_RaidAssist/Options/Window/Appearance/ShowIncomingHealsLabel"] = "Eingehende Heilung zeigen:"
+L["CT_RaidAssist/Options/Window/Appearance/ShowIncomingHealsTip"] = [=[Verlängert die HP Leiste (nicht über volle HP hinaus) um eingehende Heilung anzuzeigen von...
+- In Retail von jedem - In Classic von Nutzern kompatibler Addons (CTRA, Shadowed, Grid, IceHUD, etc.)]=]
 L["CT_RaidAssist/Options/Window/Appearance/ShowTotalAbsorbsDropDown"] = "#Ja#Nur meine Schilde#Nein"
 L["CT_RaidAssist/Options/Window/Appearance/ShowTotalAbsorbsLabel"] = "Gesamte Absorbtion anzeigen:"
+L["CT_RaidAssist/Options/Window/Appearance/ShowTotalAbsorbsTip"] = "Verlängert die HP Leiste (nicht über volle HP hinaus) um anzuzeigen, wieviel Schaden absorbiert werden kann, bevor Gesundheit verloren wird."
 L["CT_RaidAssist/Options/Window/Auras/CombatLabel"] = "Während des Kampfes anzeigen:"
 L["CT_RaidAssist/Options/Window/Auras/DropDown"] = "#Wirkbare Gruppenzauber#Entfernbare Schwächungszauber#Alle Gruppenzauber#Alle Schwächungszauber#Gewirkte Gruppenzauber#Nichts"
 L["CT_RaidAssist/Options/Window/Auras/Heading"] = "Stärkungs- und Schwächungszauber"
@@ -415,6 +432,9 @@ L["CT_RaidAssist/Spells/Soulstone"] = "Seelenstein"
 L["CT_RaidAssist/Spells/Trueshot Aura"] = "Aura des Volltreffers"
 
 
+-----------------------------------------------
+-- esES
+
 elseif (GetLocale() == "esES" or GetLocale() == "esMX") then
 
 L["CT_RaidAssist/AfterNotReadyFrame/MissedCheck"] = "Puede que hayas omitido un \"Estas Listo\" de la Raid."
@@ -428,6 +448,9 @@ L["CT_RaidAssist/Spells/Cleanse"] = "Purgación"
 L["CT_RaidAssist/Spells/Power Word: Fortitude"] = "Palabra de poder: entereza"
 
 
+-----------------------------------------------
+-- ruRU
+
 elseif (GetLocale() == "ruRU") then
 
 L["CT_RaidAssist/Spells/Abolish Poison"] = "Выведение яда"
@@ -437,6 +460,9 @@ L["CT_RaidAssist/Spells/Cleanse"] = "Очищение"
 L["CT_RaidAssist/Spells/Power Word: Fortitude"] = "Слово силы: Стойкость"
 
 
+-----------------------------------------------
+-- koKR
+
 elseif (GetLocale() == "koKR") then
 
 
@@ -445,7 +471,9 @@ L["CT_RaidAssist/Spells/Cleanse"] = "정화"
 L["CT_RaidAssist/Spells/Power Word: Fortitude"] = "신의 권능: 인내"
 
 
--- zhCN (Credits: 萌丶汉丶纸)
+-----------------------------------------------
+-- zhCN
+-- Credits to 萌丶汉丶纸
 
 elseif (GetLocale() == "zhCN") then
 
@@ -474,7 +502,7 @@ L["CT_RaidAssist/Options/ReadyCheckMonitor/Heading"] = "就位确认功能"
 L["CT_RaidAssist/Options/ReadyCheckMonitor/MonitorDurabilityLabel"] = "如果你装备的耐久度过低则提供警告"
 L["CT_RaidAssist/Options/ReadyCheckMonitor/MonitorDurabilityMessage"] = [=[键入 /reload 为CTRA停止共享耐久度.
 其他团队插件如DBM和oRA可能会重新激活此功能.]=]
-L["CT_RaidAssist/Options/ReadyCheckMonitor/MonitorDurabilitySlider"] = "当装备低于<数值>%时发出警告:关闭:50%"
+L["CT_RaidAssist/Options/ReadyCheckMonitor/MonitorDurabilitySlider"] = "当装备低于<value>%时发出警告:关闭:50%"
 L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityCheckButton"] = "让CTRA与团队分享你装备的耐久度"
 L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityTooltip"] = [=[使用CTRA, DBM 或 oRA等插件与队友分享你装备的耐久度.
 
@@ -509,11 +537,11 @@ L["CT_RaidAssist/Options/Window/Auras/ShowReverseCooldownCheckButton"] = "识别
 L["CT_RaidAssist/Options/Window/Auras/ShowReverseCooldownTip"] = [=[在剩余时间少于50%的情况下为光环添加CD动画
 注意: 由于游戏限制此功能仅限于怀旧服]=]
 L["CT_RaidAssist/Options/Window/Color/BackgroundClassHeading"] = "职业背景颜色"
-L["CT_RaidAssist/Options/Window/Color/BackgroundClassSlider"] = "背景 = <数值>%"
+L["CT_RaidAssist/Options/Window/Color/BackgroundClassSlider"] = "背景 = <value>%"
 L["CT_RaidAssist/Options/Window/Color/BackgroundClassTip"] = [=[按比例更改背景颜色.
 但是使用与标准背景色相同的透明度.]=]
 L["CT_RaidAssist/Options/Window/Color/BorderClassHeading"] = "职业边框颜色"
-L["CT_RaidAssist/Options/Window/Color/BorderClassSlider"] = "边框 = <数值>%"
+L["CT_RaidAssist/Options/Window/Color/BorderClassSlider"] = "边框 =<value>%"
 L["CT_RaidAssist/Options/Window/Color/BorderClassTip"] = [=[按比例更改边框颜色.
 但是使用与标准边框颜色相同的透明度.]=]
 L["CT_RaidAssist/Options/Window/Color/Line1"] = "首先, 设置标准调色板:"
@@ -534,7 +562,7 @@ L["CT_RaidAssist/Options/Window/Layout/OrientationDropdown"] = "#每个组的新
 L["CT_RaidAssist/Options/Window/Layout/OrientationLabel"] = "使用行或列?"
 L["CT_RaidAssist/Options/Window/Layout/Tip"] = "使用这些设置团队框架将扩展/收缩成行和列"
 L["CT_RaidAssist/Options/Window/Layout/WrapLabel"] = "行/列大小:"
-L["CT_RaidAssist/Options/Window/Layout/WrapSlider"] = "在<数值>后面换行"
+L["CT_RaidAssist/Options/Window/Layout/WrapSlider"] = "在<value>后面换行"
 L["CT_RaidAssist/Options/Window/Layout/WrapTooltipContent"] = [=[0.9:0.9:0.9#当新行或列太长时启动它
 
 |cFFFFFF99比如:|r 

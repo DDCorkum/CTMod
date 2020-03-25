@@ -1,6 +1,6 @@
-CT_MailMod (8.3.0.7) 2020-03-21
+CT_MailMod (8.3.0.7) 2020-03-25
 - Added option to prevent editboxes from losing focus during common tasks
-- Simplified-Chinese localization (courtesy: 萌丶汉丶纸)
+- Localization, courtesy of 萌丶汉丶纸 (zhCH)
 
 CT_MailMod (8.3.0.5) 2020-02-10
 - WoW Retail 8.3.0 changed the maximum mailbox size and introduced new API
@@ -17,7 +17,7 @@ CT_MailMod (8.2.5.8) 2019-12-15
 
 CT_MailMod (8.2.5.7) 2019-12-08
 - Timestamps and tooltips added to the mail log
-- Russian localization (courtesy: imposeren)
+- Localization, courtesy of imposeren (ruRU)
 
 CT_MailMod (8.2.5.5) 2019-10-18
 - Fix to text on the open/return buttons after actions performed

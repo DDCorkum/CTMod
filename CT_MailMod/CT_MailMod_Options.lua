@@ -63,33 +63,33 @@ module.frame = function()
 	optionsBeginFrame(-5, 0, "frame#tl:0:%y#r");
 		-- Tips
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_MailMod/Options/Tips/Heading"]);
-		optionsAddObject( -2, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MailMod/Options/Tips/Line1"] .. "#" .. textColor2 .. ":l");
+		optionsAddObject( -2, 2*14, "font#t:0:%y#l:13:0#r#" .. L["CT_MailMod/Options/Tips/Line1"] .. "#" .. textColor2 .. ":l");
 
 		-- General Options
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_MailMod/Options/General/Heading"]);
-		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:blockTrades#" .. L["CT_MailMod/Options/General/BlockTradesCheckButton"]);
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:showMoneyChange#" .. L["CT_MailMod/Options/General/NetIncomeCheckButton"]);
+		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:blockTrades#" .. L["CT_MailMod/Options/General/BlockTradesCheckButton"] .. "#l:268");
+		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:showMoneyChange#" .. L["CT_MailMod/Options/General/NetIncomeCheckButton"] .. "#l:268");
 
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_MailMod/Options/Bags/Heading"]);
-		optionsAddObject( -8, 4*13, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MailMod/Options/Bags/Line1"] .. "#" .. textColor2 .. ":l");
+		optionsAddObject( -8, 4*13, "font#t:0:%y#l:13:0#r#" .. L["CT_MailMod/Options/Bags/Line1"] .. "#" .. textColor2 .. ":l");
 
 		optionsAddObject( -6,   15, "font#tl:15:%y#v:ChatFontNormal#" .. L["CT_MailMod/Options/Bags/OpenLabel"]);
-		optionsAddObject( -3,   26, "checkbutton#tl:35:%y#o:openAllBags#i:openAllBags#" .. L["CT_MailMod/Options/Bags/OpenAllCheckButton"]);
-		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:openBackpack#i:openBackpack#" .. L["CT_MailMod/Options/Bags/OpenBackpackCheckButton"]);
-		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:openNoBags#i:openNoBags#" .. L["CT_MailMod/Options/Bags/CloseAllCheckButton"]);
+		optionsAddObject( -3,   26, "checkbutton#tl:35:%y#o:openAllBags#i:openAllBags#" .. L["CT_MailMod/Options/Bags/OpenAllCheckButton"] .. "#l:233");
+		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:openBackpack#i:openBackpack#" .. L["CT_MailMod/Options/Bags/OpenBackpackCheckButton"] .. "#l:233");
+		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:openNoBags#i:openNoBags#" .. L["CT_MailMod/Options/Bags/CloseAllCheckButton"] .. "#l:233");
 
 		optionsAddObject( -6,   15, "font#tl:15:%y#v:ChatFontNormal#" .. L["CT_MailMod/Options/Bags/CloseLabel"]);
-		optionsAddObject( -3,   26, "checkbutton#tl:35:%y#o:closeAllBags#" .. L["CT_MailMod/Options/Bags/CloseAllCheckButton"]);
+		optionsAddObject( -3,   26, "checkbutton#tl:35:%y#o:closeAllBags#" .. L["CT_MailMod/Options/Bags/CloseAllCheckButton"] .. "#l:233");
 
 		-- Inbox Options
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_MailMod/Options/Inbox/Heading"]);
-		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:inboxMouseWheel:true#" .. L["CT_MailMod/Options/Inbox/MouseWheelCheckButton"]);
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:inboxShowLong:true#" .. L["CT_MailMod/Options/Inbox/ShowLongCheckButton"]);
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:inboxShowExpiry:true#" .. L["CT_MailMod/Options/Inbox/ShowExpiryCheckButton"]);
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:inboxShowInbox:true#" .. L["CT_MailMod/Options/Inbox/ShowInboxCheckButton"]);
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:inboxShowMailbox:true#" .. L["CT_MailMod/Options/Inbox/ShowMailboxCheckButton"]);
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:toolMultipleItems:true#" .. L["CT_MailMod/Options/Inbox/MultipleItemsCheckButton"]);
-		optionsBeginFrame( 6,   26, "checkbutton#tl:10:%y#o:hideLogButton#" .. L["CT_MailMod/Options/Inbox/HideLogCheckButton"]);
+		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:inboxMouseWheel:true#" .. L["CT_MailMod/Options/Inbox/MouseWheelCheckButton"] .. "#l:268");
+		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:inboxShowLong:true#" .. L["CT_MailMod/Options/Inbox/ShowLongCheckButton"] .. "#l:268");
+		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:inboxShowExpiry:true#" .. L["CT_MailMod/Options/Inbox/ShowExpiryCheckButton"] .. "#l:268");
+		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:inboxShowInbox:true#" .. L["CT_MailMod/Options/Inbox/ShowInboxCheckButton"] .. "#l:268");
+		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:inboxShowMailbox:true#" .. L["CT_MailMod/Options/Inbox/ShowMailboxCheckButton"] .. "#l:268");
+		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:toolMultipleItems:true#" .. L["CT_MailMod/Options/Inbox/MultipleItemsCheckButton"] .. "#l:268");
+		optionsBeginFrame( 6,   26, "checkbutton#tl:10:%y#o:hideLogButton#" .. L["CT_MailMod/Options/Inbox/HideLogCheckButton"] .. "#l:268");
 			optionsAddTooltip({"This only hides the button; options further below control logging","While hidden, right-click on the 'globe' or type /maillog#" .. textColor1}, "ANCHOR_BOTTOMRIGHT", 15, -25);
 		optionsEndFrame();
 
@@ -98,15 +98,15 @@ module.frame = function()
 		optionsBeginFrame(  17,   17, "button#tl:250:%y#s:40:%s#v:UIPanelButtonTemplate#?");
 			optionsAddTooltip({L["CT_MailMod/Options/Inbox/Checkboxes/Heading"],L["CT_MailMod/SELECT_MESSAGE_TIP2"]}, "ANCHOR_RIGHT", 35, 0);
 		optionsEndFrame();
-		optionsAddObject(  0, 2*13, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MailMod/Options/Inbox/Checkboxes/Line1"] .. "#" .. textColor2 .. ":l");
-		optionsAddObject(  0,   26, "checkbutton#tl:10:%y#o:showCheckboxes:true#" .. L["CT_MailMod/Options/Inbox/Checkboxes/ShowCheckboxesCheckButton"]);
+		optionsAddObject(  0, 2*13, "font#t:0:%y#l:13:0#r#" .. L["CT_MailMod/Options/Inbox/Checkboxes/Line1"] .. "#" .. textColor2 .. ":l");
+		optionsAddObject(  0,   26, "checkbutton#tl:10:%y#o:showCheckboxes:true#" .. L["CT_MailMod/Options/Inbox/Checkboxes/ShowCheckboxesCheckButton"] .. "#l:268");
 		optionsBeginFrame( 0, 0, "frame#tl:0:%y#br:tr:0:%b");
-			optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:toolSelectMsg:true#" .. L["CT_MailMod/Options/Inbox/SelectMsgCheckButton"]);
-			optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:inboxShowNumbers:true#" .. L["CT_MailMod/Options/Inbox/Checkboxes/ShowNumbersCheckButton"]);
-			optionsBeginFrame( 6,   26, "checkbutton#tl:20:%y#o:inboxSenderNew:true#" .. L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewCheckButton"])
+			optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:toolSelectMsg:true#" .. L["CT_MailMod/Options/Inbox/SelectMsgCheckButton"] .. "#l:258");
+			optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:inboxShowNumbers:true#" .. L["CT_MailMod/Options/Inbox/Checkboxes/ShowNumbersCheckButton"] .. "#l:258");
+			optionsBeginFrame( 6,   26, "checkbutton#tl:20:%y#o:inboxSenderNew:true#" .. L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewCheckButton"] .. "#l:258")
 				optionsAddTooltip({L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewCheckButton"],L["CT_MailMod/Options/Inbox/Checkboxes/SenderNewTip"] .. "#" .. textColor1}, "ANCHOR_RIGHT", 35, 0);
 			optionsEndFrame();
-			optionsBeginFrame( 6,   26, "checkbutton#tl:20:%y#o:inboxRangeNew:true#" .. L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewCheckButton"])
+			optionsBeginFrame( 6,   26, "checkbutton#tl:20:%y#o:inboxRangeNew:true#" .. L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewCheckButton"] .. "#l:258")
 				optionsAddTooltip({L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewCheckButton"],L["CT_MailMod/Options/Inbox/Checkboxes/RangeNewTip"] .. "#" .. textColor1}, "ANCHOR_RIGHT", 35, 0);
 			optionsEndFrame();
 			optionsAddScript( "onupdate",
@@ -118,9 +118,9 @@ module.frame = function()
 		
 		-- Send Mail Options
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_MailMod/Options/SendMail/Heading"]);
-		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:sendmailAltClickItem#" .. L["CT_MailMod/Options/SendMail/AltClickCheckButton"]);
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:sendmailMoneySubject:true#" .. L["CT_MailMod/Options/SendMail/ReplaceSubjectCheckButton"]);
-		optionsBeginFrame(6,   26, "checkbutton#tl:10:%y#o:sendmailAutoCompleteUse#" .. L["CT_MailMod/Options/SendMail/FilterAutoCompleteCheckButton"]);
+		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:sendmailAltClickItem#" .. L["CT_MailMod/Options/SendMail/AltClickCheckButton"] .. "#l:268");
+		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:sendmailMoneySubject:true#" .. L["CT_MailMod/Options/SendMail/ReplaceSubjectCheckButton"] .. "#l:268");
+		optionsBeginFrame(6,   26, "checkbutton#tl:10:%y#o:sendmailAutoCompleteUse#" .. L["CT_MailMod/Options/SendMail/FilterAutoCompleteCheckButton"] .. "#l:268");
 			optionsAddTooltip({
 				L["CT_MailMod/Options/SendMail/FilterAutoCompleteCheckButton"],
 				L["CT_MailMod/Options/SendMail/FilterAutoCompleteTip"] .. "#" .. textColor1,
@@ -133,7 +133,7 @@ module.frame = function()
 			}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
 		optionsEndFrame();
 		if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
-			optionsBeginFrame(6, 26, "checkbutton#tl:10:%y#o:sendmailProtectFocus:true#" .. L["CT_MailMod/Options/SendMail/ProtectEditFocusCheckButton"]);
+			optionsBeginFrame(6, 26, "checkbutton#tl:10:%y#o:sendmailProtectFocus:true#" .. L["CT_MailMod/Options/SendMail/ProtectEditFocusCheckButton"] .. "#l:268");
 				optionsAddTooltip({
 					L["CT_MailMod/Options/SendMail/ProtectEditFocusCheckButton"],
 					L["CT_MailMod/Options/SendMail/ProtectEditFocusTip"] .. "#" .. textColor2,
@@ -146,20 +146,20 @@ module.frame = function()
 		optionsBeginFrame(  17,   17, "button#tl:250:%y#s:40:%s#v:UIPanelButtonTemplate#?");
 			optionsAddTooltip({L["CT_MailMod/Options/MailLog/Heading"],L["CT_MailMod/Options/MailLog/Tip"] .. "#" .. textColor2}, "ANCHOR_RIGHT", 35, 0);
 		optionsEndFrame();
-		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:printLog#" .. L["CT_MailMod/Options/MailLog/PrintCheckButton"]);
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:saveLog:true#" .. L["CT_MailMod/Options/MailLog/SaveCheckButton"]);
-		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:logOpenedMail:true#" .. L["CT_MailMod/Options/MailLog/LogOpennedCheckButton"]);
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:logReturnedMail:true#" .. L["CT_MailMod/Options/MailLog/LogReturnedCheckButton"]);
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:logDeletedMail:true#" .. L["CT_MailMod/Options/MailLog/LogDeletedButton"]);
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:logSentMail:true#" .. L["CT_MailMod/Options/MailLog/LogSentCheckButton"]);
+		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:printLog#" .. L["CT_MailMod/Options/MailLog/PrintCheckButton"] .. "#l:268");
+		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:saveLog:true#" .. L["CT_MailMod/Options/MailLog/SaveCheckButton"] .. "#l:268");
+		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:logOpenedMail:true#" .. L["CT_MailMod/Options/MailLog/LogOpennedCheckButton"] .. "#l:268");
+		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:logReturnedMail:true#" .. L["CT_MailMod/Options/MailLog/LogReturnedCheckButton"] .. "#l:268");
+		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:logDeletedMail:true#" .. L["CT_MailMod/Options/MailLog/LogDeletedButton"] .. "#l:268");
+		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:logSentMail:true#" .. L["CT_MailMod/Options/MailLog/LogSentCheckButton"] .. "#l:268");
 
 		optionsAddObject(-10,   16, "colorswatch#tl:15:%y#s:16:16#o:logColor:" .. defaultLogColor[1] .. "," .. defaultLogColor[2] .. "," .. defaultLogColor[3] .. "," .. defaultLogColor[4] .. "#true");
 		optionsAddObject( 14,   15, "font#tl:40:%y#v:ChatFontNormal#" .. L["CT_MailMod/Options/MailLog/BackgroundLabel"]);
 
 		optionsAddObject(-25,   17, "slider#t:0:%y#o:logWindowScale:1#s:175:%s#" .. L["CT_MailMod/Options/MailLog/ScaleSliderLabel"] .. "#0.20:2:0.01");
 
-		optionsAddObject(-20, 1*13, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MailMod/Options/MailLog/Delete/Heading"] .. "#" .. textColor3 .. ":l");
-		optionsAddObject(-10,   26, "checkbutton#tl:10:%y#o:resetLog#i:resetLog#" .. L["CT_MailMod/Options/MailLog/Delete/ConfirmationCheckButton"]);
+		optionsAddObject(-20, 1*13, "font#t:0:%y#l:13:0#r#" .. L["CT_MailMod/Options/MailLog/Delete/Heading"] .. "#" .. textColor3 .. ":l");
+		optionsAddObject(-10,   26, "checkbutton#tl:10:%y#o:resetLog#i:resetLog#" .. L["CT_MailMod/Options/MailLog/Delete/ConfirmationCheckButton"] .. "#l:268");
 		optionsBeginFrame(  -5,   30, "button#t:0:%y#s:120:%s#v:UIPanelButtonTemplate#i:deleteLogButton#" .. L["CT_MailMod/Options/MailLog/Delete/Button"]);
 			optionsAddScript("onclick",
 				function(self)
@@ -175,7 +175,7 @@ module.frame = function()
 		-- Reset Options
 		optionsBeginFrame(-20	, 0, "frame#tl:0:%y#br:tr:0:%b");
 			optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_MailMod/Options/Reset/Heading"]);
-			optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:resetAll#" .. L["CT_MailMod/Options/Reset/ResetAllCheckbox"]);
+			optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:resetAll#" .. L["CT_MailMod/Options/Reset/ResetAllCheckbox"] .. "#l:268");
 			optionsBeginFrame(  -5,   30, "button#t:0:%y#s:120:%s#v:UIPanelButtonTemplate#" .. L["CT_MailMod/Options/Reset/ResetButton"]);
 				optionsAddScript("onclick", function(self)
 					if (module:getOption("resetAll")) then
@@ -192,7 +192,7 @@ module.frame = function()
 					ConsoleExec("RELOADUI");
 				end);
 			optionsEndFrame();
-			optionsAddObject( -7, 2*15, "font#t:0:%y#s:0:%s#l#r#" .. L["CT_MailMod/Options/Reset/Line 1"] .. "#" .. textColor2);
+			optionsAddObject( -7, 2*15, "font#t:0:%y#l#r#" .. L["CT_MailMod/Options/Reset/Line 1"] .. "#" .. textColor2);
 		optionsEndFrame();
 
 

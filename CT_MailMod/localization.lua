@@ -458,6 +458,8 @@ L["CT_MailMod/Options/SendMail/AltClickCheckButton"] = "Alt-Linksklick fügt Geg
 L["CT_MailMod/Options/SendMail/FilterAutoCompleteCheckButton"] = "Auto-Vervollständigung des Empfängerfeldes filtern"
 L["CT_MailMod/Options/SendMail/FilterAutoCompleteTip"] = "Bei Aktivierung auf den Button neben dem Empfängerfeld klicken um zu filtern nach:"
 L["CT_MailMod/Options/SendMail/Heading"] = "Briefe versenden"
+L["CT_MailMod/Options/SendMail/ProtectEditFocusCheckButton"] = "Tastatureingaben im Briefkasten forcieren"
+L["CT_MailMod/Options/SendMail/ProtectEditFocusTip"] = "Startet nach folgenden Klicks im Briefkasten wieder die Tastatureingabe: - Rucksack und Taschenplätze - Brief Anhangplätze - Nachnahme oder Geld senden Schaltflächen"
 L["CT_MailMod/Options/SendMail/ReplaceSubjectCheckButton"] = "Leeren Betreff durch Geldbetrag ersetzen"
 L["CT_MailMod/Options/Tips/Heading"] = "Hinweise"
 L["CT_MailMod/Options/Tips/Line1"] = "Durch Eingabe von  /ctmail oder /ctmailmod wird dieses Optionsfenster direkt geöffnet."
@@ -491,7 +493,6 @@ L["CT_MailMod/Options/Inbox/Checkboxes/Line1"] = "Наведите мышь на
 
 elseif (GetLocale() == "ptBR") then
 
-L = L or {}
 L["CT_MailMod/AutoCompleteFilter/Account"] = "Reconhecer personagens nessa conta"
 L["CT_MailMod/AutoCompleteFilter/Friends"] = "Lista de amigos (incluindo offline)"
 L["CT_MailMod/AutoCompleteFilter/Group"] = "Grupo atual"
@@ -636,7 +637,7 @@ L["CT_MailMod/Options/MailLog/LogReturnedCheckButton"] = "记录退回的邮件"
 L["CT_MailMod/Options/MailLog/LogSentCheckButton"] = "记录发送邮件"
 L["CT_MailMod/Options/MailLog/PrintCheckButton"] = "打印日志消息到聊天"
 L["CT_MailMod/Options/MailLog/SaveCheckButton"] = "将日志消息保存在邮件日志中"
-L["CT_MailMod/Options/MailLog/ScaleSliderLabel"] = "邮件日志规模 = <数值>"
+L["CT_MailMod/Options/MailLog/ScaleSliderLabel"] = "邮件日志规模 = <value>"
 L["CT_MailMod/Options/MailLog/Tip"] = [=[键入/maillog 查看发送/接收的每个信件的日志.
 
 通过拖动日志的左边缘或右边缘或使用下面的缩放滑块将其放大或缩小来调整日志大小]=]
@@ -648,8 +649,11 @@ L["CT_MailMod/Options/SendMail/AltClickCheckButton"] = "Alt左键单击将物品
 L["CT_MailMod/Options/SendMail/FilterAutoCompleteCheckButton"] = "自动完成筛选发送到字段"
 L["CT_MailMod/Options/SendMail/FilterAutoCompleteTip"] = "启用后, 单击收件人字段旁边的按钮进行筛选:"
 L["CT_MailMod/Options/SendMail/Heading"] = "发送邮件"
+L["CT_MailMod/Options/SendMail/ProtectEditFocusCheckButton"] = "防止邮箱失去键盘焦点"
+L["CT_MailMod/Options/SendMail/ProtectEditFocusTip"] = "单击后将键盘光标返回到邮箱：-背包和行李槽-邮件附件槽-货到付款或汇款按钮"
 L["CT_MailMod/Options/SendMail/ReplaceSubjectCheckButton"] = "用金额替换空白主题"
 L["CT_MailMod/Options/Tips/Heading"] = "提示"
 L["CT_MailMod/Options/Tips/Line1"] = "你可以键入 /ctmail 或 /ctmailmod 直接打开设置窗口."
+
 
 end

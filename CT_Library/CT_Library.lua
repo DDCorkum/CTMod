@@ -273,6 +273,38 @@ function lib:displayPredefinedTooltip(obj, text, ...)
 	self:displayTooltip(obj, L["CT_Library/Tooltip/" .. text], ...);
 end
 
+-- Hooks fontString:SetText(text) to shrink the text up to 50% if it is longer than maxwidth, taking into account effectiveScale but ignoring any word-wrap caused by fixed widths or anchor points
+-- This function depends on the current font.  It also hooks the SetText() and SetFont() functions to automatically update itself
+function lib:blockOverflowText(fontString, maxwidth)
+	local testString = CreateFrame("Frame"):CreateFontString();
+	testString:SetFont(fontString:GetFont());
+	fontString.ctOverflowFunc = function(__, text)
+		testString:SetText(text);
+		local width = testString:GetStringWidth() / fontString:GetEffectiveScale();
+		fontString.ctIsResizing = true;
+		if (maxwidth < width) then
+			local fontName, fontHeight, fontFlags = testString:GetFont();
+			fontString:SetFont(fontName, fontHeight * max(0.5, maxwidth / width), fontFlags);			
+		else
+			fontString:SetFont(testString:GetFont());
+		end
+		fontString.ctIsResizing = false;
+	end	
+	if (not fontString.ctOverflowFuncHooked) then
+		fontString.ctOverflowFuncHooked = true;
+		hooksecurefunc(fontString, "SetText", fontString.ctOverflowFunc);
+		hooksecurefunc(fontString, "SetFont", function() if (not fontString.ctIsResizing) then testString:SetFont(fontString:GetFont()); end end);
+		fontString.ctOverflowFunc(fontString, fontString:GetText());
+	end
+end
+
+function lib:unblockOverflowText(fontString)
+	if (fontString.ctOverflowFuncHooked) then
+		-- direct the hook to a harmless dummy function that does nothing
+		fontString.ctOverflowFunc = function() return; end
+	end
+end
+
 -- Register a slash command
 if (not numSlashCmds) then
 	numSlashCmds = 0;
@@ -1304,16 +1336,55 @@ local function checkbuttonOnClick(self)
 	end
 end
 
-objectHandlers.checkbutton = function(self, parent, name, virtual, option, text, textColor)
+objectHandlers.checkbutton = function(self, parent, name, virtual, option, text, data)
 	local checkbutton = CreateFrame("CheckButton", name, parent, virtual or "InterfaceOptionsBaseCheckButtonTemplate");
+
+	-- Parse attributes for the FontString
+	local r, g, b, justify, maxwidth;
+	local a, b, c, d, e = splitString(data, colonSeparator);
+	if ( tonumber(a) and tonumber(b) and tonumber(c) ) then
+		r, g, b = tonumber(a), tonumber(b), tonumber(c);
+		justify, maxwidth = d, tonumber(e);
+	else
+		justify, maxwidth = a, tonumber(b);
+	end
+
+	-- Create FontString
 	local textObj = checkbutton:CreateFontString(nil, "ARTWORK", "ChatFontNormal");
 	textObj:SetPoint("LEFT", checkbutton, "RIGHT", 4, 0);
 	checkbutton.text = textObj;
-
-	-- Text Color
-	local r, g, b = splitString(textColor, colonSeparator);
-	if ( r ) then
+	
+	-- Color
+	if ( r and g and b ) then
 		textObj:SetTextColor(tonumber(r) or 1, tonumber(g) or 1, tonumber(b) or 1);
+	end
+	
+	-- Justify (not very useful without maxwidth or additional anchor points)
+	if ( justify ) then
+		local h = match(justify, "[lLrRcC]");
+		local v = match(justify, "[tTbBmM]");
+
+		if ( h == "l" ) then
+			textObj:SetJustifyH("LEFT");
+		elseif ( h == "r" ) then
+			textObj:SetJustifyH("RIGHT");
+		elseif ( h == "c" ) then
+			textObj:SetJustifyH("CENTER");
+		end
+
+		if ( v == "t" ) then
+			textObj:SetJustifyV("TOP");
+		elseif ( v == "b" ) then
+			textObj:SetJustifyV("BOTTOM");
+		elseif ( v == "m") then
+			textObj:SetJustifyV("MIDDLE");
+		end
+	end
+
+	-- Maximum width (to support localization)
+	if (maxwidth and maxwidth > 1) then
+		lib:blockOverflowText(textObj, maxwidth);
+		textObj:SetWidth(maxwidth);
 	end
 
 	-- Text
@@ -1370,7 +1441,6 @@ end
 
 -- FontString
 -- #r:b:g:just:max where just is the justification and max is the maximum width (strings will shrink to fit within it)
--- Do not use maximum width when also setting #s:___:___ because then the width is strictly controlled!
 objectHandlers.font = function(self, parent, name, virtual, option, text, data, layer)
 	-- Data
 	local r, g, b, justify, maxwidth;
@@ -1381,7 +1451,7 @@ objectHandlers.font = function(self, parent, name, virtual, option, text, data, 
 		r, g, b = tonumber(a), tonumber(b), tonumber(c);
 		justify, maxwidth = d, tonumber(e);
 	else
-		justify = a, tonumber(b);
+		justify, maxwidth = a, tonumber(b);
 	end
 
 	-- Create FontString
@@ -1409,18 +1479,9 @@ objectHandlers.font = function(self, parent, name, virtual, option, text, data, 
 		end
 	end
 
-	-- Maximum width (to support localization
-	if (maxwidth) then
-		hooksecurefunc(fontString, "SetText", function()
-			local fontName, fontHeight, fontFlags = fontString:GetFont();
-			fontString.originalFontHeight = fontString.originalFontHeight or fontHeight;
-			if (fontString.originalFontHeight ~= fontHeight) then
-				fontString:SetFont(fontName, fontString.originalFontHeight, fontFlags);
-			end
-			if (fontString:GetWidth() > maxwidth) then
-				fontString:SetFont(fontName, fontString.originalFontHeight / fontString:GetWidth() * maxwidth, fontFlags);
-			end
-		end);
+	-- Maximum width (to support localization)
+	if (maxwidth and maxwidth > 0) then
+		lib:blockOverflowText(fontString, maxwidth);
 	end
 
 	-- Color

@@ -3,6 +3,7 @@ CT_Library (8.3.0.7) 2020-02-24
 - Fix to titan plugin and minimap button using protected-visibility code
 - The control panel is now fully usable in combat (reversing 8.2.0.5 and more stable than 8.2.5.5)
 - The control panel may now be minimized to more easily move bars around the screen
+- More control over font sizes to support different localizations and prevent overflow
 
 CT_Library (8.3.0.5) 2020-02-09
 - Changes to help other modules use code that mimics "public", "protected" and "public" visibility
