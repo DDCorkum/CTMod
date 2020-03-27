@@ -225,14 +225,14 @@ function StaticCTRAReadyCheck()
 					if (extendReadyChecks) then
 						if (self.status == "waiting") then
 							self:Show();
-							self.text:SetText(L["CT_RaidAssist/frame/WasAFK"]);
+							self.text:SetText(L["CT_RaidAssist/AfterNotReadyFrame/WasAFK"]);
 						elseif (self.status == "notready") then
 							self:Show();
-							self.text:SetText(L["CT_RaidAssist/frame/WasNotReady"]);
+							self.text:SetText(L["CT_RaidAssist/AfterNotReadyFrame/WasNotReady"]);
 						elseif (not self.status) then
 							self:Show();
 							SetPortraitTexture(frame.portrait, "player");
-							self.text:SetText(L["CT_RaidAssist/frame/MissedCheck"]);
+							self.text:SetText(L["CT_RaidAssist/AfterNotReadyFrame/MissedCheck"]);
 							self.initiator = nil;
 						end
 					else
