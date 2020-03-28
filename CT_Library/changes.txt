@@ -1,4 +1,4 @@
-CT_Library (8.3.0.7) 2020-02-24
+CT_Library (8.3.0.7) 2020-03-28
 - Performance improvements using C_Timer to replace OnUpdate
 - Fix to titan plugin and minimap button using protected-visibility code
 - The control panel is now fully usable in combat (reversing 8.2.0.5 and more stable than 8.2.5.5)

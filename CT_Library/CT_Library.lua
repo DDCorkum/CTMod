@@ -273,27 +273,31 @@ function lib:displayPredefinedTooltip(obj, text, ...)
 	self:displayTooltip(obj, L["CT_Library/Tooltip/" .. text], ...);
 end
 
--- Hooks fontString:SetText(text) to shrink the text up to 50% if it is longer than maxwidth, taking into account effectiveScale but ignoring any word-wrap caused by fixed widths or anchor points
+-- Hooks fontString:SetText(text) to shrink the text up to 1/3 if it is longer than maxwidth, ignoring scaling and any word-wrap caused by fixed widths or anchor points
 -- This function depends on the current font.  It also hooks the SetText() and SetFont() functions to automatically update itself
 function lib:blockOverflowText(fontString, maxwidth)
-	local testString = CreateFrame("Frame"):CreateFontString();
-	testString:SetFont(fontString:GetFont());
+	local fontName, fontHeight, fontFlags = fontString:GetFont();
 	fontString.ctOverflowFunc = function(__, text)
-		testString:SetText(text);
-		local width = testString:GetStringWidth() / fontString:GetEffectiveScale();
 		fontString.ctIsResizing = true;
-		if (maxwidth < width) then
-			local fontName, fontHeight, fontFlags = testString:GetFont();
-			fontString:SetFont(fontName, fontHeight * max(0.5, maxwidth / width), fontFlags);			
-		else
-			fontString:SetFont(testString:GetFont());
+		fontString:SetFont(fontName, fontHeight, fontFlags);
+		local width = fontString:GetStringWidth();
+		local newHeight = fontHeight;
+		while (width >= maxwidth and newHeight * 1.5 > fontHeight) do
+			newHeight = newHeight - 0.5;
+			fontString:SetFont(fontName, newHeight, fontFlags);
+			width = fontString:GetStringWidth();
 		end
 		fontString.ctIsResizing = false;
 	end	
 	if (not fontString.ctOverflowFuncHooked) then
 		fontString.ctOverflowFuncHooked = true;
 		hooksecurefunc(fontString, "SetText", fontString.ctOverflowFunc);
-		hooksecurefunc(fontString, "SetFont", function() if (not fontString.ctIsResizing) then testString:SetFont(fontString:GetFont()); end end);
+		hooksecurefunc(fontString, "SetFont", function()
+			if (not fontString.ctIsResizing) then
+				fontName, fontHeight, fontFlags = fontString:GetFont();
+				fontString.ctOverflowFunc(fontString, fontString:GetText());
+			end
+		end);
 		fontString.ctOverflowFunc(fontString, fontString:GetText());
 	end
 end
