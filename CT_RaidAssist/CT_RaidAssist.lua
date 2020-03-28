@@ -2152,19 +2152,19 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 		absorbBarOverlay:SetVertTile(true);
 		absorbBarOverlay:SetHorizTile(true);
 		
-		if (owner:GetProperty("ShowTotalAbsorbs") == 1) then
-			absorbSetting = nil;
-			absorbBarFullCombat:Show();
-			absorbBarZeroCombat:Show();
-			absorbBarFullNoCombat:Show();
-			absorbBarFullNoCombat:Show();	
-		elseif (owner:GetProperty("ShowTotalAbsorbs") == 3) then
+		if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC or owner:GetProperty("ShowTotalAbsorbs") == 3) then
 			absorbBarFullCombat:Hide();
 			absorbBarZeroCombat:Hide();
 			absorbBarFullNoCombat:Hide();
 			absorbBarFullNoCombat:Hide();
 			incomingBarZeroNoCombat:SetPoint("TOPLEFT", healthBarFullCombat);	
 			incomingBarZeroNoCombat:SetPoint("BOTTOMRIGHT", healthBarFullCombat);
+		elseif (owner:GetProperty("ShowTotalAbsorbs") == 1) then
+			absorbSetting = nil;
+			absorbBarFullCombat:Show();
+			absorbBarZeroCombat:Show();
+			absorbBarFullNoCombat:Show();
+			absorbBarFullNoCombat:Show();	
 		else
 			absorbBarFullCombat:Show();
 			absorbBarZeroCombat:Show();
@@ -2250,6 +2250,14 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				healthBarZeroCombat:SetAlpha(0);
 				healthBarFullNoCombat:SetAlpha(0);
 				healthBarZeroNoCombat:SetAlpha(0);
+				absorbBarFullCombat:SetAlpha(0);
+				absorbBarZeroCombat:SetAlpha(0);
+				absorbBarFullNoCombat:SetAlpha(0);
+				absorbBarZeroNoCombat:SetAlpha(0);
+				incomingBarFullCombat:SetAlpha(0);
+				incomingBarZeroCombat:SetAlpha(0);
+				incomingBarFullNoCombat:SetAlpha(0);
+				incomingBarZeroNoCombat:SetAlpha(0);
 			end
 		end
 	end
