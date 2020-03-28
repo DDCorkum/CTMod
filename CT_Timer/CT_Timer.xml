@@ -161,9 +161,12 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 	</Frame>
 	<Frame name="CT_TimerGlobalFrame" parent="UIParent" hidden="true">
 		<Scripts>
-			<OnUpdate>
-				CT_Timer_UpdateTime(self, elapsed);
-			</OnUpdate>
+			<OnShow>
+				self.timeTicker = C_Timer.NewTicker(0.25, CT_Timer_UpdateTime);
+			</OnShow>
+			<OnHide>
+				if (self.timeTicker) then self.timeTicker:Cancel(); end
+			</OnHide>
 		</Scripts>
 	</Frame>
 </Ui>

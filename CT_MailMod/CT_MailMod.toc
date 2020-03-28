@@ -1,5 +1,5 @@
 ## Interface: 80300
-## Version: 8.3.0.5
+## Version: 8.3.0.7
 ## Title: CT_MailMod |cFF333333(BFA)
 ## Notes: Heavily improves the in-game mail functionality.
 ## DefaultState: Enabled

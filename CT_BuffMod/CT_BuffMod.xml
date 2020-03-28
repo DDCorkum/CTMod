@@ -44,6 +44,9 @@
 			<OnShow>
 				CT_BuffMod_AuraButton_OnShow(self);
 			</OnShow>
+			<OnHide>
+				CT_BuffMod_AuraButton_OnHide(self);
+			</OnHide>
 		</Scripts>
 	</Button>
 

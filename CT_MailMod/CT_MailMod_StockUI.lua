@@ -1200,3 +1200,85 @@ do
 		GameTooltip:Hide();
 	end);
 end
+
+
+--------------------------------------------
+-- Preventing the send-mail frame's edit boxes from losing focus during common tasks
+
+
+if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then		-- this resolves a nuisance introduced in WoW 8.3; not present in Classic (yet)
+	local focus;
+	local enabled = true;	-- by default, this feature is on
+	
+	function module.protectFocus(enable)
+		enabled = enable;
+	end
+	
+	local function wipeFocus()
+		focus = nil;
+	end
+	
+	local function onEditFocusGained(editbox)
+		focus = nil;
+	end
+		
+	local function onEditFocusLost(editbox)
+		if (enabled) then
+			focus = editbox;
+			C_Timer.After(0.0001, wipeFocus);
+		end
+	end
+		
+	local function trigger()
+		if (focus) then
+			focus:SetFocus();
+		end
+	end
+	
+	SendMailNameEditBox:HookScript("OnEditFocusGained", onEditFocusGained);
+	SendMailSubjectEditBox:HookScript("OnEditFocusGained", onEditFocusGained);
+	SendMailBodyEditBox:HookScript("OnEditFocusGained", onEditFocusGained);
+	SendMailMoneyGold:HookScript("OnEditFocusGained", onEditFocusGained);
+	SendMailMoneySilver:HookScript("OnEditFocusGained", onEditFocusGained);
+	SendMailMoneyCopper:HookScript("OnEditFocusGained", onEditFocusGained);
+
+	SendMailNameEditBox:HookScript("OnEditFocusLost", onEditFocusLost);
+	SendMailSubjectEditBox:HookScript("OnEditFocusLost", onEditFocusLost);
+	SendMailBodyEditBox:HookScript("OnEditFocusLost", onEditFocusLost);
+	SendMailMoneyGold:HookScript("OnEditFocusLost", onEditFocusLost);
+	SendMailMoneySilver:HookScript("OnEditFocusLost", onEditFocusLost);
+	SendMailMoneyCopper:HookScript("OnEditFocusLost", onEditFocusLost);
+
+	for __, button in pairs({
+		StackSplitFrame.OkayButton,
+		StackSplitFrame.CancelButton,
+		SendMailSendMoneyButton,
+		SendMailCODButton,
+	}) do
+		button:HookScript("OnMouseDown", trigger);
+	end
+	
+	for i=1, ATTACHMENTS_MAX_RECEIVE do
+		local frame = _G["SendMailAttachment"..i];
+		if (frame) then
+			frame:HookScript("OnMouseDown", trigger)
+		else
+			break;
+		end
+	end
+	
+	local listener = CreateFrame("Frame")
+	local bagsDone = {}
+	listener:SetScript("OnEvent", function()
+		for bag=1, 5 do
+			for slot=1, MAX_CONTAINER_ITEMS do
+				local frame = _G["ContainerFrame" .. bag .. "Item" .. slot];
+				if (frame) then
+					frame:HookScript("OnMouseDown", trigger);
+				end
+			end
+		end
+	end);
+	listener:RegisterEvent("PLAYER_LOGIN");
+
+end

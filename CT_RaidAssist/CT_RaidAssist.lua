@@ -55,7 +55,24 @@ local SetPortraitTexture = SetPortraitTexture;
 local UnitAura = UnitAura;
 local UnitClass = UnitClass;
 local UnitExists = UnitExists;
-local UnitGetTotalAbsorbs = UnitGetTotalAbsorbs or function() return 0; end -- doesn't exist in classic, and zero means no absorb bar will be created
+local UnitGetTotalAbsorbs = UnitGetTotalAbsorbs or function() return 0; end -- doesn't exist in classic
+local UnitGetIncomingHeals = UnitGetIncomingHeals or function() return 0; end -- doesn't exist in classic
+local UpdateIncomingHealsFunc;
+do
+	local libHealComm;
+	local playerGUID = UnitGUID("player");
+	function UpdateIncomingHealsFunc()
+		if (libHealComm) then
+			return;
+		end
+		libHealComm = LibStub:GetLibrary("LibHealComm-4.0", true);
+		if (libHealComm) then
+			UnitGetIncomingHeals = function(unit, selfOnly)
+				return libHealComm:GetHealAmount(UnitGUID(unit), libHealComm.ALL_DATA, nil, selfOnly and playerGUID) or 0;
+			end
+		end
+	end
+end
 local UnitInRange = UnitInRange;
 local UnitIsDeadOrGhost = UnitIsDeadOrGhost;
 local UnitIsUnit = UnitIsUnit;
@@ -208,14 +225,14 @@ function StaticCTRAReadyCheck()
 					if (extendReadyChecks) then
 						if (self.status == "waiting") then
 							self:Show();
-							self.text:SetText(L["CT_RaidAssist/frame/WasAFK"]);
+							self.text:SetText(L["CT_RaidAssist/AfterNotReadyFrame/WasAFK"]);
 						elseif (self.status == "notready") then
 							self:Show();
-							self.text:SetText(L["CT_RaidAssist/frame/WasNotReady"]);
+							self.text:SetText(L["CT_RaidAssist/AfterNotReadyFrame/WasNotReady"]);
 						elseif (not self.status) then
 							self:Show();
 							SetPortraitTexture(frame.portrait, "player");
-							self.text:SetText(L["CT_RaidAssist/frame/MissedCheck"]);
+							self.text:SetText(L["CT_RaidAssist/AfterNotReadyFrame/MissedCheck"]);
 							self.initiator = nil;
 						end
 					else
@@ -355,8 +372,6 @@ function StaticCTRAReadyCheck()
 		elseif (option == "CTRA_ShareDurability") then
 			if (value) then
 				module:InstallLibDurability()
-			else
-				print("Please /reload for CTRA to stop sharing durability.  Other addons (DBM, oRA, etc.) may re-activate this feature.");
 			end
 		end
 	end
@@ -371,23 +386,23 @@ function StaticCTRAReadyCheck()
 		local optionsEndFrame = function() module:framesEndFrame(optionsFrameList); end
 		
 		-- commonly used colors
-		local textColor1 = "0.9:0.9:0.9";
-		local textColor2 = "0.7:0.7:0.7";
+		local textColor1 = "#0.9:0.9:0.9";
+		local textColor2 = "#0.7:0.7:0.7";
 
 		-- Heading
 		optionsAddObject(-20, 17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_RaidAssist/Options/ReadyCheckMonitor/Heading"]);
-		--optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. L["CT_RaidAssist/Options/ReadyCheckMonitor/Line1"] .. "#" .. textColor2 .. ":l");
+		--optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. L["CT_RaidAssist/Options/ReadyCheckMonitor/Line1"] .. textColor2 .. ":l");
 		
 		-- Extend overdue readychecks
-		optionsBeginFrame(-15, 26, "checkbutton#tl:10:%y#n:CTRA_ExtendReadyChecksCheckButton#o:CTRA_ExtendReadyChecks:1#" .. L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksCheckButton"]);
-			optionsAddTooltip({L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksCheckButton"],L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksTooltip"] .. "#" .. textColor1});
+		optionsBeginFrame(-15, 26, "checkbutton#tl:10:%y#n:CTRA_ExtendReadyChecksCheckButton#o:CTRA_ExtendReadyChecks:1#" .. L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksCheckButton"] .. "#l:268");
+			optionsAddTooltip({L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksCheckButton"],L["CT_RaidAssist/Options/ReadyCheckMonitor/ExtendReadyChecksTooltip"] .. textColor1});
 		optionsEndFrame();
 		
 		-- Monitor and share durability
-		optionsBeginFrame(0, 26, "checkbutton#tl:10:%y#n:CTRA_ShareDurabilityCheckButton#o:CTRA_ShareDurability:true#" .. L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityCheckButton"]);
-			optionsAddTooltip({L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityCheckButton"],L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityTooltip"] .. "#" .. textColor1});
+		optionsBeginFrame(0, 26, "checkbutton#tl:10:%y#n:CTRA_ShareDurabilityCheckButton#o:CTRA_ShareDurability:true#" .. L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityCheckButton"] .. "#l:268");
+			optionsAddTooltip({L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityCheckButton"],L["CT_RaidAssist/Options/ReadyCheckMonitor/ShareDurabilityTooltip"] .. textColor1});
 		optionsEndFrame();
-		optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. L["CT_RaidAssist/Options/ReadyCheckMonitor/MonitorDurabilityLabel"] .. "#" .. textColor2 .. ":l");
+		optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. L["CT_RaidAssist/Options/ReadyCheckMonitor/MonitorDurabilityLabel"] .. textColor2 .. ":l");
 		optionsAddObject( -20	, 17, "slider#tl:50:%y#s:200:%s#n:CTRA_MonitorDurabilitySlider#o:CTRA_MonitorDurability:50#" .. L["CT_RaidAssist/Options/ReadyCheckMonitor/MonitorDurabilitySlider"] .. "#0:50:5");
 
 
@@ -570,6 +585,15 @@ function StaticCTRAFrames()
 					else
 						showDefaultFrames();
 					end
+				elseif (key == "CTRAFrames_ShareClassicHealPrediction") then
+					if (val) then
+						if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+							module:InstallLibHealComm_CallbackHandler();
+							module:InstallLibHealComm_ChatThrottle();
+							module:InstallLibHealComm();
+							UpdateIncomingHealsFunc();
+						end
+					end	
 				end
 				optionsWaiting[key] = nil;
 			end
@@ -588,8 +612,6 @@ function StaticCTRAFrames()
 			dummyFrame:Update(strsub(option,strfind(option, "_")+1), value);
 		end
 	end
-	
-
 	
 	function obj:Frame(optionsFrameList)
 		-- helper functions to shorten the code a bit
@@ -625,20 +647,24 @@ function StaticCTRAFrames()
 		end
 								
 		-- commonly used colors
-		local textColor1 = "0.9:0.9:0.9";
-		local textColor2 = "0.7:0.7:0.7";
+		local textColor1 = "#0.9:0.9:0.9";
+		local textColor2 = "#0.7:0.7:0.7";
 		
 		
 		-- Heading
 		optionsAddObject(-30, 17, "font#tl:5:%y#v:GameFontNormalLarge#Custom Raid Frames"); -- Custom Raid Frames
 		
 		-- General Options
-		optionsAddObject(-15, 26, "font#tl:15:%y#Enable CTRA Frames?#" .. textColor1 .. ":l"); -- Enable custom raid frames
+		optionsAddObject(-15, 26, "font#tl:15:%y#Enable CTRA Frames?" .. textColor1 .. ":l"); -- Enable custom raid frames
 		optionsAddFrame( 26, 20, "dropdown#tl:130:%y#s:120:%s#n:CTRAFrames_EnableFramesDropDown#o:CTRAFrames_EnableFrames:2 #Always#During Raids#During Groups#Never");
-		optionsBeginFrame( -5,  20, "checkbutton#tl:15:%y#n:CTRAFrames_HideBlizzardDefaultFramesCheckButton#o:CTRAFrames_HideBlizzardDefaultFrames:true#" .. L["CT_RaidAssist/Options/Frames/HideBlizzardDefaultCheckButton"]);
-			optionsAddTooltip({L["CT_RaidAssist/Options/Frames/HideBlizzardDefaultCheckButton"],L["CT_RaidAssist/Options/Frames/HideBlizzardDefaultTooltip"] .. "#" .. textColor1});
+		optionsBeginFrame( -5,  20, "checkbutton#tl:10:%y#n:CTRAFrames_HideBlizzardDefaultFramesCheckButton#o:CTRAFrames_HideBlizzardDefaultFrames:true#" .. L["CT_RaidAssist/Options/Frames/HideBlizzardDefaultCheckButton"] .. "#l:268");
+			optionsAddTooltip({L["CT_RaidAssist/Options/Frames/HideBlizzardDefaultCheckButton"],L["CT_RaidAssist/Options/Frames/HideBlizzardDefaultTooltip"] .. textColor1});
 		optionsEndFrame();
-		
+		if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+			optionsBeginFrame(-5, 20, "checkbutton#tl:10:%y#n:CTRA_ShareClassicHealPredictionCheckButton#o:CTRAFrames_ShareClassicHealPrediction:true#" .. L["CT_RaidAssist/Options/Frames/ShareClassicHealPredictionCheckButton"] .. "#l:268");
+				optionsAddTooltip({L["CT_RaidAssist/Options/Frames/ShareClassicHealPredictionCheckButton"],L["CT_RaidAssist/Options/Frames/ShareClassicHealPredictionTip"] .. textColor1});
+			optionsEndFrame();
+		end
 		
 		-- Everything below this line will pseudo-disable when the frames are disabled
 		optionsBeginFrame(-5, 0, "frame#tl:0:%y#br:tr:0:%b#n:");
@@ -664,7 +690,7 @@ function StaticCTRAFrames()
 
 				-- Heading
 				optionsAddObject(-15,  17, "font#tl:5:%y#v:GameFontNormal#n:CTRAFrames_SelectedWindowHeading#" .. L["CT_RaidAssist/Options/WindowControls/Heading"]);
-				optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. L["CT_RaidAssist/Options/WindowControls/Line1"] .. "#" .. textColor2 .. ":l");
+				optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. L["CT_RaidAssist/Options/WindowControls/Line1"] .. textColor2 .. ":l");
 				
 				-- select which window to configure
 				optionsAddObject(-10, 14, "font#tl:15:%y#v:ChatFontNormal#" .. L["CT_RaidAssist/Options/WindowControls/SelectionLabel"]);
@@ -857,14 +883,14 @@ function StaticCTRAFrames()
 			optionsEndFrame();
 		
 			-- Settings for the current window
-			optionsBeginFrame(0, 0, "frame#tl:10:%y#br:tr:0:%b#");
+			optionsBeginFrame(0, 0, "frame#tl:0:%y#br:tr:0:%b#");
 				
 				-- Groups, Roles, Classes
 				optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormal#" .. L["CT_RaidAssist/Options/Window/Groups/Header"]);
-				optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. L["CT_RaidAssist/Options/Window/Groups/Line1"] .. "#" .. textColor2 .. ":l");
-				optionsAddObject(-10,  20, "font#tl:15:%y#s:0:%s#" .. L["CT_RaidAssist/Options/Window/Groups/GroupHeader"] .. "#" .. textColor1 .. ":l");
+				optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. L["CT_RaidAssist/Options/Window/Groups/Line1"] .. textColor2 .. ":l");
+				optionsAddObject(-10,  20, "font#tl:15:%y#s:0:%s#" .. L["CT_RaidAssist/Options/Window/Groups/GroupHeader"] .. textColor1 .. ":l");
 				for i=1, 8 do
-					optionsBeginFrame( -5,  20, "checkbutton#tl:15:%y#n:CTRAWindow_ShowGroup" .. i .. "CheckButton#Gp " .. i);
+					optionsBeginFrame( -5,  20, "checkbutton#tl:10:%y#n:CTRAWindow_ShowGroup" .. i .. "CheckButton#Gp " .. i);
 						optionsAddScript("onload",
 							function(button)
 								button.option = function() return "CTRAWindow" .. selectedWindow .. "_ShowGroup" .. i; end
@@ -875,7 +901,7 @@ function StaticCTRAFrames()
 						optionsAddTooltip({L["CT_RaidAssist/Options/Window/Groups/GroupTooltipHeader"],L["CT_RaidAssist/Options/Window/Groups/GroupTooltipContent"]}, "CT_BESIDE", 0, 0, CTCONTROLPANEL);
 					optionsEndFrame();
 				end
-				optionsAddObject(220, 20, "font#tl:110:%y#s:0:%s#" .. L["CT_RaidAssist/Options/Window/Groups/RoleHeader"] .. "#" .. textColor1 .. ":l");
+				optionsAddObject(220, 20, "font#tl:110:%y#s:0:%s#" .. L["CT_RaidAssist/Options/Window/Groups/RoleHeader"] .. textColor1 .. ":l");
 				for __, val in ipairs((module:getGameVersion() == CT_GAME_VERSION_RETAIL and {"Myself", "Tanks", "Heals", "Melee", "Range"}) or {"Myself"}) do
 					optionsBeginFrame( -5,  25, "checkbutton#tl:110:%y#n:CTRAWindow_Show" .. val .. "CheckButton#" .. val);
 						optionsAddScript("onload",
@@ -887,9 +913,9 @@ function StaticCTRAFrames()
 					optionsEndFrame();
 				end
 				if(module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-					optionsAddObject(-5, 115, "font#tl:110:%y#Sort by tank, \nheals, and dps \nunavailable \nin Classic#" .. textColor2 .. ":l");
+					optionsAddObject(-5, 115, "font#tl:110:%y#Sort by tank, \nheals, and dps \nunavailable \nin Classic" .. textColor2 .. ":l");
 				end
-				optionsAddObject(170, 20, "font#tl:205:%y#s:0:%s#" .. L["CT_RaidAssist/Options/Window/Groups/ClassHeader"] .. "#" .. textColor1 .. ":l");
+				optionsAddObject(170, 20, "font#tl:205:%y#s:0:%s#" .. L["CT_RaidAssist/Options/Window/Groups/ClassHeader"] .. textColor1 .. ":l");
 				for __, class in ipairs(
 					(module:getGameVersion() == CT_GAME_VERSION_RETAIL and 
 						{
@@ -933,12 +959,12 @@ function StaticCTRAFrames()
 				
 				-- Orientation and Wrapping
 				optionsAddObject(-5,   17, "font#tl:5:%y#v:GameFontNormal#" .. L["CT_RaidAssist/Options/Window/Layout/Heading"]);
-				optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. L["CT_RaidAssist/Options/Window/Layout/Tip"] .. "#" .. textColor2 .. ":l");
-				optionsAddObject(-15, 26, "font#tl:15:%y#" .. L["CT_RaidAssist/Options/Window/Layout/OrientationLabel"] .. "#" .. textColor1 .. ":l");
+				optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. L["CT_RaidAssist/Options/Window/Layout/Tip"] .. textColor2 .. ":l");
+				optionsAddObject(-15, 26, "font#tl:15:%y#" .. L["CT_RaidAssist/Options/Window/Layout/OrientationLabel"] .. textColor1 .. ":l");
 				optionsBeginFrame(26,   20, "dropdown#tl:140:%y#s:100:%s#n:CTRAWindow_OrientationDropDown" .. L["CT_RaidAssist/Options/Window/Layout/OrientationDropdown"]);
 					optionsWindowizeObject("Orientation");
 				optionsEndFrame();
-				optionsAddObject(-26, 20, "font#l:tl:15:%y#" .. L["CT_RaidAssist/Options/Window/Layout/WrapLabel"] .. "#" .. textColor1 .. ":l");
+				optionsAddObject(-26, 20, "font#l:tl:15:%y#" .. L["CT_RaidAssist/Options/Window/Layout/WrapLabel"] .. textColor1 .. ":l");
 				optionsBeginFrame(26, 17, "slider#tl:160:%y#s:110:%s#n:CTRAWindow_WrapAfterSlider#" .. L["CT_RaidAssist/Options/Window/Layout/WrapSlider"] .. ":2:40#2:40:1");
 					optionsWindowizeSlider("WrapAfter");
 					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Layout/WrapTooltipHeader"],L["CT_RaidAssist/Options/Window/Layout/WrapTooltipContent"]});
@@ -951,14 +977,14 @@ function StaticCTRAFrames()
 				optionsEndFrame();				
 				-- Size and Spacing
 				optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormal#Size and Spacing");
-				optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#Should frames touch each other, or be spaced apart vertically and horizontally?#" .. textColor2 .. ":l");
+				optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#Should frames touch each other, or be spaced apart vertically and horizontally?" .. textColor2 .. ":l");
 				optionsBeginFrame(-20, 17, "slider#tl:15:%y#s:110:%s#n:CTRAWindow_HorizontalSpacingSlider#HSpacing = <value>:Touching:Far#0:100:1");
 					optionsWindowizeSlider("HorizontalSpacing");
 				optionsEndFrame();
 				optionsBeginFrame( 20, 17, "slider#tl:150:%y#s:110:%s#n:CTRAWindow_VerticalSpacingSlider#VSpacing = <value>:Touching:Far#0:100:1");
 					optionsWindowizeSlider("VerticalSpacing");
 				optionsEndFrame();
-				optionsAddObject(-25, 1*14, "font#tl:15:%y#s:0:%s#l:13:0#r#How big should the frames themselves be?#" .. textColor2 .. ":l");
+				optionsAddObject(-25, 1*14, "font#tl:15:%y#s:0:%s#l:13:0#r#How big should the frames themselves be?" .. textColor2 .. ":l");
 				optionsBeginFrame(-20, 17, "slider#tl:50:%y#s:200:%s#n:CTRAWindow_PlayerFrameScaleSlider#Scale = <value>%:50%:150%#50:150:5");
 					optionsWindowizeSlider("PlayerFrameScale");
 				optionsEndFrame();
@@ -966,7 +992,7 @@ function StaticCTRAFrames()
 				
 				-- Appearance of Player Frames
 				optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormal#" .. L["CT_RaidAssist/Options/Window/Appearance/Heading"]);
-				optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. L["CT_RaidAssist/Options/Window/Appearance/Line1"] .. "#" .. textColor2 .. ":l");
+				optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. L["CT_RaidAssist/Options/Window/Appearance/Line1"] .. textColor2 .. ":l");
 				optionsBeginFrame( -5, 30, "button#tl:15:%y#s:80:%s#v:UIPanelButtonTemplate#Classic#n:CTRAWindow_ClassicSchemeButton");
 					optionsAddScript("onclick", 
 						function()
@@ -1027,7 +1053,7 @@ function StaticCTRAFrames()
 								["ColorUnitFullHealthCombat"] = {0.00, 1.00, 0.00, 0.50},
 								["ColorUnitZeroHealthCombat"] = {1.00, 0.00, 0.00, 1.00},
 								["ColorUnitFullHealthNoCombat"] = {0.00, 1.00, 0.00, 0.00},
-								["ColorUnitZeroHealthNoCombat"] = {1.00, 0.00, 0.00, 0.25},
+								["ColorUnitZeroHealthNoCombat"] = {1.00, 0.00, 0.00, 1.00},
 								["ColorReadyCheckWaiting"] = {0.35, 0.35, 0.35, 0.65},
 								["ColorReadyCheckNotReady"] = {0.80, 0.35, 0.35, 0.65},
 								["ColorBackground"] = {0.00, 0.00, 0.60, 0.60},
@@ -1042,45 +1068,57 @@ function StaticCTRAFrames()
 					);
 					optionsAddTooltip({"Modern", "Adopt a modern feel like many retail addons|n- Health bar fills the whole background|n- No power/mana bar|n- Health bar is hidden away outside combat|n- Health bar changes bright colors when injured#0.9:0.9:0.9"});
 				optionsEndFrame();
-				optionsBeginFrame(-10, 26, "checkbutton#tl:10:%y#n:CTRAWindow_HealthBarAsBackgroundCheckButton:false#" .. L["CT_RaidAssist/Options/Window/Appearance/HealthBarAsBackgroundCheckButton"]);
+				optionsBeginFrame(-10, 26, "checkbutton#tl:10:%y#n:CTRAWindow_HealthBarAsBackgroundCheckButton:false#" .. L["CT_RaidAssist/Options/Window/Appearance/HealthBarAsBackgroundCheckButton"] .. "#l:268");
 					optionsWindowizeObject("HealthBarAsBackground");
-					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Appearance/HealthBarAsBackgroundCheckButton"],L["CT_RaidAssist/Options/Window/Appearance/HealthBarAsBackgroundTooltip"] .. "#" .. textColor1});
+					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Appearance/HealthBarAsBackgroundCheckButton"],L["CT_RaidAssist/Options/Window/Appearance/HealthBarAsBackgroundTooltip"] .. textColor1});
 				optionsEndFrame();
-				optionsBeginFrame(0, 26, "checkbutton#tl:10:%y#n:CTRAWindow_EnablePowerBarCheckButton:true#" .. L["CT_RaidAssist/Options/Window/Appearance/EnablePowerBarCheckButton"]);
+				optionsBeginFrame(0, 26, "checkbutton#tl:10:%y#n:CTRAWindow_EnablePowerBarCheckButton:true#" .. L["CT_RaidAssist/Options/Window/Appearance/EnablePowerBarCheckButton"] .. "#l:268");
 					optionsWindowizeObject("EnablePowerBar");
-					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Appearance/EnablePowerBarCheckButton"],L["CT_RaidAssist/Options/Window/Appearance/EnablePowerBarTooltip"] .. "#" .. textColor1});
+					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Appearance/EnablePowerBarCheckButton"],L["CT_RaidAssist/Options/Window/Appearance/EnablePowerBarTooltip"] .. textColor1});
 				optionsEndFrame();
-				optionsBeginFrame(0, 26, "checkbutton#tl:10:%y#n:CTRAWindow_EnableTargetFrameCheckButton:true#" .. L["CT_RaidAssist/Options/Window/Appearance/EnableTargetFrameCheckButton"]);
+				optionsBeginFrame(0, 26, "checkbutton#tl:10:%y#n:CTRAWindow_EnableTargetFrameCheckButton:true#" .. L["CT_RaidAssist/Options/Window/Appearance/EnableTargetFrameCheckButton"] .. "#l:268");
 					optionsWindowizeObject("EnableTargetFrame");
-					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Appearance/EnableTargetFrameCheckButton"],L["CT_RaidAssist/Options/Window/Appearance/EnableTargetFrameTooltip"] .. "#" .. textColor1});
+					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Appearance/EnableTargetFrameCheckButton"],L["CT_RaidAssist/Options/Window/Appearance/EnableTargetFrameTooltip"] .. textColor1});
 				optionsEndFrame();
+				if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+					optionsAddObject(-21,   20, "font#l:tl:13:%y#r:tl:158:%y#" .. L["CT_RaidAssist/Options/Window/Appearance/ShowTotalAbsorbsLabel"] .. textColor1 .. ":l:290");
+					optionsBeginFrame(26,   20, "dropdown#tl:140:%y#s:110:%s#n:CTRAWindow_ShowTotalAbsorbsDropDown" .. L["CT_RaidAssist/Options/Window/Appearance/ShowTotalAbsorbsDropDown"]);
+						optionsWindowizeObject("ShowTotalAbsorbs");
+						optionsAddTooltip({L["CT_RaidAssist/Options/Window/Appearance/ShowTotalAbsorbsLabel"],L["CT_RaidAssist/Options/Window/Appearance/ShowTotalAbsorbsTip"] .. textColor1});
+					optionsEndFrame();	
+				end
+				optionsAddObject(-21,   20, "font#l:tl:13:%y#r:tl:158:%y#" .. L["CT_RaidAssist/Options/Window/Appearance/ShowIncomingHealsLabel"] .. textColor1 .. ":l:290");
+				optionsBeginFrame(26,   20, "dropdown#tl:140:%y#s:110:%s#n:CTRAWindow_ShowIncomingHealsDropDown" .. L["CT_RaidAssist/Options/Window/Appearance/ShowIncomingHealsDropDown"]);
+					optionsWindowizeObject("ShowIncomingHeals");
+					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Appearance/ShowIncomingHealsLabel"],L["CT_RaidAssist/Options/Window/Appearance/ShowIncomingHealsTip"] .. textColor1});
+				optionsEndFrame();	
 				
 				-- Buffs and Debuffs
 				optionsAddObject(-10,   17, "font#tl:5:%y#v:GameFontNormal#" .. L["CT_RaidAssist/Options/Window/Auras/Heading"]);
-				optionsAddObject(-21,   20, "font#l:tl:13:%y#" .. L["CT_RaidAssist/Options/Window/Auras/NoCombatLabel"] .. "#" .. textColor1 .. ":l");
+				optionsAddObject(-21,   20, "font#l:tl:13:%y#r:tl:158:%y#" .. L["CT_RaidAssist/Options/Window/Auras/NoCombatLabel"] .. textColor1 .. ":l:290");
 				optionsBeginFrame(26,   20, "dropdown#tl:140:%y#s:110:%s#n:CTRAWindow_AuraFilterNoCombatDropDown" .. L["CT_RaidAssist/Options/Window/Auras/DropDown"]);
 					optionsWindowizeObject("AuraFilterNoCombat");
 				optionsEndFrame();				
-				optionsAddObject(-21,   20, "font#l:tl:13:%y#" .. L["CT_RaidAssist/Options/Window/Auras/CombatLabel"] .. "#" .. textColor1 .. ":l");
+				optionsAddObject(-21,   20, "font#l:tl:13:%y#r:tl:158:%y#" .. L["CT_RaidAssist/Options/Window/Auras/CombatLabel"] .. textColor1 .. ":l:290");
 				optionsBeginFrame(26,   20, "dropdown#tl:140:%y#s:110:%s#n:CTRAWindow_AuraFilterCombatDropDown" .. L["CT_RaidAssist/Options/Window/Auras/DropDown"]);
 					optionsWindowizeObject("AuraFilterCombat");
 				optionsEndFrame();
-				optionsBeginFrame(-10, 15, "checkbutton#tl:10:%y#n:CTRAWindow_ShowBossAurasCheckButton#" .. L["CT_RaidAssist/Options/Window/Auras/ShowBossCheckButton"]);
+				optionsBeginFrame(-10, 15, "checkbutton#tl:10:%y#n:CTRAWindow_ShowBossAurasCheckButton#" .. L["CT_RaidAssist/Options/Window/Auras/ShowBossCheckButton"] .. "#l:268");
 					optionsWindowizeObject("ShowBossAuras");
-					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Auras/ShowBossCheckButton"],L["CT_RaidAssist/Options/Window/Auras/ShowBossTip"] .. "#" .. textColor1});
+					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Auras/ShowBossCheckButton"],L["CT_RaidAssist/Options/Window/Auras/ShowBossTip"] .. textColor1});
 				optionsEndFrame();
-				optionsBeginFrame(-10, 15, "checkbutton#tl:10:%y#n:CTRAWindow_ShowReverseCooldownCheckButton#" .. L["CT_RaidAssist/Options/Window/Auras/ShowReverseCooldownCheckButton"]);
+				optionsBeginFrame(-10, 15, "checkbutton#tl:10:%y#n:CTRAWindow_ShowReverseCooldownCheckButton#" .. L["CT_RaidAssist/Options/Window/Auras/ShowReverseCooldownCheckButton"] .. "#l:268");
 					optionsWindowizeObject("ShowReverseCooldown");
-					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Auras/ShowReverseCooldownCheckButton"],L["CT_RaidAssist/Options/Window/Auras/ShowReverseCooldownTip"] .. "#" .. textColor1});
+					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Auras/ShowReverseCooldownCheckButton"],L["CT_RaidAssist/Options/Window/Auras/ShowReverseCooldownTip"] .. textColor1});
 				optionsEndFrame();
-				optionsBeginFrame(-10, 15, "checkbutton#tl:10:%y#n:CTRAWindow_RemovableDebuffColorCheckButton#" .. L["CT_RaidAssist/Options/Window/Auras/RemovableDebuffColorCheckButton"]);
+				optionsBeginFrame(-10, 15, "checkbutton#tl:10:%y#n:CTRAWindow_RemovableDebuffColorCheckButton#" .. L["CT_RaidAssist/Options/Window/Auras/RemovableDebuffColorCheckButton"] .. "#l:268");
 					optionsWindowizeObject("RemovableDebuffColor");
-					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Auras/RemovableDebuffColorCheckButton"],L["CT_RaidAssist/Options/Window/Auras/RemovableDebuffColorTip"] .. "#" .. textColor1});
+					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Auras/RemovableDebuffColorCheckButton"],L["CT_RaidAssist/Options/Window/Auras/RemovableDebuffColorTip"] .. textColor1});
 				optionsEndFrame();
 				
 				-- Colors
 				optionsAddObject(-20, 17, "font#tl:5:%y#v:GameFontNormal#Colors");
-				optionsAddObject(-5,  14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. L["CT_RaidAssist/Options/Window/Color/Line1"] .. "#" .. textColor2 .. ":l");
+				optionsAddObject(-5,  14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. L["CT_RaidAssist/Options/Window/Color/Line1"] .. textColor2 .. ":l");
 				optionsBeginFrame(-10, 0, "frame#tl:0:%y#br:tr:0:%b#");
 					optionsAddScript("onload",
 						function(frame)
@@ -1093,8 +1131,6 @@ function StaticCTRAFrames()
 										end
 										if (property) then
 											return windows[selectedWindow]:GetProperty(property);
-										--elseif (windows[1]) then
-										--	return windows[1]:GetProperty(property);
 										else
 											return nil;
 										end
@@ -1120,7 +1156,7 @@ function StaticCTRAFrames()
 						{property = "ColorUnitFullHealthCombat", label = "Full Health Combat", tooltip = "Color of the health bar at 100% during combat"},
 						{property = "ColorUnitZeroHealthCombat", label = "Near Death Combat", tooltip = "Color of the health bar when nearly dead during combat"},
 					}) do
-						optionsBeginFrame((i == 7 and 37) or -5, 16, "colorswatch#tl:" .. ((i > 6 and "-10") or "130") .. ":%y#s:16:16#n:CTRAWindow_" .. item.property .. "ColorSwatch#true");  -- the final #true causes it to use alpha
+						optionsBeginFrame((i == 7 and 37) or -5, 16, "colorswatch#tl:" .. ((i > 6 and "0") or "151") .. ":%y#s:16:16#n:CTRAWindow_" .. item.property .. "ColorSwatch#true");  -- the final #true causes it to use alpha
 							optionsWindowizeObject(item.property);
 							optionsAddScript("onenter",
 								function(swatch)
@@ -1129,19 +1165,19 @@ function StaticCTRAFrames()
 								end
 							);
 						optionsEndFrame();
-						optionsAddObject(16, 16, "font#tl:" .. ((i > 6 and "10") or "150") .. ":%y#s:0:%s#l:13:0#r#" .. item.label .. "#" .. textColor1 .. ":l");
+						optionsAddObject(16, 16, "font#tl:" .. ((i > 6 and "19") or "170") .. ":%y#s:0:%s#l:13:0#" .. item.label .. textColor1 .. ":l:132");
 					end;
 				optionsEndFrame();
 								
-				optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. L["CT_RaidAssist/Options/Window/Color/Line2"] .. "#" .. textColor2 .. ":l");
+				optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. L["CT_RaidAssist/Options/Window/Color/Line2"] .. textColor2 .. ":l");
 
 				optionsBeginFrame(-20, 17, "slider#tl:15:%y#s:110:%s#n:CTRAWindow_ColorBackgroundClassSlider#" .. L["CT_RaidAssist/Options/Window/Color/BackgroundClassSlider"] .. ":Off:100%#0:100:5");
 					optionsWindowizeSlider("ColorBackgroundClass");
-					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Color/BackgroundClassHeading"],L["CT_RaidAssist/Options/Window/Color/BackgroundClassTip"] .. "#" .. textColor1});
+					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Color/BackgroundClassHeading"],L["CT_RaidAssist/Options/Window/Color/BackgroundClassTip"] .. textColor1});
 				optionsEndFrame();
 				optionsBeginFrame(17, 17, "slider#tl:150:%y#s:110:%s#n:CTRAWindow_ColorBorderClassSlider#" .. L["CT_RaidAssist/Options/Window/Color/BorderClassSlider"] .. ":Off:100%#0:100:5");
 					optionsWindowizeSlider("ColorBorderClass");
-					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Color/BorderClassHeading"],L["CT_RaidAssist/Options/Window/Color/BorderClassTip"] .. "#" .. textColor1});
+					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Color/BorderClassHeading"],L["CT_RaidAssist/Options/Window/Color/BorderClassTip"] .. textColor1});
 				optionsEndFrame();				
 			
 			optionsEndFrame();  -- end of the window
@@ -1185,6 +1221,14 @@ function StaticCTRAFrames()
 		module:regEvent("PLAYER_LOGIN", doUpdate);		-- defers creating the frames until the player is in the game
 		module:regEvent("GROUP_ROSTER_UPDATE", doUpdate);	-- the frames might enable only during raids, groups, or always!
 		module:regEvent("PLAYER_REGEN_ENABLED", doUpdate);	-- in case the player's membership in a group/raid changed during combat
+		if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+			if (module:getOption("CTRAFrames_ShareClassicHealPrediction") ~= false) then
+				module:InstallLibHealComm_CallbackHandler();
+				module:InstallLibHealComm_ChatThrottle();
+				module:InstallLibHealComm();
+			end
+			UpdateIncomingHealsFunc();
+		end
 		return obj;
 	end
 end
@@ -1260,6 +1304,8 @@ function NewCTRAWindow(owningCTRAFrames)
 		["ShowBossAuras"] = true,
 		["ShowReverseCooldown"] = true,
 		["EnableTargetFrame"] = false,
+		["ShowTotalAbsorbs"] = 1,
+		["ShowIncomingHeals"] = 1,
 	};
 
 	-- private methods
@@ -1703,6 +1749,7 @@ function NewCTRAWindow(owningCTRAFrames)
 		if (dummyFrame) then
 			dummyFrame:Enable("player", 0, 0 + 0.00001 * windowID);
 			dummyFrame:Update("PlayerFrameScale", self:GetProperty("PlayerFrameScale"));
+			dummyFrame:Update("DisableSecureFrame", true); -- not a real option; this is a hack to prevent the dummy-frame from causing the options menu to be protected
 		end
 	end
 	
@@ -1901,7 +1948,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	local owner;			-- pointer to the CTRAWindow interface for calling functions like :GetProperty()
 	local parent;			-- pointer to the CTRAWindow's frame object that is a parent for the visualFrame
 	local visualFrame;		-- generic frame that shows various textures
-	local secureButton;	-- SecureUnitActionButton that sits in front and responds to mouseclicks
+	local secureButton;		-- SecureUnitActionButton that sits in front and responds to mouseclicks
 	local secureButtonDebuffFirst;	-- SecureUnitActionButton that sits in front and responds to mouseclicks
 	local macroRight;		-- copy of the macro currently used when right-clicking secureButton to click-cast
 	local listenerFrame;		-- generic frame that listens to various events
@@ -1912,15 +1959,19 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	local shownXOff;		-- the x coordinate this frame is currently showing
 	local shownYOff;		-- the y coordinate this frame is currently showing
 	local optionsWaiting = { };	-- a list of options that need to be triggered once combat ends
+	local healCommRegistered;	-- a flag on Classic to avoid registering multiple times.
+	local absorbSetting;		-- a flag to control the behaviour of the total-absorb bar
+	local incomingSetting;		-- a flag to control the behaviour of the incoming-heal bar (aka prediction bar)
 	
 	-- graphical textures and fontstrings of visualFrame
 	local background;
 	local colorBackgroundRed, colorBackgroundGreen, colorBackgroundBlue, colorBackgroundAlpha;
 	local colorBackgroundDeadOrGhostRed, colorBackgroundDeadOrGhostGreen, colorBackgroundDeadOrGhostBlue, colorBackgroundDeadOrGhostAlpha;
 	local colorBorderRed, colorBorderGreen, colorBorderBlue, colorBorderAlpha;
-	local colorBorderBeyondRangeRed, colorBorderBeyondRangeGreen, colorBorderBeyondRangeBlue, colorBorderBeyondRangeAlpha
+	local colorBorderBeyondRangeRed, colorBorderBeyondRangeGreen, colorBorderBeyondRangeBlue, colorBorderBeyondRangeAlpha;
 	local healthBarFullCombat, healthBarZeroCombat, healthBarFullNoCombat, healthBarZeroNoCombat;
-	local absorbBarFullCombat, absorbBarZeroCombat, absorbBarFullNoCombat, absorbBarZeroNoCombat;
+	local absorbBarFullCombat, absorbBarZeroCombat, absorbBarFullNoCombat, absorbBarZeroNoCombat, absorbBarOverlay;
+	local incomingBarFullCombat, incomingBarZeroCombat, incomingBarFullNoCombat, incomingBarZeroNoCombat;
 	local healthBarWidth;
 	local powerBar, powerBarWidth;
 	local roleTexture;
@@ -2004,16 +2055,26 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 		absorbBarFullCombat = absorbBarFullCombat or visualFrame:CreateTexture(nil, "ARTWORK");
 		absorbBarZeroCombat = absorbBarZeroCombat or visualFrame:CreateTexture(nil, "ARTWORK");
 		absorbBarFullNoCombat = absorbBarFullNoCombat or visualFrame:CreateTexture(nil, "ARTWORK");
-		absorbBarZeroNoCombat = absorbBarZeroNoCombat or visualFrame:CreateTexture(nil, "ARTWORK");		
+		absorbBarZeroNoCombat = absorbBarZeroNoCombat or visualFrame:CreateTexture(nil, "ARTWORK");
+		absorbBarOverlay = absorbBarOverlay or visualFrame:CreateTexture(nil, "ARTWORK", nil, 1);
+		incomingBarFullCombat = incomingBarFullCombat or visualFrame:CreateTexture(nil, "ARTWORK");
+		incomingBarZeroCombat = incomingBarZeroCombat or visualFrame:CreateTexture(nil, "ARTWORK");
+		incomingBarFullNoCombat = incomingBarFullNoCombat or visualFrame:CreateTexture(nil, "ARTWORK");
+		incomingBarZeroNoCombat = incomingBarZeroNoCombat or visualFrame:CreateTexture(nil, "ARTWORK");		
 
 		healthBarFullCombat:SetTexture("Interface\\TargetingFrame\\UI-StatusBar");
 		healthBarZeroCombat:SetTexture("Interface\\TargetingFrame\\UI-StatusBar");
 		healthBarFullNoCombat:SetTexture("Interface\\TargetingFrame\\UI-StatusBar");
 		healthBarZeroNoCombat:SetTexture("Interface\\TargetingFrame\\UI-StatusBar");
-		absorbBarFullCombat:SetTexture("Interface\\TargetingFrame\\UI-StatusBar");
-		absorbBarZeroCombat:SetTexture("Interface\\TargetingFrame\\UI-StatusBar");
-		absorbBarFullNoCombat:SetTexture("Interface\\TargetingFrame\\UI-StatusBar");
-		absorbBarZeroNoCombat:SetTexture("Interface\\TargetingFrame\\UI-StatusBar");
+		absorbBarFullCombat:SetTexture("Interface\\RaidFrame\\Shield-Fill");
+		absorbBarZeroCombat:SetTexture("Interface\\RaidFrame\\Shield-Fill");
+		absorbBarFullNoCombat:SetTexture("Interface\\RaidFrame\\Shield-Fill");
+		absorbBarZeroNoCombat:SetTexture("Interface\\RaidFrame\\Shield-Fill");
+		absorbBarOverlay:SetTexture("Interface\\RaidFrame\\Shield-Overlay");
+		incomingBarFullCombat:SetTexture("Interface\\TargetingFrame\\UI-StatusBar");
+		incomingBarZeroCombat:SetTexture("Interface\\TargetingFrame\\UI-StatusBar");
+		incomingBarFullNoCombat:SetTexture("Interface\\TargetingFrame\\UI-StatusBar");
+		incomingBarZeroNoCombat:SetTexture("Interface\\TargetingFrame\\UI-StatusBar");
 		
 		
 		if (owner:GetProperty("HealthBarAsBackground")) then
@@ -2044,30 +2105,90 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 		absorbBarFullNoCombat:SetPoint("TOPLEFT", absorbBarFullCombat);
 		absorbBarFullNoCombat:SetPoint("BOTTOMRIGHT", absorbBarFullCombat);
 		
-		absorbBarZeroNoCombat:SetPoint("TOPLEFT", absorbBarFullCombat);	
-		absorbBarZeroNoCombat:SetPoint("BOTTOMRIGHT", absorbBarFullCombat);
+		absorbBarOverlay:SetPoint("TOPLEFT", absorbBarFullCombat);
+		absorbBarOverlay:SetPoint("BOTTOMRIGHT", absorbBarFullCombat);
+		
+		incomingBarZeroNoCombat:SetPoint("TOPLEFT", incomingBarFullCombat);	
+		incomingBarZeroNoCombat:SetPoint("BOTTOMRIGHT", incomingBarFullCombat);
+		
+		incomingBarFullCombat:SetPoint("TOPLEFT", absorbBarFullCombat, "TOPRIGHT");
+		incomingBarFullCombat:SetPoint("BOTTOMLEFT", absorbBarFullCombat, "BOTTOMRIGHT");
+		
+		incomingBarZeroCombat:SetPoint("TOPLEFT", incomingBarFullCombat);
+		incomingBarZeroCombat:SetPoint("BOTTOMRIGHT", incomingBarFullCombat);
+		
+		incomingBarFullNoCombat:SetPoint("TOPLEFT", incomingBarFullCombat);
+		incomingBarFullNoCombat:SetPoint("BOTTOMRIGHT", incomingBarFullCombat);
+		
+		incomingBarZeroNoCombat:SetPoint("TOPLEFT", incomingBarFullCombat);	
+		incomingBarZeroNoCombat:SetPoint("BOTTOMRIGHT", incomingBarFullCombat);
 		
 		local r,g,b,a;
 		r,g,b,a = unpack(owner:GetProperty("ColorUnitFullHealthCombat"));
 		healthBarFullCombat:SetVertexColor(r,g,b);
-		absorbBarFullCombat:SetVertexColor(r,g,b);
+		absorbBarFullCombat:SetVertexColor(r*0.5+0.5,g*0.5+0.5,b*0.5+0.5);
+		incomingBarFullCombat:SetVertexColor(r,g,b);
 		healthBarFullCombat.maxAlpha = a;
 
 		r,g,b,a = unpack(owner:GetProperty("ColorUnitZeroHealthCombat"));
 		healthBarZeroCombat:SetVertexColor(r,g,b);
-		absorbBarZeroCombat:SetVertexColor(r,g,b);
+		absorbBarZeroCombat:SetVertexColor(r*0.5+0.5,g*0.5+0.5,b*0.5+0.5);
+		incomingBarZeroCombat:SetVertexColor(r,g,b);
 		healthBarZeroCombat.maxAlpha = a;
 		
 		r,g,b,a = unpack(owner:GetProperty("ColorUnitFullHealthNoCombat"));
 		healthBarFullNoCombat:SetVertexColor(r,g,b);
-		absorbBarFullNoCombat:SetVertexColor(r,g,b);
+		absorbBarFullNoCombat:SetVertexColor(r*0.5+0.5,g*0.5+0.5,b*0.5+0.5);
+		incomingBarFullNoCombat:SetVertexColor(r,g,b);
 		healthBarFullNoCombat.maxAlpha = a;
 		
 		r,g,b,a = unpack(owner:GetProperty("ColorUnitZeroHealthNoCombat"));
 		healthBarZeroNoCombat:SetVertexColor(r,g,b);
-		absorbBarZeroNoCombat:SetVertexColor(r,g,b);
+		absorbBarZeroNoCombat:SetVertexColor(r*0.5+0.5,g*0.5+0.5,b*0.5+0.5);
+		incomingBarZeroNoCombat:SetVertexColor(r,g,b);
 		healthBarZeroNoCombat.maxAlpha = a;
-	
+		
+		--absorbBarOverlay:SetVertexColor(1,1,1);
+		absorbBarOverlay:SetVertTile(true);
+		absorbBarOverlay:SetHorizTile(true);
+		
+		if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC or owner:GetProperty("ShowTotalAbsorbs") == 3) then
+			absorbBarFullCombat:Hide();
+			absorbBarZeroCombat:Hide();
+			absorbBarFullNoCombat:Hide();
+			absorbBarFullNoCombat:Hide();
+			incomingBarZeroNoCombat:SetPoint("TOPLEFT", healthBarFullCombat);	
+			incomingBarZeroNoCombat:SetPoint("BOTTOMRIGHT", healthBarFullCombat);
+		elseif (owner:GetProperty("ShowTotalAbsorbs") == 1) then
+			absorbSetting = nil;
+			absorbBarFullCombat:Show();
+			absorbBarZeroCombat:Show();
+			absorbBarFullNoCombat:Show();
+			absorbBarFullNoCombat:Show();	
+		else
+			absorbBarFullCombat:Show();
+			absorbBarZeroCombat:Show();
+			absorbBarFullNoCombat:Show();
+			absorbBarFullNoCombat:Show();		
+		end
+		
+		if (owner:GetProperty("ShowIncomingHeals") == 1) then
+			incomingSetting = nil;
+			incomingBarFullCombat:Show();
+			incomingBarZeroCombat:Show();
+			incomingBarFullNoCombat:Show();
+			incomingBarFullNoCombat:Show();	
+		elseif (owner:GetProperty("ShowIncomingHeals") == 3) then
+			incomingBarFullCombat:Hide();
+			incomingBarZeroCombat:Hide();
+			incomingBarFullNoCombat:Hide();
+			incomingBarFullNoCombat:Hide();
+		else
+			incomingBarFullCombat:Show();
+			incomingBarZeroCombat:Show();
+			incomingBarFullNoCombat:Show();
+			incomingBarFullNoCombat:Show();		
+		end
 	end
 	
 	-- updates the health and absorb bars, but must only be called after configureHealthBar has been used at least once
@@ -2076,38 +2197,52 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			if (UnitExists(shownUnit) and not UnitIsDeadOrGhost(shownUnit)) then
 				-- the unit is alive and should have a health bar
 				local healthRatio = UnitHealth(shownUnit) / UnitHealthMax(shownUnit);
-				local absorbRatio = (UnitGetTotalAbsorbs(shownUnit) / UnitHealthMax(shownUnit)) or 0;  -- the actual value in WoW Retail, or 0 in WoW Classic
+				local absorbRatio = (UnitGetTotalAbsorbs(shownUnit, absorbSetting) or 0) / UnitHealthMax(shownUnit);
+				local incomingRatio = (UnitGetIncomingHeals(shownUnit, incomingSetting) or 0) / UnitHealthMax(shownUnit);
 				if (healthRatio > 1) then
 					healthRatio = 1;
 				elseif (healthRatio < 0.001) then
-					healthRatio = 0.001
+					healthRatio = 0.001;
 				end
 				if (healthRatio + absorbRatio > 1) then
-					absorbRatio = 1 - healthRatio;
+					absorbRatio = 1.001 - healthRatio;
+				elseif (absorbRatio < 0.001) then
+					absorbRatio = 0.001;
 				end
-				if (absorbRatio < 0.001) then
-					absorbRatio = 0.001
+				if (healthRatio + absorbRatio + incomingRatio > 1.002) then
+					incomingRatio = 1.002 - healthRatio - absorbRatio;
+				elseif (incomingRatio < 0.001) then
+					incomingRatio = 0.001;
 				end
 				healthBarFullCombat:SetWidth(healthBarWidth * healthRatio)
 				absorbBarFullCombat:SetWidth(healthBarWidth * absorbRatio)
+				incomingBarFullCombat:SetWidth(healthBarWidth * incomingRatio)
 				if (InCombatLockdown()) then
 					healthBarFullCombat:SetAlpha(healthRatio * healthBarFullCombat.maxAlpha);
 					healthBarZeroCombat:SetAlpha((1 - healthRatio)  * healthBarZeroCombat.maxAlpha);
 					healthBarFullNoCombat:SetAlpha(0);
 					healthBarZeroNoCombat:SetAlpha(0);
-					absorbBarFullCombat:SetAlpha(healthRatio /2 * healthBarFullCombat.maxAlpha);
-					absorbBarZeroCombat:SetAlpha((1 - healthRatio) /2 * healthBarZeroCombat.maxAlpha);
+					absorbBarFullCombat:SetAlpha(healthRatio * healthBarFullCombat.maxAlpha * 0.8);
+					absorbBarZeroCombat:SetAlpha((1 - healthRatio)  * healthBarZeroCombat.maxAlpha * 0.8);
 					absorbBarFullNoCombat:SetAlpha(0);
 					absorbBarZeroNoCombat:SetAlpha(0);
+					incomingBarFullCombat:SetAlpha(healthRatio * healthBarFullCombat.maxAlpha * 0.4);
+					incomingBarZeroCombat:SetAlpha((1 - healthRatio)  * healthBarZeroCombat.maxAlpha * 0.4);
+					incomingBarFullNoCombat:SetAlpha(0);
+					incomingBarZeroNoCombat:SetAlpha(0);
 				else
 					healthBarFullNoCombat:SetAlpha(healthRatio * healthBarFullNoCombat.maxAlpha);
 					healthBarZeroNoCombat:SetAlpha((1 - healthRatio)  * healthBarZeroNoCombat.maxAlpha);				
 					healthBarFullCombat:SetAlpha(0);
 					healthBarZeroCombat:SetAlpha(0);
-					absorbBarFullNoCombat:SetAlpha(healthRatio /2 * healthBarFullNoCombat.maxAlpha);
-					absorbBarZeroNoCombat:SetAlpha((1 - healthRatio) /2 * healthBarZeroNoCombat.maxAlpha);				
+					absorbBarFullNoCombat:SetAlpha(healthRatio * healthBarFullCombat.maxAlpha * 0.8);
+					absorbBarZeroNoCombat:SetAlpha((1 - healthRatio)  * healthBarZeroCombat.maxAlpha * 0.8);
 					absorbBarFullCombat:SetAlpha(0);
 					absorbBarZeroCombat:SetAlpha(0);
+					incomingBarFullNoCombat:SetAlpha(healthRatio * healthBarFullCombat.maxAlpha * 0.4);
+					incomingBarZeroNoCombat:SetAlpha((1 - healthRatio)  * healthBarZeroCombat.maxAlpha * 0.4);
+					incomingBarFullCombat:SetAlpha(0);
+					incomingBarZeroCombat:SetAlpha(0);
 				end
 			else
 				-- the unit is dead, or maybe doesn't even exist, so show nothing!
@@ -2119,6 +2254,10 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				absorbBarZeroCombat:SetAlpha(0);
 				absorbBarFullNoCombat:SetAlpha(0);
 				absorbBarZeroNoCombat:SetAlpha(0);
+				incomingBarFullCombat:SetAlpha(0);
+				incomingBarZeroCombat:SetAlpha(0);
+				incomingBarFullNoCombat:SetAlpha(0);
+				incomingBarZeroNoCombat:SetAlpha(0);
 			end
 		end
 	end
@@ -2393,7 +2532,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	local configureAuras = function()
 	
 		local bgr, bgg, bgb, bga = unpack(owner:GetProperty("ColorBackground"));
-		bgr, bgg, bgb, bga = bgr * 0.5, bgg * 0.5, bgb * 0.5, bga * 0.25 + 0.5
+		bgr, bgg, bgb, bga = (bgr or 1) * 0.5, (bgg or 1) * 0.5, (bgb or 1) * 0.5, (bga or 1) * 0.25 + 0.5
 	
 		aura1Texture = aura1Texture or visualFrame:CreateTexture(nil, "OVERLAY");
 		aura1Texture:SetSize(10,10);
@@ -2532,7 +2671,6 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			aurasLastUpdated = GetTime();
 		end
 --]]		
-		
 		if (shownUnit) then
 			
 			-- STEP 2:
@@ -2858,6 +2996,17 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 					or key == "ColorBorder"
 				) then
 					configureBackdrop();
+				elseif (
+					key == "DisableSecureFrame"
+				) then
+					-- This isn't a real option!  Its used only by the dummy-frame in the options to prevent the options menu from becoming a secure frame.
+					if (val) then
+						secureButton:ClearAllPoints();
+						secureButton:SetParent(UIParent);
+					else
+						secureButton:SetParent(visualFrame);
+						secureButton:SetAllPoints();
+					end
 				end
 			end
 			optionsWaiting = { };
@@ -2877,7 +3026,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 					function(__, event)
 						if (event == "UNIT_NAME_UPDATE") then
 							updateUnitNameFontString();
-						elseif (event == "UNIT_HEALTH" or event == "UNIT_MAXHEALTH" or event == "UNIT_ABSORB_AMOUNT_CHANGED") then
+						elseif (event == "UNIT_HEALTH" or event == "UNIT_MAXHEALTH" or event == "UNIT_ABSORB_AMOUNT_CHANGED" or event == "UNIT_HEAL_PREDICTION") then
 							updateHealthBar();
 							updateBackdrop();
 						elseif (event == "UNIT_POWER_UPDATE") then
@@ -2925,16 +3074,10 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 						end
 					end
 				);
-				local timeElapsed = 0;
-				listenerFrame:SetScript("OnUpdate",
-					function(__, elapsed)
-						timeElapsed = timeElapsed + elapsed;
-						if (timeElapsed < 2.5) then return; end
-						timeElapsed = 0;
-						updateBackdrop();
-						updateStatusIndicators();
-					end
-				);
+				C_Timer.NewTicker(2, function() 
+					updateBackdrop()
+					updateStatusIndicators()
+				end);
 			end
 
 			-- configure the visualFrame and its children
@@ -2968,6 +3111,17 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
 					listenerFrame:RegisterUnitEvent("INCOMING_SUMMON_CHANGED", shownUnit);		-- updateStatusIndicators();
 					listenerFrame:RegisterUnitEvent("UNIT_ABSORB_AMOUNT_CHANGED", shownUnit);	-- updateHealthBar; updateBackdrop();
+					listenerFrame:RegisterUnitEvent("UNIT_HEAL_PREDICTION", shownUnit);		-- updateHealthBar; updateBackdrop();
+				elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC and not healCommRegistered) then
+					local healComm = LibStub("LibHealComm-4.0", true);
+					if (healComm) then
+						obj.UpdateIncomingHeals = updateHealthBar;
+						healCommRegistered = true;
+						healComm.RegisterCallback(obj, "HealComm_HealStarted", "UpdateIncomingHeals");
+						healComm.RegisterCallback(obj, "HealComm_HealUpdated", "UpdateIncomingHeals");
+						healComm.RegisterCallback(obj, "HealComm_HealDelayed", "UpdateIncomingHeals");
+						healComm.RegisterCallback(obj, "HealComm_HealStopped", "UpdateIncomingHeals");
+					end
 				end
 				
 			else

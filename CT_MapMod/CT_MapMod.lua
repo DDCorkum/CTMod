@@ -142,7 +142,7 @@ function public:InsertHerb(mapid, x, y, herb, descript, name)
 						if (module:getOption("CT_MapMod_OverwriteGathering")) then
 							note["x"] = x;
 							note["y"] = y;
-							if (note["descript"] == "") then
+							if (note["descript"] == "" or not note["descript"]) then
 								note["descript"] = "Nearby: " .. L["CT_MapMod/Herb/" .. note["subset"]];
 							elseif (note["descript"]:sub(1,8) == "Nearby: " and not note["descript"]:find(L["CT_MapMod/Herb/" .. note["subset"]],9)) then
 								note["descript"] = note["descript"] .. ", " .. L["CT_MapMod/Herb/" .. note["subset"]];
@@ -153,7 +153,7 @@ function public:InsertHerb(mapid, x, y, herb, descript, name)
 							note["version"] = MODULE_VERSION
 						else
 							-- leave the existing note, but add details in the description
-							if (note["descript"] == "") then
+							if (note["descript"] == "" or not note["descript"]) then
 								note["descript"] = "Nearby: " .. L["CT_MapMod/Herb/" .. herb];
 							elseif (note["descript"]:sub(1,8) == "Nearby: " and not note["descript"]:find(L["CT_MapMod/Herb/" .. herb],9)) then
 								note["descript"] = note["descript"] .. ", " .. L["CT_MapMod/Herb/" .. herb];
@@ -310,7 +310,7 @@ function public:InsertOre(mapid, x, y, ore, descript, name)
 							-- overwrite the existing note
 							note["x"] = x;
 							note["y"] = y;
-							if (note["descript"] == "") then
+							if (note["descript"] == "" or not note["descript"]) then
 								note["descript"] = "Nearby: " .. L["CT_MapMod/Ore/" .. note["subset"]];
 							elseif (note["descript"]:sub(1,8) == "Nearby: " and not note["descript"]:find(L["CT_MapMod/Ore/" .. note["subset"]],9)) then
 								note["descript"] = note["descript"] .. ", " .. L["CT_MapMod/Ore/" .. note["subset"]];
@@ -319,7 +319,7 @@ function public:InsertOre(mapid, x, y, ore, descript, name)
 							note["subset"] = ore;
 						else
 							-- leave the existing note, but add details in the description
-							if (note["descript"] == "") then
+							if (note["descript"] == "" or not note["descript"]) then
 								note["descript"] = "Nearby: " .. (L["CT_MapMod/Ore/" .. ore]);
 							elseif (note["descript"]:sub(1,8) == "Also nearby: " and not note["descript"]:find(L["CT_MapMod/Ore/" .. ore],9)) then
 								note["descript"] = note["descript"] .. ", " .. L["CT_MapMod/Ore/" .. ore];
@@ -363,9 +363,8 @@ function CT_MapMod_DataProviderMixin:RefreshAllData(fromOnShow)
 	-- determine if the player is an herbalist or miner, for automatic showing of those kinds of notes
 	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
 		local prof1, prof2 = GetProfessions();
-		local name, icon, skillLevel, maxSkillLevel, numAbilities, spellOffset, skillLine, skillModifier, specializationIndex, specializationOffset;
 		if (prof1) then 
-			name, icon, skillLevel, maxSkillLevel, numAbilities, spellOffset, skillLine, skillModifier, specializationIndex, specializationOffset = GetProfessionInfo(prof1)
+			local __, icon = GetProfessionInfo(prof1)
 			if (icon == 136246) then 
 				module.isHerbalist = true;
 			elseif (icon == 134708) then 
@@ -373,7 +372,7 @@ function CT_MapMod_DataProviderMixin:RefreshAllData(fromOnShow)
 			end
 		end
 		if (prof2) then 
-			name, icon, skillLevel, maxSkillLevel, numAbilities, spellOffset, skillLine, skillModifier, specializationIndex, specializationOffset = GetProfessionInfo(prof2)
+			local __, icon = GetProfessionInfo(prof2)
 			if (icon == 136246) then 
 				module.isHerbalist = true;
 			elseif (icon == 134708) then 
@@ -1334,9 +1333,9 @@ function module:AddUIElements()
 			local playerposition = C_Map.GetPlayerMapPosition(mapid,"player");
 			if (playerposition) then
 				local px, py = playerposition:GetXY();
-				px = math.floor(px*1000)/10;
-				py = math.floor(py*1000)/10;
-				module.pxy.text:SetText(format("P: %.1f, %.1f", px, py));
+				--px = math.floor(px*1000)/10;
+				--py = math.floor(py*1000)/10;
+				module.pxy.text:SetText(format("P: %.1f, %.1f", px*100, py*100));
 			else
 				module.pxy.text:SetText("-");
 			end
@@ -1357,17 +1356,17 @@ function module:AddUIElements()
 			if (cx and cy) then
 				if (cx > 0 and cx < 1 and cy > 0 and cy < 1) then
 					module.cxy.text:SetTextColor(1,1,1,1);
+					module.cxy.text:SetText(format("C: %.1f, %.1f", cx*100, cy*100));
 				else
-					module.cxy.text:SetTextColor(1,1,1,.3);			
+					module.cxy.text:SetTextColor(1,1,1,.3);
+					cx = math.max(math.min(cx,1),0);
+					cy = math.max(math.min(cy,1),0);				
+					module.cxy.text:SetText(format("C: %d, %d", cx*100, cy*100));
 				end
-				cx = math.floor(cx*1000)/10;
-				cx = math.max(math.min(cx,100),0);
-				cy = math.floor(cy*1000)/10;
-				cy = math.max(math.min(cy,100),0);				
-				module.cxy.text:SetText(format("C: %.1f, %.1f", cx, cy));
+
 			end
 		end
-		C_Timer.After(0.1, updateXYCoords);
+		C_Timer.After(0.10, updateXYCoords);
 	end
 	WorldMapFrame.ScrollContainer:HookScript("OnShow", function() isShown = true; updateXYCoords() end);
 	WorldMapFrame.ScrollContainer:HookScript("OnHide", function() isShown = false; end);

@@ -77,6 +77,9 @@ local backdrop2 = {
 	insets = { left = 12, right = 12, top = 12, bottom = 10 }
 };
 
+local actionButtons;
+local multiBars = {};
+
 --------------------------------------------
 -- Group frame
 
@@ -155,41 +158,28 @@ end
 -- existing users' bars will be in the same place.
 local firstButtonOffset = 12;
 
-local function checkMouseover(elapsed)
-	for groupNum, group in pairs(groupList) do
+local function groupOnEnter(obj)
+	local group = module:getGroup(obj.groupId);
+	if (not group.isHovered) then
+		group.isHovered = true;
+		group.frame:SetAlpha(group.opacity or 1)
+	end
+end
+
+local function groupOnLeave(obj)
+	local group = module:getGroup(obj.groupId);
+	if (group.isHovered) then
+		group.isHovered = nil;
 		if (group.barMouseover) then
-			if (group.overlay:IsMouseOver()) then
-				-- Mouse is over the frame
-				if (group.hideFlag) then
-					module:unschedule(group.hideFunc);
-					group.hideFlag = false;
-				end
-				if (not group.mouseover) then
-					-- Mouse has just entered the frame
-					if (not group.showFlag) then
-						module:schedule(group.showTimer, group.showFunc);
-						group.showFlag = true;
-					end
-				end
-			else
-				-- Mouse is not over the frame
-				if (group.showFlag) then
-					module:unschedule(group.showFunc);
-					group.showFlag = false;
-				end
-				if (group.mouseover) then
-					-- Mouse was previously over the frame
-					if (not group.hideFlag) then
-						module:schedule(group.hideTimer, group.hideFunc);
-						group.hideFlag = true;
-					end
-				end
-			end
+			group.frame:SetAlpha(group.barFaded or 0)
+		else
+			group.frame:SetAlpha(group.opacity or 1)
 		end
 	end
 end
 
-module.checkMouseover = checkMouseover;
+module.groupOnLeave = groupOnLeave;
+module.groupOnEnter = groupOnEnter;
 
 function module:setDragOnTop(onTop)
 	-- Show group drag frames on top or behind the action buttons.
@@ -692,27 +682,12 @@ function group:new(groupId)
 	overlay.background:Show();
 	overlay:Show();
 	overlay.groupId = groupId;
+	overlay:HookScript("OnEnter", groupOnEnter);
+	overlay:HookScript("OnLeave", groupOnLeave);
 
 	frame.overlay = overlay;
 	group.overlay = overlay;
 	group:updateOverlay();
-
-	-- "Fade when mouse is not over frame" related items.
-	group.mouseover = false;
-	group.hideFlag = false;
-	group.showFlag = false;
-	group.hideTimer = 0;
-	group.showTimer = 0;
-	group.hideFunc = function()
-		group.hideFlag = false;
-		group.mouseover = false;
-		group:updateOpacity();
-	end
-	group.showFunc = function()
-		group.showFlag = false;
-		group.mouseover = true;
-		group:updateOpacity();
-	end
 
 	-- Set the attribute that will tell the game which secure function to call.
 	group.frame:SetAttribute("_onattributechanged", group_OnAttributeChanged_secure);
@@ -736,13 +711,20 @@ function group:new(groupId)
 	if (module:isMasqueLoaded()) then
 		module:createMasqueGroup(group);
 	end
-
+	
+	group.objects = group.objects or {};
+	if (groupId == 12) then
+		actionButtons = group.objects;
+	elseif (groupId == 2) then
+		multiBars["MultiBarRight"] = group.objects;
+	elseif (groupId == 3) then
+		multiBars["MultiBarLeft"] = group.objects;
+	elseif (groupId == 4) then
+		multiBars["MultiBarBottomRight"] = group.objects;
+	elseif (groupId == 5) then
+		multiBars["MultiBarBottomLeft"] = group.objects;
+	end
 	return group;
-end
-
-function group:updateOpacity()
-	self:update("barFaded", module:getOption("barFaded" .. self.groupId) or 0);
-	self:update("barOpacity", module:getOption("barOpacity" .. self.groupId) or 1);
 end
 
 local defaultPositions = {};
@@ -1226,7 +1208,6 @@ function group:addObject(object)
 		object:updateVisibility();
 	end
 	button:SetScale(self.scale or 1);
-	button:SetAlpha(self.opacity or 1);
 	
 	self:updateDragframePosition();
 	self:updateOverlayPosition();
@@ -1536,33 +1517,30 @@ function group:update(optName, value)
 			end
 		end
 		self:updateClampRectInsets();
-
+		
 	elseif ( optName == "barMouseover" ) then
 		self.barMouseover = value;
+		if (self.overlay:IsMouseOver() or not value) then
+			self.isHovered = nil;
+			groupOnEnter(self);
+		else
+			self.isHovered = true;
+			groupOnLeave(self);		
+		end
 
 	elseif ( optName == "barFaded" ) then
 		self.barFaded = value;
+		if (not self.overlay:IsMouseOver()) then
+			self.isHovered = true;	-- forces a reset of the faded value
+			groupOnLeave(self);		
+		end
 
 	elseif ( optName == "barOpacity" ) then
-		-- Init "barMouseover" and/or "barFaded" before "barOpacity".
 		self.opacity = value;
-		if (self.barMouseover) then
---			-- If the group headers are not visible (the CT_BarMod/CT_BottomBar options window are closed)...
---			if (not module.showingHeaders) then
-				-- If mouse is not over this bar group...
-				if (not self.mouseover) then
-					value = (self.barFaded or 0);  -- Fade buttons by changing alpha.
-				end
---			end
+		if (self.overlay:IsMouseOver() or not self.barMouseover) then
+			self.isHovered = nil;   -- forces a reset of the base opacity
+			groupOnEnter(self);	
 		end
-		local objects = self.objects;
-		if ( objects ) then
-			for key, object in ipairs(objects) do
-				object.alphaCurrent = value;
-				object:updateOpacity();
-			end
-		end
-		self.overlay:SetAlpha(value);
 
 	elseif ( optName == "barSpacing" ) then
 		self.spacing = value;
@@ -1958,4 +1936,47 @@ function module:registerAllPagingStateDrivers()
 		module:registerPagingStateDriver(group.groupId);
 	end
 	module.needRegisterPagingStateDrivers = nil;
+end
+
+
+
+do
+	-- selectively monitor ActionButtonDown() and ActionButtonUp() while the keybindings have been overridden by CT_BarMod_KeyBindings.lua
+	hooksecurefunc("ActionButtonDown", function(id)
+		if (actionButtons) then
+			local button = actionButtons[id];
+			if (button) then
+				button.button:SetButtonState("PUSHED")
+			end
+		end
+	end);
+	
+	hooksecurefunc("ActionButtonUp", function(id)
+		if (actionButtons) then
+			local button = actionButtons[id];
+			if (button) then
+				button.button:SetButtonState("NORMAL")
+			end
+		end
+	end);
+	
+	hooksecurefunc("MultiActionButtonDown", function(bar, id)
+		bar = multiBars[bar]
+		if (bar) then
+			local button = bar[id];
+			if (button) then
+				button.button:SetButtonState("PUSHED")
+			end
+		end
+	end);
+
+	hooksecurefunc("MultiActionButtonUp", function(bar, id)
+		bar = multiBars[bar]
+		if (bar) then
+			local button = bar[id];
+			if (button) then
+				button.button:SetButtonState("NORMAL")
+			end
+		end
+	end);
 end

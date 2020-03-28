@@ -770,35 +770,35 @@ hooksecurefunc("FCF_SetUninteractable",
 	end
 );
 
-hooksecurefunc("FCF_OnUpdate",
-	function(elapsed)
-		for _, frameName in pairs(CHAT_FRAMES) do
-			local chatFrame = _G[frameName];
-			if ( chatFrame and chatFrame:IsShown() ) then
-				--Items that will always cause the frame to fade in.
-				local pushed, btn;
-				local btns = chatFrame.ctResizeButtons;
-				if (btns) then
-					for i = 1, 3 do
-						btn = btns[i];
-						if (btn) then
-							if (btn:GetButtonState() == "PUSHED") then
-								pushed = true;
-								break;
-							end
+local function CT_FCF_OnUpdate(elapsed)
+	for _, frameName in pairs(CHAT_FRAMES) do
+		local chatFrame = _G[frameName];
+		if ( chatFrame and chatFrame:IsShown() ) then
+			--Items that will always cause the frame to fade in.
+			local pushed, btn;
+			local btns = chatFrame.ctResizeButtons;
+			if (btns) then
+				for i = 1, 3 do
+					btn = btns[i];
+					if (btn) then
+						if (btn:GetButtonState() == "PUSHED") then
+							pushed = true;
+							break;
 						end
 					end
 				end
-				if ( MOVING_CHATFRAME or pushed ) then
-					chatFrame.mouseOutTime = 0;
-					if ( not chatFrame.hasBeenFaded ) then
-						FCF_FadeInChatFrame(chatFrame);
-					end
+			end
+			if ( MOVING_CHATFRAME or pushed ) then
+				chatFrame.mouseOutTime = 0;
+				if ( not chatFrame.hasBeenFaded ) then
+					FCF_FadeInChatFrame(chatFrame);
 				end
 			end
 		end
 	end
-);
+end
+
+hooksecurefunc("FCF_OnUpdate", CT_FCF_OnUpdate);
 
 --------------------------------------------
 -- Chat frame sticky chat types

@@ -19,7 +19,7 @@
 -----------------------------------------------
 -- Initialization
 
-local LIBRARY_VERSION = 8.305;		-- Once upon a time this was to differentiate between different versions of CT_Library... but its now 2020 and CT_Library has stood as its own AddOn for more than a decade.
+local LIBRARY_VERSION = 8.307;		-- Once upon a time this was to differentiate between different versions of CT_Library... but its now 2020 and CT_Library has stood as its own AddOn for more than a decade.
 local LIBRARY_NAME = "CT_Library";
 
 -- Create tables for all the PROTECTED contents and PUBLIC interface of CTMod
@@ -36,7 +36,7 @@ _G[LIBRARY_NAME] = libPublic;
 -- Private attributes
 local modules = {};		-- Collection of registered CT modules
 local movables, frame, eventTable;
-local timerRepeatedTimes, timerRepeatedFuncs, timerRepeatedStarts, timerTimes, timerFuncs;
+local timerRepeatingFuncs, timerFuncs = {}, {};
 local numSlashCmds, localizations, tableList, defaultValues;
 local frameCache;
 
@@ -120,6 +120,10 @@ local function getPrintText(...)
 		str = str .. tostring(select(i, ...)) .. ( (i < num and "  " ) or "" );
 	end
 	return str;
+end
+
+function lib:getInstalledModules()
+	return modules;
 end
 
 -- Clears a table
@@ -267,6 +271,42 @@ end
 -- Display a tooltip using predefined, localized text
 function lib:displayPredefinedTooltip(obj, text, ...)
 	self:displayTooltip(obj, L["CT_Library/Tooltip/" .. text], ...);
+end
+
+-- Hooks fontString:SetText(text) to shrink the text up to 1/3 if it is longer than maxwidth, ignoring scaling and any word-wrap caused by fixed widths or anchor points
+-- This function depends on the current font.  It also hooks the SetText() and SetFont() functions to automatically update itself
+function lib:blockOverflowText(fontString, maxwidth)
+	local fontName, fontHeight, fontFlags = fontString:GetFont();
+	fontString.ctOverflowFunc = function(__, text)
+		fontString.ctIsResizing = true;
+		fontString:SetFont(fontName, fontHeight, fontFlags);
+		local width = fontString:GetStringWidth();
+		local newHeight = fontHeight;
+		while (width >= maxwidth and newHeight * 1.5 > fontHeight) do
+			newHeight = newHeight - 0.5;
+			fontString:SetFont(fontName, newHeight, fontFlags);
+			width = fontString:GetStringWidth();
+		end
+		fontString.ctIsResizing = false;
+	end	
+	if (not fontString.ctOverflowFuncHooked) then
+		fontString.ctOverflowFuncHooked = true;
+		hooksecurefunc(fontString, "SetText", fontString.ctOverflowFunc);
+		hooksecurefunc(fontString, "SetFont", function()
+			if (not fontString.ctIsResizing) then
+				fontName, fontHeight, fontFlags = fontString:GetFont();
+				fontString.ctOverflowFunc(fontString, fontString:GetText());
+			end
+		end);
+		fontString.ctOverflowFunc(fontString, fontString:GetText());
+	end
+end
+
+function lib:unblockOverflowText(fontString)
+	if (fontString.ctOverflowFuncHooked) then
+		-- direct the hook to a harmless dummy function that does nothing
+		fontString.ctOverflowFunc = function() return; end
+	end
 end
 
 -- Register a slash command
@@ -638,87 +678,38 @@ function lib:schedule(time, func, repeatFunc)
 	end
 
 	if ( repeatFunc ) then
-		if ( not timerRepeatedTimes ) then
-			timerRepeatedTimes, timerRepeatedFuncs, timerRepeatedStarts = { }, { }, { };
+		if (timerRepeatingFuncs[repeatFunc]) then
+			timerRepeatingFuncs[repeatFunc]:Cancel();
 		end
-		tinsert(timerRepeatedTimes, time);
-		tinsert(timerRepeatedStarts, time);
-		tinsert(timerRepeatedFuncs, repeatFunc);
+		timerRepeatingFuncs[repeatFunc] = C_Timer.NewTicker(time, repeatFunc);
 	else
-		if ( not timerTimes ) then
-			timerTimes, timerFuncs = { }, { };
+		if (timerFuncs[func]) then
+			timerFuncs[func]:Cancel();	--clears the timer if it was already counting
 		end
-		tinsert(timerTimes, time);
-		tinsert(timerFuncs, func);
+		timerFuncs[func] = C_Timer.NewTimer(time, func);
 	end
-	frame:Show();
 end
 
+-- Schedule timers
+ -- Usage:	unschedule(func) to cancel a one-time callback
+ --		unschedule(func, true) to cancel a repeating function
 function lib:unschedule(func, isRepeat)
 	if ( not func ) then
 		return;
 	end
 
 	if ( isRepeat ) then
-		if ( timerRepeatedFuncs ) then
-			for key, value in ipairs(timerRepeatedFuncs) do
-				if ( value == func ) then
-					tremove(timerRepeatedTimes, key);
-					tremove(timerRepeatedStarts, key);
-					tremove(timerRepeatedFuncs, key);
-					break;
-				end
-			end
+		if ( timerRepeatingFuncs[func] ) then
+			timerRepeatingFuncs[func]:Cancel();
+			timerRepeatingFuncs[func] = nil;
 		end
 	else
-		if ( timerFuncs ) then
-			for key, value in ipairs(timerFuncs) do
-				if ( value == func ) then
-					tremove(timerTimes, key);
-					tremove(timerFuncs, key);
-					break;
-				end
-			end
+		if ( timerFuncs[func] ) then
+			timerFuncs[func]:Cancel();
+			timerFuncs[func] = nil;
 		end
 	end
 end
-
-frame:Hide();
-frame:SetScript("OnUpdate", function(self, elapsed)
-	-- Normal times
-	local found = false;
-	local val;
-
-	if ( timerTimes ) then
-		for i = #timerTimes, 1, -1 do
-			val = timerTimes[i] - elapsed;
-			timerTimes[i] = val;
-			if ( val <= 0 ) then
-				tremove(timerFuncs, i)(val);
-				tremove(timerTimes, i);
-			else
-				found = true;
-			end
-		end
-	end
-
-	if ( timerRepeatedTimes ) then
-		for key, value in ipairs(timerRepeatedTimes) do
-			found = true;
-			value = value - elapsed;
-			if ( value <= 0 ) then
-				timerRepeatedFuncs[key](value);
-				timerRepeatedTimes[key] = timerRepeatedStarts[key];
-			else
-				timerRepeatedTimes[key] = value;
-			end
-		end
-	end
-
-	if ( not found ) then
-		frame:Hide();
-	end
-end);
 
 function lib:unload()
 	self:clearTable(self);
@@ -1349,16 +1340,55 @@ local function checkbuttonOnClick(self)
 	end
 end
 
-objectHandlers.checkbutton = function(self, parent, name, virtual, option, text, textColor)
+objectHandlers.checkbutton = function(self, parent, name, virtual, option, text, data)
 	local checkbutton = CreateFrame("CheckButton", name, parent, virtual or "InterfaceOptionsBaseCheckButtonTemplate");
+
+	-- Parse attributes for the FontString
+	local r, g, b, justify, maxwidth;
+	local a, b, c, d, e = splitString(data, colonSeparator);
+	if ( tonumber(a) and tonumber(b) and tonumber(c) ) then
+		r, g, b = tonumber(a), tonumber(b), tonumber(c);
+		justify, maxwidth = d, tonumber(e);
+	else
+		justify, maxwidth = a, tonumber(b);
+	end
+
+	-- Create FontString
 	local textObj = checkbutton:CreateFontString(nil, "ARTWORK", "ChatFontNormal");
 	textObj:SetPoint("LEFT", checkbutton, "RIGHT", 4, 0);
 	checkbutton.text = textObj;
-
-	-- Text Color
-	local r, g, b = splitString(textColor, colonSeparator);
-	if ( r ) then
+	
+	-- Color
+	if ( r and g and b ) then
 		textObj:SetTextColor(tonumber(r) or 1, tonumber(g) or 1, tonumber(b) or 1);
+	end
+	
+	-- Justify (not very useful without maxwidth or additional anchor points)
+	if ( justify ) then
+		local h = match(justify, "[lLrRcC]");
+		local v = match(justify, "[tTbBmM]");
+
+		if ( h == "l" ) then
+			textObj:SetJustifyH("LEFT");
+		elseif ( h == "r" ) then
+			textObj:SetJustifyH("RIGHT");
+		elseif ( h == "c" ) then
+			textObj:SetJustifyH("CENTER");
+		end
+
+		if ( v == "t" ) then
+			textObj:SetJustifyV("TOP");
+		elseif ( v == "b" ) then
+			textObj:SetJustifyV("BOTTOM");
+		elseif ( v == "m") then
+			textObj:SetJustifyV("MIDDLE");
+		end
+	end
+
+	-- Maximum width (to support localization)
+	if (maxwidth and maxwidth > 1) then
+		lib:blockOverflowText(textObj, maxwidth);
+		textObj:SetWidth(maxwidth);
 	end
 
 	-- Text
@@ -1415,7 +1445,6 @@ end
 
 -- FontString
 -- #r:b:g:just:max where just is the justification and max is the maximum width (strings will shrink to fit within it)
--- Do not use maximum width when also setting #s:___:___ because then the width is strictly controlled!
 objectHandlers.font = function(self, parent, name, virtual, option, text, data, layer)
 	-- Data
 	local r, g, b, justify, maxwidth;
@@ -1426,7 +1455,7 @@ objectHandlers.font = function(self, parent, name, virtual, option, text, data, 
 		r, g, b = tonumber(a), tonumber(b), tonumber(c);
 		justify, maxwidth = d, tonumber(e);
 	else
-		justify = a, tonumber(b);
+		justify, maxwidth = a, tonumber(b);
 	end
 
 	-- Create FontString
@@ -1454,18 +1483,9 @@ objectHandlers.font = function(self, parent, name, virtual, option, text, data, 
 		end
 	end
 
-	-- Maximum width (to support localization
-	if (maxwidth) then
-		hooksecurefunc(fontString, "SetText", function()
-			local fontName, fontHeight, fontFlags = fontString:GetFont();
-			fontString.originalFontHeight = fontString.originalFontHeight or fontHeight;
-			if (fontString.originalFontHeight ~= fontHeight) then
-				fontString:SetFont(fontName, fontString.originalFontHeight, fontFlags);
-			end
-			if (fontString:GetWidth() > maxwidth) then
-				fontString:SetFont(fontName, fontString.originalFontHeight / fontString:GetWidth() * maxwidth, fontFlags);
-			end
-		end);
+	-- Maximum width (to support localization)
+	if (maxwidth and maxwidth > 0) then
+		lib:blockOverflowText(fontString, maxwidth);
 	end
 
 	-- Color
@@ -2165,8 +2185,15 @@ local function generalObjectHandler(self, specializedHandler, str, parent, initi
 	end
 
 	-- Check override name
-	name = overrideName or name or identifier or option;  -- Added "or identifier or option" in WoW 8.0 (Battle for Azeroth) because sliders now need unique global names
-
+	if (overrideName or name) then
+		name = overrideName or name;
+	elseif (identifier and parent and parent ~= UIParent) then
+		name = (parent:GetName() or "") .. identifier;
+	else
+		name = identifier or option;
+	end
+	
+	-- Ensure at least one valid anchor
 	anch1 = anch1 or "mid";
 
 	-- Set default value
@@ -2494,34 +2521,29 @@ end
 local controlPanelFrame;
 local selectedModule;
 local previousModule;
+local minWidth, minHeight, maxWidth, maxHeight = 300, 30, 635, 495;
 
 -- Resizes the frame smoothly
-local combatWarningPrinted;
 local function resizer(self, elapsed)
-	local width = self.width;
-	if ( width < 635 ) then
-		if (InCombatLockdown()) then
-			if (not combatWarningPrinted) then
-				print(L["CT_Library/ControlPanelCannotOpen"]);
-				combatWarningPrinted = true;
-			end
-		else
-			local newWidth = min(width + 837.5 * elapsed, 635); -- Resize to 635 over 0.4 sec
-			self:SetWidth(newWidth);
-			self.width = newWidth;
-		end
+	if (self.height > minHeight and self.isMinimized) then
+		local newHeight = max(self.height + (minHeight-maxHeight)/0.4*elapsed, minHeight);
+		self:SetHeight(newHeight);
+		self.height = newHeight;
+	elseif (self.height < maxHeight and not self.isMinimized) then
+		local newHeight = min(self.height + (maxHeight-minHeight)/0.4*elapsed, maxHeight);
+		self:SetHeight(newHeight);
+		self.height = newHeight;		
+	elseif (self.options and self.options:IsShown() and self.width < maxWidth) then
+		local newWidth = min(self.width + (maxWidth-minWidth)/0.4*elapsed, maxWidth);
+		self:SetWidth(newWidth);
+		self.width = newWidth;
+	elseif (self.options and self.options:IsShown() and self.alpha < 1 and not self.isMinimized) then
+		local newAlpha = min(self.alpha + 5 * elapsed, 1); -- Set to 100% opacity over 0.2 sec
+		self.options:SetAlpha(newAlpha);
+		self.alpha = newAlpha;
 	else
-		-- Set Alpha
-		local alpha = self.alpha;
-		if ( alpha < 1 ) then
-			local newAlpha = min(alpha + 5 * elapsed, 1); -- Set to 100% opacity over 0.2 sec
-
-			self.options:SetAlpha(newAlpha);
-			self.alpha = newAlpha;
-		else
-			-- We're done, disable the function
-			self:SetScript("OnUpdate", nil);
-		end
+		-- We're done, disable the function
+		self:SetScript("OnUpdate", nil);
 	end
 end
 
@@ -2646,7 +2668,7 @@ local function controlPanelSkeleton()
 			-- Prepare the frame
 			local selectedModuleFrame = self.selectedModuleFrame;
 			selectedModule = nil;
-
+			
 			self:SetWidth(300);
 			self.options:Hide();
 			self.selectedModuleFrame = nil;
@@ -2705,15 +2727,29 @@ local function controlPanelSkeleton()
 		["button#tl:4:-5#br:tr:-4:-25"] = {
 			"font#tl#br:bl:296:0#CTMod Control Panel v"..LIBRARY_VERSION,
 			"texture#i:bg#all#1:1:1:0.25#BACKGROUND",
-			["button#tr:3:6#s:32:32#v:SecureHandlerClickTemplate"] = {
+			["button#tr:3:6#s:32:32#"] = {
 				["onload"] = function(button)
 					button:SetNormalTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Up");
 					button:SetDisabledTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Up");
 					button:SetPushedTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Down");
 					button:SetHighlightTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight");
-					button:SetAttribute("_onclick", [=[ self:GetParent():GetParent():Hide(); ]=]);
-				end
-				--  NON SECURE, NOT ALLOWED SINCE 2.0.1  --  ["onclick"] = function(self) HideUIPanel(self.parent.parent); end
+				end,
+				["onclick"] = function()
+					PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+					CTCONTROLPANEL:Hide();
+				end,
+			},
+			["button#tr:-18:6#s:32:32#n:CTControlPanelMinimizeButton"] = {
+				["onload"] = function(button)
+					button:SetNormalTexture("Interface\\Buttons\\UI-Panel-SmallerButton-Up");
+					button:SetDisabledTexture("Interface\\Buttons\\UI-Panel-SmallerButton-Up");
+					button:SetPushedTexture("Interface\\Buttons\\UI-Panel-SmallerButton-Down");
+					button:SetHighlightTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight");
+				end,
+				["onclick"] = function(button)
+					PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+					lib:toggleMinimizeControlPanel();
+				end,
 			},
 			["onenter"] = function(self)
 				lib:displayPredefinedTooltip(self, "DRAG");
@@ -2760,7 +2796,7 @@ local function controlPanelSkeleton()
 			["button#i:701#hidden#s:263:25#tl:17:-410"] = modListButtonTemplate, -- Settings Import, 701
 			["button#i:702#hidden#s:263:25#tl:17:-435"] = modListButtonTemplate, -- Help, 702
 		},
-		["frame#s:315:0#tr:-15:-30#b:0:15#i:options#hidden"] = {
+		["frame#s:315:0#tr:-15:-30#b:t:15:-480#i:options#hidden"] = {
 			["onload"] = function(self)
 				local child = CreateFrame("Frame", nil, self);
 				child:SetPoint("TOPLEFT", self);
@@ -2786,15 +2822,40 @@ local function controlPanelSkeleton()
 	};
 end
 
+local function maximizeControlPanel()
+	controlPanelFrame.isMinimized = nil;
+	controlPanelFrame:SetScript("OnUpdate", resizer);
+	CTControlPanelMinimizeButton:SetNormalTexture("Interface\\Buttons\\UI-Panel-SmallerButton-Up");
+	CTControlPanelMinimizeButton:SetDisabledTexture("Interface\\Buttons\\UI-Panel-SmallerButton-Up");
+	CTControlPanelMinimizeButton:SetPushedTexture("Interface\\Buttons\\UI-Panel-SmallerButton-Down");
+	CT_LibraryOptionsScrollFrameScrollBar:Show();
+	CTCONTROLPANELlisting:Show();
+	CT_LibraryOptionsScrollFrame:SetScale(1);
+	CT_LibraryOptionsScrollFrame:SetAlpha(1);
+end
+
+local function minimizeControlPanel()
+	controlPanelFrame.isMinimized = true;
+	controlPanelFrame:SetScript("OnUpdate", resizer);
+	controlPanelFrame:SetClipsChildren(true);
+	CTControlPanelMinimizeButton:SetNormalTexture("Interface\\Buttons\\UI-Panel-BiggerButton-Up");
+	CTControlPanelMinimizeButton:SetDisabledTexture("Interface\\Buttons\\UI-Panel-BiggerButton-Up");
+	CTControlPanelMinimizeButton:SetPushedTexture("Interface\\Buttons\\UI-Panel-BiggerButton-Down");
+	CT_LibraryOptionsScrollFrameScrollBar:Hide();
+	CTCONTROLPANELlisting:Hide();
+	CT_LibraryOptionsScrollFrame:SetScale(0.00001);
+	CT_LibraryOptionsScrollFrame:SetAlpha(0);
+end
+
 local function displayControlPanel()
-	if (InCombatLockdown()) then
-		print(L["CT_Library/ControlPanelCannotOpen"]);
-		return;
-	end
 	if ( not controlPanelFrame ) then
 		controlPanelFrame = lib:getFrame(controlPanelSkeleton);
 		tinsert(UISpecialFrames, controlPanelFrame:GetName());
+		controlPanelFrame.height = maxHeight;	-- tracking variables used by resizer()
+		controlPanelFrame.width = minWidth;
+		controlPanelFrame.alpha = 0;
 	end
+	maximizeControlPanel();
 	controlPanelFrame:Show();
 end
 
@@ -2807,8 +2868,18 @@ function libPublic:showControlPanel(show)
 
 	if ( show ~= false ) then
 		displayControlPanel();
-	elseif ( controlPanelFrame and not InCombatLockdown()) then
+	elseif ( controlPanelFrame) then 
 		controlPanelFrame:Hide();
+	end
+end
+
+function libPublic:toggleMinimizeControlPanel()
+	if (controlPanelFrame) then
+		if (controlPanelFrame.isMinimized) then
+			maximizeControlPanel();
+		else
+			minimizeControlPanel();
+		end
 	end
 end
 

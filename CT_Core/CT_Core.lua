@@ -102,25 +102,21 @@ local function minimapFrameSkeleton()    -- note: one of the images is embedded 
 						minimapdropdown,
 						function()
 							if (UIDROPDOWNMENU_MENU_LEVEL == 1) then
-								local CT = _G["CT_Library"];
-								if (not CT) then return; end
-
-								local modules = CT:getData();
-								for i, module in ipairs(modules) do
+								for i, mod in ipairs(module:getInstalledModules()) do
 									if (i>2) then
 										info = {};
-										info.text = module.name;
+										info.text = mod.name;
 
 
 										info.notCheckable = 1;
-										if (module.externalDropDown_Initialize) then
+										if (mod.externalDropDown_Initialize) then
 											-- shows a custom dropdown provided by the module
 											info.hasArrow = 1;
-											info.value = module.name;
+											info.value = mod.name;
 										else
 											-- opens the customOpenFunction() if it exists, or just opens the standard module options
-											info.func = module.customOpenFunction or function()
-												CT:showModuleOptions(module.name);
+											info.func = mod.customOpenFunction or function()
+												module:showModuleOptions(mod.name);
 											end;
 										end
 										UIDropDownMenu_AddButton(info);
@@ -816,12 +812,28 @@ module.frame = function()
 		optionsEndFrame();
 
 	-- Regen Rates
-		optionsAddBookmark("Regen Tracker");
-		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Regen Rate Tracker");
-		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:tickMod#Display health/mana regeneration rates");
-		optionsAddObject( -2,   14, "font#tl:60:%y#v:ChatFontNormal#Format:");
-		optionsAddObject( 14,   20, "dropdown#tl:100:%y#s:125:%s#o:tickModFormat#n:CTCoreDropdown1#Health - Mana#HP/Tick - MP/Tick#HP - MP");
-
+		do
+			local function regenSubOptions(button)
+				if (button:GetChecked()) then
+					CTCoreTickModLockCheckButton:SetAlpha(1);
+					CTCoreTickModFormatLabel:SetAlpha(1);
+					CTCoreDropdown1:SetAlpha(1);
+				else
+					CTCoreTickModLockCheckButton:SetAlpha(0.5);
+					CTCoreTickModFormatLabel:SetAlpha(0.5);
+					CTCoreDropdown1:SetAlpha(0.5);				
+				end
+			end
+			optionsAddBookmark("Regen Tracker");
+			optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Regen Rate Tracker");
+			optionsBeginFrame( 0,   26, "checkbutton#tl:10:%y#o:tickMod#Display health/mana regeneration rates");
+				optionsAddScript("onload", function(button) button:HookScript("OnClick", regenSubOptions); end);
+				optionsAddScript("onshow", regenSubOptions);
+			optionsEndFrame();
+			optionsAddObject( -2,   14, "font#tl:43:%y#v:ChatFontNormal#n:CTCoreTickModFormatLabel#Format:");
+			optionsAddObject( 14,   20, "dropdown#tl:100:%y#s:125:%s#o:tickModFormat#n:CTCoreDropdown1#Health - Mana#HP/Tick - MP/Tick#HP - MP");
+			optionsAddObject(  4,   26, "checkbutton#tl:40:%y#o:tickModLock#n:CTCoreTickModLockCheckButton#Lock the regen tracker");
+		end
 	-- Tooltip Relocation
 		local tooltipOptionsObjects = {};
 		local tooltipOptionsValue = nil;

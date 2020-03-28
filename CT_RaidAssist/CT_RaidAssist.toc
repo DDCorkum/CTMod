@@ -1,5 +1,5 @@
 ## Interface: 80300
-## Version: 8.3.0.5
+## Version: 8.3.0.7
 ## Title: CT_RaidAssist |cFF333333(BFA)
 ## Author: TS & Cide (Original), Dargen (MT Addon), DDC (Redesign)
 ## Notes: Monitor raid HP and click cast buffs, debuff removals, resurrections
@@ -8,8 +8,15 @@
 ## Dependencies: CT_Library
 ## SavedVariables: CT_RaidAssistOptions
 
+# Durability tracking on both retail and classic, modified to include the opt-out feature
 Libs/LibDurability.lua
 
+# Incoming heals/absorbs tracking on Classic only, modified to include the opt-out feature
+# Classic Only # Libs/LibHealComm-4.0/CallbackHandler-1.0.lua
+# Classic Only # Libs/LibHealComm-4.0/ChatThrottleLib.lua
+# Classic Only # Libs/LibHealComm-4.0/LibHealComm-4.0.lua
+
+# CTRA (for both retail and classic)
 CT_RaidAssist.lua
 CT_RaidAssist_ExpansionData.lua
 localization.lua

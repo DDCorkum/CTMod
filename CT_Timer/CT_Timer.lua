@@ -144,14 +144,23 @@ function CT_Timer_Toggle(frame)
 	end
 end
 
-function CT_Timer_UpdateTime(self, elapsed)
+function CT_Timer_UpdateTime()
+
+	local time = GetTime()
+	
 	if ( not CT_TimerData.status or CT_TimerData.status == 0 ) then
+		CT_TimerFrame.previous = time;
 		if ( CT_TimerData.color ) then
 			CT_TimerFrameTime:SetTextColor(CT_TimerData.color[1], CT_TimerData.color[2], CT_TimerData.color[3]);
 		end
 		return;
 	end
-	CT_TimerFrame.update = ( CT_TimerFrame.update or 0 ) + elapsed;
+
+	
+	CT_TimerFrame.previous = CT_TimerFrame.previous or time;
+	CT_TimerFrame.update = ( CT_TimerFrame.update or 0 ) + time - CT_TimerFrame.previous;
+	CT_TimerFrame.previous = time;
+	
 	if ( CT_TimerFrame.update >= 1 ) then
 		if ( CT_TimerData.color ) then
 			CT_TimerFrameTime:SetTextColor(CT_TimerData.color[1], CT_TimerData.color[2], CT_TimerData.color[3]);
