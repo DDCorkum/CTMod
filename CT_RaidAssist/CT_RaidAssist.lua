@@ -657,11 +657,11 @@ function StaticCTRAFrames()
 		-- General Options
 		optionsAddObject(-15, 26, "font#tl:15:%y#Enable CTRA Frames?" .. textColor1 .. ":l"); -- Enable custom raid frames
 		optionsAddFrame( 26, 20, "dropdown#tl:130:%y#s:120:%s#n:CTRAFrames_EnableFramesDropDown#o:CTRAFrames_EnableFrames:2 #Always#During Raids#During Groups#Never");
-		optionsBeginFrame( -5,  20, "checkbutton#tl:15:%y#n:CTRAFrames_HideBlizzardDefaultFramesCheckButton#o:CTRAFrames_HideBlizzardDefaultFrames:true#" .. L["CT_RaidAssist/Options/Frames/HideBlizzardDefaultCheckButton"] .. "#l:268");
+		optionsBeginFrame( -5,  20, "checkbutton#tl:10:%y#n:CTRAFrames_HideBlizzardDefaultFramesCheckButton#o:CTRAFrames_HideBlizzardDefaultFrames:true#" .. L["CT_RaidAssist/Options/Frames/HideBlizzardDefaultCheckButton"] .. "#l:268");
 			optionsAddTooltip({L["CT_RaidAssist/Options/Frames/HideBlizzardDefaultCheckButton"],L["CT_RaidAssist/Options/Frames/HideBlizzardDefaultTooltip"] .. textColor1});
 		optionsEndFrame();
 		if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-			optionsBeginFrame(-5, 20, "checkbutton#tl:15:%y#n:CTRA_ShareClassicHealPredictionCheckButton#o:CTRAFrames_ShareClassicHealPrediction:true#" .. L["CT_RaidAssist/Options/Frames/ShareClassicHealPredictionCheckButton"] .. "#l:268");
+			optionsBeginFrame(-5, 20, "checkbutton#tl:10:%y#n:CTRA_ShareClassicHealPredictionCheckButton#o:CTRAFrames_ShareClassicHealPrediction:true#" .. L["CT_RaidAssist/Options/Frames/ShareClassicHealPredictionCheckButton"] .. "#l:268");
 				optionsAddTooltip({L["CT_RaidAssist/Options/Frames/ShareClassicHealPredictionCheckButton"],L["CT_RaidAssist/Options/Frames/ShareClassicHealPredictionTip"] .. textColor1});
 			optionsEndFrame();
 		end
@@ -1156,7 +1156,7 @@ function StaticCTRAFrames()
 						{property = "ColorUnitFullHealthCombat", label = "Full Health Combat", tooltip = "Color of the health bar at 100% during combat"},
 						{property = "ColorUnitZeroHealthCombat", label = "Near Death Combat", tooltip = "Color of the health bar when nearly dead during combat"},
 					}) do
-						optionsBeginFrame((i == 7 and 37) or -5, 16, "colorswatch#tl:" .. ((i > 6 and "-10") or "130") .. ":%y#s:16:16#n:CTRAWindow_" .. item.property .. "ColorSwatch#true");  -- the final #true causes it to use alpha
+						optionsBeginFrame((i == 7 and 37) or -5, 16, "colorswatch#tl:" .. ((i > 6 and "0") or "151") .. ":%y#s:16:16#n:CTRAWindow_" .. item.property .. "ColorSwatch#true");  -- the final #true causes it to use alpha
 							optionsWindowizeObject(item.property);
 							optionsAddScript("onenter",
 								function(swatch)
@@ -1165,7 +1165,7 @@ function StaticCTRAFrames()
 								end
 							);
 						optionsEndFrame();
-						optionsAddObject(16, 16, "font#tl:" .. ((i > 6 and "10") or "150") .. ":%y#s:0:%s#l:13:0#r#" .. item.label .. textColor1 .. ":l");
+						optionsAddObject(16, 16, "font#tl:" .. ((i > 6 and "19") or "170") .. ":%y#s:0:%s#l:13:0#" .. item.label .. textColor1 .. ":l:132");
 					end;
 				optionsEndFrame();
 								
