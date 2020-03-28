@@ -2532,7 +2532,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	local configureAuras = function()
 	
 		local bgr, bgg, bgb, bga = unpack(owner:GetProperty("ColorBackground"));
-		bgr, bgg, bgb, bga = bgr * 0.5, bgg * 0.5, bgb * 0.5, bga * 0.25 + 0.5
+		bgr, bgg, bgb, bga = (bgr or 1) * 0.5, (bgg or 1) * 0.5, (bgb or 1) * 0.5, (bga or 1) * 0.25 + 0.5
 	
 		aura1Texture = aura1Texture or visualFrame:CreateTexture(nil, "OVERLAY");
 		aura1Texture:SetSize(10,10);
