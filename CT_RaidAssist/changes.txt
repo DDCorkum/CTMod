@@ -1,7 +1,8 @@
-CT_RaidAssist (8.3.0.7) 2020-03-23
+CT_RaidAssist (8.3.0.7) 2020-03-27
 - Now shows incoming (predicted) heals on retail and classic
 - Options to configure the total-absorb and incoming-heal bars
 - Tweak to "modern" health bar opacity while outside combat
+- Fix the the localized message for missed ready checks
 - Reduced CPU usage using C_Timer
 - Localization - credits to 萌丶汉丶纸 (zhCH) and FTB_Exper (frFR)
 
