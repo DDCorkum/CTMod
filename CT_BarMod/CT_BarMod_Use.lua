@@ -979,14 +979,14 @@ local fadedButtons = {};
 local fadedCount = 0;
 
 local function fadeUpdater()
-	for button, value in pairs(fadedButtons) do
+--[[	for button, value in pairs(fadedButtons) do
 		button:updateOpacity();
 	end
+--]]
 end
 
 function useButton:updateOpacity()
---[[
-	local start, duration, enable = GetActionCooldown(self.actionId);
+--[[	local start, duration, enable = GetActionCooldown(self.actionId);
 	if ( start > 0 and duration > 0 and enable > 0 ) then
 		if (not fadedButtons[self]) then
 			fadedButtons[self] = true;
@@ -1005,11 +1005,10 @@ function useButton:updateOpacity()
 				module:unschedule(fadeUpdater, true);
 			end
 		end
---]]
 
 		self.button:SetAlpha(self.alphaCurrent or 1);
-
---	end
+	end
+--]]
 end
 
 -- Update Cooldown

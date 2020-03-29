@@ -83,6 +83,7 @@ local function updateGroups()
 
 		group:update("barMouseover", module:getOption("barMouseover" .. groupId) == true);  -- do before "barOpacity"
 		group:update("barFaded", module:getOption("barFaded" .. groupId) or 0);  -- do before "barOpacity"
+		group:update("barFadedCombat", module:getOption("barFadedCombat" .. groupId) or module:getOption("barFaded" .. groupId) or 0);  -- do before "barOpacity"
 		group:update("barOpacity", module:getOption("barOpacity" .. groupId) or 1);
 
 		group:update("showGroup", module:getOption("showGroup" .. groupId) ~= false);
@@ -557,8 +558,12 @@ local function updateGroupWidgets(groupId)
 	----------
 	-- Opacity
 	----------
+	local groupFades =  module:getOption("barMouseover" .. groupId)
+	groupFrame.mouseover:SetChecked( groupFades );
 	groupFrame.barFaded:SetValue( module:getOption("barFaded" .. groupId) or 0 );
-	groupFrame.mouseover:SetChecked( module:getOption("barMouseover" .. groupId) );
+	groupFrame.barFadedCombat:SetValue( module:getOption("barFadedCombat" .. groupId) or module:getOption("barFaded" .. groupId) or 0 );
+	groupFrame.barFaded:SetAlpha((groupFades and 1) or 0.5);
+	groupFrame.barFadedCombat:SetAlpha((groupFades and 1) or 0.5);
 	groupFrame.opacity:SetValue( module:getOption("barOpacity" .. groupId) or 1 );
 
 	----------
@@ -922,6 +927,9 @@ local function optionsAddObject(offset, size, details)
 end
 local function optionsAddScript(name, func)
 	module:framesAddScript(optionsFrameList, name, func);
+end
+local function optionsAddTooltip(text)
+	module:framesAddScript(optionsFrameList, "onenter", function(obj) module:displayTooltip(obj, text, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL); end);
 end
 local function optionsBeginFrame(offset, size, details, data)
 	module:framesBeginFrame(optionsFrameList, offset, size, details, data);
@@ -1510,15 +1518,36 @@ module.frame = function()
 		-- Opacity
 		----------
 
-		optionsAddObject(-18,   14, "font#tl:15:%y#Opacity");
-		optionsAddFrame( -17,   17, "slider#tl:42:%y#s:100:%s#o:barOpacity:1#i:opacity#n:ctbarOpacity#Normal = <value>#0:1:0.01");
-		optionsAddFrame(  17,   17, "slider#tl:180:%y#s:100:%s#o:barFaded:0#i:barFaded#Faded = <value>#0:1:0.01");
-		optionsAddObject(-10,   26, "checkbutton#tl:40:%y#i:mouseover#o:barMouseover:false#Fade when mouse is not over the bar");
+		optionsAddObject(-20,   14, "font#tl:15:%y#Opacity");
+		optionsBeginFrame(-8,   17, "slider#tl:43:%y#s:238:%s#o:barOpacity:1#i:opacity#n:ctbarOpacity#Opacity = <value>#0:1:0.01");
+			optionsAddTooltip({"Opacity", "Standard opacity when the mouse is overtop, or always if not fading.#0.9:0.9:0.9"});
+		optionsEndFrame();
+		optionsBeginFrame(-10,   26, "checkbutton#tl:40:%y#i:mouseover#o:barMouseover:false#Fade when mouse is not over the bar");
+			optionsAddTooltip({"Fade when mouse is not over the bar", "Use the sliders below to determine how much it should fade outside and during combat.#0.9:0.9:0.9"});
+			optionsAddScript("onload", function(obj)
+				obj:HookScript("OnClick", function()
+					if (obj:GetChecked()) then
+						barFaded:SetAlpha(1);
+						barFadedCombat:SetAlpha(1);
+					else
+						barFaded:SetAlpha(0.5);
+						barFadedCombat:SetAlpha(0.5);
+					end
+				end);
+			end);
+		optionsEndFrame();
+		optionsBeginFrame( -17,   17, "slider#tl:22:%y#s:120:%s#o:barFaded:0#i:barFaded#Outside Combat = <value>#0:1:0.01");
+			optionsAddTooltip({"Fading outside combat", "Fade the bar outside combat, unless the mouse is hovering overtop.#0.9:0.9:0.9"});
+		optionsEndFrame();
+		optionsBeginFrame(  17,   17, "slider#tl:180:%y#s:120:%s#o:barFadedCombat:0#i:barFadedCombat#During Combat = <value>#0:1:0.01");
+			optionsAddTooltip({"Fading during combat", "Fade the bar during combat, unless the mouse is hovering overtop.#0.9:0.9:0.9"});
+		optionsEndFrame();
+
 
 		----------
 		-- Visibility
 		----------
-		optionsAddObject(-10,   15, "font#tl:15:%y#Visibility");
+		optionsAddObject(-17,   15, "font#tl:15:%y#Visibility");
 
 		-- Basic conditions
 
@@ -2231,6 +2260,7 @@ module.optionUpdate = function(self, optName, value)
 
 		optName == "barOpacity" or
 		optName == "barFaded" or
+		optName == "barFadedCombat" or
 		optName == "barMouseover" or
 
 		optName == "barVisibility" or
