@@ -3044,17 +3044,21 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 								end
 							end
 						elseif (event == "PLAYER_REGEN_DISABLED") then
-							updateAuras();
+							-- update the following BEFORE combat lockdown begins
 							updateRightMacros();
 							secureButtonDebuffFirst:Hide();
+							-- update the following AFTER combat lockdown begins
+							C_Timer.After(0.001, updateHealthBar);
+							C_Timer.After(0.001, updateAuras);
 						elseif (event == "PLAYER_REGEN_ENABLED") then
-							updateAuras();
 							updateRightMacros();
 							if (UnitAura(shownUnit,1,"HARMFUL RAID")) then
 								secureButtonDebuffFirst:Show();
 							else
 								secureButtonDebuffFirst:Hide();
 							end
+							updateAuras();
+							updateHealthBar();
 						elseif (event == "READY_CHECK") then
 							local LD = LibStub:GetLibrary("LibDurability", true);
 							if (LD) then LD:RequestDurability(); end

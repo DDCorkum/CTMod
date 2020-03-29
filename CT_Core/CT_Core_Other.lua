@@ -1093,7 +1093,7 @@ do
 
 		prepareTrade = function(bag, item, player) -- Local
 			prepBag, prepItem, prepPlayer = bag, item, player;
-			C_After.Timer(3, clearTrade);
+			C_Timer.After(3, clearTrade);
 		end
 
 		addItemToTrade = function(bag, item)
