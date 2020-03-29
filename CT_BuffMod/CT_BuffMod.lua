@@ -1741,6 +1741,8 @@ function unitClass:updateEnchants()
 				end
 			end
 			
+			
+			--function used when rescanning
 			self.rescanEnchantsFunc = self.rescanEnchantsFunc or function()
 				local newNumEnchants = self:updateEnchants();
 				if (newNumEnchants ~= oldNumEnchants or newNumEnchants > 0) then
@@ -1749,10 +1751,19 @@ function unitClass:updateEnchants()
 				end
 			end
 				
-			if (name == UNKNOWN) then
-				C_Timer.After(1, self.rescanEnchantsFunc);
-			else
-				C_Timer.After(2, self.rescanEnchantsFunc);
+			--scheduling the rescanning, every second for unknown buffs or every two seconds for known buffs
+			if (name == UNKNOWN and self.enchantTickerTime ~= 1) then
+				if (self.enchantTicker) then
+					self.enchantTicker:Cancel();
+				end
+				self.enchantTickerTime = 1;
+				self.enchantTicker = C_Timer.NewTicker(1, self.rescanEnchantsFunc);
+			elseif (name ~= UNKNOWN and self.enchantTickerTime ~=2) then
+				if (self.enchantTicker) then
+					self.enchantTicker:Cancel();
+				end
+				self.enchantTickerTime = 2;
+				self.enchantTicker = C_Timer.NewTicker(2, self.rescanEnchantsFunc);
 			end
 			
 			-- If we previously recorded an enchant for this slot...
