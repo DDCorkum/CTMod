@@ -1,7 +1,4 @@
-CT_BuffMod (8.3.0.8) 2020-03-29
-- Critical bug fix for rogue poisons and weapon enchants on Classic
-
-CT_BuffMod (8.3.0.7) 2020-03-21
+CT_BuffMod (8.3.0.7) 2020-03-29
 - Performance improvements using C_Timer to replace OnUpdate
 - Code updates corresponding to CT_Library
 
