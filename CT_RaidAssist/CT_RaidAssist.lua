@@ -2235,19 +2235,22 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			absorbBarZeroCombat:Hide();
 			absorbBarFullNoCombat:Hide();
 			absorbBarFullNoCombat:Hide();
-			incomingBarZeroNoCombat:SetPoint("TOPLEFT", healthBarFullCombat);	
-			incomingBarZeroNoCombat:SetPoint("BOTTOMRIGHT", healthBarFullCombat);
+			absorbBarOverlay:Hide();
+			incomingBarZeroNoCombat:SetPoint("TOPLEFT", healthBarFullCombat, "TOPRIGHT");	
+			incomingBarZeroNoCombat:SetPoint("BOTTOMLEFT", healthBarFullCombat, "BOTTOMRIGHT");
 		elseif (owner:GetProperty("ShowTotalAbsorbs") == 1) then
 			absorbSetting = nil;
 			absorbBarFullCombat:Show();
 			absorbBarZeroCombat:Show();
 			absorbBarFullNoCombat:Show();
 			absorbBarFullNoCombat:Show();	
+			absorbBarOverlay:Show();
 		else
 			absorbBarFullCombat:Show();
 			absorbBarZeroCombat:Show();
 			absorbBarFullNoCombat:Show();
-			absorbBarFullNoCombat:Show();		
+			absorbBarFullNoCombat:Show();
+			absorbBarOverlay:Show();
 		end
 		
 		if (owner:GetProperty("ShowIncomingHeals") == 1) then
@@ -2304,6 +2307,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 					absorbBarZeroCombat:SetAlpha((1 - healthRatio)  * healthBarZeroCombat.maxAlpha * 0.8);
 					absorbBarFullNoCombat:SetAlpha(0);
 					absorbBarZeroNoCombat:SetAlpha(0);
+					absorbBarOverlay:SetAlpha(healthBarZeroCombat.maxAlpha * 0.8);
 					incomingBarFullCombat:SetAlpha(healthRatio * healthBarFullCombat.maxAlpha * 0.4);
 					incomingBarZeroCombat:SetAlpha((1 - healthRatio)  * healthBarZeroCombat.maxAlpha * 0.4);
 					incomingBarFullNoCombat:SetAlpha(0);
@@ -2317,6 +2321,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 					absorbBarZeroNoCombat:SetAlpha((1 - healthRatio)  * healthBarZeroCombat.maxAlpha * 0.8);
 					absorbBarFullCombat:SetAlpha(0);
 					absorbBarZeroCombat:SetAlpha(0);
+					absorbBarOverlay:SetAlpha(healthBarZeroCombat.maxAlpha * 0.8);
 					incomingBarFullNoCombat:SetAlpha(healthRatio * healthBarFullCombat.maxAlpha * 0.4);
 					incomingBarZeroNoCombat:SetAlpha((1 - healthRatio)  * healthBarZeroCombat.maxAlpha * 0.4);
 					incomingBarFullCombat:SetAlpha(0);
@@ -2332,6 +2337,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				absorbBarZeroCombat:SetAlpha(0);
 				absorbBarFullNoCombat:SetAlpha(0);
 				absorbBarZeroNoCombat:SetAlpha(0);
+				absorbBarOverlay:SetAlpha(0);
 				incomingBarFullCombat:SetAlpha(0);
 				incomingBarZeroCombat:SetAlpha(0);
 				incomingBarFullNoCombat:SetAlpha(0);
@@ -3421,19 +3427,22 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 			absorbBarZeroCombat:Hide();
 			absorbBarFullNoCombat:Hide();
 			absorbBarFullNoCombat:Hide();
-			incomingBarZeroNoCombat:SetPoint("TOPLEFT", healthBarFullCombat);	
-			incomingBarZeroNoCombat:SetPoint("BOTTOMRIGHT", healthBarFullCombat);
+			absorbBarOverlay:Hide();
+			incomingBarZeroNoCombat:SetPoint("TOPLEFT", healthBarFullCombat, "TOPRIGHT");	
+			incomingBarZeroNoCombat:SetPoint("BOTTOMLEFT", healthBarFullCombat, "BOTTOMRIGHT");
 		elseif (owner:GetProperty("ShowTotalAbsorbs") == 1) then
 			absorbSetting = nil;
 			absorbBarFullCombat:Show();
 			absorbBarZeroCombat:Show();
 			absorbBarFullNoCombat:Show();
-			absorbBarFullNoCombat:Show();	
+			absorbBarFullNoCombat:Show();
+			absorbBarOverlay:Show();
 		else
 			absorbBarFullCombat:Show();
 			absorbBarZeroCombat:Show();
 			absorbBarFullNoCombat:Show();
-			absorbBarFullNoCombat:Show();		
+			absorbBarFullNoCombat:Show();
+			absorbBarOverlay:Show();
 		end
 		
 		if (owner:GetProperty("ShowIncomingHeals") == 1) then
@@ -3483,16 +3492,17 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 				incomingBarFullCombat:SetWidth(healthBarWidth * incomingRatio)
 				if (UnitIsEnemy(shownUnit,"player")) then
 					healthBarFullCombat:SetAlpha(0);
-					healthBarZeroCombat:SetAlpha(healthBarZeroCombat.maxAlpha);
-					healthBarFullNoCombat:SetAlpha(0);
+					healthBarZeroCombat:SetAlpha(0);
+					healthBarFullNoCombat:SetAlpha(healthBarZeroCombat.maxAlpha);
 					healthBarZeroNoCombat:SetAlpha(0);
 					absorbBarFullCombat:SetAlpha(0);
-					absorbBarZeroCombat:SetAlpha(healthBarZeroCombat.maxAlpha * 0.8);
-					absorbBarFullNoCombat:SetAlpha(0);
+					absorbBarZeroCombat:SetAlpha(0);
+					absorbBarFullNoCombat:SetAlpha(healthBarZeroCombat.maxAlpha * 0.8);
 					absorbBarZeroNoCombat:SetAlpha(0);
+					absorbBarOverlay:SetAlpha(healthBarZeroCombat.maxAlpha * 0.8);
 					incomingBarFullCombat:SetAlpha(0);
-					incomingBarZeroCombat:SetAlpha(healthBarZeroCombat.maxAlpha * 0.4);
-					incomingBarFullNoCombat:SetAlpha(0);
+					incomingBarZeroCombat:SetAlpha(0);
+					incomingBarFullNoCombat:SetAlpha(healthBarZeroCombat.maxAlpha * 0.4);
 					incomingBarZeroNoCombat:SetAlpha(0);
 				elseif (InCombatLockdown() or UnitAffectingCombat(shownUnit)) then
 					healthBarFullCombat:SetAlpha(healthRatio * healthBarFullCombat.maxAlpha);
@@ -3503,6 +3513,7 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 					absorbBarZeroCombat:SetAlpha((1 - healthRatio)  * healthBarZeroCombat.maxAlpha * 0.8);
 					absorbBarFullNoCombat:SetAlpha(0);
 					absorbBarZeroNoCombat:SetAlpha(0);
+					absorbBarOverlay:SetAlpha(healthBarZeroCombat.maxAlpha * 0.8);
 					incomingBarFullCombat:SetAlpha(healthRatio * healthBarFullCombat.maxAlpha * 0.4);
 					incomingBarZeroCombat:SetAlpha((1 - healthRatio)  * healthBarZeroCombat.maxAlpha * 0.4);
 					incomingBarFullNoCombat:SetAlpha(0);
@@ -3516,6 +3527,7 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 					absorbBarZeroNoCombat:SetAlpha((1 - healthRatio)  * healthBarZeroCombat.maxAlpha * 0.8);
 					absorbBarFullCombat:SetAlpha(0);
 					absorbBarZeroCombat:SetAlpha(0);
+					absorbBarOverlay:SetAlpha(healthBarZeroCombat.maxAlpha * 0.8);
 					incomingBarFullNoCombat:SetAlpha(healthRatio * healthBarFullCombat.maxAlpha * 0.4);
 					incomingBarZeroNoCombat:SetAlpha((1 - healthRatio)  * healthBarZeroCombat.maxAlpha * 0.4);
 					incomingBarFullCombat:SetAlpha(0);
@@ -3531,6 +3543,7 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 				absorbBarZeroCombat:SetAlpha(0);
 				absorbBarFullNoCombat:SetAlpha(0);
 				absorbBarZeroNoCombat:SetAlpha(0);
+				absorbBarOverlay:SetAlpha(0);
 				incomingBarFullCombat:SetAlpha(0);
 				incomingBarZeroCombat:SetAlpha(0);
 				incomingBarFullNoCombat:SetAlpha(0);

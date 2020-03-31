@@ -1,6 +1,7 @@
 CT_RaidAssist (8.3.0.8) 2020-03-31
 - Optional health/power bars on target frames
-- Optional "pets" group to monitor water elementals
+- Optional "pets" group for water elementals and any other class pets
+- Added polish to the total-absorb and incoming-heal bars
 
 CT_RaidAssist (8.3.0.7) 2020-03-29
 - Now shows incoming (predicted) heals on retail and classic
