@@ -2075,7 +2075,6 @@ end
 --	.fsCount
 --	.fsName
 --	.fsTimeleft
---	.fsTimeleftHeight
 --	.index
 --	.mode
 --	.frameObject
@@ -2085,6 +2084,8 @@ end
 --	.txSpark
 --	.txTimerBG
 --	.unitObject
+--	.fontSize
+--	.font
 
 local mindetailWidth1 = 1;  -- Minimum width of detail frame before hiding font strings.
 
@@ -2444,14 +2445,23 @@ local function auraButton_updateAppearance(button)
 			fsTimeleft = frameDetails:CreateFontString(nil, "ARTWORK", "ChatFontNormal");
 			fsTimeleft:SetWordWrap(false)
 			button.fsTimeleft = fsTimeleft;
-			fsTimeleft:SetText("test");
-			button.fsTimeleftHeight = fsTimeleft:GetStringHeight();
-			fsTimeleft:SetHeight(button.fsTimeleftHeight);
-			fsTimeleft:SetText("");
 		end
 	elseif ( fsTimeleft ) then
 		fsTimeleft:Hide();
 		fsTimeleft = nil;
+	end
+
+	if (fsTimeleft and frameObject.fontSize) then
+		if (frameObject.fontSize == 1 and fsTimeleft.font ~= "ChatFontNormal") then
+			fsTimeleft:SetFont("Fonts\\ARIALN.TTF", 14, "");
+			fsTimeleft.font = "ChatFontNormal";
+		elseif (frameObject.fontSize == 2 and fsTimeleft.font ~= "ChatFontSmall") then
+			fsTimeleft:SetFont("Fonts\\ARIALN.TTF", 12, "");
+			fsTimeleft.font = "ChatFontSmall";
+		elseif (frameObject.fontSize == 3 and fsTimeleft.font ~= "ChatFontLarge") then
+			fsTimeleft:SetFont("Fonts\\ARIALN.TTF", 16, "");	-- there is no such thing as "ChatFontLarge"
+			fsTimeleft.font = "ChatFontLarge";
+		end
 	end
 
 	if (frameObject.buttonStyle == 2) then
@@ -2526,6 +2536,18 @@ local function auraButton_updateAppearance(button)
 				fsName = frameDetails:CreateFontString(nil, "ARTWORK", "GameFontNormal");
 				fsName:SetWordWrap(false)
 				button.fsName = fsName;
+			end
+			if (frameObject.fontSize) then
+				if (frameObject.fontSize == 1 and fsName.font ~= "GameFontNormal") then
+					fsName:SetFont("Fonts\\FRIZQT__.TTF", 12, "");
+					fsName.font = "GameFontNormal";
+				elseif (frameObject.fontSize == 2 and fsName.font ~= "GameFontNormalSmall") then
+					fsName:SetFont("Fonts\\FRIZQT__.TTF", 10, "");
+					fsName.font = "GameFontNormalSmall";
+				elseif (frameObject.fontSize == 3 and fsName.font ~= "GameFontNormalLarge") then
+					fsName:SetFont("Fonts\\FRIZQT__.TTF", 14, "");		-- the actual GameFontNormalLarge is 16, but that's too big!
+					fsName.font = "GameFontNormalLarge";
+				end
 			end
 		elseif ( fsName ) then
 			fsName:Hide();
@@ -3146,6 +3168,7 @@ end
 --	.borderSize -- Size of the border texture
 --	.buttonHeight -- Height of the "button" used for each buff (this is the same as .buffSize)
 --	.buttonWidth -- Width of the "button" used for each buff (for style 1 this includes the .detailWidth1 value)
+--	.fontSize -- Toggles the button's fonts (both types) between normal (1), small (2) and large (3) font sizes
 --   	.needUpdate -- Flag checked in aura frame's OnUpdate script to force visual update of frame contents (true == yes, nil or false == no)
 --	.useUnsecure -- Use unsescure frame and buttons (1==yes, false==no)
 --
@@ -3388,6 +3411,7 @@ function frameClass:applyUnprotectedOptions(initFlag)
 	self.timeJustifyNoName1 = frameOptions.timeJustifyNoName1 or constants.JUSTIFY_DEFAULT;
 	self.showDays1 = frameOptions.showDays1 ~= false;
 	self.showDays2 = frameOptions.showDays2 ~= false;
+	self.fontSize = frameOptions.fontSize;
 
 	if (not initFlag) then
 		self.needUpdate = true;
@@ -8178,409 +8202,6 @@ ConsolidatedBuffs:HookScript("OnShow",
 );]]
 
 
---------------------------------------------
--- Old options conversion
-
---[[
-	Option conversion table going from version 4.002 to 4.003.
-	Will also work for versions prior to 4.002.
-
-	= identical
-	o obsolete
-	t translation needed
-	n name change only
-	F frame option
-	G global option
-	- not applicable
-
-	  old							new
-	  ----------------------------------------------------- ----------------------------------
-	= hideBlizzardBuffs:true				G
-	= hideBlizzardConsolidated:true				G
-	= hideBlizzardEnchants:true				G
-	t unlockWindow:true					F lockWindow
-	o showWindowTooltips:true				-			-- since removed
-	o resizeMode:1 (Vert resiz direct, 1=Down,2=Up,3=Out)	-
-	o expandBuffs:true (true==Auto expand window height)	-
-	n clampWindow:true					F clampWindow
-	o showTitle:true					-
-	n showBorder						F showBorder
-	= backgroundColor:0,0,0,0.25				G
-	t expandUpwards	(display buffs upwards)			F layoutType
-	o lockBuffOnEnter:true					-
-	t showAuras:true					F (see sortSeq1,2,3,4)
-	t showBuffs:true					F (see sortSeq1,2,3,4)
-	t showDebuffs:true					F (see sortSeq1,2,3,4)
-	t showItemBuffs:true					F (see sortSeq1,2,3,4)
-	t sortType:1 (type, time, order, name)			F sortMethod:1 (1==Name, 2==Time, 3==Order)
-	t subSortType:1 (time, order, name)			F (see sortMethod)
-	o keepRecastPosition					-
-	t sortSeq1:1 (auras, buffs, debuffs, weapons)		F sortSeq1:2 (1==None, 2==Debuff, 3==Cancelable buff, 4==Uncancelable Buff, 5==All buffs, 6==Weapon, 7==Consolidated)
-	t sortSeq2:2 (auras, buffs, debuffs, weapons)		F sortSeq2:6
-	t sortSeq3:4 (auras, buffs, debuffs, weapons)		F sortSeq3:3
-	t sortSeq4:3 (auras, buffs, debuffs, weapons)		F sortSeq4:4
-	n sortReverse						F sortDirection:false (false == ascending, 1 == descending)
-	t buffSize:20						F buffSize1
-	n buffSpacing:0						F buffSpacing
-	n colorBuffs:true					F colorBuffs1
-	= bgColorAURA:0.35,0.8,0.15,0.5				G
-	= bgColorBUFF:0.1,0.4,0.85,0.5				G
-	= bgColorDEBUFF:1,0,0,0.85				G
-	= bgColorITEM:0.75,0.25,1,0.75				G
-	t rightAlign						F (see layoutType)
-	n showNames:true					F showNames1
-	n colorCodeDebuffs					F colorCodeDebuffs1
-	n showTimers:true					F showTimers1
-	t durationFormat					F durationFormat1
-	t durationLocation:1 (Side, Below name)			F durationLocation1:1 (1==Default, 1==Left of name, 2==Right of name, 3==Above name, 4==Below name)
-	t durationCenter					F timeJustifyNoName1:1 (1==Default, 2==Left, 3==Right, 4==Center)
-	n showBuffTimer:true					F showBuffTimer1
-	n showTimerBackground:true				F showTimerBackground1
-	= enableExpiration:true					G
-	= expirationCastOnly					G
-	= expirationSound:true					G
-	= expirationTime1:15					G
-	= expirationTime2:60					G
-	= expirationTime3:180					G
---]]
-
-local function convertToFormat1()
-	-- Convert options to format 1 (addon version 4.003).
-
-	-- Get the global options table.
-	local globalOptions = CT_BuffModOptions[module:getCharKey()];
-	if (not globalOptions) then
-		globalOptions = {};
-		CT_BuffModOptions[module:getCharKey()] = globalOptions;
-	end
-
-	-- If we are already at or beyond this format, then return.
-	local format = globalOptions.optionsFormat;
-	if (format and format >= 1) then
-		-- Don't convert.
-		return;
-	end
-
-	-- If there are no options prior to this version, then return.
-	-- The "MOVABLE-BUFFMOD" option will exist if the user was
-	-- using a version of CT_BuffMod prior to 4.003.
-	if (not globalOptions["MOVABLE-BUFFMOD"]) then
-		-- No old options.
-		return false;
-	end
-
-	-- Create the list of window options tables.
-	local windowOptionsList = {};
-	globalOptions.windowOptionsList = windowOptionsList;
-
-	-- Create options for one window (window id 1).
-	local windowOptions = {};
-	windowOptionsList[1] = windowOptions;
-
-	-- Create the list of primary options tables.
-	local primaryOptionsList = {};
-	windowOptions.primaryOptionsList = primaryOptionsList;
-
-	-- Create options for one primary frame (primary id 1).
-	local primaryOptions = {};
-	primaryOptionsList[1] = primaryOptions;
-
-	-----
-	-- Create primary options.
-	-----
-	local old, new, default;
-
-	-- Some options are identical in name and value to the previous
-	-- version of CT_BuffMod.
-	-- Some options just require a name change.
-	-- Some options require value conversion.
-
-	primaryOptions.buttonStyle = 1;  -- icon and bar
-
-	-- Frame options requiring just a name change.
-	primaryOptions.buffSpacing = tonumber(globalOptions.buffSpacing);
-	primaryOptions.clampWindow = globalOptions.clampWindow;
-	primaryOptions.showBorder = globalOptions.showBorder;
-	primaryOptions.sortDirection = globalOptions.sortReverse;
-
-	-- Frame style 1 options requiring just a name change.
-	primaryOptions.colorBuffs1 = globalOptions.colorBuffs;
-	primaryOptions.colorCodeDebuffs1 = globalOptions.colorCodeDebuffs;
-	primaryOptions.showBuffTimer1 = globalOptions.showBuffTimer;
-	primaryOptions.showNames1 = globalOptions.showNames;
-	primaryOptions.showTimerBackground1 = globalOptions.showTimerBackground;
-	primaryOptions.showTimers1 = globalOptions.showTimers;
-
-	-- Layout type
-	local up = globalOptions.expandUpwards;
-	local right = globalOptions.rightAlign;
-	local expandBuffs = globalOptions.expandBuffs ~= false;
-	if (not expandBuffs) then
-		-- Fixed height
-		if (up) then
-			if (right) then
-				new = constants.LAYOUT_GROW_UP_WRAP_LEFT;
-			else
-				new = constants.LAYOUT_GROW_UP_WRAP_RIGHT;
-			end
-		else
-			if (right) then
-				new = constants.LAYOUT_GROW_DOWN_WRAP_LEFT;
-			else
-				new = constants.LAYOUT_GROW_DOWN_WRAP_RIGHT;
-			end
-		end
-		primaryOptions.wrapAfter = 19;
-		primaryOptions.maxWraps = 1;
-	else
-		-- Variable height
-		if (up) then
-			if (right) then
-				new = constants.LAYOUT_GROW_LEFT_WRAP_UP;
-			else
-				new = constants.LAYOUT_GROW_RIGHT_WRAP_UP;
-			end
-		else
-			if (right) then
-				new = constants.LAYOUT_GROW_LEFT_WRAP_DOWN;
-			else
-				new = constants.LAYOUT_GROW_RIGHT_WRAP_DOWN;
-			end
-		end
-		primaryOptions.wrapAfter = 1;
-		primaryOptions.maxWraps = 0;
-	end
-	primaryOptions.layoutType = new;
-	primaryOptions.rightAlign1 = constants.RIGHT_ALIGN_DEFAULT;
-
-	-- Lock window
-	old = globalOptions.unlockWindow;
-	if (old) then
-		new = false;
-	elseif (old == false) then
-		new = true;
-	else
-		new = nil;
-	end
-	primaryOptions.lockWindow = new;
-
-	-- Sorting method
-	old = tonumber(globalOptions.sortType);  -- 1==type, 2==time, 3==order, 4==name, nil==type
-	if (old == nil or old == 1) then -- type
-		old = tonumber(globalOptions.subSortType);  -- 1==time, 2==order, 3==name, nil==time
-		if (old == nil) then
-			old = 1;
-		end
-		old = old + 1;
-	end
-	if (old == 2) then -- time
-		new = constants.SORT_METHOD_TIME;
-	elseif (old == 3) then -- order
-		new = constants.SORT_METHOD_INDEX;
-	elseif (old == 4) then -- name
-		new = constants.SORT_METHOD_NAME;
-	else
-		new = constants.SORT_METHOD_NAME;
-	end
-	primaryOptions.sortMethod = new;
-
-	-- Group by
-	default = {1, 2, 4, 3};  -- 1==auras, 2==buffs, 4==weapons, 3==debuffs
-	for i = 1, 4 do
-		old = tonumber(globalOptions["sortSeq" .. i]);
-		if (old == nil) then
-			old = default[i];
-		end
-		if (old == 1) then -- Aura
-			new = constants.FILTER_TYPE_BUFF_UNCANCELABLE;
-		elseif (old == 2) then -- Buffs
-			new = constants.FILTER_TYPE_BUFF_CANCELABLE;
-		elseif (old == 3) then -- Debuffs
-			new = constants.FILTER_TYPE_DEBUFF;
-		elseif (old == 4) then -- Weapons
-			new = constants.FILTER_TYPE_WEAPON;
-		else
-			new = constants.FILTER_TYPE_NONE;
-		end
-		if (new == constants.FILTER_TYPE_BUFF_UNCANCELABLE) then
-			old = globalOptions.showAuras ~= false;
-			if (not old) then
-				new = constants.FILTER_TYPE_NONE;
-			end
-		elseif (new == constants.FILTER_TYPE_BUFF_CANCELABLE) then
-			old = globalOptions.showBuffs ~= false;
-			if (not old) then
-				new = constants.FILTER_TYPE_NONE;
-			end
-		elseif (new == constants.FILTER_TYPE_DEBUFFS) then
-			old = globalOptions.showDebuffs ~= false;
-			if (not old) then
-				new = constants.FILTER_TYPE_NONE;
-			end
-		elseif (new == constants.FILTER_TYPE_WEAPON) then
-			old = globalOptions.showItemBuffs ~= false;
-			if (not old) then
-				new = constants.FILTER_TYPE_NONE;
-			end
-		end
-		primaryOptions["sortSeq" .. i] = new;
-	end
-
-	-- Time remaining location
-	old = tonumber(globalOptions.durationLocation);
-	if (old == 1) then -- beside
-		new = constants.DURATION_LOCATION_DEFAULT;
-	elseif (old == 2) then -- below
-		new = constants.DURATION_LOCATION_BELOW;
-	else
-		new = nil;
-	end
-	primaryOptions.durationLocation1 = new;
-
-	-- Time remaining justification when no name beside it
-	old = globalOptions.durationCenter;
-	if (old) then
-		new = constants.JUSTIFY_CENTER;
-	elseif (old == false) then
-		new = constants.JUSTIFY_DEFAULT;
-	else
-		new = nil;
-	end
-	primaryOptions.timeJustifyNoName1 = new;
-
-	-- Size of the buff icon
-	old = tonumber(globalOptions.buffSize);
-	if (old) then
-		if (old < constants.BUFF_SIZE_MINIMUM) then
-			new = constants.BUFF_SIZE_MINIMUM;
-		elseif (old > constants.BUFF_SIZE_MAXIMUM) then
-			new = constants.BUFF_SIZE_MAXIMUM;
-		else
-			new = old;
-		end
-	else
-		new = nil;
-	end
-	primaryOptions.buffSize1 = new;
-
-	-- Time remaining format
-	old = tonumber(globalOptions.durationFormat);
-	if (old) then
-		if (old < 1) then
-			new = 1;
-		elseif (old > 5) then
-			new = 5;
-		else
-			new = old;
-		end
-	else
-		new = nil;
-	end
-	primaryOptions.durationFormat1 = new;
-
-	-- Position of the frame
-	local old = globalOptions["MOVABLE-BUFFMOD"];
-	if (old and type(old) == "table") then
-		local framePoints = { "TOPLEFT", "TOP", "TOPRIGHT", "RIGHT", "BOTTOMRIGHT", "BOTTOM", "BOTTOMLEFT", "LEFT", "CENTER" };
-		local buffSize1 = primaryOptions.buffSize1 or 20;  -- 20 == old default buff size
-		local buffSpacing = primaryOptions.buffSpacing or 0;
-		local wrapSpacing = buffSpacing;
-		local anchorPoint = strupper(tostring(old[1] or "TOPLEFT"));
-		local anchorTo = "UIParent";
-		local relativePoint = strupper(tostring(old[3] or anchorPoint));
-		local xoffset = tonumber(old[4]) or 0;
-		local yoffset = tonumber(old[5]) or 0;
-		local width = tonumber(globalOptions.frameWidth) or 275; -- 275 == old default width
-		local height = tonumber(globalOptions.frameHeight) or 390; -- 390 == old default height
-
-		-- Validate the anchor point
-		local found = false;
-		for __, point in ipairs(framePoints) do
-			if (anchorPoint == point) then
-				found = true;
-				break;
-			end
-		end
-		if (not found) then
-			anchorPoint = "TOPLEFT";
-		end
-
-		-- Validate the relative point
-		local found = false;
-		for __, point in ipairs(framePoints) do
-			if (relativePoint == point) then
-				found = true;
-				break;
-			end
-		end
-		if (not found) then
-			relativePoint = "TOPLEFT";
-		end
-
-		-- Validate width
-		if (width < 0) then
-			width = 1;
-		end
-		if (width > 400) then
-			width = 400;  -- max value in current options window
-		end
-
-		local buffs;
-		if (not expandBuffs) then
-			-- Use the height to calculate how many buffs will fit
-			buffs = floor(height / (buffSize1 + buffSpacing));
-			if (buffs < 1) then
-				buffs = 1;
-			end
-			if (buffs > 50) then
-				buffs = 50;  -- max value in current options window
-			end
-
-			-- Calculate the actual height needed for the calculated number of buffs.
-			height = ((buffs - 1) * (buffSize1 + buffSpacing)) + (buffSize1);
-		else
-			buffs = 1;
-
-			-- Calculate the actual height needed for the calculated number of buffs.
-			height = ((buffs - 1) * (buffSize1 + wrapSpacing)) + (buffSize1);
-		end
-
-		-- Set the related options.
-		primaryOptions.position = { anchorPoint, anchorTo, relativePoint, xoffset, yoffset, width, height };
-		primaryOptions.wrapAfter = buffs;
-	end
-
-	-- Set the options format to 1 (addon version 4.003 format).
-	globalOptions.optionsFormat = 1;
-end
-
-local function convertOptions()
-	-- Convert to format 1 (addon version 4.003).
-	convertToFormat1();
-
-	-- Get the global options table.
-	local globalOptions = CT_BuffModOptions[module:getCharKey()];
-
-	-- Set the current options format for this character.
-	-- The "optionsFormat" option did not exist prior to version 4.003.
-	-- nil == prior to 4.003
-	--   1 == starting with 4.003
-	globalOptions.optionsFormat = 1;
-end
-
--- Options format nil overview (prior to version 4.003):
---
---	CT_BuffModOptions["CHAR-name-server"]
---		(globalOptionsTable)
---
--- Options format 1 overview (starting with verison 4.003):
---
---	CT_BuffModOptions["CHAR-name-server"]
---		(globalOptionsTable)
---		.windowOptionsList[windowId]
---			(windowsOptionsTable)
---				.primaryOptionsList[primaryId]
---					(primaryOptionsTable)
 
 --------------------------------------------
 -- Window options
@@ -8920,12 +8541,20 @@ local function options_updateWindowWidgets(windowId)
 	slider.title:SetText(gsub(slider.titleText, "<value>", floor( ( value or slider:GetValue() )*100+0.5)/100));
 
 	----------
+	-- Font Size
+	----------
+
+	dropdown = CT_BuffModDropdown_fontSize;
+	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.fontSize or 1 );
+
+	----------
 	-- Appearance
 	----------
 	dropdown = CT_BuffModDropdown_buttonStyle;
 	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
 	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.buttonStyle or 1 );
-
+	
 	----------
 	-- Style 1
 	----------
@@ -9087,6 +8716,12 @@ local function options_updateUnprotected(optName, value, windowId)
 
 			primaryObject:setBorder();
 			primaryObject:setClamped();
+		end
+		
+		if (
+			optName == "fontSize"
+		) then
+			primaryObject:updateAuraButtons(auraButton_updateAppearance);
 		end
 	end
 end
@@ -9371,7 +9006,8 @@ module.optionUpdate = function(self, optName, value)
 		optName == "userEdgeLeft" or
 		optName == "userEdgeRight" or
 		optName == "userEdgeTop" or
-		optName == "userEdgeBottom"
+		optName == "userEdgeBottom" or
+		optName == "fontSize"
 	) then
 		options_updateUnprotected(optName, value, windowId);
 
@@ -10256,6 +9892,14 @@ CONSOLIDATION REMOVED FROM GAME--]]
 		optionsAddObject(-25,   17, "slider#tl:40:%y#s:250:%s#i:wrapSpacing#o:wrapSpacing:0#<value>#0:200:1");
 
 		----------
+		-- Font size
+		----------
+		
+		optionsAddObject(-25, 1*13, "font#tl:15:%y#" .. L["CT_BuffMod/Options/Window/Fonts/Heading"]);
+		optionsAddObject(-20,   14, "font#tl:28:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Fonts/FontSizeLabel"]);
+		optionsAddObject( 15,   20, "dropdown#tl:80:%y#s:170:%s#n:CT_BuffModDropdown_fontSize#i:fontSize#o:fontSize:1" .. L["CT_BuffMod/Options/Window/Fonts/FontSizeDropDown"]);
+
+		----------
 		-- Button appearance
 		----------
 		optionsAddObject(-25, 1*13, "font#tl:15:%y#Button appearance");
@@ -10589,9 +10233,6 @@ end
 
 local function globalFrame_Init(self)
 	-- Perform initialization
-
-	-- Convert options if needed.
-	convertOptions();
 
 	-- Create global object.
 	globalObject = globalClass:new();

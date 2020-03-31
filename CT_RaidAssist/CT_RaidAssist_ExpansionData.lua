@@ -37,6 +37,7 @@ module.CTRA_Configuration_Buffs =
 	{
 		{["name"] = "Power Word: Fortitude", ["modifier"] = "nomod", ["id"] = 211681, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
 		{["name"] = "Power Word: Fortitude", ["modifier"] = "nomod", ["id"] = 1243, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
+		{["name"] = "Prayer of Fortitude", ["modifier"] = "shift", ["id"] = 21564, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
 	},
 	["MAGE"] =
 	{
