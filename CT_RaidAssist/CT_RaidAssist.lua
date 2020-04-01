@@ -47,6 +47,7 @@ end;
 local CompactRaidFrameManager_SetSetting = CompactRaidFrameManager_SetSetting;
 local GetInspectSpecialization = GetInspectSpecialization or function() return nil; end	-- doesn't exist in classic
 local GetSpecializationRoleByID = GetSpecializationRoleByID or function() return nil; end -- doesn't exist in classic
+local GetSpecialization = GetSpecialization;
 local GetReadyCheckStatus = GetReadyCheckStatus;
 local InCombatLockdown = InCombatLockdown;
 local IncomingSummonStatus = (C_IncomingSummon and C_IncomingSummon.IncomingSummonStatus) or function() return 0; end	-- doesn't exist in classic, and 0 means no incoming summons
@@ -96,10 +97,10 @@ local strsplit = strsplit;
 
 local StaticCTRAReadyCheck;		-- Adds features to help you share your ready check status with raid members
 local StaticCTRAFrames;			-- Wrapper over all raid-frame portions of the addon
-local NewCTRAWindow;			-- Set of player frames (and optionally labels or target frames) sharing a common appearance and anchor point
-local StaticClickCastBroker;		-- Brokers what spells a CTRAPlayerFrame object should cast when right-clicked
-local NewCTRAPlayerFrame;		-- A single, interactive player frame that is contained in a window
-local NewCTRATargetFrame;		-- A single, interactive target frame that is contained in a window
+local StaticClickCastBroker;		-- Brokers what spells a CTRAPlayerFrame object should cast when right-clicked; owned by CTRAFrames
+local NewCTRAWindow;			-- Set of player frames sharing a common appearance and anchor point; owned by CTRAFrames
+local NewCTRAPlayerFrame;		-- A single, interactive player frame that is contained in a window; owned by CTRAWindow
+local NewCTRATargetFrame;		-- A single, interactive target frame that is contained in a window; owned by CTRAWindow
 
 
 --------------------------------------------
@@ -137,8 +138,8 @@ function module:update(option, value)
 	if (option == "init") then
 		module:init();
 	else
-		module.CTRAReadyCheck:Update(option, value);
-		module.CTRAFrames:Update(option, value);
+		StaticCTRAReadyCheck():Update(option, value);
+		StaticCTRAFrames():Update(option, value);
 	end
 end
 
@@ -148,10 +149,10 @@ function module:frame()
 	local optionsFrameList = module:framesInit();
 		
 	-- Ready Check Monitor
-	module.CTRAReadyCheck:Frame(optionsFrameList);
+	StaticCTRAReadyCheck():Frame(optionsFrameList);
 
 	-- Custom Raid Frames
-	module.CTRAFrames:Frame(optionsFrameList);
+	StaticCTRAFrames():Frame(optionsFrameList);
 
 	-- see CT_Library
 	return "frame#all", module:framesGetData(optionsFrameList);
@@ -593,7 +594,9 @@ function StaticCTRAFrames()
 							module:InstallLibHealComm();
 							UpdateIncomingHealsFunc();
 						end
-					end	
+					end
+				elseif (key:sub(1,21) == "CTRAFrames_ClickCast_" and key:len() > 21) then
+					StaticClickCastBroker():Update(key:sub(22), val);
 				end
 				optionsWaiting[key] = nil;
 			end
@@ -664,6 +667,43 @@ function StaticCTRAFrames()
 			optionsBeginFrame(-5, 20, "checkbutton#tl:10:%y#n:CTRA_ShareClassicHealPredictionCheckButton#o:CTRAFrames_ShareClassicHealPrediction:true#" .. L["CT_RaidAssist/Options/Frames/ShareClassicHealPredictionCheckButton"] .. "#l:268");
 				optionsAddTooltip({L["CT_RaidAssist/Options/Frames/ShareClassicHealPredictionCheckButton"],L["CT_RaidAssist/Options/Frames/ShareClassicHealPredictionTip"] .. textColor1});
 			optionsEndFrame();
+		end
+		
+		-- Click Casting
+		optionsAddObject(-15,  17, "font#tl:5:%y#v:GameFontNormal#" .. L["CT_RaidAssist/Options/ClickCast/Heading"]);
+		optionsAddObject(-5, 3*14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. L["CT_RaidAssist/Options/ClickCast/Line1"] .. textColor2 .. ":l");
+		local buff, removeDebuff, rezCombat, rezNoCombat = StaticClickCastBroker():GetAllSpellsForClass();
+		if (#buff > 0) then
+			--optionsAddObject(-5, 14, "font#t:0:%y#" .. L["CT_RaidAssist/Options/ClickCast/BuffLabel"] .. textColor1);
+			for __, details in pairs(buff) do
+				optionsAddObject(-6, 14, "font#tl:15:%y#" .. details.name .. textColor1 .. ":l:120");
+				optionsAddObject(14, 14, "dropdown#tl:140:%y#s:120:%s#o:CTRAFrames_ClickCast_" .. details.id .. ":" .. details.option .. L["CT_RaidAssist/Options/ClickCast/DropDownOptions"]);
+			end
+		end
+		if (#removeDebuff > 0) then
+			--optionsAddObject(-5, 14, "font#t:0:%y#" .. L["CT_RaidAssist/Options/ClickCast/RemoveDebuffLabel"] .. textColor1);
+			for __, details in pairs(removeDebuff) do
+				optionsAddObject(-6, 14, "font#tl:15:%y#" .. details.name .. textColor1 .. ":l:120");
+				optionsAddObject(14, 14, "dropdown#tl:140:%y#s:120:%s#o:CTRAFrames_ClickCast_" .. details.id .. ":" .. details.option .. L["CT_RaidAssist/Options/ClickCast/DropDownOptions"]);
+			end
+		end
+		if (#rezCombat > 0) then
+			--optionsAddObject(-5, 14, "font#t:0:%y#" .. L["CT_RaidAssist/Options/ClickCast/RezCombatLabel"] .. textColor1);
+			for __, details in pairs(rezCombat) do
+				optionsAddObject(-6, 14, "font#tl:15:%y#" .. details.name .. textColor1 .. ":l:120");
+				optionsAddObject(14, 14, "dropdown#tl:140:%y#s:120:%s#o:CTRAFrames_ClickCast_" .. details.id .. ":" .. details.option .. L["CT_RaidAssist/Options/ClickCast/DropDownOptions"]);
+			end	
+		end
+		
+		if (#rezNoCombat > 0) then
+			--optionsAddObject(-5, 14, "font#t:0:%y#" .. L["CT_RaidAssist/Options/ClickCast/RezNoCombatLabel"] .. textColor2);
+			for __, details in pairs(rezNoCombat) do
+				optionsAddObject(-6, 14, "font#tl:15:%y#" .. details.name .. textColor1 .. ":l:120");
+				optionsAddObject(14, 14, "dropdown#tl:140:%y#s:120:%s#o:CTRAFrames_ClickCast_" .. details.id .. ":" .. details.option .. L["CT_RaidAssist/Options/ClickCast/DropDownOptions"]);
+			end
+		end
+		if (#buff + #removeDebuff + #rezCombat + #rezNoCombat == 0) then
+			optionsAddObject(-5, 14, "font#t:0:%y#" .. L["CT_RaidAssist/Options/ClickCast/NoneAvailable"] .. textColor2);
 		end
 		
 		-- Everything below this line will pseudo-disable when the frames are disabled
@@ -1862,16 +1902,109 @@ function StaticClickCastBroker()
 	-- PRIVATE PROPERTIES
 
 	local class = select(2,UnitClass("player"));
-	local canBuff = { };
-	local canRemoveDebuff = { };
-	local canRezCombat = { };
-	local canRezNoCombat = { };
-	local isCached = {};				-- true (value) for each unit (key) that has been cached already
-	local cachedMacros = {};			-- a macro (value) for each unit (key) if this class can click-cast, or nil
-	local cachedNoCombatMacros = {};		-- a macro (value) for each unit (key) if this class can remove debuffs outside combat, or nil
-	local registeredPlayerFrames = {};
+	local allBuff = { };				-- all buffs for this class, in this edition of the game
+	local allRemoveDebuff = { };			-- ditto
+	local allRezCombat = { };			-- ditto
+	local allRezNoCombat = { };			-- ditto
+	local canBuff = { };				-- chosen buffs the player can do right now
+	local canRemoveDebuff = { };			-- ditto
+	local canRezCombat = { };			-- ditto
+	local canRezNoCombat = { };			-- ditto
+	local isCached = { };				-- true (value) for each unit (key) that has been cached already
+	local cachedMacros = { };			-- a macro (value) for each unit (key) if this class can click-cast, or nil
+	local cachedNoCombatMacros = { };		-- a macro (value) for each unit (key) if this class can remove debuffs outside combat, or nil
+	local registeredPlayerFrames = { };		-- callback functions to each player frame that may need to update for new right clicks
 
 	-- PRIVATE METHODS
+	
+	-- Records which spells the player could cast if they were high enough level and learned the spell
+	local function configureSpells(resetFlag)
+		-- STEP 1: wipe all existing spell data
+		-- STEP 2: iterate through all spells the player might ever be able to do on this toon
+		-- STEP 3: record (or reset and record) the spell data to an intermediary table
+		
+		-- STEP 1:
+		wipe(allBuff);
+		wipe(allRemoveDebuff);
+		wipe(allRezCombat);
+		wipe(allRezNoCombat);
+		
+		-- STEP 3:  (step 2 follows underneath)
+		local function addToTable(table, id, localizedName, defaultModifier)
+			local option = module:getOption("CTRAFrames_ClickCast_" .. id)
+			if (resetFlag and option) then
+				module:setOption("CTRA_Frames_ClickCast_" .. id, nil, true);
+				option = nil;
+			end
+			if (not option) then
+				tinsert(table, {
+					["name"] = localizedName,
+					["enabled"] = true,
+					["modifier"] = defaultModifier,
+					["id"] = id,
+					["option"] = (
+						(defaultModifier == "mod:shift" and 2)
+						or (defaultModifier == "mod:ctrl" and 3)
+						or (defaultModifier == "mod:alt" and 4)
+						or 1		-- defaultModifier == "nomod"
+					),
+				});
+			elseif (option == 1 or option == 2 or option == 3 or option == 4) then
+				tinsert(table, {
+					["name"] = localizedName,
+					["enabled"] = true,
+					["modifier"] = (
+						(option == 2 and "mod:shift")
+						or (option == 3 and "mod:ctrl")
+						or (option == 4 and "mod:alt")
+						or "nomod"	-- option == 1
+					),
+					["id"] = id,
+					["option"] = option,
+				});
+			else -- if (option == 5) then
+				tinsert(table, {
+					["name"] = localizedName,
+					["enabled"] = false,
+					["modifier"] = nil,
+					["id"] = id,
+					["option"] = 5,
+				});
+			end		
+		end
+	
+		-- STEP 2: (uses the function above for brevity)
+	
+		-- allBuff
+		if (module.CTRA_Configuration_Buffs[class]) then
+			for __, details in ipairs(module.CTRA_Configuration_Buffs[class]) do
+				if (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) then
+					addToTable(allBuff, details.id, details.name, details.modifier);
+				end
+			end
+		end
+
+		-- allRemoveDebuff
+		if (module.CTRA_Configuration_FriendlyRemoves[class]) then
+			for __, details in ipairs(module.CTRA_Configuration_FriendlyRemoves[class]) do
+				if (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) then
+					addToTable(allRemoveDebuff, details.id, details.name, details.modifier);
+				end
+			end
+		end
+		
+		-- allRezCombat and allRezNoCombat
+		if (module.CTRA_Configuration_RezAbilities[class]) then
+			for __, details in ipairs(module.CTRA_Configuration_RezAbilities[class]) do
+				if (details.gameVersion == nil or details.gameVersion == module:getGameVersion() and details.combat) then
+					addToTable(allRezCombat, details.id, details.name, details.modifier);
+				end
+				if (details.gameVersion == nil or details.gameVersion == module:getGameVersion() and details.nocombat) then
+					addToTable(allRezNoCombat, details.id, details.name, details.modifier);
+				end
+			end
+		end
+	end
 	
 	local function updateSpells()
 		-- STEP 1: wipe all existing spell data
@@ -1885,33 +2018,34 @@ function StaticClickCastBroker()
 		wipe(canRezCombat);
 		wipe(canRezNoCombat);
 		
+		local spec = GetSpecialization and GetSpecialization()
+		
 		-- STEP 2:
 		-- canBuff
-		if (module.CTRA_Configuration_Buffs[class]) then
-			for __, details in ipairs(module.CTRA_Configuration_Buffs[class]) do
-				if (GetSpellInfo(details.name) and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and (canBuff[details.modifier] == nil)) then
-					canBuff[details.modifier] = details.name;
-				end
+		for __, details in ipairs(allBuff) do
+			if (details.enabled and GetSpellInfo(details.name) and (canBuff[details.modifier] == nil)) then
+				canBuff[details.modifier] = details.name;
 			end
 		end
 
 		-- canRemoveDebuff
-		if (module.CTRA_Configuration_FriendlyRemoves[class]) then
-			for __, details in ipairs(module.CTRA_Configuration_FriendlyRemoves[class]) do
-				if (GetSpellInfo(details.name) and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and canRemoveDebuff[details.modifier] == nil and (details.spec == nil or spec == nil or details.spec == spec)) then
-					canRemoveDebuff[details.modifier] = details.name;
-				end
+		for __, details in ipairs(allRemoveDebuff) do
+			if (details.enabled and GetSpellInfo(details.name) and canRemoveDebuff[details.modifier] == nil and (details.spec == nil or spec == nil or details.spec == spec)) then
+				canRemoveDebuff[details.modifier] = details.name;
 			end
 		end
-		-- canRezCombat and canRezNoCombat
-		if (module.CTRA_Configuration_RezAbilities[class]) then
-			for __, details in ipairs(module.CTRA_Configuration_RezAbilities[class]) do
-				if (GetSpellInfo(details.name) and details.combat and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and canRezCombat[details.modifier] == nil) then
-					canRezCombat[details.modifier] = details.name;
-				end
-				if (GetSpellInfo(details.name) and details.nocombat and (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) and canRezNoCombat[details.modifier] == nil) then
-					canRezNoCombat[details.modifier] = details.name;
-				end
+		
+		-- canRezCombat
+		for __, details in ipairs(allRezCombat) do
+			if (details.enabled and GetSpellInfo(details.name) and details.combat and canRezCombat[details.modifier] == nil) then
+				canRezCombat[details.modifier] = details.name;
+			end
+		end
+		
+		-- canRezNoCombat
+		for __, details in ipairs(allRezNoCombat) do
+			if (details.enabled and GetSpellInfo(details.name) and details.nocombat and canRezNoCombat[details.modifier] == nil) then
+				canRezNoCombat[details.modifier] = details.name;
 			end
 		end
 		
@@ -1992,10 +2126,27 @@ function StaticClickCastBroker()
 		end
 	end
 	
+	function obj:GetAllSpellsForClass()
+		return allBuff, allRemoveDebuff, allRezCombat, allRezNoCombat;
+	end
+	
+	function obj:Update(option, value)
+		if (tonumber(option)) then
+			configureSpells();
+			updateSpells();
+		end
+	end
+	
+	function obj:Reset(option, value)
+		configureSpells(true);
+		updateSpells();
+	end
+	
 	-- CONSTRUCTOR
 	do
+		configureSpells();
 		updateSpells();
-		module:regEvent("PLAYER_LOGIN", updateSpells);
+		module:regEvent("PLAYER_LOGIN", function() configureSpells(); updateSpells(); end);
 		module:regEvent("LEARNED_SPELL_IN_TAB", updateSpells);
 		if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
 			module:regEvent("ACTIVE_TALENT_GROUP_CHANGED", updateSpells);
