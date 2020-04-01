@@ -96,6 +96,9 @@ L["CT_BuffMod/Options/Window/Button/Style1/TimeRemainingBarCheckbox"] = "Show ti
 L["CT_BuffMod/Options/Window/Button/Style2/Heading"] = "Style 2 (icon only)"
 L["CT_BuffMod/Options/Window/Button/Style2/OffsetLabel"] = "Offset from icon:"
 L["CT_BuffMod/Options/Window/Button/Style2/TimeLocationDropdown"] = "#Left#Right#Above#Below#Center"
+L["CT_BuffMod/Options/Window/Font/FontSizeLabel"] = "Font Size:"
+L["CT_BuffMod/Options/Window/Fonts/FontSizeDropDown"] = "#Normal#Smaller#Larger"
+L["CT_BuffMod/Options/Window/Fonts/Heading"] = "Font"
 L["CT_BuffMod/Options/Window/General/DisableTooltipsCheckbox"] = "Disable icon tooltips"
 L["CT_BuffMod/Options/Window/General/DisableWindowCheckbox"] = "Disable window"
 L["CT_BuffMod/Options/Window/General/Heading"] = "General Window Settings"
@@ -184,6 +187,10 @@ L["CT_BuffMod/Options/WindowControls/WindowDeletedMessage"] = "Window %d deleted
 L["CT_BuffMod/Options/WindowControls/WindowSelectedMessage"] = "Window %d selected."
 
 
+-----------------------------------------------
+-- frFR
+-- Credits to ddc
+
 if (GetLocale() == "frFR") then
 
 L["CT_BuffMod/PRE_EXPIRATION_WARNING"] = "L'aura |cFFFFFFFF%s|r expire dans |cFFFFFFFF%s|r."
@@ -231,7 +238,7 @@ L["CT_BuffMod/Options/General/Expiration/PlaySoundCheckbox"] = "Jouer un son ave
 L["CT_BuffMod/Options/General/Expiration/WarningTimeHeading"] = "Temps de l'annonce"
 L["CT_BuffMod/Options/General/Heading"] = "Des options générales"
 L["CT_BuffMod/Options/Reset/Heading"] = "Réinitialiser les options"
-L["CT_BuffMod/Options/Reset/Line 1"] = "Note: Ce bouton va réinitialiser les options aux valeurs défauts et recharger l'interface"
+L["CT_BuffMod/Options/Reset/Line 1"] = "Note: Ce bouton réinitialise les options aux valeurs par défaut, et il recharge l'interface"
 L["CT_BuffMod/Options/Reset/ResetAllCheckbox"] = "Réinitialiser les options pour tous les personnages"
 L["CT_BuffMod/Options/Reset/ResetButton"] = "Réinitialiser"
 L["CT_BuffMod/Options/Tips/Heading"] = "Des conseils"
@@ -346,8 +353,11 @@ L["CT_BuffMod/Options/WindowControls/WindowDeletedMessage"] = "La fenêtre %d su
 L["CT_BuffMod/Options/WindowControls/WindowSelectedMessage"] = "Fenêtre %d sélectionnée."
 
 
-elseif (GetLocale() == "deDE") then
+-----------------------------------------------
+-- deDE
+-- Credits to dynaletik
 
+elseif (GetLocale() == "deDE") then
 
 L["CT_BuffMod/PRE_EXPIRATION_WARNING"] = "Der Zauber |cFFFFFFFF%s|r wird in |cFFFFFFFF%s|r ablaufen."
 L["CT_BuffMod/PRE_EXPIRATION_WARNING_KEYBINDING"] = "Der Zauber |cFFFFFFFF%s|r wird in |cFFFFFFFF%s|r ablaufen. Drücke außerhalb des Kampfes |cFFFFFFFF%s|r zum Erneuern."
@@ -368,6 +378,7 @@ L["CT_BuffMod/TimeFormat/Minutes Plural"] = "%d Minuten"
 L["CT_BuffMod/TimeFormat/Minutes Smaller"] = "%d Min"
 L["CT_BuffMod/TimeFormat/Minutes Two Digits"] = "%.2dm"
 L["CT_BuffMod/TimeFormat/Off"] = "Aus"
+L["CT_BuffMod/TimeFormat/Second Singular"] = "1 Sekunde"
 L["CT_BuffMod/TimeFormat/Seconds Abbreviated"] = "%ds"
 L["CT_BuffMod/TimeFormat/Seconds Plural"] = "%d Sekunden"
 L["CT_BuffMod/TimeFormat/Seconds Smaller"] = "%d Sek"
@@ -435,6 +446,9 @@ L["CT_BuffMod/Options/Window/Button/Style1/TimeRemainingBarCheckbox"] = "Verblei
 L["CT_BuffMod/Options/Window/Button/Style2/Heading"] = "Stil 2 (nur Symbol)"
 L["CT_BuffMod/Options/Window/Button/Style2/OffsetLabel"] = "Versatz vom Symbol:"
 L["CT_BuffMod/Options/Window/Button/Style2/TimeLocationDropdown"] = "#Links#Rechts#Darüber#Darunter#Mittig"
+L["CT_BuffMod/Options/Window/Font/FontSizeLabel"] = "Schriftgröße:"
+L["CT_BuffMod/Options/Window/Fonts/FontSizeDropDown"] = "#Normal#Kleiner#Größer"
+L["CT_BuffMod/Options/Window/Fonts/Heading"] = "Schriftart"
 L["CT_BuffMod/Options/Window/General/DisableTooltipsCheckbox"] = "Tooltips der Symbole deaktivieren"
 L["CT_BuffMod/Options/Window/General/DisableWindowCheckbox"] = "Fenster deaktivieren"
 L["CT_BuffMod/Options/Window/General/Heading"] = "Allgemeine Fenstereinstellungen"
@@ -521,6 +535,10 @@ L["CT_BuffMod/Options/WindowControls/WindowDeletedMessage"] = "Fenster %d entfer
 L["CT_BuffMod/Options/WindowControls/WindowSelectedMessage"] = "Fenster %d ausgewählt."
 
 
+-----------------------------------------------
+-- ruRU
+
+
 elseif (GetLocale() == "ruRU") then
 
 L["CT_BuffMod/Options/Blizzard Frames/Hide Buffs"] = "Скрыть стандартное окно бафов"
@@ -529,6 +547,188 @@ L["CT_BuffMod/Options/General/Expiration/DurationHeading"] = "Длительно
 L["CT_BuffMod/Options/General/Expiration/FlashSliderLabel"] = [=[Мигать иконкой
 перед окончанием:]=]
 L["CT_BuffMod/Options/General/Expiration/PlaySoundCheckbox"] = "Проигрывать звук при предупреждении"
+
+
+-----------------------------------------------
+-- zhCH
+-- Credits to 萌丶汉丶纸
+
+elseif (GetLocale() == "zhCH") then
+
+L["CT_BuffMod/PRE_EXPIRATION_WARNING"] = "|cFFFFFFFF%s|r buff将在|cFFFFFFFF%s|r消失."
+L["CT_BuffMod/PRE_EXPIRATION_WARNING_KEYBINDING"] = "|cFFFFFFFF%s|r buff将在|cFFFFFFFF%s|r消失. 在战斗中按|cFFFFFFFF%s|r重新施放."
+L["CT_BuffMod/TimeFormat/Day Singular"] = "1天"
+L["CT_BuffMod/TimeFormat/Days Abbreviated"] = "%dd"
+L["CT_BuffMod/TimeFormat/Days Digital"] = "%dd, %d:%.2dh"
+L["CT_BuffMod/TimeFormat/Days Plural"] = "%d天"
+L["CT_BuffMod/TimeFormat/Days Smaller"] = "%d天"
+L["CT_BuffMod/TimeFormat/Hour Singular"] = "1小时"
+L["CT_BuffMod/TimeFormat/Hours Abbreviated"] = "%dh"
+L["CT_BuffMod/TimeFormat/Hours Digital"] = "%d:%.2dh"
+L["CT_BuffMod/TimeFormat/Hours Plural"] = "%d小时"
+L["CT_BuffMod/TimeFormat/Hours Smaller"] = "%d时"
+L["CT_BuffMod/TimeFormat/Minute Singular"] = "1分钟"
+L["CT_BuffMod/TimeFormat/Minutes Abbreviated"] = "%dm"
+L["CT_BuffMod/TimeFormat/Minutes Digital"] = "%d:%.2d"
+L["CT_BuffMod/TimeFormat/Minutes Plural"] = "%d分钟"
+L["CT_BuffMod/TimeFormat/Minutes Smaller"] = "%d分"
+L["CT_BuffMod/TimeFormat/Minutes Two Digits"] = "%.2dm"
+L["CT_BuffMod/TimeFormat/Off"] = "关"
+L["CT_BuffMod/TimeFormat/Second Singular"] = "1秒"
+L["CT_BuffMod/TimeFormat/Seconds Abbreviated"] = "%ds"
+L["CT_BuffMod/TimeFormat/Seconds Plural"] = "%d秒"
+L["CT_BuffMod/TimeFormat/Seconds Smaller"] = "%d秒"
+L["CT_BuffMod/TimeFormat/Seconds Two Digits"] = "%.2ds"
+L["CT_BuffMod/WindowTitle"] = "%d窗"
+L["CT_BuffMod/Options/Blizzard Frames/Heading"] = "暴雪默认框架"
+L["CT_BuffMod/Options/Blizzard Frames/Hide Buffs"] = "隐藏默认的buff框架"
+L["CT_BuffMod/Options/Blizzard Frames/Hide Consolidated"] = "隐藏默认的合并buff框架"
+L["CT_BuffMod/Options/Blizzard Frames/Hide Enchants"] = "隐藏默认的武器buff框架"
+L["CT_BuffMod/Options/General/Colors/Aura"] = "光环"
+L["CT_BuffMod/Options/General/Colors/Background"] = "窗口背景"
+L["CT_BuffMod/Options/General/Colors/Buff"] = "Buff"
+L["CT_BuffMod/Options/General/Colors/Debuff"] = "Debuff"
+L["CT_BuffMod/Options/General/Colors/Heading"] = "颜色"
+L["CT_BuffMod/Options/General/Colors/Weapon"] = "武器"
+L["CT_BuffMod/Options/General/Expiration/ChatMessageCheckbox"] = "启用聊天警告消息"
+L["CT_BuffMod/Options/General/Expiration/DurationHeading"] = "Buff持续时间"
+L["CT_BuffMod/Options/General/Expiration/FlashSliderLabel"] = "超时前闪烁图标:"
+L["CT_BuffMod/Options/General/Expiration/Heading"] = "超时"
+L["CT_BuffMod/Options/General/Expiration/PlayerBuffsOnlyCheckbox"] = "只显示你能施放的buff"
+L["CT_BuffMod/Options/General/Expiration/PlaySoundCheckbox"] = "出现警告时播放声音"
+L["CT_BuffMod/Options/General/Expiration/WarningTimeHeading"] = "显示警告在"
+L["CT_BuffMod/Options/General/Heading"] = "通用设置"
+L["CT_BuffMod/Options/Reset/Heading"] = "重置设置"
+L["CT_BuffMod/Options/Reset/Line 1"] = "注意: 这会将选项重置为默认值然后重新加载UI."
+L["CT_BuffMod/Options/Reset/ResetAllCheckbox"] = "重置所有角色的选项"
+L["CT_BuffMod/Options/Reset/ResetButton"] = "重置设置"
+L["CT_BuffMod/Options/Tips/Heading"] = "提示"
+L["CT_BuffMod/Options/Tips/Line 1"] = "你可以使用 /ctbuff 或 /ctbuffmod 直接打开此选项窗口."
+L["CT_BuffMod/Options/Tips/Line 2"] = "你可以设置和配置不同的窗口以显示光环. 在窗口上按住Alt+左键以将其选中."
+L["CT_BuffMod/Options/Tips/Line 3"] = "注意: 在你退出战斗之前大多数选项都不会起作用."
+L["CT_BuffMod/Options/Window/Background/CustomColorCheckbox"] = "在此窗口中使用唯一的颜色"
+L["CT_BuffMod/Options/Window/Background/CustomColorLabel"] = "仅此窗口的背景色"
+L["CT_BuffMod/Options/Window/Background/Heading"] = "窗口背景"
+L["CT_BuffMod/Options/Window/Background/ShowBackgroundCheckbox"] = "显示背景"
+L["CT_BuffMod/Options/Window/Border/BottomSliderValue"] = "底边框 = <value>"
+L["CT_BuffMod/Options/Window/Border/Heading"] = "窗口边框"
+L["CT_BuffMod/Options/Window/Border/LeftSliderValue"] = "左边框 = <value>"
+L["CT_BuffMod/Options/Window/Border/RightSliderValue"] = "右边框 = <value>"
+L["CT_BuffMod/Options/Window/Border/ShowBorderCheckbox"] = "显示边框边缘纹理"
+L["CT_BuffMod/Options/Window/Border/TopSliderValue"] = "上边框 = <value>"
+L["CT_BuffMod/Options/Window/Button/General/DebuffBorderColorCheckbox"] = "debuff图标的边框颜色代码"
+L["CT_BuffMod/Options/Window/Button/General/DebuffColorTooltip"] = "图示: |cFF9600FF诅咒|r, |cFF966400疾病|r,|cFF3296FF魔法|r, |cFF009600毒|r, 和 |cFFc80000其他 (例如, 物理)|r."
+L["CT_BuffMod/Options/Window/Button/General/IconSizeSliderLabel"] = "图标大小:"
+L["CT_BuffMod/Options/Window/Button/General/ShowDaysCheckbox"] = "显示天数如果大于24小时"
+L["CT_BuffMod/Options/Window/Button/General/TimeFormatLabel"] = "格式:"
+L["CT_BuffMod/Options/Window/Button/General/TimeLocationLabel"] = "位置:"
+L["CT_BuffMod/Options/Window/Button/General/TimeRemainingCheckbox"] = "显示剩余时间文字"
+L["CT_BuffMod/Options/Window/Button/Style1/BarBackgroundCheckbox"] = "为栏的背景上色"
+L["CT_BuffMod/Options/Window/Button/Style1/DebuffBarBackgroundCheckbox"] = "debuff栏颜色代码"
+L["CT_BuffMod/Options/Window/Button/Style1/DebuffNameCheckbox"] = "debuff名称颜色代码"
+L["CT_BuffMod/Options/Window/Button/Style1/Heading"] = "样式1(图标和栏)"
+L["CT_BuffMod/Options/Window/Button/Style1/IconPositionDropdown"] = "#默认#左侧#右侧"
+L["CT_BuffMod/Options/Window/Button/Style1/IconPositionLabel"] = "图标位置:"
+L["CT_BuffMod/Options/Window/Button/Style1/JustifyAloneLabel"] = "使每行排齐 (当一个人的时候):"
+L["CT_BuffMod/Options/Window/Button/Style1/JustifyDropdown"] = "#默认#左#右#中"
+L["CT_BuffMod/Options/Window/Button/Style1/JustifyNotAloneLabel"] = "使每行排齐 (除了时间):"
+L["CT_BuffMod/Options/Window/Button/Style1/LeftOffsetLabel"] = "文本偏移量 (左侧):"
+L["CT_BuffMod/Options/Window/Button/Style1/RightOffsetLabel"] = "文本偏移量 (右侧):"
+L["CT_BuffMod/Options/Window/Button/Style1/ShowNameCheckbox"] = "显示名称"
+L["CT_BuffMod/Options/Window/Button/Style1/TimeLocationDropdown"] = "#默认#名字的左边#名字的右边#名字的上面#名字的下面"
+L["CT_BuffMod/Options/Window/Button/Style1/TimeRemainingBarBackgroundCheckbox"] = "显示栏背景"
+L["CT_BuffMod/Options/Window/Button/Style1/TimeRemainingBarCheckbox"] = "显示剩余时间栏"
+L["CT_BuffMod/Options/Window/Button/Style2/Heading"] = "样式2 (仅图标)"
+L["CT_BuffMod/Options/Window/Button/Style2/OffsetLabel"] = "从图标偏移:"
+L["CT_BuffMod/Options/Window/Button/Style2/TimeLocationDropdown"] = "#左#右#上#下#中"
+L["CT_BuffMod/Options/Window/Font/FontSizeLabel"] = "字体大小:"
+L["CT_BuffMod/Options/Window/Fonts/FontSizeDropDown"] = "#正常#较小#较大"
+L["CT_BuffMod/Options/Window/Fonts/Heading"] = "字体"
+L["CT_BuffMod/Options/Window/General/DisableTooltipsCheckbox"] = "禁用图标鼠标提示"
+L["CT_BuffMod/Options/Window/General/DisableWindowCheckbox"] = "禁用窗口"
+L["CT_BuffMod/Options/Window/General/Heading"] = "常规窗口设置"
+L["CT_BuffMod/Options/Window/General/PositionClampedCheckbox"] = "窗口不能移出屏幕"
+L["CT_BuffMod/Options/Window/General/PositionLockedCheckbox"] = "锁定窗口使其不能移动"
+L["CT_BuffMod/Options/Window/General/PositionResetButton"] = "重置窗口位置"
+L["CT_BuffMod/Options/Window/General/PositionResetTip"] = "这将使窗口位于屏幕中央"
+L["CT_BuffMod/Options/Window/Layout/BuffSpacingSlider"] = "Buffs间距 = <value>"
+L["CT_BuffMod/Options/Window/Layout/Heading"] = "布局"
+L["CT_BuffMod/Options/Window/Layout/HorizontalLayoutTip"] = "对于这种类型的布局, 将行数设置为零将导致行数可变."
+L["CT_BuffMod/Options/Window/Layout/HorizontalMaxWrapsSlider"] = "行数 = <value>"
+L["CT_BuffMod/Options/Window/Layout/HorizontalWrapAfterSlider"] = "每行Buffs = <value>"
+L["CT_BuffMod/Options/Window/Layout/HorizontalWrapSpacingSlider"] = "行间距 = <value>"
+L["CT_BuffMod/Options/Window/Layout/LayoutDropdown"] = "#从上到下. 向右换行.#从上到下. 向左换行.#从下到上. 向右换行.#从下到上. 向左换行.#从左到右. 向下换行.#从左到右. 向上换行.#从右到左. 向下换行.#从右到左. 向上换行."
+L["CT_BuffMod/Options/Window/Layout/LayoutDropdownLabel"] = "方向:"
+L["CT_BuffMod/Options/Window/Layout/MaxWrapsSliderAuto"] = "0 (自动展开)"
+L["CT_BuffMod/Options/Window/Layout/Tooltip"] = [=[|cFFFFFFFF布局设置在窗口内排列Buff按钮.
+|cFFFFFFFF'从上到下' 和 '从下到上' 布局将buff垂直排列，但可以换行到其他列
+|cFFFFFFFF'从左到右' 和 '从右到左' 布局将buff水平排列，但可以换行到其他行
+|cFFFFFFFF
+
+|cFFFFCC00默认: 自动向下展开的单个列
+|cFFFFFFFF 1) 从左到右, 向下换行
+|cFFFFFFFF 2) 每行Buffs = 1
+|cFFFFFFFF 3) 行数 = 自动展开]=]
+L["CT_BuffMod/Options/Window/Layout/VerticalLayoutTip"] = "对于这种类型的布局, 将列数设置为零将导致列数可变."
+L["CT_BuffMod/Options/Window/Layout/VerticalMaxWrapsSlider"] = "列数 = <value>"
+L["CT_BuffMod/Options/Window/Layout/VerticalWrapAfterSlider"] = "每列Buffs = <value>"
+L["CT_BuffMod/Options/Window/Layout/VerticalWrapSpacingSlider"] = "列间距 = <value>"
+L["CT_BuffMod/Options/Window/Sorting/Heading"] = "Buff排序"
+L["CT_BuffMod/Options/Window/Sorting/NonExpiringBuffsDropdown"] = "#先于其他buffs#后于其他buffs#和其他buffs"
+L["CT_BuffMod/Options/Window/Sorting/NonExpiringBuffsLabel"] = "非超时buffs:"
+L["CT_BuffMod/Options/Window/Sorting/Order1Label"] = "第一:"
+L["CT_BuffMod/Options/Window/Sorting/Order2Label"] = "第二:"
+L["CT_BuffMod/Options/Window/Sorting/Order3Label"] = "第三:"
+L["CT_BuffMod/Options/Window/Sorting/Order4Label"] = "第四:"
+L["CT_BuffMod/Options/Window/Sorting/Order5Label"] = "第五:"
+L["CT_BuffMod/Options/Window/Sorting/OrderDropdown"] = "#无#Debuffs#可取消buffs#不可取消buffs#所有buffs#武器"
+L["CT_BuffMod/Options/Window/Sorting/OrderLabel"] = "将buff分组如下:"
+L["CT_BuffMod/Options/Window/Sorting/PlayerBuffsDropdown"] = "#在其他玩家之前#在其他玩家之后#与其他玩家"
+L["CT_BuffMod/Options/Window/Sorting/PlayerBuffsLabel"] = "你施放的Buffs:"
+L["CT_BuffMod/Options/Window/Sorting/ReverseCheckbox"] = "反转排序的方向"
+L["CT_BuffMod/Options/Window/Sorting/SortMethodDropdown"] = "#名字#时间#排序"
+L["CT_BuffMod/Options/Window/Sorting/SortMethodLabel"] = "排序方法:"
+L["CT_BuffMod/Options/Window/Time Remaining/Duration Format Dropdown"] = "1 小时  -  22 分钟#1 小时  -  22 分#1h  -  22m#1h 11m  -  22m 22s#1:11h  -  22:22"
+L["CT_BuffMod/Options/Window/Unit/Heading"] = "单位"
+L["CT_BuffMod/Options/Window/Unit/NonSecureCheckbox"] = "使用不安全的buff按钮"
+L["CT_BuffMod/Options/Window/Unit/SecureTooltip/Content"] = [=[|cFFFFAA00安全buff按钮:
+|cFFFFFFFF- 法术buffs可以在|cFFFFFF00任何|cFFFFFFFF时间被取消.
+|cFFFFFFFF- 武器buffs可以在|cFFFFFF00任何|cFFFFFFFF时间被取消.
+
+|cFFFFAA00不安全的buff按钮:
+|cFFFFFFFF- 法术buffs可以在|cFFFF3333战斗外|cFFFFFFFF被取消.
+|cFFFFFFFF- 武器buffs|cFFFF3333不可以|cFFFFFFFF被取消.
+|cFFFFFFFF- 附加排序选项: '非到期buffs'
+|cFFFFFFFF- 解决加载项冲突的兼容模式]=]
+L["CT_BuffMod/Options/Window/Unit/SecureTooltip/Heading"] = "安全与非安全按钮"
+L["CT_BuffMod/Options/Window/Unit/UnitDropdownLabel"] = "显示buff:"
+L["CT_BuffMod/Options/Window/Unit/UnitDropdownOptions"] = "#玩家#载具#宠物#目标#焦点"
+L["CT_BuffMod/Options/Window/Unit/VehicleCheckbox"] = "当你在载具中时显示载具buffs"
+L["CT_BuffMod/Options/Window/Visibility/AdvancedRadio"] = "使用高级条件"
+L["CT_BuffMod/Options/Window/Visibility/AlwaysRadio"] = "一直显示窗口"
+L["CT_BuffMod/Options/Window/Visibility/BasicRadio"] = "使用基本条件"
+L["CT_BuffMod/Options/Window/Visibility/Heading"] = "能见度"
+L["CT_BuffMod/Options/Window/Visibility/HideCombatCheckbox"] = "在战斗中隐藏"
+L["CT_BuffMod/Options/Window/Visibility/HideNotCombatCheckbox"] = "当|cFFFFCCCC不在|r战斗中时隐藏"
+L["CT_BuffMod/Options/Window/Visibility/HideNotVehicleCheckbox"] = "当|cFFFFCCCC不在|r载具时隐藏"
+L["CT_BuffMod/Options/Window/Visibility/HideVehicleCheckbox"] = "在载具中隐藏"
+L["CT_BuffMod/Options/Window/Visibility/SaveButton"] = "保存"
+L["CT_BuffMod/Options/Window/Visibility/TestButton"] = "测试"
+L["CT_BuffMod/Options/Window/Visibility/UndoButton"] = "撤消"
+L["CT_BuffMod/Options/WindowControls/AddButton"] = "添加"
+L["CT_BuffMod/Options/WindowControls/AddTooltip"] = "使用默认设置添加新窗口."
+L["CT_BuffMod/Options/WindowControls/AltClickHint"] = "Alt+左键以选择."
+L["CT_BuffMod/Options/WindowControls/CloneButton"] = "克隆"
+L["CT_BuffMod/Options/WindowControls/CloneTooltip"] = "添加一个具有与当前所选窗口重复的设置的新窗口."
+L["CT_BuffMod/Options/WindowControls/DeleteButton"] = "删除"
+L["CT_BuffMod/Options/WindowControls/DeleteTooltip"] = "|cFFFFFF00Shift+左键|r 该按钮删除当前选择的窗口."
+L["CT_BuffMod/Options/WindowControls/Heading"] = "窗口"
+L["CT_BuffMod/Options/WindowControls/SelectionLabel"] = "选择窗口:"
+L["CT_BuffMod/Options/WindowControls/Tip"] = "此点以下的选项仅影响所选窗口."
+L["CT_BuffMod/Options/WindowControls/WindowAddedMessage"] = "窗口 %d 已添加."
+L["CT_BuffMod/Options/WindowControls/WindowClonedMessage"] = "窗口 %d 已添加, 从%d复制的设置."
+L["CT_BuffMod/Options/WindowControls/WindowDeletedMessage"] = "窗口 %d 已删除."
+L["CT_BuffMod/Options/WindowControls/WindowSelectedMessage"] = "窗口 %d 已选择."
 
 
 end
