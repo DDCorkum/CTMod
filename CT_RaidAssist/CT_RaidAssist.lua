@@ -595,6 +595,11 @@ function StaticCTRAFrames()
 							UpdateIncomingHealsFunc();
 						end
 					end
+				elseif (key == "CTRAFrames_ClickCast_UseCliqueAddon") then
+					--StaticClickCastBroker:Update(key, val); 	-- not currently used
+					for i, window in ipairs(windows) do
+						window:Update(key, val);		-- all the windows need to update their secureButton
+					end
 				elseif (key:sub(1,21) == "CTRAFrames_ClickCast_" and key:len() > 21) then
 					StaticClickCastBroker():Update(key:sub(22), val);
 				end
@@ -671,6 +676,10 @@ function StaticCTRAFrames()
 		
 		-- Click Casting
 		optionsAddObject(-15,  17, "font#tl:5:%y#v:GameFontNormal#" .. L["CT_RaidAssist/Options/ClickCast/Heading"]);
+		if (Clique) then
+			optionsAddObject(-5, 1*14, "font#tl:10:%y#s:0:%s#l:13:0#r#Clique addon detected!#1:0.5:0.5:l");
+			optionsAddObject(0,    26, "checkbutton#tl:10:%y#n:CTRAFrames_ClickCast_UseCliqueAddonCheckButton#o:CTRAFrames_ClickCast_UseCliqueAddon:true#Use Clique instead of CTRA keybinds?#1:0.5:0.5:l:268");	
+		end
 		optionsAddObject(-5, 3*14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. L["CT_RaidAssist/Options/ClickCast/Line1"] .. textColor2 .. ":l");
 		local buff, removeDebuff, rezCombat, rezNoCombat = StaticClickCastBroker():GetAllSpellsForClass();
 		if (#buff > 0) then
@@ -2106,6 +2115,9 @@ function StaticClickCastBroker()
 	-- adds several double-lines to the tooltip (default: GameTooltip) describing each spell and how to click-cast it
 	-- also adds a single line that saying "Right click..." if there is at least one click-castable spell
 	function obj:PopulateTooltip(tooltip)
+		if (Clique and module:getOption("CTRAFrames_ClickCast_UseCliqueAddon") ~= false) then
+			return;
+		end
 		tooltip = tooltip or GameTooltip;
 		local needFirstLine = true;
 		for modifier, spellName in pairs(canBuff) do
@@ -2175,6 +2187,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	local visualFrame;		-- generic frame that shows various textures
 	local secureButton;		-- SecureUnitActionButton that sits in front and responds to mouseclicks
 	local secureButtonDebuffFirst;	-- SecureUnitActionButton that sits in front and responds to mouseclicks
+	local secureButtonCliqueFirst;	-- SecureUnitActionButton that sits in front and allows itself to be configured by Clique addon
 	local macroRight;		-- copy of the macro currently used when right-clicking secureButton to click-cast
 	local listenerFrame;		-- generic frame that listens to various events
 	local requestedUnit;		-- the unit that this object is requested to display at the next opportunity
@@ -3002,6 +3015,18 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			end
 		end
 	end
+
+	local function integrateCliqueAddon(shouldEnable)
+		if (Clique and shouldEnable) then
+			secureButtonCliqueFirst:Show();
+			Clique:RegisterFrame(secureButtonCliqueFirst);
+		elseif (Clique) then
+			secureButtonCliqueFirst:Hide();
+			Clique:UnregisterFrame(secureButtonCliqueFirst);
+		else
+			secureButtonCliqueFirst:Hide();
+		end
+	end
 	
 	-- update click-casting on right click
 	local function updateRightMacros()
@@ -3195,6 +3220,11 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 						GameTooltip:Hide();
 					end
 				);
+				
+				-- overlay button that integrates with the Clique addon if present, or hides if missing
+				secureButtonCliqueFirst = CreateFrame("Button", nil, secureButton, "SecureUnitButtonTemplate");
+				secureButtonCliqueFirst:SetAllPoints();
+				integrateCliqueAddon(module:getOption("CTRAFrames_ClickCast_UseCliqueAddon") ~= false);
 			end
 		end
 		
@@ -3242,6 +3272,10 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 						secureButton:SetParent(visualFrame);
 						secureButton:SetAllPoints();
 					end
+				elseif (
+					key == "CTRAFrames_ClickCast_UseCliqueAddon"
+				) then
+					integrateCliqueAddon(val);
 				end
 			end
 			optionsWaiting = { };
@@ -3381,6 +3415,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			-- configure the secureButton for the new unit
 			secureButton:SetAttribute("unit", shownUnit);
 			secureButtonDebuffFirst:SetAttribute("unit", shownUnit);
+			secureButtonCliqueFirst:SetAttribute("unit", shownUnit);
 			if (UnitAura(shownUnit, 1, "RAID HARMFUL")) then
 				secureButtonDebuffFirst:Show();
 			else
