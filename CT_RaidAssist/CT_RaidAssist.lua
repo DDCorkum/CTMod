@@ -3057,7 +3057,13 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			local r,g,b = GetClassColor(classFilename);
 			GameTooltip:AddDoubleLine(UnitName(shownUnit) or "", UnitLevel(shownUnit) or "", r,g,b, 1,1,1);
 			local mapid = C_Map.GetBestMapForUnit(shownUnit);
-			GameTooltip:AddDoubleLine((UnitRace(shownUnit) or "") .. " " .. (className or ""), (not UnitInRange(shownUnit) and mapid and C_Map.GetMapInfo(mapid).name) or "", 1, 1, 1, 0.5, 0.5, 0.5);
+			local subgroup = tonumber(shownUnit:sub(5)) and select(3, GetRaidRosterInfo(tonumber(shownUnit:sub(5))))
+			if (isPet) then
+				local owner = UnitName(shownUnit:sub(1,-4));
+				GameTooltip:AddLine((owner and format((select(2, UnitClass(shownUnit:sub(1,-4))) == "HUNTER" and UNITNAME_TITLE_PET) or UNITNAME_TITLE_MINION, owner)) or "", 0.5, 0.5, 0.5);
+			else
+				GameTooltip:AddDoubleLine((UnitRace(shownUnit) or "") .. " " .. (className or ""), (not UnitInRange(shownUnit) and mapid and C_Map.GetMapInfo(mapid).name) or (subgroup and "Gp " .. subgroup) or "", 1, 1, 1, 0.5, 0.5, 0.5);
+			end
 			if (auraBoss1Texture:IsShown()) then
 				local color = DebuffTypeColor[auraBoss1Texture.debuffType or ""];
 				GameTooltip:AddLine("|T" .. auraBoss1Texture:GetTexture() .. ":0|t " .. (auraBoss1Texture.name or "") .. ((auraBoss1Texture.count or 0) > 1 and (" (" .. auraBoss1Texture.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
@@ -3097,7 +3103,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				module.GameTooltipExtraLine:SetText(L["CT_RaidAssist/PlayerFrame/TooltipFooter"]);
 				module.GameTooltipExtraLine:SetScale(0.90);
 			end	
-			if (not InCombatLockdown()) then
+			if (not (InCombatLockdown() or isPet)) then
 				-- Durability
 				if (durabilityAverage) then
 					local time = GetTime() - (durabilityTime or 0);
@@ -3143,6 +3149,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 					module.GameTooltipExtraLine:SetTextColor(1,1,1);
 				end
 			else
+				module.GameTooltipExtraLine:Hide();
 				GameTooltip:Show();
 			end
 		end
@@ -3224,6 +3231,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 				-- overlay button that integrates with the Clique addon if present, or hides if missing
 				secureButtonCliqueFirst = CreateFrame("Button", nil, secureButton, "SecureUnitButtonTemplate");
 				secureButtonCliqueFirst:SetAllPoints();
+				secureButtonCliqueFirst:HookScript("OnEnter", displayTooltip);
 				integrateCliqueAddon(module:getOption("CTRAFrames_ClickCast_UseCliqueAddon") ~= false);
 			end
 		end
