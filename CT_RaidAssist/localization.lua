@@ -119,6 +119,9 @@ L["CT_RaidAssist/Options/Window/Groups/Line1"] = "Which groups, roles or classes
 L["CT_RaidAssist/Options/Window/Groups/RoleHeader"] = "Roles"
 L["CT_RaidAssist/Options/Window/Groups/ShowDuplicatesOnceOnlyCheckButton"] = "Avoid duplicates"
 L["CT_RaidAssist/Options/Window/Groups/ShowDuplicatesOnceOnlyTip"] = "If a player could appear more than once, show them the first time only."
+L["CT_RaidAssist/Options/Window/Groups/ShowGroupLabelsCheckButton"] = "Show group labels"
+L["CT_RaidAssist/Options/Window/Groups/ShowGroupLabelsTip"] = [=[Adds a label before each column to indicate its groups/roles/classes.
+This option looks best when a new column is made for each group.]=]
 L["CT_RaidAssist/Options/Window/Layout/Heading"] = "Layout"
 L["CT_RaidAssist/Options/Window/Layout/OrientationDropdown"] = "#New |cFFFFFF00column|r for each group#New |cFFFFFF00row|r for each group#Merge raid to a |cFFFFFF00single column|r (subject to wrapping)#Merge raid to a |cFFFFFF00single row|r (subject to wrapping)"
 L["CT_RaidAssist/Options/Window/Layout/OrientationLabel"] = "Use rows or columns?"
@@ -134,6 +137,8 @@ L["CT_RaidAssist/Options/Window/Layout/WrapTooltipContent"] = [=[0.9:0.9:0.9#Sta
 - Set this slider to wrap after 10 players
 - Now a 40-man raid appears as four rows of 10]=]
 L["CT_RaidAssist/Options/Window/Layout/WrapTooltipHeader"] = "Wrapping large rows/columns:"
+L["CT_RaidAssist/Options/Window/Size/BorderThicknessDropDown"] = "#Fine#Medium#Heavy"
+L["CT_RaidAssist/Options/Window/Size/BorderThicknessLabel"] = "Border Thickness:"
 L["CT_RaidAssist/Options/WindowControls/AddButton"] = "Add"
 L["CT_RaidAssist/Options/WindowControls/AddTooltip"] = "Add a new window with default settings."
 L["CT_RaidAssist/Options/WindowControls/CloneButton"] = "Clone"
