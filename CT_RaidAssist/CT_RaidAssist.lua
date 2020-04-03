@@ -45,9 +45,10 @@ local GetClassColor = function(fileName)
 	end
 end;
 local CompactRaidFrameManager_SetSetting = CompactRaidFrameManager_SetSetting;
-local GetInspectSpecialization = GetInspectSpecialization or function() return nil; end	-- doesn't exist in classic
-local GetSpecializationRoleByID = GetSpecializationRoleByID or function() return nil; end -- doesn't exist in classic
-local GetSpecialization = GetSpecialization;
+local GetInspectSpecialization = GetInspectSpecialization or function() return nil; end		-- doesn't exist in classic
+local GetSpecialization = GetSpecialization or function() return nil; end 			-- doesn't exist in classic
+local GetSpecializationInfo = GetSpecializationInfo or function() return nil; end 		-- doesn't exist in classic
+local GetSpecializationRoleByID = GetSpecializationRoleByID or function() return nil; end 	-- doesn't exist in classic
 local GetReadyCheckStatus = GetReadyCheckStatus;
 local InCombatLockdown = InCombatLockdown;
 local IncomingSummonStatus = (C_IncomingSummon and C_IncomingSummon.IncomingSummonStatus) or function() return 0; end	-- doesn't exist in classic, and 0 means no incoming summons
@@ -1009,7 +1010,13 @@ function StaticCTRAFrames()
 				-- Duplicates
 				optionsBeginFrame(-5, 26, "checkbutton#tl:10:%y#n:CTRAWindow_ShowDuplicatesOnceOnlyCheckButton:true#" .. L["CT_RaidAssist/Options/Window/Groups/ShowDuplicatesOnceOnlyCheckButton"] .. "#l:268");
 					optionsWindowizeObject("ShowDuplicatesOnceOnly");
-					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Groups/ShowDuplicatesOnceOnlyCheckButton"],L["CT_RaidAssist/Options/Window/Groups/ShowDuplicatesOnceOnlyTooltip"] .. textColor1});
+					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Groups/ShowDuplicatesOnceOnlyCheckButton"],L["CT_RaidAssist/Options/Window/Groups/ShowDuplicatesOnceOnlyTip"] .. textColor1});
+				optionsEndFrame();
+				
+				-- Labels
+				optionsBeginFrame(-5, 26, "checkbutton#tl:10:%y#n:CTRAWindow_ShowGroupLabelsCheckButton:true#" .. L["CT_RaidAssist/Options/Window/Groups/ShowGroupLabelsCheckButton"] .. "#l:268");
+					optionsWindowizeObject("ShowGroupLabels");
+					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Groups/ShowGroupLabelsCheckButton"],L["CT_RaidAssist/Options/Window/Groups/ShowGroupLabelsTip"] .. textColor1});
 				optionsEndFrame();
 				
 				-- Orientation and Wrapping
@@ -1044,6 +1051,10 @@ function StaticCTRAFrames()
 				optionsBeginFrame(-20, 17, "slider#tl:50:%y#s:200:%s#n:CTRAWindow_PlayerFrameScaleSlider#Scale = <value>%:50%:150%#50:150:5");
 					optionsWindowizeSlider("PlayerFrameScale");
 				optionsEndFrame();
+				optionsAddObject(-21,   20, "font#l:tl:13:%y#r:tl:158:%y#" .. L["CT_RaidAssist/Options/Window/Size/BorderThicknessLabel"] .. textColor1 .. ":l:290");
+				optionsBeginFrame(26,   20, "dropdown#tl:140:%y#s:110:%s#n:CTRAWindow_BorderThicknessDropDown" .. L["CT_RaidAssist/Options/Window/Size/BorderThicknessDropDown"]);
+					optionsWindowizeObject("BorderThickness");
+				optionsEndFrame();
 				
 				-- Appearance of Player Frames
 				optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormal#" .. L["CT_RaidAssist/Options/Window/Appearance/Heading"]);
@@ -1065,6 +1076,7 @@ function StaticCTRAFrames()
 								"ColorBorder",
 								"ColorBorderBeyondRange",
 								"ColorBorderClass",
+								"BorderThickness",
 								"HealthBarAsBackground",
 								"EnablePowerBar",
 							}
@@ -1089,6 +1101,7 @@ function StaticCTRAFrames()
 								["ColorReadyCheckWaiting"] = {0.40, 0.40, 0.40, 0.80},
 								["ColorReadyCheckNotReady"] = {0.80, 0.40, 0.40, 0.80},
 								["ColorBackground"] = {0.00, 0.05, 0.80, 0.55},
+								["BorderThickness"] = 2,
 								["HealthBarAsBackground"] = false,
 								["EnablePowerBar"] = false,
 							}							
@@ -1112,6 +1125,7 @@ function StaticCTRAFrames()
 								["ColorReadyCheckWaiting"] = {0.35, 0.35, 0.35, 0.65},
 								["ColorReadyCheckNotReady"] = {0.80, 0.35, 0.35, 0.65},
 								["ColorBackground"] = {0.00, 0.00, 0.60, 0.60},
+								["BorderThickness"] = 1,
 								["HealthBarAsBackground"] = true,
 								["EnablePowerBar"] = false,
 							}						
@@ -1314,8 +1328,10 @@ function NewCTRAWindow(owningCTRAFrames)
 	local windowFrame;		-- appearance of the window itself
 	local playerFrames = { };	-- CTRAPlayerFrame objects
 	local targetFrames = { };	-- CTRATargetFrame objects
+	local labels = { };		-- FontStrings above each group
 	local roster = { };		-- list of the current raid or group used when constructing CTRAPlayerFrame and CTRATargetFrame objects
-	local currentOptions = { };
+	local currentOptions = { };	-- current options of this window
+	local pendingOptions = { };	-- options awaiting application to this window
 	local defaultOptions = 		-- configuration data for the default options in showing a window
 	{
 		["ShowGroup1"] = true,		-- default is to show groups 1 to 8
@@ -1345,6 +1361,7 @@ function NewCTRAWindow(owningCTRAFrames)
 		["ShowWarlocks"] = false,
 		["ShowWarriors"] = false,
 		["ShowDuplicatesOnceOnly"] = true,
+		["ShowGroupLabels"] = false,
 		["Orientation"] = 1,		-- columns
 		["GrowUpward"] = false,
 		["GrowLeft"] = false,
@@ -1364,6 +1381,7 @@ function NewCTRAWindow(owningCTRAFrames)
 		["ColorBorderClass"] = 0,
 		["ColorReadyCheckWaiting"] = {0.45, 0.45, 0.45, 1.00},
 		["ColorReadyCheckNotReady"] = {0.80, 0.45, 0.45, 1.00},
+		["BorderThickness"] = 3, 	-- thick
 		["RemovableDebuffColor"] = true,
 		["HealthBarAsBackground"] = false,
 		["EnablePowerBar"] = true,
@@ -1378,7 +1396,45 @@ function NewCTRAWindow(owningCTRAFrames)
 		["ShowIncomingHeals"] = 1,
 	};
 
-	-- private methods
+	-- PRIVATE METHODS
+	
+	local function anchorLabel(label)
+		label:ClearAllPoints();
+		if (obj:GetProperty("Orientation") == 1 or obj:GetProperty("Orientation") == 3) then
+			label:SetPoint(
+				"CENTER",
+				(
+					(obj:GetProperty("GrowLeft") and -1) or 1)
+					*(label.id - ((obj:GetProperty("GrowLeft") and 1.5) or 0.5))
+					*(90 + obj:GetProperty("HorizontalSpacing")
+				),
+				(
+					(obj:GetProperty("GrowUpward") and obj:GetProperty("EnableTargetFrame") and -20)
+					or 0
+				)
+			);
+		else
+			label:SetPoint(
+				(obj:GetProperty("GrowLeft") and "LEFT") or "RIGHT",
+				(obj:GetProperty("GrowLeft") and 90) or 0,
+				(
+					((obj:GetProperty("GrowUpward") and 1) or -1)
+					* (label.id - ((obj:GetProperty("EnableTargetFrame") and 0.5) or 0.25))
+					* (
+						40
+						+ obj:GetProperty("VerticalSpacing") 
+						+ ((obj:GetProperty("EnableTargetFrame") and 20) or 0)
+						+ (((obj:GetProperty("EnableTargetFrame") and obj:GetProperty("TargetHealth") and not obj:GetProperty("HealthBarAsBackground")) and 4) or 0)
+						+ (((obj:GetProperty("EnableTargetFrame") and obj:GetProperty("TargetPower")) and 4) or 0)
+					)
+				)
+			);
+		end
+		label:SetWidth(90 + obj:GetProperty("HorizontalSpacing")/2);
+		module:blockOverflowText(label, 90 + obj:GetProperty("HorizontalSpacing")/2);
+	end
+	
+	-- PUBLIC METHODS
 	function obj:Enable(asWindow, copyFromWindow)
 		assert(type(asWindow) == "number" and asWindow > 0, "CTRA Window being enabled without a valid number");
 		if (InCombatLockdown()) then return; end
@@ -1545,13 +1601,15 @@ function NewCTRAWindow(owningCTRAFrames)
 	
 	function obj:Update(option, value)
 		-- STEP 1: Update children and local copies of saved variables
-		-- STEP 2: If enabled, continue to steps 3 and 4.
-		-- STEP 3: Outside combat, obtain a roster of self, party members and raid members to use during step 2
-		-- STEP 4: Determine which players to show in this window, and construct/configure CTRAPlayerFrames accordingly
+		-- STEP 2: While out of combat, update any pending options
+		-- STEP 3: If enabled, continue to steps 3 and 4.
+		-- STEP 4: Outside combat, obtain a roster of self, party members and raid members to use during step 2
+		-- STEP 5: Determine which players to show in this window, and construct/configure CTRAPlayerFrames accordingly
 		
 		-- STEP 1:
 		if (option) then
 			currentOptions[option] = value;
+			pendingOptions[option] = value;
 			for __, obj in ipairs(playerFrames) do
 				obj:Update(option, value);
 			end
@@ -1559,13 +1617,39 @@ function NewCTRAWindow(owningCTRAFrames)
 				obj:Update(option, value);
 			end
 		end
-
+		
 		-- STEP 2:
+		if (not InCombatLockdown()) then
+			for key, val in pairs(pendingOptions) do
+				if (option == "PlayerFrameScale") then
+					for __, label in ipairs(labels) do
+						label:SetScale(val/100);
+					end
+				elseif (
+					option == "GrowUpward"
+					or option == "GrowLeft"
+					or option == "EnableTargetFrame"
+					or option == "HorizontalSpacing"
+					or option == "VerticalSpacing"
+					or option == "Orientation"
+					or option == "EnableTargetFrame"
+					or option == "TargetHealth"
+					or option == "TargetPower"
+				) then
+					for i, label in ipairs(labels) do
+						anchorLabel(label);
+					end
+				end
+			end
+			wipe(pendingOptions);
+		end
+
+		-- STEP 3:
 		if (not obj:IsEnabled()) then
 			return;
 		end
 
-		-- STEP 3:
+		-- STEP 4:
 		wipe(roster);
 		local numPets = 0;
 		if (IsInRaid() or UnitExists("raid2")) then
@@ -1602,8 +1686,8 @@ function NewCTRAWindow(owningCTRAFrames)
 				["name"] = UnitName("player"),
 				["class"] = select(2, UnitClass("player")),
 				["role"] = (
-					UnitGroupRolesAssigned("player") 
-					or GetSpecializationRoleByID(GetInspectSpecialization("player"))
+					(UnitGroupRolesAssigned("player") ~= "NONE" and UnitGroupRolesAssigned("player"))
+					or select(5, GetSpecializationInfo(GetSpecialization()))
 				),
 				["isPlayer"] = true,
 				["group"] = 1,
@@ -1649,7 +1733,7 @@ function NewCTRAWindow(owningCTRAFrames)
 			end
 		end
 
-		-- STEP 4:
+		-- STEP 5:
 		local categories =
 		{
 			-- {
@@ -1658,24 +1742,29 @@ function NewCTRAWindow(owningCTRAFrames)
 			--	[3] = labelText,		-- label to show if ShowLabels is true (not yet implemented, 7 Jul 19)
 			-- }
 
-			{"ShowGroup1", function(rosterEntry) return rosterEntry.group == 1; end, "Gp 1",},
-			{"ShowGroup2", function(rosterEntry) return rosterEntry.group == 2; end, "Gp 2",},
-			{"ShowGroup3", function(rosterEntry) return rosterEntry.group == 3; end, "Gp 3",},
-			{"ShowGroup4", function(rosterEntry) return rosterEntry.group == 4; end, "Gp 4",},
-			{"ShowGroup5", function(rosterEntry) return rosterEntry.group == 5; end, "Gp 5",},
-			{"ShowGroup6", function(rosterEntry) return rosterEntry.group == 6; end, "Gp 6",},
-			{"ShowGroup7", function(rosterEntry) return rosterEntry.group == 7; end, "Gp 7",},
-			{"ShowGroup8", function(rosterEntry) return rosterEntry.group == 8; end, "Gp 8",},		
+			{"ShowGroup1", function(rosterEntry) return rosterEntry.group == 1; end, "Group 1", "1",},
+			{"ShowGroup2", function(rosterEntry) return rosterEntry.group == 2; end, "Group 2", "2",},
+			{"ShowGroup3", function(rosterEntry) return rosterEntry.group == 3; end, "Group 3", "3",},
+			{"ShowGroup4", function(rosterEntry) return rosterEntry.group == 4; end, "Group 4", "4",},
+			{"ShowGroup5", function(rosterEntry) return rosterEntry.group == 5; end, "Group 5", "5",},
+			{"ShowGroup6", function(rosterEntry) return rosterEntry.group == 6; end, "Group 6", "6",},
+			{"ShowGroup7", function(rosterEntry) return rosterEntry.group == 7; end, "Group 7", "7",},
+			{"ShowGroup8", function(rosterEntry) return rosterEntry.group == 8; end, "Group 8", "8",},		
 			{	"ShowMyself",
 				function(rosterEntry) return rosterEntry.isPlayer; end,
+				"Myself",
+				"Self"
 			},
 			{
 				"ShowTanks",
 				function(rosterEntry) return rosterEntry.role == "TANK" or rosterEntry.role == "maintank" or rosterEntry.role == "mainassist"; end,
+				"Tanks",
 			},
 			{
 				"ShowHeals",
 				function(rosterEntry) return rosterEntry.role == "HEALER"; end,
+				"Healers",
+				"Heals",
 			},
 			{
 				"ShowMelee",
@@ -1692,6 +1781,8 @@ function NewCTRAWindow(owningCTRAFrames)
 						or rosterEntry.class == "DEMONHUNTER"
 					);
 				end,
+				"Melee",
+				"MDps"
 			},
 			{
 				"ShowRange",
@@ -1705,20 +1796,22 @@ function NewCTRAWindow(owningCTRAFrames)
 					or (rosterEntry.class == "DRUID" and GetInspectSpecialization(rosterEntry.unit) ~= 103)
 					);
 				end,
+				"Ranged",
+				"RDps"
 			},
-			{"ShowPets", function(rosterEntry) return rosterEntry.role == "PET"; end },
-			{"ShowDeathKnights", function(rosterEntry) return rosterEntry.class == "DEATHKNIGHT"; end, },
-			{"ShowDemonHunters", function(rosterEntry) return rosterEntry.class == "DEMONHUNTER"; end, },
-			{"ShowDruids", function(rosterEntry) return rosterEntry.class == "DRUID"; end, },
-			{"ShowHunters", function(rosterEntry) return rosterEntry.class == "HUNTER"; end, },
-			{"ShowMages", function(rosterEntry) return rosterEntry.class == "MAGE"; end, },
-			{"ShowMonks", function(rosterEntry) return rosterEntry.class == "MONK"; end, },
-			{"ShowPaladins", function(rosterEntry) return rosterEntry.class == "PALADIN"; end, },
-			{"ShowPriests", function(rosterEntry) return rosterEntry.class == "PRIEST"; end, },
-			{"ShowRogues", function(rosterEntry) return rosterEntry.class == "ROGUE"; end, },
-			{"ShowShamans", function(rosterEntry) return rosterEntry.class == "SHAMAN"; end, },
-			{"ShowWarlocks", function(rosterEntry) return rosterEntry.class == "WARLOCK"; end, },
-			{"ShowWarriors", function(rosterEntry) return rosterEntry.class == "WARRIOR"; end, },		
+			{"ShowPets", function(rosterEntry) return rosterEntry.role == "PET"; end, "Pets", },
+			{"ShowDeathKnights", function(rosterEntry) return rosterEntry.class == "DEATHKNIGHT"; end, "DKs", },
+			{"ShowDemonHunters", function(rosterEntry) return rosterEntry.class == "DEMONHUNTER"; end, "DHs", },
+			{"ShowDruids", function(rosterEntry) return rosterEntry.class == "DRUID"; end, "Drds",},
+			{"ShowHunters", function(rosterEntry) return rosterEntry.class == "HUNTER"; end, "Htrs",},
+			{"ShowMages", function(rosterEntry) return rosterEntry.class == "MAGE"; end, "Mages", },
+			{"ShowMonks", function(rosterEntry) return rosterEntry.class == "MONK"; end, "Monks", },
+			{"ShowPaladins", function(rosterEntry) return rosterEntry.class == "PALADIN"; end, "Pal's", },
+			{"ShowPriests", function(rosterEntry) return rosterEntry.class == "PRIEST"; end, "Prsts", },
+			{"ShowRogues", function(rosterEntry) return rosterEntry.class == "ROGUE"; end, "Rougs", },
+			{"ShowShamans", function(rosterEntry) return rosterEntry.class == "SHAMAN"; end, "Shams", },
+			{"ShowWarlocks", function(rosterEntry) return rosterEntry.class == "WARLOCK"; end, "Wrlks", },
+			{"ShowWarriors", function(rosterEntry) return rosterEntry.class == "WARRIOR"; end, "War's", },		
 		};
 		local x = 0;
 		local y = 0;
@@ -1731,7 +1824,10 @@ function NewCTRAWindow(owningCTRAFrames)
 		for __, frame in pairs(targetFrames) do
 			frame:Disable();
 		end
-		local playersShown = 0;
+		for __, label in pairs(labels) do
+			label:SetText("");
+		end
+		local playersShown, labelsShown = 0, 0;
 		for __, category in pairs(categories) do  -- (from step 2)
 			if self:GetProperty(category[1]) then
 
@@ -1741,18 +1837,42 @@ function NewCTRAWindow(owningCTRAFrames)
 
 						-- show this person
 						playersShown = playersShown + 1;
-						if (not playerFrames[playersShown]) then
-							playerFrames[playersShown] = NewCTRAPlayerFrame(self, windowFrame);
-						end
+						playerFrames[playersShown] = playerFrames[playersShown] or NewCTRAPlayerFrame(self, windowFrame);
 						playerFrames[playersShown]:Enable(rosterEntry.unit, (self:GetProperty("GrowLeft") and -x) or x, (self:GetProperty("GrowUpward") and -y + 50) or y - 10);
 						if (self:GetProperty("EnableTargetFrame")) then
-							if (not targetFrames[playersShown]) then
-								targetFrames[playersShown] = NewCTRATargetFrame(self, windowFrame);
-							end
+							targetFrames[playersShown] = targetFrames[playersShown] or NewCTRATargetFrame(self, windowFrame);
 							targetFrames[playersShown]:Enable(rosterEntry.unit .. "target", (self:GetProperty("GrowLeft") and -x) or x, (self:GetProperty("GrowUpward") and -y + 12) or y - 48);	-- 38 lower than the associated playerFrame
 						end
 						if (self:GetProperty("ShowDuplicatesOnceOnly")) then
 							rosterEntry.requestShow = nil;
+						end
+						if (self:GetProperty("ShowGroupLabels")) then
+							if (w == 0 and category[3]) then
+								labelsShown = labelsShown + 1
+								if not(labels[labelsShown]) then
+									labels[labelsShown] = windowFrame:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall");
+									labels[labelsShown].id = labelsShown;
+									labels[labelsShown]:SetJustifyH("CENTER");
+									labels[labelsShown]:SetJustifyV("MIDDLE");
+									labels[labelsShown]:SetScale(self:GetProperty("PlayerFrameScale")/100);
+									labels[labelsShown]:SetTextColor(1,1,1);
+									anchorLabel(labels[labelsShown]);
+								end
+								labels[labelsShown]:SetText(category[3] or "");
+								category[3] = nil;
+							elseif (category[3]) then
+								-- this isn't the first frame in this column
+								local text = labels[labelsShown]:GetText();
+								if (text and text ~= "") then
+									if (text:sub(1,6) == "Group ") then
+										text = "Groups " .. text:sub(7);
+									end
+									labels[labelsShown]:SetText(text .. ", " .. (category[4] or category[3]));
+								else
+									labels[labelsShown]:SetText(category[3]);
+								end
+								category[3] = nil;
+							end
 						end
 
 						-- move the anchor (and wrap to a new col/row if necessary) for the next person, and keep track of the max number of rows and columns in use
@@ -1775,7 +1895,7 @@ function NewCTRAWindow(owningCTRAFrames)
 									- 40
 									- self:GetProperty("VerticalSpacing") 
 									- ((self:GetProperty("EnableTargetFrame") and 20) or 0)
-									- (((self:GetProperty("EnableTargetFrame") and self:GetProperty("TargetHealth") and not self:GetProperty("ShowHealthAsBackground")) and 4) or 0)
+									- (((self:GetProperty("EnableTargetFrame") and self:GetProperty("TargetHealth") and not self:GetProperty("HealthBarAsBackground")) and 4) or 0)
 									- (((self:GetProperty("EnableTargetFrame") and self:GetProperty("TargetPower")) and 4) or 0)
 								);
 								if (w > cols) then
@@ -1795,7 +1915,7 @@ function NewCTRAWindow(owningCTRAFrames)
 									- 40
 									- self:GetProperty("VerticalSpacing") 
 									- ((self:GetProperty("EnableTargetFrame") and 20) or 0)
-									- (((self:GetProperty("EnableTargetFrame") and self:GetProperty("TargetHealth") and not self:GetProperty("ShowHealthAsBackground")) and 4) or 0)
+									- (((self:GetProperty("EnableTargetFrame") and self:GetProperty("TargetHealth") and not self:GetProperty("HealthBarAsBackground")) and 4) or 0)
 									- (((self:GetProperty("EnableTargetFrame") and self:GetProperty("TargetPower")) and 4) or 0)
 								);
 								if (w > rows) then
@@ -1833,7 +1953,7 @@ function NewCTRAWindow(owningCTRAFrames)
 							- 40
 							- self:GetProperty("VerticalSpacing") 
 							- ((self:GetProperty("EnableTargetFrame") and 20) or 0)
-							- (((self:GetProperty("EnableTargetFrame") and self:GetProperty("TargetHealth") and not self:GetProperty("ShowHealthAsBackground")) and 4) or 0)
+							- (((self:GetProperty("EnableTargetFrame") and self:GetProperty("TargetHealth") and not self:GetProperty("HealthBarAsBackground")) and 4) or 0)
 							- (((self:GetProperty("EnableTargetFrame") and self:GetProperty("TargetPower")) and 4) or 0)
 						);
 					end	
@@ -2214,7 +2334,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	local healthBarWidth;
 	local powerBar, powerBarWidth;
 	local roleTexture;
-	local unitNameFontStringLarge, unitNameFontStringSmall;
+	local unitNameFontString;
 	local aura1Texture, aura2Texture, aura3Texture, aura4Texture, aura5Texture;
 	local auraBoss1Texture, auraBoss2Texture, auraBoss3Texture;
 	local aura1CooldownParent, aura2CooldownParent, aura3CooldownParent, aura4CooldownParent, aura5CooldownParent;
@@ -2235,8 +2355,8 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 		background:SetPoint("BOTTOMRIGHT", visualFrame, -3, 3);
 		colorBackgroundRed, colorBackgroundGreen, colorBackgroundBlue, colorBackgroundAlpha = unpack(owner:GetProperty("ColorBackground"));
 		colorBackgroundDeadOrGhostRed, colorBackgroundDeadOrGhostGreen, colorBackgroundDeadOrGhostBlue, colorBackgroundDeadOrGhostAlpha = unpack(owner:GetProperty("ColorBackgroundDeadOrGhost"));
-		
-		visualFrame:SetBackdrop({["edgeFile"] = "Interface\\Tooltips\\UI-Tooltip-Border",["edgeSize"] = 16,});
+	
+		visualFrame:SetBackdrop({["edgeFile"] = "Interface\\Tooltips\\UI-Tooltip-Border",["edgeSize"] = 10 + 2 * owner:GetProperty("BorderThickness"),});
 		colorBorderRed, colorBorderGreen, colorBorderBlue, colorBorderAlpha = unpack(owner:GetProperty("ColorBorder"));
 		colorBorderBeyondRangeRed, colorBorderBeyondRangeGreen, colorBorderBeyondRangeBlue, colorBorderBeyondRangeAlpha = unpack(owner:GetProperty("ColorBorderBeyondRange"));
 	end
@@ -2569,7 +2689,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 	local configureRoleTexture = function()
 		roleTexture = roleTexture or visualFrame:CreateTexture(nil, "OVERLAY");
 		roleTexture:SetSize(12,12);
-		roleTexture:SetPoint("TOPLEFT", visualFrame, 1.80, -1.80);	
+		roleTexture:SetPoint("TOPLEFT", visualFrame, 1.20, -1.20);	
 	end
 	
 	-- creates and updates the role icon in the top left
@@ -2596,7 +2716,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 					roleTexture:SetTexCoord(0.75, 1.00, 0.25, 0.50);
 				end
 				roleTexture:Show();
-			elseif (roleAssigned == "DAMAGER") then
+			elseif (1 or roleAssigned == "DAMAGER") then
 				roleTexture:SetTexture("Interface\\LFGFrame\\UI-LFG-ICON-PORTRAITROLES");
 				roleTexture:SetTexCoord(0.3125, 0.609375, 0.34375, 0.640625);  -- GetTexCoordsForRoleSmallCircle("DAMAGER");
 				roleTexture:Show();
@@ -2705,51 +2825,20 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 		end
 	end
 	
-	-- creates the font strings to dislay the unit's name, with customization to counter the ugly side effects of SetScale()
-	local configureUnitNameFontString = function()
-
-		-- limit memory usage by using the same FontObject for the whole module
-		-- this intended to simulate the use of "static" keyword in other programming languages
-		if (not module.GetUnitNameFontLarge) then	
-			module.unitNameFontLarge = { }		
-			module.GetUnitNameFontLarge = function(__, scale)
-				if (not module.unitNameFontLarge[scale]) then
-					module.unitNameFontLarge[scale] = CreateFont("CTRA_UnitNameLargeWithScale" .. scale);
-					module.unitNameFontLarge[scale]:SetFont("Fonts\\FRIZQT__.TTF", 8 * scale);
-				end
-				return module.unitNameFontLarge[scale];
-			end
-		end
-
-		if (not module.GetUnitNameFontSmall) then
-			module.unitNameFontSmall = { }
-			module.GetUnitNameFontSmall = function(__, scale)
-				if (not module.unitNameFontSmall[scale]) then
-					module.unitNameFontSmall[scale] = CreateFont("CTRA_UnitNameSmallWithScale" .. scale);
-					module.unitNameFontSmall[scale]:SetFont("Fonts\\FRIZQT__.TTF", 7 * scale);
-				end
-				return module.unitNameFontSmall[scale];
-			end
-		end
-
-		
-		local scale = owner:GetProperty("PlayerFrameScale") / 100;
-		
-		unitNameFontStringLarge = unitNameFontStringLarge or visualFrame:CreateFontString(nil, "OVERLAY");
-		unitNameFontStringLarge:SetIgnoreParentScale(true);
-		unitNameFontStringLarge:SetFontObject(module:GetUnitNameFontLarge(scale));
-		unitNameFontStringLarge:SetPoint("BOTTOMLEFT", visualFrame, "LEFT", 12 * scale, 1);	-- leave room for roleTexture
-		unitNameFontStringLarge:SetPoint("BOTTOMRIGHT", visualFrame, "RIGHT", -12 * scale, 1);	-- leave room for aura icons
-		unitNameFontStringLarge:SetHeight(8 * scale);	-- prevents a shift when the name is truncated
-		
-	
-		unitNameFontStringSmall = unitNameFontStringSmall or visualFrame:CreateFontString(nil, "OVERLAY");
-		unitNameFontStringSmall:SetIgnoreParentScale(true);
-		unitNameFontStringSmall:SetFontObject(module:GetUnitNameFontSmall(scale));
-		unitNameFontStringSmall:SetPoint("BOTTOMLEFT", visualFrame, "LEFT", 12 * scale, 1.5 * scale);		-- leave room for roleTexture
-		unitNameFontStringSmall:SetPoint("BOTTOMRIGHT", visualFrame, "RIGHT", -12 * scale, 1.5 * scale);	-- leave room for aura icons
-		unitNameFontStringSmall:SetHeight(7 * scale);	-- prevents a shift when the name is truncated
+	-- creates the font strings to dislay the unit's name, and sizes it to strike a balance between legibility and fitting in longer names
+	local configureUnitNameFontString = function()	
+		unitNameFontString = unitNameFontString or visualFrame:CreateFontString(nil, "OVERLAY");
+		unitNameFontString:SetDrawLayer("OVERLAY", 1);	-- in front of icons
+		unitNameFontString:SetIgnoreParentScale(true);
+		local scale, effectiveScale, UIScale = visualFrame:GetScale(), visualFrame:GetEffectiveScale(), parent:GetEffectiveScale();
+		local fontHeight = floor(11 * UIScale * (0.25 + scale*0.75));
+		unitNameFontString:SetPoint("BOTTOMLEFT", visualFrame, "LEFT", 13 * effectiveScale, 1);
+		unitNameFontString:SetPoint("BOTTOMRIGHT", visualFrame, "RIGHT", -13 * effectiveScale, 1);	
+		unitNameFontString.font = 2;
+		unitNameFontString:SetFont("Fonts\\FRIZQT__.TTF", fontHeight);
+		unitNameFontString:SetHeight(fontHeight);
 	end
+	
 	
 	-- creates and updates the player's name
 	local updateUnitNameFontString = function()
@@ -2757,22 +2846,16 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			if (UnitExists(shownUnit)) then
 				-- show the name, but omit the server
 				local name;
-				name = strsplit("-", UnitName(shownUnit), 2);
+				name = strsplit("-", UnitName(shownUnit) or "", 2):sub(1,12);
 				local classR, classG, classB = GetClassColor(select(2,UnitClass(shownUnit)));
-				if (strlen(name) < 10) then
-					unitNameFontStringLarge:SetText(name);
-					unitNameFontStringLarge:SetTextColor(classR, classG, classB);
-					unitNameFontStringLarge:Show();
-					unitNameFontStringSmall:Hide();
-				else
-					unitNameFontStringSmall:SetText(name);
-					unitNameFontStringSmall:SetTextColor(classR, classG, classB);
-					unitNameFontStringSmall:Show();
-					unitNameFontStringLarge:Hide();
+				unitNameFontString:SetText(name);
+				while (unitNameFontString:GetStringWidth() > unitNameFontString:GetWidth()) do
+					name = name:sub(1, -2);
+					unitNameFontString:SetText(name);
 				end
+				unitNameFontString:SetTextColor(classR, classG, classB);
 			else
-				unitNameFontStringLarge:Hide();
-				unitNameFontStringSmall:Hide();
+				unitNameFontString:SetText("");
 			end
 		end
 	end
@@ -2847,7 +2930,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 		aura5Cooldown:SetReverse(true);
 		aura5Cooldown:SetSwipeColor(bgr, bgg, bgb, bga);
 		
-		auraBoss1Texture = auraBoss1Texture or visualFrame:CreateTexture(nil, "OVERLAY");
+		auraBoss1Texture = auraBoss1Texture or visualFrame:CreateTexture(nil, "OVERLAY", nil, 2); -- over the unitNameFontString
 		auraBoss1Texture:SetSize(11,11);
 		auraBoss1Texture:SetTexCoord(0.04,0.96,0.04,0.96);
 		auraBoss1CountFontString = auraBoss1CountFontString or visualFrame:CreateFontString(nil, "OVERLAY");
@@ -2862,7 +2945,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 		auraBoss1Cooldown:SetReverse(true);
 		auraBoss1Cooldown:SetSwipeColor(bgr, bgg, bgb, bga);
 		
-		auraBoss2Texture = auraBoss2Texture or visualFrame:CreateTexture(nil, "OVERLAY");
+		auraBoss2Texture = auraBoss2Texture or visualFrame:CreateTexture(nil, "OVERLAY", nil, 2);
 		auraBoss2Texture:SetSize(11,11);
 		auraBoss2Texture:SetTexCoord(0.04,0.96,0.04,0.96);
 		auraBoss2Texture:SetPoint("LEFT", auraBoss1Texture, "RIGHT", 1, 0);
@@ -2878,7 +2961,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 		auraBoss2Cooldown:SetReverse(true);
 		auraBoss2Cooldown:SetSwipeColor(bgr, bgg, bgb, bga);
 		
-		auraBoss3Texture = auraBoss3Texture or visualFrame:CreateTexture(nil, "OVERLAY");
+		auraBoss3Texture = auraBoss3Texture or visualFrame:CreateTexture(nil, "OVERLAY", nil, 2);
 		auraBoss3Texture:SetSize(11,11);
 		auraBoss3Texture:SetTexCoord(0.04,0.96,0.04,0.96);
 		auraBoss3Texture:SetPoint("LEFT", auraBoss2Texture, "RIGHT", 1, 0);
@@ -3244,7 +3327,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			for key, val in pairs(optionsWaiting) do
 				if (key == "PlayerFrameScale") then
 					visualFrame:SetScale((val or 100)/100);
-					configureUnitNameFontString();
+					configureUnitNameFontString(true);	-- true flag forces the font to redraw
 				elseif (
 					key == "ColorUnitFullHealthCombat"
 					or key == "ColorUnitZeroHealthCombat"
@@ -3495,7 +3578,7 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 	local incomingBarFullCombat, incomingBarZeroCombat, incomingBarFullNoCombat, incomingBarZeroNoCombat;
 	local healthBarWidth;
 	local powerBar, powerBarWidth;
-	local unitNameFontStringSmall;
+	local unitNameFontString;
 	
 	
 	-- PRIVATE FUNCTIONS
@@ -3803,40 +3886,27 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 
 	-- creates the font strings to dislay the unit's name, with customization to counter the ugly side effects of SetScale()
 	local configureUnitNameFontString = function()
-
-		-- limit memory usage by using the same FontObject for the whole module
-		-- this intended to simulate the use of "static" keyword in other programming languages
-		if (not module.GetUnitNameFontSmall) then
-			module.unitNameFontSmall = { }
-			module.GetUnitNameFontSmall = function(__, scale)
-				if (not module.unitNameFontSmall[scale]) then
-					module.unitNameFontSmall[scale] = CreateFont("CTRA_UnitNameSmallWithScale" .. scale);
-					module.unitNameFontSmall[scale]:SetFont("Fonts\\FRIZQT__.TTF", 7 * scale);
-				end
-				return module.unitNameFontSmall[scale];
-			end
-		end
+		unitNameFontString = unitNameFontString or visualFrame:CreateFontString(nil, "OVERLAY");
+		unitNameFontString:SetDrawLayer("OVERLAY", 1);	-- in front of icons
+		unitNameFontString:SetIgnoreParentScale(true);
+		local scale, effectiveScale, UIScale = visualFrame:GetScale(), visualFrame:GetEffectiveScale(), parent:GetEffectiveScale();
+		local fontHeight = floor(11 * UIScale * (0.25 + scale*0.75));
+		unitNameFontString:SetPoint("BOTTOMLEFT", visualFrame, "LEFT", 11 * effectiveScale, 1);
+		unitNameFontString:SetPoint("BOTTOMRIGHT", visualFrame, "RIGHT", -11 * effectiveScale, 1);	
+		unitNameFontString.font = 2;
+		unitNameFontString:SetFont("Fonts\\FRIZQT__.TTF", fontHeight);
+		unitNameFontString:SetHeight(fontHeight);
 		
-		local scale = owner:GetProperty("PlayerFrameScale") / 100;
-	
-		unitNameFontStringSmall = unitNameFontStringSmall or visualFrame:CreateFontString(nil, "OVERLAY");
-		unitNameFontStringSmall:SetIgnoreParentScale(true);
-		unitNameFontStringSmall:SetFontObject(module:GetUnitNameFontSmall(scale));
-		unitNameFontStringSmall:SetPoint("TOPLEFT", visualFrame, "TOPLEFT", 4 * scale, -3 * scale);
-		unitNameFontStringSmall:SetPoint("TOPRIGHT", visualFrame, "TOPRIGHT", -4 * scale, -3 * scale);
-		unitNameFontStringSmall:SetHeight(7 * scale);	-- prevents a shift when the name is truncated
-		
-		unitNameFontStringSmall:SetTextColor(1,1,1,1);	-- done here just once, because mobs don't have a class!
+		unitNameFontString:SetTextColor(1,1,1,1);	-- done here just once, because mobs don't have a class!
 	end
 	
 	-- creates and updates the player's name
 	local updateUnitNameFontString = function()
 		if (shownUnit) then
 			if (UnitExists(shownUnit)) then
-				unitNameFontStringSmall:Show();
-				unitNameFontStringSmall:SetText(UnitName(shownUnit));
+				unitNameFontString:SetText(UnitName(shownUnit));
 			else
-				unitNameFontStringSmall:Hide();
+				unitNameFontString:SetText("");
 			end
 		end
 	end
@@ -3883,7 +3953,7 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 				-- overall dimensions
 				visualFrame = CreateFrame("Frame", nil, parent, nil);
 				visualFrame:SetWidth(90);
-				visualFrame:SetHeight(20 + ((owner:GetProperty("TargetHealth") and 4) or 0) + ((owner:GetProperty("TargetPower") and 4) or 0));
+				visualFrame:SetHeight(20 + (((owner:GetProperty("TargetHealth") and not owner:GetProperty("HealthBarAsBackground")) and 4) or 0) + ((owner:GetProperty("TargetPower") and 4) or 0));
 				visualFrame:SetScale(owner:GetProperty("PlayerFrameScale")/100);
 								
 				-- overlay button that can be clicked to do stuff in combat (the secure configuration is made later in step 3)
@@ -3927,7 +3997,7 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 					key == "TargetHealth"
 					or key == "TargetPower"
 				) then
-					visualFrame:SetHeight(20 + ((owner:GetProperty("TargetHealth") and 4) or 0) + ((owner:GetProperty("TargetPower") and 4) or 0));
+					visualFrame:SetHeight(20 + (((owner:GetProperty("TargetHealth") and not owner:GetProperty("HealthBarAsBackground")) and 4) or 0) + ((owner:GetProperty("TargetPower") and 4) or 0));
 				end
 			end
 			optionsWaiting = { };

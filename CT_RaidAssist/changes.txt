@@ -1,8 +1,10 @@
 CT_RaidAssist (8.3.0.8) 2020-04-02
+- Optional group/role/class labels over each col/row
 - Optional health/power bars on target frames
 - Optional "pets" group for water elementals and any other class pets
 - Added polish to the total-absorb and incoming-heal bars
 - More control over click-casting, and integration with Clique addon
+- Tweak to font-size scaling, balancing retail and classic a bit better
 
 CT_RaidAssist (8.3.0.7) 2020-03-29
 - Now shows incoming (predicted) heals on retail and classic
