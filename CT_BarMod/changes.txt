@@ -1,3 +1,6 @@
+CT_BarMod (8.3.0.8) 2020-02-29
+- Added option to fade bars differently during and outside combat
+
 CT_BarMod (8.3.0.7) 2020-02-22
 - Further integration, reducing cpu usage and showing pushed textures
 
