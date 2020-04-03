@@ -3890,9 +3890,9 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 		unitNameFontString:SetDrawLayer("OVERLAY", 1);	-- in front of icons
 		unitNameFontString:SetIgnoreParentScale(true);
 		local scale, effectiveScale, UIScale = visualFrame:GetScale(), visualFrame:GetEffectiveScale(), parent:GetEffectiveScale();
-		local fontHeight = floor(11 * UIScale * (0.25 + scale*0.75));
-		unitNameFontString:SetPoint("BOTTOMLEFT", visualFrame, "LEFT", 11 * effectiveScale, 1);
-		unitNameFontString:SetPoint("BOTTOMRIGHT", visualFrame, "RIGHT", -11 * effectiveScale, 1);	
+		local fontHeight = floor(11.2 * UIScale * (0.25 + scale*0.75));
+		unitNameFontString:SetPoint("TOPLEFT", visualFrame, "TOPLEFT", 4 * effectiveScale, -5 * effectiveScale);
+		unitNameFontString:SetPoint("TOPRIGHT", visualFrame, "TOPRIGHT", -4 * effectiveScale, -5 * effectiveScale);	
 		unitNameFontString.font = 2;
 		unitNameFontString:SetFont("Fonts\\FRIZQT__.TTF", fontHeight);
 		unitNameFontString:SetHeight(fontHeight);
@@ -3904,7 +3904,12 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 	local updateUnitNameFontString = function()
 		if (shownUnit) then
 			if (UnitExists(shownUnit)) then
-				unitNameFontString:SetText(UnitName(shownUnit));
+				local name = UnitName(shownUnit);
+				unitNameFontString:SetText(name);
+				while (unitNameFontString:GetStringWidth() > unitNameFontString:GetWidth()) do
+					name = name:sub(1,-2);
+					unitNameFontString:SetText(name);
+				end
 			else
 				unitNameFontString:SetText("");
 			end
