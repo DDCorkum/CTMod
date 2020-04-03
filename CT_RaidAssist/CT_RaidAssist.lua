@@ -2831,7 +2831,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 		unitNameFontString:SetDrawLayer("OVERLAY", 1);	-- in front of icons
 		unitNameFontString:SetIgnoreParentScale(true);
 		local scale, effectiveScale, UIScale = visualFrame:GetScale(), visualFrame:GetEffectiveScale(), parent:GetEffectiveScale();
-		local fontHeight = floor(11 * UIScale * (0.25 + scale*0.75));
+		local fontHeight = floor(11.2 * UIScale * (0.25 + scale*0.75));
 		unitNameFontString:SetPoint("BOTTOMLEFT", visualFrame, "LEFT", 13 * effectiveScale, 1);
 		unitNameFontString:SetPoint("BOTTOMRIGHT", visualFrame, "RIGHT", -13 * effectiveScale, 1);	
 		unitNameFontString.font = 2;
@@ -2846,7 +2846,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame)
 			if (UnitExists(shownUnit)) then
 				-- show the name, but omit the server
 				local name;
-				name = strsplit("-", UnitName(shownUnit) or "", 2):sub(1,12);
+				name = strsplit("-", UnitName(shownUnit) or "", 2);
 				local classR, classG, classB = GetClassColor(select(2,UnitClass(shownUnit)));
 				unitNameFontString:SetText(name);
 				while (unitNameFontString:GetStringWidth() > unitNameFontString:GetWidth()) do
