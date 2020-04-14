@@ -1000,7 +1000,7 @@ function StaticCTRAFrames()
 							{"Warriors", LOCALIZED_CLASS_NAMES_MALE.WARRIOR},
 						}
 				) do
-					optionsBeginFrame((module:getGameVersion() == CT_GAME_VERSION_RETAIL and -5) or -6, 15, "checkbutton#tl:190:%y#n:CTRAWindow_Show" .. class[1] .. "CheckButton#" .. class[2] .. "#l:90");
+					optionsBeginFrame( -5, (module:getGameVersion() == CT_GAME_VERSION_RETAIL and 15) or 20, "checkbutton#tl:190:%y#n:CTRAWindow_Show" .. class[1] .. "CheckButton#" .. class[2] .. "#l:90");
 						optionsAddScript("onload",
 							function(button)
 								button.option = function() return "CTRAWindow" .. selectedWindow .. "_Show" .. class[1]; end
