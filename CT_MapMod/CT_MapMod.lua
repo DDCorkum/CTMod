@@ -28,7 +28,7 @@ _G[MODULE_NAME] = module.publicInterface;
 local public = module.publicInterface; -- shorthand
 
 module.text = module.text or { };
-L = module.text;
+local L = module.text;
 
 --------------------------------------------
 -- Public design
