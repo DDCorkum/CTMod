@@ -1,3 +1,6 @@
+CT_Library (8.3.0.8) 2020-03-31
+- Small fixes to color swatches
+
 CT_Library (8.3.0.7) 2020-03-28
 - Performance improvements using C_Timer to replace OnUpdate
 - Fix to titan plugin and minimap button using protected-visibility code
