@@ -1230,6 +1230,8 @@ function StaticCTRAFrames()
 							if (not selectedWindow) then
 								windows[1] = NewCTRAWindow(self);
 								selectedWindow = 1;
+								windows[1]:Enable(1);
+								windows[1]:Disable();
 							end
 							dummyFrame:Enable("player", 5, 0);
 						end
@@ -1448,7 +1450,7 @@ function NewCTRAWindow(owningCTRAFrames)
 	end
 	
 	local function updateFont()
-		font = font or CreateFont("CTRAWindow" .. windowID .. "Font")
+		font = font or CreateFont("CTRAWindow" .. (windowID or 1) .. "Font")
 		local scale, UIScale = obj:GetProperty("PlayerFrameScale"), windowFrame:GetEffectiveScale();
 		local fontHeight = floor(11.2 * UIScale * (0.25 + scale*0.0075));
 		font:SetFont("Fonts\\FRIZQT__.TTF", fontHeight, "");
@@ -2149,10 +2151,10 @@ function StaticClickCastBroker()
 		-- allRezCombat and allRezNoCombat
 		if (module.CTRA_Configuration_RezAbilities[class]) then
 			for __, details in ipairs(module.CTRA_Configuration_RezAbilities[class]) do
-				if (details.gameVersion == nil or details.gameVersion == module:getGameVersion() and details.combat) then
+				if (details.combat and (details.gameVersion == nil or details.gameVersion == module:getGameVersion())) then
 					addToTable(allRezCombat, details.id, details.name, details.modifier);
 				end
-				if (details.gameVersion == nil or details.gameVersion == module:getGameVersion() and details.nocombat) then
+				if (details.nocombat and (details.gameVersion == nil or details.gameVersion == module:getGameVersion())) then
 					addToTable(allRezNoCombat, details.id, details.name, details.modifier);
 				end
 			end
@@ -2484,9 +2486,6 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 		absorbBarOverlay:SetPoint("TOPLEFT", absorbBarFullCombat);
 		absorbBarOverlay:SetPoint("BOTTOMRIGHT", absorbBarFullCombat);
 		
-		incomingBarZeroNoCombat:SetPoint("TOPLEFT", incomingBarFullCombat);	
-		incomingBarZeroNoCombat:SetPoint("BOTTOMRIGHT", incomingBarFullCombat);
-		
 		-- incomingBarFullCombat is anchored during configureHealthBar()
 		
 		incomingBarZeroCombat:SetPoint("TOPLEFT", incomingBarFullCombat);
@@ -2546,8 +2545,8 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 			absorbBarFullNoCombat:Hide();
 			absorbBarFullNoCombat:Hide();
 			absorbBarOverlay:Hide();
-			incomingBarZeroNoCombat:SetPoint("TOPLEFT", healthBarFullCombat, "TOPRIGHT");	
-			incomingBarZeroNoCombat:SetPoint("BOTTOMLEFT", healthBarFullCombat, "BOTTOMRIGHT");
+			incomingBarFullCombat:SetPoint("TOPLEFT", healthBarFullCombat, "TOPRIGHT");	
+			incomingBarFullCombat:SetPoint("BOTTOMLEFT", healthBarFullCombat, "BOTTOMRIGHT");
 		else
 			absorbBarFullCombat:Show();
 			absorbBarZeroCombat:Show();

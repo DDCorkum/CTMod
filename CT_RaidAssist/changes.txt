@@ -1,4 +1,4 @@
-CT_RaidAssist (8.3.0.8) 2020-04-13
+CT_RaidAssist (8.3.0.8) 2020-04-19
 - Optional group/role/class labels over each col/row
 - Optional health/power bars on target frames
 - Optional "pets" group for water elementals and any other class pets
