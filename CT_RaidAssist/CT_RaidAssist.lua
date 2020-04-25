@@ -1587,6 +1587,9 @@ function NewCTRAWindow(owningCTRAFrames)
 		for __, targetframe in pairs(targetFrames) do
 			targetframe:Disable();
 		end
+		for __, label in pairs(labels) do
+			label:SetText("");
+		end;
 		
 		-- STEP 4:
 		module:UnregisterMovable("CTRAWindow" .. windowID);
@@ -3278,6 +3281,12 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 					secureButtonCliqueFirst = CreateFrame("Button", nil, secureButton, "SecureUnitButtonTemplate");
 					secureButtonCliqueFirst:SetAllPoints();
 					secureButtonCliqueFirst:HookScript("OnEnter", displayTooltip);
+					secureButtonCliqueFirst:HookScript("OnLeave",
+						function()
+							module.GameTooltipExtraLine:Hide();
+							GameTooltip:Hide();
+						end
+					);
 					integrateCliqueAddon(module:getOption("CTRAFrames_ClickCast_UseCliqueAddon") ~= false);
 					
 					-- end of secure buttons
