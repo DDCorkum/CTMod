@@ -30,6 +30,7 @@ local MODULE_NAME, module = ...;
 -- Which buffs could be applied out of combat by right-clicking the player frame?  Buffs listed first take precedence.
 -- name: 	name of the spell to be cast 			(mandatory)
 -- modifier: 	nomod, mod, mod:shift, mod:ctrl, or mod:alt	(mandatory)
+-- id:		spellId of any rank of this spell		(mandatory)
 -- gameVersion: if set, this line only applies to classic or retail using CT_GAME_VERSION_CLASSIC or CT_GAME_VERSION_RETAIL constants
 module.CTRA_Configuration_Buffs =
 {
@@ -37,12 +38,13 @@ module.CTRA_Configuration_Buffs =
 	{
 		{["name"] = "Power Word: Fortitude", ["modifier"] = "nomod", ["id"] = 211681, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
 		{["name"] = "Power Word: Fortitude", ["modifier"] = "nomod", ["id"] = 1243, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
+		{["name"] = "Prayer of Fortitude", ["modifier"] = "shift", ["id"] = 21564, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
 	},
 	["MAGE"] =
 	{
 		{["name"] = "Arcane Intellect", ["modifier"] = "nomod", ["id"] = 1459},
 		{["name"] = "Arcane Brilliance", ["modifier"] = "mod:shift", ["id"] = 23028, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
-		{["name"] = "Amplify Magic", ["modifier"] = "mod:ctrl", ["id"] = 1008, ["gameVersion"] = CT_GAME_VERSION_CLASSI,},
+		{["name"] = "Amplify Magic", ["modifier"] = "mod:ctrl", ["id"] = 1008, ["gameVersion"] = CT_GAME_VERSION_CLASSIC,},
 		{["name"] = "Dampen Magic", ["modifier"] = "mod:alt", ["id"] = 604, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
 	},
 	["WARRIOR"] =
@@ -69,8 +71,7 @@ module.CTRA_Configuration_Buffs =
 -- Which debuff removals could be cast in combat by right-clicking the player frame?  Buffs listed first take precedence.
 -- name: 	name of the spell to be cast 			(mandatory)
 -- modifier: 	nomod, mod, mod:shift, mod:ctrl, or mod:alt	(mandatory)
--- magic: 	if set, the addon should indicate the presence of a removable magic debuff
--- curse, poison, disease: same as for magic
+-- id:		spellId of any rank of this spell		(mandatory)
 -- spec:	if set, this line only applies when GetInspectSpecialization("player") returns this SpecializationID
 -- gameVersion: if set, this line only applies to classic or retail using CT_GAME_VERSION_CLASSIC or CT_GAME_VERSION_RETAIL constants
 module.CTRA_Configuration_FriendlyRemoves =												
@@ -122,6 +123,7 @@ module.CTRA_Configuration_FriendlyRemoves =
 -- Which ressurection spells could be cast by right-clicking the player frame?  Buffs listed first take precedence.
 -- name: 	name of the spell to be cast 			(mandatory)
 -- modifier: 	nomod, mod, mod:shift, mod:ctrl, or mod:alt	(mandatory)
+-- id:		spellId of any rank of this spell		(mandatory)
 -- combat: 	if set, this spell may be cast during combat
 -- nocombat:	if set, this spell may be cast outside combat
 -- gameVersion: if set, this line only applies to classic or retail using CT_GAME_VERSION_CLASSIC or CT_GAME_VERSION_RETAIL constants

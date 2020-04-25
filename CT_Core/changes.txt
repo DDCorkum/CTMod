@@ -1,3 +1,6 @@
+CT_Core (8.3.0.8) 2020-04-18
+- Fix to the options menu when disabling bag management (for CT_Library 8.3.0.7)
+
 CT_Core (8.3.0.7) 2020-03-29
 - Performance improvements using C_Timer instead of OnUpdate
 - Added the option to lock the regen rate tracker

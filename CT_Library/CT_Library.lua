@@ -19,7 +19,7 @@
 -----------------------------------------------
 -- Initialization
 
-local LIBRARY_VERSION = 8.307;		-- Once upon a time this was to differentiate between different versions of CT_Library... but its now 2020 and CT_Library has stood as its own AddOn for more than a decade.
+local LIBRARY_VERSION = 8.308;		-- Once upon a time this was to differentiate between different versions of CT_Library... but its now 2020 and CT_Library has stood as its own AddOn for more than a decade.
 local LIBRARY_NAME = "CT_Library";
 
 -- Create tables for all the PROTECTED contents and PUBLIC interface of CTMod
@@ -1796,7 +1796,7 @@ local function colorSwatchColor()
 	if (colors) then
 		colors[1], colors[2], colors[3] = r, g, b;
 	else
-		colors = {r, g, b}
+		colors = {r, g, b, 1}
 	end
 	object:setOption(option, colors, not self.global);
 	self.normalTexture:SetVertexColor(r, g, b);
@@ -1810,7 +1810,7 @@ local function colorSwatchOpacity()
 		-- some addons overload 'option' with a custom function to display different windows
 		option = option();
 	end
-	local colors = object:getOption(option) or {self, r, self.g, self.b};
+	local colors = object:getOption(option) or {self.r, self.g, self.b};
 	colors[4] = a;
 	object:setOption(option, colors, not self.global);
 end
@@ -1831,7 +1831,7 @@ local function colorSwatchShow(self)
 		r, g, b, a = 1, 1, 1, 1;
 	end
 
-	self.r, self.g, self.b, self.opacity = r, g, b, a;
+	self.r, self.g, self.b, self.opacity = r, g, b, a or 1;
 	self.opacityFunc = colorSwatchOpacity;
 	self.swatchFunc = colorSwatchColor;
 	self.cancelFunc = colorSwatchCancel;

@@ -442,8 +442,8 @@ module.frame = function()
 			if (module:getGameVersion() == CT_GAME_VERSION_RETAIL or bagevent.classic) then
 				-- Show options for all bag automation, or just the vanilla/classic ones
 				-- refer to the on-load script for the next frame
-				optionsAddObject( -18, 15, "font#tl:25:%y#v:GameFontNormal#i:" .. bagevent.openAll .. "Label#" .. bagevent.label);
-				optionsBeginFrame( -3, 15, "checkbutton#tl:60:%y#o:" .. bagevent.openAll .. "#i:" .. bagevent.openAll .. "#Open all bags");
+				optionsAddObject( -18, 15, "font#tl:25:%y#v:GameFontNormal#n:" .. bagevent.openAll .. "Label#" .. bagevent.label);
+				optionsBeginFrame( -3, 15, "checkbutton#tl:60:%y#o:" .. bagevent.openAll .. "#n:" .. bagevent.openAll .. "#Open all bags");
 					optionsAddScript("onenter",
 						function(self)
 							GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 120, -5);
@@ -466,7 +466,7 @@ module.frame = function()
 						end
 					);
 				optionsEndFrame();
-				optionsBeginFrame(  -3, 15, "checkbutton#tl:60:%y#o:" .. bagevent.backpack .. "#i:" .. bagevent.backpack .. "#Backpack only");
+				optionsBeginFrame(  -3, 15, "checkbutton#tl:60:%y#o:" .. bagevent.backpack .. "#n:" .. bagevent.backpack .. "#Backpack only");
 					optionsAddScript("onenter",
 						function(self)
 							GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 120, -5);
@@ -485,7 +485,7 @@ module.frame = function()
 						end
 					);
 				optionsEndFrame();
-				optionsBeginFrame(  -3, 15, "checkbutton#tl:60:%y#o:" .. bagevent.nobags .. "#i:" .. bagevent.nobags .. "#Leave bags shut");
+				optionsBeginFrame(  -3, 15, "checkbutton#tl:60:%y#o:" .. bagevent.nobags .. "#n:" .. bagevent.nobags .. "#Leave bags shut");
 					optionsAddScript("onenter",
 						function(self)
 							GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 120, -5);
@@ -506,7 +506,7 @@ module.frame = function()
 					);
 				optionsEndFrame();
 				if (bagevent.bank) then
-					optionsBeginFrame(  -8, 15, "checkbutton#tl:60:%y#o:" .. bagevent.bank .. "#i:" .. bagevent.bank .. "#...and open all bank slots");
+					optionsBeginFrame(  -8, 15, "checkbutton#tl:60:%y#o:" .. bagevent.bank .. "#n:" .. bagevent.bank .. "#...and open all bank slots");
 						optionsAddScript("onenter",
 							function(self)
 								GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 120, -5);
@@ -527,7 +527,7 @@ module.frame = function()
 					optionsEndFrame();
 				end	
 				if (bagevent.close) then
-					optionsBeginFrame(  -8, 15, "checkbutton#tl:60:%y#o:" .. bagevent.close .. "#i:" .. bagevent.close .. "#...and close when finished");
+					optionsBeginFrame(  -8, 15, "checkbutton#tl:60:%y#o:" .. bagevent.close .. "#n:" .. bagevent.close .. "#...and close when finished");
 						optionsAddScript("onenter",
 							function(self)
 								GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 120, -5);

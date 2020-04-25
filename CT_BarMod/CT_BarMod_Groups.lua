@@ -171,11 +171,31 @@ local function groupOnLeave(obj)
 	if (group.isHovered) then
 		group.isHovered = nil;
 		if (group.barMouseover) then
-			group.frame:SetAlpha(group.barFaded or 0)
+			group.frame:SetAlpha((InCombatLockdown() and group.barFadedCombat) or group.barFaded or 0)
 		else
 			group.frame:SetAlpha(group.opacity or 1)
 		end
 	end
+end
+
+local function groupOnCombatStart(group)
+	if (not group.isHovered) then
+		if (group.barMouseover) then
+			group.frame:SetAlpha(group.barFadedCombat or group.barFaded or 0)
+		else
+			group.frame:SetAlpha(group.opacity or 1)
+		end
+	end
+end
+
+local function groupOnCombatEnd(group)
+	if (not group.isHovered) then
+		if (group.barMouseover) then
+			group.frame:SetAlpha(group.barFaded or 0)
+		else
+			group.frame:SetAlpha(group.opacity or 1)
+		end
+	end	
 end
 
 module.groupOnLeave = groupOnLeave;
@@ -684,6 +704,17 @@ function group:new(groupId)
 	overlay.groupId = groupId;
 	overlay:HookScript("OnEnter", groupOnEnter);
 	overlay:HookScript("OnLeave", groupOnLeave);
+	overlay:HookScript("OnEvent", function(__, event)
+		if (event == "PLAYER_REGEN_DISABLED") then
+			C_Timer.After(0.001, function()
+				groupOnCombatStart(group);
+			end);
+		elseif (event == "PLAYER_REGEN_ENABLED") then
+			groupOnCombatEnd(group);
+		end
+	end);
+	overlay:RegisterEvent("PLAYER_REGEN_DISABLED");
+	overlay:RegisterEvent("PLAYER_REGEN_ENABLED");
 
 	frame.overlay = overlay;
 	group.overlay = overlay;
@@ -1208,6 +1239,7 @@ function group:addObject(object)
 		object:updateVisibility();
 	end
 	button:SetScale(self.scale or 1);
+	hooksecurefunc(button, "SetParent", print);
 	
 	self:updateDragframePosition();
 	self:updateOverlayPosition();
@@ -1530,6 +1562,13 @@ function group:update(optName, value)
 
 	elseif ( optName == "barFaded" ) then
 		self.barFaded = value;
+		if (not self.overlay:IsMouseOver()) then
+			self.isHovered = true;	-- forces a reset of the faded value
+			groupOnLeave(self);		
+		end
+		
+	elseif ( optName == "barFadedCombat" ) then
+		self.barFadedCombat = value;
 		if (not self.overlay:IsMouseOver()) then
 			self.isHovered = true;	-- forces a reset of the faded value
 			groupOnLeave(self);		

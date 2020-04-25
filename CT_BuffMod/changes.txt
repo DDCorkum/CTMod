@@ -1,3 +1,6 @@
+CT_BuffMod (8.3.0.8) 2020-03-31
+- Optional smaller or larger font size
+
 CT_BuffMod (8.3.0.7) 2020-03-29
 - Performance improvements using C_Timer to replace OnUpdate
 - Code updates corresponding to CT_Library

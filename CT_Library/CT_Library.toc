@@ -1,5 +1,5 @@
 ## Interface: 80300
-## Version: 8.3.0.7
+## Version: 8.3.0.8
 ## Title: CT_Library |cFF333333(BFA)
 ## Notes: Library features for CTMod. 
 ## DefaultState: Enabled

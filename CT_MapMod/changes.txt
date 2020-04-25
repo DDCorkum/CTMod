@@ -1,3 +1,6 @@
+CT_MapMod (8.3.0.8) 2020-04-13
+- Correction to prevent conflicts with other addons
+
 CT_MapMod (8.3.0.7) 2020-03-08
 - Performance improvements using C_Timer
 - Fixed a logic error affecting herbs and ore without a description
