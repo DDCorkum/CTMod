@@ -13,16 +13,16 @@ local module = select(2, ...);
 
 local function CT_PlayerFrame_HealthTextStatusBar_UpdateTextString(bar)
 	if (CT_UnitFramesOptions) then
-		CT_UnitFrames_TextStatusBar_UpdateTextString(bar, CT_UnitFramesOptions.styles[1][1])
+		module:UpdateStatusBarTextString(bar, CT_UnitFramesOptions.styles[1][1])
 		CT_UnitFrames_HealthBar_OnValueChanged(bar, tonumber(bar:GetValue()), not CT_UnitFramesOptions.oneColorHealth)
-		CT_UnitFrames_BesideBar_UpdateTextString(bar, CT_UnitFramesOptions.styles[1][2], CT_PlayerHealthRight)
+		module:UpdateBesideBarTextString(bar, CT_UnitFramesOptions.styles[1][2], CT_PlayerHealthRight)
 	end
 end
 
 local function CT_PlayerFrame_ManaTextStatusBar_UpdateTextString(bar)
 	if (CT_UnitFramesOptions) then
-		CT_UnitFrames_TextStatusBar_UpdateTextString(bar, CT_UnitFramesOptions.styles[1][3])
-		CT_UnitFrames_BesideBar_UpdateTextString(bar, CT_UnitFramesOptions.styles[1][4], CT_PlayerManaRight)
+		module:UpdateStatusBarTextString(bar, CT_UnitFramesOptions.styles[1][3])
+		module:UpdateBesideBarTextString(bar, CT_UnitFramesOptions.styles[1][4], CT_PlayerManaRight)
 	end
 end
 

@@ -71,12 +71,12 @@ local function CT_PartyFrame_TextStatusBar_UpdateTextString(bar)
 		
 		-- apply changes for the health and mana bars
 		if (bar.type == "health") then	
-			CT_UnitFrames_TextStatusBar_UpdateTextString(bar, CT_UnitFramesOptions.styles[2][1])
+			module:UpdateStatusBarTextString(bar, CT_UnitFramesOptions.styles[2][1])
 			CT_UnitFrames_HealthBar_OnValueChanged(bar, tonumber(bar:GetValue()), not CT_UnitFramesOptions.oneColorHealth)
-			CT_UnitFrames_BesideBar_UpdateTextString(bar, CT_UnitFramesOptions.styles[2][2], bar.textRight)
+			module:UpdateBesideBarTextString(bar, CT_UnitFramesOptions.styles[2][2], bar.textRight)
 		else -- if bar.type == "mana"
-			CT_UnitFrames_TextStatusBar_UpdateTextString(bar, CT_UnitFramesOptions.styles[2][3])
-			CT_UnitFrames_BesideBar_UpdateTextString(bar, CT_UnitFramesOptions.styles[2][4], bar.textRight)			
+			module:UpdateStatusBarTextString(bar, CT_UnitFramesOptions.styles[2][3])
+			module:UpdateBesideBarTextString(bar, CT_UnitFramesOptions.styles[2][4], bar.textRight)			
 		end
 	end
 end

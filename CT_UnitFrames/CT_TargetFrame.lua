@@ -173,16 +173,16 @@ local function CT_TargetFrame_HealthTextStatusBar_UpdateTextString(bar)
 		else
 			style = CT_UnitFramesOptions.styles[3][5];
 		end
-		CT_UnitFrames_TextStatusBar_UpdateTextString(bar, style, 0)
+		module:UpdateStatusBarTextString(bar, style, 0)
 		CT_UnitFrames_HealthBar_OnValueChanged(bar, tonumber(bar:GetValue()), not CT_UnitFramesOptions.oneColorHealth)
-		CT_UnitFrames_BesideBar_UpdateTextString(bar, CT_UnitFramesOptions.styles[3][2], CT_TargetHealthLeft)	
+		module:UpdateBesideBarTextString(bar, CT_UnitFramesOptions.styles[3][2], CT_TargetHealthLeft)	
 	end
 end
 
 local function CT_TargetFrame_ManaTextStatusBar_UpdateTextString(bar)
 	if (CT_UnitFramesOptions) then
-		CT_UnitFrames_TextStatusBar_UpdateTextString(bar, CT_UnitFramesOptions.styles[3][3], 0)
-		CT_UnitFrames_BesideBar_UpdateTextString(bar, CT_UnitFramesOptions.styles[3][4], CT_TargetManaLeft)
+		module:UpdateStatusBarTextString(bar, CT_UnitFramesOptions.styles[3][3], 0)
+		module:UpdateBesideBarTextString(bar, CT_UnitFramesOptions.styles[3][4], CT_TargetManaLeft)
 	end
 end
 

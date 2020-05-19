@@ -1334,15 +1334,15 @@ local function CT_AssistFrame_TextStatusBar_UpdateTextString(bar)
 			else
 				style = CT_UnitFramesOptions.styles[4][5];
 			end
-			CT_UnitFrames_TextStatusBar_UpdateTextString(bar, style, 0)
+			module:UpdateStatusBarTextString(bar, style, 0)
 			CT_UnitFrames_HealthBar_OnValueChanged(bar, tonumber(bar:GetValue()), not CT_UnitFramesOptions.oneColorHealth)
-			CT_UnitFrames_BesideBar_UpdateTextString(bar, CT_UnitFramesOptions.styles[4][2], self.healthBesideText)
+			module:UpdateBesideBarTextString(bar, CT_UnitFramesOptions.styles[4][2], self.healthBesideText)
 		end
 
 	elseif (bar == self.manabar) then
 		if (CT_UnitFramesOptions) then
-			CT_UnitFrames_TextStatusBar_UpdateTextString(bar, CT_UnitFramesOptions.styles[4][3], 0)
-			CT_UnitFrames_BesideBar_UpdateTextString(bar, CT_UnitFramesOptions.styles[4][4], self.manaBesideText)
+			module:UpdateStatusBarTextString(bar, CT_UnitFramesOptions.styles[4][3], 0)
+			module:UpdateBesideBarTextString(bar, CT_UnitFramesOptions.styles[4][4], self.manaBesideText)
 		end
 	else
 		print("foo");

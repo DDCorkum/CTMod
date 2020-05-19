@@ -25,7 +25,7 @@ CT_Library:registerModule(module);
 _G[MODULE_NAME] = module;
 
 --------------------------------------------
--- Common functions
+-- Frame dragging
 
 function CT_UnitFrames_LinkFrameDrag(frame, drag, point, relative, x, y)
 	frame:ClearAllPoints();
@@ -66,8 +66,21 @@ function CT_UnitFrames_ResetDragLink(name)
 	end
 end
 
-function CT_UnitFrames_TextStatusBar_UpdateTextString(textStatusBar, settings, lockShow)
-	local textString =  textStatusBar.ctTextString;			--ctTextString is used to avoid creating taint
+--------------------------------------------
+-- Health and mana bar text
+
+local percentPattern = "%.2f%%";
+local valuesPattern = "%s/%s";
+local prefixedPercentPattern = "%s " .. percentPattern;
+local prefixedValuesPattern = "%s " .. valuesPattern;
+
+function module:UpdateStatusBarTextString(textStatusBar, settings, lockShow)
+	-- STEP 1: Avoid taint by creating creating a custom FontString called ctTextString
+	-- STEP 2: In Classic only, change the fonts if they have not been changed already
+	-- STEP 3: Set the text as desired
+
+	-- STEP 1:
+	local textString =  textStatusBar.ctTextString;			
 	if (not textString) then
 		-- create our string
 		local intermediateFrame = CreateFrame("Frame", nil, textStatusBar);
@@ -81,9 +94,7 @@ function CT_UnitFrames_TextStatusBar_UpdateTextString(textStatusBar, settings, l
 		textStatusBar.TextString:SetAlpha(0);
 	end
 
-
-
-
+	-- STEP 2:
 	if (module:getGameVersion() == 1) then
 		if ((textString.ctControlled == "Classic" or textString.ctControlled == nil) and CT_UnitFramesOptions.makeFontLikeRetail) then
 			-- set or change it to retail font, but do it just once
@@ -95,112 +106,93 @@ function CT_UnitFrames_TextStatusBar_UpdateTextString(textStatusBar, settings, l
 			textString.ctControlled = "Classic";	
 		end
 	end
-	if(textString) then
-		if (lockShow == nil) then lockShow = textStatusBar.lockShow; end
-		local value = textStatusBar:GetValue();
-		local valueMin, valueMax = textStatusBar:GetMinMaxValues();
-		if ( ( tonumber(valueMax) ~= valueMax or valueMax > 0 ) and not ( textStatusBar.pauseUpdates ) ) then
-			local style = settings[1];
-			local abbreviate = CT_UnitFramesOptions.largeAbbreviate ~= false;
-			local breakup = CT_UnitFramesOptions.largeBreakUp ~= false;
-			local prefix;
-			if (lockShow > 0) then
-				style = 4;
-				prefix = 1;
-			end
-			textStatusBar:Show();
-			if ( value and valueMax > 0 and ( style == 2 ) ) then
-				-- Percent
-				if ( value == 0 and textStatusBar.zeroText ) then
-					textString:SetText(textStatusBar.zeroText);
-					textStatusBar.isZero = 1;
-					textString:Show();
-					return;
-				end
-				value = math.ceil((value / valueMax) * 100);
-				if (abbreviate) then
-					value = module:abbreviateLargeNumbers(value, breakup);
-				elseif (breakup) then
-					value = module:breakUpLargeNumbers(value, breakup);
-				end
-				if ( textStatusBar.prefix and prefix ) then
-					textString:SetText(textStatusBar.prefix .. " " .. value .. "%");
-				else
-					textString:SetText(value .. "%");
-				end
-			elseif ( value == 0 and textStatusBar.zeroText ) then
-				textString:SetText(textStatusBar.zeroText);
-				textStatusBar.isZero = 1;
-				textString:Show();
-				return;
-			elseif (style == 1) then
-				-- None
-				if (textStatusBar == GetMouseFocus()) then
-				else
-					textString:SetText("");
-					textStatusBar.isZero = nil;
-					textStatusBar:Show();
-				end
-			elseif (style == 3) then
-				-- Deficit
-				textStatusBar.isZero = nil;
-				value = value - valueMax;
-				if (value >= 0) then
-					value = "";
-				else
-					if (abbreviate) then
-						value = module:abbreviateLargeNumbers(value, breakup);
-					elseif (breakup) then
-						value = module:breakUpLargeNumbers(value, breakup);
-					end
-				end
-				if ( textStatusBar.prefix and prefix ) then
-					textString:SetText(textStatusBar.prefix .. " " .. value);
-				else
-					textString:SetText(value);
-				end
-			elseif (style == 5) then
-				-- Current
-				textStatusBar.isZero = nil;
-				if (abbreviate) then
-					value = module:abbreviateLargeNumbers(value, breakup);
-				elseif (breakup) then
-					value = module:breakUpLargeNumbers(value, breakup);
-				end
-				if ( textStatusBar.prefix and prefix ) then
-					textString:SetText(textStatusBar.prefix .. " " .. value);
-				else
-					textString:SetText(value);
-				end
-			else
-				-- Values
-				textStatusBar.isZero = nil;
---				if ( textStatusBar.capNumericDisplay ) then
-				if (abbreviate) then
-					value = module:abbreviateLargeNumbers(value, breakup);
-					valueMax = module:abbreviateLargeNumbers(valueMax, breakup);
-				elseif (breakup) then
-					value = module:breakUpLargeNumbers(value, breakup);
-					valueMax = module:breakUpLargeNumbers(valueMax, breakup);
-				end
-				if ( textStatusBar.prefix and prefix ) then
-					textString:SetText(textStatusBar.prefix .. " " .. value .. "/" .. valueMax);
-				else
-					textString:SetText(value .. "/" .. valueMax);
-				end
-			end
-			textString:Show();
-		else
-			textString:Hide();
-			textStatusBar:Hide();
+	
+	-- STEP 3:
+	if (lockShow == nil) then lockShow = textStatusBar.lockShow; end
+	local value = textStatusBar:GetValue();
+	local valueMin, valueMax = textStatusBar:GetMinMaxValues();
+	if ( valueMax > 0  and not ( textStatusBar.pauseUpdates ) ) then
+		local style = settings[1];
+		local abbreviate = CT_UnitFramesOptions.largeAbbreviate ~= false;
+		local breakup = CT_UnitFramesOptions.largeBreakUp ~= false;
+		local prefix;
+		if (lockShow > 0) then
+			style = 4;
+			prefix = 1;
 		end
-		textString:SetTextColor(settings[2], settings[3], settings[4], settings[5]);
+		textStatusBar:Show();
+		if ( value == 0 and textStatusBar.zeroText ) then
+			textString:SetText(textStatusBar.zeroText);
+			textStatusBar.isZero = 1;			
+		elseif ( style == 2 ) then
+			textStatusBar.isZero = nil;
+			-- Percent
+			if ( textStatusBar.prefix and prefix ) then
+				textString:SetText(prefixedPercentPattern:format(value / valueMax * 100));
+			else
+				textString:SetText(percentPattern:format(value / valueMax * 100));
+			end
+		elseif (style == 1) then
+			-- None
+			textString:SetText("");
+			textStatusBar.isZero = nil;
+			textStatusBar:Show();
+		elseif (style == 3) then
+			-- Deficit
+			textStatusBar.isZero = nil;
+			value = value - valueMax;
+			if (value >= 0) then
+				textString:SetText("");
+			elseif (abbreviate) then
+				if ( textStatusBar.prefix and prefix ) then
+					textString:SetText(textStatusBar.prefix .. " " .. module:abbreviateLargeNumbers(value, breakup));
+				else
+					textString:SetText(module:abbreviateLargeNumbers(value, breakup));
+				end
+			elseif ( textStatusBar.prefix and prefix ) then
+				textString:SetText(textStatusBar.prefix .. " " .. module:breakUpLargeNumbers(value, breakup));
+			else
+				textString:SetText(module:breakUpLargeNumbers(value, breakup));
+			end
+		elseif (style == 5) then
+			-- Current
+			textStatusBar.isZero = nil;
+			if (abbreviate) then
+				if ( textStatusBar.prefix and prefix ) then
+					textString:SetText(textStatusBar.prefix .. " " .. module:abbreviateLargeNumbers(value, breakup));
+				else
+					textString:SetText(module:abbreviateLargeNumbers(value, breakup));
+				end
+			elseif ( textStatusBar.prefix and prefix ) then
+				textString:SetText(textStatusBar.prefix .. " " .. module:breakUpLargeNumbers(value, breakup));
+			else
+				textString:SetText(module:breakUpLargeNumbers(value, breakup));
+			end
+		else
+			-- Values
+			textStatusBar.isZero = nil;
+			if (abbreviate) then
+				value = module:abbreviateLargeNumbers(value, breakup);
+				valueMax = module:abbreviateLargeNumbers(valueMax, breakup);
+			elseif (breakup) then
+				value = module:breakUpLargeNumbers(value, breakup);
+				valueMax = module:breakUpLargeNumbers(valueMax, breakup);
+			end
+			if ( textStatusBar.prefix and prefix ) then
+				textString:SetText(prefixedValuesPattern:format(textStatusBar.prefix, value, valueMax));
+			else
+				textString:SetText(valuesPattern:format(value, valueMax));
+			end
+		end
+		textString:Show();
+	else
+		textString:Hide();
+		textStatusBar:Hide();
 	end
+	textString:SetTextColor(settings[2], settings[3], settings[4], settings[5]);
 end
 
-local percentPattern = "%.2f%%";
-local valuesPattern = "%s/%s";
-function CT_UnitFrames_BesideBar_UpdateTextString(textStatusBar, settings, textString)
+function module:UpdateBesideBarTextString(textStatusBar, settings, textString)
 	if(textString) then
 		local value = textStatusBar:GetValue();
 		local valueMin, valueMax = textStatusBar:GetMinMaxValues();
