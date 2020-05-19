@@ -9,8 +9,7 @@
 -- the CTMod Team. Thank you.                 --
 ------------------------------------------------
 
-local _G = getfenv(0);
-local module = _G.CT_UnitFrames;
+local module = select(2, ...);
 
 --------------------------------------------
 -- API
@@ -279,17 +278,22 @@ function CT_UnitFramesOptions_Radio_Update()
 	CT_FocusFrame_ToggleStandardFocus();
 
 	-- Call the functions to update player/target/target of target/party
-	CT_PlayerFrame_ShowBarText();
-	CT_TargetFrame_ShowBarText();
-	CT_PartyFrame_ShowBarText();
-	CT_AssistFrame_ShowBarText();
-	CT_FocusFrame_ShowBarText();
-
-	CT_PlayerFrame_AnchorSideText();
-	CT_TargetFrame_AnchorSideText();
-	CT_PartyFrame_AnchorSideText();
-	CT_AssistFrame_AnchorSideText();
-	CT_FocusFrame_AnchorSideText();
+	module:ShowPlayerFrameBarText();
+	module:AnchorPlayerFrameSideText();
+	
+	module:ShowTargetFrameBarText();
+	module:AnchorTargetFrameSideText();
+		
+	module:ShowPartyFrameBarText();
+	module:AnchorPartyFrameSideText();
+	
+	if (module:getGameVersion() >= 8) then
+		module:ShowAssistFrameBarText();
+		module:AnchorAssistFrameSideText();
+		
+		module:ShowFocusFrameBarText();
+		module:AnchorFocusFrameSideText();
+	end
 end
 
 -- Color swatch functions
@@ -343,7 +347,7 @@ function CT_UnitFramesOptions_Box_CB_OnClick(self)
 		if (self:GetID() == 18) then
 			-- "Show health/mana on left"
 			CT_UnitFramesOptions.playerTextLeft = self:GetChecked();
-			CT_PlayerFrame_AnchorSideText();
+			module:AnchorPlayerFrameSideText();
 		elseif (self:GetID() == 63) then
 			-- "Show player coordinates"
 			CT_UnitFramesOptions.playerCoordsRight = self:GetChecked();
@@ -364,7 +368,7 @@ function CT_UnitFramesOptions_Box_CB_OnClick(self)
 		elseif (self:GetID() == 18) then
 			-- "Show health/mana on right"
 			CT_UnitFramesOptions.targetTextRight = self:GetChecked();
-			CT_TargetFrame_AnchorSideText();
+			module:AnchorTargetFrameSideText();
 		elseif (self:GetID() == 64) then
 			if (self:GetChecked()) then
 				SetCVar("showTargetOfTarget", 1);
@@ -398,7 +402,7 @@ function CT_UnitFramesOptions_Box_CB_OnClick(self)
 		elseif (self:GetID() == 18) then
 			-- "Show health/mana on right"
 			CT_UnitFramesOptions.assistTextRight = self:GetChecked();
-			CT_AssistFrame_AnchorSideText();
+			module:AnchorAssistFrameSideText();
 		elseif (self:GetID() == 19) then
 			-- "Show buffs on top"
 			CT_UnitFramesOptions.assistBuffsOnTop = self:GetChecked();
@@ -449,7 +453,7 @@ function CT_UnitFramesOptions_Box_CB_OnClick(self)
 		elseif (self:GetID() == 18) then
 			-- "Show health/mana on right"
 			CT_UnitFramesOptions.focusTextRight = self:GetChecked();
-			CT_FocusFrame_AnchorSideText();
+			module:AnchorFocusFrameSideText();
 		elseif (self:GetID() == 19) then
 			-- "Show buffs on top"
 			CT_UnitFramesOptions.focusBuffsOnTop = self:GetChecked();
@@ -549,38 +553,38 @@ end
 
 function CT_UnitFramesOptions_OneColorHealth_CB_OnClick(self, checked)
 	CT_UnitFramesOptions.oneColorHealth = checked; -- nil, 1
-	CT_PlayerFrame_ShowBarText();
-	CT_PartyFrame_ShowBarText();
-	CT_TargetFrame_ShowBarText();
-	CT_AssistFrame_ShowBarText();
-	CT_FocusFrame_ShowBarText();
+	module:ShowPlayerFrameBarText();
+	module:ShowPartyFrameBarText();
+	module:ShowTargetFrameBarText();
+	module:ShowAssistFrameBarText();
+	module:ShowFocusFrameBarText();
 end
 
 function CT_UnitFramesOptions_LargeBreakUp_CB_OnClick(self, checked)
 	CT_UnitFramesOptions.largeBreakUp = (not not checked); -- false if checked == nil, true if 1
-	CT_PlayerFrame_ShowBarText();
-	CT_PartyFrame_ShowBarText();
-	CT_TargetFrame_ShowBarText();
-	CT_AssistFrame_ShowBarText();
-	CT_FocusFrame_ShowBarText();
+	module:ShowPlayerFrameBarText();
+	module:ShowPartyFrameBarText();
+	module:ShowTargetFrameBarText();
+	module:ShowAssistFrameBarText();
+	module:ShowFocusFrameBarText();
 end
 
 function CT_UnitFramesOptions_LargeAbbreviate_CB_OnClick(self, checked)
 	CT_UnitFramesOptions.largeAbbreviate = (not not checked); -- false if checked == nil, true if 1
-	CT_PlayerFrame_ShowBarText();
-	CT_PartyFrame_ShowBarText();
-	CT_TargetFrame_ShowBarText();
-	CT_AssistFrame_ShowBarText();
-	CT_FocusFrame_ShowBarText();
+	module:ShowPlayerFrameBarText();
+	module:ShowPartyFrameBarText();
+	module:ShowTargetFrameBarText();
+	module:ShowAssistFrameBarText();
+	module:ShowFocusFrameBarText();
 end
 
 function CT_UnitFramesOptions_MakeFontLikeRetail_CB_OnClick(self, checked)
 	CT_UnitFramesOptions.makeFontLikeRetail = (not not checked); -- false if checked == nil, true if 1
-	CT_PlayerFrame_ShowBarText();
-	CT_PartyFrame_ShowBarText();
-	CT_TargetFrame_ShowBarText();
-	CT_AssistFrame_ShowBarText();
-	CT_FocusFrame_ShowBarText();
+	module:ShowPlayerFrameBarText();
+	module:ShowPartyFrameBarText();
+	module:ShowTargetFrameBarText();
+	module:ShowAssistFrameBarText();
+	module:ShowFocusFrameBarText();
 end
 
 --------------------------------------------
@@ -599,8 +603,8 @@ end
 module:setSlashCmd(module.customOpenFunction, "/uf", "/ctuf", "/unitframes");
 
 -- Mod Initialization
-module.update = function(self, type, value)
-	if ( type == "init" ) then
+module.update = function(self, option, value)
+	if ( option == "init" ) then
 		CT_AssistFrame.buffsOnTop = CT_UnitFramesOptions.assistBuffsOnTop;
 		CT_FocusFrame.buffsOnTop = CT_UnitFramesOptions.focusBuffsOnTop;
 
@@ -654,8 +658,6 @@ module.update = function(self, type, value)
 			CT_Core.addCastingBarFrame("CT_FocusFrameSpellBar");
 			CT_Core.addCastingBarFrame("CT_AssistFrameSpellBar");
 		end
-	else
-
 	end
 end
 

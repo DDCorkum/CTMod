@@ -101,17 +101,22 @@
 			</Cooldown>
 		</Frames>
 		<Scripts>
-			<OnUpdate>
-				if ( GameTooltip:IsOwned(self) ) then
-					GameTooltip:SetUnitDebuff(self.unit, self:GetID());
-				end
-			</OnUpdate>
 			<OnEnter>
 				GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 15, -25);
 				GameTooltip:SetUnitDebuff(self.unit, self:GetID());
+				
+				self.debuffTicker = self.debuffTicker or C_Timer.NewTicker(0.1, function()
+					if ( GameTooltip:IsOwned(self) ) then
+						GameTooltip:SetUnitDebuff(self.unit, self:GetID());
+					end
+				end);
 			</OnEnter>
 			<OnLeave>
 				GameTooltip:Hide();
+				if (self.debuffTicker) then
+					self.debuffTicker:Cancel();
+					self.debuffTicker = nil;
+				end
 			</OnLeave>
 		</Scripts>
 	</Frame>
@@ -161,17 +166,21 @@
 			</Cooldown>
 		</Frames>
 		<Scripts>
-			<OnUpdate>
-				if ( GameTooltip:IsOwned(self) ) then
-					GameTooltip:SetUnitBuff(self.unit, self:GetID());
-				end
-			</OnUpdate>
 			<OnEnter>
 				GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 15, -25);
 				GameTooltip:SetUnitBuff(self.unit, self:GetID());
+				self.ctBuffTicker = self.ctBuffTicker or C_Timer.NewTicker(0.1, function()
+					if ( GameTooltip:IsOwned(self) ) then
+						GameTooltip:SetUnitBuff(self.unit, self:GetID());
+					end
+				end);
 			</OnEnter>
 			<OnLeave>
 				GameTooltip:Hide();
+				if (self.ctBuffTicker) then
+					self.ctBuffTicker:Cancel();
+					self.ctBuffTicker = nil;
+				end
 			</OnLeave>
 		</Scripts>
 	</Frame>
@@ -480,6 +489,7 @@
 						self.cvar = "targetStatusText";
 						self.cvarLabel = "STATUS_TEXT_TARGET";
 						self.zeroText = "";
+						CT_FocusFrame_TextStatusBar_OnLoad(self)
 					</OnLoad>
 					<OnValueChanged>
 						UnitFrameHealthBar_OnValueChanged(self, value);
@@ -510,6 +520,7 @@
 						self.textLockable = 1;
 						self.cvar = "targetStatusText";
 						self.cvarLabel = "STATUS_TEXT_TARGET";
+						CT_FocusFrame_TextStatusBar_OnLoad(self)
 					</OnLoad>
 				</Scripts>
 				<BarTexture urgency="5" file="Interface\TargetingFrame\UI-StatusBar"/>
@@ -588,9 +599,6 @@
 			<OnShow>
 				CT_FocusFrame_OnShow(self);
 			</OnShow>
-			<OnUpdate>
-				CT_FocusFrame_OnUpdate(self, elapsed);
-			</OnUpdate>
 			<OnHide>
 				CT_FocusFrame_OnHide(self);
 			</OnHide>
@@ -763,11 +771,6 @@
 			<OnEvent>
 				UnitFrame_OnEvent(self, event, ...);
 			</OnEvent>
-<!--
-			<OnUpdate>
-				CT_TargetofFocus_Update(self, elapsed);
-			</OnUpdate>
--->
 		</Scripts>
 	</Button>
 </Ui>

@@ -1,4 +1,15 @@
-local module = select(2,...);
+------------------------------------------------
+--               CT_UnitFrames                --
+--                                            --
+-- Heavily customizable mod that allows you   --
+-- to modify the Blizzard unit frames into    --
+-- your personal style and liking.            --
+-- Please do not modify or otherwise          --
+-- redistribute this without the consent of   --
+-- the CTMod Team. Thank you.                 --
+------------------------------------------------
+
+local module = select(2, ...);
 
 local _G = _G
 local tonumber = tonumber
@@ -36,115 +47,57 @@ local function CT_PartyFrame_AnchorSideText_Single(id)
 	end
 end
 
-function CT_PartyFrame_AnchorSideText()
-	for id = 1, 4 do
-		CT_PartyFrame_AnchorSideText_Single(id);
-	end
-end
+local function CT_PartyFrame_TextStatusBar_UpdateTextString(bar)
+	if (CT_UnitFrameOptions) then
 
-function CT_PartyFrame_ShowBarText()
-	UnitFrameHealthBar_Update(PartyMemberFrame1HealthBar, "party1");
-	UnitFrameManaBar_Update(PartyMemberFrame1ManaBar, "party1");
+		-- compatibility with WoW Classic
+		local barTextString = bar.TextString or bar.ctTextString;
+		if (not barTextString) then
+			local intermediateFrame = CreateFrame("Frame", nil, bar);
+			intermediateFrame:SetFrameLevel(5);
+			intermediateFrame:SetAllPoints();
+			barTextString = intermediateFrame:CreateFontString(nil, "ARTWORK", "GameTooltipTextSmall");
+			barTextString:SetPoint("CENTER", bar);
+			barTextString.ctControlled = "Party";
+			bar.ctTextString = barTextString;
+		end
 
-	UnitFrameHealthBar_Update(PartyMemberFrame2HealthBar, "party2");
-	UnitFrameManaBar_Update(PartyMemberFrame2ManaBar, "party2");
-
-	UnitFrameHealthBar_Update(PartyMemberFrame3HealthBar, "party3");
-	UnitFrameManaBar_Update(PartyMemberFrame3ManaBar, "party3");
-
-	UnitFrameHealthBar_Update(PartyMemberFrame4HealthBar, "party4");
-	UnitFrameManaBar_Update(PartyMemberFrame4ManaBar, "party4");
-end
-
-function CT_PartyFrame_TextStatusBar_UpdateTextString(bar)
-
-	if (bar == PartyMemberFrame1HealthBar or bar == PartyMemberFrame2HealthBar or bar == PartyMemberFrame3HealthBar or bar == PartyMemberFrame4HealthBar) then
-		if (CT_UnitFramesOptions) then
-			local textRight;
-
-			if (bar == PartyMemberFrame1HealthBar) then
-				textRight = CT_PartyFrame1HealthRight; -- _G["CT_PartyFrame" .. bar:GetParent():GetID() .. "HealthBar"];
-
-			elseif (bar == PartyMemberFrame2HealthBar) then
-				textRight = CT_PartyFrame2HealthRight;
-
-			elseif (bar == PartyMemberFrame3HealthBar) then
-				textRight = CT_PartyFrame3HealthRight;
-
-			elseif (bar == PartyMemberFrame4HealthBar) then
-				textRight = CT_PartyFrame4HealthRight;
-			end
-
-			-- compatibility with WoW Classic
-			local barTextString = bar.TextString or bar.ctTextString;
-			if (not barTextString) then
-				local intermediateFrame = CreateFrame("Frame", nil, bar);
-				intermediateFrame:SetFrameLevel(5);
-				intermediateFrame:SetAllPoints();
-				barTextString = intermediateFrame:CreateFontString(nil, "ARTWORK", "GameTooltipTextSmall");
-				barTextString:SetPoint("CENTER", bar);
-				barTextString.ctControlled = "Party";
-				bar.ctTextString = barTextString;
-			end
-			
-			-- font
-			if (barTextString.ctSize ~= (CT_UnitFramesOptions.partyTextSize or 3)) then
-				barTextString.ctSize = CT_UnitFramesOptions.partyTextSize or 3
-				barTextString:SetFont("Fonts\\FRIZQT__.TTF", barTextString.ctSize + 7, "OUTLINE");
-				textRight:SetFont("Fonts\\FRIZQT__.TTF", barTextString.ctSize + 7);
-			end
-			
+		-- font
+		if (barTextString.ctSize ~= (CT_UnitFramesOptions.partyTextSize or 3)) then
+			barTextString.ctSize = CT_UnitFramesOptions.partyTextSize or 3
+			barTextString:SetFont("Fonts\\FRIZQT__.TTF", barTextString.ctSize + 7, "OUTLINE");
+			bar.textRight:SetFont("Fonts\\FRIZQT__.TTF", barTextString.ctSize + 7);
+		end
+		
+		-- apply changes for the health and mana bars
+		if (bar.type == "health") then	
 			CT_UnitFrames_TextStatusBar_UpdateTextString(bar, CT_UnitFramesOptions.styles[2][1])
 			CT_UnitFrames_HealthBar_OnValueChanged(bar, tonumber(bar:GetValue()), not CT_UnitFramesOptions.oneColorHealth)
-			CT_UnitFrames_BesideBar_UpdateTextString(bar, CT_UnitFramesOptions.styles[2][2], textRight)
-		end
-
-	elseif (bar == PartyMemberFrame1ManaBar or bar == PartyMemberFrame2ManaBar or bar == PartyMemberFrame3ManaBar or bar == PartyMemberFrame4ManaBar) then
-		if (CT_UnitFramesOptions) then
-			local textRight;
-
-			if (bar == PartyMemberFrame1ManaBar) then
-				textRight = CT_PartyFrame1ManaRight; -- _G["CT_PartyFrame" .. bar:GetParent():GetID() .. "ManaBar"];
-
-			elseif (bar == PartyMemberFrame2ManaBar) then
-				textRight = CT_PartyFrame2ManaRight;
-
-			elseif (bar == PartyMemberFrame3ManaBar) then
-				textRight = CT_PartyFrame3ManaRight;
-
-			elseif (bar == PartyMemberFrame4ManaBar) then
-				textRight = CT_PartyFrame4ManaRight;
-			end
-			
-			
-			-- compatibility with WoW Classic
-			local barTextString = bar.TextString or bar.ctTextString;
-			if (not barTextString) then
-				local intermediateFrame = CreateFrame("Frame", nil, bar);
-				intermediateFrame:SetFrameLevel(5);
-				intermediateFrame:SetAllPoints();
-				barTextString = intermediateFrame:CreateFontString(nil, "ARTWORK", "GameTooltipTextSmall");
-				barTextString:SetPoint("CENTER", bar);
-				barTextString.ctControlled = "Party";
-				bar.ctTextString = barTextString;
-			end
-			
-			-- font
-			if (barTextString.ctSize ~= (CT_UnitFramesOptions.partyTextSize or 3)) then
-				barTextString.ctSize = CT_UnitFramesOptions.partyTextSize or 3
-				barTextString:SetFont("Fonts\\FRIZQT__.TTF", barTextString.ctSize + 7, "OUTLINE");
-				textRight:SetFont("Fonts\\FRIZQT__.TTF", barTextString.ctSize + 7);
-			end
-
+			CT_UnitFrames_BesideBar_UpdateTextString(bar, CT_UnitFramesOptions.styles[2][2], bar.textRight)
+		else -- if bar.type == "mana"
 			CT_UnitFrames_TextStatusBar_UpdateTextString(bar, CT_UnitFramesOptions.styles[2][3])
-			CT_UnitFrames_BesideBar_UpdateTextString(bar, CT_UnitFramesOptions.styles[2][4], textRight)
+			CT_UnitFrames_BesideBar_UpdateTextString(bar, CT_UnitFramesOptions.styles[2][4], bar.textRight)			
 		end
 	end
 end
 
-hooksecurefunc("TextStatusBar_UpdateTextString", CT_PartyFrame_TextStatusBar_UpdateTextString);
-hooksecurefunc("ShowTextStatusBarText", CT_PartyFrame_TextStatusBar_UpdateTextString);
-hooksecurefunc("HideTextStatusBarText", CT_PartyFrame_TextStatusBar_UpdateTextString);
+module:regEvent("PLAYER_LOGIN", function()
+	local bars = {PartyMemberFrame1HealthBar, PartyMemberFrame1ManaBar, PartyMemberFrame2HealthBar, PartyMemberFrame2ManaBar, PartyMemberFrame3HealthBar, PartyMemberFrame3ManaBar, PartyMemberFrame4HealthBar, PartyMemberFrame4ManaBar};
+	local textRight = {CT_PartyFrame1HealthRight, CT_PartyFrame1ManaRight, CT_PartyFrame2HealthRight, CT_PartyFrame2ManaRight, CT_PartyFrame3HealthRight, CT_PartyFrame3ManaRight, CT_PartyFrame4HealthRight, CT_PartyFrame4ManaRight};
+	for i=1, 8 do
+		bars[i]:HookScript("OnEnter", CT_PartyFrame_TextStatusBar_UpdateTextString);
+		bars[i]:HookScript("OnLeave", CT_PartyFrame_TextStatusBar_UpdateTextString);
+		bars[i]:HookScript("OnValueChanged", CT_PartyFrame_TextStatusBar_UpdateTextString);
+		bars[i].textRight = textRight[i];
+		bars[i].type = i%2 == 1 and "health" or "mana";
+	end
+end);
+
+--[[	-- replaced by hooks onto each specific frame during PLAYER_LOGIN
+	hooksecurefunc("TextStatusBar_UpdateTextString", CT_PartyFrame_TextStatusBar_UpdateTextString);
+	hooksecurefunc("ShowTextStatusBarText", CT_PartyFrame_TextStatusBar_UpdateTextString);
+	hooksecurefunc("HideTextStatusBarText", CT_PartyFrame_TextStatusBar_UpdateTextString);
+--]]
 
 hooksecurefunc("PartyMemberFrame_UpdateNotPresentIcon",
 	function(self)
@@ -152,6 +105,36 @@ hooksecurefunc("PartyMemberFrame_UpdateNotPresentIcon",
 		CT_PartyFrame_AnchorSideText_Single(id);
 	end
 );
+
+
+function module:AnchorPartyFrameSideText()
+	for id = 1, 4 do
+		CT_PartyFrame_AnchorSideText_Single(id);
+	end
+end
+
+function module:ShowPartyFrameBarText()
+	UnitFrameHealthBar_Update(PartyMemberFrame1HealthBar, "party1");
+	UnitFrameManaBar_Update(PartyMemberFrame1ManaBar, "party1");
+	CT_PartyFrame_TextStatusBar_UpdateTextString(PartyMemberFrame1HealthBar);
+	CT_PartyFrame_TextStatusBar_UpdateTextString(PartyMemberFrame1ManaBar);
+
+	UnitFrameHealthBar_Update(PartyMemberFrame2HealthBar, "party2");
+	UnitFrameManaBar_Update(PartyMemberFrame2ManaBar, "party2");
+	CT_PartyFrame_TextStatusBar_UpdateTextString(PartyMemberFrame2HealthBar);
+	CT_PartyFrame_TextStatusBar_UpdateTextString(PartyMemberFrame2ManaBar);
+	
+	UnitFrameHealthBar_Update(PartyMemberFrame3HealthBar, "party3");
+	UnitFrameManaBar_Update(PartyMemberFrame3ManaBar, "party3");
+	CT_PartyFrame_TextStatusBar_UpdateTextString(PartyMemberFrame3HealthBar);
+	CT_PartyFrame_TextStatusBar_UpdateTextString(PartyMemberFrame3ManaBar);
+
+	UnitFrameHealthBar_Update(PartyMemberFrame4HealthBar, "party4");
+	UnitFrameManaBar_Update(PartyMemberFrame4ManaBar, "party4");
+	CT_PartyFrame_TextStatusBar_UpdateTextString(PartyMemberFrame4HealthBar);
+	CT_PartyFrame_TextStatusBar_UpdateTextString(PartyMemberFrame4ManaBar);
+end
+
 
 function CT_PartyFrame_UpdateClassColor()
 	local GetClassColor = GetClassColor or C_ClassColor.GetClassColor
