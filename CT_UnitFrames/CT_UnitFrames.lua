@@ -91,7 +91,9 @@ function module:UpdateStatusBarTextString(textStatusBar, settings, lockShow)
 		textStatusBar.ctTextString = textString;
 		
 		-- prevent the default text string from ever appearing
-		textStatusBar.TextString:SetAlpha(0);
+		if (textStatusBar.TextString) then
+			textStatusBar.TextString:SetAlpha(0);
+		end
 	end
 
 	-- STEP 2:

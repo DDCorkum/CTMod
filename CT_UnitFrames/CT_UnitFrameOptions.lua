@@ -275,7 +275,9 @@ function CT_UnitFramesOptions_Radio_Update()
 		CT_TargetFrameClassFrame:Hide();
 	end
 
-	CT_FocusFrame_ToggleStandardFocus();
+	if (module:getGameVersion() >= 2) then
+		CT_FocusFrame_ToggleStandardFocus();
+	end
 
 	-- Call the functions to update player/target/target of target/party
 	module:ShowPlayerFrameBarText();
@@ -287,7 +289,7 @@ function CT_UnitFramesOptions_Radio_Update()
 	module:ShowPartyFrameBarText();
 	module:AnchorPartyFrameSideText();
 	
-	if (module:getGameVersion() >= 8) then
+	if (module:getGameVersion() >= 2) then
 		module:ShowAssistFrameBarText();
 		module:AnchorAssistFrameSideText();
 		
@@ -481,12 +483,13 @@ end
 
 -- Lock Handler
 -- The [index] must match the ID of the checkbox, and is also used to save the settings.
-local lockTable = {
---	[1] = { drag = "CT_PlayerFrame_Drag", cb = "CT_UnitFramesOptionsFrameBox1LockCB" },
---	[2] = { drag = "CT_TargetFrame_Drag", cb = "CT_UnitFramesOptionsFrameBox3LockCB" },
-	[3] = { drag = "CT_AssistFrame_Drag", cb = "CT_UnitFramesOptionsFrameBox4LockCB" },
-	[4] = { drag = "CT_FocusFrame_Drag",  cb = "CT_UnitFramesOptionsFrameBox5LockCB" },
-};
+local lockTable = { }
+if (module:getGameVersion() >= 2) then
+--	lockTable[1] = { drag = "CT_PlayerFrame_Drag", cb = "CT_UnitFramesOptionsFrameBox1LockCB" };
+--	lockTable[2] = { drag = "CT_TargetFrame_Drag", cb = "CT_UnitFramesOptionsFrameBox3LockCB" };
+	lockTable[3] = { drag = "CT_AssistFrame_Drag", cb = "CT_UnitFramesOptionsFrameBox4LockCB" };
+	lockTable[4] = { drag = "CT_FocusFrame_Drag",  cb = "CT_UnitFramesOptionsFrameBox5LockCB" };
+end
 
 function CT_UnitFramesOptions_Lock_CB_OnClick(obj, checked, id)
 	if ( not CT_UnitFramesOptions.unlock ) then
@@ -605,41 +608,43 @@ module:setSlashCmd(module.customOpenFunction, "/uf", "/ctuf", "/unitframes");
 -- Mod Initialization
 module.update = function(self, option, value)
 	if ( option == "init" ) then
-		CT_AssistFrame.buffsOnTop = CT_UnitFramesOptions.assistBuffsOnTop;
-		CT_FocusFrame.buffsOnTop = CT_UnitFramesOptions.focusBuffsOnTop;
+		if (module:getGameVersion() >= 2) then
+			CT_AssistFrame.buffsOnTop = CT_UnitFramesOptions.assistBuffsOnTop;
+			CT_FocusFrame.buffsOnTop = CT_UnitFramesOptions.focusBuffsOnTop;
+	
+			if (not InCombatLockdown()) then
+				if ( CT_UnitFramesOptions.shallDisplayAssist ) then
+					RegisterUnitWatch(CT_AssistFrame);
+					CT_AssistFrame_Update(CT_AssistFrame);
+				else
+					UnregisterUnitWatch(CT_AssistFrame);
+					CT_AssistFrame:Hide();
+				end
+				if ( CT_UnitFramesOptions.shallDisplayTargetofAssist ) then
+					RegisterUnitWatch(CT_TargetofAssistFrame);
+					CT_TargetofAssist_Update(CT_TargetofAssistFrame);
+				else
+					UnregisterUnitWatch(CT_TargetofAssistFrame);
+					CT_TargetofAssistFrame:Hide();
+				end
 
-		if (not InCombatLockdown()) then
-			if ( CT_UnitFramesOptions.shallDisplayAssist ) then
-				RegisterUnitWatch(CT_AssistFrame);
-				CT_AssistFrame_Update(CT_AssistFrame);
-			else
-				UnregisterUnitWatch(CT_AssistFrame);
-				CT_AssistFrame:Hide();
-			end
-			if ( CT_UnitFramesOptions.shallDisplayTargetofAssist ) then
-				RegisterUnitWatch(CT_TargetofAssistFrame);
-				CT_TargetofAssist_Update(CT_TargetofAssistFrame);
-			else
-				UnregisterUnitWatch(CT_TargetofAssistFrame);
-				CT_TargetofAssistFrame:Hide();
-			end
-
-			if ( CT_UnitFramesOptions.shallDisplayFocus ) then
-				RegisterUnitWatch(CT_FocusFrame);
-				CT_FocusFrame_Update(CT_FocusFrame);
-			else
-				UnregisterUnitWatch(CT_FocusFrame);
-				CT_FocusFrame:Hide();
-			end
-			if ( CT_UnitFramesOptions.shallDisplayTargetofFocus ) then
-				RegisterUnitWatch(CT_TargetofFocusFrame);
-				CT_TargetofFocus_Update(CT_TargetofFocusFrame);
-			else
-				UnregisterUnitWatch(CT_TargetofFocusFrame);
-				CT_TargetofFocusFrame:Hide();
+				if ( CT_UnitFramesOptions.shallDisplayFocus ) then
+					RegisterUnitWatch(CT_FocusFrame);
+					CT_FocusFrame_Update(CT_FocusFrame);
+				else
+					UnregisterUnitWatch(CT_FocusFrame);
+					CT_FocusFrame:Hide();
+				end
+				if ( CT_UnitFramesOptions.shallDisplayTargetofFocus ) then
+					RegisterUnitWatch(CT_TargetofFocusFrame);
+					CT_TargetofFocus_Update(CT_TargetofFocusFrame);
+				else
+					UnregisterUnitWatch(CT_TargetofFocusFrame);
+					CT_TargetofFocusFrame:Hide();
+				end
 			end
 		end
-
+		
 		if ( not CT_UnitFramesOptions.unlock ) then
 			CT_UnitFramesOptions.unlock = { };
 		end
