@@ -10027,7 +10027,7 @@ CONSOLIDATION REMOVED FROM GAME--]]
 		optionsBeginFrame( -5,   26, "checkbutton#tl:30:%y#i:colorCodeIcons1#o:colorCodeIcons1#" .. L["CT_BuffMod/Options/Window/Button/General/DebuffBorderColorCheckbox"]);
 			optionsAddScript("onenter",
 				function(button)
-					module:displayTooltip(button, {L["CT_BuffMod/Options/Window/Button/General/DebuffBorderColorCheckbox"],L["CT_BuffMod/Options/Window/Button/General/DebuffColorTooltip"]}, "ANCHOR_TOPLEFTw");
+					module:displayTooltip(button, {L["CT_BuffMod/Options/Window/Button/General/DebuffBorderColorCheckbox"],L["CT_BuffMod/Options/Window/Button/General/DebuffColorTooltip"]}, "ANCHOR_TOPLEFT");
 				end
 			);
 		optionsEndFrame();
@@ -10041,7 +10041,7 @@ CONSOLIDATION REMOVED FROM GAME--]]
 		optionsBeginFrame(  6,   26, "checkbutton#tl:44:%y#i:colorCodeBackground1#o:colorCodeBackground1#" .. L["CT_BuffMod/Options/Window/Button/Style1/DebuffBarBackgroundCheckbox"]);
 			optionsAddScript("onenter",
 				function(button)
-					module:displayTooltip(button, {L["CT_BuffMod/Options/Window/Button/Style1/DebuffBarBackgroundCheckbox"],L["CT_BuffMod/Options/Window/Button/General/DebuffColorTooltip"]}, "ANCHOR_TOPLEFTw");
+					module:displayTooltip(button, {L["CT_BuffMod/Options/Window/Button/Style1/DebuffBarBackgroundCheckbox"],L["CT_BuffMod/Options/Window/Button/General/DebuffColorTooltip"]}, "ANCHOR_TOPLEFT");
 				end
 			);
 		optionsEndFrame();
@@ -10055,7 +10055,7 @@ CONSOLIDATION REMOVED FROM GAME--]]
 		optionsBeginFrame(  6,   26, "checkbutton#tl:44:%y#i:colorCodeDebuffs1#o:colorCodeDebuffs1#" .. L["CT_BuffMod/Options/Window/Button/Style1/DebuffNameCheckbox"]);
 			optionsAddScript("onenter",
 				function(button)
-					module:displayTooltip(button, {L["CT_BuffMod/Options/Window/Button/Style1/DebuffNameCheckbox"],L["CT_BuffMod/Options/Window/Button/General/DebuffColorTooltip"]}, "ANCHOR_TOPLEFTw");
+					module:displayTooltip(button, {L["CT_BuffMod/Options/Window/Button/Style1/DebuffNameCheckbox"],L["CT_BuffMod/Options/Window/Button/General/DebuffColorTooltip"]}, "ANCHOR_TOPLEFT");
 				end
 			);
 		optionsEndFrame();
@@ -10107,7 +10107,7 @@ CONSOLIDATION REMOVED FROM GAME--]]
 		optionsBeginFrame(-15,   26, "checkbutton#tl:30:%y#i:colorCodeIcons2#o:colorCodeIcons2#" .. L["CT_BuffMod/Options/Window/Button/General/DebuffBorderColorCheckbox"]);
 			optionsAddScript("onenter",
 				function(button)
-					module:displayTooltip(button, {L["CT_BuffMod/Options/Window/Button/General/DebuffBorderColorCheckbox"],L["CT_BuffMod/Options/Window/Button/General/DebuffColorTooltip"]}, "ANCHOR_TOPLEFTw");
+					module:displayTooltip(button, {L["CT_BuffMod/Options/Window/Button/General/DebuffBorderColorCheckbox"],L["CT_BuffMod/Options/Window/Button/General/DebuffColorTooltip"]}, "ANCHOR_TOPLEFT");
 				end
 			);
 		optionsEndFrame();
