@@ -8347,6 +8347,7 @@ local function options_updateWindowWidgets(windowId)
 		frame.playerUnsecure:Show();
 	else
 		frame.playerUnsecure:Hide();
+		playerUnsecure = true;
 	end
 
 	-- Show vehicle buffs when in a vehicle
@@ -8356,26 +8357,6 @@ local function options_updateWindowWidgets(windowId)
 	else
 		frame.vehicleBuffs:Hide();
 	end
-
-	----------
-	-- Visibility
-	----------
-
-	-- Visibility radio buttons
-	options_updateWindowWidgets_Visibility(windowId);
-
-	-- Basic conditions
-	frame.visHideInCombat:SetChecked( not not frameOptions.visHideInCombat );
-	frame.visHideNotCombat:SetChecked( not not frameOptions.visHideNotCombat );
-	frame.visHideInVehicle:SetChecked( not not frameOptions.visHideInVehicle );
-	frame.visHideNotVehicle:SetChecked( not not frameOptions.visHideNotVehicle );
-
-	-- Advanced conditions
-	windowOptionsFrame.conditionEB:SetText( frameOptions.visCondition or "" );
-	windowOptionsFrame.visSave:Disable();
-
-	windowOptionsFrame.conditionEB.ctUndo = frameOptions.visCondition or "";
-	windowOptionsFrame.visUndo:Disable();
 
 	----------
 	-- Sorting
@@ -8390,11 +8371,11 @@ local function options_updateWindowWidgets(windowId)
 	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
 	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.separateZero or constants.SEPARATE_ZERO_WITH );
 	if (playerUnsecure) then
-		frame.separateZeroText:Show();
-		frame.separateZero:Show();
+		frame.separateZero.label:SetAlpha(1);
+		UIDropDownMenu_EnableDropDown(frame.separateZero.dropdown);
 	else
-		frame.separateZeroText:Hide();
-		frame.separateZero:Hide();
+		frame.separateZero.label:SetAlpha(0.5);
+		UIDropDownMenu_DisableDropDown(frame.separateZero.dropdown);
 	end
 
 	frame.sortDirection:SetChecked( not not frameOptions.sortDirection );
@@ -8428,6 +8409,26 @@ local function options_updateWindowWidgets(windowId)
 	dropdown = CT_BuffModDropdown_sortSeq5;
 	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
 	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.sortSeq5 or constants.FILTER_TYPE_NONE );
+
+	----------
+	-- Visibility
+	----------
+
+	-- Visibility radio buttons
+	options_updateWindowWidgets_Visibility(windowId);
+
+	-- Basic conditions
+	frame.visHideInCombat:SetChecked( not not frameOptions.visHideInCombat );
+	frame.visHideNotCombat:SetChecked( not not frameOptions.visHideNotCombat );
+	frame.visHideInVehicle:SetChecked( not not frameOptions.visHideInVehicle );
+	frame.visHideNotVehicle:SetChecked( not not frameOptions.visHideNotVehicle );
+
+	-- Advanced conditions
+	windowOptionsFrame.conditionEB:SetText( frameOptions.visCondition or "" );
+	windowOptionsFrame.visSave:Disable();
+
+	windowOptionsFrame.conditionEB.ctUndo = frameOptions.visCondition or "";
+	windowOptionsFrame.visUndo:Disable();
 
 	----------
 	-- Consolidation
@@ -9136,6 +9137,9 @@ end
 local function optionsAddScript(name, func)
 	module:framesAddScript(optionsFrameList, name, func);
 end
+local optionsAddTooltip = function(text)
+	module:framesAddScript(optionsFrameList, "onenter", function(obj) module:displayTooltip(obj, text, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL); end);
+end
 local function optionsBeginFrame(offset, size, details, data)
 	module:framesBeginFrame(optionsFrameList, offset, size, details, data);
 end
@@ -9471,6 +9475,65 @@ CONSOLIDATION REMOVED FROM GAME --]]
 		end
 
 		----------
+		-- Sorting
+		----------
+
+		optionsAddObject(-20, 1*13, "font#tl:15:%y#" .. L["CT_BuffMod/Options/Window/Sorting/Heading"]);
+
+		-- Sort method
+		optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Sorting/SortMethodLabel"]);
+		optionsAddObject( 15,   20, "dropdown#tl:140:%y#s:100:%s#n:CT_BuffModDropdown_sortMethod#i:sortMethod#o:sortMethod:" .. constants.SORT_METHOD_NAME .. L["CT_BuffMod/Options/Window/Sorting/SortMethodDropdown"]);
+
+		-- Sort direction
+		optionsAddObject(  0,   26, "checkbutton#tl:33:%y#i:sortDirection#o:sortDirection#" .. L["CT_BuffMod/Options/Window/Sorting/ReverseCheckbox"]);
+
+		-- Buffs you cast
+		optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Sorting/PlayerBuffsLabel"]);
+		-- Bug: Omit 3rd menu item while waiting for Blizzard to fix the "Sort with others" bug
+		--
+		--      Note: As of WoW 4.3 they have fixed the bug related to this attribute.
+		--	      I've added the third option and made SEPARATE_OWN_WITH the default instead of SEPARATE_OWN_BEFORE.
+		--
+		optionsAddObject( 15,   20, "dropdown#tl:140:%y#s:130:%s#n:CT_BuffModDropdown_separateOwn#i:separateOwn#o:separateOwn:" .. constants.SEPARATE_OWN_WITH .. L["CT_BuffMod/Options/Window/Sorting/PlayerBuffsDropdown"]);
+
+		-- Sort zero duration buffs
+		optionsBeginFrame( 0,    0, "frame#tl:0:%y#br:tr:0:%b#i:separateZero");
+			optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#i:label#" .. L["CT_BuffMod/Options/Window/Sorting/NonExpiringBuffsLabel"]);
+			optionsAddObject( 15,   20, "dropdown#tl:140:%y#s:130:%s#n:CT_BuffModDropdown_separateZero#i:dropdown#o:separateZero:" .. constants.SEPARATE_ZERO_WITH .. L["CT_BuffMod/Options/Window/Sorting/NonExpiringBuffsDropdown"]);
+			optionsAddScript("onleave", function(frame)
+				frameOptionsplayerUnsecure.text:SetTextColor(1,1,1);
+			end);
+			optionsAddScript("onenter", function(frame)
+				if (frame.label:GetAlpha() < 1) then
+					module:displayTooltip(frame, {L["CT_BuffMod/Options/Window/Sorting/NonExpiringBuffsLabel"], L["CT_BuffMod/Options/Window/Sorting/NonExpiringBuffsTip"] .. "#" .. textColor2}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
+					frameOptionsplayerUnsecure.text:SetTextColor(1, 1, 0);
+				end
+			end);
+		optionsEndFrame();
+
+		-- Group by
+		do
+			local menu = L["CT_BuffMod/Options/Window/Sorting/OrderDropdown"]; -- "#None#Debuffs#Cancelable buffs#Uncancelable buffs#All buffs#Weapons" -- the 7th option was previously #Consolidated, but that does nothing any more
+
+			optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Sorting/OrderLabel"]);
+
+			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Sorting/Order1Label"]);
+			optionsAddObject( 15,   20, "dropdown#tl:110:%y#s:140:%s#n:CT_BuffModDropdown_sortSeq1#i:sortSeq1#o:sortSeq1:" .. constants.FILTER_TYPE_DEBUFF .. menu);
+
+			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Sorting/Order2Label"]);
+			optionsAddObject( 15,   20, "dropdown#tl:110:%y#s:140:%s#n:CT_BuffModDropdown_sortSeq2#i:sortSeq2#o:sortSeq2:" .. constants.FILTER_TYPE_WEAPON .. menu);
+
+			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Sorting/Order3Label"]);
+			optionsAddObject( 15,   20, "dropdown#tl:110:%y#s:140:%s#n:CT_BuffModDropdown_sortSeq3#i:sortSeq3#o:sortSeq3:" .. constants.FILTER_TYPE_BUFF_CANCELABLE .. menu);
+
+			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Sorting/Order4Label"]);
+			optionsAddObject( 15,   20, "dropdown#tl:110:%y#s:140:%s#n:CT_BuffModDropdown_sortSeq4#i:sortSeq4#o:sortSeq4:" .. constants.FILTER_TYPE_BUFF_UNCANCELABLE .. menu);
+
+			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Sorting/Order5Label"]);
+			optionsAddObject( 15,   20, "dropdown#tl:110:%y#s:140:%s#n:CT_BuffModDropdown_sortSeq5#i:sortSeq5#o:sortSeq5:" .. constants.FILTER_TYPE_NONE .. menu);
+		end
+		
+		----------
 		-- Visibility
 		----------
 		optionsAddObject(-20, 1*13, "font#tl:15:%y#" .. L["CT_BuffMod/Options/Window/Visibility/Heading"]);
@@ -9741,53 +9804,6 @@ CONSOLIDATION REMOVED FROM GAME --]]
 			);
 		optionsEndFrame();
 
-		----------
-		-- Sorting
-		----------
-
-		optionsAddObject(-20, 1*13, "font#tl:15:%y#" .. L["CT_BuffMod/Options/Window/Sorting/Heading"]);
-
-		-- Sort method
-		optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Sorting/SortMethodLabel"]);
-		optionsAddObject( 15,   20, "dropdown#tl:140:%y#s:100:%s#n:CT_BuffModDropdown_sortMethod#i:sortMethod#o:sortMethod:" .. constants.SORT_METHOD_NAME .. L["CT_BuffMod/Options/Window/Sorting/SortMethodDropdown"]);
-
-		-- Sort direction
-		optionsAddObject(  0,   26, "checkbutton#tl:33:%y#i:sortDirection#o:sortDirection#" .. L["CT_BuffMod/Options/Window/Sorting/ReverseCheckbox"]);
-
-		-- Buffs you cast
-		optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Sorting/PlayerBuffsLabel"]);
-		-- Bug: Omit 3rd menu item while waiting for Blizzard to fix the "Sort with others" bug
-		--
-		--      Note: As of WoW 4.3 they have fixed the bug related to this attribute.
-		--	      I've added the third option and made SEPARATE_OWN_WITH the default instead of SEPARATE_OWN_BEFORE.
-		--
-		optionsAddObject( 15,   20, "dropdown#tl:140:%y#s:130:%s#n:CT_BuffModDropdown_separateOwn#i:separateOwn#o:separateOwn:" .. constants.SEPARATE_OWN_WITH .. L["CT_BuffMod/Options/Window/Sorting/PlayerBuffsDropdown"]);
-
-		-- Sort zero duration buffs
-		optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#i:separateZeroText#" .. L["CT_BuffMod/Options/Window/Sorting/NonExpiringBuffsLabel"]);
-		optionsAddObject( 15,   20, "dropdown#tl:140:%y#s:130:%s#n:CT_BuffModDropdown_separateZero#i:separateZero#o:separateZero:" .. constants.SEPARATE_ZERO_WITH .. L["CT_BuffMod/Options/Window/Sorting/NonExpiringBuffsDropdown"]);
-
-		-- Group by
-		do
-			local menu = L["CT_BuffMod/Options/Window/Sorting/OrderDropdown"]; -- "#None#Debuffs#Cancelable buffs#Uncancelable buffs#All buffs#Weapons" -- the 7th option was previously #Consolidated, but that does nothing any more
-
-			optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Sorting/OrderLabel"]);
-
-			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Sorting/Order1Label"]);
-			optionsAddObject( 15,   20, "dropdown#tl:110:%y#s:140:%s#n:CT_BuffModDropdown_sortSeq1#i:sortSeq1#o:sortSeq1:" .. constants.FILTER_TYPE_DEBUFF .. menu);
-
-			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Sorting/Order2Label"]);
-			optionsAddObject( 15,   20, "dropdown#tl:110:%y#s:140:%s#n:CT_BuffModDropdown_sortSeq2#i:sortSeq2#o:sortSeq2:" .. constants.FILTER_TYPE_WEAPON .. menu);
-
-			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Sorting/Order3Label"]);
-			optionsAddObject( 15,   20, "dropdown#tl:110:%y#s:140:%s#n:CT_BuffModDropdown_sortSeq3#i:sortSeq3#o:sortSeq3:" .. constants.FILTER_TYPE_BUFF_CANCELABLE .. menu);
-
-			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Sorting/Order4Label"]);
-			optionsAddObject( 15,   20, "dropdown#tl:110:%y#s:140:%s#n:CT_BuffModDropdown_sortSeq4#i:sortSeq4#o:sortSeq4:" .. constants.FILTER_TYPE_BUFF_UNCANCELABLE .. menu);
-
-			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Sorting/Order5Label"]);
-			optionsAddObject( 15,   20, "dropdown#tl:110:%y#s:140:%s#n:CT_BuffModDropdown_sortSeq5#i:sortSeq5#o:sortSeq5:" .. constants.FILTER_TYPE_NONE .. menu);
-		end
 
 		----------
 		-- Consolidation
