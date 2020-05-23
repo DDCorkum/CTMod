@@ -14,8 +14,7 @@
 --------------------------------------------
 -- Initialization
 
-local module = { };
-local _G = getfenv(0);
+local module = select(2, ...);
 
 local MODULE_NAME = "CT_BarMod";
 local MODULE_VERSION = strmatch(GetAddOnMetadata(MODULE_NAME, "version"), "^([%d.]+)");

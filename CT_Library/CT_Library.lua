@@ -196,84 +196,110 @@ end
 -- if text is a string, it will simply display the text
 -- if text is a table of strings, it will AddLine() each string and optionally set r,g,b,a and wrap by checking for '#' delimiters, or AddDoubleLine() if sufficient content is provided
 -- setting anchor to CT_ABOVEBELOW or CT_BESIDE will position the tooltip wherever there is more room on the screen
-function lib:displayTooltip(obj, text, anchor, offx, offy, owner)
+do
+	local lineHeight = { };
+	local left, right = { }, { };
 	local tooltip = GameTooltip;
-	if not obj or not tooltip then return; end
 	
-	-- when the mouse leaves this object, make the tooltip go away (using HookScript if possible to avoid overriding any other behaviour)
-	if not (obj.ct_displayTooltip_Hooked) then
-		if (obj.HookScript) then
-			obj:HookScript("OnLeave", function() tooltip:Hide(); end);
-		else
-			obj:SetScript("OnLeave", function() tooltip:Hide(); end);
+	function lib:displayTooltip(obj, text, anchor, offx, offy, owner)
+		
+		if not obj or not tooltip then return; end
+
+		-- when the mouse leaves this object, make the tooltip go away (using HookScript if possible to avoid overriding any other behaviour)
+		if not (obj.ct_displayTooltip_Hooked) then
+			obj:HookScript("OnLeave", function()
+				tooltip:Hide();
+			for i, height in pairs(lineHeight) do
+				left[i]:SetScale(1);
+				if (right[i]) then right[i]:SetScale(1); end
+			end
+			wipe(lineHeight);
+			end);
+			obj.ct_displayTooltip_Hooked = true
 		end
-		obj.ct_displayTooltip_Hooked = true
-	end
-	
-	-- anchor the tooltip
-	owner = (type(owner) == "string" and _G[owner]) or owner or obj;
-	if ( not anchor ) then
-		GameTooltip_SetDefaultAnchor(tooltip, owner);
-	elseif (anchor == "CT_ABOVEBELOW") then
-		if (owner:GetBottom() * owner:GetEffectiveScale() <= (UIParent:GetTop() * UIParent:GetEffectiveScale()) - (owner:GetTop() * owner:GetEffectiveScale())) then
-			tooltip:SetOwner(owner, "ANCHOR_TOP", offx or 0, offy or 0);
+
+		-- anchor the tooltip
+		owner = (type(owner) == "string" and _G[owner]) or owner or obj;
+		if ( not anchor ) then
+			GameTooltip_SetDefaultAnchor(tooltip, owner);
+		elseif (anchor == "CT_ABOVEBELOW") then
+			if (owner:GetBottom() * owner:GetEffectiveScale() <= (UIParent:GetTop() * UIParent:GetEffectiveScale()) - (owner:GetTop() * owner:GetEffectiveScale())) then
+				tooltip:SetOwner(owner, "ANCHOR_TOP", offx or 0, offy or 0);
+			else
+				tooltip:SetOwner(owner, "ANCHOR_BOTTOM", offx or 0, -(offy or 0));
+			end
+		elseif (anchor == "CT_BESIDE") then
+			if (owner:GetLeft() <= UIParent:GetRight() - owner:GetRight()) then
+				tooltip:SetOwner(owner, "ANCHOR_BOTTOMRIGHT", offx or 0, (offy or 0) + owner:GetHeight());
+			else
+				tooltip:SetOwner(owner, "ANCHOR_BOTTOMLEFT", -(offx or 0), (offy or 0) + owner:GetHeight());
+			end
 		else
-			tooltip:SetOwner(owner, "ANCHOR_BOTTOM", offx or 0, -(offy or 0));
+			tooltip:SetOwner(owner, anchor, offx or 0, offy or 0);
 		end
-	elseif (anchor == "CT_BESIDE") then
-		if (owner:GetLeft() <= UIParent:GetRight() - owner:GetRight()) then
-			tooltip:SetOwner(owner, "ANCHOR_BOTTOMRIGHT", offx or 0, (offy or 0) + owner:GetHeight());
-		else
-			tooltip:SetOwner(owner, "ANCHOR_BOTTOMLEFT", -(offx or 0), (offy or 0) + owner:GetHeight());
-		end
-	else
-		tooltip:SetOwner(owner, anchor, offx or 0, offy or 0);
-	end
-	
-	-- generate the tooltip content
-	if (type(text) == "string") then
-		tooltip:SetText(text);
-	elseif (type(text) == "table") then
-		for i, row in ipairs(text) do
-			local splitrow = {strsplit("#", row)}
-			local leftR,leftG,leftB,rightR,rightG,rightB,alpha,wrap,leftText,rightText;
-			for j=1, #splitrow do
-				local pieces = {strsplit(":", splitrow[j])}
-				local isAllNums = true;
-				for k, piece in ipairs(pieces) do
-					if (not tonumber(piece) or tonumber(piece) < 0 or tonumber(piece) > 1) then
-						isAllNums = false;
+
+		-- generate the tooltip content
+		if (type(text) == "string") then
+			tooltip:SetText(text);
+		elseif (type(text) == "table") then
+			for i, row in ipairs(text) do
+				local splitrow = {strsplit("#", row)}
+				local leftR,leftG,leftB,rightR,rightG,rightB,alpha,wrap,leftText,rightText;
+				for j=1, #splitrow do
+					local pieces = {strsplit(":", splitrow[j])}
+					local isAllNums = true;
+					for k, piece in ipairs(pieces) do
+						if (not tonumber(piece) or tonumber(piece) < 0 or tonumber(piece) > 1) then
+							isAllNums = false;
+						end
+					end						
+					if (not leftR and #pieces >= 3 and isAllNums) then
+						leftR = pieces[1];
+						leftG = pieces[2];
+						leftB = pieces[3];
+						if (pieces[6]) then
+							rightR = pieces[4];
+							rightG = pieces[5];
+							rightB = pieces[6];
+						elseif (pieces[4]) then
+							alpha = pieces[4];
+						end
+					elseif (not wrap and #pieces == 1 and pieces[1] == "w") then
+						wrap = true;
+					elseif (not size and #pieces == 2 and pieces[1] == "s") then
+						lineHeight[i] = tonumber(pieces[2]);
+					elseif (not leftText) then
+						leftText = splitrow[j];
+					elseif (not rightText) then
+						rightText = splitrow[j];
 					end
-				end						
-				if (not leftR and #pieces >= 3 and isAllNums) then
-					leftR = pieces[1];
-					leftG = pieces[2];
-					leftB = pieces[3];
-					if (pieces[6]) then
-						rightR = pieces[4];
-						rightG = pieces[5];
-						rightB = pieces[6];
-					elseif (pieces[4]) then
-						alpha = pieces[4];
-					end
-				elseif (not wrap and #pieces == 1 and pieces[1] == "w") then
-					wrap = true;
-				elseif (not leftText) then
-					leftText = splitrow[j];
-				elseif (not rightText) then
-					rightText = splitrow[j];
 				end
+				if (size) then
+					customSize = size;
+				end
+				if (rightText) then
+					GameTooltip:AddDoubleLine(leftText, rightText, leftR, leftG, leftB, rightR, rightG, rightB);
+				elseif (leftText) then
+					GameTooltip:AddLine(leftText, leftR, leftG, leftB, alpha, wrap);
+				end
+				customSize = nil;
 			end
-			if (rightText) then
-				GameTooltip:AddDoubleLine(leftText, rightText, leftR, leftG, leftB, rightR, rightG, rightB);
-			elseif (leftText) then
-				GameTooltip:AddLine(leftText, leftR, leftG, leftB, alpha, wrap);
+		end
+
+		-- make the tooltip finally appear!
+		tooltip:Show();
+		
+		for i, height in pairs(lineHeight) do
+			left[i] = left[i] or _G["GameTooltipTextLeft" .. i]
+			right[i] = right[i] or _G["GameTooltipTextRight" .. i]
+			tooltip:SetHeight(tooltip:GetHeight() + (height - 1) * left[i]:GetHeight());
+			left[i]:SetScale(height);
+			if (right[i] and right[i]:IsVisible()) then
+				right[i]:SetScale(height);
+				right[i]:SetPoint("RIGHT", left[i], "LEFT", select(4, right[i]:GetPoint(1))/height, 0)
 			end
 		end
 	end
-	
-	-- make the tooltip finally appear!
-	tooltip:Show();
 end
 
 -- Display a tooltip using predefined, localized text

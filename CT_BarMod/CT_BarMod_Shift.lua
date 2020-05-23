@@ -20,8 +20,7 @@
 --------------------------------------------
 -- Initialization
 
-local _G = getfenv(0);
-local module = _G.CT_BarMod;
+local module = select(2, ...);
 
 -- End Initialization
 --------------------------------------------

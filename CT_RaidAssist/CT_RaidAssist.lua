@@ -2223,7 +2223,7 @@ function StaticClickCastBroker()
 				if (not canBuff[key]) then
 					canBuff[key] = details.name;
 					tinsert(tooltipLeft, "|cFF33CC66nocombat, " .. key:gsub("1","left"):gsub("2","right"):gsub(", nomod", ""):gsub("mod:", ""));
-					tinsert(tooltipRight, "|cFF33CC66" .. details.name);
+					tinsert(tooltipRight, "|cFF33CC66" .. details.name:gsub("#", ""));
 					attributes[details.attribute] = true;
 				end
 			end
@@ -2236,7 +2236,7 @@ function StaticClickCastBroker()
 				if (not canRemoveDebuff[key]) then
 					canRemoveDebuff[key] = details.name;
 					tinsert(tooltipLeft, "|cFFCC6666combat, " .. key:gsub("1","left"):gsub("2","right"):gsub(", nomod", ""):gsub("mod:", ""));
-					tinsert(tooltipRight, "|cFFCC6666" .. details.name);
+					tinsert(tooltipRight, "|cFFCC6666" .. details.name:gsub("#", ""));
 					attributes[details.attribute] = true;
 				end
 			end
@@ -2249,7 +2249,7 @@ function StaticClickCastBroker()
 				if (not canRezCombat[key]) then
 					canRezCombat[key] = details.name;
 					tinsert(tooltipLeft, "|cFF999999combat, dead, " .. key:gsub("1","left"):gsub("2","right"):gsub(", nomod", ""):gsub("mod:", ""));
-					tinsert(tooltipRight, "|cFF999999" .. details.name);
+					tinsert(tooltipRight, "|cFF999999" .. details.name:gsub("#", ""));
 					attributes[details.attribute] = true;
 				end
 			end
@@ -2262,7 +2262,7 @@ function StaticClickCastBroker()
 				if (not canRezNoCombat[key]) then
 					canRezNoCombat[key] = details.name;
 					tinsert(tooltipLeft, "|cFF999999nocombat, dead, " .. key:gsub("1","left"):gsub("2","right"):gsub(", nomod", ""):gsub("mod:", ""));
-					tinsert(tooltipRight, "|cFF999999" .. details.name);
+					tinsert(tooltipRight, "|cFF999999" .. details.name:gsub("#", ""));
 					attributes[details.attribute] = true;
 				end
 			end
@@ -2322,16 +2322,18 @@ function StaticClickCastBroker()
 	
 	-- adds several double-lines to the tooltip (default: GameTooltip) describing each spell and how to click-cast it
 	-- also adds a single line that saying "Right click..." if there is at least one click-castable spell
-	function obj:PopulateTooltip(tooltip)
-		if (Clique and module:getOption("CTRAFrames_ClickCast_UseCliqueAddon") ~= false) then
-			return;
-		end
-		tooltip = tooltip or GameTooltip;
-		for i=1, #tooltipLeft do
-			if (i==1) then
-				tooltip:AddLine("|nClick casting...");
+	do
+		local pattern = "%s - %s#s:0.85";
+		function obj:PopulateTooltip(tooltipTable)
+			if (Clique and module:getOption("CTRAFrames_ClickCast_UseCliqueAddon") ~= false) then
+				return;
 			end
-			tooltip:AddDoubleLine(tooltipLeft[i], tooltipRight[i]);
+			for i=1, #tooltipLeft do
+				if (i==1) then
+					tinsert(tooltipTable, "|nClick casting...#0.9:0.9:0.9#s:0.8");
+				end
+				tinsert(tooltipTable, pattern:format(tooltipLeft[i], tooltipRight[i]));
+			end
 		end
 	end
 	
@@ -2810,7 +2812,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 	-- frequently updates roleTexture to reflect game state; see createRoleTexture()
 	local function updateRoleTexture()
 		if (shownUnit and UnitExists(shownUnit)) then
-			local targetIndex, inPhase, roleAssigned = GetRaidTargetIndex(shownUnit), UnitInPhase(shownUnit), UnitGroupRolesAssigned(shownUnit);
+			local targetIndex, inPhase, inWarModePhase, roleAssigned = GetRaidTargetIndex(shownUnit), UnitInPhase(shownUnit), UnitIsWarModePhased(shownUnit), UnitGroupRolesAssigned(shownUnit);
 			if (targetIndex and targetIndex <= 8) then
 				roleTexture:SetTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcons");
 				if (targetIndex == 1) then
@@ -2831,7 +2833,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 					roleTexture:SetTexCoord(0.75, 1.00, 0.25, 0.50);
 				end
 				roleTexture:Show();
-			elseif (not inPhase) then
+			elseif (not inPhase or inWarModePhase) then
 				roleTexture:SetTexture("Interface\\TargetingFrame\\UI-PhasingIcon");
 				roleTexture:SetTexCoord(0.15625, 0.84375, 0.15625, 0.84375);
 				roleTexture:Show();
@@ -3180,69 +3182,82 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 	end
 	
 	-- frequently displays a tooltip when mousing over secureButton or secureButtonDebuffFirst
-	local function displayTooltip()
+	local tooltipTable = { };
+	local strings = {
+		"%s#%s#%f:%f:%f:1:1:1", 	-- 1 name and level
+		"%s#%s#0.5:0.5:0.5", 		-- 2 pet type
+		"%s#%s#1:1:1:0.5:0.5:0.5", 	-- 3 race/class and range/phase/group
+		"%s#0.5:0.5:0.5",		-- 4 war mode
+		"|T%s:0|t %s (%d)#%f:%f:%f",	-- 5 aura with stacks
+		"|T%s:0|t %s#%f:%f:%f",		-- 6 aura without stacks
+		L["CT_RaidAssist/PlayerFrame/TooltipFooter"] .. "#0.5:0.5:0.5#s:0.8",	-- 7 footer if the window has been configured
+		"|T%s:0|t %s from |T%s:0|t %s#0.9:0.9:0.9",				-- 8 complex consumable buff
+		"|T%s:0|t %s#0.9:0.9:0.9",						-- 9 simple consumable buff
+	};
+	local function displayTooltip(button)
+		wipe(tooltipTable);
 		if (shownUnit and UnitExists(shownUnit)) then
-			GameTooltip:SetOwner(parent, (owner:GetProperty("GrowUpward") and "ANCHOR_BOTTOMRIGHT") or "ANCHOR_TOPLEFT");
+			--GameTooltip:SetOwner(parent, (owner:GetProperty("GrowUpward") and "ANCHOR_BOTTOMRIGHT") or "ANCHOR_TOPLEFT");
 			local className, classFilename = UnitClass(shownUnit);
 			local r,g,b = GetClassColor(classFilename);
-			GameTooltip:AddDoubleLine(UnitName(shownUnit) or "", UnitLevel(shownUnit) or "", r,g,b, 1,1,1);
+			tinsert(tooltipTable, strings[1]:format(UnitName(shownUnit) or "", UnitLevel(shownUnit) or "", r, g, b));
 			local mapid = C_Map.GetBestMapForUnit(shownUnit);
 			local subgroup = tonumber(shownUnit:sub(5)) and select(3, GetRaidRosterInfo(tonumber(shownUnit:sub(5))))
 			if (isPet) then
 				local owner = UnitName(shownUnit:sub(1,-4));
-				GameTooltip:AddLine((owner and format((select(2, UnitClass(shownUnit:sub(1,-4))) == "HUNTER" and UNITNAME_TITLE_PET) or UNITNAME_TITLE_MINION, owner)) or "", 0.5, 0.5, 0.5);
+				
+				tinsert(tooltipTable, strings[2]:format(select(2, UnitClass(shownUnit:sub(1,-4))) == "HUNTER" and UNITNAME_TITLE_PET) or UNITNAME_TITLE_MINION, owner);
 			else
-				GameTooltip:AddDoubleLine(
+				tinsert(tooltipTable, strings[3]:format(
 					(UnitRace(shownUnit) or "") .. " " .. (className or ""),
 					(
 						(not UnitInRange(shownUnit) and mapid and C_Map.GetMapInfo(mapid).name)
-						or (not UnitInPhase(shownUnit) and (UnitIsWarModePhased(shownUnit) and (C_PvP.IsWarModeDesired() and PARTY_PLAYER_WARMODE_DISABLED or PARTY_PLAYER_WARMODE_ENABLED) or PARTY_PHASED_MESSAGE))
 						or (subgroup and "Gp " .. subgroup) 
 						or ""
-					),
-					1, 1, 1,
-					0.5, 0.5, 0.5);
+					)
+				));
 			end
+			if (UnitIsWarModePhased(shownUnit)) then
+				tinsert(tooltipTable, strings[4]:format(C_PvP.IsWarModeDesired() and ERR_PVP_WARMODE_TOGGLE_OFF or ERR_PVP_WARMODE_TOGGLE_ON));
+			end
+
 			if (auraBoss1:IsShown()) then
 				local color = DebuffTypeColor[auraBoss1.debuffType or ""];
-				GameTooltip:AddLine("|T" .. auraBoss1.texture:GetTexture() .. ":0|t " .. (auraBoss1.name or "") .. ((auraBoss1.count or 0) > 1 and (" (" .. auraBoss1.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+				tinsert(tooltipTable, auraBoss1.count > 1 and strings[5]:format(auraBoss1.texture:GetTexture() or "", auraBoss1.name or "", auraBoss1.count, color.r, color.g, color.b) or strings[6]:format(auraBoss1.name or "", color.r, color.g, color.b));
 				if (auraBoss2:IsShown()) then
 					color = DebuffTypeColor[auraBoss2.debuffType or ""];
-					GameTooltip:AddLine("|T" .. auraBoss2.texture:GetTexture() .. ":0|t " .. (auraBoss2.name or "") .. ((auraBoss2.count or 0) > 1 and (" (" .. auraBoss2.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+					tinsert(tooltipTable, auraBoss2.count > 1 and strings[5]:format(auraBoss2.texture:GetTexture() or "", auraBoss2.name or "", auraBoss2.count, color.r, color.g, color.b) or strings[6]:format(auraBoss2.name or "", color.r, color.g, color.b));
 					if (auraBoss3:IsShown()) then
 						color = DebuffTypeColor[auraBoss3.debuffType or ""];
-						GameTooltip:AddLine("|T" .. auraBoss3.texture:GetTexture() .. ":0|t " .. (auraBoss3.name or "") .. ((auraBoss3.count or 0) > 1 and (" (" .. auraBoss3.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+						tinsert(tooltipTable, auraBoss3.count > 1 and strings[5]:format(auraBoss1.texture:GetTexture() or "", auraBoss3.name or "", auraBoss3.count, color.r, color.g, color.b) or strings[6]:format(auraBoss3.name or "", color.r, color.g, color.b));
 					end
 				end
 			end
 			if (aura1:IsShown()) then
 				local color = DebuffTypeColor[aura1.debuffType or ""];
-				GameTooltip:AddLine("|T" .. aura1.texture:GetTexture() .. ":0|t " .. (aura1.name or "") .. ((aura1.count or 0) > 1 and (" (" .. aura1.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+				tinsert(tooltipTable, strings[6]:format(aura1.texture:GetTexture() or "", aura1.name or "", color.r, color.g, color.b));
 				if (aura2:IsShown()) then
 					color = DebuffTypeColor[aura2.debuffType or ""];
-					GameTooltip:AddLine("|T" .. aura2.texture:GetTexture() .. ":0|t " .. (aura2.name or "") .. ((aura2.count or 0) > 1 and (" (" .. aura2.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+					tinsert(tooltipTable, strings[6]:format(aura2.texture:GetTexture() or "", aura2.name or "", color.r, color.g, color.b));
 					if (aura3:IsShown()) then
 						color = DebuffTypeColor[aura3.debuffType or ""];
-						GameTooltip:AddLine("|T" .. aura3.texture:GetTexture() .. ":0|t " .. (aura3.name or "") .. ((aura3.count or 0) > 1 and (" (" .. aura3.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+						tinsert(tooltipTable, strings[6]:format(aura3.texture:GetTexture() or "", aura3.name or "", color.r, color.g, color.b));
 						if (aura4:IsShown()) then
 							color = DebuffTypeColor[aura4.debuffType or ""];
-							GameTooltip:AddLine("|T" .. aura4.texture:GetTexture() .. ":0|t " .. (aura4.name or "") .. ((aura4.count or 0) > 1 and (" (" .. aura4.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+							tinsert(tooltipTable, strings[6]:format(aura4.texture:GetTexture() or "", aura4.name or "", color.r, color.g, color.b));
 							if (aura5:IsShown()) then
 								color = DebuffTypeColor[aura5.debuffType or ""];
-								GameTooltip:AddLine("|T" .. aura5.texture:GetTexture() .. ":0|t " .. (aura5.name or "") .. ((aura5.count or 0) > 1 and (" (" .. aura5.count .. ")") or ""), color and color["r"], color and color["g"], color and color["b"]);
+								tinsert(tooltipTable, strings[6]:format(aura5.texture:GetTexture() or "", aura5.name or "", color.r, color.g, color.b));
 							end
 						end
 					end
 				end
 			end
 
-			if (not module.GameTooltipExtraLine) then
-				module.GameTooltipExtraLine = GameTooltip:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall");
-				module.GameTooltipExtraLine:SetPoint("BOTTOM", 0, 6);
-				module.GameTooltipExtraLine:SetText(L["CT_RaidAssist/PlayerFrame/TooltipFooter"]);
-				module.GameTooltipExtraLine:SetScale(0.90);
-			end	
+	
+
 			if (not (InCombatLockdown() or isPet)) then
+			--[[
 				-- Durability
 				if (durabilityAverage) then
 					local time = GetTime() - (durabilityTime or 0);
@@ -3252,7 +3267,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 						GameTooltip:AddLine(format(L["CT_RaidAssist/PlayerFrame/TooltipItemsNotBroken"],durabilityAverage,  floor(time/60),time - floor(time/60) * 60), 0.9, 0.9, 0.9);
 					end
 				end
-
+			--]]
 				-- Consumables
 				for i=1, 40 do
 					local name, icon, __, __, __, __, __, __, __, spellId = UnitAura(shownUnit, i, "HELPFUL CANCELABLE");
@@ -3264,32 +3279,26 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 						if (type(isConsumable) == "number") then
 							local itemName, __, __, __, __, __, __, __, __, itemIcon = GetItemInfo(isConsumable);
 							if (itemName and itemIcon) then
-								GameTooltip:AddLine("|T" .. icon .. ":0|t " .. name .. " from " .. "|T" .. itemIcon .. ":0|t " .. itemName, 0.9, 0.9, 0.9);
+								tinsert(tooltipTable, strings[8]:format(icon, name, itemIcon, itemName));
 							else
-								GameTooltip:AddLine("|T" .. icon .. ":0|t " .. name, 0.9, 0.9, 0.9);
+								tinsert(tooltipTable, strings[9]:format(icon, name));
 							end
 						else
-							GameTooltip:AddLine("|T" .. icon .. ":0|t " .. name, 0.9, 0.9, 0.9);
+							tinsert(tooltipTable, strings[9]:format(icon, name));
 						end
 					end
 				end
-
+			
 				-- Click-Casting
-				StaticClickCastBroker():PopulateTooltip();
-
+				StaticClickCastBroker():PopulateTooltip(tooltipTable);
+			
 				-- CTRA Footer
-				GameTooltip:Show();
-				module.GameTooltipExtraLine:Show();
-				GameTooltip:SetHeight(GameTooltip:GetHeight()+5);
-				GameTooltip:SetWidth(max(150,GameTooltip:GetWidth()));
-				if (owner.GetWindowID and module:getOption("MOVABLE-CTRAWindow" .. owner:GetWindowID())) then
-					module.GameTooltipExtraLine:SetTextColor(0.50, 0.50, 0.50);
-				else
-					module.GameTooltipExtraLine:SetTextColor(1,1,1);
+				if (owner.GetWindowID and not module:getOption("MOVABLE-CTRAWindow" .. owner:GetWindowID())) then
+					tinsert(tooltipTable, strings[7]);
 				end
+				module:displayTooltip(button, tooltipTable, owner:GetProperty("GrowUpward") and "ANCHOR_BOTTOMRIGHT" or "ANCHOR_TOPLEFT", 0, 0, parent);
 			else
-				module.GameTooltipExtraLine:Hide();
-				GameTooltip:Show();
+				module:displayTooltip(button, tooltipTable, owner:GetProperty("GrowUpward") and "ANCHOR_BOTTOMRIGHT" or "ANCHOR_TOPLEFT", 0, 0, parent);
 			end
 		end
 	end
@@ -3343,35 +3352,17 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 		secureButton:SetAllPoints();
 		secureButton:RegisterForClicks("AnyDown");
 		secureButton:HookScript("OnEnter", displayTooltip);
-		secureButton:HookScript("OnLeave",
-			function()
-				module.GameTooltipExtraLine:Hide();
-				GameTooltip:Hide();
-			end
-		);
 
 		-- alternative button with a different macro to prioritize decursing outside combat
 		secureButtonDebuffFirst = CreateFrame("Button", nil, secureButton, "SecureUnitButtonTemplate");
 		secureButtonDebuffFirst:SetAllPoints();
 		secureButtonDebuffFirst:RegisterForClicks("AnyDown");
 		secureButtonDebuffFirst:HookScript("OnEnter", displayTooltip);
-		secureButtonDebuffFirst:HookScript("OnLeave",
-			function()
-				module.GameTooltipExtraLine:Hide();
-				GameTooltip:Hide();
-			end
-		);
 
 		-- alternative button that integrates with the Clique addons if present and enabled
 		secureButtonCliqueFirst = CreateFrame("Button", nil, secureButton, "SecureUnitButtonTemplate");
 		secureButtonCliqueFirst:SetAllPoints();
 		secureButtonCliqueFirst:HookScript("OnEnter", displayTooltip);
-		secureButtonCliqueFirst:HookScript("OnLeave",
-			function()
-				module.GameTooltipExtraLine:Hide();
-				GameTooltip:Hide();
-			end
-		);
 
 		-- initial configuration
 		local broker = StaticClickCastBroker();
@@ -3576,9 +3567,12 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 							or event == "UNIT_CONNECTION"
 						) then
 							updateRaidStatusIndicators();
+							updateRoleTexture();
 						elseif (
 							event == "RAID_TARGET_UPDATE"
 							or event == "UNIT_PHASE"
+							--or event == "PARTY_MEMBER_ENABLE"
+							--or event == "PARTY_MEMBER_DISABLE"
 						) then
 							updateRoleTexture();
 						end
@@ -3608,6 +3602,8 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 				listenerFrame:RegisterEvent("CONFIRM_SUMMON");					-- updateRaidStatusIndicators();
 				listenerFrame:RegisterEvent("RAID_TARGET_UPDATE");				-- updateRoleTexture();
 				listenerFrame:RegisterUnitEvent("UNIT_PHASE", shownUnit);			-- updateRoleTexture();
+				--listenerFrame:RegisterUnitEvent("PARTY_MEMBER_ENABLE");				-- updateRoleTexture();
+				--listenerFrame:RegisterUnitEvent("PARTY_MEMBER_DISABLE");			-- updateRoleTexture();
 				if (module:getGameVersion() >= 8) then
 					listenerFrame:RegisterUnitEvent("INCOMING_SUMMON_CHANGED", shownUnit);		-- updateRaidStatusIndicators();
 					listenerFrame:RegisterUnitEvent("UNIT_ABSORB_AMOUNT_CHANGED", shownUnit);	-- updateHealthBar; updateBackdrop();
