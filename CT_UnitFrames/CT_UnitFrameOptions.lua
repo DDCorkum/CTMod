@@ -360,7 +360,7 @@ function CT_UnitFramesOptions_Box_CB_OnClick(self)
 		if (self:GetID() == 65) then
 			-- "Use class colors"
 			CT_UnitFramesOptions.partyClassColor = self:GetChecked();
-			CT_PartyFrame_UpdateClassColor();
+			module.UpdatePartyFrameClassColors();
 		end
 	elseif ( self:GetParent():GetID() == 3 ) then
 		-- Box3

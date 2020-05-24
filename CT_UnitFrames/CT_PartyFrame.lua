@@ -136,7 +136,7 @@ function module:ShowPartyFrameBarText()
 end
 
 
-function CT_PartyFrame_UpdateClassColor()
+local function UpdatePartyFrameClassColors()
 	local GetClassColor = GetClassColor or C_ClassColor.GetClassColor
 	for i=1, 4 do
 		if (CT_UnitFramesOptions.partyClassColor and UnitExists("party" .. i)) then
@@ -149,4 +149,6 @@ function CT_PartyFrame_UpdateClassColor()
 	end
 end
 
-module:regEvent("GROUP_ROSTER_UPDATE", CT_PartyFrame_UpdateClassColor);
+module.UpdatePartyFrameClassColors = UpdatePartyFrameClassColors;
+module:regEvent("GROUP_ROSTER_UPDATE", UpdatePartyFrameClassColors);
+module:regEvent("PLAYER_LOGIN", UpdatePartyFrameClassColors);
