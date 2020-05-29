@@ -579,15 +579,22 @@ local mouseUnitOffset = 0;
 local function updateMousePosition()	
 	local cx, cy = GetCursorPosition();		
 	if (cy) then	
-		tooltipMouseAnchor:SetPoint("BOTTOMLEFT", cx, cy + mouseUnitOffset );
+		tooltipMouseAnchor:SetPoint("BOTTOMLEFT", cx, cy + mouseUnitOffset);
 	end
 end
 
 -- position the tooltip when it is not owned by something else
 hooksecurefunc("GameTooltip_SetDefaultAnchor",
 	function (tooltip, text, x, y, wrap)
-		if (module:getOption("tooltipRelocation") == 2 or module:getOption("tooltipRelocation") == 4) then
+		local option = module:getOption("tooltipRelocation");
+		if (option == 2 or option == 4) then
 			--on mouse (stationary) and on mouse (following)
+			
+			-- update the mouse anchor's position, and cause it to keep updating rapidly if option == 4
+			updateMousePosition();
+			if (option == 4) then
+				tooltip.ctTicker = tooltip.ctTicker or C_Timer.NewTicker(0.03, updateMousePosition);
+			end
 			
 			-- where is the mouse cursor, anyways?
 			local uiScale, cx, cy = UIParent:GetEffectiveScale(), GetCursorPosition();		
@@ -598,30 +605,22 @@ hooksecurefunc("GameTooltip_SetDefaultAnchor",
 			-- adds hooks once to each GameTooltip only (there could be several if addons use their own versions)
 			if (not tooltip.ctIsHooked) then
 				tooltip.ctIsHooked = true;
-				local mouseTicker, fadeTicker;
 				tooltip:HookScript("OnShow",
-					function()
-						-- this allows the next OnUpdate call to control the tooltip
-						local option = module:getOption("tooltipRelocation");
-						if (not tooltip:GetUnit()) then
-							mouseUnitOffset = 0;
-						end
-						updateMousePosition();
-						if (option == 4) then
-							mouseTicker = mouseTicker or C_Timer.NewTicker(0.06, updateMousePosition);
-						end
+					function() 
+						-- This information isn't known until the tooltip has appeared
+						mouseUnitOffset = tooltip:GetUnit() and mouseUnitOffset or 0;
 					end
 				);
 				tooltip:HookScript("OnHide",
 					function() 
-						if (mouseTicker) then 
-							mouseTicker:Cancel(); 
-							mouseTicker = nil; 
+						if (tooltip.ctTicker) then
+							tooltip.ctTicker:Cancel();
+							tooltip.ctTicker = nil;
 						end
 					end
 				);
 			end
-			
+						
 			-- anchor the tooltip itself, because it has to be done now and no later to avoid taint (if it is the GameTooltip)
 			if (cx/uiScale > UIParent:GetWidth()/2) then
 				if (cy/uiScale > UIParent:GetHeight()/2) then			-- mouse is in top-right quadrant
@@ -659,8 +658,8 @@ hooksecurefunc("GameTooltip_SetDefaultAnchor",
 					);
 					mouseUnitOffset = 10;
 				end
-			end	
-		elseif (module:getOption("tooltipRelocation") == 3) then
+			end
+		elseif (option == 3) then
 			--on anchor
 			local direction = "NONE";
 			local anchorSetting = module:getOption("tooltipAnchor") or 5;
@@ -682,27 +681,32 @@ hooksecurefunc("GameTooltip_SetDefaultAnchor",
 	end
 );
 
-local function accelerateFade()
-	if (GameTooltip:GetAlpha() < 1) then
-		GameTooltip:Hide();
+
+
+do
+	-- Control whether the tooltip should fade out or disappear immediately
+	
+	local tooltipFadeTicker;
+
+	local function accelerateFade()
+		if (GameTooltip:GetAlpha() < 1) then
+			GameTooltip:Hide();
+		end
 	end
+
+	GameTooltip:HookScript("OnShow", function()
+		if (module:getOption("tooltipDisableFade")) then
+			tooltipFadeTicker = tooltipFadeTicker or C_Timer.NewTicker(0.1, accelerateFade);
+		end
+	end);
+	GameTooltip:HookScript("OnHide", function()
+		if (tooltipFadeTicker) then
+			tooltipFadeTicker:Cancel();
+			tooltipFadeTicker = nil;
+		end
+	end);
+
 end
-
-local tooltipFadeTicker;
-
-GameTooltip:HookScript("OnShow", function()
-	if (module:getOption("tooltipDisableFade")) then
-		tooltipFadeTicker = tooltipFadeTicker or C_Timer.NewTicker(0.1, accelerateFade);
-	end
-end);
-GameTooltip:HookScript("OnHide", function()
-	if (tooltipFadeTicker) then
-		tooltipFadeTicker:Cancel();
-		tooltipFadeTicker = nil;
-	end
-end);
-
-
 --------------------------------------------
 -- Tick Mod
 
