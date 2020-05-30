@@ -1751,7 +1751,7 @@ end
 -- Out of Range (icon coloring)
 -----
 do
-	local isReset = true;
+	local isReset;
 
 	local function CT_BarMod_ActionButton_FadeOutOfRange(self)
 		if (defbarShowRange) then
@@ -1762,8 +1762,6 @@ do
 				else
 					icon:SetVertexColor(0.8, 0.4, 0.4);
 				end
-
-				isReset = false;
 			else
 				ActionButton_UpdateUsable(self);
 			end
@@ -1771,7 +1769,7 @@ do
 	end
 	
 	local function CT_BarMod_ActionButton_StartFadeTicker(self)
-		self.ctFadeTicker = self.ctFadeTicker or C_Timer.NewTicker(0.25, CT_BarMod_ActionButton_FadeOutOfRange);
+		self.ctFadeTicker = self.ctFadeTicker or C_Timer.NewTicker(0.25, function() CT_BarMod_ActionButton_FadeOutOfRange(self); end);
 	end
 	
 	local function CT_BarMod_ActionButton_CancelFadeTicker(self)
@@ -1795,7 +1793,7 @@ do
 
 	function CT_BarMod_UpdateActionButtonRange()
 		if (defbarShowRange) then
-			--The update itself is handled by the fadeTicker, but it is still necessary to set the isReset flag
+			updateBlizzardButtons(CT_BarMod_ActionButton_FadeOutOfRange);
 			isReset = nil;
 		elseif (isReset) then
 			return;
