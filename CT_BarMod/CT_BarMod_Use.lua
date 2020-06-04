@@ -1947,7 +1947,6 @@ do
 
 	local function CT_BarMod_ActionButton_UpdateActionText(self, ...)
 		if (defbarShowActionText) then
-
 			local name = self.Name;		--  _G[self:GetName() .. "Name"];
 			if (name) then
 				local actionId = self.action;
@@ -1976,7 +1975,7 @@ do
 
 	function CT_BarMod_UpdateActionButtonActionText()
 		if (defbarShowActionText) then
-			updateBlizzardButtons(CT_BarMod_ActionButton_ResetActionText);
+			updateBlizzardButtons(CT_BarMod_ActionButton_UpdateActionText);
 			isReset = nil;
 		elseif (isReset) then
 			return;
