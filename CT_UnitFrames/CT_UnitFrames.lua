@@ -69,7 +69,7 @@ end
 --------------------------------------------
 -- Health and mana bar text
 
-local percentPattern = "%.2f%%";
+local percentPattern = "%d%%";
 local valuesPattern = "%s/%s";
 local prefixedPercentPattern = "%s " .. percentPattern;
 local prefixedValuesPattern = "%s " .. valuesPattern;
