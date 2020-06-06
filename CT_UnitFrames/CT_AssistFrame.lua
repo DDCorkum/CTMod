@@ -1,8 +1,23 @@
+------------------------------------------------
+--               CT_UnitFrames                --
+--                                            --
+-- Heavily customizable mod that allows you   --
+-- to modify the Blizzard unit frames into    --
+-- your personal style and liking.            --
+-- Please do not modify or otherwise          --
+-- redistribute this without the consent of   --
+-- the CTMod Team. Thank you.                 --
+------------------------------------------------
+
+local module = select(2,...);
+
+--------------------------------------------
 -- This is a modified version of Blizzard's TargetFrame
 -- (originally based on the 3.2 source)
 -- plus some additional functions.
 -- This file displays targettarget, and targettargettarget frames.
 
+local unit0 = "target";
 local unit1 = "targettarget";
 local unit2 = "targettargettarget";
 
@@ -27,9 +42,6 @@ local PLAYER_UNITS = {
 };
 
 function CT_AssistFrame_OnLoad(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The main unit frame
 	self.noTextPrefix = true;
 	self.showLevel = true;
@@ -96,18 +108,19 @@ function CT_AssistFrame_OnLoad(self)
 
 	self:RegisterEvent("PLAYER_ENTERING_WORLD");
 	self:RegisterEvent("PLAYER_TARGET_CHANGED");
-	self:RegisterEvent("UNIT_HEALTH");
+	self:RegisterUnitEvent("UNIT_HEALTH", unit1);
 	if ( self.showLevel ) then
-		self:RegisterEvent("UNIT_LEVEL");
+		self:RegisterUnitEvent("UNIT_LEVEL", unit1);
 	end
-	self:RegisterEvent("UNIT_FACTION");
+	self:RegisterUnitEvent("UNIT_FACTION", unit1);
 	if ( self.showClassification ) then
-		self:RegisterEvent("UNIT_CLASSIFICATION_CHANGED");
+		self:RegisterUnitEvent("UNIT_CLASSIFICATION_CHANGED", unit1);
 	end
-	self:RegisterEvent("UNIT_AURA");
+	self:RegisterUnitEvent("UNIT_AURA", unit1);
 	if ( self.showLeader ) then
-		self:RegisterEvent("PLAYER_FLAGS_CHANGED");
+		self:RegisterUnitEvent("PLAYER_FLAGS_CHANGED", unit1);
 	end
+	self:RegisterUnitEvent("UNIT_TARGET", unit0, unit1); -- update the ToT frame
 	self:RegisterEvent("GROUP_ROSTER_UPDATE");
 	self:RegisterEvent("RAID_TARGET_UPDATE");
 	self:RegisterEvent("PLAYER_REGEN_ENABLED");
@@ -144,19 +157,12 @@ function CT_AssistFrame_OnLoad(self)
 
 	-- Set alpha of heal prediction bars to 0 so that they do not
 	-- briefly appear as full length bars when our frame is
-	-- initially shown. We'll set a flag in the OnShow script
-	-- that will be checked for in the OnUpdate script. Waiting for
-	-- the next OnUpdate gives the game enough time to update
-	-- the prediction bars so that when we set the alpha back to 1
-	-- during the OnUpdate script, the bars won't be visible.
+	-- initially shown. We'll restore this 0.001sec after OnShow
 	self.myHealPredictionBar:SetAlpha(0);
 	self.otherHealPredictionBar:SetAlpha(0);
 end
 
 function CT_AssistFrame_Update(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The main unit frame
 
 	-- This check is here so the frame will hide when the target goes away
@@ -212,9 +218,6 @@ function CT_AssistFrame_Update(self)
 end
 
 function CT_AssistFrame_OnEvent(self, event, ...)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The main unit frame
 	UnitFrame_OnEvent(self, event, ...);
 
@@ -323,32 +326,43 @@ function CT_AssistFrame_OnEvent(self, event, ...)
 			UnregisterUnitWatch(self.totFrame);
 		end
 		CT_UnitFrames_ResetDragLink(_G[self:GetName().."_Drag"]);
+	elseif ( event == "UNIT_TARGET" ) then
+		if (CT_UnitFramesOptions.shallDisplayTargetOfAssist) then
+			CT_TargetofAssist_Update(self.totFrame);
+		end
+		module:ShowAssistFrameBarText();
 	end
 end
 
 function CT_AssistFrame_OnShow(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The main unit frame
-	self.ctShowPredict = true;
---	CT_AssistFrame_Update(self);
+	C_Timer.After(0.01, function()
+		self.myHealPredictionBar:SetAlpha(1);
+		self.otherHealPredictionBar:SetAlpha(1);
+	end);
+	CT_AssistFrame_Update(self);
+
+	-- self.ctUpdateTicker = self.ctUpdateTicker or C_Timer.NewTicker(0.1, function() CT_FocusFrame_Update(self) end);	
+	-- self.ctThreatTicker = self.ctThreatTicker or C_Timer.NewTicker(0.5, function() UnitFrame_UpdateThreatIndicator(self.threatIndicator, self.threatNumericIndicator, self.feedbackUnit); end);
+
 end
 
 function CT_AssistFrame_OnHide(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The main unit frame
-
+	if (self.ctUpdateTicker) then
+		self.ctUpdateTicker:Cancel();
+		self.ctUpdateTicker = nil;
+	end
+	if (self.ctThreatTicker) then
+		self.ctThreatTicker:Cancel();
+		self.ctThreatTicker = nil;
+	end
+	
 --	PlaySound(684);
 --	CloseDropDownMenus();
 end
 
 function CT_AssistFrame_CheckLevel(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The main unit frame
 	local assistLevel = UnitLevel(self.unit);
 
@@ -381,9 +395,6 @@ function CT_AssistFrame_CheckLevel(self)
 end
 
 function CT_AssistFrame_CheckFaction(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The main unit frame
 	if ( not UnitPlayerControlled(self.unit) and UnitIsTapDenied(self.unit) ) then
 		self.nameBackground:SetVertexColor(0.5, 0.5, 0.5);
@@ -412,9 +423,6 @@ function CT_AssistFrame_CheckFaction(self)
 end
 
 function CT_AssistFrame_CheckBattlePet(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The main unit frame
 	if ( UnitIsWildBattlePet(self.unit) or UnitIsBattlePetCompanion(self.unit) ) then
 		local petType = UnitBattlePetType(self.unit);
@@ -426,9 +434,6 @@ function CT_AssistFrame_CheckBattlePet(self)
 end
 
 function CT_AssistFrame_CheckClassification(self, forceNormalTexture)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The main unit frame
 	local classification = UnitClassification(self.unit);
 	self.nameBackground:Show();
@@ -501,9 +506,6 @@ function CT_AssistFrame_CheckClassification(self, forceNormalTexture)
 end
 
 function CT_AssistFrame_CheckDead(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The main unit frame
 	if ( (UnitHealth(self.unit) <= 0) and UnitIsConnected(self.unit) ) then
 		self.deadText:Show();
@@ -514,43 +516,10 @@ function CT_AssistFrame_CheckDead(self)
 	end
 end
 
-function CT_AssistFrame_OnUpdate(self, elapsed)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
-	-- self == The main unit frame
-	if (self.ctShowPredict) then
-		self.myHealPredictionBar:SetAlpha(1);
-		self.otherHealPredictionBar:SetAlpha(1);
-		self.ctShowPredict = false;
-	end
-
---	if ( self.totFrame:IsShown() ~= (UnitExists("target") and UnitExists(unit1) and UnitExists(unit2)) ) then
---		CT_TargetofAssist_Update(self.totFrame);
---	end
-
-	self.ctUpdate = self.ctUpdate + elapsed;
-	if ( self.ctUpdate > 0.1 ) then
-		self.ctUpdate = 0;
-		CT_AssistFrame_Update(self);
-	end
-
-	self.elapsed = (self.elapsed or 0) + elapsed;
-	if ( self.elapsed > 0.5 ) then
-		self.elapsed = 0;
---		UnitFrame_UpdateThreatIndicator(self.threatIndicator, self.threatNumericIndicator, self.feedbackUnit);
-	end
-
-	CT_AssistFrame_HealthUpdate(self, elapsed, self.unit);
-end
-
 local largeBuffList = {};
 local largeDebuffList = {};
 
 function CT_AssistFrame_UpdateAuras(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The main unit frame
 	local frame, frameName;
 	local frameIcon, frameCount, frameCooldown;
@@ -739,9 +708,6 @@ function CT_AssistFrame_UpdateAuras(self)
 end
 
 function CT_AssistFrame_ShouldShowDebuff(unit, index, filter)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	--This is an enemy
 	if ( SHOW_ALL_ENEMY_DEBUFFS == "1" or not UnitCanAttack("player", unit) ) then
 		return true;
@@ -758,9 +724,6 @@ function CT_AssistFrame_ShouldShowDebuff(unit, index, filter)
 end
 
 function CT_AssistFrame_UpdateAuraPositions(self, auraName, numAuras, numOppositeAuras, largeAuraList, updateFunc, maxRowWidth, offsetX, mirrorAurasVertically)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The main unit frame
 
 	-- A lot of this complexity is in place to allow the auras to wrap around the target of target frame if it's shown
@@ -809,9 +772,6 @@ function CT_AssistFrame_UpdateAuraPositions(self, auraName, numAuras, numOpposit
 end
 
 function CT_AssistFrame_UpdateBuffAnchor(self, buffName, index, numDebuffs, anchorIndex, size, offsetX, offsetY, mirrorVertically)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The main unit frame
 
 	--For mirroring vertically
@@ -861,9 +821,6 @@ function CT_AssistFrame_UpdateBuffAnchor(self, buffName, index, numDebuffs, anch
 end
 
 function CT_AssistFrame_UpdateDebuffAnchor(self, debuffName, index, numBuffs, anchorIndex, size, offsetX, offsetY, mirrorVertically)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The main unit frame
 	local buff = _G[debuffName..index];
 	local isFriend = UnitIsFriend("player", self.unit);
@@ -921,9 +878,6 @@ function CT_AssistFrame_UpdateDebuffAnchor(self, debuffName, index, numBuffs, an
 end
 
 function CT_AssistFrame_HealthUpdate(self, elapsed, unit)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The main unit frame
 	if ( UnitIsPlayer(unit) ) then
 		if ( (self.unitHPPercent > 0) and (self.unitHPPercent <= 0.2) ) then
@@ -951,9 +905,6 @@ function CT_AssistFrame_HealthUpdate(self, elapsed, unit)
 end
 
 function CT_AssistHealthCheck(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The main unit frame's health bar
 	local parent = self:GetParent(); -- The main unit frame
 	if ( UnitIsPlayer(parent.unit) ) then
@@ -1032,9 +983,6 @@ end
 -- RAID_TARGET_TEXTURE_ROWS = 4;
 
 function CT_AssistFrame_UpdateRaidTargetIcon(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The main unit frame
 	local index = GetRaidTargetIndex(self.unit);
 	if ( index ) then
@@ -1068,9 +1016,6 @@ end
 -- ------------------------------------------------------------------------
 
 function CT_TargetofAssist_OnLoad(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The "target of" unit frame
 	local parent = self:GetParent();
 	parent.totFrame = self;
@@ -1091,7 +1036,7 @@ function CT_TargetofAssist_OnLoad(self)
 		nil
 	);
 	SetTextStatusBarTextZeroText(frame.healthbar, DEAD);
-	frame:RegisterEvent("UNIT_AURA");
+	frame:RegisterUnitEvent("UNIT_AURA", unit2);
 	frame.deadText = _G[thisName.."TextureFrameDeadText"];
 	SecureUnitButton_OnLoad(frame, frame.unit);
 
@@ -1104,17 +1049,11 @@ function CT_TargetofAssist_OnLoad(self)
 end
 
 function CT_TargetofAssist_OnShow(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The "target of" unit frame
 	CT_AssistFrame_UpdateAuras(self:GetParent());
 end
 
 function CT_TargetofAssist_OnHide(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The "target of" unit frame
 	local parent = self:GetParent();
 	CT_Assist_Spellbar_AdjustPosition(parent.spellbar);
@@ -1122,9 +1061,6 @@ function CT_TargetofAssist_OnHide(self)
 end
 
 function CT_TargetofAssist_Update(self, elapsed)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The "target of" unit frame
 	local show;
 	local parent = self:GetParent();
@@ -1147,9 +1083,6 @@ function CT_TargetofAssist_Update(self, elapsed)
 end
 
 function CT_TargetofAssist_CheckDead(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The "target of" unit frame
 	if ( (UnitHealth(self.unit) <= 0) and UnitIsConnected(self.unit) ) then
 		self.background:SetAlpha(0.9);
@@ -1161,9 +1094,6 @@ function CT_TargetofAssist_CheckDead(self)
 end
 
 function CT_TargetofAssist_HealthCheck(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The "target of" unit frame
 	if ( UnitIsPlayer(self.unit) ) then
 		local unitHPMin, unitHPMax, unitCurrHP;
@@ -1191,9 +1121,6 @@ end
 -- -----------------------------------------------------------------------------------
 
 function CT_Assist_Spellbar_OnLoad(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == Spellbar for the main unit frame.
 	local parent = self:GetParent();
 	parent.spellbar = self;
@@ -1223,9 +1150,6 @@ function CT_Assist_Spellbar_OnLoad(self)
 end
 
 function CT_Assist_ToggleSpellbar(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == Spellbar for the main unit frame.
 	if ( CT_UnitFramesOptions and not CT_UnitFramesOptions.showAssistCastbar ) then
 		self.showCastbar = false;
@@ -1240,9 +1164,6 @@ function CT_Assist_ToggleSpellbar(self)
 end
 
 function CT_Assist_Spellbar_OnEvent(self, event, ...)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == Spellbar for the main unit frame.
 	local arg1 = ...
 
@@ -1292,9 +1213,6 @@ function CT_Assist_Spellbar_OnEvent(self, event, ...)
 end
 
 function CT_Assist_Spellbar_AdjustPosition(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	local parentFrame = self:GetParent();
 	if ( parentFrame.haveToT ) then
 		if ( parentFrame.buffsOnTop or parentFrame.auraRows <= 1 ) then
@@ -1321,10 +1239,69 @@ end
 -- ------------------------------------------------------------------
 -- Bar text
 
-function CT_AssistFrame_AnchorSideText()
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
+local function CT_AssistFrame_TextStatusBar_UpdateTextString(bar)
+	local self = CT_AssistFrame;
+
+	if (bar == self.healthbar) then
+		if (CT_UnitFramesOptions) then
+			local style;
+			if (UnitIsFriend(self.unit, "player")) then
+				style = CT_UnitFramesOptions.styles[4][1];
+			else
+				style = CT_UnitFramesOptions.styles[4][5];
+			end
+			module:UpdateStatusBarTextString(bar, style, 0)
+			CT_UnitFrames_HealthBar_OnValueChanged(bar, tonumber(bar:GetValue()), not CT_UnitFramesOptions.oneColorHealth)
+			module:UpdateBesideBarTextString(bar, CT_UnitFramesOptions.styles[4][2], self.healthBesideText)
+		end
+
+	elseif (bar == self.manabar) then
+		if (CT_UnitFramesOptions) then
+			module:UpdateStatusBarTextString(bar, CT_UnitFramesOptions.styles[4][3], 0)
+			module:UpdateBesideBarTextString(bar, CT_UnitFramesOptions.styles[4][4], self.manaBesideText)
+		end
+	else
+		print("foo");
 	end
+end
+
+function CT_AssistFrame_TextStatusBar_OnLoad(bar)
+	bar:HookScript("OnValueChanged", CT_AssistFrame_TextStatusBar_UpdateTextString);
+	bar:HookScript("OnEnter", CT_AssistFrame_TextStatusBar_UpdateTextString);
+	bar:HookScript("OnLeave", CT_AssistFrame_TextStatusBar_UpdateTextString);
+end
+
+--[[  	-- replaced by CT_AssistFrame_TextStatusBar_OnLoad(bar)
+
+	local function CT_AssistFrame_ShowTextStatusBarText(bar)
+
+		local self = CT_AssistFrame;
+		if (bar == self.healthbar or bar == self.manabar) then
+			CT_AssistFrame_TextStatusBar_UpdateTextString(bar);
+		end
+	end
+
+	local function CT_AssistFrame_HideTextStatusBarText(bar)
+		local self = CT_AssistFrame;
+		if (bar == self.healthbar or bar == self.manabar) then
+			CT_AssistFrame_TextStatusBar_UpdateTextString(bar);
+		end
+	end
+
+	hooksecurefunc("ShowTextStatusBarText", CT_AssistFrame_ShowTextStatusBarText);
+	hooksecurefunc("TextStatusBar_UpdateTextString", CT_AssistFrame_TextStatusBar_UpdateTextString);
+	hooksecurefunc("HideTextStatusBarText", CT_AssistFrame_HideTextStatusBarText);
+--]]
+
+function module:ShowAssistFrameBarText()
+	local self = CT_AssistFrame;
+	UnitFrameHealthBar_Update(self.healthbar, self.unit);
+	UnitFrameManaBar_Update(self.manabar, self.unit);
+	CT_AssistFrame_TextStatusBar_UpdateTextString(self.healthbar);
+	CT_AssistFrame_TextStatusBar_UpdateTextString(self.manabar);
+end
+
+function module:AnchorAssistFrameSideText()
 	local self = CT_AssistFrame;
 	local fsTable = { self.healthBesideText, self.manaBesideText };
 	for i, frame in ipairs(fsTable) do
@@ -1343,62 +1320,3 @@ function CT_AssistFrame_AnchorSideText()
 
 	end
 end
-
-function CT_AssistFrame_ShowBarText()
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
-	local self = CT_AssistFrame;
-	UnitFrameHealthBar_Update(self.healthbar, self.unit);
-	UnitFrameManaBar_Update(self.manabar, self.unit);
-end
-
-function CT_AssistFrame_TextStatusBar_UpdateTextString(bar)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
-	local self = CT_AssistFrame;
-
-	if (bar == self.healthbar) then
-		if (CT_UnitFramesOptions) then
-			local style;
-			if (UnitIsFriend(self.unit, "player")) then
-				style = CT_UnitFramesOptions.styles[4][1];
-			else
-				style = CT_UnitFramesOptions.styles[4][5];
-			end
-			CT_UnitFrames_TextStatusBar_UpdateTextString(bar, style, 0)
-			CT_UnitFrames_HealthBar_OnValueChanged(bar, tonumber(bar:GetValue()), not CT_UnitFramesOptions.oneColorHealth)
-			CT_UnitFrames_BesideBar_UpdateTextString(bar, CT_UnitFramesOptions.styles[4][2], self.healthBesideText)
-		end
-
-	elseif (bar == self.manabar) then
-		if (CT_UnitFramesOptions) then
-			CT_UnitFrames_TextStatusBar_UpdateTextString(bar, CT_UnitFramesOptions.styles[4][3], 0)
-			CT_UnitFrames_BesideBar_UpdateTextString(bar, CT_UnitFramesOptions.styles[4][4], self.manaBesideText)
-		end
-	end
-end
-hooksecurefunc("TextStatusBar_UpdateTextString", CT_AssistFrame_TextStatusBar_UpdateTextString);
-
-function CT_AssistFrame_ShowTextStatusBarText(bar)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
-	local self = CT_AssistFrame;
-	if (bar == self.healthbar or bar == self.manabar) then
-		CT_AssistFrame_TextStatusBar_UpdateTextString(bar);
-	end
-end
-hooksecurefunc("ShowTextStatusBarText", CT_AssistFrame_ShowTextStatusBarText);
-
-function CT_AssistFrame_HideTextStatusBarText(bar)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
-	local self = CT_AssistFrame;
-	if (bar == self.healthbar or bar == self.manabar) then
-		CT_AssistFrame_TextStatusBar_UpdateTextString(bar);
-	end
-end
-hooksecurefunc("HideTextStatusBarText", CT_AssistFrame_HideTextStatusBarText);

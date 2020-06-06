@@ -61,7 +61,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 			</OnLoad>
 			<OnEvent>
 				if (event == "PLAYER_ENTERING_WORLD") then
-					CT_PartyFrame_ShowBarText();
+					CT_UnitFrames:ShowPartyFrameBarText();
 				end
 			</OnEvent>
 		</Scripts>

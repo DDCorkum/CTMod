@@ -19,7 +19,7 @@
 -----------------------------------------------
 -- Initialization
 
-local LIBRARY_VERSION = 8.308;		-- Once upon a time this was to differentiate between different versions of CT_Library... but its now 2020 and CT_Library has stood as its own AddOn for more than a decade.
+local LIBRARY_VERSION = 8.309;		-- Once upon a time this was to differentiate between different versions of CT_Library... but its now 2020 and CT_Library has stood as its own AddOn for more than a decade.
 local LIBRARY_NAME = "CT_Library";
 
 -- Create tables for all the PROTECTED contents and PUBLIC interface of CTMod
@@ -138,20 +138,28 @@ function lib:clearTable(tbl, clearMeta)
 	end
 end
 
--- Identify if this is WoW Retail (1) or WoW Classic (2)
-CT_GAME_VERSION_UNKNOWN = 0;
-CT_GAME_VERSION_RETAIL  = 1;
-CT_GAME_VERSION_CLASSIC = 2;
-function libPublic:getGameVersion()
-	local version = CT_GAME_VERSION_UNKNOWN;
-	if (MainMenuBarArtFrame and MainMenuBarArtFrame.LeftEndCap) then
-		-- The gryphons were changed in WoW 8.0
-		version = CT_GAME_VERSION_RETAIL;
-	elseif (MainMenuBarLeftEndCap) then
-		-- Older gryphons pre-8.0, and existing today only in Classic
-		version = CT_GAME_VERSION_CLASSIC;
+-- Returns the game version as a number.  If the arguments are true, appends the major patch in the hundredths and minor patch in ten-thousandths.
+do
+	-- constants
+	CT_GAME_VERSION_CLASSIC = 1;	-- These globals may be eliminated in the future.  They are included for backwards compatibility.
+	CT_GAME_VERSION_RETAIL  = 8; 
+	
+	local version, major, minor = strsplit(".", GetBuildInfo());
+	version, major, minor = tonumber(version) or 0, tonumber(major) or 0, tonumber(minor) or 0
+	major = version + major/100
+	minor = major + minor/10000
+	
+	function libPublic:getGameVersion(includeMajor, alsoIncludeMinor)
+		if (includeMajor) then
+			if (includeMinor) then
+				return minor;
+			else
+				return major;
+			end
+		else
+			return version;
+		end
 	end
-	return version;
 end
 
 -- Print a formatted message in yellow to ChatFrame1
@@ -188,84 +196,110 @@ end
 -- if text is a string, it will simply display the text
 -- if text is a table of strings, it will AddLine() each string and optionally set r,g,b,a and wrap by checking for '#' delimiters, or AddDoubleLine() if sufficient content is provided
 -- setting anchor to CT_ABOVEBELOW or CT_BESIDE will position the tooltip wherever there is more room on the screen
-function lib:displayTooltip(obj, text, anchor, offx, offy, owner)
+do
+	local lineHeight = { };
+	local left, right = { }, { };
 	local tooltip = GameTooltip;
-	if not obj or not tooltip then return; end
 	
-	-- when the mouse leaves this object, make the tooltip go away (using HookScript if possible to avoid overriding any other behaviour)
-	if not (obj.ct_displayTooltip_Hooked) then
-		if (obj.HookScript) then
-			obj:HookScript("OnLeave", function() tooltip:Hide(); end);
-		else
-			obj:SetScript("OnLeave", function() tooltip:Hide(); end);
+	function lib:displayTooltip(obj, text, anchor, offx, offy, owner)
+		
+		if not obj or not tooltip then return; end
+
+		-- when the mouse leaves this object, make the tooltip go away (using HookScript if possible to avoid overriding any other behaviour)
+		if not (obj.ct_displayTooltip_Hooked) then
+			obj:HookScript("OnLeave", function()
+				tooltip:Hide();
+			for i, height in pairs(lineHeight) do
+				left[i]:SetScale(1);
+				if (right[i]) then right[i]:SetScale(1); end
+			end
+			wipe(lineHeight);
+			end);
+			obj.ct_displayTooltip_Hooked = true
 		end
-		obj.ct_displayTooltip_Hooked = true
-	end
-	
-	-- anchor the tooltip
-	owner = (type(owner) == "string" and _G[owner]) or owner or obj;
-	if ( not anchor ) then
-		GameTooltip_SetDefaultAnchor(tooltip, owner);
-	elseif (anchor == "CT_ABOVEBELOW") then
-		if (owner:GetBottom() * owner:GetEffectiveScale() <= (UIParent:GetTop() * UIParent:GetEffectiveScale()) - (owner:GetTop() * owner:GetEffectiveScale())) then
-			tooltip:SetOwner(owner, "ANCHOR_TOP", offx or 0, offy or 0);
+
+		-- anchor the tooltip
+		owner = (type(owner) == "string" and _G[owner]) or owner or obj;
+		if ( not anchor ) then
+			GameTooltip_SetDefaultAnchor(tooltip, owner);
+		elseif (anchor == "CT_ABOVEBELOW") then
+			if (owner:GetBottom() * owner:GetEffectiveScale() <= (UIParent:GetTop() * UIParent:GetEffectiveScale()) - (owner:GetTop() * owner:GetEffectiveScale())) then
+				tooltip:SetOwner(owner, "ANCHOR_TOP", offx or 0, offy or 0);
+			else
+				tooltip:SetOwner(owner, "ANCHOR_BOTTOM", offx or 0, -(offy or 0));
+			end
+		elseif (anchor == "CT_BESIDE") then
+			if (owner:GetLeft() <= UIParent:GetRight() - owner:GetRight()) then
+				tooltip:SetOwner(owner, "ANCHOR_BOTTOMRIGHT", offx or 0, (offy or 0) + owner:GetHeight());
+			else
+				tooltip:SetOwner(owner, "ANCHOR_BOTTOMLEFT", -(offx or 0), (offy or 0) + owner:GetHeight());
+			end
 		else
-			tooltip:SetOwner(owner, "ANCHOR_BOTTOM", offx or 0, -(offy or 0));
+			tooltip:SetOwner(owner, anchor, offx or 0, offy or 0);
 		end
-	elseif (anchor == "CT_BESIDE") then
-		if (owner:GetLeft() <= UIParent:GetRight() - owner:GetRight()) then
-			tooltip:SetOwner(owner, "ANCHOR_BOTTOMRIGHT", offx or 0, (offy or 0) + owner:GetHeight());
-		else
-			tooltip:SetOwner(owner, "ANCHOR_BOTTOMLEFT", -(offx or 0), (offy or 0) + owner:GetHeight());
-		end
-	else
-		tooltip:SetOwner(owner, anchor, offx or 0, offy or 0);
-	end
-	
-	-- generate the tooltip content
-	if (type(text) == "string") then
-		tooltip:SetText(text);
-	elseif (type(text) == "table") then
-		for i, row in ipairs(text) do
-			local splitrow = {strsplit("#", row)}
-			local leftR,leftG,leftB,rightR,rightG,rightB,alpha,wrap,leftText,rightText;
-			for j=1, #splitrow do
-				local pieces = {strsplit(":", splitrow[j])}
-				local isAllNums = true;
-				for k, piece in ipairs(pieces) do
-					if (not tonumber(piece) or tonumber(piece) < 0 or tonumber(piece) > 1) then
-						isAllNums = false;
+
+		-- generate the tooltip content
+		if (type(text) == "string") then
+			tooltip:SetText(text);
+		elseif (type(text) == "table") then
+			for i, row in ipairs(text) do
+				local splitrow = {strsplit("#", row)}
+				local leftR,leftG,leftB,rightR,rightG,rightB,alpha,wrap,leftText,rightText;
+				for j=1, #splitrow do
+					local pieces = {strsplit(":", splitrow[j])}
+					local isAllNums = true;
+					for k, piece in ipairs(pieces) do
+						if (not tonumber(piece) or tonumber(piece) < 0 or tonumber(piece) > 1) then
+							isAllNums = false;
+						end
+					end						
+					if (not leftR and #pieces >= 3 and isAllNums) then
+						leftR = pieces[1];
+						leftG = pieces[2];
+						leftB = pieces[3];
+						if (pieces[6]) then
+							rightR = pieces[4];
+							rightG = pieces[5];
+							rightB = pieces[6];
+						elseif (pieces[4]) then
+							alpha = pieces[4];
+						end
+					elseif (not wrap and #pieces == 1 and pieces[1] == "w") then
+						wrap = true;
+					elseif (not size and #pieces == 2 and pieces[1] == "s") then
+						lineHeight[i] = tonumber(pieces[2]);
+					elseif (not leftText) then
+						leftText = splitrow[j];
+					elseif (not rightText) then
+						rightText = splitrow[j];
 					end
-				end						
-				if (not leftR and #pieces >= 3 and isAllNums) then
-					leftR = pieces[1];
-					leftG = pieces[2];
-					leftB = pieces[3];
-					if (pieces[6]) then
-						rightR = pieces[4];
-						rightG = pieces[5];
-						rightB = pieces[6];
-					elseif (pieces[4]) then
-						alpha = pieces[4];
-					end
-				elseif (not wrap and #pieces == 1 and pieces[1] == "w") then
-					wrap = true;
-				elseif (not leftText) then
-					leftText = splitrow[j];
-				elseif (not rightText) then
-					rightText = splitrow[j];
 				end
+				if (size) then
+					customSize = size;
+				end
+				if (rightText) then
+					GameTooltip:AddDoubleLine(leftText, rightText, leftR, leftG, leftB, rightR, rightG, rightB);
+				elseif (leftText) then
+					GameTooltip:AddLine(leftText, leftR, leftG, leftB, alpha, wrap);
+				end
+				customSize = nil;
 			end
-			if (rightText) then
-				GameTooltip:AddDoubleLine(leftText, rightText, leftR, leftG, leftB, rightR, rightG, rightB);
-			elseif (leftText) then
-				GameTooltip:AddLine(leftText, leftR, leftG, leftB, alpha, wrap);
+		end
+
+		-- make the tooltip finally appear!
+		tooltip:Show();
+		
+		for i, height in pairs(lineHeight) do
+			left[i] = left[i] or _G["GameTooltipTextLeft" .. i]
+			right[i] = right[i] or _G["GameTooltipTextRight" .. i]
+			tooltip:SetHeight(tooltip:GetHeight() + (height - 1) * left[i]:GetHeight());
+			left[i]:SetScale(height);
+			if (right[i] and right[i]:IsVisible()) then
+				right[i]:SetScale(height);
+				right[i]:SetPoint("RIGHT", left[i], "LEFT", select(4, right[i]:GetPoint(1))/height, 0)
 			end
 		end
 	end
-	
-	-- make the tooltip finally appear!
-	tooltip:Show();
 end
 
 -- Display a tooltip using predefined, localized text
@@ -481,7 +515,15 @@ function lib:copyTable(source, dest)
 	return dest;
 end
 
-function lib:abbreviateLargeNumbers(value, breakup)
+do
+	local separatorPattern4 = "%s%d" .. LARGE_NUMBER_SEPERATOR .. "%d";
+	local separatorPattern7 = "%s%d" .. LARGE_NUMBER_SEPERATOR .. "%d" .. LARGE_NUMBER_SEPERATOR .. "%d";
+	local capPattern4 = separatorPattern4;
+	local capPattern6 = "%s%d" .. FIRST_NUMBER_CAP;
+	local capPattern7 = separatorPattern4 .. FIRST_NUMBER_CAP;
+	local capPattern9 = "%s%d" .. SECOND_NUMBER_CAP;
+	local capPattern10 = separatorPattern4 .. SECOND_NUMBER_CAP;
+
 	-- This abbreviates large numbers by reducing the number of digits
 	-- and appending some abbreviation text. The breakup parameter
 	-- controls whether or not the number will be broken up using separators.
@@ -490,89 +532,77 @@ function lib:abbreviateLargeNumbers(value, breakup)
 	-- as of WoW 5.0.4.
 	-- This modified version handles negative numbers, adds the breakup parameter,
 	-- and is capable of breaking up numbers before adding the abbreviation text.
+	-- 
+	-- Further changed in 8.3.0.9 for faster performance
 	--
 	-- Parameters:
 	-- value == value to be abbreviated (very large values may not display properly).
 	-- breakup == Should the number be broken up using seperators.
 	--            nil == yes, true == yes, false == no
-	local negative = "";
-	if (value < 0) then
-		negative = "-";
-		value = -value;
+	function lib:abbreviateLargeNumbers(value, breakup)
+		local negative = "";
+		if (value < 0) then
+			negative = "-";
+			value = -value;
+		end
+		if (value < 1000) then
+			return negative .. value
+		elseif (value < 100000 and breakup ~= false) then
+			return capPattern4:format(negative, value/1000, value%1000);
+		elseif (value < 1000000) then
+			return capPattern6:format(negative, value/1000);
+		elseif (value < 100000000 and breakup ~= false) then
+			return capPattern7:format(negative, value/1000000, value%1000000/1000);
+		elseif (value < 1000000000 or breakup == false) then
+			return capPattern9:format(negative, value/1000000);
+		else
+			return capPattern10:format(negative, value/1000000000, value/1000000);
+		end
 	end
 
-	local retString = value;
-	local strLen = strlen(value);
-	if ( strLen > 8 ) then
-		-- Drop the last 6 digits and add the abbreviation text.
-		value = tonumber(string.sub(value, 1, -7));
-		retString = self:breakUpLargeNumbers(value, breakup);
-		retString = retString .. SECOND_NUMBER_CAP;
-	elseif ( strLen > 5 ) then
-		-- Drop the last 3 digits and add the abbreviation text.
-		value = tonumber(string.sub(retString, 1, -4));
-		retString = self:breakUpLargeNumbers(value, breakup);
-		retString = retString .. FIRST_NUMBER_CAP;
-	elseif (strLen > 3 ) then
-		retString = self:breakUpLargeNumbers(value, breakup);
-	end
-	return negative .. retString;
-end
 
-function lib:breakUpLargeNumbers(value, breakup)
 	-- Break up large numbers using separators, and if the number contains
 	-- decimals then the returned string will have two decimals.
 	--
 	-- This is a modified version of BreakUpLargeNumbers() from UIParent.lua
 	-- as of WoW 5.0.4.
 	-- This modified version handles negative numbers, adds the breakup parameter,
-	-- and drops the use of GetCVarBool("breakUpLargeNumbers").
+	-- and drops the use of GetCVarBool("breakUpLargeNumbers"). 
+	-- 
+	-- Further changed in 8.3.0.9 for faster performance
 	--
 	-- Parameters:
 	-- value == value to be abbreviated (very large values may not display properly).
 	-- breakup == Should the number be broken up using seperators.
 	--            nil == yes, true == yes, false == no
-	local negative = "";
-	if (value < 0) then
-		negative = "-";
-		value = -value;
-	end
-	if (breakup == nil) then
-		breakup = true;
-	end
-
-	local retString = "";
-
-	if ( value < 1000 ) then
-		if ( (value - math.floor(value)) == 0) then
-			-- Return a string with no decimals.
-			return negative .. value;
+	function lib:breakUpLargeNumbers(value, breakup)
+		local negative = "";
+		if (value < 0) then
+			negative = "-";
+			value = -value;
 		end
-		-- Return a string with two decimals.
-		local decimal = (math.floor(value*100));
-		retString = string.sub(decimal, 1, -3);
-		retString = retString .. DECIMAL_SEPERATOR;
-		retString = retString .. string.sub(decimal, -2);
-		return negative .. retString;
-	end
 
-	-- Don't allow any decimals.
-	value = math.floor(value);
-	local strLen = strlen(value);
-	if (breakup) then
-		-- Use seperators to break the value up.
-		if ( strLen > 6 ) then
-			retString = string.sub(value, 1, -7) .. LARGE_NUMBER_SEPERATOR;
+		if ( value < 1000 ) then
+			if ( value%1 == 0) then
+				-- Return the integer
+				return negative .. value;
+			else
+				-- Return a string with two decimals.
+				return negative .. format("%.2f", value);
+			end
+		elseif (breakup ~= false) then
+			-- Use seperators to break the value up, and don't allow any decimals.
+			--value = math.floor(value);
+			if ( value >= 1000000 ) then
+				return separatorPattern7:format(negative, value/1000000, value/1000, value%1000);
+			else
+				return separatorPattern4:format(negative, value/1000, value%1000);
+			end
+		else
+			-- no separators, but still don't allow any decimals.
+			return negative .. math.floor(value);
 		end
-		if ( strLen > 3 ) then
-			retString = retString .. string.sub(value, -6, -4) .. LARGE_NUMBER_SEPERATOR;
-		end
-		retString = retString .. string.sub(value, -3, -1);
-	else
-		-- Do not use seperators.
-		retString = value;
 	end
-	return negative .. retString;
 end
 
 -----------------------------------------------

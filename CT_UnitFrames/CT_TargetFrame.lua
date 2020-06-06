@@ -1,3 +1,16 @@
+------------------------------------------------
+--               CT_UnitFrames                --
+--                                            --
+-- Heavily customizable mod that allows you   --
+-- to modify the Blizzard unit frames into    --
+-- your personal style and liking.            --
+-- Please do not modify or otherwise          --
+-- redistribute this without the consent of   --
+-- the CTMod Team. Thank you.                 --
+------------------------------------------------
+
+local module = select(2, ...);
+
 local inworld;
 function CT_TargetFrameOnEvent(self, event, arg1, ...)
 
@@ -39,17 +52,15 @@ hooksecurefunc("TargetFrame_ResetUserPlacedPosition", CT_TargetFrame_ResetUserPl
 --   STEP 2 (new in 8.2.0.8): Changes the color of the target class frame to indicate friend, hostile, pvp, etc.
 function CT_SetTargetClass()
 	-- STEP 1:
-	if ( not CT_UnitFramesOptions.displayTargetClass ) then
-		return;
-	end
-	if ( not UnitExists("target") or not UnitExists("player") ) then
+	if ( CT_UnitFramesOptions.displayTargetClass and UnitExists("target") ) then
+		if ( UnitIsPlayer("target") ) then
+			CT_TargetFrameClassFrameText:SetText(UnitClass("target") or "");
+		else
+			CT_TargetFrameClassFrameText:SetText(UnitCreatureType("target") or "");
+		end
+	else
 		CT_TargetFrameClassFrameText:SetText("");
 		return;
-	end
-	if ( UnitIsPlayer("target") ) then
-		CT_TargetFrameClassFrameText:SetText(UnitClass("target") or "");
-	else
-		CT_TargetFrameClassFrameText:SetText(UnitCreatureType("target") or "");
 	end
 
 	-- STEP 2:
@@ -154,7 +165,57 @@ function CT_TargetFrame_SetThreatPosition(center, numericIndicator)
 	end
 end
 
-function CT_TargetFrame_AnchorSideText()
+local function CT_TargetFrame_HealthTextStatusBar_UpdateTextString(bar)
+	if (CT_UnitFramesOptions) then
+		local style;
+		if (UnitIsFriend("target", "player")) then
+			style = CT_UnitFramesOptions.styles[3][1];
+		else
+			style = CT_UnitFramesOptions.styles[3][5];
+		end
+		module:UpdateStatusBarTextString(bar, style, 0)
+		CT_UnitFrames_HealthBar_OnValueChanged(bar, tonumber(bar:GetValue()), not CT_UnitFramesOptions.oneColorHealth)
+		module:UpdateBesideBarTextString(bar, CT_UnitFramesOptions.styles[3][2], CT_TargetHealthLeft)	
+	end
+end
+
+local function CT_TargetFrame_ManaTextStatusBar_UpdateTextString(bar)
+	if (CT_UnitFramesOptions) then
+		module:UpdateStatusBarTextString(bar, CT_UnitFramesOptions.styles[3][3], 0)
+		module:UpdateBesideBarTextString(bar, CT_UnitFramesOptions.styles[3][4], CT_TargetManaLeft)
+	end
+end
+
+module:regEvent("PLAYER_LOGIN", function()
+	TargetFrameHealthBar:HookScript("OnEnter", CT_TargetFrame_HealthTextStatusBar_UpdateTextString);
+	TargetFrameHealthBar:HookScript("OnLeave", CT_TargetFrame_HealthTextStatusBar_UpdateTextString);
+	TargetFrameHealthBar:HookScript("OnValueChanged", CT_TargetFrame_HealthTextStatusBar_UpdateTextString);
+	TargetFrameManaBar:HookScript("OnEnter", CT_TargetFrame_ManaTextStatusBar_UpdateTextString);
+	TargetFrameManaBar:HookScript("OnLeave", CT_TargetFrame_ManaTextStatusBar_UpdateTextString);
+	TargetFrameManaBar:HookScript("OnValueChanged", CT_TargetFrame_ManaTextStatusBar_UpdateTextString);
+end);
+
+--[[	replaced by PLAYER_LOGIN event
+
+	function CT_TargetFrame_ShowTextStatusBarText(bar)
+		if (bar == TargetFrameHealthBar or bar == TargetFrameManaBar) then
+			CT_TargetFrame_TextStatusBar_UpdateTextString(bar);
+		end
+	end
+
+
+	function CT_TargetFrame_HideTextStatusBarText(bar)
+		if (bar == TargetFrameHealthBar or bar == TargetFrameManaBar) then
+			CT_TargetFrame_TextStatusBar_UpdateTextString(bar);
+		end
+	end
+
+	hooksecurefunc("TextStatusBar_UpdateTextString", CT_TargetFrame_TextStatusBar_UpdateTextString);
+	hooksecurefunc("ShowTextStatusBarText", CT_TargetFrame_ShowTextStatusBarText);
+	hooksecurefunc("HideTextStatusBarText", CT_TargetFrame_HideTextStatusBarText);
+--]]
+
+function module:AnchorTargetFrameSideText()
 	local fsTable = { "CT_TargetHealthLeft", "CT_TargetManaLeft" };
 	for i, name in ipairs(fsTable) do
 		local frame = _G[name];
@@ -175,42 +236,9 @@ function CT_TargetFrame_AnchorSideText()
 	end
 end
 
-function CT_TargetFrame_ShowBarText()
+function module:ShowTargetFrameBarText()
 	UnitFrameHealthBar_Update(TargetFrameHealthBar, "target");
 	UnitFrameManaBar_Update(TargetFrameManaBar, "target");
+	CT_TargetFrame_HealthTextStatusBar_UpdateTextString(TargetFrameHealthBar);
+	CT_TargetFrame_ManaTextStatusBar_UpdateTextString(TargetFrameManaBar);
 end
-
-function CT_TargetFrame_TextStatusBar_UpdateTextString(bar)
-
-	if (bar == TargetFrameHealthBar and CT_UnitFramesOptions) then
-		local style;
-		if (UnitIsFriend("target", "player")) then
-			style = CT_UnitFramesOptions.styles[3][1];
-		else
-			style = CT_UnitFramesOptions.styles[3][5];
-		end
-		CT_UnitFrames_TextStatusBar_UpdateTextString(bar, style, 0)
-		CT_UnitFrames_HealthBar_OnValueChanged(bar, tonumber(bar:GetValue()), not CT_UnitFramesOptions.oneColorHealth)
-		CT_UnitFrames_BesideBar_UpdateTextString(bar, CT_UnitFramesOptions.styles[3][2], CT_TargetHealthLeft)
-
-	elseif (bar == TargetFrameManaBar and CT_UnitFramesOptions) then
-		CT_UnitFrames_TextStatusBar_UpdateTextString(bar, CT_UnitFramesOptions.styles[3][3], 0)
-		CT_UnitFrames_BesideBar_UpdateTextString(bar, CT_UnitFramesOptions.styles[3][4], CT_TargetManaLeft)
-	end
-end
-hooksecurefunc("TextStatusBar_UpdateTextString", CT_TargetFrame_TextStatusBar_UpdateTextString);
-
-function CT_TargetFrame_ShowTextStatusBarText(bar)
-	if (bar == TargetFrameHealthBar or bar == TargetFrameManaBar) then
-		CT_TargetFrame_TextStatusBar_UpdateTextString(bar);
-	end
-end
-hooksecurefunc("ShowTextStatusBarText", CT_TargetFrame_ShowTextStatusBarText);
-
-function CT_TargetFrame_HideTextStatusBarText(bar)
-	if (bar == TargetFrameHealthBar or bar == TargetFrameManaBar) then
-		CT_TargetFrame_TextStatusBar_UpdateTextString(bar);
-	end
-end
-hooksecurefunc("HideTextStatusBarText", CT_TargetFrame_HideTextStatusBarText);
-

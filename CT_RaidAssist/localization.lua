@@ -32,10 +32,14 @@ L["CT_RaidAssist/PlayerFrame/TooltipFooter"] = "/ctra to move and configure"
 L["CT_RaidAssist/PlayerFrame/TooltipItemsBroken"] = "%d%% durability, %d broken items (as of %d:%02d mins ago)"
 L["CT_RaidAssist/PlayerFrame/TooltipItemsNotBroken"] = "%d%% durability (as of %d:%02d mins ago)"
 L["CT_RaidAssist/WindowTitle"] = "Window %d"
-L["CT_RaidAssist/Options/ClickCast/DropDownOptions"] = "#Right Click#Shift-Right Click#Ctrl-Right Click#Alt-Right Click#Disabled"
+L["CT_RaidAssist/Options/ClickCast/DropDownOptions"] = "#Right Click#Shift-Right Click#Ctrl-Right Click#Alt-Right Click#Disabled#Left Click#Shift-Left Click#Ctrl-Left Click#Alt-Left Click"
 L["CT_RaidAssist/Options/ClickCast/Heading"] = "Click casting (right click)"
 L["CT_RaidAssist/Options/ClickCast/Line1"] = "CTRA allows some classes to apply buffs, remove debuffs and cast resurrection by right clicking."
 L["CT_RaidAssist/Options/ClickCast/NoneAvailable"] = "No spells available for this class"
+L["CT_RaidAssist/Options/ClickCast/TargetDropDown"] = "#All other clicks#Disabled"
+L["CT_RaidAssist/Options/ClickCast/TargetLabel"] = "Target"
+L["CT_RaidAssist/Options/ClickCast/ToggleMenuLabel"] = "Toggle Menu"
+
 L["CT_RaidAssist/Options/Frames/HideBlizzardDefaultCheckButton"] = "Hide Blizzard's Default Raid Frames"
 L["CT_RaidAssist/Options/Frames/HideBlizzardDefaultTooltip"] = [=[Prevents default raid groups from appearing whenever custom CTRA frames are present.
 Has no effect if CTRA frames are disabled.

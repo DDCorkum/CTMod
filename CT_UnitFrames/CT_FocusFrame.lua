@@ -1,3 +1,17 @@
+------------------------------------------------
+--               CT_UnitFrames                --
+--                                            --
+-- Heavily customizable mod that allows you   --
+-- to modify the Blizzard unit frames into    --
+-- your personal style and liking.            --
+-- Please do not modify or otherwise          --
+-- redistribute this without the consent of   --
+-- the CTMod Team. Thank you.                 --
+------------------------------------------------
+
+local module = select(2, ...);
+
+--------------------------------------------
 -- This is a modified version of Blizzard's TargetFrame
 -- (originally based on the 3.2 source)
 -- plus some additional functions.
@@ -27,9 +41,6 @@ local PLAYER_UNITS = {
 };
 
 function CT_FocusFrame_OnLoad(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 
 	-- self == The main unit frame
 	self.noTextPrefix = true;
@@ -45,7 +56,6 @@ function CT_FocusFrame_OnLoad(self)
 	self.statusCounter = 0;
 	self.statusSign = -1;
 	self.unitHPPercent = 1;
-	self.ctUpdate = 0;
 
 	local thisName = self:GetName();
 	self.borderTexture = _G[thisName.."TextureFrameTexture"];
@@ -97,18 +107,19 @@ function CT_FocusFrame_OnLoad(self)
 
 	self:RegisterEvent("PLAYER_ENTERING_WORLD");
 	self:RegisterEvent("PLAYER_FOCUS_CHANGED");
-	self:RegisterEvent("UNIT_HEALTH");
+	self:RegisterUnitEvent("UNIT_HEALTH", unit1);
 	if ( self.showLevel ) then
-		self:RegisterEvent("UNIT_LEVEL");
+		self:RegisterUnitEvent("UNIT_LEVEL", unit1);
 	end
-	self:RegisterEvent("UNIT_FACTION");
+	self:RegisterUnitEvent("UNIT_FACTION", unit1, "player");
 	if ( self.showClassification ) then
-		self:RegisterEvent("UNIT_CLASSIFICATION_CHANGED");
+		self:RegisterUnitEvent("UNIT_CLASSIFICATION_CHANGED", unit1);
 	end
-	self:RegisterEvent("UNIT_AURA");
+	self:RegisterUnitEvent("UNIT_AURA", unit1);
 	if ( self.showLeader ) then
-		self:RegisterEvent("PLAYER_FLAGS_CHANGED");
+		self:RegisterUnitEvent("PLAYER_FLAGS_CHANGED", unit1);
 	end
+	self:RegisterUnitEvent("UNIT_TARGET", unit1);
 	self:RegisterEvent("GROUP_ROSTER_UPDATE");
 	self:RegisterEvent("RAID_TARGET_UPDATE");
 	self:RegisterEvent("PLAYER_REGEN_ENABLED");
@@ -145,27 +156,17 @@ function CT_FocusFrame_OnLoad(self)
 
 	-- Set alpha of heal prediction bars to 0 so that they do not
 	-- briefly appear as full length bars when our frame is
-	-- initially shown. We'll set a flag in the OnShow script
-	-- that will be checked for in the OnUpdate script. Waiting for
-	-- the next OnUpdate gives the game enough time to update
-	-- the prediction bars so that when we set the alpha back to 1
-	-- during the OnUpdate script, the bars won't be visible.
+	-- initially shown. We'll restore one frame after the OnShow script
 	self.myHealPredictionBar:SetAlpha(0);
 	self.otherHealPredictionBar:SetAlpha(0);
 end
 
 function CT_FocusFrame_Update(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The main unit frame
 
 	-- This check is here so the frame will hide when the focus goes away
 	-- even if some of the functions below are hooked by addons.
-	if ( not UnitExists(self.unit) ) then
---		self:Hide();
-	else
---		self:Show();
+	if ( UnitExists(self.unit) ) then
 
 		-- Moved here to avoid taint from functions below
 		if ( self.totFrame ) then
@@ -196,9 +197,6 @@ function CT_FocusFrame_Update(self)
 			end
 		end
 		CT_FocusFrame_UpdateAuras(self);
-		if ( self.portrait ) then
-			self.portrait:SetAlpha(1.0);
-		end
 		CT_FocusFrame_CheckBattlePet(self);
 		if ( self.petBattleIcon ) then
 			self.petBattleIcon:SetAlpha(1.0);
@@ -208,9 +206,6 @@ function CT_FocusFrame_Update(self)
 end
 
 function CT_FocusFrame_OnEvent(self, event, ...)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The main unit frame
 	UnitFrame_OnEvent(self, event, ...);
 
@@ -248,22 +243,23 @@ function CT_FocusFrame_OnEvent(self, event, ...)
 --		end
 
 	elseif ( event == "UNIT_HEALTH" ) then
-		if ( arg1 == self.unit ) then
+		--if ( arg1 == self.unit ) then
 			CT_FocusFrame_CheckDead(self);
-		end
+			CT_FocusHealthCheck(self.healthbar);
+		--end
 
 	elseif ( event == "UNIT_LEVEL" ) then
-		if ( arg1 == self.unit ) then
+		--if ( arg1 == self.unit ) then
 			CT_FocusFrame_CheckLevel(self);
-		end
+		--end
 
 	elseif ( event == "UNIT_FACTION" ) then
-		if ( arg1 == self.unit or arg1 == "player" ) then
+		--if ( arg1 == self.unit or arg1 == "player" ) then
 			CT_FocusFrame_CheckFaction(self);
 			if ( self.showLevel ) then
 				CT_FocusFrame_CheckLevel(self);
 			end
-		end
+		--end
 
 	elseif ( event == "UNIT_CLASSIFICATION_CHANGED" ) then
 		if ( arg1 == self.unit ) then
@@ -271,18 +267,18 @@ function CT_FocusFrame_OnEvent(self, event, ...)
 		end
 
 	elseif ( event == "UNIT_AURA" ) then
-		if ( arg1 == self.unit ) then
+		--if ( arg1 == self.unit ) then
 			CT_FocusFrame_UpdateAuras(self);
-		end
+		--end
 
 	elseif ( event == "PLAYER_FLAGS_CHANGED" ) then
-		if ( arg1 == self.unit and self.showLeader ) then
+		--if ( arg1 == self.unit and self.showLeader ) then
 			if ( UnitLeadsAnyGroup(self.unit) ) then
 				self.leaderIcon:Show();
 			else
 				self.leaderIcon:Hide();
 			end
-		end
+		--end
 
 	elseif ( event == "GROUP_ROSTER_UPDATE" ) then
 		if ( self.totFrame ) then
@@ -319,32 +315,39 @@ function CT_FocusFrame_OnEvent(self, event, ...)
 			UnregisterUnitWatch(self.totFrame);
 		end
 		CT_UnitFrames_ResetDragLink(_G[self:GetName().."_Drag"]);
+	elseif (event == "UNIT_TARGET") then
+		CT_FocusFrame_Update(self)
 	end
 end
 
 function CT_FocusFrame_OnShow(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The main unit frame
-	self.ctShowPredict = true;
---	CT_FocusFrame_Update(self);
+	
+	C_Timer.After(0.01, function()
+		self.myHealPredictionBar:SetAlpha(1);
+		self.otherHealPredictionBar:SetAlpha(1);
+	end);
+
+	-- self.ctUpdateTicker = self.ctUpdateTicker or C_Timer.NewTicker(0.1, function() CT_FocusFrame_Update(self) end);	
+	self.ctThreatTicker = self.ctThreatTicker or C_Timer.NewTicker(0.5, function() UnitFrame_UpdateThreatIndicator(self.threatIndicator, self.threatNumericIndicator, self.feedbackUnit); end);
 end
 
 function CT_FocusFrame_OnHide(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The main unit frame
+	if (self.ctUpdateTicker) then
+		self.ctUpdateTicker:Cancel();
+		self.ctUpdateTicker = nil;
+	end
+	if (self.ctThreatTicker) then
+		self.ctThreatTicker:Cancel();
+		self.ctThreatTicker = nil;
+	end
 
 --	PlaySound(684);
 --	CloseDropDownMenus();
 end
 
 function CT_FocusFrame_CheckLevel(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The main unit frame
 	local focusLevel = UnitLevel(self.unit);
 
@@ -377,18 +380,15 @@ function CT_FocusFrame_CheckLevel(self)
 end
 
 function CT_FocusFrame_CheckFaction(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The main unit frame
 	if ( not UnitPlayerControlled(self.unit) and UnitIsTapDenied(self.unit) ) then
 		self.nameBackground:SetVertexColor(0.5, 0.5, 0.5);
-		if ( self.portrait ) then
+		if ( self.portrait and not self.ctPortraitTicker ) then
 			self.portrait:SetVertexColor(0.5, 0.5, 0.5);
 		end
 	else
 		self.nameBackground:SetVertexColor(UnitSelectionColor(self.unit));
-		if ( self.portrait ) then
+		if ( self.portrait and not self.ctPortraitTicker ) then
 			self.portrait:SetVertexColor(1.0, 1.0, 1.0);
 		end
 	end
@@ -408,9 +408,6 @@ function CT_FocusFrame_CheckFaction(self)
 end
 
 function CT_FocusFrame_CheckBattlePet(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The main unit frame
 	if ( UnitIsWildBattlePet(self.unit) or UnitIsBattlePetCompanion(self.unit) ) then
 		local petType = UnitBattlePetType(self.unit);
@@ -422,9 +419,6 @@ function CT_FocusFrame_CheckBattlePet(self)
 end
 
 function CT_FocusFrame_CheckClassification(self, forceNormalTexture)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The main unit frame
 	local classification = UnitClassification(self.unit);
 	self.nameBackground:Show();
@@ -497,9 +491,6 @@ function CT_FocusFrame_CheckClassification(self, forceNormalTexture)
 end
 
 function CT_FocusFrame_CheckDead(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The main unit frame
 	if ( (UnitHealth(self.unit) <= 0) and UnitIsConnected(self.unit) ) then
 		self.deadText:Show();
@@ -510,48 +501,11 @@ function CT_FocusFrame_CheckDead(self)
 	end
 end
 
-function CT_FocusFrame_OnUpdate(self, elapsed)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
-	-- self == The main unit frame
-	if (self.ctShowPredict) then
-		self.myHealPredictionBar:SetAlpha(1);
-		self.otherHealPredictionBar:SetAlpha(1);
-		self.ctShowPredict = false;
-	end
-
-	-- In WoW 5.0.4 beta, UnitExists("focustarget") is returning 1 during the OnLoad script
-	-- for CT_FocusFrame when logging into the game. It seems ok when reloading the UI.
-	-- It used to return nil in WoW 4 during the OnLoad script.
-	-- I've added an extra UnitExists() check for "focus" (unit1) as well, since
-	-- "focustarget" (unit2) can't exist if "focus" (unit1) does not exist.
-	if ( self.totFrame:IsShown() ~= (UnitExists(unit1) and UnitExists(unit2)) ) then
-		CT_TargetofFocus_Update(self.totFrame);
-	end
-
-	self.ctUpdate = self.ctUpdate + elapsed;
-	if ( self.ctUpdate > 0.1 ) then
-		self.ctUpdate = 0;
-		CT_FocusFrame_Update(self);
-	end
-
-	self.elapsed = (self.elapsed or 0) + elapsed;
-	if ( self.elapsed > 0.5 ) then
-		self.elapsed = 0;
-		UnitFrame_UpdateThreatIndicator(self.threatIndicator, self.threatNumericIndicator, self.feedbackUnit);
-	end
-
-	CT_FocusFrame_HealthUpdate(self, elapsed, self.unit);
-end
 
 local largeBuffList = {};
 local largeDebuffList = {};
 
 function CT_FocusFrame_UpdateAuras(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The main unit frame
 	local frame, frameName;
 	local frameIcon, frameCount, frameCooldown;
@@ -738,9 +692,6 @@ function CT_FocusFrame_UpdateAuras(self)
 end
 
 function CT_FocusFrame_ShouldShowDebuff(unit, index, filter)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	--This is an enemy
 	if ( SHOW_ALL_ENEMY_DEBUFFS == "1" or not UnitCanAttack("player", unit) ) then
 		return true;
@@ -757,9 +708,6 @@ function CT_FocusFrame_ShouldShowDebuff(unit, index, filter)
 end
 
 function CT_FocusFrame_UpdateAuraPositions(self, auraName, numAuras, numOppositeAuras, largeAuraList, updateFunc, maxRowWidth, offsetX, mirrorAurasVertically)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The main unit frame
 
 	-- A lot of this complexity is in place to allow the auras to wrap around the target of focus frame if it's shown
@@ -808,9 +756,6 @@ function CT_FocusFrame_UpdateAuraPositions(self, auraName, numAuras, numOpposite
 end
 
 function CT_FocusFrame_UpdateBuffAnchor(self, buffName, index, numDebuffs, anchorIndex, size, offsetX, offsetY, mirrorVertically)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The main unit frame
 
 	--For mirroring vertically
@@ -860,9 +805,6 @@ function CT_FocusFrame_UpdateBuffAnchor(self, buffName, index, numDebuffs, ancho
 end
 
 function CT_FocusFrame_UpdateDebuffAnchor(self, debuffName, index, numBuffs, anchorIndex, size, offsetX, offsetY, mirrorVertically)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The main unit frame
 	local buff = _G[debuffName..index];
 	local isFriend = UnitIsFriend("player", self.unit);
@@ -919,40 +861,36 @@ function CT_FocusFrame_UpdateDebuffAnchor(self, debuffName, index, numBuffs, anc
 	debuffFrame:SetHeight(size+2);
 end
 
-function CT_FocusFrame_HealthUpdate(self, elapsed, unit)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
+local function CT_FocusFrame_HealthFlash(self)
 	-- self == The main unit frame
-	if ( UnitIsPlayer(unit) ) then
-		if ( (self.unitHPPercent > 0) and (self.unitHPPercent <= 0.2) ) then
-			local alpha = 255;
-			local counter = self.statusCounter + elapsed;
-			local sign    = self.statusSign;
+	if ( UnitIsPlayer(self.unit) and self.unitHPPercent > 0 and self.unitHPPercent <= 0.2 ) then
+		local alpha = 255;
+		local counter = self.statusCounter + 0.04;
+		local sign    = self.statusSign;
 
-			if ( counter > 0.5 ) then
-				sign = -sign;
-				self.statusSign = sign;
-			end
-			counter = mod(counter, 0.5);
-			self.statusCounter = counter;
-
-			if ( sign == 1 ) then
-				alpha = (127  + (counter * 256)) / 255;
-			else
-				alpha = (255 - (counter * 256)) / 255;
-			end
-			if ( self.portrait ) then
-				self.portrait:SetAlpha(alpha);
-			end
+		if ( counter > 0.4 ) then
+			sign = -sign;
+			self.statusSign = sign;
 		end
+		counter = mod(counter, 0.4);
+		self.statusCounter = counter;
+
+		if ( sign == 1 ) then
+			alpha = (153  + (counter * 256)) / 255;
+		else
+			alpha = (255 - (counter * 256)) / 255;
+		end
+
+		if ( self.portrait ) then
+			self.portrait:SetVertexColor(1.0, 0.0, 0.0, alpha);
+		end
+	else
+		self.ctPortraitTicker:Cancel();
+		self.ctPortraitTicker = nil;
 	end
 end
 
 function CT_FocusHealthCheck(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The main unit frame's health bar
 	local parent = self:GetParent(); -- The main unit frame
 	if ( UnitIsPlayer(parent.unit) ) then
@@ -970,7 +908,7 @@ function CT_FocusHealthCheck(self)
 			elseif ( UnitIsGhost(parent.unit) ) then
 				parent.portrait:SetVertexColor(0.2, 0.2, 0.75, 1.0);
 			elseif ( (parent.unitHPPercent > 0) and (parent.unitHPPercent <= 0.2) ) then
-				parent.portrait:SetVertexColor(1.0, 0.0, 0.0);
+				parent.ctPortraitTicker = parent.ctPortraitTicker or  C_Timer.NewTicker(0.05, function() CT_FocusFrame_HealthFlash(parent) end);
 			else
 				parent.portrait:SetVertexColor(1.0, 1.0, 1.0, 1.0);
 			end
@@ -1031,9 +969,6 @@ end
 -- RAID_TARGET_TEXTURE_ROWS = 4;
 
 function CT_FocusFrame_UpdateRaidTargetIcon(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The main unit frame
 	local index = GetRaidTargetIndex(self.unit);
 	if ( index ) then
@@ -1067,9 +1002,6 @@ end
 -- ------------------------------------------------------------------------
 
 function CT_TargetofFocus_OnLoad(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The "target of" unit frame
 	local parent = self:GetParent();
 	parent.totFrame = self;
@@ -1090,7 +1022,7 @@ function CT_TargetofFocus_OnLoad(self)
 		nil
 	);
 	SetTextStatusBarTextZeroText(frame.healthbar, DEAD);
-	frame:RegisterEvent("UNIT_AURA");
+	frame:RegisterUnitEvent("UNIT_AURA", unit2);
 	frame.deadText = _G[thisName.."TextureFrameDeadText"];
 	SecureUnitButton_OnLoad(frame, frame.unit);
 
@@ -1103,17 +1035,11 @@ function CT_TargetofFocus_OnLoad(self)
 end
 
 function CT_TargetofFocus_OnShow(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The "target of" unit frame
 	CT_FocusFrame_UpdateAuras(self:GetParent());
 end
 
 function CT_TargetofFocus_OnHide(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The "target of" unit frame
 	local parent = self:GetParent();
 	CT_Focus_Spellbar_AdjustPosition(parent.spellbar);
@@ -1121,9 +1047,6 @@ function CT_TargetofFocus_OnHide(self)
 end
 
 function CT_TargetofFocus_Update(self, elapsed)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The "target of" unit frame
 	local show;
 	local parent = self:GetParent();
@@ -1146,9 +1069,6 @@ function CT_TargetofFocus_Update(self, elapsed)
 end
 
 function CT_TargetofFocus_CheckDead(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The "target of" unit frame
 	if ( (UnitHealth(self.unit) <= 0) and UnitIsConnected(self.unit) ) then
 		self.background:SetAlpha(0.9);
@@ -1160,9 +1080,6 @@ function CT_TargetofFocus_CheckDead(self)
 end
 
 function CT_TargetofFocus_HealthCheck(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == The "target of" unit frame
 	if ( UnitIsPlayer(self.unit) ) then
 		local unitHPMin, unitHPMax, unitCurrHP;
@@ -1190,9 +1107,6 @@ end
 -- -----------------------------------------------------------------------------------
 
 function CT_Focus_Spellbar_OnLoad(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == Spellbar for the main unit frame.
 	local parent = self:GetParent();
 	parent.spellbar = self;
@@ -1222,9 +1136,6 @@ function CT_Focus_Spellbar_OnLoad(self)
 end
 
 function CT_Focus_ToggleSpellbar(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == Spellbar for the main unit frame.
 	if ( CT_UnitFramesOptions and not CT_UnitFramesOptions.showFocusCastbar ) then
 		self.showCastbar = false;
@@ -1239,9 +1150,6 @@ function CT_Focus_ToggleSpellbar(self)
 end
 
 function CT_Focus_Spellbar_OnEvent(self, event, ...)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == Spellbar for the main unit frame.
 	local arg1 = ...
 
@@ -1291,9 +1199,6 @@ function CT_Focus_Spellbar_OnEvent(self, event, ...)
 end
 
 function CT_Focus_Spellbar_AdjustPosition(self)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	-- self == Spellbar for the main unit frame.
 	local parentFrame = self:GetParent();
 	if ( parentFrame.haveToT ) then
@@ -1321,10 +1226,64 @@ end
 -- ------------------------------------------------------------------
 -- Bar text
 
-function CT_FocusFrame_AnchorSideText()
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
+local function CT_FocusFrame_TextStatusBar_UpdateTextString(bar)
+	local self = CT_FocusFrame;
+
+	if (bar == self.healthbar) then
+		if (CT_UnitFramesOptions) then
+			local style;
+			if (UnitIsFriend(self.unit, "player")) then
+				style = CT_UnitFramesOptions.styles[5][1];
+			else
+				style = CT_UnitFramesOptions.styles[5][5];
+			end
+			module:UpdateStatusBarTextString(bar, style, 0)
+			CT_UnitFrames_HealthBar_OnValueChanged(bar, tonumber(bar:GetValue()), not CT_UnitFramesOptions.oneColorHealth)
+			module:UpdateBesideBarTextString(bar, CT_UnitFramesOptions.styles[5][2], self.healthBesideText)
+		end
+
+	elseif (bar == self.manabar) then
+		if (CT_UnitFramesOptions) then
+			module:UpdateStatusBarTextString(bar, CT_UnitFramesOptions.styles[5][3], 0)
+			module:UpdateBesideBarTextString(bar, CT_UnitFramesOptions.styles[5][4], self.manaBesideText)
+		end
 	end
+end
+
+function CT_FocusFrame_TextStatusBar_OnLoad(bar)
+	bar:HookScript("OnValueChanged", CT_FocusFrame_TextStatusBar_UpdateTextString);
+	bar:HookScript("OnEnter", CT_FocusFrame_TextStatusBar_UpdateTextString);
+	bar:HookScript("OnLeave", CT_FocusFrame_TextStatusBar_UpdateTextString);
+end
+
+--[[	-- replaced by CT_FocusFrame_TextStatusBar_OnLoad(bar)
+ 
+	function CT_FocusFrame_ShowTextStatusBarText(bar)
+		if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+			return;
+		end
+		local self = CT_FocusFrame;
+		if (bar == self.healthbar or bar == self.manabar) then
+			CT_FocusFrame_TextStatusBar_UpdateTextString(bar);
+		end
+	end
+
+
+	function CT_FocusFrame_HideTextStatusBarText(bar)
+		if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+			return;
+		end
+		local self = CT_FocusFrame;
+		if (bar == self.healthbar or bar == self.manabar) then
+			CT_FocusFrame_TextStatusBar_UpdateTextString(bar);
+		end
+	end
+	hooksecurefunc("TextStatusBar_UpdateTextString", CT_FocusFrame_TextStatusBar_UpdateTextString);
+	hooksecurefunc("ShowTextStatusBarText", CT_FocusFrame_ShowTextStatusBarText);
+	hooksecurefunc("HideTextStatusBarText", CT_FocusFrame_HideTextStatusBarText);
+--]]
+
+function module:AnchorFocusFrameSideText()
 	local self = CT_FocusFrame;
 	local fsTable = { self.healthBesideText, self.manaBesideText };
 	for i, frame in ipairs(fsTable) do
@@ -1344,64 +1303,11 @@ function CT_FocusFrame_AnchorSideText()
 	end
 end
 
-function CT_FocusFrame_ShowBarText()
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
+function module:ShowFocusFrameBarText()
 	local self = CT_FocusFrame;
 	UnitFrameHealthBar_Update(self.healthbar, self.unit);
 	UnitFrameManaBar_Update(self.manabar, self.unit);
 end
-
-function CT_FocusFrame_TextStatusBar_UpdateTextString(bar)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
-	local self = CT_FocusFrame;
-
-	if (bar == self.healthbar) then
-		if (CT_UnitFramesOptions) then
-			local style;
-			if (UnitIsFriend(self.unit, "player")) then
-				style = CT_UnitFramesOptions.styles[5][1];
-			else
-				style = CT_UnitFramesOptions.styles[5][5];
-			end
-			CT_UnitFrames_TextStatusBar_UpdateTextString(bar, style, 0)
-			CT_UnitFrames_HealthBar_OnValueChanged(bar, tonumber(bar:GetValue()), not CT_UnitFramesOptions.oneColorHealth)
-			CT_UnitFrames_BesideBar_UpdateTextString(bar, CT_UnitFramesOptions.styles[5][2], self.healthBesideText)
-		end
-
-	elseif (bar == self.manabar) then
-		if (CT_UnitFramesOptions) then
-			CT_UnitFrames_TextStatusBar_UpdateTextString(bar, CT_UnitFramesOptions.styles[5][3], 0)
-			CT_UnitFrames_BesideBar_UpdateTextString(bar, CT_UnitFramesOptions.styles[5][4], self.manaBesideText)
-		end
-	end
-end
-hooksecurefunc("TextStatusBar_UpdateTextString", CT_FocusFrame_TextStatusBar_UpdateTextString);
-
-function CT_FocusFrame_ShowTextStatusBarText(bar)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
-	local self = CT_FocusFrame;
-	if (bar == self.healthbar or bar == self.manabar) then
-		CT_FocusFrame_TextStatusBar_UpdateTextString(bar);
-	end
-end
-hooksecurefunc("ShowTextStatusBarText", CT_FocusFrame_ShowTextStatusBarText);
-
-function CT_FocusFrame_HideTextStatusBarText(bar)
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
-	local self = CT_FocusFrame;
-	if (bar == self.healthbar or bar == self.manabar) then
-		CT_FocusFrame_TextStatusBar_UpdateTextString(bar);
-	end
-end
-hooksecurefunc("HideTextStatusBarText", CT_FocusFrame_HideTextStatusBarText);
 
 -- ------------------------------------------------------------------
 -- Toggle the default UI's focus frame.
@@ -1420,17 +1326,17 @@ function CT_FocusFrame_ToggleStandardFocus()
 	else
 		frame:RegisterEvent("PLAYER_ENTERING_WORLD");
 		frame:RegisterEvent("PLAYER_FOCUS_CHANGED");
-		frame:RegisterEvent("UNIT_HEALTH");
-		frame:RegisterEvent("UNIT_LEVEL");
-		frame:RegisterEvent("UNIT_FACTION");
-		frame:RegisterEvent("UNIT_AURA");
+		frame:RegisterUnitEvent("UNIT_HEALTH", unit1);
+		frame:RegisterUnitEvent("UNIT_LEVEL", unit1);
+		frame:RegisterUnitEvent("UNIT_FACTION", unit1);
+		frame:RegisterUnitEvent("UNIT_AURA", unit1);
 		frame:RegisterEvent("GROUP_ROSTER_UPDATE");
 		frame:RegisterEvent("RAID_TARGET_UPDATE");
 		if (not frame.smallSize) then
-			frame:RegisterEvent("UNIT_CLASSIFICATION_CHANGED");
-			frame:RegisterEvent("PLAYER_FLAGS_CHANGED");
+			frame:RegisterUnitEvent("UNIT_CLASSIFICATION_CHANGED", unit1);
+			frame:RegisterUnitEvent("PLAYER_FLAGS_CHANGED", unit1);
 		end
-		frame:RegisterUnitEvent("UNIT_AURA", "focus");
+		frame:RegisterUnitEvent("UNIT_AURA", unit1);
 		if (UnitExists("focus")) then
 			frame:Show();
 		end

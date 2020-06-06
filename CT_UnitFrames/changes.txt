@@ -1,3 +1,7 @@
+CT_UnitFrames (8.3.0.9) 2020-06-03
+- Significant performance improvements using RegisterUnitEvent() and other techniques
+- Class-colours on party members updated after /reload or disconnect
+
 CT_UnitFrames (8.3.0.7) 2020-03-08
 - Performance improvements when showing player coordinates
 

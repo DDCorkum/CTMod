@@ -625,7 +625,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							<OnValueChanged>
 								CT_UnitFramesOptions.playerTextSpacing = self:GetValue();
 								_G[self:GetName().."Text"]:SetText(CT_UFO_RIGHTSPACING .. format("%0.1f", self:GetValue()));
-								CT_PlayerFrame_AnchorSideText();
+								CT_UnitFrames:AnchorPlayerFrameSideText();
 							</OnValueChanged>
 						</Scripts>
 					</Slider>
@@ -747,7 +747,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							<OnValueChanged>
 								CT_UnitFramesOptions.partyTextSpacing = self:GetValue();
 								_G[self:GetName().."Text"]:SetText(CT_UFO_RIGHTSPACING .. format("%0.1f", self:GetValue()));
-								CT_PartyFrame_AnchorSideText();
+								CT_UnitFrames:AnchorPartyFrameSideText();
 							</OnValueChanged>
 						</Scripts>
 					</Slider>
@@ -946,7 +946,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							<OnValueChanged>
 								CT_UnitFramesOptions.targetTextSpacing = self:GetValue();
 								_G[self:GetName().."Text"]:SetText(CT_UFO_LEFTSPACING .. format("%0.1f", self:GetValue()));
-								CT_TargetFrame_AnchorSideText();
+								CT_UnitFrames:AnchorTargetFrameSideText();
 							</OnValueChanged>
 						</Scripts>
 					</Slider>
@@ -1222,7 +1222,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							<OnValueChanged>
 								CT_UnitFramesOptions.assistTextSpacing = self:GetValue();
 								_G[self:GetName().."Text"]:SetText(CT_UFO_LEFTSPACING .. format("%0.1f", self:GetValue()));
-								CT_AssistFrame_AnchorSideText();
+								CT_UnitFrames:AnchorAssistFrameSideText();
 							</OnValueChanged>
 						</Scripts>
 					</Slider>
@@ -1550,7 +1550,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							<OnValueChanged>
 								CT_UnitFramesOptions.focusTextSpacing = self:GetValue();
 								_G[self:GetName().."Text"]:SetText(CT_UFO_LEFTSPACING .. format("%0.1f", self:GetValue()));
-								CT_FocusFrame_AnchorSideText();
+								CT_UnitFrames:AnchorFocusFrameSideText();
 							</OnValueChanged>
 						</Scripts>
 					</Slider>

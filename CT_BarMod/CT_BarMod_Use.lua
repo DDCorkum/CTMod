@@ -14,8 +14,7 @@
 --------------------------------------------
 -- Initialization
 
-local _G = getfenv(0);
-local module = _G.CT_BarMod;
+local module = select(2, ...);
 
 -- Options
 local displayBindings = true;
@@ -527,6 +526,7 @@ function useButton:destructor(...)
 	-- Do stuff
 	self.hasAction = nil;
 	self.hasRange = nil;
+	self.actionType = nil;
 	self.checked = nil;
 	
 	if ( self.flashing ) then
@@ -641,6 +641,7 @@ function useButton:update()
 
 	self.hasAction = hasAction;
 	self.hasRange = ActionHasRange(actionId);
+	self.actionType = GetActionInfo(actionId);
 	
 	self.isConsumable = IsConsumableAction(actionId);
 	self.isStackable = IsStackableAction(actionId);
@@ -649,6 +650,7 @@ function useButton:update()
 	
 --	self:updateCount();
 	self:updateBinding();
+	self:updateRange();
 	self:updateTexture();
 	self:updateOpacity();
 --	self:updateState();  -- updateFlash() calls updateState().
@@ -958,7 +960,7 @@ function useButton:updateUsable()
 	elseif (
 		isUsable
 		and (
-			module:getGameVersion() == CT_GAME_VERSION_RETAIL
+			module:getGameVersion() > 1
 			or not self.isConsumable	-- reagents behave differently in classic
 			or self.isItem
 			or GetActionCount(self.actionId) > 0
@@ -969,6 +971,9 @@ function useButton:updateUsable()
 	elseif ( notEnoughMana ) then
 		button.icon:SetVertexColor(0.5, 0.5, 1);
 
+	elseif ( self.actionType == "companion" and not InCombatLockdown()) then
+		button.icon:SetVertexColor(1, 1, 1);
+	
 	else
 		button.icon:SetVertexColor(0.4, 0.4, 0.4);
 	end
@@ -1064,22 +1069,10 @@ end
 
 -- Update Binding
 function useButton:updateBinding()
-	local actionId = self.actionId;
 	local hotkey = self.button.hotkey
 	if (not self.hasAction) then
 		hotkey:SetText("");
 		return;
-	end
-	local isInRange;
-	if (self.hasRange) then
-		isInRange = IsActionInRange(actionId)
-	end
-	if ( isInRange == false ) then
-		self.outOfRange = true;
-		hotkey:SetVertexColor(1.0, 0.1, 0.1);
-	else
-		self.outOfRange = nil;
-		hotkey:SetVertexColor(0.6, 0.6, 0.6);
 	end
 	local text;
 	if ( displayBindings ) then		
@@ -1087,7 +1080,9 @@ function useButton:updateBinding()
 	end
 	if (text) then
 		hotkey:SetText(text);
-	elseif (displayRangeDot and isInRange) then
+		hotkey.showRangeIndicator = nil;
+	elseif (self.hasRange and IsActionInRange(self.actionId) ~= nil and displayRangeDot) then
+		-- this ability has a range limitation applicable to the current target
 		hotkey:SetText(rangeIndicator);
 	else
 		hotkey:SetText("");
@@ -1096,9 +1091,32 @@ end
 
 -- Update Range
 function useButton:updateRange()
-	self:updateBinding();
+	if (self.hasAction) then
+		local hotkey = self.button.hotkey;
+		if (self.hasRange) then
+			if (IsActionInRange(self.actionId) ~= false) then
+				self.outOfRange = nil;
+				hotkey:SetVertexColor(0.6, 0.6, 0.6);
+			else
+				self.outOfRange = true
+				hotkey:SetVertexColor(1.0, 0.1, 0.1);
+			end
+		else
+			self.outOfRange = nil;
+			hotkey:SetVertexColor(0.6, 0.6, 0.6);
+		end
+	end
+	
 	if ( colorLack ) then
 		self:updateUsable();
+	end
+end
+
+-- Clears previous range indications (called once when the player no longer has a target)
+function useButton:clearRange()
+	if (self.hasAction and self.hasRange) then
+		self.outOfRange = nil;
+		self.button.hotkey:SetVertexColor(0.6, 0.6, 0.6);
 	end
 end
 
@@ -1179,16 +1197,17 @@ end
 
 -- cache to improve the performance of useButton:getBinding()
 local hasCachedBindingKeys, cachedBindingKey1, cachedBindingKey2 = {}, {}, {}
-local getActionBindingKey = function(value)
+local function getActionBindingKey(value)
 	-- Returns key(s) currently bound to the default game button number.
 	-- Eg. "1", "SHIFT-A", etc.
 	
 	if (hasCachedBindingKeys[value]) then
 		return cachedBindingKey1[value], cachedBindingKey2[value]
+	else
+		local key1, key2 = GetBindingKey(value);
+		hasCachedBindingKeys[value], cachedBindingKey1[value], cachedBindingKey2[value] = true, key1, key2
+		return key1, key2
 	end
-	local key1, key2 = GetBindingKey(value);
-	hasCachedBindingKeys[value], cachedBindingKey1[value], cachedBindingKey2[value] = true, key1, key2
-	return key1, key2
 end
 
 -- another cache to improve the performance of useButton:getBinding()
@@ -1605,7 +1624,6 @@ local function eventHandler_UpdateCooldown()
 	actionButtonList:updateCount();
 	actionButtonList:updateCooldown();
 	actionButtonList:updateOpacity();
-	CT_BarMod_UpdateActionButtonCooldown();
 end
 
 local function eventHandler_UpdateUsable()
@@ -1636,9 +1654,14 @@ local function eventHandler_updateSummonPets()
 	actionButtonList:updateSummonPets();
 end
 
--- Target changed range hider
+-- Target changed
 local function rangeTargetUpdater()
 	actionButtonList:updateBinding();
+	if ( UnitExists("target")) then
+		actionButtonList:updateRange()
+	else
+		actionButtonList:clearRange();
+	end
 	if ( colorLack ) then
 		actionButtonList:updateUsable();
 	end
@@ -1648,10 +1671,13 @@ end
 local function rangeUpdater()
 	if UnitExists("target") then
 		actionButtonList:updateRange();
-	else
-		-- don't do a full range checking, but still update keybindings
-		actionButtonList:updateBinding();
 	end
+end
+
+-- Formerly called every 0.5 sec as part of rangeUpdater(), but now broken away to experiment with calling every 5.0 sec
+-- In a future version, this should be removed completely to further improve CPU usage
+local function bindingUpdator()
+	actionButtonList:updateBinding();
 end
 
 --------------------------------------------
@@ -1697,51 +1723,68 @@ local function updateBlizzardButtons(func)
 	end
 end
 
+do
+	local function setBlizzardButtonAttributes(button)
+		action = ActionButton_GetPagedID(button)
+		button.hasAction = HasAction(action);
+		button.hasRange = ActionHasRange(action);
+		button.isConsumable = IsConsumableAction(action);
+		button.isStackable = IsStackableAction(action);
+		button.isItem = IsItemAction(action);
+	end
+		
+	local function hookBlizzardButtonAttributes(button)
+		-- in case something was dragged to this slot
+		button:HookScript("OnReceiveDrag", setBlizzardButtonAttributes);
+		
+		-- in case something was dragged from this slot
+		button:HookScript("OnDragStop", setBlizzardButtonAttributes);
+		
+		-- when the buttons first appear!
+		button:HookScript("OnShow", setBlizzardButtonAttributes);
+	end
+	
+	updateBlizzardButtons(hookBlizzardButtonAttributes);
+end
+
 -----
 -- Out of Range (icon coloring)
 -----
 do
-	local isReset = true;
+	local isReset;
 
-	function CT_BarMod_ActionButton_OnUpdate(self, elapsed, ...)
-		if (not defbarShowRange) then
-			return;
-		end
-		local rangeTimer = self.rangeTimer;
-		if ( rangeTimer and rangeTimer == TOOLTIP_UPDATE_TIME ) then
-			if ( colorLack and self.hasAction and IsActionInRange(ActionButton_GetPagedID(self)) == false ) then
-				local icon = _G[self:GetName().."Icon"];
+	local function CT_BarMod_ActionButton_FadeOutOfRange(self)
+		if (defbarShowRange) then
+			if ( colorLack and self.hasAction and self.hasRange and IsActionInRange(ActionButton_GetPagedID(self)) == false ) then
+				local icon = self.icon;		-- _G[self:GetName().."Icon"];
 				if ( colorLack == 2 ) then
 					icon:SetVertexColor(0.5, 0.5, 0.5);
 				else
 					icon:SetVertexColor(0.8, 0.4, 0.4);
 				end
-
-				isReset = false;
 			else
 				ActionButton_UpdateUsable(self);
 			end
 		end
 	end
-	hooksecurefunc("ActionButton_OnUpdate", CT_BarMod_ActionButton_OnUpdate);
-
-	function CT_BarMod_ActionButton_UpdateUsable(self, ...)
-		if (not defbarShowRange) then
-			return;
-		end
-		if ( colorLack and self.hasRange and IsActionInRange(ActionButton_GetPagedID(self)) == false ) then
-			local icon = _G[self:GetName().."Icon"];
-			if ( colorLack == 2 ) then
-				icon:SetVertexColor(0.5, 0.5, 0.5);
-			else
-				icon:SetVertexColor(0.8, 0.4, 0.4);
-			end
-
-			isReset = false;
+	
+	local function CT_BarMod_ActionButton_StartFadeTicker(self)
+		self.ctFadeTicker = self.ctFadeTicker or C_Timer.NewTicker(0.25, function() CT_BarMod_ActionButton_FadeOutOfRange(self); end);
+	end
+	
+	local function CT_BarMod_ActionButton_CancelFadeTicker(self)
+		if (self.ctFadeTicker) then
+			self.ctFadeTicker:Cancel();
+			self.ctFadeTicker = nil;
 		end
 	end
-	hooksecurefunc("ActionButton_UpdateUsable", CT_BarMod_ActionButton_UpdateUsable);
 
+	updateBlizzardButtons(function(button)
+		button:HookScript("OnEnter", CT_BarMod_ActionButton_FadeOutOfRange);
+		button:HookScript("OnShow", CT_BarMod_ActionButton_StartFadeTicker);
+		button:HookScript("OnHide", CT_BarMod_ActionButton_CancelFadeTicker);
+	end);
+	
 	local function CT_BarMod_ActionButton_ResetRange(self)
 		-- Reset button to Blizzard default state.
 
@@ -1749,23 +1792,19 @@ do
 	end
 
 	function CT_BarMod_UpdateActionButtonRange()
-		local func;
-		local reset;
-		if (not defbarShowRange) then
-			if (isReset) then
-				return;
-			end
-			reset = true;
-		end
-		if (reset) then
-			func = CT_BarMod_ActionButton_ResetRange;
-		else
-			-- Do nothing. The OnUpdate will handle the updates.
+		if (defbarShowRange) then
+			updateBlizzardButtons(CT_BarMod_ActionButton_FadeOutOfRange);
+			isReset = nil;
+		elseif (isReset) then
 			return;
+		else
+			updateBlizzardButtons(CT_BarMod_ActionButton_ResetRange);
+			isReset = true;
 		end
-		updateBlizzardButtons(func);
-		isReset = true;
 	end
+	
+	module:regEvent("PLAYER_TARGET_CHANGED", CT_BarMod_UpdateActionButtonRange);
+	module:regEvent("ACTIONBAR_PAGE_CHANGED", CT_BarMod_UpdateActionButtonRange);
 end
 
 -----
@@ -1774,15 +1813,10 @@ end
 do
 	local isReset = true;
 
-	local function CT_BarMod_ActionButton_UpdateCooldown(self, ...)
-		if (not defbarShowCooldown) then
-			return;
-		end
-
-		isReset = false;
+	local function CT_BarMod_ActionButton_UpdateCooldown(self)
 
 		local actionId = ActionButton_GetPagedID(self);
-		local cooldown = _G[self:GetName().."Cooldown"];
+		local cooldown = self.cooldown;
 
 		-- Set up variables we need in our cooldown handler
 		cooldown.object = self;
@@ -1816,13 +1850,12 @@ do
 	 		end
 		end
 	end
-	hooksecurefunc("ActionButton_UpdateCooldown", CT_BarMod_ActionButton_UpdateCooldown);
 
 	local function CT_BarMod_ActionButton_ResetCooldown(self)
 		-- Reset button to Blizzard default state.
 
 		local actionId = ActionButton_GetPagedID(self);
-		local cooldown = _G[self:GetName().."Cooldown"];
+		local cooldown = self.cooldown;
 
 		-- Set up variables we need in our cooldown handler
 		cooldown.object = self;
@@ -1832,22 +1865,19 @@ do
 	end
 
 	function CT_BarMod_UpdateActionButtonCooldown()
-		local func;
-		local reset;
-		if (not defbarShowCooldown) then
-			if (isReset) then
-				return;
-			end
-			reset = true;
-		end
-		if (reset) then
-			func = CT_BarMod_ActionButton_ResetCooldown;
+		if (defbarShowCooldown) then
+			updateBlizzardButtons(CT_BarMod_ActionButton_UpdateCooldown);
+			isReset = nil;
+		elseif (isReset) then
+			return;
 		else
-			func = CT_BarMod_ActionButton_UpdateCooldown;
+			updateBlizzardButtons(CT_BarMod_ActionButton_ResetCooldown);
+			isReset = true;
 		end
-		updateBlizzardButtons(func);
-		isReset = reset;
 	end
+	
+	module:regEvent("ACTIONBAR_UPDATE_COOLDOWN", CT_BarMod_UpdateActionButtonCooldown);
+	module:regEvent("ACTIONBAR_PAGE_CHANGED", CT_BarMod_UpdateActionButtonCooldown);
 end
 
 -----
@@ -1858,37 +1888,33 @@ do
 
 	local function CT_BarMod_ActionButton_UpdateHotkeys(self, ...)
 		if (not defbarShowBindings) then
-			return;
-		end
-
-		isReset = false;
-
-		local hotkey = _G[self:GetName().."HotKey"];
-		if (displayBindings and displayRangeDot) then
-			-- Default behavior of standard UI is to display both.
-			hotkey:SetAlpha(1);
-			return;
-		end
-		local hide;
-		if (not displayBindings) then
-			if (not displayRangeDot) then
-				hide = true;
+			local hotkey = self.HotKey;		-- _G[self:GetName().."HotKey"];
+			if (displayBindings and displayRangeDot) then
+				-- Default behavior of standard UI is to display both.
+				hotkey:SetAlpha(1);
+				return;
+			end
+			local hide;
+			if (not displayBindings) then
+				if (not displayRangeDot) then
+					hide = true;
+				else
+					if (hotkey:GetText() ~= rangeIndicator) then
+						hide = true;
+					end
+				end
 			else
-				if (hotkey:GetText() ~= rangeIndicator) then
-					hide = true;
+				if (not displayRangeDot) then
+					if (hotkey:GetText() == rangeIndicator) then
+						hide = true;
+					end
 				end
 			end
-		else
-			if (not displayRangeDot) then
-				if (hotkey:GetText() == rangeIndicator) then
-					hide = true;
-				end
+			if (hide) then
+				hotkey:SetAlpha(0);
+			else
+				hotkey:SetAlpha(1);
 			end
-		end
-		if (hide) then
-			hotkey:SetAlpha(0);
-		else
-			hotkey:SetAlpha(1);
 		end
 	end
 	hooksecurefunc("ActionButton_UpdateHotkeys", CT_BarMod_ActionButton_UpdateHotkeys);
@@ -1896,26 +1922,20 @@ do
 	local function CT_BarMod_ActionButton_ResetHotkeys(self)
 		-- Reset button to Blizzard default state.
 
-		local hotkey = _G[self:GetName().."HotKey"];
+		local hotkey = self.HotKey;		-- _G[self:GetName().."HotKey"];
 		hotkey:SetAlpha(1);
 	end
 
 	function CT_BarMod_UpdateActionButtonHotkeys()
-		local func;
-		local reset;
-		if (not defbarShowBindings) then
-			if (isReset) then
-				return;
-			end
-			reset = true;
-		end
-		if (reset) then
-			func = CT_BarMod_ActionButton_ResetHotkeys;
+		if (defbarShowBindings) then
+			updateBlizzardButtons(CT_BarMod_ActionButton_UpdateHotkeys);
+			isReset = nil;
+		elseif (isReset) then
+			return;
 		else
-			func = CT_BarMod_ActionButton_UpdateHotkeys;
+			updateBlizzardButtons(CT_BarMod_ActionButton_ResetHotkeys);
+			isReset = true;
 		end
-		updateBlizzardButtons(func);
-		isReset = reset;
 	end
 end
 
@@ -1926,28 +1946,23 @@ do
 	local isReset = true;
 
 	local function CT_BarMod_ActionButton_UpdateActionText(self, ...)
-		if (not defbarShowActionText) then
-			return;
-		end
-
-		isReset = false;
-
-		local name = _G[self:GetName() .. "Name"];
-		if (name) then
-			local actionId = self.action;
-			if ( displayActionText and not self.isConsumable and not self.isStackable ) then
-				name:SetText(GetActionText(actionId));
-			else
-				name:SetText("");
+		if (defbarShowActionText) then
+			local name = self.Name;		--  _G[self:GetName() .. "Name"];
+			if (name) then
+				local actionId = self.action;
+				if ( displayActionText and not self.isConsumable and not self.isStackable ) then
+					name:SetText(GetActionText(actionId));
+				else
+					name:SetText("");
+				end
 			end
 		end
 	end
-	hooksecurefunc("ActionButton_Update", CT_BarMod_ActionButton_UpdateActionText);
 
 	local function CT_BarMod_ActionButton_ResetActionText(self)
 		-- Reset button to Blizzard default state.
 
-		local name = _G[self:GetName() .. "Name"];
+		local name = self.Name;		--  _G[self:GetName() .. "Name"];
 		if (name) then
 			local actionId = self.action;
 			if ( not self.isConsumable and not self.isStackable ) then
@@ -1959,22 +1974,48 @@ do
 	end
 
 	function CT_BarMod_UpdateActionButtonActionText()
-		local func;
-		local reset;
-		if (not defbarShowActionText) then
-			if (isReset) then
-				return;
-			end
-			reset = true;
-		end
-		if (reset) then
-			func = CT_BarMod_ActionButton_ResetActionText;
+		if (defbarShowActionText) then
+			updateBlizzardButtons(CT_BarMod_ActionButton_UpdateActionText);
+			isReset = nil;
+		elseif (isReset) then
+			return;
 		else
-			func = CT_BarMod_ActionButton_UpdateActionText;
+			updateBlizzardButtons(CT_BarMod_ActionButton_ResetActionText);
+			isReset = true;
 		end
-		updateBlizzardButtons(func);
-		isReset = reset;
 	end
+	
+	module:regEvent("UPDATE_MACROS", CT_BarMod_UpdateActionButtonActionText);
+	module:regEvent("ACTIONBAR_PAGE_CHANGED", CT_BarMod_UpdateActionButtonActionText);
+	module:regEvent("PLAYER_LOGIN", function()
+		-- apply the settings now that the user is logged in
+		CT_BarMod_UpdateActionButtonActionText();
+		
+		-- hook all the buttons to reapply settings
+		updateBlizzardButtons(function (button)
+			-- in case something was dragged to this slot
+			button:HookScript("OnReceiveDrag", CT_BarMod_ActionButton_UpdateActionText);
+
+			-- in case something was dragged from this slot
+			button:HookScript("OnDragStop", CT_BarMod_ActionButton_UpdateActionText);
+
+			-- when the buttons first appear!
+			button:HookScript("OnShow", CT_BarMod_ActionButton_UpdateActionText);
+
+			-- during mouseover
+			button:HookScript("OnEnter", CT_BarMod_ActionButton_UpdateActionText);
+		end);
+		
+		-- hook the MacroFrame to reapply settings (this is done only after PLAYER_LOGIN to cut down on false positives while the game boots up)
+		local function hookMacroFrame(__, name)
+			if (name == "Blizzard_MacroUI") then
+				MacroFrame:HookScript("OnHide", CT_BarMod_UpdateActionButtonActionText);
+				module:unregEvent("ADDON_LOADED", hookMacroFrame);
+			end
+			
+		end
+		module:regEvent("ADDON_LOADED", hookMacroFrame);
+	end);
 end
 
 -----
@@ -1982,10 +2023,7 @@ end
 -----
 do
 	local function CT_BarMod_ActionButton_SetTooltip(self, ...)
-		if (not defbarHideTooltip) then
-			return;
-		end
-		if (hideTooltip) then
+		if (defbarHideTooltip and hideTooltip) then
 			GameTooltip:Hide();
 		end
 	end
@@ -2047,7 +2085,8 @@ module.useEnable = function(self)
 		self:regEvent("SPELL_ACTIVATION_OVERLAY_GLOW_HIDE", eventHandler_HideOverlayGlow);
 		self:regEvent("UPDATE_SUMMONPETS_ACTION", eventHandler_updateSummonPets);
 	end
-	self:schedule(0.5, true, rangeUpdater);
+	self:schedule(0.25, true, rangeUpdater); -- originally 0.5 sec, but setting at 0.25 sec to more closely match the Blizzard default bars
+	self:schedule(5, true, bindingUpdater);  -- it is unclear if this is truly even necessary.  It used to be every 0.5 sec.  Now experimenting with every 5 sec, after migrating range-checking parts into a separate function
 end
 
 module.useDisable = function(self)
@@ -2090,6 +2129,7 @@ module.useDisable = function(self)
 		self:unregEvent("LOSS_OF_CONTROL_UPDATE", eventHandler_UpdateCooldown);
 	end
 	self:unschedule(rangeUpdater, true);
+	self:unschedule(bindingUpdater, true);
 end
 
 module.useUpdate = function(self, optName, value)

@@ -1,3 +1,6 @@
+CT_BuffMod (8.3.0.9) 2020-05-23
+- Small adjustments to the options menu for easier use
+
 CT_BuffMod (8.3.0.8) 2020-03-31
 - Optional smaller or larger font size
 

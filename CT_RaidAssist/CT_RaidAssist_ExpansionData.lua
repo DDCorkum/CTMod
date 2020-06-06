@@ -36,31 +36,31 @@ module.CTRA_Configuration_Buffs =
 {
 	["PRIEST"] =
 	{
-		{["name"] = "Power Word: Fortitude", ["modifier"] = "nomod", ["id"] = 211681, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
-		{["name"] = "Power Word: Fortitude", ["modifier"] = "nomod", ["id"] = 1243, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
-		{["name"] = "Prayer of Fortitude", ["modifier"] = "shift", ["id"] = 21564, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
+		{["name"] = "Power Word: Fortitude", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 211681, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
+		{["name"] = "Power Word: Fortitude", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 1243, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
+		{["name"] = "Prayer of Fortitude", ["button"] = 2, ["modifier"] = "mod:shift", ["id"] = 21564, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
 	},
 	["MAGE"] =
 	{
-		{["name"] = "Arcane Intellect", ["modifier"] = "nomod", ["id"] = 1459},
-		{["name"] = "Arcane Brilliance", ["modifier"] = "mod:shift", ["id"] = 23028, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
-		{["name"] = "Amplify Magic", ["modifier"] = "mod:ctrl", ["id"] = 1008, ["gameVersion"] = CT_GAME_VERSION_CLASSIC,},
-		{["name"] = "Dampen Magic", ["modifier"] = "mod:alt", ["id"] = 604, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
+		{["name"] = "Arcane Intellect", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 1459},
+		{["name"] = "Arcane Brilliance", ["button"] = 2, ["modifier"] = "mod:shift", ["id"] = 23028, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
+		{["name"] = "Amplify Magic", ["button"] = 2, ["modifier"] = "mod:ctrl", ["id"] = 1008, ["gameVersion"] = CT_GAME_VERSION_CLASSIC,},
+		{["name"] = "Dampen Magic", ["button"] = 2, ["modifier"] = "mod:alt", ["id"] = 604, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
 	},
 	["WARRIOR"] =
 	{	
-		{["name"] = "Battle Shout", ["modifier"] = "nomod", ["id"] = 6673},
+		{["name"] = "Battle Shout", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 6673},
 	},
 	["HUNTER"] =
 	{
-		{["name"] = "Trueshot Aura", ["modifier"] = "nomod", ["id"] = 19506, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
+		{["name"] = "Trueshot Aura", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 19506, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
 	},
 	["PALADIN"] = 
 	{
-		{["name"] = "Blessing of Kings", ["modifier"] = "nomod", ["id"] = 20217, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
-		{["name"] = "Blessing of Wisdom", ["modifier"] = "mod:shift", ["id"] = 19742, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
-		{["name"] = "Blessing of Might", ["modifier"] = "mod:ctrl", ["id"] = 19740, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
-		{["name"] = "Blessing of Salvation", ["modifier"] = "mod:alt", ["id"] = 1038, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
+		{["name"] = "Blessing of Kings", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 20217, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
+		{["name"] = "Blessing of Wisdom", ["button"] = 2, ["modifier"] = "mod:shift", ["id"] = 19742, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
+		{["name"] = "Blessing of Might", ["button"] = 2, ["modifier"] = "mod:ctrl", ["id"] = 19740, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
+		{["name"] = "Blessing of Salvation", ["button"] = 2, ["modifier"] = "mod:alt", ["id"] = 1038, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
 	}
 }
 
@@ -78,41 +78,41 @@ module.CTRA_Configuration_FriendlyRemoves =
 {			
 	["DRUID"] =										
 	{											
-		{["name"] = "Nature's Cure", ["modifier"] = "nomod", ["id"] = 88423, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
-		{["name"] = "Remove Corruption", ["modifier"] = "nomod", ["id"] = 2782, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
-		{["name"] = "Abolish Poison", ["modifier"] = "nomod", ["id"] = 2893, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
-		{["name"] = "Cure Poison", ["modifier"] = "nomod", ["id"] = 8946, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},  	--  the first available 'nomod' on the list has precedence, so at lvl 26 this stops being used
-		{["name"] = "Remove Curse", ["modifier"] = "mod:shift", ["id"] = 2782, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
+		{["name"] = "Nature's Cure", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 88423, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
+		{["name"] = "Remove Corruption", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 2782, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
+		{["name"] = "Abolish Poison", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 2893, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
+		{["name"] = "Cure Poison", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 8946, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},  	--  the first available 'nomod' on the list has precedence, so at lvl 26 this stops being used
+		{["name"] = "Remove Curse", ["button"] = 2, ["modifier"] = "mod:shift", ["id"] = 2782, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
 	},
 	["MAGE"] =
 	{
-		{["name"] = "Remove Curse", ["modifier"] = "nomod", ["id"] = 475, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
-		{["name"] = "Remove Lesser Curse", ["modifier"] = "nomod", ["id"] = 475, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
+		{["name"] = "Remove Curse", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 475, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
+		{["name"] = "Remove Lesser Curse", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 475, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
 	},
 	["MONK"] =
 	{
-		{["name"] = "Detox", ["modifier"] = "nomod", ["id"] = 115450, ["spec"] = 270},
-		{["name"] = "Detox", ["modifier"] = "nomod", ["id"] = 218164},	-- this is superceded for mistweavers by the higher one on the list with spec=270
+		{["name"] = "Detox", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 115450, ["spec"] = 270},
+		{["name"] = "Detox", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 218164},	-- this is superceded for mistweavers by the higher one on the list with spec=270
 	},
 	["PALADIN"] =
 	{
-		{["name"] = "Cleanse", ["modifier"] = "nomod", ["id"] = 4987},
-		{["name"] = "Cleanse  Toxins", ["modifier"] = "nomod", ["id"] = 213644, ["gameVersion"] = CT_GAME_VERSION_RETAIL},	-- used by specs in retail who don't get the full cleanse
-		{["name"] = "Purify", ["modifier"] = "nomod", ["id"] = 1152, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},	--at higher levels, replaced by cleanse
+		{["name"] = "Cleanse", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 4987},
+		{["name"] = "Cleanse  Toxins", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 213644, ["gameVersion"] = CT_GAME_VERSION_RETAIL},	-- used by specs in retail who don't get the full cleanse
+		{["name"] = "Purify", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 1152, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},	--at higher levels, replaced by cleanse
 	},
 	["PRIEST"] = 
 	{
-		{["name"] = "Purify", ["modifier"] = "nomod", ["id"] = 527, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
-		{["name"] = "Purify Disease", ["modifier"] = "nomod", ["id"] = 213634, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
-		{["name"] = "Cure Disease", ["modifier"] = "mod:shift", ["id"] = 528, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
-		{["name"] = "Dispel Magic", ["modifier"] = "nomod", ["id"] = 527, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
+		{["name"] = "Purify", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 527, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
+		{["name"] = "Purify Disease", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 213634, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
+		{["name"] = "Cure Disease", ["button"] = 2, ["modifier"] = "mod:shift", ["id"] = 528, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
+		{["name"] = "Dispel Magic", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 527, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
 	},
 	["SHAMAN"] =
 	{
-		{["name"] = "Purify Spirit", ["modifier"] = "nomod", ["id"] = 77130, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
-		{["name"] = "Cleanse Spirit", ["modifier"] = "nomod", ["id"] = 51886, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
-		{["name"] = "Cure Poison", ["modifier"] = "mod:shift", ["id"] = 526},
-		{["name"] = "Cure Disease", ["modifier"] = "mod:alt", ["id"] = 2870},
+		{["name"] = "Purify Spirit", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 77130, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
+		{["name"] = "Cleanse Spirit", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 51886, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
+		{["name"] = "Cure Poison", ["button"] = 2, ["modifier"] = "mod:shift", ["id"] = 526},
+		{["name"] = "Cure Disease", ["button"] = 2, ["modifier"] = "mod:alt", ["id"] = 2870},
 	},
 }
 
@@ -131,28 +131,28 @@ module.CTRA_Configuration_RezAbilities =
 {
 	["DRUID"] =
 	{
-		{["name"] = "Rebirth", ["modifier"] = "nomod", ["id"] = 20484, ["combat"] = true},
-		{["name"] = "Revive", ["modifier"] = "nomod", ["id"] = 50769, ["nocombat"] = true},
+		{["name"] = "Rebirth", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 20484, ["combat"] = true},
+		{["name"] = "Revive", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 50769, ["nocombat"] = true},
 	},
 	["DEATHKNIGHT"] =
 	{
-		{["name"] = "Raise Ally", ["modifier"] = "nomod", ["id"] = 61999, ["combat"] = true, ["nocombat"] = true},
+		{["name"] = "Raise Ally", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 61999, ["combat"] = true, ["nocombat"] = true},
 	},
 	["WARLOCK"] =
 	{
-		{["name"] = "Soulstone", ["modifier"] = "nomod", ["id"] = 5232, ["combat"] = true, ["gameVersion"] = CT_GAME_VERSION_RETAIL},	--TO DO: Make a classic version that uses the soulstone sitting in the bags
+		{["name"] = "Soulstone", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 5232, ["combat"] = true, ["gameVersion"] = CT_GAME_VERSION_RETAIL},	--TO DO: Make a classic version that uses the soulstone sitting in the bags
 	},
 	["PALADIN"] =
 	{
-		{["name"] = "Redemption", ["modifier"] = "nomod", ["id"] = 7328, ["nocombat"] = true},
+		{["name"] = "Redemption", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 7328, ["nocombat"] = true},
 	},	
 	["PRIEST"] =
 	{
-		{["name"] = "Resurrection", ["modifier"] = "nomod", ["id"] = 2006, ["nocombat"] = true},
+		{["name"] = "Resurrection", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 2006, ["nocombat"] = true},
 	},	
 	["SHAMAN"] =
 	{
-		{["name"] = "Ancestral Spirit", ["modifier"] = "nomod", ["id"] = 2008, ["nocombat"] = true},
+		{["name"] = "Ancestral Spirit", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 2008, ["nocombat"] = true},
 	},
 }
 

@@ -14,8 +14,7 @@
 --------------------------------------------
 -- Initialization
 
-local _G = getfenv(0);
-local module = _G.CT_BarMod;
+local module = select(2, ...);
 
 -- End Initialization
 --------------------------------------------
@@ -83,10 +82,11 @@ module.getBindingKey = function(buttonId)
 	
 	if (hasCachedBindingKeys[buttonId]) then
 		return cachedBindingKey1[buttonId], cachedBindingKey2[buttonId]
+	else
+		local key1, key2 = GetBindingKey("CLICK CT_BarModActionButton" .. buttonId .. ":LeftButton");
+		hasCachedBindingKeys[buttonId], cachedBindingKey1[buttonId], cachedBindingKey2[buttonId] = true, key1, key2
+		return key1, key2
 	end
-	local key1, key2 = GetBindingKey("CLICK CT_BarModActionButton" .. buttonId .. ":LeftButton");
-	hasCachedBindingKeys[buttonId], cachedBindingKey1[buttonId], cachedBindingKey2[buttonId] = true, key1, key2
-	return key1, key2
 end
 
 local function wipeBindingCache()
