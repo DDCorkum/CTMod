@@ -1,5 +1,6 @@
-CT_Libarary (8.3.0.9) 2020-05-17
+CT_Library (8.3.0.9) 2020-06-07
 - Added flexibility for modules to simultaneously support Classic, Retail and Beta/PTR
+- Small adjustments to improve efficiency
 
 CT_Library (8.3.0.8) 2020-03-31
 - Small fixes to color swatches

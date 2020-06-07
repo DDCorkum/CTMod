@@ -516,8 +516,8 @@ function lib:copyTable(source, dest)
 end
 
 do
-	local separatorPattern4 = "%s%d" .. LARGE_NUMBER_SEPERATOR .. "%d";
-	local separatorPattern7 = "%s%d" .. LARGE_NUMBER_SEPERATOR .. "%d" .. LARGE_NUMBER_SEPERATOR .. "%d";
+	local separatorPattern4 = "%s%d" .. LARGE_NUMBER_SEPERATOR .. "%03d";
+	local separatorPattern7 = "%s%d" .. LARGE_NUMBER_SEPERATOR .. "%03d" .. LARGE_NUMBER_SEPERATOR .. "%03d";
 	local capPattern4 = separatorPattern4;
 	local capPattern6 = "%s%d" .. FIRST_NUMBER_CAP;
 	local capPattern7 = separatorPattern4 .. FIRST_NUMBER_CAP;
