@@ -594,7 +594,7 @@ do
 			-- Use seperators to break the value up, and don't allow any decimals.
 			--value = math.floor(value);
 			if ( value >= 1000000 ) then
-				return separatorPattern7:format(negative, value/1000000, value/1000, value%1000);
+				return separatorPattern7:format(negative, value/1000000, value/1000%1000, value%1000);
 			else
 				return separatorPattern4:format(negative, value/1000, value%1000);
 			end
