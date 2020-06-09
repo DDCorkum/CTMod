@@ -1887,33 +1887,17 @@ do
 	local isReset = true;
 
 	local function CT_BarMod_ActionButton_UpdateHotkeys(self, ...)
-		if (not defbarShowBindings) then
-			local hotkey = self.HotKey;		-- _G[self:GetName().."HotKey"];
+		if (defbarShowBindings) then
+			local hotkey = self.HotKey;		-- _G[self:GetName().."HotKey"];			
 			if (displayBindings and displayRangeDot) then
 				-- Default behavior of standard UI is to display both.
 				hotkey:SetAlpha(1);
-				return;
-			end
-			local hide;
-			if (not displayBindings) then
-				if (not displayRangeDot) then
-					hide = true;
-				else
-					if (hotkey:GetText() ~= rangeIndicator) then
-						hide = true;
-					end
-				end
-			else
-				if (not displayRangeDot) then
-					if (hotkey:GetText() == rangeIndicator) then
-						hide = true;
-					end
-				end
-			end
-			if (hide) then
-				hotkey:SetAlpha(0);
-			else
+			elseif (displayRangeDot and hotkey:GetText() == rangeIndicator) then
 				hotkey:SetAlpha(1);
+			elseif (displayBindings and hotkey:GetText() ~= rangeIndicator) then
+				hotkey:SetAlpha(1);
+			else
+				hotkey:SetAlpha(0);
 			end
 		end
 	end
