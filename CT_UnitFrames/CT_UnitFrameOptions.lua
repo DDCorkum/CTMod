@@ -516,14 +516,14 @@ function CT_UnitFrameOptions_SetOptionsFrame(name)
 	if (module.currBoxFrame) then
 		module.currBoxFrame:Hide();
 	end
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+	if (module:getGameVersion() >= 2) then
 		-- Enable all page buttons
 		CT_UnitFramesOptionsFramePlayerOptions:Enable();
 		CT_UnitFramesOptionsFramePartyOptions:Enable();
 		CT_UnitFramesOptionsFrameTargetOptions:Enable();
 		CT_UnitFramesOptionsFrameAssistOptions:Enable();
 		CT_UnitFramesOptionsFrameFocusOptions:Enable();
-	elseif (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+	else
 		CT_UnitFramesOptionsFramePlayerOptions:Enable();
 		CT_UnitFramesOptionsFramePartyOptions:Enable();
 		CT_UnitFramesOptionsFrameTargetOptions:Enable();
@@ -559,8 +559,10 @@ function CT_UnitFramesOptions_OneColorHealth_CB_OnClick(self, checked)
 	module:ShowPlayerFrameBarText();
 	module:ShowPartyFrameBarText();
 	module:ShowTargetFrameBarText();
-	module:ShowAssistFrameBarText();
-	module:ShowFocusFrameBarText();
+	if (module:getGameVersion() >= 2) then
+		module:ShowAssistFrameBarText();
+		module:ShowFocusFrameBarText();
+	end
 end
 
 function CT_UnitFramesOptions_LargeBreakUp_CB_OnClick(self, checked)
@@ -568,8 +570,10 @@ function CT_UnitFramesOptions_LargeBreakUp_CB_OnClick(self, checked)
 	module:ShowPlayerFrameBarText();
 	module:ShowPartyFrameBarText();
 	module:ShowTargetFrameBarText();
-	module:ShowAssistFrameBarText();
-	module:ShowFocusFrameBarText();
+	if (module:getGameVersion() >= 2) then
+		module:ShowAssistFrameBarText();
+		module:ShowFocusFrameBarText();
+	end
 end
 
 function CT_UnitFramesOptions_LargeAbbreviate_CB_OnClick(self, checked)
@@ -577,8 +581,10 @@ function CT_UnitFramesOptions_LargeAbbreviate_CB_OnClick(self, checked)
 	module:ShowPlayerFrameBarText();
 	module:ShowPartyFrameBarText();
 	module:ShowTargetFrameBarText();
-	module:ShowAssistFrameBarText();
-	module:ShowFocusFrameBarText();
+	if (module:getGameVersion() >= 2) then
+		module:ShowAssistFrameBarText();
+		module:ShowFocusFrameBarText();
+	end
 end
 
 function CT_UnitFramesOptions_MakeFontLikeRetail_CB_OnClick(self, checked)
@@ -586,8 +592,10 @@ function CT_UnitFramesOptions_MakeFontLikeRetail_CB_OnClick(self, checked)
 	module:ShowPlayerFrameBarText();
 	module:ShowPartyFrameBarText();
 	module:ShowTargetFrameBarText();
-	module:ShowAssistFrameBarText();
-	module:ShowFocusFrameBarText();
+	if (module:getGameVersion() >= 2) then
+		module:ShowAssistFrameBarText();
+		module:ShowFocusFrameBarText();
+	end
 end
 
 --------------------------------------------
