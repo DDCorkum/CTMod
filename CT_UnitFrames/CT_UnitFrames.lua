@@ -97,16 +97,25 @@ function module:UpdateStatusBarTextString(textStatusBar, settings, lockShow)
 	end
 
 	-- STEP 2:
+	if (textStatusBar.ctUsePartyFontSize) then
+		if (textString.ctSize ~= (CT_UnitFramesOptions.partyTextSize or 3) + 6) then
+			textString.ctSize = (CT_UnitFramesOptions.partyTextSize or 3) + 6
+			textString.ctControlled = "ChangeSize"
+		end
+	else
+		textString.ctSize = 10
+	end
 	if (module:getGameVersion() == 1) then
-		if ((textString.ctControlled == "Classic" or textString.ctControlled == nil) and CT_UnitFramesOptions.makeFontLikeRetail) then
-			-- set or change it to retail font, but do it just once
-			textString:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE");
+		if (textString.ctControlled ~= "Retail" and CT_UnitFramesOptions.makeFontLikeRetail) then
+			textString:SetFont("Fonts\\FRIZQT__.TTF", textString.ctSize, "OUTLINE");
 			textString.ctControlled = "Retail";
-		elseif ((textString.ctControlled == "Retail" or textString.ctControlled == nil) and not CT_UnitFramesOptions.makeFontLikeRetail) then
-			-- set or change it to classic font, but do it just once
-			textString:SetFont("Fonts\\ARIALN.TTF", 14, "OUTLINE");
+		elseif (textString.ctControlled ~= "Classic" and not CT_UnitFramesOptions.makeFontLikeRetail) then
+			textString:SetFont("Fonts\\ARIALN.TTF", textStatusBar.ctUsePartyFontSize and textString.ctSize + 3 or textString.ctSize + 4, "OUTLINE");
 			textString.ctControlled = "Classic";	
 		end
+	elseif (textString.ctControlled == "ChangeSize") then
+		textString.ctControlled = nil;
+		textString:SetFont("Fonts\\FRIZQT__.TTF", textString.ctSize, "OUTLINE");
 	end
 	
 	-- STEP 3:

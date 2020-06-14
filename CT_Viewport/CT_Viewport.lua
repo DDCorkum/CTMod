@@ -505,6 +505,10 @@ function CT_ViewportFrame_OnLoad(self)
 	hooksecurefunc(WorldFrame, "ClearAllPoints", CT_Viewport_ApplySavedViewport);
 	hooksecurefunc(WorldFrame, "SetAllPoints", CT_Viewport_ApplySavedViewport);
 	hooksecurefunc(WorldFrame, "SetPoint", CT_Viewport_ApplySavedViewport);
+	
+	-- Beginning in Battle for Azeroth, some raid encounters have cinematics during combat.  Examples: Jaina freezing the sea, or N'Zoth special area on mythic mode
+	CinematicFrame:SetScript("OnShow", nil);
+	CinematicFrame:SetScript("OnHide", nil);
 
 	-- The game reloads the UI when switching between different aspect ratios.
 	-- The game does not reload the UI when switching between resolutions with the same aspect ratio.
