@@ -1,5 +1,5 @@
 ## Interface: 80300
-## Version: 8.3.0.10
+## Version: 8.3.0.11
 ## Title: CT_UnitFrames |cFF333333(BFA)
 ## Notes: Changes display of hp/mana values and adds a percentage.
 ## DefaultState: Enabled
