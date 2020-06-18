@@ -3223,13 +3223,13 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 
 			if (auraBoss1:IsShown()) then
 				local color = DebuffTypeColor[auraBoss1.debuffType or ""];
-				tinsert(tooltipTable, auraBoss1.count > 1 and strings[5]:format(auraBoss1.texture:GetTexture() or "", auraBoss1.name or "", auraBoss1.count, color.r, color.g, color.b) or strings[6]:format(auraBoss1.name or "", color.r, color.g, color.b));
+				tinsert(tooltipTable, auraBoss1.count > 1 and strings[5]:format(auraBoss1.texture:GetTexture() or "", auraBoss1.name or "", auraBoss1.count, color.r, color.g, color.b) or strings[6]:format(auraBoss1.texture:GetTexture() or "", auraBoss1.name or "", color.r, color.g, color.b));
 				if (auraBoss2:IsShown()) then
 					color = DebuffTypeColor[auraBoss2.debuffType or ""];
-					tinsert(tooltipTable, auraBoss2.count > 1 and strings[5]:format(auraBoss2.texture:GetTexture() or "", auraBoss2.name or "", auraBoss2.count, color.r, color.g, color.b) or strings[6]:format(auraBoss2.name or "", color.r, color.g, color.b));
+					tinsert(tooltipTable, auraBoss2.count > 1 and strings[5]:format(auraBoss2.texture:GetTexture() or "", auraBoss2.name or "", auraBoss2.count, color.r, color.g, color.b) or strings[6]:format(auraBoss2.texture:GetTexture() or "", auraBoss2.name or "", color.r, color.g, color.b));
 					if (auraBoss3:IsShown()) then
 						color = DebuffTypeColor[auraBoss3.debuffType or ""];
-						tinsert(tooltipTable, auraBoss3.count > 1 and strings[5]:format(auraBoss1.texture:GetTexture() or "", auraBoss3.name or "", auraBoss3.count, color.r, color.g, color.b) or strings[6]:format(auraBoss3.name or "", color.r, color.g, color.b));
+						tinsert(tooltipTable, auraBoss3.count > 1 and strings[5]:format(auraBoss1.texture:GetTexture() or "", auraBoss3.name or "", auraBoss3.count, color.r, color.g, color.b) or strings[6]:format(auraBoss3.texture:GetTexture() or "", auraBoss3.name or "", color.r, color.g, color.b));
 					end
 				end
 			end
