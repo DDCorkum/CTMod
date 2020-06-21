@@ -2372,7 +2372,6 @@ end
 --------------------------------------------
 -- CTRAPlayerFrame
 
-
 function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 	
 	-- PUBLIC INTERFACE
@@ -2415,8 +2414,9 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 	local powerBar, powerBarWidth;
 	local roleTexture;
 	local unitNameFontString;
+	local auraBossShown = { };
+	local auraBoss1, auraBoss2, auraBoss3, auraBoss4;
 	local aura1, aura2, aura3, aura4, aura5;
-	local auraBoss1, auraBoss2, auraBoss3;
 	local statusTexture, statusFontString, statusNoticeBackground, statusAlarmBackground;
 	local durabilityAverage, durabilityBroken, durabilityTime;
 	
@@ -3002,8 +3002,8 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 	-- infrequently configures unitNameFontString according to user settings
 	local configureUnitNameFontString = function()	
 		local effectiveScale = visualFrame:GetEffectiveScale();
-		unitNameFontString:SetPoint("BOTTOMLEFT", visualFrame, "LEFT", 13 * effectiveScale, 1);
-		unitNameFontString:SetPoint("BOTTOMRIGHT", visualFrame, "RIGHT", -13 * effectiveScale, 1);
+		unitNameFontString:SetPoint("BOTTOMLEFT", visualFrame, "LEFT", 13 * effectiveScale, 1.5);
+		unitNameFontString:SetPoint("BOTTOMRIGHT", visualFrame, "RIGHT", -13 * effectiveScale, 1.5);
 	end
 	
 	-- permanently creates unitNameFontString
@@ -3017,8 +3017,6 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 		configureUnitNameFontString();
 	end
 	
-
-
 	-- frequently updates buff and debuff icons to reflect game state; see createAuras() and configureAuras()
 	local function updateAuras()
 		-- STEP 1: prioritized buffs and debuffs for boss encounters, starting at the middle of the frame
@@ -3026,38 +3024,43 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 	
 		-- STEP 1:
 		local numShown = 0;
+		wipe(auraBossShown);
 		local frame = auraBoss1;
-		if(shownUnit and UnitExists(shownUnit) and owner:GetProperty("ShowBossAuras")) then		
+		local encounter = module:isInEncounter();
+		if(encounter and shownUnit and UnitExists(shownUnit) and owner:GetProperty("ShowBossAuras")) then		
 			for auraIndex = 1, 40 do
-				local name, icon, count, debuffType, duration, expirationTime, __, __, __, spellId = UnitAura(shownUnit, auraIndex, "");
-				if (not name or not frame) then
-					--either no more boss buffs to show, or no more frames to display them
+				local name, icon, count, debuffType, duration, expirationTime, __, __, __, spellId = UnitAura(shownUnit, auraIndex);
+				if (name and spellId and frame) then				
+					if (module.CTRA_Configuration_BossAuras[spellId] and (count or 0) >= module.CTRA_Configuration_BossAuras[spellId]) then
+						auraBossShown[spellId] = true;
+						numShown = numShown + 1;
+						frame:Show();
+						frame.texture:SetTexture(icon);
+						frame.name = name;
+						frame.count = count;
+						frame.debuffType = debuffType;
+						if (frame.text and (count or 0) > 0) then
+							local color = DebuffTypeColor[debuffType or ""];
+							frame.text:SetText(count < 100 and count or "*");
+							frame.text:SetTextColor(1 - (1-color.r)/2, 1 - (1-color.g)/2, 1 - (1-color.b)/2);
+						elseif (frame.text) then
+							frame.text:SetText("");
+						end
+						if (owner:GetProperty("ShowReverseCooldown") and duration and duration >= 12 and expirationTime and expirationTime > 0) then
+							frame.cooldown:SetCooldown(expirationTime - duration * 0.4, duration * 0.4);
+						else
+							frame.cooldown:Clear();
+						end
+						frame = frame.next;	-- increments the pointer to the next frame
+					end
+				else
+					--either no more buffs to show, or no more frames to display them
 					break;
-				elseif (module.CTRA_Configuration_BossAuras[spellId] and (count or 0) >= module.CTRA_Configuration_BossAuras[spellId]) then
-					numShown = numShown + 1;
-					frame:Show();
-					frame.texture:SetTexture(icon);
-					frame.name = name;
-					frame.count = count;
-					frame.debuffType = debuffType;
-					if (frame.text and (count or 0) > 1) then
-						local color = DebuffTypeColor[debuffType or ""];
-						frame.text:SetText(count);
-						frame.text:SetTextColor(1 - (1-color.r)/2, 1 - (1-color.g)/2, 1 - (1-color.b)/2);
-					elseif (frame.text) then
-						frame.text:SetText("");
-					end
-					if (owner:GetProperty("ShowReverseCooldown") and duration and duration >= 12 and expirationTime and expirationTime > 0) then
-						frame.cooldown:SetCooldown(expirationTime - duration * 0.4, duration * 0.4);
-					else
-						frame.cooldown:Clear();
-					end
-					frame = frame.next;	-- increments the pointer to the next frame
 				end
 			end
-			auraBoss1:SetPoint("CENTER", 0.5 - (min(3,numShown) * 6), -4.5);
+			auraBoss1:SetPoint("CENTER", 8 - 8 * min(4,numShown), -2.5);
 		end
-		while (numShown  < 3) do
+		while (numShown  < 4) do
 			numShown = numShown + 1;
 			frame:Hide();
 			frame = frame.next;
@@ -3080,26 +3083,28 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 			end
 			for auraIndex = 1, 40 do
 				local name, icon, count, debuffType, duration, expirationTime, source, __, __, spellId = UnitAura(shownUnit, auraIndex, filterText);
-				if (not name or not spellId or not frame) then
+				if (name and spellId and frame) then
+					if(
+						auraBossShown[spellId] ~= true
+						and (filterType == 2 or filterType == 4 or not SpellIsSelfBuff(spellId))			-- excludes self-only buffs
+						and (filterType ~= 5 or source == "player" or source == "vehicle" or source == "pet")		-- complements filterType == 5  (buffs cast by the player only)
+					) then
+						numShown = numShown + 1;
+						frame:Show();
+						frame.texture:SetTexture(icon);
+						frame.name = name;
+						frame.count = count;
+						frame.debuffType = debuffType;
+						if (owner:GetProperty("ShowReverseCooldown") and duration and duration >= 15 and expirationTime and expirationTime > 0) then
+							frame.cooldown:SetCooldown(expirationTime - duration * 0.3, duration * 0.3);
+						else
+							frame.cooldown:Clear();
+						end
+						frame = frame.next;
+					end
+				else
 					--either no more buffs to show, or no more frames to display them
 					break;
-				elseif(
-					not (owner:GetProperty("ShowBossAuras") and (module.CTRA_Configuration_BossAuras[spellId] and (count or 0) >= module.CTRA_Configuration_BossAuras[spellId]))
-					and (filterType == 2 or filterType == 4 or not SpellIsSelfBuff(spellId))			-- excludes self-only buffs
-					and (filterType ~= 5 or source == "player" or source == "vehicle" or source == "pet")		-- complements filterType == 5  (buffs cast by the player only)
-				) then
-					numShown = numShown + 1;
-					frame:Show();
-					frame.texture:SetTexture(icon);
-					frame.name = name;
-					frame.count = count;
-					frame.debuffType = debuffType;
-					if (owner:GetProperty("ShowReverseCooldown") and duration and duration >= 15 and expirationTime and expirationTime > 0) then
-						frame.cooldown:SetCooldown(expirationTime - duration * 0.3, duration * 0.3);
-					else
-						frame.cooldown:Clear();
-					end
-					frame = frame.next;
 				end
 			end
 		end
@@ -3131,7 +3136,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 			frame = CreateFrame("Frame", nil, visualFrame);
 			frame:SetSize(10,10);
 			frame:SetPoint("TOPRIGHT", x, y);
-			frame.texture = frame:CreateTexture(nil, "OVERLAY")
+			frame.texture = frame:CreateTexture(nil, "OVERLAY", nil, 1)		-- just behind boss auras, if there are enough of them
 			frame.texture:SetAllPoints();
 			frame.texture:SetTexCoord(0.04,0.96,0.04,0.96);
 			frame.cooldown = CreateFrame("Cooldown", nil, frame, "CooldownFrameTemplate");
@@ -3143,22 +3148,25 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 
 		local function constructAuraBoss()
 			frame = CreateFrame("Frame", nil, visualFrame);
-			frame:SetSize(11,11);
-			frame.texture = frame:CreateTexture(nil, "OVERLAY")
+			frame:SetSize(12,12);
+			frame.texture = frame:CreateTexture(nil, "OVERLAY", nil, 2)
 			frame.texture:SetAllPoints();
 			frame.texture:SetTexCoord(0.04,0.96,0.04,0.96);
 			frame.cooldown = CreateFrame("Cooldown", nil, frame, "CooldownFrameTemplate");
 			frame.cooldown:SetAllPoints();
 			frame.cooldown:SetDrawEdge(false);
 			frame.cooldown:SetReverse(true);
-			frame.text = frame:CreateFontString(nil, "OVERLAY", "ChatFontSmall");
-			frame.text:SetPoint("TOP", 0, -12);
+			frame.text = frame:CreateFontString(nil, "OVERLAY", nil, 2);		-- just ahead non-boss auras, if there are enough of them
+			frame.text:SetFontObject(owner:GetUnitNameFont());
+			frame.text:SetIgnoreParentScale(true);
+			frame.text:SetPoint("TOP", frame, "BOTTOM");
 			return frame;
 		end
 
 		auraBoss1 = auraBoss1 or constructAuraBoss();
 		auraBoss2 = auraBoss2 or constructAuraBoss();
 		auraBoss3 = auraBoss3 or constructAuraBoss();
+		auraBoss4 = auraBoss4 or constructAuraBoss();
 		
 		aura1 = aura1 or constructAura(-5, -5, aura1Frame);
 		aura2 = aura2 or constructAura(-5, -15, aura1Frame);
@@ -3168,14 +3176,16 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 		
 		auraBoss1.next = auraBoss2;
 		auraBoss2.next = auraBoss3;
-		auraBoss3.next = aura1;
+		auraBoss3.next = auraBoss4;
+		auraBoss4.next = aura1;
 		aura1.next = aura2;
 		aura2.next = aura3;
 		aura3.next = aura4;
 		aura4.next = aura5;
 		
-		auraBoss2:SetPoint("LEFT", auraBoss1, "RIGHT", 1, 0);
-		auraBoss3:SetPoint("LEFT", auraBoss2, "RIGHT", 1, 0);
+		auraBoss2:SetPoint("LEFT", auraBoss1, "RIGHT", 4, 0);
+		auraBoss3:SetPoint("LEFT", auraBoss2, "RIGHT", 4, 0);
+		auraBoss4:SetPoint("LEFT", auraBoss3, "RIGHT", 4, 0);
 		
 		-- initial configuration
 		configureAuras();
@@ -3230,6 +3240,10 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 					if (auraBoss3:IsShown()) then
 						color = DebuffTypeColor[auraBoss3.debuffType or ""];
 						tinsert(tooltipTable, auraBoss3.count > 1 and strings[5]:format(auraBoss1.texture:GetTexture() or "", auraBoss3.name or "", auraBoss3.count, color.r, color.g, color.b) or strings[6]:format(auraBoss3.texture:GetTexture() or "", auraBoss3.name or "", color.r, color.g, color.b));
+						if (auraBoss4:IsShown()) then
+							color = DebuffTypeColor[auraBoss4.debuffType or ""];
+							tinsert(tooltipTable, auraBoss4.count > 1 and strings[5]:format(auraBoss1.texture:GetTexture() or "", auraBoss4.name or "", auraBoss4.count, color.r, color.g, color.b) or strings[6]:format(auraBoss4.texture:GetTexture() or "", auraBoss4.name or "", color.r, color.g, color.b));
+						end
 					end
 				end
 			end
