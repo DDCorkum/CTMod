@@ -49,6 +49,7 @@ do
 	end
 end
 local CompactRaidFrameManager_SetSetting = CompactRaidFrameManager_SetSetting;
+local GetInstanceInfo = GetInstanceInfo;
 local GetInspectSpecialization = GetInspectSpecialization or function() return nil; end		-- doesn't exist in classic
 local GetSpecialization = GetSpecialization or function() return nil; end 			-- doesn't exist in classic
 local GetSpecializationInfo = GetSpecializationInfo or function() return nil; end 		-- doesn't exist in classic
@@ -3026,7 +3027,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 		local numShown = 0;
 		wipe(auraBossShown);
 		local frame = auraBoss1;
-		local encounter = module:isInEncounter();
+		local encounter = module:isInEncounter() or select(3, GetInstanceInfo()) == 8;	-- raid fights, or mythic plus dungeons
 		if(encounter and shownUnit and UnitExists(shownUnit) and owner:GetProperty("ShowBossAuras")) then		
 			for auraIndex = 1, 40 do
 				local name, icon, count, debuffType, duration, expirationTime, __, __, __, spellId = UnitAura(shownUnit, auraIndex);
