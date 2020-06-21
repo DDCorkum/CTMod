@@ -1,3 +1,6 @@
+CT_BarMod (8.3.0.11) 2020-06-21
+- The Mythic+ keystone frame will no longer hide behind custom bar positions
+
 CT_BarMod (8.3.0.10) 2020-06-08
 - Fixed the "hide range dot" and "hide keybindings" options on non-CT bars
 
