@@ -1,4 +1,4 @@
-CT_RaidAssist (8.3.0.11) 2020-06-20
+CT_RaidAssist (8.3.0.11) 2020-06-24
 - Fix to tooltip bug during certain boss encounters
 - Added more unique encounter buffs
 

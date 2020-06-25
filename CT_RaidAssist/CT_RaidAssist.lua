@@ -60,6 +60,8 @@ local IncomingSummonStatus = (C_IncomingSummon and C_IncomingSummon.IncomingSumm
 local RegisterStateDriver = RegisterStateDriver;
 local SetPortraitTexture = SetPortraitTexture;
 local UnitAura = UnitAura;
+local UnitBuff = UnitBuff;
+local UnitDebuff = UnitDebuff;
 local UnitClass = UnitClass;
 local UnitExists = UnitExists;
 local UnitGetTotalAbsorbs = UnitGetTotalAbsorbs or function() return 0; end -- doesn't exist in classic
@@ -3018,10 +3020,32 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 		configureUnitNameFontString();
 	end
 	
+	local function updateAuraButton(frame, name, icon, count, debuffType, duration, expirationTime)
+		frame:Show();
+		frame.texture:SetTexture(icon);
+		frame.name = name;
+		frame.count = count or 0;
+		frame.debuffType = debuffType;
+		if (frame.text) then
+			if (frame.count > 0) then
+				local color = DebuffTypeColor[debuffType or ""] or DebuffTypeColor[""];
+				frame.text:SetText(count < 100 and count or "*");
+				frame.text:SetTextColor(1 - (1-color.r)/2, 1 - (1-color.g)/2, 1 - (1-color.b)/2);
+			else
+				frame.text:SetText("");
+			end
+		end
+		if (owner:GetProperty("ShowReverseCooldown") and duration and duration >= 12 and expirationTime and expirationTime > 0) then
+			frame.cooldown:SetCooldown(expirationTime - duration * 0.4, duration * 0.4);
+		else
+			frame.cooldown:Clear();
+		end
+	end
+
 	-- frequently updates buff and debuff icons to reflect game state; see createAuras() and configureAuras()
 	local function updateAuras()
 		-- STEP 1: prioritized buffs and debuffs for boss encounters, starting at the middle of the frame
-		-- STEP 2: all other buffs and debuffs, filtered, at the right edge of the frame
+		-- STEP 2: other buffs and debuffs, filtered, at the right edge of the frame
 	
 		-- STEP 1:
 		local numShown = 0;
@@ -3030,32 +3054,30 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 		local encounter = module:isInEncounter() or select(3, GetInstanceInfo()) == 8;	-- raid fights, or mythic plus dungeons
 		if(encounter and shownUnit and UnitExists(shownUnit) and owner:GetProperty("ShowBossAuras")) then		
 			for auraIndex = 1, 40 do
-				local name, icon, count, debuffType, duration, expirationTime, __, __, __, spellId = UnitAura(shownUnit, auraIndex);
-				if (name and spellId and frame) then				
+				local name, icon, count, debuffType, duration, expirationTime, __, __, __, spellId = UnitBuff(shownUnit, auraIndex);
+				if (name and spellId and frame) then
 					if (module.CTRA_Configuration_BossAuras[spellId] and (count or 0) >= module.CTRA_Configuration_BossAuras[spellId]) then
 						auraBossShown[spellId] = true;
 						numShown = numShown + 1;
-						frame:Show();
-						frame.texture:SetTexture(icon);
-						frame.name = name;
-						frame.count = count;
-						frame.debuffType = debuffType;
-						if (frame.text and (count or 0) > 0) then
-							local color = DebuffTypeColor[debuffType or ""];
-							frame.text:SetText(count < 100 and count or "*");
-							frame.text:SetTextColor(1 - (1-color.r)/2, 1 - (1-color.g)/2, 1 - (1-color.b)/2);
-						elseif (frame.text) then
-							frame.text:SetText("");
-						end
-						if (owner:GetProperty("ShowReverseCooldown") and duration and duration >= 12 and expirationTime and expirationTime > 0) then
-							frame.cooldown:SetCooldown(expirationTime - duration * 0.4, duration * 0.4);
-						else
-							frame.cooldown:Clear();
-						end
-						frame = frame.next;	-- increments the pointer to the next frame
+						updateAuraButton(frame, name, icon, count, debuffType, duration, expirationTime);
+						frame = frame.next
 					end
 				else
 					--either no more buffs to show, or no more frames to display them
+					break;
+				end
+			end
+			for auraIndex = 1, 40 do
+				local name, icon, count, debuffType, duration, expirationTime, __, __, __, spellId = UnitDebuff(shownUnit, auraIndex);
+				if (name and spellId and frame) then
+					if (module.CTRA_Configuration_BossAuras[spellId] and (count or 0) >= module.CTRA_Configuration_BossAuras[spellId]) then
+						auraBossShown[spellId] = true;
+						numShown = numShown + 1;
+						updateAuraButton(frame, name, icon, count, debuffType, duration, expirationTime);
+						frame = frame.next
+					end
+				else
+					--either no more debuffs to show, or no more frames to display them
 					break;
 				end
 			end
@@ -3091,16 +3113,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 						and (filterType ~= 5 or source == "player" or source == "vehicle" or source == "pet")		-- complements filterType == 5  (buffs cast by the player only)
 					) then
 						numShown = numShown + 1;
-						frame:Show();
-						frame.texture:SetTexture(icon);
-						frame.name = name;
-						frame.count = count;
-						frame.debuffType = debuffType;
-						if (owner:GetProperty("ShowReverseCooldown") and duration and duration >= 15 and expirationTime and expirationTime > 0) then
-							frame.cooldown:SetCooldown(expirationTime - duration * 0.3, duration * 0.3);
-						else
-							frame.cooldown:Clear();
-						end
+						updateAuraButton(frame, name, icon, count, debuffType, duration, expirationTime);
 						frame = frame.next;
 					end
 				else
