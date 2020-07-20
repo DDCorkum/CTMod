@@ -1,3 +1,6 @@
+CT_MapMod (8.3.0.11) 2020-06-13
+- Added publicly-scoped CT_MapMod:GetDataProvider() for other addons
+
 CT_MapMod (8.3.0.8) 2020-04-13
 - Correction to prevent conflicts with other addons
 

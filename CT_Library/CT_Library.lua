@@ -18,14 +18,14 @@
 
 -----------------------------------------------
 -- Initialization
-
-local LIBRARY_VERSION = 8.309;		-- Once upon a time this was to differentiate between different versions of CT_Library... but its now 2020 and CT_Library has stood as its own AddOn for more than a decade.
-local LIBRARY_NAME = "CT_Library";
+local LIBRARY_NAME, lib = ...;
+local LIBRARY_VERSION = strmatch(GetAddOnMetadata(LIBRARY_NAME, "version"), "^([%d.]+)");
 
 -- Create tables for all the PROTECTED contents and PUBLIC interface of CTMod
-local _G = getfenv(0);
-local lib = select(2, ...);	-- Protected attributes and methods that any CT module may access by calling CT_Library:RegisterModule(module) with its own table as a parameter
+
+
 local libPublic = {}		-- Public attributes and methods that any AddOn, including CT modules, may access at time by calling _G["CT_Library"] or via the special table module.publicInterface that is created by CT_Library(RegisterModule.module)
+				-- By contrast, "lib" contains any Protected attributes and methods that any CT module may access by calling CT_Library:RegisterModule(module) with its own table as a parameter
 
 -- Associate lib and libPublic, so that code written for the protected lib can also access the public libPublic without being aware of the difference
 setmetatable(lib, { __index = libPublic });
@@ -720,7 +720,7 @@ function lib:schedule(time, func, repeatFunc)
 	end
 end
 
--- Schedule timers
+-- Unschedule timers
  -- Usage:	unschedule(func) to cancel a one-time callback
  --		unschedule(func, true) to cancel a repeating function
 function lib:unschedule(func, isRepeat)
@@ -739,6 +739,24 @@ function lib:unschedule(func, isRepeat)
 			timerFuncs[func] = nil;
 		end
 	end
+end
+
+
+-- Check if an encounter is in progress, and return its ID (might not work after a /reload until the next encounter begins)
+do
+
+	local inEncounter = nil,
+	lib:regEvent("ENCOUNTER_START", function(id)
+		inEncounter = id;
+	end);
+	lib:regEvent("ENCOUNTER_END", function()
+		inEncounter = nil;
+	end);
+	
+	function lib:isInEncounter()
+		return inEncounter;
+	end
+
 end
 
 function lib:unload()
@@ -2672,9 +2690,9 @@ end
 
 local function controlPanelSkeleton()
 	local modListButtonTemplate = {
-		"font#i:text#v:ChatFontNormal#l:17:0",
-		"font#i:version#r:-5:0##0.65:0.65:0.65",
-		"texture#i:bullet#l:4:-1#s:7:7#1:1:1",
+		"font#i:text#v:ChatFontNormal#l:16:0",
+		"font#i:version#l:r:-57:0##0.65:0.65:0.65",
+		"texture#i:bullet#l:2:-1#s:7:7#1:1:1",
 		["onload"] = function(self)
 			self.bullet:SetVertexColor(1, 0.82, 0);
 			self:SetFontString(self.text);
@@ -2755,7 +2773,7 @@ local function controlPanelSkeleton()
 			eventHandler(lib, "CONTROL_PANEL_VISIBILITY");
 		end,
 		["button#tl:4:-5#br:tr:-4:-25"] = {
-			"font#tl#br:bl:296:0#CTMod Control Panel v"..LIBRARY_VERSION,
+			"font#tl#br:bl:296:0#CTMod Control Panel",
 			"texture#i:bg#all#1:1:1:0.25#BACKGROUND",
 			["button#tr:3:6#s:32:32#"] = {
 				["onload"] = function(button)
@@ -3397,7 +3415,7 @@ end
 local module = { };
 module.name = "|c00FFFFCCHelp|r";
 module.optionsName = "Help";
-module.version = "";
+module.version = LIBRARY_VERSION;
 -- Register as module 2 only, since this will code will get executed once per different
 -- version of CT_Library. We don't want multiple copies showing up in the
 -- control panel.

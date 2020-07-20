@@ -33,15 +33,16 @@ local L = module.text;
 --------------------------------------------
 -- Public design
 
--- CT_MapMod_DataProviderMixin		-- Handles the creation, placement and removal of pins from a map
--- CT_MapMod_PinMixin			-- Handles the appearance and behaviour of a single pin on a map
+-- CT_MapMod:GetDataProvider		-- Publicly accessible copy of a CT_MapMod data provider, so other addons can integrate CT_MapMod into their custom map.
 -- CT_MapMod:InsertHerb()		-- Inserts an herbalism pin using a localized name and position, but avoiding duplicates
 -- CT_MapMod:InsertOre()		-- Inserts a mining pin using a localized name and position, but avoiding duplicates
+-- CT_MapMod_PinMixin			-- Handles the appearance and behaviour of a single pin on a map
 
 --------------------------------------------
 -- Private design
 
 local StaticNoteEditPanel;		-- Allows the manual editing of a pin's contents
+local CT_MapMod_DataProviderMixin;	-- Handles the creation, placement and removal of pins from a map
 
 --------------------------------------------
 -- Initialization
@@ -56,8 +57,17 @@ function module:Initialize()				-- called via module.update("init") from CT_Libr
 	
 	-- load an additional DataProvider to the FlightMapFrame in retail, so pins can appear on the continent flight map
 	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
-		if (not FlightMapFrame) then FlightMap_LoadUI(); end
-		FlightMapFrame:AddDataProvider(CreateFromMixins(CT_MapMod_DataProviderMixin));
+		if (FlightMapFrame) then
+			FlightMapFrame:AddDataProvider(CT_MapMod_DataProviderMixin);
+		else
+			local needFlightMap = true;
+			hooksecurefunc("FlightMap_LoadUI", function()
+				if (needFlightMap) then
+					needFlightMap = false;
+					FlightMapFrame:AddDataProvider(CreateFromMixins(CT_MapMod_DataProviderMixin))
+				end
+			end);
+		end
 	end
 	
 	-- add UI elements to the WorldMapFrame
@@ -348,7 +358,11 @@ end
 -- DataProvider
 -- Manages the adding, updating, and removing of data like icons, blobs or text to the map canvas
 
-CT_MapMod_DataProviderMixin = CreateFromMixins(MapCanvasDataProviderMixin);
+function public:GetDataProvider()
+	return CreateFromMixins(CT_MapMod_DataProviderMixin)
+end
+
+CT_MapMod_DataProviderMixin = CreateFromMixins(MapCanvasDataProviderMixin);	-- this is a locally scoped variable, per the design at the top of the document
  
 function CT_MapMod_DataProviderMixin:RemoveAllData()
 	self:GetMap():RemoveAllPinsByTemplate("CT_MapMod_PinTemplate");
@@ -599,7 +613,7 @@ end
  
 function CT_MapMod_PinMixin:ApplyFrameLevel()
 	if (self.set == "User") then
-		self:SetFrameLevel (2099)
+		self:SetFrameLevel(2099)
 	else
 		self:SetFrameLevel(2012);  -- herbalism and mining nodes don't cover over the flypoints
 	end

@@ -177,6 +177,32 @@ module.CTRA_Configuration_BossAuras =
 	[19776] = 0,		-- Molten Core - Sulfuron Harbinger: Shadow Word: Pain
 	[20294] = 0,		-- Molten Core - Sulfuron Harbinger: Immolater
 	[18431] = 0,		-- Onyxia's Lair - Onyxia: Bellowing Roar
+	[23958] = 0,		-- Blackwing Lair - Razorgore the Untamed: Mind Exhaustion
+	[18183] = 0,		-- Blackwing Lair - Vaelastrasz the Corrupt: Burning Adrenaline
+	[24573] = 0,		-- Blackwing Lair - Broodlord Lashlayer: Mortal Strike
+	[23341] = 5,		-- Blackwing Lair - Firemaw: Flame Buffet
+	[23340] = 0,		-- Blackwing Lair - Ebonroc: Shadow of Ebonroc
+	[23153] = 0,		-- Blackwing Lair - Chromaggus: Brood Affliction, Blue
+	[23154] = 0,		-- Blackwing Lair - Chromaggus: Brood Affliction, Black
+	[23155] = 0,		-- Blackwing Lair - Chromaggus: Brood Affliction, Red
+	[23169] = 0,		-- Blackwing Lair - Chromaggus: Brood Affliction, Green
+	[23170] = 0,		-- Blackwing Lair - Chromaggus: Brood Affliction, Bronze
+	[23224] = 0,		-- Blackwing Lair - Nefarian: Veil of Shadow
+	[23603] = 0,		-- Blackwing Lair - Nefarian: Wild Polymorph
+	[23401] = 0,		-- Blackwing Lair - Nefarian: Corrupted Healing
+	[24314] = 0,		-- Zul'Gurub - Bloodlord Mandokir: Threatening Gaze
+	[24053] = 0,		-- Zul'Gurub - Jin'do the Hexxer: Hex
+	[24321] = 0,		-- Zul'Gurub - Hakkar the Soulflayer: Poisonous Blood
+	[24327] = 0,		-- Zul'Gurub - Hakkar the Soulflayer: Cause Insanity
+	[24328] = 0,		-- Zul'Gurub - Hakkar the Soulflayer: Corrupted Blood
+	[25189] = 0,		-- Ruins of Ahn'Qiraj - Ossirian the Unscarred: Enveloping Winds
+	[785] = 0,		-- Temple of Ahn'Qiraj - The Prohpet Skeram: True Fulfillment
+	[25646] = 3,		-- Temple of Ahn'Qiraj - Battleguard Sartura: Mortal Wound
+	[25812] = 2,		-- Temple of Ahn'Qiraj - The Bug Trio; Yauj, Vem and Kri: Toxic Volley
+	[25991] = 2,		-- Temple of Ahn'Qiraj - Viscidus: Poison Bolt Volley
+	[26050] = 5,		-- Temple of Ahn'Qiraj - Princess Huhuran: Acid Spit
+	[26476] = 5,		-- Temple of Ahn'Qiraj - C'Thun: Digestive Acid
+	
 
 	-- Battle for Azeroth
 	[240443] = 1,		-- Mythic Plus: Bursting
@@ -223,7 +249,27 @@ module.CTRA_Configuration_BossAuras =
 	[307839] = 0,		-- Ny'alotha - Maut: Devoured Abyss
 	[307399] = 5,		-- Ny'alotha - Maut: Arcane Wounds
 	[314337] = 1,		-- Ny'alotha - Maut: Ancient Curse
+	[307937] = 0,		-- Ny'alotha - Prophet Skitra: Shred Psyche
+	[307977] = 3,		-- Ny'alotha - Prophet Skitra: Shadow Shock
+	[311551] = 1,		-- Ny'alotha - Dark Inquisitor Xanesh: Abyssal Strike
+	[312406] = 0,		-- Ny'alotha - Dark Inquisitor Xanesh: Voidwoken
+	[314298] = 2,		-- Ny'alotha - Dark Inquisitor Xanesh: Imminent Doom
+	[307019] = 12,		-- Ny'alotha - Vexiona: Void Corruption
+	[307317] = 0,		-- Ny'alotha - Vexiona: Encroaching Shadows
+	[313460] = 0,		-- Ny'alotha - Hivemind: Nullification
+	[313461] = 0,		-- Ny'alotha - Hivemind: Corrosion
+	[306819] = 1,		-- Ny'alotha - Ra'den: Nullifying Strike
+	[307471] = 1,		-- Ny'alotha - Shad'har: Crush
+	[307472] = 1,		-- Ny'alotha - Shad'har: Dissolve
+	[306692] = 0,		-- Ny'alotha - Shad'har the Insatiable: Living Miasma
+	[310277] = 0,		-- Ny'alotha - Drest'agath: Volatile Seed
+	[308377] = 0,		-- Ny'alotha - Drest'agath: Void Infused Ichor
+	[310563] = 1,		-- Ny'alotha - Drest'agath: Mutterings of Betrayal
+	[309961] = 2,		-- Ny'alotha - Il'gynoth: Eye of N'Zoth
+	[315954] = 2,		-- Ny'alotha - Carapace of N'Zoth: Black Scar
+	[306973] = 0,		-- Ny'alotha - Carapace of N'Zoth: Madness Bomb
 }
+
 
 ------------------------------------------------
 -- CTRA_Configuration_Consumables

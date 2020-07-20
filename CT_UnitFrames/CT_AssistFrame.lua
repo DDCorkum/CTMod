@@ -327,6 +327,7 @@ function CT_AssistFrame_OnEvent(self, event, ...)
 		end
 		CT_UnitFrames_ResetDragLink(_G[self:GetName().."_Drag"]);
 	elseif ( event == "UNIT_TARGET" ) then
+		CT_AssistFrame_Update(self);
 		if (CT_UnitFramesOptions.shallDisplayTargetOfAssist) then
 			CT_TargetofAssist_Update(self.totFrame);
 		end
