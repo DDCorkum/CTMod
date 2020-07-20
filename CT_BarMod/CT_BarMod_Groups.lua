@@ -137,7 +137,7 @@ local function groupFrameSkeleton()
 	if ( not groupFrameTable ) then
 		groupFrameTable = {
 			-- Frame used to allow dragging of the action buttons.
-			["button#hidden#i:dragframe#st:LOW"] = {
+			["button#hidden#i:dragframe#st:LOW#v:BackdropTemplate"] = {
 				"backdrop#tooltip#0:0:0.5:0.85",
 				"font#v:GameFontNormalLarge#i:text",
 				["onenter"] = groupFrame_OnEnter,

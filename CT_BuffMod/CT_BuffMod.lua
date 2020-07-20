@@ -4395,7 +4395,7 @@ function frameClass:createAltFrame()
 	-- is open (the aura and alt frames should not have the mouse enabled at
 	-- the same time, and we may not be able to enable the mouse for aura
 	-- frame tooltips during combat).
-	local altFrame = CreateFrame("Frame", nil, UIParent);
+	local altFrame = CreateFrame("Frame", nil, UIParent, BackdropTemplateMixin and "BackdropTemplate");
 
 	auraFrame.altFrame = altFrame;
 	altFrame.auraFrame = auraFrame;

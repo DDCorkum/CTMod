@@ -1,3 +1,7 @@
+CT_Viewport (8.3.7.1) 2020-07-18
+- Unified with the CT Control Panel to resolve Shadowlands BackdropTemplate compatibility
+- Integrated with CurseForge community localization
+
 CT_Viewport (8.3.0.10) 2020-06-10
 - Maintains a custom viewport during mid-encounter cut scenes (e.g. Jaina or Mythic N'Zoth)
 

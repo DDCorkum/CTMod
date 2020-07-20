@@ -135,12 +135,15 @@ function module:init()
 	module.CTRAReadyCheck = StaticCTRAReadyCheck();
 	module.CTRAFrames = StaticCTRAFrames();
 	
-	-- convert from pre-BFA CTRA to 8.2.0.5
-	--if (not module:getOption("CTRA_LastConversion") or module:getOption("CTRA_LastConversion") < 8.205) then
-	--	module:setOption("CTRA_LastConversion", 8.205, true)
-	--	-- there was code here to do the conversion, but now that is removed and no longer necessary
-	--
-	--end
+	-- convert from 8.3.0.11 and earlier to 8.3.7.1
+	if (not module:getOption("CTRA_LastConversion") or module:getOption("CTRA_LastConversion") < 8.307) then
+		module:setOption("CTRA_LastConversion", 8.307, true)
+		for i=1, 10 do
+			local v, h = module:getOption("CTRAWindow" .. i .. "_VerticalSpacing"), module:getOption("CTRAWindow" .. i .. "_HorizontalSpacing")
+			module:setOption("CTRAWindow" .. i .. "_VerticalSpacing", v and v+3, true);
+			module:setOption("CTRAWindow" .. i .. "_HorizontalSpacing", h and h+3, true);
+		end
+	end
 end
 
 -- triggered by CT_Library whenever a setting changes, and upon initialization, to call functions associated with tailoring various functionality as required
@@ -1058,10 +1061,10 @@ function StaticCTRAFrames()
 				-- Size and Spacing
 				optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormal#Size and Spacing");
 				optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#Should frames touch each other, or be spaced apart vertically and horizontally?" .. textColor2 .. ":l");
-				optionsBeginFrame(-20, 17, "slider#tl:15:%y#s:110:%s#n:CTRAWindow_HorizontalSpacingSlider#HSpacing = <value>:Touching:Far#0:100:1");
+				optionsBeginFrame(-20, 17, "slider#tl:15:%y#s:130:%s#n:CTRAWindow_HorizontalSpacingSlider#HSpacing = <value>:Touching:Far#0:100:1");
 					optionsWindowizeSlider("HorizontalSpacing");
 				optionsEndFrame();
-				optionsBeginFrame( 20, 17, "slider#tl:150:%y#s:110:%s#n:CTRAWindow_VerticalSpacingSlider#VSpacing = <value>:Touching:Far#0:100:1");
+				optionsBeginFrame( 17, 17, "slider#tl:160:%y#s:130:%s#n:CTRAWindow_VerticalSpacingSlider#VSpacing = <value>:Touching:Far#0:100:1");
 					optionsWindowizeSlider("VerticalSpacing");
 				optionsEndFrame();
 				optionsAddObject(-30,   20, "font#l:tl:13:%y#r:tl:158:%y#" .. L["CT_RaidAssist/Options/Window/Size/BorderThicknessLabel"] .. textColor1 .. ":l:290");
@@ -1277,14 +1280,16 @@ function StaticCTRAFrames()
 								
 				optionsAddObject(-5, 2*14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. L["CT_RaidAssist/Options/Window/Color/Line2"] .. textColor2 .. ":l");
 
-				optionsBeginFrame(-20, 17, "slider#tl:15:%y#s:110:%s#n:CTRAWindow_ColorBackgroundClassSlider#" .. L["CT_RaidAssist/Options/Window/Color/BackgroundClassSlider"] .. ":Off:100%#0:100:5");
+				optionsBeginFrame(-15, 17, "slider#tl:15:%y#s:130:%s#n:CTRAWindow_ColorBackgroundClassSlider#" .. L["CT_RaidAssist/Options/Window/Color/BackgroundClassSlider"] .. ":Off:100%#0:100:5");
 					optionsWindowizeSlider("ColorBackgroundClass");
 					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Color/BackgroundClassHeading"],L["CT_RaidAssist/Options/Window/Color/BackgroundClassTip"] .. textColor1});
 				optionsEndFrame();
-				optionsBeginFrame(17, 17, "slider#tl:150:%y#s:110:%s#n:CTRAWindow_ColorBorderClassSlider#" .. L["CT_RaidAssist/Options/Window/Color/BorderClassSlider"] .. ":Off:100%#0:100:5");
+				optionsBeginFrame(17, 17, "slider#tl:160:%y#s:130:%s#n:CTRAWindow_ColorBorderClassSlider#" .. L["CT_RaidAssist/Options/Window/Color/BorderClassSlider"] .. ":Off:100%#0:100:5");
 					optionsWindowizeSlider("ColorBorderClass");
 					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Color/BorderClassHeading"],L["CT_RaidAssist/Options/Window/Color/BorderClassTip"] .. textColor1});
-				optionsEndFrame();				
+				optionsEndFrame();
+				
+				optionsAddObject(-20,0, "frame#t:0:%y#s:1:1");	-- delete this if ever more options are added underneath
 			
 			optionsEndFrame();  -- end of the window
 			
@@ -1395,8 +1400,8 @@ function NewCTRAWindow(owningCTRAFrames)
 		["GrowUpward"] = false,
 		["GrowLeft"] = false,
 		["WrapAfter"] = 5,
-		["HorizontalSpacing"] = 1,
-		["VerticalSpacing"] = 1,
+		["HorizontalSpacing"] = 4,
+		["VerticalSpacing"] = 4,
 		["PlayerFrameScale"] = 100,
 		["ColorUnitFullHealthCombat"] = {0.00, 1.00, 0.00, 1.00},
 		["ColorUnitZeroHealthCombat"] = {0.00, 1.00, 0.00, 1.00},
@@ -1435,7 +1440,7 @@ function NewCTRAWindow(owningCTRAFrames)
 				(
 					(obj:GetProperty("GrowLeft") and -1) or 1)
 					*(label.id - ((obj:GetProperty("GrowLeft") and 1.5) or 0.5))
-					*(90 + obj:GetProperty("HorizontalSpacing")
+					*(87 + obj:GetProperty("HorizontalSpacing")
 				),
 				(
 					(obj:GetProperty("GrowUpward") and obj:GetProperty("EnableTargetFrame") and -20)
@@ -1445,12 +1450,12 @@ function NewCTRAWindow(owningCTRAFrames)
 		else
 			label:SetPoint(
 				(obj:GetProperty("GrowLeft") and "LEFT") or "RIGHT",
-				(obj:GetProperty("GrowLeft") and 90) or 0,
+				(obj:GetProperty("GrowLeft") and 87) or 0,
 				(
 					((obj:GetProperty("GrowUpward") and 1) or -1)
 					* (label.id - ((obj:GetProperty("EnableTargetFrame") and 0.5) or 0.25))
 					* (
-						40
+						37
 						+ obj:GetProperty("VerticalSpacing") 
 						+ ((obj:GetProperty("EnableTargetFrame") and 20) or 0)
 						+ (((obj:GetProperty("EnableTargetFrame") and obj:GetProperty("TargetHealth") and not obj:GetProperty("HealthBarAsBackground")) and 4) or 0)
@@ -1459,8 +1464,8 @@ function NewCTRAWindow(owningCTRAFrames)
 				)
 			);
 		end
-		label:SetWidth(90 + obj:GetProperty("HorizontalSpacing")/2);
-		module:blockOverflowText(label, 90 + obj:GetProperty("HorizontalSpacing")/2);
+		label:SetWidth(87 + obj:GetProperty("HorizontalSpacing")/2);
+		module:blockOverflowText(label, 87 + obj:GetProperty("HorizontalSpacing")/2);
 	end
 	
 	local function updateFont()
@@ -1918,7 +1923,7 @@ function NewCTRAWindow(owningCTRAFrames)
 						w = w + 1;
 						if (w == self:GetProperty("WrapAfter")) then
 							if (self:GetProperty("Orientation") == 1 or self:GetProperty("Orientation") == 3) then
-								x = x + 90 + self:GetProperty("HorizontalSpacing");
+								x = x + 87 + self:GetProperty("HorizontalSpacing");
 								y = 0;
 								if (w > rows) then
 									rows = w;
@@ -1931,7 +1936,7 @@ function NewCTRAWindow(owningCTRAFrames)
 								x = 0;
 								y = (
 									y 
-									- 40
+									- 37
 									- self:GetProperty("VerticalSpacing") 
 									- ((self:GetProperty("EnableTargetFrame") and 20) or 0)
 									- (((self:GetProperty("EnableTargetFrame") and self:GetProperty("TargetHealth") and not self:GetProperty("HealthBarAsBackground")) and 4) or 0)
@@ -1951,7 +1956,7 @@ function NewCTRAWindow(owningCTRAFrames)
 								-- x = x;
 								y = (
 									y 
-									- 40
+									- 37
 									- self:GetProperty("VerticalSpacing") 
 									- ((self:GetProperty("EnableTargetFrame") and 20) or 0)
 									- (((self:GetProperty("EnableTargetFrame") and self:GetProperty("TargetHealth") and not self:GetProperty("HealthBarAsBackground")) and 4) or 0)
@@ -1965,7 +1970,7 @@ function NewCTRAWindow(owningCTRAFrames)
 									cols = cols + 1;
 								end
 							else
-								x = x + 90 + self:GetProperty("HorizontalSpacing");
+								x = x + 87 + self:GetProperty("HorizontalSpacing");
 								-- y = y;
 								if (w > cols) then
 									cols = w;
@@ -1983,13 +1988,13 @@ function NewCTRAWindow(owningCTRAFrames)
 				if (w > 0 and (self:GetProperty("Orientation") == 1 or self:GetProperty("Orientation") == 2)) then
 					w = 0;
 					if (self:GetProperty("Orientation") == 1) then
-						x = x + 90 + self:GetProperty("HorizontalSpacing");
+						x = x + 87 + self:GetProperty("HorizontalSpacing");
 						y = 0;
 					else
 						x = 0;
 						y = (
 							y 
-							- 40
+							- 37
 							- self:GetProperty("VerticalSpacing") 
 							- ((self:GetProperty("EnableTargetFrame") and 20) or 0)
 							- (((self:GetProperty("EnableTargetFrame") and self:GetProperty("TargetHealth") and not self:GetProperty("HealthBarAsBackground")) and 4) or 0)
@@ -3451,7 +3456,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 				return;
 			else
 				-- overall dimensions
-				visualFrame = CreateFrame("Frame", nil, parent, (module:getGameVersion() >= 9 and "BackdropTemplate") or nil);
+				visualFrame = CreateFrame("Frame", nil, parent, BackdropTemplateMixin and "BackdropTemplate");
 				visualFrame:SetSize(90, 40);
 				visualFrame:SetScale(owner:GetProperty("PlayerFrameScale")/100);
 								
@@ -4123,7 +4128,7 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 				return;
 			else
 				-- overall dimensions
-				visualFrame = CreateFrame("Frame", nil, parent, (module:getGameVersion() >= 9 and "BackdropTemplate") or nil);
+				visualFrame = CreateFrame("Frame", nil, parent, BackdropTemplateMixin and "BackdropTemplate");
 				visualFrame:SetWidth(90);
 				visualFrame:SetHeight(20 + (((owner:GetProperty("TargetHealth") and not owner:GetProperty("HealthBarAsBackground")) and 4) or 0) + ((owner:GetProperty("TargetPower") and 4) or 0));
 				visualFrame:SetScale(owner:GetProperty("PlayerFrameScale")/100);

@@ -12,7 +12,7 @@
 
 -- Credit:
 -- CT_BB module written by DDCorkum
--- Some lines of code borrowed from MoveTalkingHead addon by Ketho (EU-Boulderfist) 
+-- Six lines of code adapted from MoveTalkingHead addon by Ketho (EU-Boulderfist) 
 
 
 --------------------------------------------
@@ -66,13 +66,13 @@ local function addon_Init(self)
 	self.frame:SetHeight(155);
 	self.frame:SetWidth(570);
 	
-	for i, alertSubSystem in pairs(AlertFrame.alertFrameSubSystems) do
+	for i, alertSubSystem in pairs(AlertFrame.alertFrameSubSystems) do	-- Credit: this loop is in the Public Domain by Ketho (EU-Boulderfist)
 		if alertSubSystem.anchorFrame == TalkingHeadFrame then
 			tremove(AlertFrame.alertFrameSubSystems, i);
 		end
 	end
 	
-	TalkingHeadFrame.ignoreFramePositionManager = true;
+	TalkingHeadFrame.ignoreFramePositionManager = true;			-- Credit: this line is in the Public Domain by Ketho (EU-Boulderfist)
 	
 	hooksecurefunc("TalkingHeadFrame_PlayCurrent", function()
 	 	if (CT_BB_TalkingHead_IsEnabled) then

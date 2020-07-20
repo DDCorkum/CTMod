@@ -1,3 +1,7 @@
+CT_RaidAssist (8.3.7.1) 2020-07-18
+- Switched to a better method for Shadowlands BackdropTemplate compatibility
+- Optional tighter vertical and horizonatal spacing
+
 CT_RaidAssist (8.3.0.11) 2020-06-24
 - Fix to tooltip bug during certain boss encounters
 - Added more unique encounter buffs

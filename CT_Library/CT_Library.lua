@@ -856,10 +856,10 @@ end
 
 local function registerLocalizationMeta(module)
 	-- most modules populate this table using localization.lua
-	module.text = module.text or {}
+	module.text = module.text or {};
 	
 	-- gracefully handle errors, in case a localisation is missing
-	local meta = getmetatable(module.text) or {}
+	local meta = getmetatable(module.text) or {};
 	meta.__index = function(table, missingKey)
 		missingKey = gsub(missingKey, (module.name or "CT_Library") .. "/", "");
 		missingKey = gsub(missingKey, "Options/", "O/");
@@ -1139,7 +1139,7 @@ end
 -----------------------------------------------
 -- Frame Misc
 
-function lib:createMultiLineEditBox(name, width, height, parent, bdtype)
+function lib:createMultiLineEditBox(name, width, height, parent, bdtype, font)
 	-- Create a multi line edit box
 	-- Param: bdtype -- nil==No backdrop, 1=Tooltip backdrop, 2==Dialog backdrop
 	local frame, scrollFrame, editBox;
@@ -1165,16 +1165,21 @@ function lib:createMultiLineEditBox(name, width, height, parent, bdtype)
 		};
 	end
 
-	frame = CreateFrame("Frame", name, parent);
-	frame:SetHeight(height);
-	frame:SetWidth(width);
-	frame:SetPoint("TOPLEFT", parent, "TOPLEFT", 0, 0);
-	frame:SetPoint("BOTTOMRIGHT", parent, "TOPLEFT", width, -height);
+
 	if (backdrop) then
+		frame = CreateFrame("Frame", name, parent, BackdropTemplateMixin and "BackdropTemplate");
 		frame:SetBackdrop(backdrop);
 		frame:SetBackdropBorderColor(0.4, 0.4, 0.4);
 		frame:SetBackdropColor(0, 0, 0);
+	else
+		frame = CreateFrame("Frame", name, parent);
 	end
+	
+	frame:SetHeight(height);
+	frame:SetWidth(width);
+	frame:SetPoint("TOPLEFT", parent);
+	frame:SetPoint("BOTTOMRIGHT", parent, "TOPLEFT", width, -height);
+
 	frame:EnableMouse(true);
 	frame:Hide();
 
@@ -1198,7 +1203,7 @@ function lib:createMultiLineEditBox(name, width, height, parent, bdtype)
 	editBox:SetMultiLine(true);
 	editBox:EnableMouse(true);
 	editBox:SetAutoFocus(false);
-	editBox:SetFontObject(ChatFontNormal);
+	editBox:SetFontObject(font or ChatFontNormal);
 
 	-- Note:
 	--
@@ -1568,18 +1573,11 @@ objectHandlers.editbox = function(self, parent, name, virtual, option, font, bdt
 	local frame;
 	local backdrop;
 	if (multiline) then
-		frame = lib:createMultiLineEditBox(name,multilinewidth,multilineheight,parent,bdtype);
-		if (font) then
-			frame.editBox:SetFontObject(font)
-		end
+		frame = lib:createMultiLineEditBox(name,multilinewidth,multilineheight,parent,bdtype, font);
 		if (option) then
 			frame.editBox:SetText(self:getOption(option) or "");
 		end
 	else
-		frame = CreateFrame("EditBox", name, parent, virtual);
-		if (font) then
-			frame:SetFontObject(font)
-		end
 		if (tonumber(bdtype) == 1) then
 			backdrop = {
 				bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
@@ -1600,9 +1598,16 @@ objectHandlers.editbox = function(self, parent, name, virtual, option, font, bdt
 			};
 		end
 		if (backdrop) then
+			frame = CreateFrame("EditBox", name, parent, virtual, BackdropTemplateMixin and "BackdropTemplate");
 			frame:SetBackdrop(backdrop);
 			frame:SetBackdropBorderColor(0.4, 0.4, 0.4);
 			frame:SetBackdropColor(0, 0, 0);
+		else
+			frame = CreateFrame("EditBox", name, parent, virtual);
+		end
+		
+		if (font) then
+			frame:SetFontObject(font)
 		end
 		if (option) then
 			frame:SetText(self:getOption(option) or "");
@@ -2153,7 +2158,9 @@ local function generalObjectHandler(self, specializedHandler, str, parent, initi
 			if ( not found and not virtual ) then
 				local v, inherit = splitString(value, colonSeparator);
 				if ( v == "v" and inherit ) then
-					virtual = inherit;
+					if (inherit ~= "BackdropTemplate" or BackdropTemplateMixin) then		-- Classic compatibility, because BackdropTemplate doesn't exist yet
+						virtual = inherit;
+					end
 					found = true;
 				end
 			end
@@ -2708,7 +2715,7 @@ local function controlPanelSkeleton()
 		end,
 		["onclick"] = selectControlPanelModule,
 	};
-	return "frame#st:DIALOG#n:CTCONTROLPANEL#clamped#movable#t:mid:0:400#s:300:495", {
+	return "frame#st:DIALOG#n:CTCONTROLPANEL#clamped#movable#t:mid:0:400#s:300:495#v:BackdropTemplate", {
 		"backdrop#tooltip#0:0:0:0.80",
 		["onshow"] = function(self)
 			local module, obj;

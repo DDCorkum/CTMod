@@ -1,3 +1,6 @@
+CT_Library (8.3.7.1) 2020-07-18
+- Shadowlands BackdropTemplate compatibility
+
 CT_Libarary (8.3.0.11) 2020-06-20
 - Adding a utility function for encounterIDs (used by CT_RaidAssist)
 

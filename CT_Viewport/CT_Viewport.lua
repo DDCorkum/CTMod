@@ -4,53 +4,94 @@
 -- Allows you to customize the rendered game  --
 -- area, resulting in an overall more         --
 -- customizable and usable  user interface.   --
+--                                            --
 -- Please do not modify or otherwise          --
 -- redistribute this without the consent of   --
 -- the CTMod Team. Thank you.                 --
+--					      --
+-- Original credits to Cide and TS            --
+-- Maintained by Resike from 2014 to 2017     --
+-- Maintained by Dahk Celes (ddc) since 2018  --
 ------------------------------------------------
 
 -- Initialization
-local module = { };
-
-local MODULE_NAME = "CT_Viewport";
+local MODULE_NAME, module = ...;
 local MODULE_VERSION = strmatch(GetAddOnMetadata(MODULE_NAME, "version"), "^([%d.]+)");
 
 module.name = MODULE_NAME;
 module.version = MODULE_VERSION;
 
 CT_Library:registerModule(module);
+_G[MODULE_NAME] = module.publicInterface;
+local public = _G[MODULE_NAME]
 
--- module.frame = "CT_ViewportFrame";
--- module.external = true;
+-- See localization.lua
+module.text = module.text or { };
+local L = module.text;
 
--- Mod code below
 
-CT_Viewport = {
-	["initialValues"] = {
-		[1] = 563,
-		[2] = 937,
-		[3] = 736,
-		[4] = 455,
-		[5] = 375,
-		[6] = 281
-	},
-	["currOffset"] = {
-		0, 0, 0, 0
-	}
+module.initialValues =
+{
+	[1] = 563,
+	[2] = 937,
+	[3] = 736,
+	[4] = 455,
+	[5] = 187.5,		-- 375 until 9.0.0.1
+	[6] = 140.5		-- 281 until 9.0.0.1
 };
-CT_Viewport_Saved = { 0, 0, 0, 0, 0, 0, 0 };
 
--- Not going to bother adding a localization file :)
-CT_VIEWPORT_INFO = "Note: |c00FFFFFFLeft click and drag a yellow bar to resize the viewport area.  To enter a custom value, type in the number and hit enter to set it, then click apply to see your changes.|r";
-if ( GetLocale() == "deDE" ) then
-	CT_VIEWPORT_INFO = "Note: |c00FFFFFFLeft click and drag a yellow bar to resize the viewport area.  To enter a custom value, type in the number and hit enter to set it, then click apply to see your changes.|r";
-elseif ( GetLocale() == "frFR" ) then
-	CT_VIEWPORT_INFO = "Note: |c00FFFFFFLeft click and drag a yellow bar to resize the viewport area.  To enter a custom value, type in the number and hit enter to set it, then click apply to see your changes.|r";
-end
+module.currOffset = {0, 0, 0, 0}
+
+CT_Viewport_Saved = { 0, 0, 0, 0, 0, 0, 0 };
 
 local frameClearAllPoints, frameSetAllPoints, frameSetPoint;
 
-function CT_Viewport_GetQuotient(number)
+-- Public API
+
+-- Returns true if the viewport is anything other than 0 0 0 0
+function public:IsViewportCustomized()
+	local offset = module.currOffset;
+	return offset[1] ~= 0 and offset[2] ~= 0 and offset[3] ~= 0 and offset[4]~= 0
+end
+
+-- Returns the current custom viewport settings as four variables: L, R, T, B
+function public:GetViewportSettings()
+	local offset = module.currOffset;
+	return tonumber(offset[1]), tonumber(offset[2]), tonumber(offset[3]), tonumber(offset[4]);	--tonumber is just cheating to create a new copy of the number
+end
+
+-- Slash command to display the frame
+SlashCmdList["VIEWPORT"] = function(msg)
+	module:showModuleOptions(module.name);
+	local iStart, iEnd, left, right, top, bottom = string.find(msg, "^(%d+) (%d+) (%d+) (%d+)$");
+	if ( left and right and top and bottom ) then
+		local screenRes = module.screenRes;
+		if not screenRes then
+			screenRes = {1920, 1080}
+		end
+		left = min(tonumber(left), screenRes[1]/2 - 1);
+		right = min(tonumber(right), screenRes[1]/2 - 1, screenRes[1]/2 - left);
+		top = min(tonumber(top), screenRes[2]/2 - 1);
+		bottom = min(tonumber(bottom), screenRes[2]/2 - 1, screenRes[2]/2 - top);
+		
+		if (left ~= 0 or right ~= 0 or top ~= 0 or bottom ~= 0) then
+			module.CheckKeepSettings();
+		end
+		
+		CT_ViewportLeftEB:SetText(floor(left + 0.1));
+		CT_ViewportRightEB:SetText(floor(right + 0.1));
+		CT_ViewportTopEB:SetText(floor(top + 0.1));
+		CT_ViewportBottomEB:SetText(floor(bottom + 0.1));
+		
+		module.ApplyViewport(left, right, top, bottom);
+		module.ApplyInnerViewport(left, right, top, bottom);
+	end
+end
+SLASH_VIEWPORT1 = "/viewport";
+SLASH_VIEWPORT2 = "/ctvp";
+SLASH_VIEWPORT3 = "/ctviewport";
+
+function module.GetQuotient(number)
 	number = format("%.2f", number);
 
 	for a = 1, 100, 1 do
@@ -65,46 +106,14 @@ function CT_Viewport_GetQuotient(number)
 	return number;
 end
 
--- Add to special frames table
-tinsert(UISpecialFrames, "CT_ViewportFrame");
-
--- Slash command to display the frame
-SlashCmdList["VIEWPORT"] = function(msg)
-	local iStart, iEnd, left, right, top, bottom = string.find(msg, "^(%d+) (%d+) (%d+) (%d+)$");
-	if ( left and right and top and bottom ) then
-		local screenRes = CT_Viewport.screenRes;
-		if not screenRes then
-			screenRes = {1920, 1080}
-		end
-		left = min(tonumber(left), screenRes[1]/2 - 1);
-		right = min(tonumber(right), screenRes[1]/2 - 1);
-		top = min(tonumber(top), screenRes[2]/2 - 1);
-		bottom = min(tonumber(top), screenRes[2]/2 - 1);
-		
-		CT_Viewport_CheckKeepSettings();
-		CT_Viewport_ApplyViewport(left, right, top, bottom);
-		CT_ViewportFrame:Show();
-	else
-		ShowUIPanel(CT_ViewportFrame);
-	end
-end
-SLASH_VIEWPORT1 = "/viewport";
-SLASH_VIEWPORT2 = "/ctvp";
-SLASH_VIEWPORT3 = "/ctviewport";
-
-
--- Direct loading of the frame from other means
-module.customOpenFunction = function()
-	ShowUIPanel(CT_ViewportFrame);
-end
-
 -- Resizing functions
-function CT_Viewport_Resize(button, anchorPoint)
-	local ivalues = CT_Viewport.initialValues;
-	local iframe = CT_ViewportFrameInnerFrame;
+function module.Resize(button, anchorPoint)
+	module.UpdateInnerFrameBounds();
+	local ivalues = module.initialValues;
+	local iframe = CT_ViewportInnerFrame;
 
 	button:GetParent():StartSizing(anchorPoint);
-	CT_Viewport.isResizing = anchorPoint;
+	module.isResizing = anchorPoint;
 
 	-- A bit hackish, but meh, it works
 	if ( anchorPoint == "LEFT" ) then
@@ -133,12 +142,12 @@ function CT_Viewport_Resize(button, anchorPoint)
 	end
 end
 
-function CT_Viewport_StopResize(button)
-	local screenRes = CT_Viewport.screenRes;
-	local currOffset = CT_Viewport.currOffset;
+function module.StopResize(button)
+	local screenRes = module.screenRes;
+	local currOffset = module.currOffset;
 
 	button:GetParent():StopMovingOrSizing();
-	CT_Viewport.isResizing = nil;
+	module.isResizing = nil;
 
 	-- We need to re-anchor the inner frame after the player drags it.
 	-- The game picks its own anchor when dragging stops, and the one that it picks
@@ -146,11 +155,11 @@ function CT_Viewport_StopResize(button)
 	-- center of the screen the game will anchor the inner frame using a CENTER
 	-- anchor point to UIParent. What we really need are TOPLEFT and BOTTOMRIGHT
 	-- anchor points to the outer frame.
-	CT_Viewport_ApplyInnerViewport(
-		CT_Viewport.currOffset[1], -- left
-		CT_Viewport.currOffset[2], -- right
-		CT_Viewport.currOffset[3], -- top
-		CT_Viewport.currOffset[4] -- bottom
+	module.ApplyInnerViewport(
+		module.currOffset[1], -- left
+		module.currOffset[2], -- right
+		module.currOffset[3], -- top
+		module.currOffset[4] -- bottom
 	);
 
 	local value1 = (screenRes[1] - currOffset[1] - currOffset[2]);
@@ -161,7 +170,7 @@ function CT_Viewport_StopResize(button)
 	else
 		value3 = value1 / value2;
 	end
-	CT_ViewportFrameAspectRatioNewText:SetText("Aspect Ratio (Current): |c00FFFFFF" .. CT_Viewport_GetQuotient(value3));
+	CT_ViewportAspectRatioNewText:SetText(L["CT_Viewport/Options/AspectRatio/NewPattern"]:format(module.GetQuotient(value3)));
 
 	local value1 = screenRes[1];
 	local value2 = screenRes[2];
@@ -171,18 +180,18 @@ function CT_Viewport_StopResize(button)
 	else
 		value3 = value1 / value2;
 	end
-	CT_ViewportFrameAspectRatioDefaultText:SetText("Aspect Ratio (Default): |c00FFFFFF" .. CT_Viewport_GetQuotient(value3));
+	CT_ViewportAspectRatioDefaultText:SetText(L["CT_Viewport/Options/AspectRatio/DefaultPattern"]:format(module.GetQuotient(value3)));
 end
 
 -- Get initial size values
-function CT_Viewport_GetInitialValues()
-	local bframe = CT_ViewportFrameBorderFrame;
+function module.UpdateInnerFrameBounds()
+	local bframe = CT_ViewportBorderFrame;
 
-	if (not CT_Viewport.initialValues) then
-		CT_Viewport.initialValues = {};
+	if (not module.initialValues) then
+		module.initialValues = {};
 	end
 
-	local ivalues = CT_Viewport.initialValues;
+	local ivalues = module.initialValues;
 
 	-- Calculate limits of inner frame using the border frame since it will
 	-- always be in a fixed position, unlike the inner frame whose edges may get
@@ -198,7 +207,7 @@ function CT_Viewport_GetInitialValues()
 end
 
 -- Get current resolution in x and y
-function CT_Viewport_GetCurrentResolution(...)
+function module.GetCurrentResolution(...)
 	local currRes = nil;
 	
 	if (GetCurrentResolution() > 0) then
@@ -218,8 +227,8 @@ function CT_Viewport_GetCurrentResolution(...)
 end
 
 -- Apply the viewport settings
-function CT_Viewport_ApplyViewport(left, right, top, bottom, r, g, b)
-	local screenRes = CT_Viewport.screenRes;
+function module.ApplyViewport(left, right, top, bottom, r, g, b)
+	local screenRes = module.screenRes;
 
 	-- UIParent values change when the UI scale is changed by the user,
 	-- or if the video resolution is changed by the user.
@@ -227,9 +236,10 @@ function CT_Viewport_ApplyViewport(left, right, top, bottom, r, g, b)
 	local parentHeight = UIParent:GetHeight();
 	local parentScale = UIParent:GetScale();
 
-	if ( not left ) then
-		local ivalues = CT_Viewport.initialValues;
-		local iframe = CT_ViewportFrameInnerFrame;
+	if ( not left and CT_ViewportInnerFrame) then
+		module.UpdateInnerFrameBounds()
+		local ivalues = module.initialValues;
+		local iframe = CT_ViewportInnerFrame;
 
 		if (ivalues[5] == 0) then
 			right = 0;
@@ -246,17 +256,22 @@ function CT_Viewport_ApplyViewport(left, right, top, bottom, r, g, b)
 			bottom = ((iframe:GetBottom() - ivalues[4]) / ivalues[6]) * screenRes[2];
 		end
 	end
-	if ( right < 0 ) then
-		right = 0;
-	end
-	if ( left < 0 ) then
-		left = 0;
-	end
-	if ( top < 0 ) then
-		top = 0;
-	end
-	if ( bottom < 0 ) then
-		bottom = 0;
+	if (left) then
+		if ( right < 0 ) then
+			right = 0;
+		end
+		if ( left < 0 ) then
+			left = 0;
+		end
+		if ( top < 0 ) then
+			top = 0;
+		end
+		if ( bottom < 0 ) then
+			bottom = 0;
+		end
+	else
+		-- this shouldn't happen
+		left, right, top, bottom = 0, 0, 0, 0;
 	end
 
 	r = ( r or 0 );
@@ -303,8 +318,8 @@ function CT_Viewport_ApplyViewport(left, right, top, bottom, r, g, b)
 	--CT_ViewportOverlay:SetVertexColor(r, g, b, 1);
 end
 
-function CT_Viewport_ApplySavedViewport()
-	local screenRes = CT_Viewport.screenRes;
+function module.ApplySavedViewport()
+	local screenRes = module.screenRes;
 	if screenRes then
 		CT_Viewport_Saved[1] = min(tonumber(CT_Viewport_Saved[1]), screenRes[1]/2 - 1);
 		CT_Viewport_Saved[2] = min(tonumber(CT_Viewport_Saved[2]), screenRes[1]/2 - 1);
@@ -322,7 +337,7 @@ function CT_Viewport_ApplySavedViewport()
 	if (tonumber(CT_Viewport_Saved[1]) + tonumber(CT_Viewport_Saved[2]) + tonumber(CT_Viewport_Saved[3]) + tonumber(CT_Viewport_Saved[4]) > 0) then
 		C_Timer.After(8, function() print("|cFFFFFF00CT_Viewport is currently active! |n      |r/ctvp|cFFFFFF00 to tweak settings |n      |r/ctvp 0 0 0 0|cFFFFFF00 to restore default"); end);
 	end
-	CT_Viewport_ApplyViewport(
+	module.ApplyViewport(
 		CT_Viewport_Saved[1],
 		CT_Viewport_Saved[2],
 		CT_Viewport_Saved[3],
@@ -333,78 +348,89 @@ function CT_Viewport_ApplySavedViewport()
 	);
 end
 
--- after pressing 'apply' or 'okay' ensure the screen is visible
-local newSettingsApplied = nil;
-function CT_Viewport_CheckKeepSettings()
-	if (newSettingsApplied) then
-		-- check is already in progress; after 20 seconds revert if the user hasn't presed the button
-		if (GetTime() > newSettingsApplied + 20) then
-			CT_ViewportFrameOkay:Show();
-			CT_ViewportFrameCancel:Show();
-			CT_ViewportFrameApply:Show();
-			CT_ViewportFrameKeepSettings:Hide();
-			CT_Viewport_ApplyViewport(0, 0, 0, 0);
-			newSettingsApplied = nil;
+-- after pressing 'okay' ensure the screen is visible
+do
+	local newSettingsApplied, keepSettingsTicker;
+	function module.CheckKeepSettings()
+		if (newSettingsApplied) then
+			-- check is already in progress; after 20 seconds revert if the user hasn't presed the button
+			if (GetTime() > newSettingsApplied + 20) then
+				module.applyButton:Show();
+				module.cancelButton:Show();
+				module.keepSettingsButton:Hide();
+				newSettingsApplied = nil;
+				if (keepSettingsTicker) then
+					keepSettingsTicker:Cancel();
+					keepSettingsTicker = nil
+				end
+				module.ApplyViewport(0, 0, 0, 0);
+			else
+				module.keepSettingsButton:SetText(L["CT_Viewport/Options/Viewport/KeepSettingsPattern"]:format(newSettingsApplied + 20 - GetTime()));
+			end
 		else
-			CT_ViewportFrameKeepSettings:SetText("Keep Settings?  Reverting in " .. floor(newSettingsApplied +20 -GetTime()) );
+			-- start of a new check
+			newSettingsApplied = GetTime();
+			module.applyButton:Hide();
+			module.cancelButton:Hide();
+			module.keepSettingsButton:Show();
+			keepSettingsTicker = keepSettingsTicker or C_Timer.NewTicker(0.25, module.CheckKeepSettings)
 		end
-	else
-		-- start of a new check
-		newSettingsApplied = GetTime();
-		CT_ViewportFrameOkay:Hide();
-		CT_ViewportFrameCancel:Hide();
-		CT_ViewportFrameApply:Hide();
-		CT_ViewportFrameKeepSettings:Show();
 	end
-end
 
 
-function CT_Viewport_KeepSettings()
-	newSettingsApplied = nil;
-	CT_ViewportFrameOkay:Show();
-	CT_ViewportFrameOkay:Enable();
-	CT_ViewportFrameCancel:Show();
-	CT_ViewportFrameApply:Show();
-	CT_ViewportFrameKeepSettings:Hide();
+	function module.KeepSettings()
+		newSettingsApplied = nil;
+		if (keepSettingsTicker) then
+			keepSettingsTicker:Cancel();
+			keepSettingsTicker = nil
+		end
+		module.applyButton:Show();
+		module.cancelButton:Show();
+		module.keepSettingsButton:Hide();
+	end
 end
 
 -- Apply saved settings to the inner viewport
-function CT_Viewport_ApplyInnerViewport(left, right, top, bottom, r, g, b)
-	local screenRes = CT_Viewport.screenRes;
-	local ivalues = CT_Viewport.initialValues;
-	local iframe = CT_ViewportFrameInnerFrame;
+function module.ApplyInnerViewport(left, right, top, bottom, r, g, b)
+	local screenRes = module.screenRes;
+	local ivalues = module.initialValues;
+	local iframe = CT_ViewportInnerFrame;
 
-	CT_ViewportFrameLeftEB:SetText(floor(left + 0.5));
-	CT_ViewportFrameRightEB:SetText(floor(right + 0.5));
-	CT_ViewportFrameTopEB:SetText(floor(top + 0.5));
-	CT_ViewportFrameBottomEB:SetText(floor(bottom + 0.5));
+	CT_ViewportLeftEB:SetText(floor(left + 0.1));
+	CT_ViewportRightEB:SetText(floor(right + 0.1));
+	CT_ViewportTopEB:SetText(floor(top + 0.1));
+	CT_ViewportBottomEB:SetText(floor(bottom + 0.1));
 
-	CT_Viewport.currOffset = {
-		floor(left + 0.5),
-		floor(right + 0.5),
-		floor(top + 0.5),
-		floor(bottom + 0.5)
+	module.currOffset = {
+		floor(left + 0.1),
+		floor(right + 0.1),
+		floor(top + 0.1),
+		floor(bottom + 0.1)
 	};
 
-	local value1 = (screenRes[1] - left - right);
-	local value2 = (screenRes[2] - top - bottom);
-	local value3
-	if (value2 == 0) then
-		value3 = 0;
-	else
-		value3 = value1 / value2;
+	if (CT_ViewportAspectRatioNewText) then
+		local value1 = (screenRes[1] - left - right);
+		local value2 = (screenRes[2] - top - bottom);
+		local value3
+		if (value2 == 0) then
+			value3 = 0;
+		else
+			value3 = value1 / value2;
+		end
+		CT_ViewportAspectRatioNewText:SetText(L["CT_Viewport/Options/AspectRatio/NewPattern"]:format(module.GetQuotient(value3)));
 	end
-	CT_ViewportFrameAspectRatioNewText:SetText("Aspect Ratio (Current): |c00FFFFFF" .. CT_Viewport_GetQuotient(value3));
 
-	local value1 = screenRes[1];
-	local value2 = screenRes[2];
-	local value3
-	if (value2 == 0) then
-		value3 = 0;
-	else
-		value3 = value1 / value2;
+	if (CT_ViewportAspectRatioDefaultText) then
+		local value1 = screenRes[1];
+		local value2 = screenRes[2];
+		local value3
+		if (value2 == 0) then
+			value3 = 0;
+		else
+			value3 = value1 / value2;
+		end
+		CT_ViewportAspectRatioDefaultText:SetText(L["CT_Viewport/Options/AspectRatio/DefaultPattern"]:format(module.GetQuotient(value3)));
 	end
-	CT_ViewportFrameAspectRatioDefaultText:SetText("Aspect Ratio (Default): |c00FFFFFF" .. CT_Viewport_GetQuotient(value3));
 
 	if (screenRes[1] == 0) then
 		left = 0;
@@ -423,8 +449,8 @@ function CT_Viewport_ApplyInnerViewport(left, right, top, bottom, r, g, b)
 	end
 
 	iframe:ClearAllPoints();
-	iframe:SetPoint("TOPLEFT", "CT_ViewportFrameBorderFrame", "TOPLEFT", left + 4, -(top + 4));
-	iframe:SetPoint("BOTTOMRIGHT", "CT_ViewportFrameBorderFrame", "BOTTOMRIGHT", -(right + 4), bottom + 4);
+	iframe:SetPoint("TOPLEFT", "CT_ViewportBorderFrame", "TOPLEFT", left + 4, -(top + 4));
+	iframe:SetPoint("BOTTOMRIGHT", "CT_ViewportBorderFrame", "BOTTOMRIGHT", -(right + 4), bottom + 4);
 
 	local frameTop = iframe:GetTop();
 	local frameBottom = iframe:GetBottom();
@@ -435,12 +461,12 @@ function CT_Viewport_ApplyInnerViewport(left, right, top, bottom, r, g, b)
 		iframe:SetHeight(frameTop - frameBottom);
 		iframe:SetWidth(frameRight - frameLeft);
 	else
-		CT_ViewportFrame.awaitingValues = true;
+		module.awaitingValues = true;
 	end
 end
 
 -- Change a side of the viewport
-function CT_Viewport_ChangeViewportSide(editBox)
+function module.ChangeViewportSide(editBox)
 	local value = tonumber(editBox:GetText());
 	if ( not value ) then
 		return;
@@ -448,33 +474,33 @@ function CT_Viewport_ChangeViewportSide(editBox)
 	value = abs(value);
 	local id = editBox:GetID();
 
-	local left = CT_Viewport.currOffset[1];
-	local right = CT_Viewport.currOffset[2];
-	local top = CT_Viewport.currOffset[3];
-	local bottom = CT_Viewport.currOffset[4];
+	local left = module.currOffset[1];
+	local right = module.currOffset[2];
+	local top = module.currOffset[3];
+	local bottom = module.currOffset[4];
 
 	if ( id == 1 ) then
 		-- Left
-		CT_Viewport_ApplyInnerViewport(value, right, top, bottom);
+		module.ApplyInnerViewport(value, right, top, bottom);
 	elseif ( id == 2 ) then
 		-- Right
-		CT_Viewport_ApplyInnerViewport(left, value, top, bottom);
+		module.ApplyInnerViewport(left, value, top, bottom);
 	elseif ( id == 3 ) then
 		-- Top
-		CT_Viewport_ApplyInnerViewport(left, right, value, bottom);
+		module.ApplyInnerViewport(left, right, value, bottom);
 	elseif ( id == 4 ) then
 		-- Bottom
-		CT_Viewport_ApplyInnerViewport(left, right, top, value);
+		module.ApplyInnerViewport(left, right, top, value);
 	end
 end
 
-function CT_ViewportFrame_Init(width, height)
+function module.Init(width, height)
 	local x, y;
 	if (width and height) then
 		x = width;
 		y = height;
 	else
-		x, y = CT_Viewport_GetCurrentResolution(GetScreenResolutions());
+		x, y = module.GetCurrentResolution(GetScreenResolutions());
 	end
 	if ( x and y ) then
 		local modifier;
@@ -484,229 +510,648 @@ function CT_ViewportFrame_Init(width, height)
 			modifier = x / y;
 		end
 		if ( modifier ~= (4 / 3) ) then
-			local newViewportHeight = 281 / modifier;  -- CT_Viewport.initialValues[6] / modifier;
-			CT_ViewportFrameInnerFrame:SetHeight(newViewportHeight);
-			CT_ViewportFrameBorderFrame:SetHeight(newViewportHeight + 8);
-		end
-		CT_Viewport.screenRes = { x, y };
-		CT_ViewportFrame:SetHeight(210 + CT_ViewportFrameBorderFrame:GetHeight());
-		CT_Viewport.awaitingValues = true;
-	end
-end
-
--- Handlers
-
-	-- OnLoad
-function CT_ViewportFrame_OnLoad(self)
-	frameClearAllPoints = CT_ViewportFrame.ClearAllPoints;
-	frameSetAllPoints = CT_ViewportFrame.SetAllPoints;
-	frameSetPoint = CT_ViewportFrame.SetPoint;
-
-	hooksecurefunc(WorldFrame, "ClearAllPoints", CT_Viewport_ApplySavedViewport);
-	hooksecurefunc(WorldFrame, "SetAllPoints", CT_Viewport_ApplySavedViewport);
-	hooksecurefunc(WorldFrame, "SetPoint", CT_Viewport_ApplySavedViewport);
-	
-	-- Beginning in Battle for Azeroth, some raid encounters have cinematics during combat.  Examples: Jaina freezing the sea, or N'Zoth special area on mythic mode
-	CinematicFrame:SetScript("OnShow", nil);
-	CinematicFrame:SetScript("OnHide", nil);
-
-	-- The game reloads the UI when switching between different aspect ratios.
-	-- The game does not reload the UI when switching between resolutions with the same aspect ratio.
-	-- The game does not reload the UI when switching between windowed, windowed (fullscreen),
-	-- and fullscreen modes.
-	-- The game does not reload the UI when changing the UI scale slider. We'll catch this indirectly
-	-- via the OnShow script when the viewport window is re-opened.
-
-	-- Handle screen resolution changes.
-	hooksecurefunc("SetScreenResolution",
-		function(width, height, ...)
-			CT_ViewportFrame_Init(width, height);
-			CT_Viewport_ApplySavedViewport();
-			CT_ViewportFrame.hasAppliedViewport = nil;
-		end
-	);
-
-	self:RegisterEvent("VARIABLES_LOADED");
-
-	CT_ViewportFrame_Init(nil, nil);
-
-	CT_ViewportFrameInnerFrame:SetBackdropBorderColor(1, 1, 0, 1);
-	CT_ViewportFrameBorderFrame:SetBackdropBorderColor(1, 0, 0, 1);
-	CT_ViewportFrameInnerFrameBackground:SetVertexColor(1, 1, 0, 0.1);
-
-	--[[if (not CT_ViewportOverlay) then
-		CT_ViewportOverlay = WorldFrame:CreateTexture("CT_ViewportOverlay", "BACKGROUND");
-		CT_ViewportOverlay:SetColorTexture(1, 1, 1, 0);
-		CT_ViewportOverlay:SetPoint("TOPLEFT", "UIParent", "TOPLEFT", -1, 1);
-		CT_ViewportOverlay:SetPoint("BOTTOMRIGHT", "UIParent", "BOTTOMRIGHT", 1, -1);
-	end]]
-end
-
-	-- OnUpdate
-function CT_ViewportFrame_OnUpdate(self, elapsed)
-	local iframe = CT_ViewportFrameInnerFrame;
-	local screenRes = CT_Viewport.screenRes;
-
-	if ( not self.hasAppliedViewport ) then
-		self.hasAppliedViewport = 1;
-
-		iframe:ClearAllPoints();
-		iframe:SetPoint("TOPLEFT", "CT_ViewportFrameBorderFrame", "TOPLEFT", 4, -4);
-		iframe:SetPoint("BOTTOMRIGHT", "CT_ViewportFrameBorderFrame", "BOTTOMRIGHT", -4, 4);
-
-	elseif ( self.hasAppliedViewport == 1 ) then
-		self.hasAppliedViewport = 2;
-
-		if ( CT_Viewport.awaitingValues ) then
-			CT_Viewport_GetInitialValues();
-			CT_Viewport.awaitingValues = nil;
-
-			local ivalues = CT_Viewport.initialValues;
-			iframe:SetMinResize(ivalues[5] / 2, ivalues[6] / 2);
-
-			CT_ViewportFrameLeftEB.limitation = screenRes[1] / 2 - 1;
-			CT_ViewportFrameRightEB.limitation = screenRes[1] / 2 - 1;
-			CT_ViewportFrameTopEB.limitation = screenRes[2] / 2 - 1;
-			CT_ViewportFrameBottomEB.limitation = screenRes[2] / 2 - 1;
-		end
-		CT_ViewportFrame_OnShow();
-	end
-
-	if ( CT_Viewport.isResizing ) then
-		local ivalues = CT_Viewport.initialValues;
-
-		local right, left, top, bottom;
-
-		if (ivalues[5] == 0) then
-			right = 0;
-			left = 0;
-		else
-			right = ((ivalues[2] - iframe:GetRight()) / ivalues[5]) * screenRes[1];
-			left = ((iframe:GetLeft() - ivalues[1]) / ivalues[5]) * screenRes[1];
-		end
-		if (ivalues[6] == 0) then
-			top = 0;
-			bottom = 0;
-		else
-			top = ((ivalues[3] - iframe:GetTop()) / ivalues[6]) * screenRes[2];
-			bottom = ((iframe:GetBottom() - ivalues[4]) / ivalues[6]) * screenRes[2];
-		end
-
-		if ( right < 0 ) then
-			right = 0;
-		end
-		if ( left < 0 ) then
-			left = 0;
-		end
-		if ( top < 0 ) then
-			top = 0;
-		end
-		if ( bottom < 0 ) then
-			bottom = 0;
-		end
-
-		CT_ViewportFrameLeftEB:SetText(floor(left + 0.5));
-		CT_ViewportFrameRightEB:SetText(floor(right + 0.5));
-		CT_ViewportFrameTopEB:SetText(floor(top + 0.5));
-		CT_ViewportFrameBottomEB:SetText(floor(bottom + 0.5));
-
-		CT_Viewport.currOffset = {
-			floor(left + 0.5),
-			floor(right + 0.5),
-			floor(top + 0.5),
-			floor(bottom + 0.5)
-		};
-
-		if ( not self.update ) then
-			self.update = 0;
-		else
-			self.update = self.update - elapsed;
-		end
-		if ( self.update <= 0 ) then
-			local value1 = (screenRes[1] - left - right);
-			local value2 = (screenRes[2] - top - bottom);
-			local value3
-			if (value2 == 0) then
-				value3 = 0;
+			local newViewportHeight = 224.8 / modifier;  -- module.initialValues[6] / modifier;
+			if (CT_ViewportInnerFrame) then
+				CT_ViewportInnerFrame:SetHeight(newViewportHeight);
+				--CT_ViewportBorderFrame:SetHeight(newViewportHeight + 8);
 			else
-				value3 = value1 / value2;
+				module.pendingViewportHeight = newViewportHeight;
 			end
-			CT_ViewportFrameAspectRatioNewText:SetText("Aspect Ratio (Current): |c00FFFFFF" .. CT_Viewport_GetQuotient(value3));
-
-			local value1 = screenRes[1];
-			local value2 = screenRes[2];
-			local value3
-			if (value2 == 0) then
-				value3 = 0;
-			else
-				value3 = value1 / value2;
-			end
-			CT_ViewportFrameAspectRatioDefaultText:SetText("Aspect Ratio (Default): |c00FFFFFF" .. CT_Viewport_GetQuotient(value3));
-
-			self.update = 0.1;
 		end
-	else
-		self.update = nil;
+		module.screenRes = { x, y };
+		--CT_Viewport:SetHeight(210 + CT_ViewportBorderFrame:GetHeight());
+		module.awaitingValues = true;
 	end
 end
 
-	-- OnShow
-function CT_ViewportFrame_OnShow(self)
-	if ( CT_ViewportFrameInnerFrame:GetLeft() ) then
-		CT_Viewport_GetInitialValues();
-		CT_Viewport_ApplyInnerViewport(
-			CT_Viewport_Saved[1],
-			CT_Viewport_Saved[2],
-			CT_Viewport_Saved[3],
-			CT_Viewport_Saved[4],
-			CT_Viewport_Saved[5],
-			CT_Viewport_Saved[6],
-			CT_Viewport_Saved[7]
+-- Handlers 
+
+function module:update(option, value)
+	if (option == "init") then
+		-- The former on-load and VARIABLES_LOADED until 9.0.0.1
+		local dummyFrame = CreateFrame("Frame");
+		frameClearAllPoints = dummyFrame.ClearAllPoints;
+		frameSetAllPoints = dummyFrame.SetAllPoints;
+		frameSetPoint = dummyFrame.SetPoint;
+
+		hooksecurefunc(WorldFrame, "ClearAllPoints", module.ApplySavedViewport);
+		hooksecurefunc(WorldFrame, "SetAllPoints", module.ApplySavedViewport);
+		hooksecurefunc(WorldFrame, "SetPoint", module.ApplySavedViewport);
+
+		-- Beginning in Battle for Azeroth, some raid encounters have cinematics during combat.  Examples: Jaina freezing the sea, or N'Zoth special area on mythic mode
+		CinematicFrame:SetScript("OnShow", nil);
+		CinematicFrame:SetScript("OnHide", nil);
+
+		-- The game reloads the UI when switching between different aspect ratios.
+		-- The game does not reload the UI when switching between resolutions with the same aspect ratio.
+		-- The game does not reload the UI when switching between windowed, windowed (fullscreen),
+		-- and fullscreen modes.
+		-- The game does not reload the UI when changing the UI scale slider. We'll catch this indirectly
+		-- via the OnShow script when the viewport window is re-opened.
+
+		-- Handle screen resolution changes.
+		hooksecurefunc("SetScreenResolution",
+			function(width, height, ...)
+				module.Init(width, height);
+				module.ApplySavedViewport();
+				module.hasAppliedViewport = nil;
+			end
 		);
-	else
-		CT_ViewportFrame.hasAppliedViewport = nil;
-	end
-end
 
-	-- OnEvent
-function CT_ViewportFrame_OnEvent(self, event, ...)
-	if ( event == "VARIABLES_LOADED" ) then
-		CT_Viewport_ApplySavedViewport();
+
+		module.Init(nil, nil);
+		
+		module.ApplySavedViewport();
 	end
 end
 
 --------------------------------------------
 -- Options Frame Code
 
-module.frame = function()
-	local options = {};
-	local yoffset = 5;
-	local ysize;
 
+function module.frame()
+	-- see CT_Library
+	local optionsFrameList = module:framesInit();
+
+	-- helper functions to shorten the code a bit
+	local optionsAddFrame = function(offset, size, details, data) module:framesAddFrame(optionsFrameList, offset, size, details, data); end
+	local optionsAddObject = function(offset, size, details) module:framesAddObject(optionsFrameList, offset, size, details); end
+	local optionsAddScript = function(name, func) module:framesAddScript(optionsFrameList, name, func); end
+	local optionsAddTooltip = function(text) module:framesAddScript(optionsFrameList, "onenter", function(obj) module:displayTooltip(obj, text, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL); end); end
+	local optionsBeginFrame = function(offset, size, details, data) module:framesBeginFrame(optionsFrameList, offset, size, details, data); end
+	local optionsEndFrame = function() module:framesEndFrame(optionsFrameList); end
+		
+	-- commonly used colors
+	local textColor1 = "#0.9:0.9:0.9";
+	local textColor2 = "#0.7:0.7:0.7";
+	
 	-- Tips
-	ysize = 60;
-	options["frame#tl:0:-" .. yoffset .. "#br:tr:0:-".. (yoffset + ysize)] = {
-		"font#tl:5:0#v:GameFontNormalLarge#Tips",
-		"font#t:0:-25#s:0:30#l:13:0#r#You can use /viewport, /ctvp, or /ctviewport to open the CT_Viewport options window.#0.6:0.6:0.6:l",
-	};
+	optionsAddObject(-10, 17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_Viewport/Options/Tips/Heading"]);
+	optionsAddObject(-10, 1*14, "font#tl:10:%y#r#" .. L["CT_Viewport/Options/Tips/Line1"] .. textColor2 .. ":l");
+	optionsAddObject( -2, 1*14, "font#tl:20:%y#r:t#/ctvp" .. textColor1 .. ":l");
+	optionsAddObject( 14, 1*14, "font#tl:120:%y#r#" .. L["CT_Viewport/Options/Tips/Line2"] .. textColor2 .. ":l");
+	optionsAddObject(  0, 1*14, "font#tl:20:%y#r:t#/ctvp 0 0 0 0" .. textColor1 .. ":l");
+	optionsAddObject( 14, 1*14, "font#tl:120:%y#r#" .. L["CT_Viewport/Options/Tips/Line3"] .. textColor2 .. ":l");
+	optionsAddObject(  0, 1*14, "font#tl:20:%y#r:t#/ctvp 5 20 15 0" .. textColor1 .. ":l");
+	optionsAddObject( 14, 1*14, "font#tl:120:%y#r#" .. L["CT_Viewport/Options/Tips/Line4"] .. textColor2 .. ":l");
+	optionsAddObject(-10, 1*14, "font#tl:10:%y#r#" .. L["CT_Viewport/Options/Tips/Line5"] .. textColor2 .. ":l");
 
-	-- General Options
-	yoffset = yoffset + ysize + 15;
-	ysize = 140;
-	options["frame#tl:0:-" .. yoffset .. "#br:tr:0:-".. (yoffset + ysize)] = {
-		"font#tl:5:0#v:GameFontNormalLarge#Options",
-		"font#t:5:-25#s:0:30#l:13:0#r#Click the button below to open the CT_Viewport options window.#0.6:0.6:0.6:l",
-		"font#t:5:-60#s:0:30#l:13:0#r#Shift-click the button if you want to leave the CTMod Control Panel open.#0.6:0.6:0.6:l",
-		["button#t:0:-100#s:120:30#n:CT_Viewport_ShowOptions_Button#v:GameMenuButtonTemplate#Show options"] = {
-			["onclick"] = function(self)
-				CT_ViewportFrame:Show();
-				if (not IsShiftKeyDown()) then
-					module:showControlPanel(false);
+	-- Heading
+	optionsAddObject(-10, 17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_Viewport/Options/Viewport/Heading"]);
+	
+	-- Apply/Cancel/Keep Settings
+	optionsBeginFrame(-10, 32, "button#tr:t:-10:%y#s:125:32#v:GameMenuButtonTemplate#Apply");
+		optionsAddScript("onload", function(button)
+			module.applyButton = button;
+			button:HookScript("OnClick", function()
+				CT_ViewportLeftEB:ClearFocus();
+				CT_ViewportRightEB:ClearFocus();
+				CT_ViewportTopEB:ClearFocus();
+				CT_ViewportBottomEB:ClearFocus();
+				module.CheckKeepSettings();
+				module.ApplyViewport();
+			end);
+		end);
+		optionsAddTooltip({"Apply", "Settings will revert in 20 seconds if the UI fails." .. textColor2});
+	optionsEndFrame();
+	
+	optionsBeginFrame(32, 32, "button#tl:t:10:%y#s:125:32#v:GameMenuButtonTemplate#Reset");
+		optionsAddScript("onload", function(button)
+			module.cancelButton = button;
+			button:HookScript("OnClick", function()
+				module.ApplyViewport(0, 0, 0, 0)
+			end);
+		end);
+		optionsAddTooltip({"Reset", "/ctvp 0 0 0 0" .. textColor2});
+	optionsEndFrame();
+	
+	optionsBeginFrame(32, 32, "button#t:0:%y#s:270:32#v:GameMenuButtonTemplate#Keep Settings?");
+		optionsAddScript("onload", function(button)
+			module.keepSettingsButton = button;
+			button:Hide();
+			button:HookScript("OnClick", module.KeepSettings);
+		end);
+	optionsEndFrame();
+	
+	-- Manual edit boxes (top, left, right and bottom)
+	optionsBeginFrame(-10, 32, "editbox#t:0:%y#n:CT_ViewportTopEB#i:3#ChatFontNormal");
+		optionsAddScript("onload", function(eb)
+			eb:SetAutoFocus(false);
+			eb:SetMaxLetters(4);
+			eb:SetSize(35, 25);
+			eb:SetJustifyH("CENTER");
+
+			eb.texL = eb:CreateTexture(nil, "BACKGROUND")
+			eb.texL:SetTexture("Interface\\ChatFrame\\UI-ChatInputBorder-Left");
+			eb.texL:SetSize(40, 32);
+			eb.texL:SetPoint("LEFT", -10, 0);
+			eb.texL:SetTexCoord(0, 0.156246, 0, 1);
+			
+			eb.texR = eb:CreateTexture(nil, "BACKGROUND")
+			eb.texR:SetTexture("Interface\\ChatFrame\\UI-ChatInputBorder-Right");
+			eb.texR:SetSize(25, 32);
+			eb.texR:SetPoint("RIGHT", 10, 0);
+			eb.texR:SetTexCoord(0.9, 1, 0, 1);
+			
+			eb.texM = eb:CreateTexture(nil, "BACKGROUND")
+			eb.texM:SetTexture("Interface\\ChatFrame\\UI-ChatInputBorder-Left");
+			eb.texM:SetSize(25, 32);
+			eb.texM:SetPoint("LEFT", eb.texL, "RIGHT");
+			eb.texM:SetPoint("RIGHT", eb,texL, "LEFT");
+			eb.texM:SetTexCoord(0.29296875, 1, 0, 1);
+			
+			eb:HookScript("OnEscapePressed", function()
+				if (eb.ctUndo) then
+					eb:SetText(eb.ctUndo);
 				end
-			end,
-		},
-	};
-	yoffset = yoffset + ysize;
+				eb:ClearFocus();
+			end);
+			
+			eb:HookScript("OnEnterPressed", function()
+				eb.ctUndo = eb:GetText();
+				module.ChangeViewportSide(eb);
+			end);
+			
+			eb:HookScript("OnTabPressed", function()
+				if (IsShiftKeyDown()) then
+					CT_ViewportRightEB:SetFocus();
+				else
+					CT_ViewportBottomEB:SetFocus();
+				end
+			end);
+			
+			eb:HookScript("OnTextChanged", function()
+				if ( ( not tonumber(eb:GetText()) or ( eb.limitation and tonumber(eb:GetText()) > eb.limitation ) ) and strlen(eb:GetText()) > 0 ) then
+					if ( tonumber(eb:GetText()) and eb.limitation and tonumber(eb:GetText()) >  eb.limitation ) then
+						eb:SetText(eb.limitation);
+					else
+						eb:SetText(strsub(eb:GetText(), 1, strlen(eb:GetText())-1));
+					end
+				end
+			end);
+			
+			eb:HookScript("OnEditFocusGained", function()
+				eb.ctUndo = eb:GetText();
+				eb:HighlightText();
+			end);
+			
+			eb:HookScript("OnEditFocusLost", function()
+				eb:HighlightText(0, 0);
+				module.ChangeViewportSide(eb);
+			end);
+		end);
+	optionsEndFrame();
+	
+	optionsBeginFrame(-56.25, 32, "editbox#tl:tl:8:%y#n:CT_ViewportLeftEB#i:1#ChatFontNormal");
+		optionsAddScript("onload", function(eb)
+			eb:SetAutoFocus(false);
+			eb:SetMaxLetters(4);
+			eb:SetSize(35, 25);
+			eb:SetJustifyH("CENTER");
 
-	return "frame#all", options;
+			eb.texL = eb:CreateTexture(nil, "BACKGROUND")
+			eb.texL:SetTexture("Interface\\ChatFrame\\UI-ChatInputBorder-Left");
+			eb.texL:SetSize(40, 32);
+			eb.texL:SetPoint("LEFT", -10, 0);
+			eb.texL:SetTexCoord(0, 0.156246, 0, 1);
+			
+			eb.texR = eb:CreateTexture(nil, "BACKGROUND")
+			eb.texR:SetTexture("Interface\\ChatFrame\\UI-ChatInputBorder-Right");
+			eb.texR:SetSize(25, 32);
+			eb.texR:SetPoint("RIGHT", 10, 0);
+			eb.texR:SetTexCoord(0.9, 1, 0, 1);
+			
+			eb.texM = eb:CreateTexture(nil, "BACKGROUND")
+			eb.texM:SetTexture("Interface\\ChatFrame\\UI-ChatInputBorder-Left");
+			eb.texM:SetSize(25, 32);
+			eb.texM:SetPoint("LEFT", eb.texL, "RIGHT");
+			eb.texM:SetPoint("RIGHT", eb,texL, "LEFT");
+			eb.texM:SetTexCoord(0.29296875, 1, 0, 1);
+			
+			eb:HookScript("OnEscapePressed", function()
+				if (eb.ctUndo) then
+					eb:SetText(eb.ctUndo);
+				end
+				eb:ClearFocus();
+			end);
+			
+			eb:HookScript("OnEnterPressed", function()
+				eb.ctUndo = eb:GetText();
+				module.ChangeViewportSide(eb);
+			end);
+			
+			eb:HookScript("OnTabPressed", function()
+				if (IsShiftKeyDown()) then
+					CT_ViewportBottomEB:SetFocus();
+				else
+					CT_ViewportRightEB:SetFocus();
+				end
+			end);
+			
+			eb:HookScript("OnTextChanged", function()
+				if ( ( not tonumber(eb:GetText()) or ( eb.limitation and tonumber(eb:GetText()) > eb.limitation ) ) and strlen(eb:GetText()) > 0 ) then
+					if ( tonumber(eb:GetText()) and eb.limitation and tonumber(eb:GetText()) >  eb.limitation ) then
+						eb:SetText(eb.limitation);
+					else
+						eb:SetText(strsub(eb:GetText(), 1, strlen(eb:GetText())-1));
+					end
+				end
+			end);
+			
+			eb:HookScript("OnEditFocusGained", function()
+				eb.ctUndo = eb:GetText();
+				eb:HighlightText();
+			end);
+			
+			eb:HookScript("OnEditFocusLost", function()
+				eb:HighlightText(0, 0);
+				module.ChangeViewportSide(eb);
+			end);
+		end);	
+	optionsEndFrame();
+	
+	optionsBeginFrame( 32, 32, "editbox#tr:tr:-8:%y#n:CT_ViewportRightEB#i:2#ChatFontNormal");
+		optionsAddScript("onload", function(eb)
+			eb:SetAutoFocus(false);
+			eb:SetMaxLetters(4);
+			eb:SetSize(35, 25);
+			eb:SetJustifyH("CENTER");
+
+			eb.texL = eb:CreateTexture(nil, "BACKGROUND")
+			eb.texL:SetTexture("Interface\\ChatFrame\\UI-ChatInputBorder-Left");
+			eb.texL:SetSize(40, 32);
+			eb.texL:SetPoint("LEFT", -10, 0);
+			eb.texL:SetTexCoord(0, 0.156246, 0, 1);
+			
+			eb.texR = eb:CreateTexture(nil, "BACKGROUND")
+			eb.texR:SetTexture("Interface\\ChatFrame\\UI-ChatInputBorder-Right");
+			eb.texR:SetSize(25, 32);
+			eb.texR:SetPoint("RIGHT", 10, 0);
+			eb.texR:SetTexCoord(0.9, 1, 0, 1);
+			
+			eb.texM = eb:CreateTexture(nil, "BACKGROUND")
+			eb.texM:SetTexture("Interface\\ChatFrame\\UI-ChatInputBorder-Left");
+			eb.texM:SetSize(25, 32);
+			eb.texM:SetPoint("LEFT", eb.texL, "RIGHT");
+			eb.texM:SetPoint("RIGHT", eb,texL, "LEFT");
+			eb.texM:SetTexCoord(0.29296875, 1, 0, 1);
+			
+			eb:HookScript("OnEscapePressed", function()
+				if (eb.ctUndo) then
+					eb:SetText(eb.ctUndo);
+				end
+				eb:ClearFocus();
+			end);
+			
+			eb:HookScript("OnEnterPressed", function()
+				eb.ctUndo = eb:GetText();
+				module.ChangeViewportSide(eb);
+			end);
+			
+			eb:HookScript("OnTabPressed", function()
+				if (IsShiftKeyDown()) then
+					CT_ViewportLeftEB:SetFocus();
+				else
+					CT_ViewportTopEB:SetFocus();
+				end
+			end);
+			
+			eb:HookScript("OnTextChanged", function()
+				if ( ( not tonumber(eb:GetText()) or ( eb.limitation and tonumber(eb:GetText()) > eb.limitation ) ) and strlen(eb:GetText()) > 0 ) then
+					if ( tonumber(eb:GetText()) and eb.limitation and tonumber(eb:GetText()) >  eb.limitation ) then
+						eb:SetText(eb.limitation);
+					else
+						eb:SetText(strsub(eb:GetText(), 1, strlen(eb:GetText())-1));
+					end
+				end
+			end);
+			
+			eb:HookScript("OnEditFocusGained", function()
+				eb.ctUndo = eb:GetText();
+				eb:HighlightText();
+			end);
+			
+			eb:HookScript("OnEditFocusLost", function()
+				eb:HighlightText(0, 0);
+				module.ChangeViewportSide(eb);
+			end);
+		end);	
+	optionsEndFrame();
+	
+	optionsBeginFrame(-56.25, 32, "editbox#t:0:%y#n:CT_ViewportBottomEB#i:4#ChatFontNormal");
+		optionsAddScript("onload", function(eb)
+			eb:SetAutoFocus(false);
+			eb:SetMaxLetters(4);
+			eb:SetSize(35, 25);
+			eb:SetJustifyH("CENTER");
+
+			eb.texL = eb:CreateTexture(nil, "BACKGROUND")
+			eb.texL:SetTexture("Interface\\ChatFrame\\UI-ChatInputBorder-Left");
+			eb.texL:SetSize(40, 32);
+			eb.texL:SetPoint("LEFT", -10, 0);
+			eb.texL:SetTexCoord(0, 0.156246, 0, 1);
+			
+			eb.texR = eb:CreateTexture(nil, "BACKGROUND")
+			eb.texR:SetTexture("Interface\\ChatFrame\\UI-ChatInputBorder-Right");
+			eb.texR:SetSize(25, 32);
+			eb.texR:SetPoint("RIGHT", 10, 0);
+			eb.texR:SetTexCoord(0.9, 1, 0, 1);
+			
+			eb.texM = eb:CreateTexture(nil, "BACKGROUND")
+			eb.texM:SetTexture("Interface\\ChatFrame\\UI-ChatInputBorder-Left");
+			eb.texM:SetSize(25, 32);
+			eb.texM:SetPoint("LEFT", eb.texL, "RIGHT");
+			eb.texM:SetPoint("RIGHT", eb,texL, "LEFT");
+			eb.texM:SetTexCoord(0.29296875, 1, 0, 1);
+			
+			eb:HookScript("OnEscapePressed", function()
+				if (eb.ctUndo) then
+					eb:SetText(eb.ctUndo);
+				end
+				eb:ClearFocus();
+			end);
+			
+			eb:HookScript("OnEnterPressed", function()
+				eb.ctUndo = eb:GetText();
+				module.ChangeViewportSide(eb);
+			end);
+			
+			eb:HookScript("OnTabPressed", function()
+				if (IsShiftKeyDown()) then
+					CT_ViewportTopEB:SetFocus();
+				else
+					CT_ViewportLeftEB:SetFocus();
+				end
+			end);
+			
+			eb:HookScript("OnTextChanged", function()
+				if ( ( not tonumber(eb:GetText()) or ( eb.limitation and tonumber(eb:GetText()) > eb.limitation ) ) and strlen(eb:GetText()) > 0 ) then
+					if ( tonumber(eb:GetText()) and eb.limitation and tonumber(eb:GetText()) >  eb.limitation ) then
+						eb:SetText(eb.limitation);
+					else
+						eb:SetText(strsub(eb:GetText(), 1, strlen(eb:GetText())-1));
+					end
+				end
+			end);
+			
+			eb:HookScript("OnEditFocusGained", function()
+				eb.ctUndo = eb:GetText();
+				eb:HighlightText();
+			end);
+			
+			eb:HookScript("OnEditFocusLost", function()
+				eb:HighlightText(0, 0);
+				module.ChangeViewportSide(eb);
+			end);
+		end);
+	optionsEndFrame();
+		
+	-- Draggable Borders and Inner Frame (representing the viewport)
+	optionsBeginFrame(180, 150, "frame#t:0:%y#s:191.5:144.5#n:CT_ViewportBorderFrame#v:BackdropTemplate");
+		optionsAddScript("onload", function(frame)
+			frame:SetBackdrop({
+				edgeFile = "Interface\\ChatFrame\\ChatFrameBackground";
+				tile = true;
+				edgeSize = 3.2;
+				tileSize = 3.2;
+			});
+			frame:SetBackdropBorderColor(1, 0, 0, 1);
+		end);
+	optionsEndFrame();
+	
+	optionsBeginFrame(0, 0, "frame#n:CT_ViewportInnerFrame#v:BackdropTemplate");
+		optionsAddScript("onload", function(frame)
+			frame:ClearAllPoints();
+			frame:SetPoint("TOPLEFT", CT_ViewportBorderFrame, "TOPLEFT", 4, -4);
+			frame:SetMaxResize(187.5, 140.5);		-- 1/2 the size of the original CT_Viewport frame beginning in 9.0.0.1
+			frame:SetMinResize(93.75, 70.25);		-- The screen cannot shrink by more than 50 in either height or width
+			frame:SetResizable(true);
+			if (module.pendingViewportHeight) then
+				frame:SetHeight(module.pendingViewportHeight);
+				module.pendingViewportHeight = nil;
+			end
+			frame:SetBackdrop({
+				edgeFile = "Interface\\ChatFrame\\ChatFrameBackground";
+				tile = true;
+				edgeSize = 3.2;
+				tileSize = 3.2;
+			});
+			frame:SetBackdropBorderColor(1, 1, 0, 1);
+			
+			frame.background = frame:CreateTexture(nil, "BACKGROUND");
+			frame.background:SetTexture("Interface\\ChatFrame\\ChatFrameBackground");
+			frame.background:SetVertexColor(1, 1, 0, 0.1);
+			frame.background:SetAllPoints();
+			
+			frame.fontString = frame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+			frame.fontString:SetText(L["CT_Viewport/Options/Viewport/RenderedArea"]);
+			
+			frame.resizeTopLeft = CreateFrame("Button", nil, frame);
+			frame.resizeTopLeft:SetSize(16,16);
+			frame.resizeTopLeft:SetPoint("TOPLEFT");
+			frame.resizeTopLeft:SetFrameLevel(frame:GetFrameLevel());
+			frame.resizeTopLeft:HookScript("OnMouseDown", function(button) module.Resize(button, "TOPLEFT") end);
+			frame.resizeTopLeft:HookScript("OnMouseUp", function(button) module.StopResize(button) end);
+			
+			frame.resizeTopRight = CreateFrame("Button", nil, frame);
+			frame.resizeTopRight:SetSize(16,16);
+			frame.resizeTopRight:SetPoint("TOPRIGHT");
+			frame.resizeTopRight:SetFrameLevel(frame:GetFrameLevel());
+			frame.resizeTopRight:HookScript("OnMouseDown", function(button) module.Resize(button, "TOPRIGHT") end);
+			frame.resizeTopRight:HookScript("OnMouseUp", function(button) module.StopResize(button) end);
+			
+			frame.resizeBottomLeft = CreateFrame("Button", nil, frame);
+			frame.resizeBottomLeft:SetSize(16,16);
+			frame.resizeBottomLeft:SetPoint("BOTTOMLEFT");
+			frame.resizeBottomLeft:SetFrameLevel(frame:GetFrameLevel());
+			frame.resizeBottomLeft:HookScript("OnMouseDown", function(button) module.Resize(button, "BOTTOMLEFT") end);
+			frame.resizeBottomLeft:HookScript("OnMouseUp", function(button) module.StopResize(button) end);
+			
+			frame.resizeBottomRight = CreateFrame("Button", nil, frame);
+			frame.resizeBottomRight:SetSize(16,16);
+			frame.resizeBottomRight:SetPoint("BOTTOMRIGHT");
+			frame.resizeBottomRight:SetFrameLevel(frame:GetFrameLevel());
+			frame.resizeBottomRight:HookScript("OnMouseDown", function(button) module.Resize(button, "BOTTOMRIGHT") end);
+			frame.resizeBottomRight:HookScript("OnMouseUp", function(button) module.StopResize(button) end);
+			
+			frame.resizeRight = CreateFrame("Button", nil, frame);
+			frame.resizeRight:SetPoint("TOPLEFT", frame.resizeTopRight, "BOTTOMLEFT");
+			frame.resizeRight:SetPoint("BOTTOMRIGHT", frame.resizeBottomRight, "TOPRIGHT");
+			frame.resizeRight:SetFrameLevel(frame:GetFrameLevel());
+			frame.resizeRight:HookScript("OnMouseDown", function(button) module.Resize(button, "RIGHT") end);
+			frame.resizeRight:HookScript("OnMouseUp", function(button) module.StopResize(button) end);
+			
+			frame.resizeLeft = CreateFrame("Button", nil, frame);
+			frame.resizeLeft:SetPoint("TOPLEFT", frame.resizeTopLeft, "BOTTOMLEFT");
+			frame.resizeLeft:SetPoint("BOTTOMRIGHT", frame.resizeBottomLeft, "TOPRIGHT");
+			frame.resizeLeft:SetFrameLevel(frame:GetFrameLevel());
+			frame.resizeLeft:HookScript("OnMouseDown", function(button) module.Resize(button, "LEFT") end);
+			frame.resizeLeft:HookScript("OnMouseUp", function(button) module.StopResize(button) end);
+			
+			frame.resizeTop = CreateFrame("Button", nil, frame);
+			frame.resizeTop:SetPoint("TOPLEFT", frame.resizeTopLeft, "TOPRIGHT");
+			frame.resizeTop:SetPoint("BOTTOMRIGHT", frame.resizeTopRight, "BOTTOMLEFT");
+			frame.resizeTop:SetFrameLevel(frame:GetFrameLevel());
+			frame.resizeTop:HookScript("OnMouseDown", function(button) module.Resize(button, "TOP") end);
+			frame.resizeTop:HookScript("OnMouseUp", function(button) module.StopResize(button) end);
+			
+			frame.resizeBottom = CreateFrame("Button", nil, frame);
+			frame.resizeBottom:SetPoint("TOPLEFT", frame.resizeBottomLeft, "TOPRIGHT");
+			frame.resizeBottom:SetPoint("BOTTOMRIGHT", frame.resizeBottomRight, "BOTTOMLEFT");
+			frame.resizeBottom:SetFrameLevel(frame:GetFrameLevel());
+			frame.resizeBottom:HookScript("OnMouseDown", function(button) module.Resize(button, "BOTTOM") end);
+			frame.resizeBottom:HookScript("OnMouseUp", function(button) module.StopResize(button) end);
+		end);
+	optionsEndFrame();
+
+	-- Aspect Ratio
+	optionsAddObject(-20, 17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_Viewport/Options/AspectRatio/Heading"]);
+	optionsAddObject( -5, 14, "font#tl:10:%y#r#n:CT_ViewportAspectRatioDefaultText#placeholder");
+	optionsAddObject( -5, 14, "font#tl:10:%y#r#n:CT_ViewportAspectRatioNewText#placeholder");
+	
+	optionsBeginFrame(0, 0, "frame")
+		optionsAddScript("onload", function(frame)
+			frame:HookScript("OnShow", function()
+				if ( CT_ViewportInnerFrame:GetLeft() ) then
+					module.ApplyInnerViewport(
+						CT_Viewport_Saved[1],
+						CT_Viewport_Saved[2],
+						CT_Viewport_Saved[3],
+						CT_Viewport_Saved[4],
+						CT_Viewport_Saved[5],
+						CT_Viewport_Saved[6],
+						CT_Viewport_Saved[7]
+					);
+				else
+					module.hasAppliedViewport = nil;
+				end
+			end);
+			
+			frame:HookScript("OnHide", function()
+				module.isResizing = nil;
+				CT_ViewportInnerFrame:StopMovingOrSizing();
+				PlaySound(1115);
+			end);
+			
+			frame:HookScript("OnUpdate", function(__, elapsed)
+				local iframe = CT_ViewportInnerFrame;
+				local screenRes = module.screenRes;
+
+				if ( not module.hasAppliedViewport ) then
+					module.hasAppliedViewport = 1;
+
+					iframe:ClearAllPoints();
+					iframe:SetPoint("TOPLEFT", "CT_ViewportBorderFrame", "TOPLEFT", 4, -4);
+					iframe:SetPoint("BOTTOMRIGHT", "CT_ViewportBorderFrame", "BOTTOMRIGHT", -4, 4);
+
+				elseif ( module.hasAppliedViewport == 1 ) then
+					module.hasAppliedViewport = 2;
+
+					if ( module.awaitingValues ) then
+						module.awaitingValues = nil;
+
+						CT_ViewportLeftEB.limitation = screenRes[1] / 2 - 1;
+						CT_ViewportRightEB.limitation = screenRes[1] / 2 - 1;
+						CT_ViewportTopEB.limitation = screenRes[2] / 2 - 1;
+						CT_ViewportBottomEB.limitation = screenRes[2] / 2 - 1;
+					end
+					if ( CT_ViewportInnerFrame ) then
+						module.ApplyInnerViewport(
+							CT_Viewport_Saved[1],
+							CT_Viewport_Saved[2],
+							CT_Viewport_Saved[3],
+							CT_Viewport_Saved[4],
+							CT_Viewport_Saved[5],
+							CT_Viewport_Saved[6],
+							CT_Viewport_Saved[7]
+						);
+					else
+						module.hasAppliedViewport = nil;
+					end
+				end
+
+				if ( module.isResizing ) then
+					module.UpdateInnerFrameBounds()
+					local ivalues = module.initialValues;
+
+					local right, left, top, bottom;
+
+					if (ivalues[5] == 0) then
+						right = 0;
+						left = 0;
+					else
+						right = ((ivalues[2] - iframe:GetRight()) / ivalues[5]) * screenRes[1];
+						left = ((iframe:GetLeft() - ivalues[1]) / ivalues[5]) * screenRes[1];
+					end
+					if (ivalues[6] == 0) then
+						top = 0;
+						bottom = 0;
+					else
+						top = ((ivalues[3] - iframe:GetTop()) / ivalues[6]) * screenRes[2];
+						bottom = ((iframe:GetBottom() - ivalues[4]) / ivalues[6]) * screenRes[2];
+					end
+
+					if ( right < 0 ) then
+						right = 0;
+					end
+					if ( left < 0 ) then
+						left = 0;
+					end
+					if ( top < 0 ) then
+						top = 0;
+					end
+					if ( bottom < 0 ) then
+						bottom = 0;
+					end
+
+					CT_ViewportLeftEB:SetText(floor(left + 0.1));
+					CT_ViewportRightEB:SetText(floor(right + 0.1));
+					CT_ViewportTopEB:SetText(floor(top + 0.1));
+					CT_ViewportBottomEB:SetText(floor(bottom + 0.1));
+
+					module.currOffset = {
+						floor(left + 0.1),
+						floor(right + 0.1),
+						floor(top + 0.1),
+						floor(bottom + 0.1)
+					};
+
+					if ( module.elapsed ) then
+						module.elapsed = module.elapsed - elapsed;
+						
+					else
+						module.elapsed = 0.1;
+					end
+					if ( module.elapsed <= 0 ) then
+						local value1 = (screenRes[1] - left - right);
+						local value2 = (screenRes[2] - top - bottom);
+						local value3
+						if (value2 == 0) then
+							value3 = 0;
+						else
+							value3 = value1 / value2;
+						end
+						CT_ViewportAspectRatioNewText:SetText("Aspect Ratio (Current): |c00FFFFFF" .. module.GetQuotient(value3));
+
+						local value1 = screenRes[1];
+						local value2 = screenRes[2];
+						local value3
+						if (value2 == 0) then
+							value3 = 0;
+						else
+							value3 = value1 / value2;
+						end
+						CT_ViewportAspectRatioDefaultText:SetText("Aspect Ratio (Default): |c00FFFFFF" .. module.GetQuotient(value3));
+
+						module.elapsed = 0.1;
+					end
+				else
+					module.elapsed = nil;
+				end
+			end);
+		end);
+	optionsEndFrame();
+	
+	-- see CT_Library
+	return "frame#all", module:framesGetData(optionsFrameList);
 end
