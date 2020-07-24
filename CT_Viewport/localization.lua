@@ -31,9 +31,12 @@ L["CT_Viewport/Options/Tips/Line2"] = "Open the control panel"
 L["CT_Viewport/Options/Tips/Line3"] = "Reset all sides"
 L["CT_Viewport/Options/Tips/Line4"] = "Set all sides: L, R, T, B"
 L["CT_Viewport/Options/Tips/Line5"] = "Alternatively, set custom values below."
+L["CT_Viewport/Options/Viewport/ApplyButton"] = "Apply"
+L["CT_Viewport/Options/Viewport/ApplyTip"] = "Settings will revert in 20 seconds if the UI fails."
 L["CT_Viewport/Options/Viewport/Heading"] = "Custom Viewport"
-L["CT_Viewport/Options/Viewport/KeepSettingsPattern"] = "Keep Settings?  Reverting in %d sec"
+L["CT_Viewport/Options/Viewport/KeepSettingsPattern"] = "Keep Settings?  Reverting in %d sec."
 L["CT_Viewport/Options/Viewport/RenderedArea"] = "Rendered Area"
+L["CT_Viewport/Options/Viewport/ResetButton"] = "Reset"
 
 
 -----------------------------------------------
@@ -49,11 +52,14 @@ L["CT_Viewport/Options/Tips/Heading"] = "Des conseils"
 L["CT_Viewport/Options/Tips/Line1"] = "Tapez /viewport, /ctvp, ou /ctviewport :"
 L["CT_Viewport/Options/Tips/Line2"] = "Ouvrir le panneau de configuration"
 L["CT_Viewport/Options/Tips/Line3"] = "Réinitialiser au défaut"
-L["CT_Viewport/Options/Tips/Line4"] = "Configurer les cotés : g d sup inf"
+L["CT_Viewport/Options/Tips/Line4"] = "Configurer les cotés g., d., sup., et inf."
 L["CT_Viewport/Options/Tips/Line5"] = "Alternativement, utilisez l'interface en-dessous."
+L["CT_Viewport/Options/Viewport/ApplyButton"] = "Appliquer"
+L["CT_Viewport/Options/Viewport/ApplyTip"] = "S'il y a d'erreur, les options vont réinitialiser dans 20 secondes."
 L["CT_Viewport/Options/Viewport/Heading"] = "L'écran personnalisé"
 L["CT_Viewport/Options/Viewport/KeepSettingsPattern"] = "Sauvegarder? Réinitialisant dans %d sec."
 L["CT_Viewport/Options/Viewport/RenderedArea"] = "La zone rendue"
+L["CT_Viewport/Options/Viewport/ResetButton"] = "Réinitialiser"
 
 
 -----------------------------------------------

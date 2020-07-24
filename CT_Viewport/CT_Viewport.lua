@@ -356,7 +356,7 @@ do
 			-- check is already in progress; after 20 seconds revert if the user hasn't presed the button
 			if (GetTime() > newSettingsApplied + 20) then
 				module.applyButton:Show();
-				module.cancelButton:Show();
+				module.resetButton:Show();
 				module.keepSettingsButton:Hide();
 				newSettingsApplied = nil;
 				if (keepSettingsTicker) then
@@ -371,7 +371,7 @@ do
 			-- start of a new check
 			newSettingsApplied = GetTime();
 			module.applyButton:Hide();
-			module.cancelButton:Hide();
+			module.resetButton:Hide();
 			module.keepSettingsButton:SetText(L["CT_Viewport/Options/Viewport/KeepSettingsPattern"]:format(20));
 			module.keepSettingsButton:Show();
 			keepSettingsTicker = keepSettingsTicker or C_Timer.NewTicker(0.25, module.CheckKeepSettings)
@@ -386,7 +386,7 @@ do
 			keepSettingsTicker = nil
 		end
 		module.applyButton:Show();
-		module.cancelButton:Show();
+		module.resetButton:Show();
 		module.keepSettingsButton:Hide();
 	end
 end
@@ -601,7 +601,7 @@ function module.frame()
 	optionsAddObject(-10, 17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_Viewport/Options/Viewport/Heading"]);
 	
 	-- Apply/Cancel/Keep Settings
-	optionsBeginFrame(-10, 32, "button#tr:t:-10:%y#s:125:32#v:GameMenuButtonTemplate#Apply");
+	optionsBeginFrame(-10, 32, "button#tr:t:-10:%y#s:125:32#v:GameMenuButtonTemplate#" .. L["CT_Viewport/Options/Viewport/ApplyButton"]);
 		optionsAddScript("onload", function(button)
 			module.applyButton = button;
 			button:HookScript("OnClick", function()
@@ -613,17 +613,17 @@ function module.frame()
 				module.ApplyViewport();
 			end);
 		end);
-		optionsAddTooltip({"Apply", "Settings will revert in 20 seconds if the UI fails." .. textColor2});
+		optionsAddTooltip({L["CT_Viewport/Options/Viewport/ApplyButton"], L["CT_Viewport/Options/Viewport/ApplyTip"] .. textColor2});
 	optionsEndFrame();
 	
-	optionsBeginFrame(32, 32, "button#tl:t:10:%y#s:125:32#v:GameMenuButtonTemplate#Reset");
+	optionsBeginFrame(32, 32, "button#tl:t:10:%y#s:125:32#v:GameMenuButtonTemplate#" .. L["CT_Viewport/Options/Viewport/ResetButton"]);
 		optionsAddScript("onload", function(button)
-			module.cancelButton = button;
+			module.resetButton = button;
 			button:HookScript("OnClick", function()
 				module.ApplyViewport(0, 0, 0, 0)
 			end);
 		end);
-		optionsAddTooltip({"Reset", "/ctvp 0 0 0 0" .. textColor2});
+		optionsAddTooltip({L["CT_Viewport/Options/Viewport/ResetButton"], "/ctvp 0 0 0 0" .. textColor2});
 	optionsEndFrame();
 	
 	optionsBeginFrame(32, 32, "button#t:0:%y#s:270:32#v:GameMenuButtonTemplate#Keep Settings?");
