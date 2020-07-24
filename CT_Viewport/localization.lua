@@ -52,7 +52,7 @@ L["CT_Viewport/Options/Tips/Line3"] = "Réinitialiser au défaut"
 L["CT_Viewport/Options/Tips/Line4"] = "Configurer les cotés : g d sup inf"
 L["CT_Viewport/Options/Tips/Line5"] = "Alternativement, utilisez l'interface en-dessous."
 L["CT_Viewport/Options/Viewport/Heading"] = "L'écran personnalisé"
-L["CT_Viewport/Options/Viewport/KeepSettingsPattern"] = "Sauvegarder? Réinitialisant dans &d sec."
+L["CT_Viewport/Options/Viewport/KeepSettingsPattern"] = "Sauvegarder? Réinitialisant dans %d sec."
 L["CT_Viewport/Options/Viewport/RenderedArea"] = "La zone rendue"
 
 

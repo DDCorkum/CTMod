@@ -2161,6 +2161,7 @@ local function generalObjectHandler(self, specializedHandler, str, parent, initi
 			if ( not found and not virtual ) then
 				local v, inherit = splitString(value, colonSeparator);
 				if ( v == "v" and inherit ) then
+					virtual = inherit;
 					found = true;
 				end
 			end

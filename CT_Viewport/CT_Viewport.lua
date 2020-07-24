@@ -372,6 +372,7 @@ do
 			newSettingsApplied = GetTime();
 			module.applyButton:Hide();
 			module.cancelButton:Hide();
+			module.keepSettingsButton:SetText(L["CT_Viewport/Options/Viewport/KeepSettingsPattern"]:format(20));
 			module.keepSettingsButton:Show();
 			keepSettingsTicker = keepSettingsTicker or C_Timer.NewTicker(0.25, module.CheckKeepSettings)
 		end
@@ -587,14 +588,14 @@ function module.frame()
 	
 	-- Tips
 	optionsAddObject(-10, 17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_Viewport/Options/Tips/Heading"]);
-	optionsAddObject(-10, 1*14, "font#tl:10:%y#r#" .. L["CT_Viewport/Options/Tips/Line1"] .. textColor2 .. ":l");
-	optionsAddObject( -2, 1*14, "font#tl:20:%y#r:t#/ctvp" .. textColor1 .. ":l");
-	optionsAddObject( 14, 1*14, "font#tl:120:%y#r#" .. L["CT_Viewport/Options/Tips/Line2"] .. textColor2 .. ":l");
-	optionsAddObject(  0, 1*14, "font#tl:20:%y#r:t#/ctvp 0 0 0 0" .. textColor1 .. ":l");
-	optionsAddObject( 14, 1*14, "font#tl:120:%y#r#" .. L["CT_Viewport/Options/Tips/Line3"] .. textColor2 .. ":l");
-	optionsAddObject(  0, 1*14, "font#tl:20:%y#r:t#/ctvp 5 20 15 0" .. textColor1 .. ":l");
-	optionsAddObject( 14, 1*14, "font#tl:120:%y#r#" .. L["CT_Viewport/Options/Tips/Line4"] .. textColor2 .. ":l");
-	optionsAddObject(-10, 1*14, "font#tl:10:%y#r#" .. L["CT_Viewport/Options/Tips/Line5"] .. textColor2 .. ":l");
+	optionsAddObject(-10, 1*14, "font#tl:5:%y#" .. L["CT_Viewport/Options/Tips/Line1"] .. textColor2 .. ":l:300");
+	optionsAddObject( -2, 1*14, "font#tl:15:%y#/ctvp" .. textColor1 .. ":l");
+	optionsAddObject( 14, 1*14, "font#tl:115:%y#" .. L["CT_Viewport/Options/Tips/Line2"] .. textColor2 .. ":l:190");
+	optionsAddObject(  0, 1*14, "font#tl:15:%y#/ctvp 0 0 0 0" .. textColor1 .. ":l");
+	optionsAddObject( 14, 1*14, "font#tl:115:%y#" .. L["CT_Viewport/Options/Tips/Line3"] .. textColor2 .. ":l:190");
+	optionsAddObject(  0, 1*14, "font#tl:15:%y#/ctvp 5 20 15 0" .. textColor1 .. ":l");
+	optionsAddObject( 14, 1*14, "font#tl:115:%y#" .. L["CT_Viewport/Options/Tips/Line4"] .. textColor2 .. ":l:190");
+	optionsAddObject(-10, 1*14, "font#tl:5:%y#" .. L["CT_Viewport/Options/Tips/Line5"] .. textColor2 .. ":l:300");
 
 	-- Heading
 	optionsAddObject(-10, 17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_Viewport/Options/Viewport/Heading"]);
@@ -1007,7 +1008,7 @@ function module.frame()
 	optionsEndFrame();
 
 	-- Aspect Ratio
-	optionsAddObject(-20, 17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_Viewport/Options/AspectRatio/Heading"]);
+	optionsAddObject(-25, 17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_Viewport/Options/AspectRatio/Heading"]);
 	optionsAddObject( -5, 14, "font#tl:10:%y#r#n:CT_ViewportAspectRatioDefaultText#placeholder");
 	optionsAddObject( -5, 14, "font#tl:10:%y#r#n:CT_ViewportAspectRatioNewText#placeholder");
 	
@@ -1133,7 +1134,7 @@ function module.frame()
 						else
 							value3 = value1 / value2;
 						end
-						CT_ViewportAspectRatioNewText:SetText("Aspect Ratio (Current): |c00FFFFFF" .. module.GetQuotient(value3));
+						CT_ViewportAspectRatioNewText:SetText(L["CT_Viewport/Options/AspectRatio/NewPattern"]:format(module.GetQuotient(value3)));
 
 						local value1 = screenRes[1];
 						local value2 = screenRes[2];
@@ -1143,7 +1144,7 @@ function module.frame()
 						else
 							value3 = value1 / value2;
 						end
-						CT_ViewportAspectRatioDefaultText:SetText("Aspect Ratio (Default): |c00FFFFFF" .. module.GetQuotient(value3));
+						CT_ViewportAspectRatioDefaultText:SetText(L["CT_Viewport/Options/AspectRatio/DefaultPattern"]:format(module.GetQuotient(value3)));
 
 						module.elapsed = 0.1;
 					end
