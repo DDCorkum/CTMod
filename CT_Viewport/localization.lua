@@ -40,7 +40,7 @@ L["CT_Viewport/Options/Viewport/RenderedArea"] = "Rendered Area"
 -- frFR
 -- Credits to ddc
 
-elseif (GetLocale() == "frFR") then
+if (GetLocale() == "frFR") then
 
 L["CT_Viewport/Options/AspectRatio/DefaultPattern"] = "|cFFCCCCCCRésolution d'écran : |cFFFFFFFF%s"
 L["CT_Viewport/Options/AspectRatio/Heading"] = "Le rapport hauteur / largeur"
