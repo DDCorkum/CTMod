@@ -330,7 +330,7 @@ do
 			end
 		}
 
-		return "frame#n:CT_MailMod_MailLog#s:" .. defaultLogWidth .. ":500#v:BackdropTemplate", {
+		return "frame#n:CT_MailMod_MailLog#s:" .. defaultLogWidth .. ":500", {
 			"backdrop#tooltip#0:0:0:0.75",
 			"font#t:0:-10#v:GameFontNormalHuge#" .. module.text["CT_MailMod/MAIL_LOG"] .. "#1:1:1",
 

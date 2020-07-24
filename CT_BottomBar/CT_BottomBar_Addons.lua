@@ -86,7 +86,7 @@ local function addonDragSkeleton()
 	if ( not addonFrameTable ) then
 		addonFrameTable = {
 			-- The drag button.
-			["button#hidden#i:button#st:LOW#v:BackdropTemplate"] = {
+			["button#hidden#i:button#st:LOW"] = {
 				"backdrop#tooltip#0:0:0:0.75",
 				"font#v:GameFontNormalLarge#i:text",
 				["onload"] = addonFrame_OnLoad,

@@ -766,7 +766,7 @@ local function updateTickDisplay(obj, diff)
 end
 
 local function tickFrameSkeleton()
-	return "button#tl:mid:350:-200#s:90:40#v:BackdropTemplate", {
+	return "button#tl:mid:350:-200#s:90:40", {
 		"backdrop#tooltip",
 		"font#i:health#t:0:-8",
 		"font#i:mana#b:0:8",
@@ -2078,7 +2078,7 @@ do
 
 	-- Create the frame
 	local function watchFrameSkeleton()
-		return "frame#r:0:75#st:LOW#v:BackdropTemplate", {
+		return "frame#r:0:75#st:LOW", {
 			"backdrop#tooltip",
 
 			["button#s:16:16#i:resizeBL#bl"] = {

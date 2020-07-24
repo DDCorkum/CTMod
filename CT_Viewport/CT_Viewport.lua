@@ -907,8 +907,9 @@ function module.frame()
 	optionsEndFrame();
 		
 	-- Draggable Borders and Inner Frame (representing the viewport)
-	optionsBeginFrame(180, 150, "frame#t:0:%y#s:191.5:144.5#n:CT_ViewportBorderFrame#v:BackdropTemplate");
+	optionsBeginFrame(180, 150, "frame#t:0:%y#s:191.5:144.5#n:CT_ViewportBorderFrame");
 		optionsAddScript("onload", function(frame)
+			Mixin(frame, BackdropTemplateMixin or {});
 			frame:SetBackdrop({
 				edgeFile = "Interface\\ChatFrame\\ChatFrameBackground";
 				tile = true;
@@ -919,7 +920,7 @@ function module.frame()
 		end);
 	optionsEndFrame();
 	
-	optionsBeginFrame(0, 0, "frame#n:CT_ViewportInnerFrame#v:BackdropTemplate");
+	optionsBeginFrame(0, 0, "frame#n:CT_ViewportInnerFrame");
 		optionsAddScript("onload", function(frame)
 			frame:ClearAllPoints();
 			frame:SetPoint("TOPLEFT", CT_ViewportBorderFrame, "TOPLEFT", 4, -4);
@@ -930,6 +931,7 @@ function module.frame()
 				frame:SetHeight(module.pendingViewportHeight);
 				module.pendingViewportHeight = nil;
 			end
+			Mixin(frame, BackdropTemplateMixin or {});
 			frame:SetBackdrop({
 				edgeFile = "Interface\\ChatFrame\\ChatFrameBackground";
 				tile = true;

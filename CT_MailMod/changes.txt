@@ -1,6 +1,3 @@
-CT_MailMod (8.3.7.1) 2020-07-18
-- Shadowlands BackdropTemplate compatibility
-
 CT_MailMod (8.3.0.7) 2020-03-25
 - Added option to prevent editboxes from losing focus during common tasks
 - Localization, courtesy of 萌丶汉丶纸 (zhCH)

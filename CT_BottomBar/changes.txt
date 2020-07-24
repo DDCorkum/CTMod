@@ -1,6 +1,3 @@
-CT_BottomBar (8.3.7.1) 2020-07-18
-- Shadowlands BackdropTemplate compatibility
-
 CT_BottomBar (8.3.0.7) 2020-03-25
 - Small tweak to options menu; nothing substantive
 

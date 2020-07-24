@@ -1,3 +1,6 @@
+CT_ExpenseHistory (8.3.7.1) 2020-07-24
+- Shadowlands BackdropTemplate compatibility
+
 CT_UnitFrames (8.3.0.11) 2020-06-18
 - Fix to the assist frame updating when the target-of-target changes after 8.3.0.9
 

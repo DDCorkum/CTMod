@@ -802,10 +802,11 @@ do
 						end,
 					},
 					["font#l:tl:15:-25#" .. L["CT_MapMod/Pin/Name"] .. "#" .. textColor2 .. ":l"] = { },
-					["editbox#l:tl:55:-25#s:150:18#v:BackdropTemplate"] = { 
+					["editbox#l:tl:55:-25#s:150:18"] = { 
 						["onload"] = function(self)
 							nameEditBox = self;
 							self:SetAutoFocus(false);
+							Mixin(self, BackdropTemplateMixin or { });
 							self:SetBackdrop({
 								bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
 								tile = true,
@@ -825,10 +826,10 @@ do
 					["font#l:tl:15:-50#" .. L["CT_MapMod/Pin/Type"] .. "#" .. textColor2 .. ":l"] = { },
 					["font#l:t:5:-50#" .. L["CT_MapMod/Pin/Icon"] .. "#" .. textColor2 .. ":l"] = { },
 					["font#l:tl:15:-75#" .. L["CT_MapMod/Pin/Description"] .. "#" .. textColor2 .. ":l"] = { },
-					["editbox#tl:tl:15:-84#br:tl:315:-144#v:BackdropTemplate#ChatFontSmall"] = {
-						--"backdrop#tooltip##0:0:0:0",
+					["editbox#tl:tl:15:-84#br:tl:315:-144#ChatFontSmall"] = {
 						["onload"] = function(self)
 							descriptEditBox = self;
+							Mixin(self, BackdropTemplateMixin or { });
 							self:SetBackdrop({
 								bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
 								tile = true,

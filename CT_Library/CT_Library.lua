@@ -1475,6 +1475,9 @@ local tooltipBackdrop = {
 	insets = { left = 4, right = 4, top = 4, bottom = 4 }
 };
 objectHandlers.backdrop = function(self, parent, name, virtual, option, backdropType, bgColor, borderColor)
+	-- 9.0 Shadowlands compatibility
+	Mixin(parent, BackdropTemplateMixin or { });
+	
 	-- Convert short-notation names to the appropriate tables
 	if ( backdropType == "dialog" ) then
 		parent:SetBackdrop(dialogBackdrop);
@@ -2158,9 +2161,6 @@ local function generalObjectHandler(self, specializedHandler, str, parent, initi
 			if ( not found and not virtual ) then
 				local v, inherit = splitString(value, colonSeparator);
 				if ( v == "v" and inherit ) then
-					if (inherit ~= "BackdropTemplate" or BackdropTemplateMixin) then		-- Classic compatibility, because BackdropTemplate doesn't exist yet
-						virtual = inherit;
-					end
 					found = true;
 				end
 			end
@@ -2715,7 +2715,7 @@ local function controlPanelSkeleton()
 		end,
 		["onclick"] = selectControlPanelModule,
 	};
-	return "frame#st:DIALOG#n:CTCONTROLPANEL#clamped#movable#t:mid:0:400#s:300:495#v:BackdropTemplate", {
+	return "frame#st:DIALOG#n:CTCONTROLPANEL#clamped#movable#t:mid:0:400#s:300:495", {
 		"backdrop#tooltip#0:0:0:0.80",
 		["onshow"] = function(self)
 			local module, obj;

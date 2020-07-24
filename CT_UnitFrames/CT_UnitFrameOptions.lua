@@ -63,6 +63,15 @@ CT_UnitFramesOptions_NumSelections = {
 
 -- OnLoad handlers
 function CT_UnitFrameOptions_OnLoad(self)
+	Mixin(self, BackdropTemplateMixin or {});
+	self:SetBackdrop({
+		bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+		edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+		tile = true,
+		tileSize = 16,
+		edgeSize = 16,
+		insets = { left = 5, right = 5, top = 5, bottom = 5 },
+	});
 	self:SetBackdropColor(0, 0, 0, 0.8);
 	self:RegisterEvent("PLAYER_LOGIN");
 	--self:RegisterEvent("VARIABLES_LOADED");

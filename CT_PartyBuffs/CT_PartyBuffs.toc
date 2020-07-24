@@ -1,4 +1,4 @@
-## Interface: 80307
+## Interface: 80300
 ## Version: 8.2.5.6
 ## Title: CT_PartyBuffs |cFF333333(BFA)
 ## Notes: Shows buffs at party member frames.
