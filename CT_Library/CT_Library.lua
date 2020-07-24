@@ -3467,7 +3467,10 @@ module.frame = function()
 		helpAddObject( -5, 2*14, "font#tl:10:%y#s:0:%s#l:13:0#r#" .. L["CT_Library/Help/About/Credits"] .. "#" .. textColor1 .. ":l");  -- Two lines giving credits to Cide, TS, Resike and Dahk
 		
 		helpAddObject(-15,   14, "font#tl:10:%y#s:0:%s#l:13:0#r#" .. L["CT_Library/Help/About/Updates"] .. "#" .. textColor1 .. ":l");  -- "Updates are available at:"
-		helpAddObject( -5,   14, "font#tl:30:%y#s:0:%s#l:13:0#r#CurseForge.com/WoW/Addons/CTMod# " .. textColor0 .. ":l");
+		helpAddObject( -5,   14, "font#tl:30:%y#s:0:%s#l:13:0#CurseForge.com/WoW/Addons/CTMod# " .. textColor0 .. ":l:280");
+		helpAddObject( -5,   14, "font#tl:30:%y#s:0:%s#l:13:0#GitHub.com/DDCorkum/CTMod# " .. textColor0 .. ":l:280");
+		helpAddObject( -5,   14, "font#tl:30:%y#s:0:%s#l:13:0#WoWInterface.com/downloads/info3826-CTMod.html# " .. textColor0 .. ":l:280");
+		
 	
 	helpEndFrame();
 	
