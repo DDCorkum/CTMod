@@ -1,5 +1,6 @@
-CT_BuffMod (8.3.7.1) 2020-07-18
+CT_BuffMod (8.3.7.1) 2020-07-24
 - Shadowlands BackdropTemplate compatibility
+- Option to show the default UI border on aura buttons
 
 CT_BuffMod (8.3.0.9) 2020-05-23
 - Small adjustments to the options menu for easier use

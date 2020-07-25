@@ -2345,7 +2345,7 @@ local function auraButton_updateDimensions(button)
 			txTimerBG:SetHeight(frameObject.detailHeight1);
 		end
 	end
-
+	
 	auraButton_updateTimerBar(button);
 end
 
@@ -2601,42 +2601,39 @@ local function auraButton_updateAppearance(button)
 --		txIcon:SetTexCoord(0, 0.5, 0, 1);  -- original
 --		txIcon:SetTexCoord(0.1, 0.4, 0.2, 0.8);  -- with border
 		txIcon:SetTexCoord(0.155, 0.345, 0.310, 0.690);  -- no border
+	elseif ((frameObject.buttonStyle == 1 and frameObject.normalIconBorder1) or (frameObject.buttonStyle == 2 and frameObject.normalIconBorder2)) then
+		txIcon:SetTexCoord(0, 1, 0, 1);
 	else
-		txIcon:SetTexCoord(0.1, 0.9, 0.1, 0.9);
+		txIcon:SetTexCoord(0.08, 0.92, 0.08, 0.92);
 	end
 
 	-- Set icon border
 	-- Consolidated button doesn't have a border.
 	if (txBorder) then
-		if (auraObject.auraType == constants.AURATYPE_DEBUFF) then
-			if (
-				(frameObject.buttonStyle == 1 and not frameObject.colorCodeIcons1) or
-				(frameObject.buttonStyle == 2 and not frameObject.colorCodeIcons2)
-			) then
-				-- Hide the border and symbol
-				txBorder:SetVertexColor(0, 0, 0, 0);
-				button.symbol:Hide();
-			else
-				local color;
-				local debuffType = auraObject.debuffType;
-				if ( debuffType ) then
-					color = DebuffTypeColor[debuffType];
-					if (not color) then
-						color = DebuffTypeColor["none"];
-					end
-					if ( ENABLE_COLORBLIND_MODE == "1" ) then
-						button.symbol:Show();
-						button.symbol:SetText(DebuffTypeSymbol[debuffType] or "");
-					else
-						button.symbol:Hide();
-					end
-				else
-					-- txBorder:SetVertexColor(1, 0.82, 0, 1);
+		if (
+			auraObject.auraType == constants.AURATYPE_DEBUFF
+			and ((frameObject.buttonStyle == 1 and frameObject.colorCodeIcons1) or (frameObject.buttonStyle == 2 and frameObject.colorCodeIcons2))
+		) then
+			-- Show a color-coded border and symbol to emphasize the type of debuff
+			local color;
+			local debuffType = auraObject.debuffType;
+			if ( debuffType ) then
+				color = DebuffTypeColor[debuffType];
+				if (not color) then
 					color = DebuffTypeColor["none"];
+				end
+				if ( ENABLE_COLORBLIND_MODE == "1" ) then
+					button.symbol:Show();
+					button.symbol:SetText(DebuffTypeSymbol[debuffType] or "");
+				else
 					button.symbol:Hide();
 				end
-				txBorder:SetVertexColor(color.r, color.g, color.b, 1);
+			else
+				-- txBorder:SetVertexColor(1, 0.82, 0, 1);
+				color = DebuffTypeColor["none"];
+				button.symbol:Hide();
 			end
+			txBorder:SetVertexColor(color.r, color.g, color.b, 1);
 		else
 			-- Hide the border and symbol
 			txBorder:SetVertexColor(0, 0, 0, 0);
@@ -3131,6 +3128,7 @@ end
 --  	.durationLocation1 -- Where to display the time remaining text (1==Default, 1==Left of name, 2==Right of name, 3==Above name, 4==Below name, default == default)
 --  	.nameJustifyNoTime1 -- Justification of name when time is not shown beside it (1==Default, 2==Left, 3==Right, 4==Center, default==Default) (see constants.JUSTIFY_*)
 --  	.nameJustifyWithTime1 -- Justification of name when time is shown beside it (1==Default, 2==Left, 3==Right, 4==Center, default==Default) (see constants.JUSTIFY_*)
+--  	.normalIconBorder1 -- Show a border around the icon all the time (1 == yes, false == no, default == no)
 -- P	.rightAlign1 -- Which side of detail frame to show the icon (1==Default, 2==Left, 3==Right, default == 1) (see constants.RIGHT_ALIGN_*)
 -- P	.rightAlignDef1 -- (calculated) Default side the icon is on for the current layout (false == left, true == right)
 -- P	.rightAlignIcon1 -- (calculated) Current side the icon is to be shown on (false == left, true == right)
@@ -3149,6 +3147,7 @@ end
 --  	.dataSide2 -- Side of button to display time remaining text (1==Top, 2==Right, 3==Bottom, 4==Left) (see constants.DATA_SIDE_*)
 --  	.durationFormat2 -- Format used to display time remaining text (style 2) (1=="1 hour/35 minutes", 2=="1 hour/35 min", 3=="1h/35m", 4=="1h 35m/35m 15s", 5=="1:35h/35:15", default == "1 hour/35 minutes")
 --  	.durationFunc2 -- (calculated) Function used to get a formatted time for the time remaining (style 2)
+--  	.normalIconBorder2 -- Show a border around the icon all the time (1 == yes, false == no, default == no)
 --  	.showTimers2 -- Show time remaining as text (style 2) (1 == yes, false == no, default == yes)
 --  	.spacingFromIcon2 -- Distance between icon and text (Style 2) (number, default == 0)
 --
@@ -3359,6 +3358,8 @@ function frameClass:applyUnprotectedOptions(initFlag)
 	self.colorCodeIcons1 = not not frameOptions.colorCodeIcons1;
 	self.colorCodeIcons2 = not not frameOptions.colorCodeIcons2;
 	self.colorCodeBackground1 = not not frameOptions.colorCodeBackground1;
+	self.normalIconBorder1 = not not frameOptions.normalIconBorder1;
+	self.normalIconBorder2 = not not frameOptions.normalIconBorder2;
 
 	local func, value;
 
@@ -4745,6 +4746,7 @@ function consolidatedClass:setDefaultOptions()
 	frameOptions.colorCodeDebuffs1 = nil;
 	frameOptions.colorCodeIcons1 = nil;
 	frameOptions.colorCodeBackground1 = nil;
+	frameOptions.normalIconBorder1 = nil;
 	frameOptions.nameJustifyWithTime1 = nil;
 	frameOptions.nameJustifyNoTime1 = nil;
 
@@ -4761,6 +4763,7 @@ function consolidatedClass:setDefaultOptions()
 
 	frameOptions.buffSize2 = 20;
 	frameOptions.colorCodeIcons2 = nil;
+	frameOptions.normalIconBorder2 = nil;
 	frameOptions.showTimers2 = 1;
 	frameOptions.durationFormat2 = 3;
 	frameOptions.dataSide2 = constants.DATA_SIDE_BOTTOM;
@@ -8561,6 +8564,7 @@ local function options_updateWindowWidgets(windowId)
 	----------
 	frame.buffSize1:SetValue( frameOptions.buffSize1 or constants.BUFF_SIZE_DEFAULT );
 	frame.colorCodeIcons1:SetChecked( not not frameOptions.colorCodeIcons1 );
+	frame.normalIconBorder1:SetChecked( not not frameOptions.normalIconBorder1 );
 	frame.detailWidth1:SetValue( frameOptions.detailWidth1 or constants.DEFAULT_DETAIL_WIDTH );
 
 	dropdown = CT_BuffModDropdown_rightAlign1;
@@ -8607,6 +8611,7 @@ local function options_updateWindowWidgets(windowId)
 	----------
 	frame.buffSize2:SetValue( frameOptions.buffSize2 or constants.BUFF_SIZE_DEFAULT );
 	frame.colorCodeIcons2:SetChecked( not not frameOptions.colorCodeIcons2 );
+	frame.normalIconBorder2:SetChecked( not not frameOptions.normalIconBorder2 );
 
 	frame.showTimers2:SetChecked( frameOptions.showTimers2 ~= false );
 
@@ -8995,6 +9000,8 @@ module.optionUpdate = function(self, optName, value)
 		optName == "durationLocation1" or
 		optName == "nameJustifyWithTime1" or
 		optName == "nameJustifyNoTime1" or
+		optName == "normalIconBorder1" or
+		optName == "normalIconBorder2" or
 		optName == "showBuffTimer1" or
 		optName == "showNames1" or
 		optName == "showTimerBackground1" or
@@ -9939,6 +9946,7 @@ CONSOLIDATION REMOVED FROM GAME--]]
 						CT_BuffMod_Style1PositionLabel:Show();
 						CT_BuffModDropdown_rightAlign1:Show();
 						frameOptionscolorCodeIcons1:Show();
+						frameOptionsnormalIconBorder1:Show();
 						frameOptionsdetailWidth1:Show();
 						frameOptionscolorBuffs1:Show();
 						frameOptionscolorCodeBackground1:Show();
@@ -9966,6 +9974,7 @@ CONSOLIDATION REMOVED FROM GAME--]]
 						CT_BuffMod_Style2SizeLabel:Hide();
 						frameOptionsbuffSize2:Hide();
 						frameOptionscolorCodeIcons2:Hide();
+						frameOptionsnormalIconBorder2:Hide();
 						frameOptionsshowTimers2:Hide();
 						CT_BuffMod_Style2FormatLabel:Hide();
 						CT_BuffModDropdown_durationFormat2:Hide();
@@ -9985,6 +9994,7 @@ CONSOLIDATION REMOVED FROM GAME--]]
 						CT_BuffMod_Style1PositionLabel:Hide();
 						CT_BuffModDropdown_rightAlign1:Hide();
 						frameOptionscolorCodeIcons1:Hide();
+						frameOptionsnormalIconBorder1:Hide();
 						frameOptionsdetailWidth1:Hide();
 						frameOptionscolorBuffs1:Hide();
 						frameOptionscolorCodeBackground1:Hide();
@@ -10012,6 +10022,7 @@ CONSOLIDATION REMOVED FROM GAME--]]
 						CT_BuffMod_Style2SizeLabel:Show();
 						frameOptionsbuffSize2:Show();
 						frameOptionscolorCodeIcons2:Show();
+						frameOptionsnormalIconBorder2:Show();
 						frameOptionsshowTimers2:Show();
 						CT_BuffMod_Style2FormatLabel:Show();
 						CT_BuffModDropdown_durationFormat2:Show();
@@ -10039,11 +10050,18 @@ CONSOLIDATION REMOVED FROM GAME--]]
 		optionsAddObject(-20,   15, "font#tl:35:%y#n:CT_BuffMod_Style1PositionLabel#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Button/Style1/IconPositionLabel"]);
 		optionsAddObject( 15,   20, "dropdown#tl:140:%y#s:120:%s#n:CT_BuffModDropdown_rightAlign1#i:rightAlign1#o:rightAlign1:" .. constants.RIGHT_ALIGN_DEFAULT .. L["CT_BuffMod/Options/Window/Button/Style1/IconPositionDropdown"]);
 
-		-- Color code border of debuff icons
+		-- Icon Borders, including debuff colour codes
 		optionsBeginFrame( -5,   26, "checkbutton#tl:30:%y#i:colorCodeIcons1#o:colorCodeIcons1#" .. L["CT_BuffMod/Options/Window/Button/General/DebuffBorderColorCheckbox"]);
 			optionsAddScript("onenter",
 				function(button)
 					module:displayTooltip(button, {L["CT_BuffMod/Options/Window/Button/General/DebuffBorderColorCheckbox"],L["CT_BuffMod/Options/Window/Button/General/DebuffColorTooltip"]}, "ANCHOR_TOPLEFT");
+				end
+			);
+		optionsEndFrame();
+		optionsBeginFrame( -5,   26, "checkbutton#tl:30:%y#i:normalIconBorder1#o:normalIconBorder1#" .. L["CT_BuffMod/Options/Window/Button/General/NormalIconBorderCheckbox"]);
+			optionsAddScript("onenter",
+				function(button)
+					module:displayTooltip(button, {L["CT_BuffMod/Options/Window/Button/General/NormalIconBorderCheckbox"],L["CT_BuffMod/Options/Window/Button/General/NormalIconBorderTip"]}, "ANCHOR_TOPLEFT");
 				end
 			);
 		optionsEndFrame();
@@ -10119,11 +10137,18 @@ CONSOLIDATION REMOVED FROM GAME--]]
 		optionsAddObject(-20,   14, "font#tl:35:%y#n:CT_BuffMod_Style2SizeLabel#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Button/General/IconSizeSliderLabel"]);
 		optionsAddObject( 15,   17, "slider#tl:165:%y#s:120:%s#i:buffSize2#o:buffSize2:" .. constants.BUFF_SIZE_DEFAULT .. "#<value>#" .. constants.BUFF_SIZE_MINIMUM ..":" .. constants.BUFF_SIZE_MAXIMUM .. ":1");
 
-		-- Color code border of debuff icons
+		-- Icon Borders, including debuff colour codes
 		optionsBeginFrame(-15,   26, "checkbutton#tl:30:%y#i:colorCodeIcons2#o:colorCodeIcons2#" .. L["CT_BuffMod/Options/Window/Button/General/DebuffBorderColorCheckbox"]);
 			optionsAddScript("onenter",
 				function(button)
 					module:displayTooltip(button, {L["CT_BuffMod/Options/Window/Button/General/DebuffBorderColorCheckbox"],L["CT_BuffMod/Options/Window/Button/General/DebuffColorTooltip"]}, "ANCHOR_TOPLEFT");
+				end
+			);
+		optionsEndFrame();
+		optionsBeginFrame( -6,   26, "checkbutton#tl:30:%y#i:normalIconBorder2#o:normalIconBorder2#" .. L["CT_BuffMod/Options/Window/Button/General/NormalIconBorderCheckbox"]);
+			optionsAddScript("onenter",
+				function(button)
+					module:displayTooltip(button, {L["CT_BuffMod/Options/Window/Button/General/NormalIconBorderCheckbox"],L["CT_BuffMod/Options/Window/Button/General/NormalIconBorderTip"]}, "ANCHOR_TOPLEFT");
 				end
 			);
 		optionsEndFrame();
