@@ -19,7 +19,6 @@ local module = _G.CT_BottomBar;
 local appliedOptions;
 local frame_SetAlpha;
 local frame_EnableMouse;
-local MainMenuBarArtFrame = MainMenuBarArtFrame;	-- for faster retail vs classic detection
 
 --------------------------------------------
 -- Configure gryphons
@@ -76,7 +75,7 @@ function module:toggleGryphons(hide)
 	end
 	-- Hide/Show the gryphons
 	if ( hide ) then
-		if (MainMenuBarArtFrame) then
+		if (module:getGameVersion() >= 2) then
 			-- Retail
 			MainMenuBarArtFrame.LeftEndCap:Hide();
 			MainMenuBarArtFrame.RightEndCap:Hide();
@@ -86,7 +85,7 @@ function module:toggleGryphons(hide)
 			MainMenuBarRightEndCap:Hide();
 		end
 	else
-		if (MainMenuBarArtFrame) then
+		if (module:getGameVersion() >= 2) then
 			MainMenuBarArtFrame.LeftEndCap:Show();
 			MainMenuBarArtFrame.RightEndCap:Show();
 		else
@@ -103,14 +102,14 @@ local shownLions;
 
 function module:showLions(show)
 	if (show) then
-		(MainMenuBarArtFrame and MainMenuBarArtFrame.LeftEndCap or MainMenuBarLeftEndCap):SetTexture("Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Human");
-		(MainMenuBarArtFrame and MainMenuBarArtFrame.RightEndCap or MainMenuBarRightEndCap):SetTexture("Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Human");
+		(module:getGameVersion() >= 2 and MainMenuBarArtFrame.LeftEndCap or MainMenuBarLeftEndCap):SetTexture("Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Human");
+		(module:getGameVersion() >= 2 and MainMenuBarArtFrame.RightEndCap or MainMenuBarRightEndCap):SetTexture("Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Human");
 		shownLions = true;
 	else
 		-- Only show the gryphons if we have previously shown the lions.
 		if (shownLions) then
-			(MainMenuBarArtFrame and MainMenuBarArtFrame.LeftEndCap or MainMenuBarLeftEndCap):SetTexture("Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Dwarf");
-			(MainMenuBarArtFrame and MainMenuBarArtFrame.RightEndCap or MainMenuBarRightEndCap):SetTexture("Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Dwarf");
+			(module:getGameVersion() >= 2 and MainMenuBarArtFrame.LeftEndCap or MainMenuBarLeftEndCap):SetTexture("Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Dwarf");
+			(module:getGameVersion() >= 2 and MainMenuBarArtFrame.RightEndCap or MainMenuBarRightEndCap):SetTexture("Interface\\MainMenuBar\\UI-MainMenuBar-EndCap-Dwarf");
 			shownLions = false;
 		end
 	end
@@ -128,7 +127,7 @@ function module:hideTexturesBackground(hide)
 	-- Changed in WoW 8.0.1 to now hide the "small" texture when only the left half is showing.
 
 	if (hide) then
-		if (MainMenuBarArtFrame) then
+		if (module:getGameVersion() >= 2) then
 			-- Retail
 			MainMenuBarArtFrameBackground:Hide();
 		else
@@ -143,7 +142,7 @@ function module:hideTexturesBackground(hide)
 	else
 		-- Only show the textures if we previously hid them.
 		if (hidMainBackground) then
-			if (MainMenuBarArtFrame) then
+			if (module:getGameVersion() >= 2) then
 				-- Retail
 				MainMenuBarArtFrameBackground:Show();
 			else
@@ -165,7 +164,7 @@ function module:hideMenuAndBagsBackground(hide)
 	-- Hide/Show the background textures
 	
 	if (hide) then
-		if (MainMenuBarArtFrame) then
+		if (module:getGameVersion() >= 2) then
 			-- Retail
 			MicroButtonAndBagsBar:Hide();
 		else
@@ -177,9 +176,11 @@ function module:hideMenuAndBagsBackground(hide)
 	else
 		-- Only show the textures if we previously hid them.
 		if (hidMenuAndBagsBackground) then
-			if (MainMenuBarArtFrame) then
+			if (module:getGameVersion() >= 2) then
+				-- Retail
 				MicroButtonAndBagsBar:Show();
-			elseif(module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+			else
+				-- Classic
 				MainMenuBarTexture2:Show();
 				MainMenuBarTexture3:Show();
 			end
