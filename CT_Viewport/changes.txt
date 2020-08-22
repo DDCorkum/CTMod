@@ -1,5 +1,6 @@
 CT_Viewport (8.3.7.1) 2020-07-18
 - Unified with the CT Control Panel to resolve Shadowlands BackdropTemplate compatibility
+- Added option to remove the alert message when loading the game with a custom viewport
 - Added frFR and zhCN localization (courtesy: ddc, fredakook)
 
 CT_Viewport (8.3.0.10) 2020-06-10

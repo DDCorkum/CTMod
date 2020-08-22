@@ -60,7 +60,8 @@ local tremove = tremove;
 local unpack = unpack;
 local ceil = ceil;
 local next = next;
-local ActionButton_GetPagedID = ActionButton_GetPagedID;
+local ActionButton_GetPagedID = ActionButton_GetPagedID or ActionBarActionButtonMixin.GetPagedID;		-- Shadowlands 9.0 vs. 8.x and earlier
+local ActionButton_UpdateUsable = ActionButton_UpdateUsable or ActionBarActionButtonMixin.UpdateUsable;		-- Shadowlands 9.0 vs. 8.x and earlier
 local ActionHasRange = ActionHasRange;
 local CanExitVehicle = CanExitVehicle;
 local GetActionCharges = GetActionCharges;
@@ -1901,7 +1902,13 @@ do
 			end
 		end
 	end
-	hooksecurefunc("ActionButton_UpdateHotkeys", CT_BarMod_ActionButton_UpdateHotkeys);
+	if (ActionBarActionButtonMixin) then
+		-- Shadowlands 9.0
+		hooksecurefunc(ActionBarActionButtonMixin, "UpdateHotkeys", CT_BarMod_ActionButton_UpdateHotkeys);
+	else
+		-- 8.x and earlier
+		hooksecurefunc("ActionButton_UpdateHotkeys", CT_BarMod_ActionButton_UpdateHotkeys);
+	end
 
 	local function CT_BarMod_ActionButton_ResetHotkeys(self)
 		-- Reset button to Blizzard default state.
@@ -2011,7 +2018,13 @@ do
 			GameTooltip:Hide();
 		end
 	end
-	hooksecurefunc("ActionButton_SetTooltip", CT_BarMod_ActionButton_SetTooltip);
+	if (ActionBarActionButtonMixin) then
+		-- Shadowlands 9.0
+		hooksecurefunc(ActionBarActionButtonMixin, "SetTooltip", CT_BarMod_ActionButton_SetTooltip);
+	else
+		-- 8.x and earlier
+		hooksecurefunc("ActionButton_SetTooltip", CT_BarMod_ActionButton_SetTooltip);
+	end
 end
 
 --------------------------------------------

@@ -82,8 +82,9 @@ do
 		end
 	end
 end
+local UnitIsWarModePhased = UnitIsWarModePhased;
 local UnitInPhase = UnitInPhase;
-local UnitIsWarModePhased = UnitIsWarModePhased or function() return nil; end -- doesn't exist in classic
+local UnitPhaseReason = UnitPhaseReason	or function(unit) return UnitIsWarModePhased and UnitIsWarModePhased(unit) and 2 or not UnitInPhase(unit) and 0 or nil;	end	-- compatibility with Classic, BFA and Shadowlands
 local UnitInRange = UnitInRange;
 local UnitIsDeadOrGhost = UnitIsDeadOrGhost;
 local UnitIsUnit = UnitIsUnit;
@@ -2820,7 +2821,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 	-- frequently updates roleTexture to reflect game state; see createRoleTexture()
 	local function updateRoleTexture()
 		if (shownUnit and UnitExists(shownUnit)) then
-			local targetIndex, inPhase, inWarModePhase, roleAssigned = GetRaidTargetIndex(shownUnit), UnitInPhase(shownUnit), UnitIsWarModePhased(shownUnit), UnitGroupRolesAssigned(shownUnit);
+			local targetIndex, outOfPhase, roleAssigned = GetRaidTargetIndex(shownUnit), UnitPhaseReason(shownUnit), UnitGroupRolesAssigned(shownUnit);
 			if (targetIndex and targetIndex <= 8) then
 				roleTexture:SetTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcons");
 				if (targetIndex == 1) then
@@ -2841,7 +2842,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 					roleTexture:SetTexCoord(0.75, 1.00, 0.25, 0.50);
 				end
 				roleTexture:Show();
-			elseif (not inPhase or inWarModePhase) then
+			elseif (outOfPhase) then
 				roleTexture:SetTexture("Interface\\TargetingFrame\\UI-PhasingIcon");
 				roleTexture:SetTexCoord(0.15625, 0.84375, 0.15625, 0.84375);
 				roleTexture:Show();
@@ -3246,7 +3247,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 					)
 				));
 			end
-			if (UnitIsWarModePhased(shownUnit)) then
+			if (UnitPhaseReason(shownUnit) == 2) then
 				tinsert(tooltipTable, strings[4]:format(C_PvP.IsWarModeDesired() and ERR_PVP_WARMODE_TOGGLE_OFF or ERR_PVP_WARMODE_TOGGLE_ON));
 			end
 

@@ -37,6 +37,9 @@ L["CT_Viewport/Options/Viewport/Heading"] = "Custom Viewport"
 L["CT_Viewport/Options/Viewport/KeepSettingsPattern"] = "Keep Settings?  Reverting in %d sec."
 L["CT_Viewport/Options/Viewport/RenderedArea"] = "Rendered Area"
 L["CT_Viewport/Options/Viewport/ResetButton"] = "Reset"
+L["CT_Viewport/Options/Alerts/Heading"] = "Alerts"
+L["CT_Viewport/Options/Alerts/SuppressLoadingMessageCheckButton"] = "Suppress the on-load message"
+L["CT_Viewport/Options/Alerts/SuppressLoadingMessageTip"] = "Stops an alert from appearing in the chat window a few seconds after loading the game."
 
 
 -----------------------------------------------

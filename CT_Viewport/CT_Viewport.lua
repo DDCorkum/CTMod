@@ -334,7 +334,7 @@ function module.ApplySavedViewport()
 			CT_Viewport_Saved[4] = screenRes[2]/2 - 50;
 		end
 	end
-	if (tonumber(CT_Viewport_Saved[1]) + tonumber(CT_Viewport_Saved[2]) + tonumber(CT_Viewport_Saved[3]) + tonumber(CT_Viewport_Saved[4]) > 0) then
+	if (tonumber(CT_Viewport_Saved[1]) + tonumber(CT_Viewport_Saved[2]) + tonumber(CT_Viewport_Saved[3]) + tonumber(CT_Viewport_Saved[4]) > 0 and not module:getOption("CTVP_SuppressLoadingMessage")) then
 		C_Timer.After(8, function() print("|cFFFFFF00CT_Viewport is currently active! |n      |r/ctvp|cFFFFFF00 to tweak settings |n      |r/ctvp 0 0 0 0|cFFFFFF00 to restore default"); end);
 	end
 	module.ApplyViewport(
@@ -1154,6 +1154,13 @@ function module.frame()
 			end);
 		end);
 	optionsEndFrame();
+	
+	-- Display warning a few seconds after loading
+	optionsAddObject(-25, 17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_Viewport/Options/Alerts/Heading"]);
+	optionsBeginFrame(-5, 26, "checkbutton#tl:10:%y#o:CTVP_SuppressLoadingMessage#" .. L["CT_Viewport/Options/Alerts/SuppressLoadingMessageCheckButton"] .. "#l:268");
+		optionsAddTooltip({L["CT_Viewport/Options/Alerts/SuppressLoadingMessageCheckButton"],L["CT_Viewport/Options/Alerts/SuppressLoadingMessageTip"] .. textColor1});
+	optionsEndFrame();
+	
 	
 	-- see CT_Library
 	return "frame#all", module:framesGetData(optionsFrameList);

@@ -1,5 +1,5 @@
 CT_BottomBar (8.3.0.7) 2020-03-25
-- Small tweak to options menu; nothing substantive
+- Improved compatibility between different editions (Classic, Retail, PTR, Beta)
 
 CT_BottomBar (8.3.0.3) 2020-01-16
 - Small tweak to options menu; nothing substantive

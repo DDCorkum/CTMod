@@ -496,7 +496,7 @@
 						CT_FocusHealthCheck(self, value);
 					</OnValueChanged>
 					<OnSizeChanged>
-						if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+						if (_G["CT_Library"]:getGameVersion() >= 2) then
 							UnitFrameHealPredictionBars_UpdateSize(self:GetParent());
 						end
 					</OnSizeChanged>

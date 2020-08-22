@@ -1,5 +1,5 @@
-CT_RaidAssist (8.3.7.1) 2020-07-18
-- Switched to a better method for Shadowlands BackdropTemplate compatibility
+CT_RaidAssist (8.3.7.1) 2020-08-21
+- Compatibility changes for Shadowlands 9.0 pre-patch
 - Optional tighter vertical and horizonatal spacing
 
 CT_RaidAssist (8.3.0.11) 2020-06-24
