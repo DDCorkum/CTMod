@@ -67,6 +67,32 @@ L["CT_Viewport/Options/Viewport/ResetButton"] = "Réinitialiser"
 
 -----------------------------------------------
 -- zhCN
+-- Credits to dynaletik
+
+elseif (GetLocale() == "deDE") then
+
+L["CT_Viewport/Options/Alerts/Heading"] = "Warnungen"
+L["CT_Viewport/Options/Alerts/SuppressLoadingMessageCheckButton"] = "Nachricht beim Laden des Spiels unterdrücken"
+L["CT_Viewport/Options/Alerts/SuppressLoadingMessageTip"] = "Lässt kurz nach dem Laden des Spieles keine Warnung im Chatfenster anzeigen."
+L["CT_Viewport/Options/AspectRatio/DefaultPattern"] = "|cFFCCCCCCBildschirm Auflösung: |cFFFFFFFF%s"
+L["CT_Viewport/Options/AspectRatio/Heading"] = "Bildseitenverhältnis"
+L["CT_Viewport/Options/AspectRatio/NewPattern"] = "|cFFCCCCCCBenutzerdefinierter Viewport: |cFFFFFFFF%s"
+L["CT_Viewport/Options/Tips/Heading"] = "Hinweise"
+L["CT_Viewport/Options/Tips/Line1"] = "Gebe /viewport, /ctvp, oder /ctviewport ein:"
+L["CT_Viewport/Options/Tips/Line2"] = "Kontrollzentrum öffnen"
+L["CT_Viewport/Options/Tips/Line3"] = "Alle Seiten zurücksetzen"
+L["CT_Viewport/Options/Tips/Line4"] = "Alle Seiten festlegen: L, R, O, U"
+L["CT_Viewport/Options/Tips/Line5"] = "Alternativ eigene Werte unten eingeben."
+L["CT_Viewport/Options/Viewport/ApplyButton"] = "Übernehmen"
+L["CT_Viewport/Options/Viewport/ApplyTip"] = "Einstellungen werden bei fehlerhafter Oberfläche nach 20 Sekunden rückgängig gemacht."
+L["CT_Viewport/Options/Viewport/Heading"] = "Benutzerdefinierter Viewport"
+L["CT_Viewport/Options/Viewport/KeepSettingsPattern"] = "Einstellungen beibehalten? Zurücksetzen in %d Sekunden"
+L["CT_Viewport/Options/Viewport/RenderedArea"] = "Gerenderter Bereich"
+L["CT_Viewport/Options/Viewport/ResetButton"] = "Zurücksetzen"
+
+
+-----------------------------------------------
+-- zhCN
 -- Credits to fredakook
 
 elseif (GetLocale() == "zhCN") then
