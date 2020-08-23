@@ -1,3 +1,6 @@
+CT_MapMod (8.3.7.2) 2020-08-22
+- Integration with the future Shadowlands waypoint system (usable on 9.0 PTR and Beta)
+
 CT_MapMod (8.3.7.1) 2020-07-24
 - Shadowlands BackdropTemplate compatibility
 - Visual improvements to the note editing panel
