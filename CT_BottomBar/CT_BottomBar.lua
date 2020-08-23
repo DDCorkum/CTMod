@@ -545,7 +545,7 @@ local function registerEvents()
 
 	local frame = CT_BottomBar_Frame;
 
-	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+	if (module:getGameVersion() >= 3) then
 		-- frame:RegisterEvent("UNIT_ENTERING_VEHICLE");
 		-- frame:RegisterEvent("UNIT_EXITING_VEHICLE");
 		frame:RegisterEvent("UNIT_ENTERED_VEHICLE");
@@ -605,7 +605,7 @@ local function hook_UIParent_ManageFramePositions()
 	PetActionBarFrame:HookScript("OnHide", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
 
 	
-	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+	if (module:getGameVersion() >= 2) then
 	
 		-- From PossessActionBarFrame.xml
 		PossessBarFrame:HookScript("OnShow", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
@@ -667,7 +667,7 @@ module.update = function(self, optName, value)
 	configureActionBar();
 
 	-- Initialize some bars bar
-	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+	if (module:getGameVersion() >= 3) then
 		module:initOverrideActionBar();
 	end
 	module:initMainMenuBar();
@@ -683,7 +683,7 @@ module.update = function(self, optName, value)
 	pendingOptions = module.pendingOptions;
 
 	-- Initialize some other lua files.
-	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then	
+	if (module:getGameVersion()  >= 3) then	
 		module:overrideInit();
 	end
 	module:mainmenuInit();
@@ -696,7 +696,7 @@ module.update = function(self, optName, value)
 		--
 		-- "Experience Bar" needs to load before "Reputation Bar".
 		--
-		if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then	
+		if (module:getGameVersion() >= 2) then	
 			module:loadAddon("Action Bar Arrows");
 			module:loadAddon("Bags Bar");
 			module:loadAddon("Class Bar");

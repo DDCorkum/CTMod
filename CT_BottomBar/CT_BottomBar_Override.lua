@@ -45,7 +45,7 @@ end
 
 local animFlag;
 
-if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+if (module:getGameVersion() >= 3) then
 	-- WoW Classic does not have an OverrideActionBar
 	OverrideActionBar.slideOut:HookScript("OnPlay",
 		function(self)

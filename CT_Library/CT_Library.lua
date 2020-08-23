@@ -856,10 +856,10 @@ end
 
 local function registerLocalizationMeta(module)
 	-- most modules populate this table using localization.lua
-	module.text = module.text or {}
+	module.text = module.text or {};
 	
 	-- gracefully handle errors, in case a localisation is missing
-	local meta = getmetatable(module.text) or {}
+	local meta = getmetatable(module.text) or {};
 	meta.__index = function(table, missingKey)
 		missingKey = gsub(missingKey, (module.name or "CT_Library") .. "/", "");
 		missingKey = gsub(missingKey, "Options/", "O/");
@@ -1139,7 +1139,7 @@ end
 -----------------------------------------------
 -- Frame Misc
 
-function lib:createMultiLineEditBox(name, width, height, parent, bdtype)
+function lib:createMultiLineEditBox(name, width, height, parent, bdtype, font)
 	-- Create a multi line edit box
 	-- Param: bdtype -- nil==No backdrop, 1=Tooltip backdrop, 2==Dialog backdrop
 	local frame, scrollFrame, editBox;
@@ -1165,16 +1165,21 @@ function lib:createMultiLineEditBox(name, width, height, parent, bdtype)
 		};
 	end
 
-	frame = CreateFrame("Frame", name, parent);
-	frame:SetHeight(height);
-	frame:SetWidth(width);
-	frame:SetPoint("TOPLEFT", parent, "TOPLEFT", 0, 0);
-	frame:SetPoint("BOTTOMRIGHT", parent, "TOPLEFT", width, -height);
+
 	if (backdrop) then
+		frame = CreateFrame("Frame", name, parent, BackdropTemplateMixin and "BackdropTemplate");
 		frame:SetBackdrop(backdrop);
 		frame:SetBackdropBorderColor(0.4, 0.4, 0.4);
 		frame:SetBackdropColor(0, 0, 0);
+	else
+		frame = CreateFrame("Frame", name, parent);
 	end
+	
+	frame:SetHeight(height);
+	frame:SetWidth(width);
+	frame:SetPoint("TOPLEFT", parent);
+	frame:SetPoint("BOTTOMRIGHT", parent, "TOPLEFT", width, -height);
+
 	frame:EnableMouse(true);
 	frame:Hide();
 
@@ -1198,7 +1203,7 @@ function lib:createMultiLineEditBox(name, width, height, parent, bdtype)
 	editBox:SetMultiLine(true);
 	editBox:EnableMouse(true);
 	editBox:SetAutoFocus(false);
-	editBox:SetFontObject(ChatFontNormal);
+	editBox:SetFontObject(font or ChatFontNormal);
 
 	-- Note:
 	--
@@ -1470,6 +1475,9 @@ local tooltipBackdrop = {
 	insets = { left = 4, right = 4, top = 4, bottom = 4 }
 };
 objectHandlers.backdrop = function(self, parent, name, virtual, option, backdropType, bgColor, borderColor)
+	-- 9.0 Shadowlands compatibility
+	Mixin(parent, BackdropTemplateMixin or { });
+	
 	-- Convert short-notation names to the appropriate tables
 	if ( backdropType == "dialog" ) then
 		parent:SetBackdrop(dialogBackdrop);
@@ -1568,18 +1576,11 @@ objectHandlers.editbox = function(self, parent, name, virtual, option, font, bdt
 	local frame;
 	local backdrop;
 	if (multiline) then
-		frame = lib:createMultiLineEditBox(name,multilinewidth,multilineheight,parent,bdtype);
-		if (font) then
-			frame.editBox:SetFontObject(font)
-		end
+		frame = lib:createMultiLineEditBox(name,multilinewidth,multilineheight,parent,bdtype, font);
 		if (option) then
 			frame.editBox:SetText(self:getOption(option) or "");
 		end
 	else
-		frame = CreateFrame("EditBox", name, parent, virtual);
-		if (font) then
-			frame:SetFontObject(font)
-		end
 		if (tonumber(bdtype) == 1) then
 			backdrop = {
 				bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
@@ -1600,9 +1601,16 @@ objectHandlers.editbox = function(self, parent, name, virtual, option, font, bdt
 			};
 		end
 		if (backdrop) then
+			frame = CreateFrame("EditBox", name, parent, virtual, BackdropTemplateMixin and "BackdropTemplate");
 			frame:SetBackdrop(backdrop);
 			frame:SetBackdropBorderColor(0.4, 0.4, 0.4);
 			frame:SetBackdropColor(0, 0, 0);
+		else
+			frame = CreateFrame("EditBox", name, parent, virtual);
+		end
+		
+		if (font) then
+			frame:SetFontObject(font)
 		end
 		if (option) then
 			frame:SetText(self:getOption(option) or "");
@@ -3460,7 +3468,10 @@ module.frame = function()
 		helpAddObject( -5, 2*14, "font#tl:10:%y#s:0:%s#l:13:0#r#" .. L["CT_Library/Help/About/Credits"] .. "#" .. textColor1 .. ":l");  -- Two lines giving credits to Cide, TS, Resike and Dahk
 		
 		helpAddObject(-15,   14, "font#tl:10:%y#s:0:%s#l:13:0#r#" .. L["CT_Library/Help/About/Updates"] .. "#" .. textColor1 .. ":l");  -- "Updates are available at:"
-		helpAddObject( -5,   14, "font#tl:30:%y#s:0:%s#l:13:0#r#CurseForge.com/WoW/Addons/CTMod# " .. textColor0 .. ":l");
+		helpAddObject( -5,   14, "font#tl:30:%y#s:0:%s#l:13:0#CurseForge.com/WoW/Addons/CTMod# " .. textColor0 .. ":l:280");
+		helpAddObject( -5,   14, "font#tl:30:%y#s:0:%s#l:13:0#GitHub.com/DDCorkum/CTMod# " .. textColor0 .. ":l:280");
+		helpAddObject( -5,   14, "font#tl:30:%y#s:0:%s#l:13:0#WoWInterface.com/downloads/info3826-CTMod.html# " .. textColor0 .. ":l:280");
+		
 	
 	helpEndFrame();
 	

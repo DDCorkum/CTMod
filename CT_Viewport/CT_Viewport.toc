@@ -1,9 +1,10 @@
 ## Interface: 80300
-## Version: 8.3.0.10
+## Version: 8.3.7.1
 ## Title: CT_Viewport |cFF333333(BFA)
 ## Notes: Allows you to change the rendered world's size.
 ## DefaultState: Enabled
-## SavedVariablesPerCharacter: CT_Viewport_Saved
+## SavedVariablesPerCharacter: CT_Viewport_Saved, CT_ViewportOptions
 ## Dependencies: CT_Library
 
-CT_Viewport.xml
+CT_Viewport.lua
+localization.lua

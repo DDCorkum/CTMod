@@ -687,7 +687,7 @@ function group:new(groupId)
 
 	-- Create a frame and anchor it around the action buttons.
 	-- This will allow us to detect OnEnter and OnLeave events when the dragframe is not visible.
-	local overlay = CreateFrame("Frame", "CT_BarMod_Group" .. groupId .. "Frame", frame);
+	local overlay = CreateFrame("Frame", "CT_BarMod_Group" .. groupId .. "Frame", frame, BackdropTemplateMixin and "BackdropTemplate");
 --	overlay:SetBackdrop(backdrop);
 --	overlay:SetBackdropColor(1, 1, 1, 0.85);
 --	overlay:EnableMouse(true);

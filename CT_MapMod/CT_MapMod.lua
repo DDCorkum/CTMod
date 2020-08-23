@@ -738,11 +738,26 @@ do
 		
 		-- Creates the frame and its contents (called by the constructor)
 		local function createNotePanel()
+			if (frame) then
+				return;
+			end
+			
 			-- STEP 1: Create the frame, and establish its basic properties
 			-- STEP 2: Create the frame's children
 			
 			-- STEP 1:
-			frame = frame or CreateFrame("FRAME", nil, nil, "CT_MapMod_NoteTemplate");
+			frame = CreateFrame("FRAME", nil, nil, BackdropTemplateMixin and "BackdropTemplate");
+			frame:SetSize(330, 180);
+			frame:SetBackdrop({
+				bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+				edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+				tile = true,
+				tileEdge = true,
+				tileSize = 16,
+				edgeSize = 24,
+				insets = { left = 8, right = 8, top = 8, bottom = 8 },
+			});
+			frame:SetBackdropColor(0.4, 0.4, 0.4, 0.8);
 			if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
 				frame:SetScale(1.2);
 			end
@@ -753,44 +768,53 @@ do
 			local textColor2 = "0.7:0.7:0.7";
 			local textColor3 = "0.9:0.72:0.0";
 			module:getFrame (
-				{	["button#s:80:25#br:b:-42:16#v:GameMenuButtonTemplate#" .. L["CT_MapMod/Pin/Okay"]] = {
+				{	["button#s:80:25#br:b:-42:10#v:GameMenuButtonTemplate#" .. L["CT_MapMod/Pin/Okay"]] = {
 						["onclick"] = okayPressed,
 					},
-					["button#s:80:25#b:b:0:16#v:GameMenuButtonTemplate#" .. L["CT_MapMod/Pin/Cancel"]] = {
+					["button#s:80:25#b:b:0:10#v:GameMenuButtonTemplate#" .. L["CT_MapMod/Pin/Cancel"]] = {
 						["onclick"] = cancelPressed,
 					},
-					["button#s:80:25#bl:b:42:16#v:GameMenuButtonTemplate#" .. L["CT_MapMod/Pin/Delete"]] = {
+					["button#s:80:25#bl:b:42:10#v:GameMenuButtonTemplate#" .. L["CT_MapMod/Pin/Delete"]] = {
 						["onclick"] = deletePressed,
 					},
-					["font#l:tr:-100:-20#x#" .. textColor2 .. ":l"] = { },
-					["editbox#l:tr:-85:-20#s:30:18#v:CT_MapMod_EditBoxTemplate"] = { 
+					["font#l:tr:-100:-25#x#" .. textColor2 .. ":l"] = { },
+					["editbox#l:tr:-85:-25#s:30:18"] = { 
 						["onload"] = function(self)
 							xEditBox = self;
 							-- change this to allow typing in x coord manually
 							self:SetAutoFocus(false);
-							self:SetBackdropColor(1,1,1,0);
+							self:SetFontObject(ChatFontSmall);
 							self:HookScript("OnEditFocusGained", function(self)
 								self:ClearFocus();
 							end);
 						end,
 					},
-					["font#l:tr:-55:-20#y#" .. textColor2 .. ":l"] = { },
-					["editbox#l:tr:-40:-20#s:30:18#v:CT_MapMod_EditBoxTemplate"] = { 
+					["font#l:tr:-55:-25#y#" .. textColor2 .. ":l"] = { },
+					["editbox#l:tr:-40:-25#s:30:18"] = { 
 						["onload"] = function(self)
 							yEditBox = self;
 							-- change this to allow typing in y coord manually
 							self:SetAutoFocus(false);
-							self:SetBackdropColor(1,1,1,0);
+							self:SetFontObject(ChatFontSmall);
 							self:HookScript("OnEditFocusGained", function(self)
 								self:ClearFocus();
 							end);
 						end,
 					},
-					["font#l:tl:15:-30#" .. L["CT_MapMod/Pin/Name"] .. "#" .. textColor2 .. ":l"] = { },
-					["editbox#l:tl:55:-30#s:100:18#v:CT_MapMod_EditBoxTemplate"] = { 
+					["font#l:tl:15:-25#" .. L["CT_MapMod/Pin/Name"] .. "#" .. textColor2 .. ":l"] = { },
+					["editbox#l:tl:55:-25#s:150:18"] = { 
 						["onload"] = function(self)
 							nameEditBox = self;
 							self:SetAutoFocus(false);
+							Mixin(self, BackdropTemplateMixin or { });
+							self:SetBackdrop({
+								bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+								tile = true,
+								tileSize = 1,
+							});
+							self:SetBackdropColor(1,1,1,1);
+							self:SetFontObject(ChatFontSmall);
+							self:SetMaxLetters(32);
 							self:HookScript("OnEscapePressed", function(self)
 								self:ClearFocus();
 							end);
@@ -799,17 +823,25 @@ do
 							end);
 						end,
 					},	
-					["font#l:tl:15:-60#" .. L["CT_MapMod/Pin/Type"] .. "#" .. textColor2 .. ":l"] = { },
-					["font#l:t:0:-60#" .. L["CT_MapMod/Pin/Icon"] .. "#" .. textColor2 .. ":l"] = { },
-					["font#l:tl:15:-90#" .. L["CT_MapMod/Pin/Description"] .. "#" .. textColor2 .. ":l"] = { },
-					["editbox#l:tl:20:-110#s:290:18#v:CT_MapMod_EditBoxTemplate"] = { 
+					["font#l:tl:15:-50#" .. L["CT_MapMod/Pin/Type"] .. "#" .. textColor2 .. ":l"] = { },
+					["font#l:t:5:-50#" .. L["CT_MapMod/Pin/Icon"] .. "#" .. textColor2 .. ":l"] = { },
+					["font#l:tl:15:-75#" .. L["CT_MapMod/Pin/Description"] .. "#" .. textColor2 .. ":l"] = { },
+					["editbox#tl:tl:15:-84#br:tl:315:-144#ChatFontSmall"] = {
 						["onload"] = function(self)
 							descriptEditBox = self;
+							Mixin(self, BackdropTemplateMixin or { });
+							self:SetBackdrop({
+								bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+								tile = true,
+								tileSize = 1,
+							});
 							self:SetAutoFocus(false);
-							self:HookScript("OnEscapePressed", function(self)
+							self:SetMultiLine(true);
+							self:SetMaxLetters(255);
+							self:HookScript("OnEscapePressed", function()
 								self:ClearFocus();
 							end);
-							self:HookScript("OnEnterPressed", function(self)
+							self:HookScript("OnEnterPressed", function()
 								self:ClearFocus();
 							end);
 						end,
@@ -818,12 +850,12 @@ do
 				frame
 			);
 			setDropDown = CreateFrame("Frame", nil, frame, "UIDropDownMenuTemplate");
-			setDropDown:SetPoint("LEFT",frame,"TOPLEFT",35,-60);
+			setDropDown:SetPoint("LEFT",frame,"TOPLEFT",35,-52);
 			UIDropDownMenu_SetWidth(setDropDown, 90);
 			UIDropDownMenu_JustifyText(setDropDown, "LEFT");
 			
 			subsetDropDown = CreateFrame("Frame", nil, frame, "UIDropDownMenuTemplate");
-			subsetDropDown:SetPoint("LEFT",frame,"TOP",30,-60);
+			subsetDropDown:SetPoint("LEFT",frame,"TOP",30,-52);
 			UIDropDownMenu_SetWidth(subsetDropDown, 90);
 			UIDropDownMenu_JustifyText(subsetDropDown, "LEFT");
 
