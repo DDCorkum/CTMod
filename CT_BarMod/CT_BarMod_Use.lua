@@ -865,7 +865,7 @@ local function CT_BarMod__ActionButton_UpdateOverlayGlow(self)
 	if ( spellType == "spell" and IsSpellOverlayed(id) ) then
 		CT_BarMod__ActionButton_ShowOverlayGlow(self);
 	elseif ( spellType == "macro" ) then
-		local _, _, spellId = GetMacroSpell(id);
+		local spellId = GetMacroSpell(id);
 		if ( spellId and IsSpellOverlayed(spellId) ) then
 			CT_BarMod__ActionButton_ShowOverlayGlow(self);
 		else
@@ -889,7 +889,7 @@ function useButton:showOverlayGlow(arg1)
 		CT_BarMod__ActionButton_ShowOverlayGlow(self.button);
 	elseif ( actionType == "macro" ) then
 		-- id == macro number
-		local _, _, spellId = GetMacroSpell(id);
+		local spellId = GetMacroSpell(id);
 		if (spellId and spellId == arg1 ) then
 			CT_BarMod__ActionButton_ShowOverlayGlow(self.button);
 		end
@@ -906,7 +906,7 @@ function useButton:hideOverlayGlow(arg1)
 		CT_BarMod__ActionButton_HideOverlayGlow(self.button);
 	elseif ( actionType == "macro" ) then
 		-- id == macro number
-		local _, _, spellId = GetMacroSpell(id);
+		local spellId = GetMacroSpell(id);
 		if (spellId and spellId == arg1 ) then
 			CT_BarMod__ActionButton_HideOverlayGlow(self.button);
 		end
