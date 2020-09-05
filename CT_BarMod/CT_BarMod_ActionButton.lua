@@ -503,7 +503,7 @@ setmetatable(actionButtonList, { __index =
 --------------------------------------------
 -- Event Handlers
 
-local function eventHandler_SlotChanged(event, actionId)
+module:regEvent("ACTIONBAR_SLOT_CHANGED", function(event, actionId)
 	if (actionId == 0) then
 		actionButtonList:update();
 	else
@@ -514,9 +514,13 @@ local function eventHandler_SlotChanged(event, actionId)
 			end
 		end
 	end
-end
+end);
 
-module:regEvent("ACTIONBAR_SLOT_CHANGED", eventHandler_SlotChanged);
+
+
+module:regEvent("SPELL_UPDATE_ICON", function()
+	actionButtonList:updateTexture();
+end);
 
 --------------------------------------------
 -- Mode Handler
