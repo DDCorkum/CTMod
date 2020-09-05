@@ -573,8 +573,9 @@ do
 	local waypointLinkPattern = "|cffffff00|Hworldmap:%d:%d:%d|h[|A:Waypoint-MapPin-ChatIcon:13:13:0:0|a Map Pin Location]|h|r"
 	function CT_MapMod_PinMixin:OnClick(button)	
 		if (IsModifiedClick("CHATLINK") and module:getGameVersion() >= 9) then
+			-- Share the pin in chat
 			ChatEdit_InsertLink(waypointLinkPattern:format(self.mapid, self.x*10000, self.y*10000));
-		elseif (GetModifiedClick("CHATLINK") == "SHIFT-BUTTON1" and button == "LeftButton" and IsAltKeyDown() or button == "LeftButton" and IsShiftKeyDown()) then
+		elseif (button == "LeftButton" and (GetModifiedClick("CHATLINK") == "SHIFT-BUTTON1" and IsAltKeyDown() or IsShiftKeyDown())) then
 			-- Edit the pin
 			local panel = StaticNoteEditPanel();
 			panel:RequestFocus(self);
