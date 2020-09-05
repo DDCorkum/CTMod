@@ -575,8 +575,8 @@ do
 		if (IsModifiedClick("CHATLINK") and module:getGameVersion() >= 9) then
 			-- Share the pin in chat
 			ChatEdit_InsertLink(waypointLinkPattern:format(self.mapid, self.x*10000, self.y*10000));
-		elseif (button == "LeftButton" and (GetModifiedClick("CHATLINK") == "SHIFT-BUTTON1" and IsAltKeyDown() or IsShiftKeyDown())) then
-			-- Edit the pin
+		elseif (button == "LeftButton" and (GetModifiedClick("CHATLINK") ~= "SHIFT-BUTTON1" and IsShiftKeyDown or IsAltKeyDown)()) then
+			-- Edit the pin, using shift-left unless that keybind is already used for CHATLINK
 			local panel = StaticNoteEditPanel();
 			panel:RequestFocus(self);
 		elseif (IsControlKeyDown() and module:getGameVersion() >= 9) then
@@ -635,9 +635,9 @@ function CT_MapMod_PinMixin:OnMouseEnter()
 	end
 	if (not module.PinHasFocus) then  -- clicking on pins won't do anything while the edit box is open for this or another pin
 		if (self.datemodified and self.version) then
-			GameTooltip:AddDoubleLine(GetModifiedClick("CHATLINK") == "SHIFT-BUTTON1" and L["CT_MapMod/Pin/Alt-Click to Edit"] or L["CT_MapMod/Pin/Shift-Click to Edit"], self.datemodified .. " (" .. self.version .. ")", 0.00, 0.50, 0.90, 0.45, 0.45, 0.45);
+			GameTooltip:AddDoubleLine(L[GetModifiedClick("CHATLINK") ~= "SHIFT-BUTTON1" and "CT_MapMod/Pin/Shift-Click to Edit" or "CT_MapMod/Pin/Alt-Click to Edit"], self.datemodified .. " (" .. self.version .. ")", 0.00, 0.50, 0.90, 0.45, 0.45, 0.45);
 		else	
-			GameTooltip:AddLine(L["CT_MapMod/Map/Shift-Click to Drag"], 0, 0.5, 0.9, 1);
+			GameTooltip:AddLine(L[GetModifiedClick("CHATLINK") ~= "SHIFT-BUTTON1" and "CT_MapMod/Pin/Shift-Click to Edit" or "CT_MapMod/Pin/Alt-Click to Edit"], 0, 0.5, 0.9, 1);
 		end
 		GameTooltip:AddDoubleLine(L["CT_MapMod/Pin/Right-Click to Drag"], self.mapid, 0.00, 0.50, 0.90, 0.05, 0.05, 0.05 );
 		
