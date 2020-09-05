@@ -104,9 +104,6 @@ module.pinTypes =
 			{ ["name"] = "Heartblossom", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
 			{ ["name"] = "Whiptail", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
 			{ ["name"] = "Twilight Jasmine", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
-		},
-		["Recent Expansions"] =
-		{
 			-- Mists of Pandaria
 			{ ["name"] = "Green Tea Leaf", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
 			{ ["name"] = "Rain Poppy", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
@@ -115,6 +112,9 @@ module.pinTypes =
 			{ ["name"] = "Fool's Cap", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
 			{ ["name"] = "Sha-Touched Herb", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
 			{ ["name"] = "Golden Lotus", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
+		},
+		["Recent Expansions"] =
+		{
 			-- Warlords of Draenor
 			{ ["name"] = "Fireweed", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Fireweed" },
 			{ ["name"] = "Gorgrond Flytrap", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_GorgrondFlytrap" },
@@ -144,6 +144,7 @@ module.pinTypes =
 			{ ["name"] = "Death Blossom", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_DeathBlossom", },
 			{ ["name"] = "Marrowroot", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
 			{ ["name"] = "Rising Glory", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
+			{ ["name"] = "Vigil's Torch", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
 			{ ["name"] = "Widowbloom", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
 			
 		},
@@ -162,7 +163,7 @@ module.pinTypes =
 			{ ["name"] = "Truesilver", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_TruesilverVein" }, --8
 			{ ["name"] = "Adamantite", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_AdamantiteVein" }, --9
 		},
-		["Expansions"] = 
+		["Early Expansions"] = 
 		{
 			-- Burning Crusade
 			{ ["name"] = "Fel Iron", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_FelIronVein" }, --10
@@ -179,6 +180,9 @@ module.pinTypes =
 			{ ["name"] = "Ghost Iron", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_GhostIron" }, -- 18
 			{ ["name"] = "Kyparite", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Kyparite" }, -- 19
 			{ ["name"] = "Trillium", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Trillium" }, -- 20
+		},
+		["Recent Expansions"] = 
+		{
 			-- Warlords of Draenor
 			{ ["name"] = "Blackrock", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein" },
 			{ ["name"] = "True Iron", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein" },
@@ -191,10 +195,10 @@ module.pinTypes =
 			{ ["name"] = "Platinum", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Platinum", ["spawnsRandomly"] = true },
 			{ ["name"] = "Osmenite", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Elementium" },
 			-- Shadowlands
-			{ ["name"] = "Laestrite", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_ElementiumVein" },
+			{ ["name"] = "Laestrite", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Elementium" },
 			{ ["name"] = "Oxxein", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein" },
 			{ ["name"] = "Phaedrum", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein" },
-			{ ["name"] = "Sinvyr", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein" },
+			{ ["name"] = "Sinvyr", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_SaroniteVein" },
 			{ ["name"] = "Solenium", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_GoldVein" },
 		},
 	},
@@ -274,6 +278,7 @@ module.miningSkills =
 	[265849] = true,	-- Legion
 	[265851] = true,	-- Kul Tiran
 	[265854] = true,	-- Zandalari
+	[309835] = true,	-- Shadowlands
 }
 
 
