@@ -99,6 +99,11 @@ constants.VISIBILITY_ADVANCED = 3
 constants.SEPARATE_ZERO_BEFORE = 1;
 constants.SEPARATE_ZERO_AFTER = 2;
 constants.SEPARATE_ZERO_WITH = 3;
+constants.SEPARATE_ZERO_HIDDEN = 4;
+constants.SEPARATE_ZERO_SHOWN_ONLY = 5;
+
+constants.SEPARATE_ZERO = {1, -1, 0, 0, 0}
+constants.FILTER_ZERO = {0, 0, 0, 1, -1}
 
 constants.SEPARATE_OWN_BEFORE = 1;
 constants.SEPARATE_OWN_AFTER = 2;
@@ -294,6 +299,10 @@ local function configureAuras(self, auraTable, consolidateTable, weaponPosition)
 	local minWidth = tonumber(self:GetAttribute("minWidth")) or 0;
 	local minHeight = tonumber(self:GetAttribute("minHeight")) or 0;
 
+	-- Begin Mod
+	local filterZero = tonumber(self:GetAttribute("filterZero")) or 0;
+	-- End Mod
+
 	if ( consolidateTable and #consolidateTable == 0 ) then
 		consolidateTable = nil;
 	end
@@ -301,21 +310,33 @@ local function configureAuras(self, auraTable, consolidateTable, weaponPosition)
 
 	wipe(buttons);
 	local buffTemplate, buffWidget = extractTemplateInfo(self:GetAttribute("template"), "Button");
+	-- Begin Mod
+	local count = 0;
+	-- End Mod
 	if ( buffTemplate ) then
 		for i=1, #auraTable do
-			local childAttr = "child"..i;
-			local button = self:GetAttribute("child"..i);
-			if ( button ) then
-				button:ClearAllPoints();
-			else
-				button = constructChild(buffWidget, name and name.."AuraButton"..i, self, buffTemplate);
-				setAttributesWithoutResponse(self, childAttr, button, "frameref-"..childAttr, GetFrameHandle(button));
+			-- Begin Mod
+			if (
+				filterZero == 0 
+				or filterZero == 1 and auraTable[i].duration > 0 
+				or filterZero == -1 and auraTable[i].duration == 0
+			) then
+				count = count + 1
+				local childAttr = "child"..count;
+				local button = self:GetAttribute(childAttr);
+				if ( button ) then
+					button:ClearAllPoints();
+				else
+					button = constructChild(buffWidget, name and name.."AuraButton"..i, self, buffTemplate);
+					setAttributesWithoutResponse(self, childAttr, button, "frameref-"..childAttr, GetFrameHandle(button));
+				end
+				local buffInfo = auraTable[i];
+				button:SetID(buffInfo.index);
+				button:SetAttribute("index", buffInfo.index);
+				button:SetAttribute("filter", buffInfo.filter);
+				buttons[count] = button;
 			end
-			local buffInfo = auraTable[i];
-			button:SetID(buffInfo.index);
-			button:SetAttribute("index", buffInfo.index);
-			button:SetAttribute("filter", buffInfo.filter);
-			buttons[i] = button;
+			-- End Mod
 		end
 	end
 	-- Bugfix
@@ -5106,7 +5127,7 @@ end
 -- P	.disableTooltips -- Prevent tooltips from appearing (1==Yes, false==no, default is no)
 -- P	.playerUnsecure -- Use unsecure frame and buttons for player and vehicle units (1==yes, false==no, default == no)
 -- P	.separateOwn -- Sort auras cast by player from others (1==Sort before others, 2==Sort after others, 3==Sort with others, default==Sort before others) (see constants.SEPARATE_OWN_*)
--- P	.separateZero -- Sort non-expiring buffs before, with, or after other buffs (1=before, 2=after, 3=with)
+-- P	.separateZero  -- Sort non-expiring buffs before, with, or after other buffs; or hide them entirely (1=before, 2=after, 3=with; 4=hide)
 -- P	.sortDirection -- Sort direction (false == ascending, 1 == descending, default == ascending)
 -- P	.sortMethod -- Sort by (1==Name, 2==Time, 3==Order, default == Name) (see constants.SORT_METHOD_*)
 -- P	.sortSeq1 -- First type of buff to sort (1==None, 2==Debuff, 3==Cancelable buff, 4==Uncancelable Buff, 5==All buffs, 6==Weapon, 7=Consolidated, default==Debuff) (see constants.FILTER_TYPE_*)
@@ -5574,7 +5595,7 @@ function primaryClass:applyProtectedOptions(initFlag)
 	self.sortMethod = frameOptions.sortMethod or constants.SORT_METHOD_NAME;
 	self.sortDirection = not not frameOptions.sortDirection;
 	self.separateZero = frameOptions.separateZero or constants.SEPARATE_ZERO_WITH;
-
+	
 	self.consolidateDuration = (frameOptions.consolidateDurationMinutes or 0) * 60 + (frameOptions.consolidateDurationSeconds or 30);
 	self.consolidateThreshold = (frameOptions.consolidateThresholdMinutes or 0) * 60 + (frameOptions.consolidateThresholdSeconds or 10);
 	self.consolidateFraction = (frameOptions.consolidateFractionPercent or 10) / 100;
@@ -5759,19 +5780,9 @@ function primaryClass:setAttributes()
 	end
 	auraFrame:SetAttribute("separateOwn", value);
 
-	-- Sort zero duration buffs before, after, or with other buffs
-	local value = self.separateZero;
-	if (value == constants.SEPARATE_ZERO_BEFORE) then
-		-- Sort zero duration buffs before others
-		value = 1;
-	elseif (value == constants.SEPARATE_ZERO_AFTER) then
-		-- Sort zero duration buffs after others
-		value = -1;
-	else -- if (value == constants.SEPARATE_ZERO_WITH) then
-		-- Sort zero duration buffs with others
-		value = 0;
-	end
-	auraFrame:SetAttribute("separateZero", value);
+	-- Sort zero duration buffs before, after, or with other buffs; or hide them entirely
+	auraFrame:SetAttribute("separateZero", constants.SEPARATE_ZERO[self.separateZero]);
+	auraFrame:SetAttribute("filterZero", constants.FILTER_ZERO[self.separateZero]);
 
 	-- Values used to determine if auras get consolidated.
 	auraFrame:SetAttribute("consolidateDuration", self.consolidateDuration);
