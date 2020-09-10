@@ -449,7 +449,6 @@ function StaticCTRAFrames()
 	-- private properties, and where applicable their default values
 	local windows = { };			-- non-interactive frames that anchor and orient assigned collections of PlayerFrames, TargetFrames and LabelFrames
 	local selectedWindow = nil;		-- the currently selected window
-	local listener = nil;			-- listener for joining and leaving a raid
 	local enabledState;			-- are the raidframes enabled (but possibly hidden if not in a raid)
 	local settingsOverlayToStopClicks;	-- button that sits overtop several options to stop interactions with them
 	local dummyFrame;			-- pretend CTRAPlayerFrame to illustrate options
@@ -615,7 +614,7 @@ function StaticCTRAFrames()
 					or key == "CTRAFrames_ClickCast_Target"
 				) then
 					--StaticClickCastBroker:Update(key, val); 	-- not currently used
-					for i, window in ipairs(windows) do
+					for __, window in ipairs(windows) do
 						window:Update(key, val);		-- all the windows need to update their secureButton
 					end
 				elseif (key:sub(1,21) == "CTRAFrames_ClickCast_" and key:len() > 21) then
@@ -1667,7 +1666,7 @@ function NewCTRAWindow(owningCTRAFrames)
 			for key, val in pairs(pendingOptions) do
 				if (key == "PlayerFrameScale") then
 					updateFont();
-					for i, label in ipairs(labels) do
+					for __, label in ipairs(labels) do
 						label:SetScale(val/100);
 					end					
 				elseif (
@@ -1681,7 +1680,7 @@ function NewCTRAWindow(owningCTRAFrames)
 					or key == "TargetHealth"
 					or key == "TargetPower"
 				) then
-					for i, label in ipairs(labels) do
+					for __, label in ipairs(labels) do
 						anchorLabel(label);
 					end
 				end
@@ -2179,7 +2178,7 @@ function StaticClickCastBroker()
 		-- allBuff
 		if (module.CTRA_Configuration_Buffs[class]) then
 			for __, details in ipairs(module.CTRA_Configuration_Buffs[class]) do
-				if (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) then
+				if (details.name) then
 					addToTable(allBuff, details.id, details.name, details.modifier, details.button);
 				end
 			end
@@ -2188,7 +2187,7 @@ function StaticClickCastBroker()
 		-- allRemoveDebuff
 		if (module.CTRA_Configuration_FriendlyRemoves[class]) then
 			for __, details in ipairs(module.CTRA_Configuration_FriendlyRemoves[class]) do
-				if (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) then
+				if (details.name) then
 					addToTable(allRemoveDebuff, details.id, details.name, details.modifier, details.button);
 				end
 			end
@@ -2197,11 +2196,13 @@ function StaticClickCastBroker()
 		-- allRezCombat and allRezNoCombat
 		if (module.CTRA_Configuration_RezAbilities[class]) then
 			for __, details in ipairs(module.CTRA_Configuration_RezAbilities[class]) do
-				if (details.combat and (details.gameVersion == nil or details.gameVersion == module:getGameVersion())) then
-					addToTable(allRezCombat, details.id, details.name, details.modifier, details.button);
-				end
-				if (details.nocombat and (details.gameVersion == nil or details.gameVersion == module:getGameVersion())) then
-					addToTable(allRezNoCombat, details.id, details.name, details.modifier, details.button);
+				if (details.name) then
+					if (details.combat) then
+						addToTable(allRezCombat, details.id, details.name, details.modifier, details.button);
+					end
+					if (details.nocombat) then
+						addToTable(allRezNoCombat, details.id, details.name, details.modifier, details.button);
+					end
 				end
 			end
 		end
@@ -2357,16 +2358,21 @@ function StaticClickCastBroker()
 		end
 	end
 	
-	function obj:Reset(option, value)
+	function obj:Reset()
 		configureSpells(true);
 		updateSpells();
 	end
 	
-	-- CONSTRUCTOR
-	do
+	-- PACKAGE METHODS
+	
+	function module.reconfigureSpellBroker()
 		configureSpells();
 		updateSpells();
-		module:regEvent("PLAYER_LOGIN", function() configureSpells(); updateSpells(); end);
+	end;
+	
+	-- CONSTRUCTOR
+	do
+		module:regEvent("PLAYER_LOGIN", module.reconfigureSpellBroker);		-- any spell data loaded after the PLAYER_LOGIN will trigger the package-visible module.reconfigureSpellBroker found in the filterAndLocalize() method of _ExpansionData.lua
 		module:regEvent("LEARNED_SPELL_IN_TAB", updateSpells);
 		if (module:getGameVersion() >= 8) then
 			module:regEvent("ACTIVE_TALENT_GROUP_CHANGED", updateSpells);
@@ -2395,7 +2401,6 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 	local secureButton;		-- SecureUnitActionButton that sits in front and responds to mouseclicks
 	local secureButtonDebuffFirst;	-- SecureUnitActionButton that sits in front and responds to mouseclicks
 	local secureButtonCliqueFirst;	-- SecureUnitActionButton that sits in front and allows itself to be configured by Clique addon
-	local macro;		-- copy of the macro currently used when right-clicking secureButton to click-cast
 	local listenerFrame;		-- generic frame that listens to various events
 	local requestedUnit;		-- the unit that this object is requested to display at the next opportunity
 	local requestedXOff;		-- the x coordinate to position this object's frames at the next opportunity (relative to parent's left)w
@@ -2427,7 +2432,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 	local auraBoss1, auraBoss2, auraBoss3, auraBoss4;
 	local aura1, aura2, aura3, aura4, aura5;
 	local statusTexture, statusFontString, statusNoticeBackground, statusAlarmBackground;
-	local durabilityAverage, durabilityBroken, durabilityTime;
+	local durabilityAverage, durabilityTime;
 	
 	-- PRIVATE FUNCTIONS
 
@@ -3153,7 +3158,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 	-- permanently creates the aura and auraBoss textures 
 	local function createAuras()
 		local function constructAura(x, y)
-			frame = CreateFrame("Frame", nil, visualFrame);
+			local frame = CreateFrame("Frame", nil, visualFrame);
 			frame:SetSize(10,10);
 			frame:SetPoint("TOPRIGHT", x, y);
 			frame.texture = frame:CreateTexture(nil, "OVERLAY", nil, 1)		-- just behind boss auras, if there are enough of them
@@ -3732,6 +3737,7 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 	local healthBarFullCombat, healthBarZeroCombat, healthBarFullNoCombat, healthBarZeroNoCombat;
 	local absorbBarFullCombat, absorbBarZeroCombat, absorbBarFullNoCombat, absorbBarZeroNoCombat, absorbBarOverlay;
 	local incomingBarFullCombat, incomingBarZeroCombat, incomingBarFullNoCombat, incomingBarZeroNoCombat;
+	local incomingSetting, absorbSetting;
 	local healthBarWidth;
 	local powerBar, powerBarWidth;
 	local unitNameFontString;

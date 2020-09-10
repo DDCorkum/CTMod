@@ -36,31 +36,31 @@ module.CTRA_Configuration_Buffs =
 {
 	["PRIEST"] =
 	{
-		{["name"] = "Power Word: Fortitude", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 211681, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
-		{["name"] = "Power Word: Fortitude", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 1243, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
-		{["name"] = "Prayer of Fortitude", ["button"] = 2, ["modifier"] = "mod:shift", ["id"] = 21564, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
+		{["id"] = 211681, ["button"] = 2, ["modifier"] = "nomod" },	-- Power Word: Fortitude (Retail)
+		{["id"] = 1243, ["button"] = 2, ["modifier"] = "nomod" },	-- Power Word: Fortitude (Classic)
+		{["id"] = 2156, ["button"] = 2, ["modifier"] = "mod:shift" },	-- Prayer of Fortitude (Classic)
 	},
 	["MAGE"] =
 	{
-		{["name"] = "Arcane Intellect", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 1459},
-		{["name"] = "Arcane Brilliance", ["button"] = 2, ["modifier"] = "mod:shift", ["id"] = 23028, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
-		{["name"] = "Amplify Magic", ["button"] = 2, ["modifier"] = "mod:ctrl", ["id"] = 1008, ["gameVersion"] = CT_GAME_VERSION_CLASSIC,},
-		{["name"] = "Dampen Magic", ["button"] = 2, ["modifier"] = "mod:alt", ["id"] = 604, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
+		{["id"] = 1459, ["button"] = 2, ["modifier"] = "nomod"},	-- Arcane Intellect
+		{["id"] = 23028, ["button"] = 2, ["modifier"] = "mod:shift"},	-- Arcane Brilliance (Classic)
+		{["id"] = 1008, ["button"] = 2, ["modifier"] = "mod:ctrl"},	-- Amplify Magic (Classic)
+		{["id"] = 604, ["button"] = 2, ["modifier"] = "mod:alt"},	-- Dampen Magic (Classic)
 	},
 	["WARRIOR"] =
 	{	
-		{["name"] = "Battle Shout", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 6673},
+		{["id"] = 6673, ["button"] = 2, ["modifier"] = "nomod"},	-- Battle Shout
 	},
 	["HUNTER"] =
 	{
-		{["name"] = "Trueshot Aura", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 19506, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
+		{["id"] = 19506, ["button"] = 2, ["modifier"] = "nomod"},	-- Trueshot Aura
 	},
 	["PALADIN"] = 
 	{
-		{["name"] = "Blessing of Kings", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 20217, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
-		{["name"] = "Blessing of Wisdom", ["button"] = 2, ["modifier"] = "mod:shift", ["id"] = 19742, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
-		{["name"] = "Blessing of Might", ["button"] = 2, ["modifier"] = "mod:ctrl", ["id"] = 19740, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
-		{["name"] = "Blessing of Salvation", ["button"] = 2, ["modifier"] = "mod:alt", ["id"] = 1038, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
+		{["id"] = 20217, ["button"] = 2, ["modifier"] = "nomod"},	-- Blessing of Kings
+		{["id"] = 19742, ["button"] = 2, ["modifier"] = "mod:shift" },	-- Blessing of Might
+		{["id"] = 19740, ["button"] = 2, ["modifier"] = "mod:ctrl"},	-- Blessing of Wisdom
+		{["id"] = 1038, ["button"] = 2, ["modifier"] = "mod:alt"},	-- Blessing of Salvation
 	}
 }
 
@@ -78,41 +78,37 @@ module.CTRA_Configuration_FriendlyRemoves =
 {			
 	["DRUID"] =										
 	{											
-		{["name"] = "Nature's Cure", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 88423, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
-		{["name"] = "Remove Corruption", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 2782, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
-		{["name"] = "Abolish Poison", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 2893, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
-		{["name"] = "Cure Poison", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 8946, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},  	--  the first available 'nomod' on the list has precedence, so at lvl 26 this stops being used
-		{["name"] = "Remove Curse", ["button"] = 2, ["modifier"] = "mod:shift", ["id"] = 2782, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
+		{["id"] = 88423, ["button"] = 2, ["modifier"] = "nomod"},	-- Nature's Cure (Retail some specs)
+		{["id"] = 2782, ["button"] = 2, ["modifier"] = (module:getGameVersion() == 1 and "mod:shift" or "nomod")},	-- Remove Curse (Classic 2:shift) or Remove Corruption (Retail other specs 2:nomod)
+		{["id"] = 2893, ["button"] = 2, ["modifier"] = "nomod"},	-- Abolish Poison (Classic after lvl 26)
+		{["id"] = 8946, ["button"] = 2, ["modifier"] = "nomod"},  	-- Cure Poison (Classic until lvl 26)
 	},
 	["MAGE"] =
 	{
-		{["name"] = "Remove Curse", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 475, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
-		{["name"] = "Remove Lesser Curse", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 475, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
+		{["id"] = 475, ["button"] = 2, ["modifier"] = "nomod"},		-- Remove Curse / Remove Lesser Curse
 	},
 	["MONK"] =
 	{
-		{["name"] = "Detox", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 115450, ["spec"] = 270},
-		{["name"] = "Detox", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 218164},	-- this is superceded for mistweavers by the higher one on the list with spec=270
+		{["id"] = 115450, ["button"] = 2, ["modifier"] = "nomod"},	-- Detox
 	},
 	["PALADIN"] =
 	{
-		{["name"] = "Cleanse", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 4987},
-		{["name"] = "Cleanse  Toxins", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 213644, ["gameVersion"] = CT_GAME_VERSION_RETAIL},	-- used by specs in retail who don't get the full cleanse
-		{["name"] = "Purify", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 1152, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},	--at higher levels, replaced by cleanse
+		{["id"] = 4987, ["button"] = 2, ["modifier"] = "nomod"},	-- Cleanse (high-level in Classic, and some Retail specs)
+		{["id"] = 213644, ["button"] = 2, ["modifier"] = "nomod"},	-- Cleanse Toxins (other Retail specs)
+		{["id"] = 1152, ["button"] = 2, ["modifier"] = "nomod"},	-- Purify (low-level Classic)
 	},
 	["PRIEST"] = 
-	{
-		{["name"] = "Purify", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 527, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
-		{["name"] = "Purify Disease", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 213634, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
-		{["name"] = "Cure Disease", ["button"] = 2, ["modifier"] = "mod:shift", ["id"] = 528, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
-		{["name"] = "Dispel Magic", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 527, ["gameVersion"] = CT_GAME_VERSION_CLASSIC},
+	{	
+		{["id"] = 527, ["button"] = 2, ["modifier"] = "nomod"},		-- Purify (Retail some specs) / Dispel Magic (Classic)
+		{["id"] = 21363, ["button"] = 2, ["modifier"] = "nomod"},	-- Purify Disease (Retail other specs)
+		{["id"] = 528, ["button"] = 2, ["modifier"] = "mod:shift"},	-- Cure Disease (Classic)
 	},
 	["SHAMAN"] =
 	{
-		{["name"] = "Purify Spirit", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 77130, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
-		{["name"] = "Cleanse Spirit", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 51886, ["gameVersion"] = CT_GAME_VERSION_RETAIL},
-		{["name"] = "Cure Poison", ["button"] = 2, ["modifier"] = "mod:shift", ["id"] = 526},
-		{["name"] = "Cure Disease", ["button"] = 2, ["modifier"] = "mod:alt", ["id"] = 2870},
+		{["id"] = 77130, ["button"] = 2, ["modifier"] = "nomod"},	-- Purify Spirit (Retail some specs)
+		{["id"] = 51886, ["button"] = 2, ["modifier"] = "nomod"},	-- Cleanse Spirit (Retail other specs)
+		{["id"] = 526, ["button"] = 2, ["modifier"] = "mod:shift"},	-- Cure Poison (Classic)
+		{["id"] = 2870, ["button"] = 2, ["modifier"] = "mod:alt"},	-- Cure Disease (Classic)
 	},
 }
 
@@ -131,28 +127,29 @@ module.CTRA_Configuration_RezAbilities =
 {
 	["DRUID"] =
 	{
-		{["name"] = "Rebirth", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 20484, ["combat"] = true},
-		{["name"] = "Revive", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 50769, ["nocombat"] = true},
+		{["id"] = 20484, ["button"] = 2, ["modifier"] = "nomod", ["combat"] = true},			-- Rebirth
+		{["id"] = 50769, ["button"] = 2, ["modifier"] = "nomod", ["nocombat"] = true},			-- Revive
 	},
 	["DEATHKNIGHT"] =
 	{
-		{["name"] = "Raise Ally", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 61999, ["combat"] = true, ["nocombat"] = true},
+		{["id"] = 61999, ["button"] = 2, ["modifier"] = "nomod", ["combat"] = true, ["nocombat"] = true},			-- Raise Ally
 	},
-	["WARLOCK"] =
-	{
-		{["name"] = "Soulstone", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 5232, ["combat"] = true, ["gameVersion"] = CT_GAME_VERSION_RETAIL},	--TO DO: Make a classic version that uses the soulstone sitting in the bags
-	},
+	["WARLOCK"] = 
+		module:getGameVersion() >= 4 
+		and {
+			{["id"] = 5232, ["button"] = 2, ["modifier"] = "nomod", ["combat"] = true},		-- Soulstone (Retail)
+		} or nil,
 	["PALADIN"] =
 	{
-		{["name"] = "Redemption", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 7328, ["nocombat"] = true},
+		{["id"] = 7328, ["button"] = 2, ["modifier"] = "nomod", ["nocombat"] = true},			-- Redemption
 	},	
 	["PRIEST"] =
 	{
-		{["name"] = "Resurrection", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 2006, ["nocombat"] = true},
+		{["id"] = 2006, ["button"] = 2, ["modifier"] = "nomod", ["nocombat"] = true},			-- Ressurrection
 	},	
 	["SHAMAN"] =
 	{
-		{["name"] = "Ancestral Spirit", ["button"] = 2, ["modifier"] = "nomod", ["id"] = 2008, ["nocombat"] = true},
+		{["id"] = 2008, ["button"] = 2, ["modifier"] = "nomod", ["nocombat"] = true},			-- Ancestral Spirit
 	},
 }
 
@@ -457,20 +454,33 @@ module.CTRA_Configuration_Consumables =
 
 
 ------------------------------------------------
--- Localization
+-- Filtering spells not available in the current expansion, and localizing to the current client name
 
-local function localizeClickCasting(table)
+local loggedIn = nil;					-- if the PLAYER_LOGIN event has already fired before spell data asynchrously loads, then this will notify the spell broker that it must do a late update
+module:regEvent("PLAYER_LOGIN", function()
+	loggedIn = true
+end);
+
+local function filterAndLocalize(table)
 	local class = select(2, UnitClass("player"));
-	if (table[class]) then
-		for __, details in ipairs(table[class]) do
-			if (C_Spell.DoesSpellExist(details.id) and (details.gameVersion == module:getGameVersion() or not details.gameVersion)) then
-				local spell = Spell:CreateFromSpellID(details.id);
-				spell:ContinueOnSpellLoad(function() details.name = GetSpellInfo(details.id) end);
+	local spells, i = table[class], 1;
+	if (spells) then
+		while (spells[i]) do
+			if (C_Spell.DoesSpellExist(spells[i].id)) then
+				Spell:CreateFromSpellID(spells[i].id):ContinueOnSpellLoad(function()
+					spells[i].name = GetSpellInfo(spells[i].id)
+					if (loggedIn) then
+						module.reconfigureSpellBroker();
+					end
+				end);
+				i = i + 1;
+			else
+				tremove(spells, i);
 			end
 		end
 	end
 end
 
-localizeClickCasting(module.CTRA_Configuration_Buffs);
-localizeClickCasting(module.CTRA_Configuration_FriendlyRemoves);
-localizeClickCasting(module.CTRA_Configuration_RezAbilities);
+filterAndLocalize(module.CTRA_Configuration_Buffs);
+filterAndLocalize(module.CTRA_Configuration_FriendlyRemoves);
+filterAndLocalize(module.CTRA_Configuration_RezAbilities);
