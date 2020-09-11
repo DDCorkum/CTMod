@@ -462,20 +462,24 @@ module:regEvent("PLAYER_LOGIN", function()
 end);
 
 local function filterAndLocalize(table)
-	local class = select(2, UnitClass("player"));
-	local spells, i = table[class], 1;
-	if (spells) then
-		while (spells[i]) do
-			if (C_Spell.DoesSpellExist(spells[i].id)) then
-				Spell:CreateFromSpellID(spells[i].id):ContinueOnSpellLoad(function()
-					spells[i].name = GetSpellInfo(spells[i].id)
+	local entries = table[select(2, UnitClass("player"))];
+	if (entries) then
+		-- manual while loop, because entries will be removed if they don't exist in the current edition of the game
+		local i = 1;
+		while (entries[i]) do
+			local entry = entries[i];	-- This local reference is important! The async queries below could come back after entries[i] points to something else.
+			if (C_Spell.DoesSpellExist(entry.id)) then
+				local spell = Spell:CreateFromSpellID(entry.id)
+				spell:ContinueOnSpellLoad(function()
+					entry.name = GetSpellInfo(entry.id)
 					if (loggedIn) then
+						-- PLAYER_LOGIN already happened, so trigger a post-login update
 						module.reconfigureSpellBroker();
 					end
 				end);
-				i = i + 1;
+				i = i + 1;			-- moves to the next spell
 			else
-				tremove(spells, i);
+				tremove(entries, i);		-- shifts the remaining spells forward to the current position
 			end
 		end
 	end
