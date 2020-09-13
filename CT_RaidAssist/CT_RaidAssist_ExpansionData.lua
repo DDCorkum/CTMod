@@ -28,40 +28,46 @@ local MODULE_NAME, module = ...;
 -- CTRA_Configuration_Buffs
 
 -- Which buffs could be applied out of combat by right-clicking the player frame?  Buffs listed first take precedence.
--- name: 	name of the spell to be cast 			(mandatory)
--- modifier: 	nomod, mod, mod:shift, mod:ctrl, or mod:alt	(mandatory)
 -- id:		spellId of any rank of this spell		(mandatory)
--- gameVersion: if set, this line only applies to classic or retail using CT_GAME_VERSION_CLASSIC or CT_GAME_VERSION_RETAIL constants
+-- button: 	1 (left), or 2 (right).				(optional; mandatory if modifier has a value, or omit both for spells disabled by default)
+-- modifier: 	nomod, mod, mod:shift, mod:ctrl, or mod:alt	(optional; mandatory if button has a value, or omit both for spells disabled by default)
 module.CTRA_Configuration_Buffs =
 {
-	["PRIEST"] =
+	["DRUID"] = 
 	{
-		{["id"] = 211681, ["button"] = 2, ["modifier"] = "nomod" },	-- Power Word: Fortitude (Retail)
-		{["id"] = 1243, ["button"] = 2, ["modifier"] = "nomod" },	-- Power Word: Fortitude (Classic)
-		{["id"] = 2156, ["button"] = 2, ["modifier"] = "mod:shift" },	-- Prayer of Fortitude (Classic)
-	},
-	["MAGE"] =
-	{
-		{["id"] = 1459, ["button"] = 2, ["modifier"] = "nomod"},	-- Arcane Intellect
-		{["id"] = 23028, ["button"] = 2, ["modifier"] = "mod:shift"},	-- Arcane Brilliance (Classic)
-		{["id"] = 1008, ["button"] = 2, ["modifier"] = "mod:ctrl"},	-- Amplify Magic (Classic)
-		{["id"] = 604, ["button"] = 2, ["modifier"] = "mod:alt"},	-- Dampen Magic (Classic)
-	},
-	["WARRIOR"] =
-	{	
-		{["id"] = 6673, ["button"] = 2, ["modifier"] = "nomod"},	-- Battle Shout
+		{["id"] = 1126, ["button"] = 2, ["modifier"] = "nomod"},		-- Mark of the Wild (Classic)
+		{["id"] = 48470, ["button"] = 2, ["modifier"] = "mod:shift"},		-- Gift of the Wild (Classic)
 	},
 	["HUNTER"] =
 	{
-		{["id"] = 19506, ["button"] = 2, ["modifier"] = "nomod"},	-- Trueshot Aura
+		{["id"] = 19506, ["button"] = 2, ["modifier"] = "nomod"},		-- Trueshot Aura
+	},
+	["MAGE"] =
+	{
+		{["id"] = 1459, ["button"] = 2, ["modifier"] = "nomod"},		-- Arcane Intellect
+		{["id"] = 23028, ["button"] = 2, ["modifier"] = "mod:shift"},		-- Arcane Brilliance (Classic)
+		{["id"] = 1008, ["button"] = 2, ["modifier"] = "mod:ctrl"},		-- Amplify Magic (Classic)
+		{["id"] = 604, ["button"] = 2, ["modifier"] = "mod:alt"},		-- Dampen Magic (Classic)
 	},
 	["PALADIN"] = 
 	{
-		{["id"] = 20217, ["button"] = 2, ["modifier"] = "nomod"},	-- Blessing of Kings
-		{["id"] = 19742, ["button"] = 2, ["modifier"] = "mod:shift" },	-- Blessing of Might
-		{["id"] = 19740, ["button"] = 2, ["modifier"] = "mod:ctrl"},	-- Blessing of Wisdom
-		{["id"] = 1038, ["button"] = 2, ["modifier"] = "mod:alt"},	-- Blessing of Salvation
-	}
+		{["id"] = 20217, ["button"] = 2, ["modifier"] = "nomod"},		-- Blessing of Kings
+		{["id"] = 19742, ["button"] = 2, ["modifier"] = "mod:shift"},		-- Blessing of Might
+		{["id"] = 19740, ["button"] = 2, ["modifier"] = "mod:ctrl"},		-- Blessing of Wisdom
+		{["id"] = 1038, ["button"] = 2, ["modifier"] = "mod:alt"},		-- Blessing of Salvation
+	},
+	["PRIEST"] =
+	{
+		{["id"] = 211681, ["button"] = 2, ["modifier"] = "nomod"},		-- Power Word: Fortitude (Retail)
+		{["id"] = 1243, ["button"] = 2, ["modifier"] = "nomod"},		-- Power Word: Fortitude (Classic)
+		{["id"] = 21562, ["button"] = 2, ["modifier"] = "mod:shift"},		-- Prayer of Fortitude (Classic)
+		{["id"] = 976, ["button"] = 2, ["modifier"] = "mod:ctrl"},		-- Shadow Protection (Classic; no default keybind)
+		{["id"] = 27683, ["button"] = 2, ["modifier"] = "mod:alt"},		-- Prayer of Shadow Protection (Classic, no default keybind)
+	},
+	["WARRIOR"] =
+	{	
+		{["id"] = 6673, ["button"] = 2, ["modifier"] = "nomod"},		-- Battle Shout
+	},
 }
 
 
@@ -69,46 +75,47 @@ module.CTRA_Configuration_Buffs =
 -- CTRA_Configuration_FriendlyRemoves
 
 -- Which debuff removals could be cast in combat by right-clicking the player frame?  Buffs listed first take precedence.
--- name: 	name of the spell to be cast 			(mandatory)
--- modifier: 	nomod, mod, mod:shift, mod:ctrl, or mod:alt	(mandatory)
 -- id:		spellId of any rank of this spell		(mandatory)
+-- button: 	1 (left), or 2 (right).				(optional; mandatory if modifier has a value, or omit both for spells disabled by default)
+-- modifier: 	nomod, mod, mod:shift, mod:ctrl, or mod:alt	(optional; mandatory if button has a value, or omit both for spells disabled by default)
 -- spec:	if set, this line only applies when GetInspectSpecialization("player") returns this SpecializationID
--- gameVersion: if set, this line only applies to classic or retail using CT_GAME_VERSION_CLASSIC or CT_GAME_VERSION_RETAIL constants
 module.CTRA_Configuration_FriendlyRemoves =												
 {			
 	["DRUID"] =										
 	{											
-		{["id"] = 88423, ["button"] = 2, ["modifier"] = "nomod"},	-- Nature's Cure (Retail some specs)
+		{["id"] = 88423, ["button"] = 2, ["modifier"] = "nomod"},		-- Nature's Cure (Retail some specs)
 		{["id"] = 2782, ["button"] = 2, ["modifier"] = (module:getGameVersion() == 1 and "mod:shift" or "nomod")},	-- Remove Curse (Classic 2:shift) or Remove Corruption (Retail other specs 2:nomod)
-		{["id"] = 2893, ["button"] = 2, ["modifier"] = "nomod"},	-- Abolish Poison (Classic after lvl 26)
-		{["id"] = 8946, ["button"] = 2, ["modifier"] = "nomod"},  	-- Cure Poison (Classic until lvl 26)
+		{["id"] = 2893, ["button"] = 2, ["modifier"] = "nomod"},		-- Abolish Poison (Classic after lvl 26)
+		{["id"] = 8946, ["button"] = 2, ["modifier"] = "nomod"},  		-- Cure Poison (Classic until lvl 26)
 	},
 	["MAGE"] =
 	{
-		{["id"] = 475, ["button"] = 2, ["modifier"] = "nomod"},		-- Remove Curse / Remove Lesser Curse
+		{["id"] = 475, ["button"] = 2, ["modifier"] = "nomod"},			-- Remove Curse / Remove Lesser Curse
 	},
 	["MONK"] =
 	{
-		{["id"] = 115450, ["button"] = 2, ["modifier"] = "nomod"},	-- Detox
+		{["id"] = 115450, ["button"] = 2, ["modifier"] = "nomod"},		-- Detox
 	},
 	["PALADIN"] =
 	{
-		{["id"] = 4987, ["button"] = 2, ["modifier"] = "nomod"},	-- Cleanse (high-level in Classic, and some Retail specs)
-		{["id"] = 213644, ["button"] = 2, ["modifier"] = "nomod"},	-- Cleanse Toxins (other Retail specs)
-		{["id"] = 1152, ["button"] = 2, ["modifier"] = "nomod"},	-- Purify (low-level Classic)
+		{["id"] = 4987, ["button"] = 2, ["modifier"] = "nomod"},		-- Cleanse (high-level in Classic, and some Retail specs)
+		{["id"] = 213644, ["button"] = 2, ["modifier"] = "nomod"},		-- Cleanse Toxins (other Retail specs)
+		{["id"] = 1152, ["button"] = 2, ["modifier"] = "nomod"},		-- Purify (low-level Classic)
 	},
 	["PRIEST"] = 
 	{	
-		{["id"] = 527, ["button"] = 2, ["modifier"] = "nomod"},		-- Purify (Retail some specs) / Dispel Magic (Classic)
-		{["id"] = 21363, ["button"] = 2, ["modifier"] = "nomod"},	-- Purify Disease (Retail other specs)
-		{["id"] = 528, ["button"] = 2, ["modifier"] = "mod:shift"},	-- Cure Disease (Classic)
+		{["id"] = 527, ["button"] = 2, ["modifier"] = "nomod"},			-- Purify (Retail some specs) / Dispel Magic (Classic)
+		{["id"] = 213634, ["button"] = 2, ["modifier"] = "nomod"},		-- Purify Disease (Retail other specs)
+		module:getGameVersion() <= 4
+			and {["id"] = 528, ["button"] = 2, ["modifier"] = "mod:shift"}	-- Cure Disease (Classic until Cataclysm)
+			or nil,	
 	},
 	["SHAMAN"] =
 	{
-		{["id"] = 77130, ["button"] = 2, ["modifier"] = "nomod"},	-- Purify Spirit (Retail some specs)
-		{["id"] = 51886, ["button"] = 2, ["modifier"] = "nomod"},	-- Cleanse Spirit (Retail other specs)
-		{["id"] = 526, ["button"] = 2, ["modifier"] = "mod:shift"},	-- Cure Poison (Classic)
-		{["id"] = 2870, ["button"] = 2, ["modifier"] = "mod:alt"},	-- Cure Disease (Classic)
+		{["id"] = 77130, ["button"] = 2, ["modifier"] = "nomod"},		-- Purify Spirit (Retail some specs)
+		{["id"] = 51886, ["button"] = 2, ["modifier"] = "nomod"},		-- Cleanse Spirit (Retail other specs)
+		{["id"] = 526, ["button"] = 2, ["modifier"] = "mod:shift"},		-- Cure Poison (Classic)
+		{["id"] = 2870, ["button"] = 2, ["modifier"] = "mod:alt"},		-- Cure Disease (Classic)
 	},
 }
 
@@ -117,39 +124,37 @@ module.CTRA_Configuration_FriendlyRemoves =
 -- CTRA_Configuration_RezAbilities
 
 -- Which ressurection spells could be cast by right-clicking the player frame?  Buffs listed first take precedence.
--- name: 	name of the spell to be cast 			(mandatory)
--- modifier: 	nomod, mod, mod:shift, mod:ctrl, or mod:alt	(mandatory)
 -- id:		spellId of any rank of this spell		(mandatory)
--- combat: 	if set, this spell may be cast during combat
--- nocombat:	if set, this spell may be cast outside combat
--- gameVersion: if set, this line only applies to classic or retail using CT_GAME_VERSION_CLASSIC or CT_GAME_VERSION_RETAIL constants
+-- button: 	1 (left), or 2 (right).				(optional; mandatory if modifier has a value, or omit both for spells disabled by default)
+-- modifier: 	nomod, mod, mod:shift, mod:ctrl, or mod:alt	(optional; mandatory if button has a value, or omit both for spells disabled by default)
+-- combat: 	if set, this spell may be cast during combat	(optional; but either this or nocombat must be set to be useful)
+-- nocombat:	if set, this spell may be cast outside combat	(optional; but either this or combat must be set to be useful)
 module.CTRA_Configuration_RezAbilities =
 {
 	["DRUID"] =
 	{
-		{["id"] = 20484, ["button"] = 2, ["modifier"] = "nomod", ["combat"] = true},			-- Rebirth
-		{["id"] = 50769, ["button"] = 2, ["modifier"] = "nomod", ["nocombat"] = true},			-- Revive
+		{["id"] = 20484, ["button"] = 2, ["modifier"] = "nomod", ["combat"] = true},				-- Rebirth
+		{["id"] = 50769, ["button"] = 2, ["modifier"] = "nomod", ["nocombat"] = true},				-- Revive
 	},
 	["DEATHKNIGHT"] =
 	{
-		{["id"] = 61999, ["button"] = 2, ["modifier"] = "nomod", ["combat"] = true, ["nocombat"] = true},			-- Raise Ally
+		{["id"] = 61999, ["button"] = 2, ["modifier"] = "nomod", ["combat"] = true, ["nocombat"] = true},	-- Raise Ally
 	},
 	["WARLOCK"] = 
 		module:getGameVersion() >= 4 
-		and {
-			{["id"] = 5232, ["button"] = 2, ["modifier"] = "nomod", ["combat"] = true},		-- Soulstone (Retail)
-		} or nil,
+			and {["id"] = 5232, ["button"] = 2, ["modifier"] = "nomod", ["combat"] = true}			-- Soulstone (Retail)
+			or nil,
 	["PALADIN"] =
 	{
-		{["id"] = 7328, ["button"] = 2, ["modifier"] = "nomod", ["nocombat"] = true},			-- Redemption
+		{["id"] = 7328, ["button"] = 2, ["modifier"] = "nomod", ["nocombat"] = true},				-- Redemption
 	},	
 	["PRIEST"] =
 	{
-		{["id"] = 2006, ["button"] = 2, ["modifier"] = "nomod", ["nocombat"] = true},			-- Ressurrection
+		{["id"] = 2006, ["button"] = 2, ["modifier"] = "nomod", ["nocombat"] = true},				-- Ressurrection
 	},	
 	["SHAMAN"] =
 	{
-		{["id"] = 2008, ["button"] = 2, ["modifier"] = "nomod", ["nocombat"] = true},			-- Ancestral Spirit
+		{["id"] = 2008, ["button"] = 2, ["modifier"] = "nomod", ["nocombat"] = true},				-- Ancestral Spirit
 	},
 }
 
@@ -456,11 +461,6 @@ module.CTRA_Configuration_Consumables =
 ------------------------------------------------
 -- Filtering spells not available in the current expansion, and localizing to the current client name
 
-local loggedIn = nil;					-- if the PLAYER_LOGIN event has already fired before spell data asynchrously loads, then this will notify the spell broker that it must do a late update
-module:regEvent("PLAYER_LOGIN", function()
-	loggedIn = true
-end);
-
 local function filterAndLocalize(table)
 	local entries = table[select(2, UnitClass("player"))];
 	if (entries) then
@@ -472,9 +472,8 @@ local function filterAndLocalize(table)
 				local spell = Spell:CreateFromSpellID(entry.id)
 				spell:ContinueOnSpellLoad(function()
 					entry.name = GetSpellInfo(entry.id)
-					if (loggedIn) then
-						-- PLAYER_LOGIN already happened, so trigger a post-login update
-						module.reconfigureSpellBroker();
+					if (module.ClickCastBroker) then
+						module.ClickCastBroker:Refresh();
 					end
 				end);
 				i = i + 1;			-- moves to the next spell
