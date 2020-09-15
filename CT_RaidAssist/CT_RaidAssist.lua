@@ -734,7 +734,7 @@ function StaticCTRAFrames()
 				for __, details in ipairs(buff) do
 					optionsAddObject(-6, 13, "font#tl:15:%y#" .. details.name .. "#0.2:0.8:0.4:l:146#v:GameFontNormalSmall");
 					optionsBeginFrame(13, 13, "dropdown#tl:162:%y#s:107:%s#o:CTRAFrames_ClickCast_" .. details.id .. ":" .. details.option .. L["CT_RaidAssist/Options/ClickCast/DropDownOptions"]);
-						optionsAddTooltip({"spell:" .. details.id});
+						optionsAddTooltip("spell:" .. details.id);
 					optionsEndFrame();
 				end
 			end
@@ -743,7 +743,7 @@ function StaticCTRAFrames()
 				for __, details in ipairs(removeDebuff) do
 					optionsAddObject(-6, 14, "font#tl:15:%y#" .. details.name .. "#0.8:0.4:0.4:l:146#v:GameFontNormalSmall");
 					optionsBeginFrame(14, 14, "dropdown#tl:162:%y#s:107:%s#o:CTRAFrames_ClickCast_" .. details.id .. ":" .. details.option .. L["CT_RaidAssist/Options/ClickCast/DropDownOptions"]);
-						optionsAddTooltip({"spell:" .. details.id});
+						optionsAddTooltip("spell:" .. details.id);
 					optionsEndFrame();
 				end
 			end
@@ -752,7 +752,7 @@ function StaticCTRAFrames()
 				for __, details in ipairs(rezCombat) do
 					optionsAddObject(-6, 14, "font#tl:15:%y#" .. details.name .. "#0.6:0.6:0.6:l:146#v:GameFontNormalSmall");
 					optionsBeginFrame(14, 14, "dropdown#tl:162:%y#s:107:%s#o:CTRAFrames_ClickCast_" .. details.id .. ":" .. details.option .. L["CT_RaidAssist/Options/ClickCast/DropDownOptions"]);
-						optionsAddTooltip({"spell:" .. details.id});
+						optionsAddTooltip("spell:" .. details.id);
 					optionsEndFrame();
 				end	
 			end
@@ -761,7 +761,7 @@ function StaticCTRAFrames()
 				for __, details in ipairs(rezNoCombat) do
 					optionsAddObject(-6, 14, "font#tl:15:%y#" .. details.name .. "#0.6:0.6:0.6:l:146#v:GameFontNormalSmall");
 					optionsBeginFrame(14, 14, "dropdown#tl:162:%y#s:107:%s#o:CTRAFrames_ClickCast_" .. details.id .. ":" .. details.option .. L["CT_RaidAssist/Options/ClickCast/DropDownOptions"]);
-						optionsAddTooltip({"spell:" .. details.id});
+						optionsAddTooltip("spell:" .. details.id);
 					optionsEndFrame();
 				end
 			end
