@@ -1,3 +1,6 @@
+CT_Library (8.3.7.2) 2020-09-14
+- More tooltip automation used with the CTRA options panel
+
 CT_Library (8.3.7.1) 2020-07-24
 - Shadowlands BackdropTemplate compatibility
 
