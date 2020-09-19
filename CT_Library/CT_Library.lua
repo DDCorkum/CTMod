@@ -200,6 +200,12 @@ do
 	local lineHeight = { };
 	local left, right = { }, { };
 	local tooltip = GameTooltip;
+	local validLinkTypes =
+	{
+		-- list of types converted to GameTooltip:SetHyperlink()
+		["item"] = true,
+		["spell"] = true,
+	}
 	
 	function lib:displayTooltip(obj, text, anchor, offx, offy, owner)
 		
@@ -240,7 +246,12 @@ do
 
 		-- generate the tooltip content
 		if (type(text) == "string") then
-			tooltip:SetText(text);
+			local p1, p2 = strsplit(":", text);
+			if (p1 and p2 and validLinkTypes[p1] and tonumber(p2)) then
+				tooltip:SetHyperlink(text);
+			else
+				tooltip:SetText(text);
+			end
 		elseif (type(text) == "table") then
 			for i, row in ipairs(text) do
 				local splitrow = {strsplit("#", row)}

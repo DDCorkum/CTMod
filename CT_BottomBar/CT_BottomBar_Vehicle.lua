@@ -428,12 +428,7 @@ local function create_CT_BottomBar_MainMenuBarVehicleLeaveButton()
 	);
 	button:SetScript("OnEnter",
 		function(self)
-			GameTooltip_AddNewbieTip(self, LEAVE_VEHICLE, 1.0, 1.0, 1.0, nil);
-		end
-	);
-	button:SetScript("OnLeave",
-		function(self)
-			GameTooltip_Hide();
+			module:displayTooltip(self, LEAVE_VEHICLE, "CT_ABOVEBELOW");
 		end
 	);
 	button:SetNormalTexture("Interface\\Vehicles\\UI-Vehicles-Button-Exit-Up");

@@ -132,7 +132,7 @@ L["CT_BuffMod/Options/Window/Layout/VerticalMaxWrapsSlider"] = "Number of column
 L["CT_BuffMod/Options/Window/Layout/VerticalWrapAfterSlider"] = "Buffs per column = <value>"
 L["CT_BuffMod/Options/Window/Layout/VerticalWrapSpacingSlider"] = "Column spacing = <value>"
 L["CT_BuffMod/Options/Window/Sorting/Heading"] = "Buff Sorting"
-L["CT_BuffMod/Options/Window/Sorting/NonExpiringBuffsDropdown"] = "#Before other buffs#After other buffs#With other buffs"
+L["CT_BuffMod/Options/Window/Sorting/NonExpiringBuffsDropdown"] = "#Before other buffs#After other buffs#With other buffs#Hidden#Shown only"
 L["CT_BuffMod/Options/Window/Sorting/NonExpiringBuffsLabel"] = "Non-expiring buffs:"
 L["CT_BuffMod/Options/Window/Sorting/NonExpiringBuffsTip"] = [=[Due to Blizzard-imposed restrictions, this option is sometimes disabled.
 To enable, select |cffffff00Use non-secure buff buttons|r]=]

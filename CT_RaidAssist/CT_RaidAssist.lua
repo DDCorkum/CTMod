@@ -135,6 +135,7 @@ local L = module.text
 function module:init()	
 	module.CTRAReadyCheck = StaticCTRAReadyCheck();
 	module.CTRAFrames = StaticCTRAFrames();
+	module.ClickCastBroker = StaticClickCastBroker();
 	
 	-- convert from 8.3.0.11 and earlier to 8.3.7.1
 	if (not module:getOption("CTRA_LastConversion") or module:getOption("CTRA_LastConversion") < 8.307) then
@@ -449,7 +450,6 @@ function StaticCTRAFrames()
 	-- private properties, and where applicable their default values
 	local windows = { };			-- non-interactive frames that anchor and orient assigned collections of PlayerFrames, TargetFrames and LabelFrames
 	local selectedWindow = nil;		-- the currently selected window
-	local listener = nil;			-- listener for joining and leaving a raid
 	local enabledState;			-- are the raidframes enabled (but possibly hidden if not in a raid)
 	local settingsOverlayToStopClicks;	-- button that sits overtop several options to stop interactions with them
 	local dummyFrame;			-- pretend CTRAPlayerFrame to illustrate options
@@ -615,7 +615,7 @@ function StaticCTRAFrames()
 					or key == "CTRAFrames_ClickCast_Target"
 				) then
 					--StaticClickCastBroker:Update(key, val); 	-- not currently used
-					for i, window in ipairs(windows) do
+					for __, window in ipairs(windows) do
 						window:Update(key, val);		-- all the windows need to update their secureButton
 					end
 				elseif (key:sub(1,21) == "CTRAFrames_ClickCast_" and key:len() > 21) then
@@ -675,15 +675,20 @@ function StaticCTRAFrames()
 		-- commonly used colors
 		local textColor1 = "#0.9:0.9:0.9";
 		local textColor2 = "#0.7:0.7:0.7";
+		local textColor3 = "#1.0:1.0:0.6";	-- subheadings
 		
 		
 		-- Heading
-		optionsAddObject(-30, 17, "font#tl:5:%y#v:GameFontNormalLarge#Custom Raid Frames"); -- Custom Raid Frames
+		optionsAddObject(-30, 17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_RaidAssist/Options/Frames/Heading"]); -- Custom Raid Frames
 		
 		-- General Options
-		optionsAddObject(-15, 26, "font#tl:15:%y#Enable CTRA Frames?" .. textColor1 .. ":l"); -- Enable custom raid frames
-		optionsAddFrame( 26, 20, "dropdown#tl:130:%y#s:120:%s#n:CTRAFrames_EnableFramesDropDown#o:CTRAFrames_EnableFrames:2 #Always#During Raids#During Groups#Never");
-		optionsBeginFrame( -5,  20, "checkbutton#tl:10:%y#n:CTRAFrames_HideBlizzardDefaultFramesCheckButton#o:CTRAFrames_HideBlizzardDefaultFrames:true#" .. L["CT_RaidAssist/Options/Frames/HideBlizzardDefaultCheckButton"] .. "#l:268");
+		optionsAddObject(-20, 15, "font#t:0:%y#n:CTRAFrames_EnableFramesLabel#" .. L["CT_RaidAssist/Options/Frames/EnableLabel"] .. textColor3 .. ":l"); -- Enable custom raid frames
+		optionsBeginFrame(-5, 24, "dropdown#t:0:%y#s:150:%s#n:CTRAFrames_EnableFramesDropDown#o:CTRAFrames_EnableFrames:2" .. L["CT_RaidAssist/Options/Frames/EnableDropDown"]);
+			optionsAddScript("onload", function(dropdown)
+				UIDropDownMenu_JustifyText(dropdown,"CENTER");
+			end);
+		optionsEndFrame();
+		optionsBeginFrame( -15,  20, "checkbutton#tl:10:%y#n:CTRAFrames_HideBlizzardDefaultFramesCheckButton#o:CTRAFrames_HideBlizzardDefaultFrames:true#" .. L["CT_RaidAssist/Options/Frames/HideBlizzardDefaultCheckButton"] .. "#l:268");
 			optionsAddTooltip({L["CT_RaidAssist/Options/Frames/HideBlizzardDefaultCheckButton"],L["CT_RaidAssist/Options/Frames/HideBlizzardDefaultTooltip"] .. textColor1});
 		optionsEndFrame();
 		if (module:getGameVersion() == 1) then
@@ -691,53 +696,7 @@ function StaticCTRAFrames()
 				optionsAddTooltip({L["CT_RaidAssist/Options/Frames/ShareClassicHealPredictionCheckButton"],L["CT_RaidAssist/Options/Frames/ShareClassicHealPredictionTip"] .. textColor1});
 			optionsEndFrame();
 		end
-		
-		-- Click Casting
-		optionsAddObject(-15,  17, "font#tl:5:%y#v:GameFontNormal#" .. L["CT_RaidAssist/Options/ClickCast/Heading"]);
-		if (Clique) then
-			optionsAddObject(-5, 1*14, "font#tl:10:%y#s:0:%s#l:13:0#r#Clique addon detected!#1:0.5:0.5:l");
-			optionsAddObject(0,    26, "checkbutton#tl:10:%y#n:CTRAFrames_ClickCast_UseCliqueAddonCheckButton#o:CTRAFrames_ClickCast_UseCliqueAddon:true#Use Clique instead of CTRA keybinds?#1:0.5:0.5:l:268");	
-		end
-		optionsAddObject(-5, 3*14, "font#tl:15:%y#s:0:%s#l:13:0#r#" .. L["CT_RaidAssist/Options/ClickCast/Line1"] .. textColor2 .. ":l");
-		local buff, removeDebuff, rezCombat, rezNoCombat = StaticClickCastBroker():GetAllSpellsForClass();
-		if (#buff > 0) then
-			--optionsAddObject(-5, 14, "font#t:0:%y#" .. L["CT_RaidAssist/Options/ClickCast/BuffLabel"] .. textColor1);
-			for __, details in pairs(buff) do
-				optionsAddObject(-6, 14, "font#tl:15:%y#" .. details.name .. textColor1 .. ":l:120");
-				optionsAddObject(14, 14, "dropdown#tl:140:%y#s:120:%s#o:CTRAFrames_ClickCast_" .. details.id .. ":" .. details.option .. L["CT_RaidAssist/Options/ClickCast/DropDownOptions"]);
-			end
-		end
-		if (#removeDebuff > 0) then
-			--optionsAddObject(-5, 14, "font#t:0:%y#" .. L["CT_RaidAssist/Options/ClickCast/RemoveDebuffLabel"] .. textColor1);
-			for __, details in pairs(removeDebuff) do
-				optionsAddObject(-6, 14, "font#tl:15:%y#" .. details.name .. textColor1 .. ":l:120");
-				optionsAddObject(14, 14, "dropdown#tl:140:%y#s:120:%s#o:CTRAFrames_ClickCast_" .. details.id .. ":" .. details.option .. L["CT_RaidAssist/Options/ClickCast/DropDownOptions"]);
-			end
-		end
-		if (#rezCombat > 0) then
-			--optionsAddObject(-5, 14, "font#t:0:%y#" .. L["CT_RaidAssist/Options/ClickCast/RezCombatLabel"] .. textColor1);
-			for __, details in pairs(rezCombat) do
-				optionsAddObject(-6, 14, "font#tl:15:%y#" .. details.name .. textColor1 .. ":l:120");
-				optionsAddObject(14, 14, "dropdown#tl:140:%y#s:120:%s#o:CTRAFrames_ClickCast_" .. details.id .. ":" .. details.option .. L["CT_RaidAssist/Options/ClickCast/DropDownOptions"]);
-			end	
-		end
-		
-		if (#rezNoCombat > 0) then
-			--optionsAddObject(-5, 14, "font#t:0:%y#" .. L["CT_RaidAssist/Options/ClickCast/RezNoCombatLabel"] .. textColor2);
-			for __, details in pairs(rezNoCombat) do
-				optionsAddObject(-6, 14, "font#tl:15:%y#" .. details.name .. textColor1 .. ":l:120");
-				optionsAddObject(14, 14, "dropdown#tl:140:%y#s:120:%s#o:CTRAFrames_ClickCast_" .. details.id .. ":" .. details.option .. L["CT_RaidAssist/Options/ClickCast/DropDownOptions"]);
-			end
-		end
-		if (#buff + #removeDebuff + #rezCombat + #rezNoCombat == 0) then
-			optionsAddObject(-5, 14, "font#t:0:%y#" .. L["CT_RaidAssist/Options/ClickCast/NoneAvailable"] .. textColor2);
-		end
-		optionsAddObject(-6, 14, "font#tl:15:%y#" .. L["CT_RaidAssist/Options/ClickCast/ToggleMenuLabel"] .. textColor1 .. ":l:120");
-		optionsAddObject(14, 14, "dropdown#tl:140:%y#s:120:%s#o:CTRAFrames_ClickCast_ToggleMenu:7" .. L["CT_RaidAssist/Options/ClickCast/DropDownOptions"]);
 
-		optionsAddObject(-6, 14, "font#tl:15:%y#" .. L["CT_RaidAssist/Options/ClickCast/TargetLabel"] .. textColor1 .. ":l:120");
-		optionsAddObject(14, 14, "dropdown#tl:140:%y#s:120:%s#o:CTRAFrames_ClickCast_Target:1" .. L["CT_RaidAssist/Options/ClickCast/TargetDropDown"]);
-		
 		-- Everything below this line will pseudo-disable when the frames are disabled
 		optionsBeginFrame(-5, 0, "frame#tl:0:%y#br:tr:0:%b#n:");
 			optionsAddScript("onload",
@@ -749,14 +708,69 @@ function StaticCTRAFrames()
 					tex:SetAllPoints();
 					tex:SetColorTexture(0,0,0,0.50);
 					settingsOverlayToStopClicks:SetFrameLevel(25);
-					settingsOverlayToStopClicks:SetScript("OnEnter",
+					settingsOverlayToStopClicks:HookScript("OnEnter",
 						function()
-							module:displayTooltip(settingsOverlayToStopClicks, "Raid frames are currently disabled!\nYou must enable them using the dropdown above.", "ANCHOR_CURSOR");
+							module:displayTooltip(settingsOverlayToStopClicks, {L["CT_RaidAssist/Options/Frames/DisabledTip"],L["CT_RaidAssist/Options/Frames/EnableLabel"] .. " " .. UIDropDownMenu_GetText(CTRAFrames_EnableFramesDropDown) .. textColor1}, "ANCHOR_CURSOR");
+							CTRAFrames_EnableFramesLabel:SetTextColor(1,1,0);
+						end
+					);
+					settingsOverlayToStopClicks:HookScript("OnLeave",
+						function()
+							CTRAFrames_EnableFramesLabel:SetTextColor(1, 1, 0.6);
 						end
 					);
 				end
 			);
 		
+			-- Click Casting
+			optionsAddObject(-15,  17, "font#tl:5:%y#v:GameFontNormal#" .. L["CT_RaidAssist/Options/ClickCast/Heading"]);
+			if (Clique) then
+				optionsAddObject(-5, 1*14, "font#tl:10:%y#s:0:%s#l:13:0#r#Clique addon detected!#1:0.5:0.5:l");
+				optionsAddObject(0,    26, "checkbutton#tl:10:%y#n:CTRAFrames_ClickCast_UseCliqueAddonCheckButton#o:CTRAFrames_ClickCast_UseCliqueAddon:true#Use Clique instead of CTRA keybinds?#1:0.5:0.5:l:268");	
+			end
+			local buff, removeDebuff, rezCombat, rezNoCombat = StaticClickCastBroker():GetAllSpellsForClass();
+			if (#buff > 0) then
+				optionsAddObject(-5, 14, "font#tl:15:%y#" .. L["CT_RaidAssist/Options/ClickCast/BuffSubheading"] .. textColor3 .. ":l#v:GameFontNormalSmall");
+				for __, details in ipairs(buff) do
+					optionsAddObject(-6, 13, "font#tl:15:%y#" .. details.name .. "#0.2:0.8:0.4:l:146#v:GameFontNormalSmall");
+					optionsBeginFrame(13, 13, "dropdown#tl:162:%y#s:107:%s#o:CTRAFrames_ClickCast_" .. details.id .. ":" .. details.option .. L["CT_RaidAssist/Options/ClickCast/DropDownOptions"]);
+						optionsAddTooltip("spell:" .. details.id);
+					optionsEndFrame();
+				end
+			end
+			if (#removeDebuff > 0) then
+				optionsAddObject(-10, 14, "font#tl:15:%y#" .. L["CT_RaidAssist/Options/ClickCast/RemoveDebuffSubheading"] .. textColor3 .. ":l#v:GameFontNormalSmall");
+				for __, details in ipairs(removeDebuff) do
+					optionsAddObject(-6, 14, "font#tl:15:%y#" .. details.name .. "#0.8:0.4:0.4:l:146#v:GameFontNormalSmall");
+					optionsBeginFrame(14, 14, "dropdown#tl:162:%y#s:107:%s#o:CTRAFrames_ClickCast_" .. details.id .. ":" .. details.option .. L["CT_RaidAssist/Options/ClickCast/DropDownOptions"]);
+						optionsAddTooltip("spell:" .. details.id);
+					optionsEndFrame();
+				end
+			end
+			if (#rezCombat > 0) then
+				optionsAddObject(-10, 14, "font#tl:15:%y#" .. L["CT_RaidAssist/Options/ClickCast/RezCombatSubheading"] .. textColor3 .. ":l#v:GameFontNormalSmall");
+				for __, details in ipairs(rezCombat) do
+					optionsAddObject(-6, 14, "font#tl:15:%y#" .. details.name .. "#0.6:0.6:0.6:l:146#v:GameFontNormalSmall");
+					optionsBeginFrame(14, 14, "dropdown#tl:162:%y#s:107:%s#o:CTRAFrames_ClickCast_" .. details.id .. ":" .. details.option .. L["CT_RaidAssist/Options/ClickCast/DropDownOptions"]);
+						optionsAddTooltip("spell:" .. details.id);
+					optionsEndFrame();
+				end	
+			end
+			if (#rezNoCombat > 0) then
+				optionsAddObject(-10, 14, "font#tl:15:%y#" .. L["CT_RaidAssist/Options/ClickCast/RezNoCombatSubheading"] .. textColor3 .. ":l#v:GameFontNormalSmall");
+				for __, details in ipairs(rezNoCombat) do
+					optionsAddObject(-6, 14, "font#tl:15:%y#" .. details.name .. "#0.6:0.6:0.6:l:146#v:GameFontNormalSmall");
+					optionsBeginFrame(14, 14, "dropdown#tl:162:%y#s:107:%s#o:CTRAFrames_ClickCast_" .. details.id .. ":" .. details.option .. L["CT_RaidAssist/Options/ClickCast/DropDownOptions"]);
+						optionsAddTooltip("spell:" .. details.id);
+					optionsEndFrame();
+				end
+			end
+			optionsAddObject(-10, 14, "font#tl:15:%y#" .. L["CT_RaidAssist/Options/ClickCast/UtilitySubheading"] .. textColor3 .. ":l#v:GameFontNormalSmall");
+			optionsAddObject(-6, 14, "font#tl:15:%y#" .. L["CT_RaidAssist/Options/ClickCast/ToggleMenuLabel"] .. textColor1 .. ":l:146#v:GameFontNormalSmall");
+			optionsAddObject(14, 14, "dropdown#tl:162:%y#s:107:%s#o:CTRAFrames_ClickCast_ToggleMenu:7" .. L["CT_RaidAssist/Options/ClickCast/DropDownOptions"]);
+			optionsAddObject(-6, 14, "font#tl:15:%y#" .. L["CT_RaidAssist/Options/ClickCast/TargetLabel"] .. textColor1 .. ":l:146#v:GameFontNormalSmall");
+			optionsAddObject(14, 14, "dropdown#tl:162:%y#s:107:%s#o:CTRAFrames_ClickCast_Target:1" .. L["CT_RaidAssist/Options/ClickCast/TargetDropDown"]);
+
 			-- Window Selection
 			optionsBeginFrame(0, 0, "frame#tl:0:%y#br:tr:0:%b");
 
@@ -1505,8 +1519,8 @@ function NewCTRAWindow(owningCTRAFrames)
 			-- anchor to handle positioning, with assistance from CT_Library
 			anchorFrame = CreateFrame("Frame", nil, UIParent);
 			anchorFrame:SetSize(80,20);
-			anchorFrame:SetPoint("CENTER", -300/asWindow, UIParent:GetHeight()/(3 + asWindow)); -- causes multiple new windows to be sort of cascading
 			anchorFrame:SetFrameLevel(4);	-- places it above windowFrame (1), and above the visualFrame (2) and secureButton (3) components of CTRAPlayerFrame
+			--the frame's anchor point will be set later in step 4
 			anchorFrame.texture = anchorFrame:CreateTexture(nil,"BACKGROUND");
 			anchorFrame.texture:SetAllPoints(true);
 			anchorFrame.texture:SetColorTexture(1,1,0,0.5);
@@ -1558,6 +1572,8 @@ function NewCTRAWindow(owningCTRAFrames)
 		end
 		
 		-- STEP 4:
+		anchorFrame:ClearAllPoints();
+		anchorFrame:SetPoint("CENTER", -300/asWindow, UIParent:GetHeight()/(3 + asWindow)); -- lays out new windows near the middle of the screen, slightly offset from each other
 		module:registerMovable("CTRAWindow" .. asWindow, anchorFrame, true);
 		
 		-- STEP 5:
@@ -1667,7 +1683,7 @@ function NewCTRAWindow(owningCTRAFrames)
 			for key, val in pairs(pendingOptions) do
 				if (key == "PlayerFrameScale") then
 					updateFont();
-					for i, label in ipairs(labels) do
+					for __, label in ipairs(labels) do
 						label:SetScale(val/100);
 					end					
 				elseif (
@@ -1681,7 +1697,7 @@ function NewCTRAWindow(owningCTRAFrames)
 					or key == "TargetHealth"
 					or key == "TargetPower"
 				) then
-					for i, label in ipairs(labels) do
+					for __, label in ipairs(labels) do
 						anchorLabel(label);
 					end
 				end
@@ -2123,14 +2139,16 @@ function StaticClickCastBroker()
 					["button"] = defaultButton,
 					["id"] = id,
 					["option"] = (
-						(defaultModifier == "mod:shift" and (defaultButton == 2 and 2 or 7))
+						(defaultModifier == "nomod" and (defaultButton == 2 and 1 or 6))
+						or (defaultModifier == "mod:shift" and (defaultButton == 2 and 2 or 7))
 						or (defaultModifier == "mod:ctrl" and (defaultButton == 2 and 3 or 8))
 						or (defaultModifier == "mod:alt" and (defaultButton == 2 and 4 or 9))
-						or (defaultButton == 2 and 1 or 5)		-- defaultModifier == "nomod"
+						or 5
+						
 					),
 					["attribute"] = (
-						defaultModifier == "nomod" and "type" .. defaultButton
-						or defaultModifier:sub(5) .. "-type" .. defaultButton
+						defaultModifier == "nomod" and "type" .. defaultButton				-- type2
+						or defaultModifier and defaultModifier:sub(5) .. "-type" .. defaultButton  	-- nil or shift-type2
 					),
 				});
 			elseif (option == 5) then
@@ -2179,7 +2197,7 @@ function StaticClickCastBroker()
 		-- allBuff
 		if (module.CTRA_Configuration_Buffs[class]) then
 			for __, details in ipairs(module.CTRA_Configuration_Buffs[class]) do
-				if (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) then
+				if (details.name) then
 					addToTable(allBuff, details.id, details.name, details.modifier, details.button);
 				end
 			end
@@ -2188,7 +2206,7 @@ function StaticClickCastBroker()
 		-- allRemoveDebuff
 		if (module.CTRA_Configuration_FriendlyRemoves[class]) then
 			for __, details in ipairs(module.CTRA_Configuration_FriendlyRemoves[class]) do
-				if (details.gameVersion == nil or details.gameVersion == module:getGameVersion()) then
+				if (details.name) then
 					addToTable(allRemoveDebuff, details.id, details.name, details.modifier, details.button);
 				end
 			end
@@ -2197,11 +2215,13 @@ function StaticClickCastBroker()
 		-- allRezCombat and allRezNoCombat
 		if (module.CTRA_Configuration_RezAbilities[class]) then
 			for __, details in ipairs(module.CTRA_Configuration_RezAbilities[class]) do
-				if (details.combat and (details.gameVersion == nil or details.gameVersion == module:getGameVersion())) then
-					addToTable(allRezCombat, details.id, details.name, details.modifier, details.button);
-				end
-				if (details.nocombat and (details.gameVersion == nil or details.gameVersion == module:getGameVersion())) then
-					addToTable(allRezNoCombat, details.id, details.name, details.modifier, details.button);
+				if (details.name) then
+					if (details.combat) then
+						addToTable(allRezCombat, details.id, details.name, details.modifier, details.button);
+					end
+					if (details.nocombat) then
+						addToTable(allRezNoCombat, details.id, details.name, details.modifier, details.button);
+					end
 				end
 			end
 		end
@@ -2357,16 +2377,19 @@ function StaticClickCastBroker()
 		end
 	end
 	
-	function obj:Reset(option, value)
+	function obj:Refresh()
+		configureSpells();
+		updateSpells();
+	end
+	
+	function obj:Reset()
 		configureSpells(true);
 		updateSpells();
 	end
 	
 	-- CONSTRUCTOR
 	do
-		configureSpells();
-		updateSpells();
-		module:regEvent("PLAYER_LOGIN", function() configureSpells(); updateSpells(); end);
+		obj:Refresh();
 		module:regEvent("LEARNED_SPELL_IN_TAB", updateSpells);
 		if (module:getGameVersion() >= 8) then
 			module:regEvent("ACTIVE_TALENT_GROUP_CHANGED", updateSpells);
@@ -2395,7 +2418,6 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 	local secureButton;		-- SecureUnitActionButton that sits in front and responds to mouseclicks
 	local secureButtonDebuffFirst;	-- SecureUnitActionButton that sits in front and responds to mouseclicks
 	local secureButtonCliqueFirst;	-- SecureUnitActionButton that sits in front and allows itself to be configured by Clique addon
-	local macro;		-- copy of the macro currently used when right-clicking secureButton to click-cast
 	local listenerFrame;		-- generic frame that listens to various events
 	local requestedUnit;		-- the unit that this object is requested to display at the next opportunity
 	local requestedXOff;		-- the x coordinate to position this object's frames at the next opportunity (relative to parent's left)w
@@ -2427,7 +2449,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 	local auraBoss1, auraBoss2, auraBoss3, auraBoss4;
 	local aura1, aura2, aura3, aura4, aura5;
 	local statusTexture, statusFontString, statusNoticeBackground, statusAlarmBackground;
-	local durabilityAverage, durabilityBroken, durabilityTime;
+	local durabilityAverage, durabilityTime;
 	
 	-- PRIVATE FUNCTIONS
 
@@ -3153,7 +3175,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 	-- permanently creates the aura and auraBoss textures 
 	local function createAuras()
 		local function constructAura(x, y)
-			frame = CreateFrame("Frame", nil, visualFrame);
+			local frame = CreateFrame("Frame", nil, visualFrame);
 			frame:SetSize(10,10);
 			frame:SetPoint("TOPRIGHT", x, y);
 			frame.texture = frame:CreateTexture(nil, "OVERLAY", nil, 1)		-- just behind boss auras, if there are enough of them
@@ -3732,6 +3754,7 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 	local healthBarFullCombat, healthBarZeroCombat, healthBarFullNoCombat, healthBarZeroNoCombat;
 	local absorbBarFullCombat, absorbBarZeroCombat, absorbBarFullNoCombat, absorbBarZeroNoCombat, absorbBarOverlay;
 	local incomingBarFullCombat, incomingBarZeroCombat, incomingBarFullNoCombat, incomingBarZeroNoCombat;
+	local incomingSetting, absorbSetting;
 	local healthBarWidth;
 	local powerBar, powerBarWidth;
 	local unitNameFontString;

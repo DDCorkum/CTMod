@@ -39,7 +39,8 @@ module.pinTypes =
 		{ ["name"] = "White Circle", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Skin\\WhiteCircle" }, --4
 		{ ["name"] = "Green Square", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Skin\\GreenSquare" }, --5
 		{ ["name"] = "Red Cross", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Skin\\RedCross" }, --6
-		{ ["name"] = "Diamond", ["icon"] = "Interface\\RaidFrame\\UI-RaidFrame-Threat" } -- added in 8.0
+		{ ["name"] = "Diamond", ["icon"] = "Interface\\RaidFrame\\UI-RaidFrame-Threat" }, -- added in 8.0
+		module:getGameVersion() >= 9 and { ["name"] = "Waypoint", ["icon"] = "Interface\\Waypoint\\WaypoinMapPinUI", ["texCoord"] = {width = 30, height = 30, left = 0.320312, right = 0.554688, top = 0.515625, bottom = 0.984375} } or nil, -- added in 9.0
 	},			
 	["Herb"] =
 	{
@@ -103,9 +104,6 @@ module.pinTypes =
 			{ ["name"] = "Heartblossom", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
 			{ ["name"] = "Whiptail", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
 			{ ["name"] = "Twilight Jasmine", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
-		},
-		["Recent Expansions"] =
-		{
 			-- Mists of Pandaria
 			{ ["name"] = "Green Tea Leaf", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
 			{ ["name"] = "Rain Poppy", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
@@ -114,6 +112,9 @@ module.pinTypes =
 			{ ["name"] = "Fool's Cap", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
 			{ ["name"] = "Sha-Touched Herb", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
 			{ ["name"] = "Golden Lotus", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
+		},
+		["Recent Expansions"] =
+		{
 			-- Warlords of Draenor
 			{ ["name"] = "Fireweed", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Fireweed" },
 			{ ["name"] = "Gorgrond Flytrap", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_GorgrondFlytrap" },
@@ -139,6 +140,13 @@ module.pinTypes =
 			{ ["name"] = "Star Moss", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_StarMoss" },
 			{ ["name"] = "Winter's Kiss", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_WintersKiss" },
 			{ ["name"] = "Zin'anthid", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Zinanthid" },
+			-- Shadowlands
+			{ ["name"] = "Death Blossom", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_DeathBlossom", },
+			{ ["name"] = "Marrowroot", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
+			{ ["name"] = "Rising Glory", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
+			{ ["name"] = "Vigil's Torch", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
+			{ ["name"] = "Widowbloom", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed" },
+			
 		},
 	},
 	["Ore"] =
@@ -155,7 +163,7 @@ module.pinTypes =
 			{ ["name"] = "Truesilver", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_TruesilverVein" }, --8
 			{ ["name"] = "Adamantite", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_AdamantiteVein" }, --9
 		},
-		["Expansions"] = 
+		["Early Expansions"] = 
 		{
 			-- Burning Crusade
 			{ ["name"] = "Fel Iron", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_FelIronVein" }, --10
@@ -172,6 +180,9 @@ module.pinTypes =
 			{ ["name"] = "Ghost Iron", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_GhostIron" }, -- 18
 			{ ["name"] = "Kyparite", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Kyparite" }, -- 19
 			{ ["name"] = "Trillium", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Trillium" }, -- 20
+		},
+		["Recent Expansions"] = 
+		{
 			-- Warlords of Draenor
 			{ ["name"] = "Blackrock", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein" },
 			{ ["name"] = "True Iron", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein" },
@@ -183,6 +194,12 @@ module.pinTypes =
 			{ ["name"] = "Storm Silver", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_StormSilver" },
 			{ ["name"] = "Platinum", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Platinum", ["spawnsRandomly"] = true },
 			{ ["name"] = "Osmenite", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Elementium" },
+			-- Shadowlands
+			{ ["name"] = "Laestrite", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Elementium" },
+			{ ["name"] = "Oxxein", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein" },
+			{ ["name"] = "Phaedrum", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein" },
+			{ ["name"] = "Sinvyr", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_SaroniteVein" },
+			{ ["name"] = "Solenium", ["icon"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_GoldVein" },
 		},
 	},
 };
@@ -203,6 +220,7 @@ module.flightMaps =
 	[1209] =  12, -- Kalimdor
 	[1384] = 113, -- Northrend
 	[1467] = 101, -- Outland
+	[1647] = 1550, -- Shadowlands 
 };
 
 
@@ -232,6 +250,7 @@ module.herbalismSkills =
 	[265831] = true,
 	[265834] = true,
 	[265835] = true,
+	[309780] = true,	-- Shadowlands
 }
 
 -- Allows detecting interactions with mining nodes
@@ -259,6 +278,7 @@ module.miningSkills =
 	[265849] = true,	-- Legion
 	[265851] = true,	-- Kul Tiran
 	[265854] = true,	-- Zandalari
+	[309835] = true,	-- Shadowlands
 }
 
 

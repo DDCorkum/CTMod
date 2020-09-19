@@ -56,7 +56,7 @@ function module:Initialize()				-- called via module.update("init") from CT_Libr
 	WorldMapFrame:AddDataProvider(CreateFromMixins(CT_MapMod_DataProviderMixin));
 	
 	-- load an additional DataProvider to the FlightMapFrame in retail, so pins can appear on the continent flight map
-	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+	if (module:getGameVersion() >= 8) then
 		if (FlightMapFrame) then
 			FlightMapFrame:AddDataProvider(CT_MapMod_DataProviderMixin);
 		else
@@ -375,7 +375,7 @@ function CT_MapMod_DataProviderMixin:RefreshAllData(fromOnShow)
 	module.PinHasFocus = nil;  --rather than calling this for each pin, just call it once when all pins are gone.
 	
 	-- determine if the player is an herbalist or miner, for automatic showing of those kinds of notes
-	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+	if (module:getGameVersion() >= 8) then
 		local prof1, prof2 = GetProfessions();
 		if (prof1) then 
 			local __, icon = GetProfessionInfo(prof1)
@@ -393,7 +393,7 @@ function CT_MapMod_DataProviderMixin:RefreshAllData(fromOnShow)
 				module.isMiner = true;
 			end
 		end
-	elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then		
+	else	
 		local tabName, tabTexture, tabOffset, numEntries = GetSpellTabInfo(1);
 		for i=tabOffset + 1, tabOffset + numEntries, 1 do
 			local spellName, spellSubName = GetSpellBookItemName(i, BOOKTYPE_SPELL)
@@ -466,6 +466,11 @@ function CT_MapMod_PinMixin:OnAcquired(...) -- the arguments here are anything t
 				for j, val in ipairs(expansion) do
 					if (val["name"] == self.subset) then
 						self.texture:SetTexture(val["icon"]);
+						if (val.texCoord) then
+							self.texture:SetTexCoord(val.texCoord.left, val.texCoord.right, val.texCoord.top, val.texCoord.bottom);
+						else
+							self.texture:SetTexCoord(0, 1, 0, 1);
+						end
 					end
 				end
 			end
@@ -474,8 +479,15 @@ function CT_MapMod_PinMixin:OnAcquired(...) -- the arguments here are anything t
 			for i, val in ipairs(module.pinTypes[self.set]) do
 				if (val["name"] == self.subset) then
 					self.texture:SetTexture(val["icon"]);
+					if (val.texCoord) then
+						self.texture:SetTexCoord(val.texCoord.left, val.texCoord.right, val.texCoord.top, val.texCoord.bottom);
+					else
+						self.texture:SetTexCoord(0, 1, 0, 1);
+					end
 				end
+
 			end
+		
 		end
 	end
 	if (self.set == "User") then
@@ -551,33 +563,52 @@ function CT_MapMod_PinMixin:OnReleased()
 	end
 	self:Hide();
 end
- 
-function CT_MapMod_PinMixin:OnClick(button)
-	-- Override in your mixin, called when this pin is clicked	
-	if (IsShiftKeyDown()) then
-		local panel = StaticNoteEditPanel();
-		panel:RequestFocus(self);
-	end
 
+do
+	local uiMapPoint =
+	{
+		uiMapID = 0;
+		position = CreateVector2D(0,0)
+	}
+	local waypointLinkPattern = "|cffffff00|Hworldmap:%d:%d:%d|h[%s]|h|r";		-- uiMapID, x, y, MAP_PIN_HYPERLINK
+	function CT_MapMod_PinMixin:OnClick(button)	
+		if (IsModifiedClick("CHATLINK") and module:getGameVersion() >= 9) then
+			-- Share the pin in chat
+			ChatEdit_InsertLink(waypointLinkPattern:format(self.mapid, self.x*10000, self.y*10000, MAP_PIN_HYPERLINK));
+		elseif (button == "LeftButton" and (GetModifiedClick("CHATLINK") ~= "SHIFT-BUTTON1" and IsShiftKeyDown or IsAltKeyDown)()) then
+			-- Edit the pin, using shift-left unless that keybind is already used for CHATLINK
+			local panel = StaticNoteEditPanel();
+			panel:RequestFocus(self);
+		elseif (IsControlKeyDown() and module:getGameVersion() >= 9) then
+			-- Add a waypoint (beginning in Shadowlands)
+			uiMapPoint.uiMapID = self.mapid;
+			uiMapPoint.position:SetXY(self.x, self.y);
+			C_Map.SetUserWaypoint(uiMapPoint);
+		end
+	end
 end
 
+local patterns = { noIcon = "  %s", basicIcon = "|T%s:20|t %s", texCoordIcon = "|T%s:20:20:0:0:%f:%f:%f:%f:%f:%f|t %s" }
 function CT_MapMod_PinMixin:OnMouseEnter()
 	if (self.isBeingDragged) then
 		return;
 	end
-	local icon = "";
+	local icon;
+	local texCoord;
 	if (self.set == "Herb" or self.set == "Ore") then
 		for key, expansion in pairs(module.pinTypes[self.set]) do
 			for i, type in ipairs(expansion) do
 				if (type["name"] == self.subset) then
 					icon = type["icon"]
+					texCoord = type.texCoord;
 				end
 			end
 		end
 	elseif (self.set == "User") then
 		for i, type in ipairs(module.pinTypes["User"]) do
 			if (type["name"] == self.subset) then
-				icon = type["icon"]
+				icon = type["icon"];
+				texCoord = type.texCoord;
 			end
 		end	
 	end
@@ -587,17 +618,29 @@ function CT_MapMod_PinMixin:OnMouseEnter()
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 	end
 	GameTooltip:ClearLines();
-	GameTooltip:AddDoubleLine("|T"..icon..":20|t " .. self.name, self.set, 0, 1, 0, 0.6, 0.6, 0.6);
+	if (texCoord) then
+		GameTooltip:AddDoubleLine(patterns.texCoordIcon:format(icon, texCoord.width, texCoord.height, texCoord.left * texCoord.width, texCoord.right * texCoord.width, texCoord.top * texCoord.height, texCoord.bottom * texCoord.height, self.name), self.set, 0, 1, 0, 0.6, 0.6, 0.6);
+	elseif (icon) then
+		GameTooltip:AddDoubleLine(patterns.basicIcon:format(icon, self.name), self.set, 0, 1, 0, 0.6, 0.6, 0.6);
+	else
+		GameTooltip:AddDoubleLine(patterns.noIcon:format(self.name), self.set, 0, 1, 0, 0.6, 0.6, 0.6);
+	end
 	if ( self.descript ) then
 		GameTooltip:AddLine(self.descript, nil, nil, nil, 1);
 	end
+	if (module:getGameVersion() >= 9) then
+		GameTooltip:AddLine(" ");
+		GameTooltip_AddNormalLine(GameTooltip, MAP_PIN_SHARING_TOOLTIP);
+		GameTooltip:AddLine(" ");
+	end
 	if (not module.PinHasFocus) then  -- clicking on pins won't do anything while the edit box is open for this or another pin
 		if (self.datemodified and self.version) then
-			GameTooltip:AddDoubleLine(L["CT_MapMod/Pin/Shift-Click to Edit"], self.datemodified .. " (" .. self.version .. ")", 0.00, 0.50, 0.90, 0.45, 0.45, 0.45);
+			GameTooltip:AddDoubleLine(L[GetModifiedClick("CHATLINK") ~= "SHIFT-BUTTON1" and "CT_MapMod/Pin/Shift-Click to Edit" or "CT_MapMod/Pin/Alt-Click to Edit"], self.datemodified .. " (" .. self.version .. ")", 0.00, 0.50, 0.90, 0.45, 0.45, 0.45);
 		else	
-			GameTooltip:AddLine(L["CT_MapMod/Map/Shift-Click to Drag"], 0, 0.5, 0.9, 1);
+			GameTooltip:AddLine(L[GetModifiedClick("CHATLINK") ~= "SHIFT-BUTTON1" and "CT_MapMod/Pin/Shift-Click to Edit" or "CT_MapMod/Pin/Alt-Click to Edit"], 0, 0.5, 0.9, 1);
 		end
 		GameTooltip:AddDoubleLine(L["CT_MapMod/Pin/Right-Click to Drag"], self.mapid, 0.00, 0.50, 0.90, 0.05, 0.05, 0.05 );
+		
 	else
 		if (self.datemodified and self.version) then
 			GameTooltip:AddDoubleLine(" ", self.datemodified .. " (" .. self.version .. ")", 0.00, 0.50, 0.90, 0.45, 0.45, 0.45);
@@ -758,7 +801,7 @@ do
 				insets = { left = 8, right = 8, top = 8, bottom = 8 },
 			});
 			frame:SetBackdropColor(0.4, 0.4, 0.4, 0.8);
-			if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+			if (module:getGameVersion() >= 8) then
 				frame:SetScale(1.2);
 			end
 			
@@ -875,13 +918,24 @@ do
 							for __, kind in ipairs(module.pinTypes["User"]) do
 								if (kind.name == self.value) then
 									pin.texture:SetTexture(kind.icon);
+									if (kind.texCoord) then
+										pin.texture:SetTexCoord(kind.texCoord.left, kind.texCoord.right, kind.texCoord.top, kind.texCoord.bottom);
+									else
+										pin.texture:SetTexCoord(0, 1, 0, 1);
+									end
 								end
 							end
 						else
 							-- use the first icon on the list
-							subsetDropDown.unapprovedValue = module.pinTypes["User"][1]["name"];
-							UIDropDownMenu_SetText(subsetDropDown, L["CT_MapMod/User/" .. module.pinTypes["User"][1]["name"]]);
-							pin.texture:SetTexture(module.pinTypes["User"][1]["icon"]);
+							local kind = module.pinTypes["User"][1]
+							subsetDropDown.unapprovedValue = kind.name;
+							UIDropDownMenu_SetText(subsetDropDown, L["CT_MapMod/User/" .. kind.name]);
+							pin.texture:SetTexture(kind.icon);
+							if (kind.texCoord) then
+								pin.texture:SetTexCoord(kind.texCoord.left, kind.texCoord.right, kind.texCoord.top, kind.texCoord.bottom);
+							else
+								pin.texture:SetTexCoord(0, 1, 0, 1);
+							end
 						end
 					else
 						-- herb or ore
@@ -896,14 +950,25 @@ do
 								for __, kind in ipairs(expansion) do
 									if (kind.name == pin.subset) then
 										pin.texture:SetTexture(kind.icon);
+										if (kind.texCoord) then
+											pin.texture:SetTexCoord(kind.texCoord.left, kind.texCoord.right, kind.texCoord.top, kind.texCoord.bottom);
+										else
+											pin.texture:SetTexCoord(0, 1, 0, 1);
+										end
 									end
 								end
 							end
 						else
 							-- use the first icon on the list
-							subsetDropDown.unapprovedValue = module.pinTypes[self.value]["Classic"][1]["name"];
-							UIDropDownMenu_SetText(subsetDropDown, L["CT_MapMod/" .. self.value .. "/" .. module.pinTypes[self.value]["Classic"][1]["name"]]);
-							pin.texture:SetTexture(module.pinTypes[self.value]["Classic"][1]["icon"]);
+							local kind = module.pinTypes[self.value]["Classic"][1];
+							subsetDropDown.unapprovedValue = kind.name;
+							UIDropDownMenu_SetText(subsetDropDown, L["CT_MapMod/" .. self.value .. "/" .. kind.name]);
+							pin.texture:SetTexture(kind.icon);
+							if (kind.texCoord) then
+								pin.texture:SetTexCoord(kind.texCoord.left, kind.texCoord.right, kind.texCoord.top, kind.texCoord.bottom);
+							else
+								pin.texture:SetTexCoord(0, 1, 0, 1);
+							end
 						end
 					end
 				end
@@ -941,31 +1006,53 @@ do
 					subsetDropDown.unapprovedValue = entry.value;
 					if (set == "User") then
 						UIDropDownMenu_SetText(subsetDropDown,L["CT_MapMod/User/" .. entry.value]);
-						for i, val in ipairs(module.pinTypes["User"]) do
-							if (val["name"] == entry.value) then
-								pin.texture:SetTexture(val["icon"]);
+						for __, kind in ipairs(module.pinTypes["User"]) do
+							if (kind.name == entry.value) then
+								pin.texture:SetTexture(kind.icon);
+								if (kind.texCoord) then
+									pin.texture:SetTexCoord(kind.texCoord.left, kind.texCoord.right, kind.texCoord.top, kind.texCoord.bottom);
+								else
+									pin.texture:SetTexCoord(0, 1, 0, 1);
+								end
 							end
 						end
 					else
 						-- herb or ore
 						UIDropDownMenu_SetText(subsetDropDown,L["CT_MapMod/" .. set .. "/" .. entry.value]);
 						for __, expansion in pairs(module.pinTypes[set]) do
-							for i, val in ipairs(expansion) do
-								if (val["name"] == entry.value) then
-									pin.texture:SetTexture(val["icon"]);
+							for __, kind in ipairs(expansion) do
+								if (kind.name == entry.value) then
+									pin.texture:SetTexture(kind.icon);
+									if (kind.texCoord) then
+										pin.texture:SetTexCoord(kind.texCoord.left, kind.texCoord.right, kind.texCoord.top, kind.texCoord.bottom);
+									else
+										pin.texture:SetTexCoord(0, 1, 0, 1);
+									end
 								end
+						
 							end
 						end
 					end
 				end
 
 				
-				-- properties unique to each option
+				-- Create the dropdown entries
 				if (set == "User") then
 					for i, type in ipairs(module.pinTypes["User"]) do
 						dropdownEntry.text = L["CT_MapMod/User/" .. type["name"]] or type["name"];
 						dropdownEntry.value = type["name"];
 						dropdownEntry.icon = type["icon"];
+						if (type.texCoord) then
+							dropdownEntry.tCoordLeft = type.texCoord.left;
+							dropdownEntry.tCoordRight = type.texCoord.right;
+							dropdownEntry.tCoordTop = type.texCoord.top;
+							dropdownEntry.tCoordBottom = type.texCoord.bottom;
+						else
+							dropdownEntry.tCoordLeft = nil;
+							dropdownEntry.tCoordRight = nil;
+							dropdownEntry.tCoordTop = nil;
+							dropdownEntry.tCoordBottom = nil;
+						end
 						if (dropdownEntry.value == (subsetDropDown.unapprovedValue or pin.subset)) then
 							dropdownEntry.checked = true;
 						elseif (not subsetDropDown.unapprovedValue and i == 1) then
@@ -975,10 +1062,8 @@ do
 						end
 						UIDropDownMenu_AddButton(dropdownEntry);
 					end
-				else
-					-- herb or ore
-					-- properties unique to each option
-					if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+				else	-- if set == herb or set == ore
+					if (module:getGameVersion() >= 8) then
 						for key, expansion in pairs(module.pinTypes[set]) do
 							if (level == 1) then
 								dropdownEntry.text = key;
@@ -992,6 +1077,17 @@ do
 									dropdownEntry.text = L["CT_MapMod/" .. set .. "/" .. type["name"]] or type["name"];
 									dropdownEntry.value = type["name"];
 									dropdownEntry.icon = type["icon"];
+									if (type.texCoord) then
+										dropdownEntry.tCoordLeft = type.texCoord.left;
+										dropdownEntry.tCoordRight = type.texCoord.right;
+										dropdownEntry.tCoordTop = type.texCoord.top;
+										dropdownEntry.tCoordBottom = type.texCoord.bottom;
+									else
+										dropdownEntry.tCoordLeft = nil;
+										dropdownEntry.tCoordRight = nil;
+										dropdownEntry.tCoordTop = nil;
+										dropdownEntry.tCoordBottom = nil;
+									end
 									dropdownEntry.hasArrow = nil;
 									dropdownEntry.menuList = nil;
 									if (dropdownEntry.value == (subsetDropDown.unapprovedValue or pin.subset)) then
@@ -1005,11 +1101,22 @@ do
 								end
 							end
 						end
-					elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+					else	-- if module:getGameVersion() == 1
 						for i, type in ipairs(module.pinTypes[set]["Classic"]) do
 							dropdownEntry.text = L["CT_MapMod/" .. set .. "/" .. type["name"]] or type["name"];
 							dropdownEntry.value = type["name"];
 							dropdownEntry.icon = type["icon"];
+							if (type.texCoord) then
+								dropdownEntry.tCoordLeft = type.texCoord.left;
+								dropdownEntry.tCoordRight = type.texCoord.right;
+								dropdownEntry.tCoordTop = type.texCoord.top;
+								dropdownEntry.tCoordBottom = type.texCoord.bottom;
+							else
+								dropdownEntry.tCoordLeft = nil;
+								dropdownEntry.tCoordRight = nil;
+								dropdownEntry.tCoordTop = nil;
+								dropdownEntry.tCoordBottom = nil;
+							end
 							dropdownEntry.hasArrow = nil;
 							dropdownEntry.menuList = nil;
 							if (dropdownEntry.value == (subsetDropDown.unapprovedValue or pin.subset)) then
@@ -1203,17 +1310,17 @@ function module:AddUIElements()
 							alreadyInPosition = true;
 							if (not WorldMapFrame.ctMaxMinHooked) then
 								WorldMapFrame.ctMaxMinHooked = true;
-								if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+								if (module:getGameVersion() >= 8) then
 									hooksecurefunc(WorldMapFrame.BorderFrame.MaximizeMinimizeFrame, "Maximize", function() alreadyInPosition = nil; end);
 									hooksecurefunc(WorldMapFrame.BorderFrame.MaximizeMinimizeFrame, "Minimize", function() alreadyInPosition = nil; end);
 								end
 							end
-							if (module:getGameVersion() == CT_GAME_VERSION_RETAIL and not WorldMapFrame:IsMaximized() and WorldMapFrame.SidePanelToggle.OpenButton:IsShown()) then
+							if (module:getGameVersion() >= 8 and not WorldMapFrame:IsMaximized() and WorldMapFrame.SidePanelToggle.OpenButton:IsShown()) then
 								-- Minimized without quest frame
 								if (value < -225 and value > -350) then value = -225; end
 								if (value < -350 and value > -477) then value = -477; end
 								if (value < -535) then value = -535; end
-							elseif (module:getGameVersion() == CT_GAME_VERSION_RETAIL and not WorldMapFrame:IsMaximized() and WorldMapFrame.SidePanelToggle.CloseButton:IsShown()) then
+							elseif (module:getGameVersion() >= 8 and not WorldMapFrame:IsMaximized() and WorldMapFrame.SidePanelToggle.CloseButton:IsShown()) then
 								-- Minimized with quest frame
 								if (value < -370 and value > -495) then value = -370; end
 								if (value < -495 and value > -622) then value = -622; end
@@ -1416,6 +1523,20 @@ function module:AddUIElements()
 	end
 	WorldMapFrame.ScrollContainer:HookScript("OnShow", function() isShown = true; updateXYCoords() end);
 	WorldMapFrame.ScrollContainer:HookScript("OnHide", function() isShown = false; end);
+	
+	
+	-- integrate extra features into the Shadowlands 9.0 waypoint pin
+	if (module:getGameVersion() >= 9) then
+		hooksecurefunc(WaypointLocationPinMixin, "OnMouseClickAction", function(self)
+			local mapid = self:GetMap():GetMapID();
+			local x, y = self:GetPosition();
+			if (x and y and module.isCreatingNote) then
+				module:InsertPin(mapid, x, y, "Waypoint", "User", "Waypoint", "New note under waypoint")
+				module.isCreatingNote = nil;
+				WorldMapFrame:RefreshAllDataProviders();
+			end
+		end);	
+	end
 end
 
 
@@ -1663,7 +1784,7 @@ module.frame = function()
 		optionsAddObject(-5,    8, "font#t:0:%y#s:0:%s#l:13:0#r#Alpha when zoomed in#" .. textColor1 .. ":l");
 		optionsAddFrame( -5,   28, "slider#tl:24:%y#s:169:15#o:CT_MapMod_AlphaZoomedIn:1.00##0.50:1.00:0.05");
 		
-		if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+		if (module:getGameVersion() >= 8) then
 			optionsAddObject(-5,   50, "font#t:0:%y#s:0:%s#l:13:0#r#Pins added to continents (via the World Map) \nmay also appear at flight masters.#" .. textColor2 .. ":l");
 			optionsAddObject(-5,   14, "font#t:0:%y#s:0:%s#l:13:0#r#Also show pins on flight maps#" .. textColor1 .. ":l");
 			optionsAddObject(-5,   24, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_ShowOnFlightMaps#n:CT_MapMod_ShowOnFlightMaps#" .. L["CT_MapMod/Options/Always"] .. "#" .. L["CT_MapMod/Options/Disabled"]);
