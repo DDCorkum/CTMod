@@ -715,6 +715,16 @@ local function createChatFrameResizeButtons(chatFrame)
 			if (bg) then
 				btn:SetPoint(chatResizePoints[buttonNum], bg, chatResizePoints[buttonNum], 0, 0);
 			end
+			local keepFadedIn;
+			local function preventFadeOutDuringDrag()
+				if (keepFadedIn) then
+					chatFrame.mouseOutTime = 0;
+					if ( not chatFrame.hasBeenFaded ) then
+						FCF_FadeInChatFrame(chatFrame);
+					end
+					C_Timer.After(0.1, preventFadeOutDuringDrag);
+				end
+			end
 			btn:SetScript("OnMouseDown",
 				function(self)
 					local chatFrame = self:GetParent();
@@ -722,6 +732,8 @@ local function createChatFrameResizeButtons(chatFrame)
 					-- SetCursor("UI-Cursor-Size");	--Hide the cursor
 					self:GetHighlightTexture():Hide();
 					chatFrame:StartSizing(chatResizePoints[buttonNum]);
+					keepFadedIn = true;
+					C_Timer.After(0.1, preventFadeOutDuringDrag);
 				end
 			);
 			btn:SetScript("OnMouseUp",
@@ -731,6 +743,7 @@ local function createChatFrameResizeButtons(chatFrame)
 					self:GetHighlightTexture():Show();
 					self:GetParent():StopMovingOrSizing();
 					FCF_SavePositionAndDimensions(self:GetParent());
+					keepFadedIn = false;
 				end
 			);
 			btn:Hide();
@@ -770,35 +783,42 @@ hooksecurefunc("FCF_SetUninteractable",
 	end
 );
 
-local function CT_FCF_OnUpdate(elapsed)
-	for _, frameName in pairs(CHAT_FRAMES) do
-		local chatFrame = _G[frameName];
-		if ( chatFrame and chatFrame:IsShown() ) then
-			--Items that will always cause the frame to fade in.
-			local pushed, btn;
-			local btns = chatFrame.ctResizeButtons;
-			if (btns) then
-				for i = 1, 3 do
-					btn = btns[i];
-					if (btn) then
-						if (btn:GetButtonState() == "PUSHED") then
-							pushed = true;
-							break;
+
+--[[
+	-- Replaced in 8.3.7.2 with button.preventFadeOutDuringDrag() inside createChatFrameResizeButtons(); vastly improving performance with C_Timer over OnUpdate
+	
+	-- Stop the chat frame parts from fading out while CT handles are used for resizing.
+	local function CT_FCF_OnUpdate(elapsed)
+		for _, frameName in pairs(CHAT_FRAMES) do
+			local chatFrame = _G[frameName];
+			if ( chatFrame and chatFrame:IsShown() ) then
+				--Items that will always cause the frame to fade in.
+				local pushed, btn;
+				local btns = chatFrame.ctResizeButtons;
+				if (btns) then
+					for i = 1, 3 do
+						btn = btns[i];
+						if (btn) then
+							if (btn:GetButtonState() == "PUSHED") then
+								pushed = true;
+								break;
+							end
 						end
 					end
 				end
-			end
-			if ( MOVING_CHATFRAME or pushed ) then
-				chatFrame.mouseOutTime = 0;
-				if ( not chatFrame.hasBeenFaded ) then
-					FCF_FadeInChatFrame(chatFrame);
+				if ( MOVING_CHATFRAME or pushed ) then
+					chatFrame.mouseOutTime = 0;
+					if ( not chatFrame.hasBeenFaded ) then
+						FCF_FadeInChatFrame(chatFrame);
+					end
 				end
 			end
 		end
 	end
-end
 
-hooksecurefunc("FCF_OnUpdate", CT_FCF_OnUpdate);
+	hooksecurefunc("FCF_OnUpdate", CT_FCF_OnUpdate);
+
+--]]
 
 --------------------------------------------
 -- Chat frame sticky chat types
