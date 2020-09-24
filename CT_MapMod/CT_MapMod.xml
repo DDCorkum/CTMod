@@ -1,6 +1,4 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/.. \FrameXML\UI.xsd">
  	<Frame name="CT_MapMod_PinTemplate" mixin="CT_MapMod_PinMixin" enableMouseMotion="true" enableMouseClicks="true" virtual="true">
 	</Frame>
-	<Frame name="CT_MapMod_CornerPinTemplate" mixin="CT_MapMod_CornerPinMixin" hidden="true" virtual="true">
-	</Frame>
 </Ui>

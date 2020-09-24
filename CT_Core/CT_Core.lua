@@ -86,10 +86,9 @@ local function minimapResetPosition()
 end
 
 local minimapdropdown;
-local function minimapFrameSkeleton()    -- note: one of the images is embedded in CT_Libarary/Images
+local function minimapFrameSkeleton()
 	return "button#n:CT_MinimapButton#s:32:32#mid:bl:Minimap:15:15#st:LOW", {
-		"texture#all#i:disabled#Interface\\Addons\\CT_Library\\Images\\minimapIcon",  
-		"texture#all#i:enabled#hidden#Interface\\AddOns\\CT_Core\\Images\\minimapIconHighlight",
+		"texture#all#Interface\\Addons\\CT_Library\\Images\\minimapIcon",  
 		
 		["onclick"] = function(self, button)
 			if (button == "LeftButton") then
@@ -122,7 +121,7 @@ local function minimapFrameSkeleton()    -- note: one of the images is embedded 
 										UIDropDownMenu_AddButton(info);
 									end
 								end
-							elseif (_G[ UIDROPDOWNMENU_MENU_VALUE] and _G[UIDROPDOWNMENU_MENU_VALUE].externalDropDown_Initialize) then
+							elseif (_G[UIDROPDOWNMENU_MENU_VALUE] and _G[UIDROPDOWNMENU_MENU_VALUE].externalDropDown_Initialize) then
 								_G[UIDROPDOWNMENU_MENU_VALUE].externalDropDown_Initialize()
 							end
 						end,

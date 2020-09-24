@@ -1,5 +1,5 @@
 ## Interface: 80300
-## Version: 8.3.7.2
+## Version: 8.3.7.3
 ## Title: CT_MapMod |cFF333333(BFA)
 ## Notes: Pins the World Map with points of interest and herb/ore nodes
 ## DefaultState: Enabled

@@ -96,6 +96,13 @@ constants.VISIBILITY_SHOW = 1
 constants.VISIBILITY_BASIC = 2
 constants.VISIBILITY_ADVANCED = 3
 
+constants.GROUP_BY_FILTER_OWN_ZERO = 1; -- Group by the 1st to 5th aura types, then by separateOwn, then by separateZero.   This is closest to the default UI.
+constants.GROUP_BY_FILTER_ZERO_OWN = 2;
+constants.GROUP_BY_OWN_FILTER_ZERO = 3;
+constants.GROUP_BY_OWN_ZERO_FILTER = 4;
+constants.GROUP_BY_ZERO_FILTER_OWN = 5;
+constants.GROUP_BY_ZERO_OWN_FILTER = 6;
+
 constants.SEPARATE_ZERO_BEFORE = 1;
 constants.SEPARATE_ZERO_AFTER = 2;
 constants.SEPARATE_ZERO_WITH = 3;
@@ -487,115 +494,142 @@ do
 	end
 end
 
-local sorters = {};
+local sorterBuilders =
+{
+	["filter"] = function()
+		return function(a, b)
+			if (groupingTable[a.filter] ~= groupingTable[b.filter]) then
+				return groupingTable[a.filter] < groupingTable[b.filter]
+			end
+		end
+	end,
+	["separateOwn"] = function(separateOwn)
+		if (separateOwn > 0) then
+			return function(a, b)
+				local ownA, ownB = a.caster == "player", b.caster == "player";
+				if (ownA ~= ownB) then
+					return ownA;
+				end
+			end
+		elseif (separateOwn < 0) then
+			return function(a, b)
+				local ownA, ownB = a.caster == "player", b.caster == "player";
+				if (ownA ~= ownB) then
+					return not ownA;
+				end
+			end
+		else
+			return function()
+				return nil;
+			end
+		end
+	end,
+	["separateZero"] = function(separateZero)
+		if (separateZero > 0) then
+			return function(a, b)
+				local zeroA, zeroB = a.duration == 0, b.duration == 0;
+				if (zeroA ~= zeroB) then
+					return zeroA;
+				end
+			end
+		elseif (separateZero < 0) then
+			return function(a, b)
+				local zeroA, zeroB = a.duration == 0, b.duration == 0;
+				if (zeroA ~= zeroB) then
+					return not zeroA;
+				end
+			end
+		else
+			return function()
+				return nil;
+			end
+		end
+	end,
+	["index"] = function(reverse)
+		if (reverse) then
+			return function(a, b)
+				if (a.index ~= b.index) then
+					return a.index > b.index;
+				end
+			end
+		else
+			return function(a, b)
+				if (a.index ~= b.index) then
+					return a.index < b.index;
+				end
+			end
+		end
+	end,
+	["name"] = function(reverse)
+		if (reverse) then
+			return function(a, b)
+				if (a.name ~= b.name) then
+					return a.name > b.name;
+				end
+			end
+		else
+			return function(a, b)
+				if (a.name ~= b.name) then
+					return a.name < b.name;
+				end
+			end
+		end
+	end,
+	["expires"] = function(reverse)
+		if (reverse) then
+			return function(a, b)
+				if (a.expires ~= b.expires) then
+					return a.expires > b.expires;
+				end
+			end
+		else
+			return function(a, b)
+				if (a.expires ~= b.expires) then
+					return a.expires < b.expires;
+				end
+			end
+		end
+	end,
+}
+
+-- groupByPriority
+-- 1. Filter > Own > Zero
+-- 2. Filter > Zero > Own
+-- 3. Own > Filter > Zero
+-- 4. Own > Zero > Filter
+-- 5. Zero > Groups > Own
+-- 6. Zero > Own > Filter
 
 -- BeginMod
 --local function sortFactory(key, separateOwn, reverse)
-local function sortFactory(key, separateOwn, reverse, separateZero)
--- EndMod
-	if ( separateOwn ~= 0 ) then
-		if ( reverse ) then
-			return function (a, b)
-				if ( groupingTable[a.filter] == groupingTable[b.filter] ) then
-					local ownA, ownB = a.caster == "player", b.caster == "player";
-					if ( ownA ~= ownB ) then
-						return ownA == (separateOwn > 0)
-					end
-					-- BeginMod
-					if (separateZero ~= 0) then
-						local ownA, ownB = a.duration == 0, b.duration == 0;
-						if (ownA ~= ownB) then
-							return ownA == (separateZero > 0);
-						end
-					end
-					if (key == "expires") then
-						if (a[key] == b[key]) then
-							-- Subsort by name for buffs with same expiration
-							return a["name"] < b["name"];
-						end
-					end
-					-- EndMod
-					return a[key] > b[key];
-				else
-					return groupingTable[a.filter] < groupingTable[b.filter];
+local function sortFactory(key, separateOwn, reverse, separateZero, priority)
+	local fragments =
+	{
+		-- GROUPING
+		[1] = priority < 3 and sorterBuilders["filter"]() or priority < 5 and sorterBuilders["separateOwn"](separateOwn) or sorterBuilders["separateZero"](separateZero),
+		[2] = priority % 5 == 1 and sorterBuilders["separateOwn"](separateOwn) or priority % 2 == 0 and sorterBuilders["separateZero"](separateZero) or sorterBuilders["filter"](),
+		[3] = priority % 3 == 2 and sorterBuilders["separateOwn"](separateOwn) or priority % 2 == 1 and sorterBuilders["separateZero"](separateZero) or sorterBuilders["filter"](),
+		
+		-- SORTING
+		[4] = sorterBuilders[key](reverse),
+		[5] = key ~= "name" and sorterBuilders["name"](reverse) or sorterBuilders["expires"](reverse),	-- first fallback
+		[6] = key ~= "index" and sorterBuilders["index"](reverse) or sorterBuilders["expires"](reverse),	-- second fallback
+	}
+	return function(a, b)
+		if (a and b) then
+			for i=1, 6 do
+				local val = fragments[i](a, b);
+				if (val ~= nil) then
+					return val;
 				end
-			end;
-		else
-			return function (a, b)
-				if ( groupingTable[a.filter] == groupingTable[b.filter] ) then
-					local ownA, ownB = a.caster == "player", b.caster == "player";
-					if ( ownA ~= ownB ) then
-						return ownA == (separateOwn > 0)
-					end
-					-- BeginMod
-					if (separateZero ~= 0) then
-						local ownA, ownB = a.duration == 0, b.duration == 0;
-						if (ownA ~= ownB) then
-							return ownA == (separateZero > 0);
-						end
-					end
-					if (key == "expires") then
-						if (a[key] == b[key]) then
-							-- Subsort by name for buffs with same expiration
-							return a["name"] < b["name"];
-						end
-					end
-					-- EndMod
-					return a[key] < b[key];
-				else
-					return groupingTable[a.filter] < groupingTable[b.filter];
-				end
-			end;
+			end
 		end
-	else
-		if ( reverse ) then
-			return function (a, b)
-				if ( groupingTable[a.filter] == groupingTable[b.filter] ) then
-					-- BeginMod
-					if (separateZero ~= 0) then
-						local ownA, ownB = a.duration == 0, b.duration == 0;
-						if (ownA ~= ownB) then
-							return ownA == (separateZero > 0);
-						end
-					end
-					if (key == "expires") then
-						if (a[key] == b[key]) then
-							-- Subsort by name for buffs with same expiration
-							return a["name"] < b["name"];
-						end
-					end
-					-- EndMod
-					return a[key] > b[key];
-				else
-					return groupingTable[a.filter] < groupingTable[b.filter];
-				end
-			end;
-		else
-			return function (a, b)
-				if ( groupingTable[a.filter] == groupingTable[b.filter] ) then
-					-- BeginMod
-					if (separateZero ~= 0) then
-						local ownA, ownB = a.duration == 0, b.duration == 0;
-						if (ownA ~= ownB) then
-							return ownA == (separateZero > 0);
-						end
-					end
-					if (key == "expires") then
-						if (a[key] == b[key]) then
-							-- Subsort by name for buffs with same expiration
-							return a["name"] < b["name"];
-						end
-					end
-					-- EndMod
-					return a[key] < b[key];
-				else
-					return groupingTable[a.filter] < groupingTable[b.filter];
-				end
-			end;
-		end
-	end
+		return true;
+	end;
 end
+-- EndMod
 
+local sorters = {};
 for __, key in ipairs{"index", "name", "expires"} do
 	local label = key:upper();
 	sorters[label] = {};
@@ -606,7 +640,10 @@ for __, key in ipairs{"index", "name", "expires"} do
 			--sorters[label][bool][sep] = sortFactory(key, sep, bool);
 			sorters[label][bool][sep] = {};
 			for zero = -1, 1 do
-				sorters[label][bool][sep][zero] = sortFactory(key, sep, bool, zero);
+				sorters[label][bool][sep][zero] = {};
+				for priority = 1, 6 do
+					sorters[label][bool][sep][zero][priority] = sortFactory(key, sep, bool, zero, priority); -- the flip between sep and bool are intentional to mirror Blizzard
+				end
 			end
 			-- EndMod
 		end
@@ -643,8 +680,10 @@ function CT_BuffMod_UnsecureAuraHeader_Update(self)
 	elseif (separateZero < 0 ) then
 		separateZero = -1;
 	end
+	local groupByPriority = tonumber(self:GetAttribute("groupByPriority")) or constants.GROUP_BY_FILTER_OWN_ZERO;
 	-- EndMod
-	local sortMethod = (sorters[tostring(self:GetAttribute("sortMethod")):upper()] or sorters["INDEX"])[sortDirection == "-"][separateOwn][separateZero];
+
+ 	local sortMethod = (sorters[tostring(self:GetAttribute("sortMethod")):upper()] or sorters["INDEX"])[sortDirection == "-"][separateOwn][separateZero][groupByPriority];
 
 	local time = GetTime();
 
@@ -5128,6 +5167,7 @@ end
 -- P	.playerUnsecure -- Use unsecure frame and buttons for player and vehicle units (1==yes, false==no, default == no)
 -- P	.separateOwn -- Sort auras cast by player from others (1==Sort before others, 2==Sort after others, 3==Sort with others, default==Sort before others) (see constants.SEPARATE_OWN_*)
 -- P	.separateZero  -- Sort non-expiring buffs before, with, or after other buffs; or hide them entirely (1=before, 2=after, 3=with; 4=hide)
+-- P	.groupByPriority -- Sequence for applying buff-type filters/groupings, separateOwn, and separateZero (ranges from 1 to 6, default (1) is Filter > Own > Zero)
 -- P	.sortDirection -- Sort direction (false == ascending, 1 == descending, default == ascending)
 -- P	.sortMethod -- Sort by (1==Name, 2==Time, 3==Order, default == Name) (see constants.SORT_METHOD_*)
 -- P	.sortSeq1 -- First type of buff to sort (1==None, 2==Debuff, 3==Cancelable buff, 4==Uncancelable Buff, 5==All buffs, 6==Weapon, 7=Consolidated, default==Debuff) (see constants.FILTER_TYPE_*)
@@ -5595,6 +5635,7 @@ function primaryClass:applyProtectedOptions(initFlag)
 	self.sortMethod = frameOptions.sortMethod or constants.SORT_METHOD_NAME;
 	self.sortDirection = not not frameOptions.sortDirection;
 	self.separateZero = frameOptions.separateZero or constants.SEPARATE_ZERO_WITH;
+	self.groupByPriority = frameOptions.groupByPriority or constants.GROUP_BY_FILTER_OWN_ZERO;
 	
 	self.consolidateDuration = (frameOptions.consolidateDurationMinutes or 0) * 60 + (frameOptions.consolidateDurationSeconds or 30);
 	self.consolidateThreshold = (frameOptions.consolidateThresholdMinutes or 0) * 60 + (frameOptions.consolidateThresholdSeconds or 10);
@@ -5651,6 +5692,7 @@ function primaryClass:setAttributes()
 	--	includeWeaponsNormal -- The normal value of the "includeWeapons" attribute. Used by our secure code when entering/leaving a vehicle.
 	--	primaryFrame -- Name of the primary aura frame that we've created
 	--	separateZero -- Sort zero duration buffs before, after, or with other buffs (1=before, -1=after, 0=with)
+	--	groupByPriority -- Sequence for applying buff-type filters/groupings, separateOwn, and separateZero (ranges from 1 to 6, default (1) is Filter > Own > Zero)
 	--	unitNormal -- Normal unit id (string) used for the frame (may not equal .unitId if in a vehicle).
 	--	vehicleBuffs -- Show vehicle buffs when in a vehicle (only applies if normal unit is "player") (1==yes, false==no, default == yes)
 	--
@@ -5783,6 +5825,9 @@ function primaryClass:setAttributes()
 	-- Sort zero duration buffs before, after, or with other buffs; or hide them entirely
 	auraFrame:SetAttribute("separateZero", constants.SEPARATE_ZERO[self.separateZero]);
 	auraFrame:SetAttribute("filterZero", constants.FILTER_ZERO[self.separateZero]);
+	
+	-- In what priority should grouping by filters, separateOwn, and separateZero be applied?
+	auraFrame:SetAttribute("groupByPriority", self.groupByPriority);
 
 	-- Values used to determine if auras get consolidated.
 	auraFrame:SetAttribute("consolidateDuration", self.consolidateDuration);
@@ -8381,15 +8426,26 @@ local function options_updateWindowWidgets(windowId)
 	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
 	UIDropDownMenu_SetSelectedValue( dropdown, sortMethod );
 
-	dropdown = CT_BuffModDropdown_separateZero;
+	dropdown = frame.separateZero.dropdown;
 	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
 	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.separateZero or constants.SEPARATE_ZERO_WITH );
 	if (playerUnsecure) then
 		frame.separateZero.label:SetAlpha(1);
-		UIDropDownMenu_EnableDropDown(frame.separateZero.dropdown);
+		UIDropDownMenu_EnableDropDown(dropdown);
 	else
 		frame.separateZero.label:SetAlpha(0.5);
-		UIDropDownMenu_DisableDropDown(frame.separateZero.dropdown);
+		UIDropDownMenu_DisableDropDown(dropdown);
+	end
+	
+	dropdown = frame.groupByPriority.dropdown;
+	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
+	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.groupByPriority or constants.GROUP_BY_FILTER_OWN_ZERO );
+	if (playerUnsecure) then
+		frame.groupByPriority.label:SetAlpha(1);
+		UIDropDownMenu_EnableDropDown(dropdown);
+	else
+		frame.groupByPriority.label:SetAlpha(0.5);
+		UIDropDownMenu_DisableDropDown(dropdown);
 	end
 
 	frame.sortDirection:SetChecked( not not frameOptions.sortDirection );
@@ -8755,6 +8811,7 @@ local function options_updateProtected(optName, value, windowId)
 			optName == "layoutType" or
 			optName == "playerUnsecure" or
 			optName == "separateZero" or
+			optName == "groupByPriority" or
 			optName == "sortSeq1" or
 			optName == "sortSeq2" or
 			optName == "sortSeq3" or
@@ -9062,6 +9119,7 @@ module.optionUpdate = function(self, optName, value)
 		optName == "rightAlign1" or
 		optName == "separateOwn" or
 		optName == "separateZero" or
+		optName == "groupByPriority" or
 		optName == "sortDirection" or
 		optName == "sortMethod" or
 		optName == "sortSeq1" or
@@ -9493,7 +9551,86 @@ CONSOLIDATION REMOVED FROM GAME --]]
 		end
 
 		----------
-		-- Sorting
+		-- Grouping (takes precedence over sorting)
+		----------
+
+		optionsAddObject(-20, 1*13, "font#tl:15:%y#" .. L["CT_BuffMod/Options/Window/Grouping/Heading"]);
+		
+		-- What sequence to apply grouping in
+		optionsBeginFrame( 0,    0, "frame#tl:0:%y#br:tr:0:%b#i:groupByPriority");
+		
+			local groupByStrings =
+			{
+				[1] = "#" .. L["CT_BuffMod/Options/Window/Grouping/GroupByPriorityFragment1"] .. " > " .. L["CT_BuffMod/Options/Window/Grouping/GroupByPriorityFragment2"] .. " > " .. L["CT_BuffMod/Options/Window/Grouping/GroupByPriorityFragment3"],
+				[2] = "#" .. L["CT_BuffMod/Options/Window/Grouping/GroupByPriorityFragment1"] .. " > " .. L["CT_BuffMod/Options/Window/Grouping/GroupByPriorityFragment3"] .. " > " .. L["CT_BuffMod/Options/Window/Grouping/GroupByPriorityFragment2"],
+				[3] = "#" .. L["CT_BuffMod/Options/Window/Grouping/GroupByPriorityFragment2"] .. " > " .. L["CT_BuffMod/Options/Window/Grouping/GroupByPriorityFragment1"] .. " > " .. L["CT_BuffMod/Options/Window/Grouping/GroupByPriorityFragment3"],
+				[4] = "#" .. L["CT_BuffMod/Options/Window/Grouping/GroupByPriorityFragment2"] .. " > " .. L["CT_BuffMod/Options/Window/Grouping/GroupByPriorityFragment3"] .. " > " .. L["CT_BuffMod/Options/Window/Grouping/GroupByPriorityFragment1"],
+				[5] = "#" .. L["CT_BuffMod/Options/Window/Grouping/GroupByPriorityFragment3"] .. " > " .. L["CT_BuffMod/Options/Window/Grouping/GroupByPriorityFragment1"] .. " > " .. L["CT_BuffMod/Options/Window/Grouping/GroupByPriorityFragment2"],
+				[6] = "#" .. L["CT_BuffMod/Options/Window/Grouping/GroupByPriorityFragment3"] .. " > " .. L["CT_BuffMod/Options/Window/Grouping/GroupByPriorityFragment2"] .. " > " .. L["CT_BuffMod/Options/Window/Grouping/GroupByPriorityFragment1"],
+			}
+			optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#i:label#" .. L["CT_BuffMod/Options/Window/Grouping/GroupByPriorityLabel"]);
+			optionsAddObject( 15,   20, "dropdown#tl:140:%y#s:130:%s#n:CT_BuffModDropdown_groupByPriority#i:dropdown#o:groupByPriority:" .. constants.GROUP_BY_FILTER_OWN_ZERO .. groupByStrings[1] .. groupByStrings[2] .. groupByStrings[3] .. groupByStrings[4] .. groupByStrings[5] .. groupByStrings[6]);
+			optionsAddScript("onleave", function(frame)
+				frameOptionsplayerUnsecure.text:SetTextColor(1,1,1);
+			end);
+			optionsAddScript("onenter", function(frame)
+				if (frame.label:GetAlpha() < 1) then
+					module:displayTooltip(frame, {L["CT_BuffMod/Options/Window/Grouping/GroupByPriorityLabel"], L["CT_BuffMod/Options/Window/Grouping/MethodUnavailableTip"] .. "#" .. textColor2}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
+					frameOptionsplayerUnsecure.text:SetTextColor(1, 1, 0);
+				else
+					module:displayTooltip(frame, {L["CT_BuffMod/Options/Window/Grouping/GroupByPriorityLabel"], L["CT_BuffMod/Options/Window/Grouping/GroupByPriorityTip"] .. "#" .. textColor2}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
+				end
+			end);
+		optionsEndFrame();
+		
+		-- Buffs you cast
+		optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Grouping/PlayerBuffsLabel"]);
+		-- Bug: Omit 3rd menu item while waiting for Blizzard to fix the "Sort with others" bug
+		--
+		--      Note: As of WoW 4.3 they have fixed the bug related to this attribute.
+		--	      I've added the third option and made SEPARATE_OWN_WITH the default instead of SEPARATE_OWN_BEFORE.
+		--
+		optionsAddObject( 15,   20, "dropdown#tl:140:%y#s:130:%s#n:CT_BuffModDropdown_separateOwn#i:separateOwn#o:separateOwn:" .. constants.SEPARATE_OWN_WITH .. L["CT_BuffMod/Options/Window/Grouping/PlayerBuffsDropdown"]);
+
+		-- Sort zero duration buffs
+		optionsBeginFrame( 0,    0, "frame#tl:0:%y#br:tr:0:%b#i:separateZero");
+			optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#i:label#" .. L["CT_BuffMod/Options/Window/Grouping/NonExpiringBuffsLabel"]);
+			optionsAddObject( 15,   20, "dropdown#tl:140:%y#s:130:%s#n:CT_BuffModDropdown_separateZero#i:dropdown#o:separateZero:" .. constants.SEPARATE_ZERO_WITH .. L["CT_BuffMod/Options/Window/Grouping/NonExpiringBuffsDropdown"]);
+			optionsAddScript("onleave", function(frame)
+				frameOptionsplayerUnsecure.text:SetTextColor(1,1,1);
+			end);
+			optionsAddScript("onenter", function(frame)
+				if (frame.label:GetAlpha() < 1) then
+					module:displayTooltip(frame, {L["CT_BuffMod/Options/Window/Grouping/NonExpiringBuffsLabel"], L["CT_BuffMod/Options/Window/Grouping/MethodUnavailableTip"] .. "#" .. textColor2}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
+					frameOptionsplayerUnsecure.text:SetTextColor(1, 1, 0);
+				end
+			end);
+		optionsEndFrame();
+
+		-- Group by
+		do
+			local menu = L["CT_BuffMod/Options/Window/Grouping/OrderDropdown"]; -- "#None#Debuffs#Cancelable buffs#Uncancelable buffs#All buffs#Weapons" -- the 7th option was previously #Consolidated, but that does nothing any more
+
+			optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Grouping/OrderLabel"]);
+
+			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Grouping/Order1Label"]);
+			optionsAddObject( 15,   20, "dropdown#tl:110:%y#s:140:%s#n:CT_BuffModDropdown_sortSeq1#i:sortSeq1#o:sortSeq1:" .. constants.FILTER_TYPE_DEBUFF .. menu);
+
+			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Grouping/Order2Label"]);
+			optionsAddObject( 15,   20, "dropdown#tl:110:%y#s:140:%s#n:CT_BuffModDropdown_sortSeq2#i:sortSeq2#o:sortSeq2:" .. constants.FILTER_TYPE_WEAPON .. menu);
+
+			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Grouping/Order3Label"]);
+			optionsAddObject( 15,   20, "dropdown#tl:110:%y#s:140:%s#n:CT_BuffModDropdown_sortSeq3#i:sortSeq3#o:sortSeq3:" .. constants.FILTER_TYPE_BUFF_CANCELABLE .. menu);
+
+			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Grouping/Order4Label"]);
+			optionsAddObject( 15,   20, "dropdown#tl:110:%y#s:140:%s#n:CT_BuffModDropdown_sortSeq4#i:sortSeq4#o:sortSeq4:" .. constants.FILTER_TYPE_BUFF_UNCANCELABLE .. menu);
+
+			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Grouping/Order5Label"]);
+			optionsAddObject( 15,   20, "dropdown#tl:110:%y#s:140:%s#n:CT_BuffModDropdown_sortSeq5#i:sortSeq5#o:sortSeq5:" .. constants.FILTER_TYPE_NONE .. menu);
+		end
+		
+		----------
+		-- Sorting (subordinate to grouping)
 		----------
 
 		optionsAddObject(-20, 1*13, "font#tl:15:%y#" .. L["CT_BuffMod/Options/Window/Sorting/Heading"]);
@@ -9504,52 +9641,6 @@ CONSOLIDATION REMOVED FROM GAME --]]
 
 		-- Sort direction
 		optionsAddObject(  0,   26, "checkbutton#tl:33:%y#i:sortDirection#o:sortDirection#" .. L["CT_BuffMod/Options/Window/Sorting/ReverseCheckbox"]);
-
-		-- Buffs you cast
-		optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Sorting/PlayerBuffsLabel"]);
-		-- Bug: Omit 3rd menu item while waiting for Blizzard to fix the "Sort with others" bug
-		--
-		--      Note: As of WoW 4.3 they have fixed the bug related to this attribute.
-		--	      I've added the third option and made SEPARATE_OWN_WITH the default instead of SEPARATE_OWN_BEFORE.
-		--
-		optionsAddObject( 15,   20, "dropdown#tl:140:%y#s:130:%s#n:CT_BuffModDropdown_separateOwn#i:separateOwn#o:separateOwn:" .. constants.SEPARATE_OWN_WITH .. L["CT_BuffMod/Options/Window/Sorting/PlayerBuffsDropdown"]);
-
-		-- Sort zero duration buffs
-		optionsBeginFrame( 0,    0, "frame#tl:0:%y#br:tr:0:%b#i:separateZero");
-			optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#i:label#" .. L["CT_BuffMod/Options/Window/Sorting/NonExpiringBuffsLabel"]);
-			optionsAddObject( 15,   20, "dropdown#tl:140:%y#s:130:%s#n:CT_BuffModDropdown_separateZero#i:dropdown#o:separateZero:" .. constants.SEPARATE_ZERO_WITH .. L["CT_BuffMod/Options/Window/Sorting/NonExpiringBuffsDropdown"]);
-			optionsAddScript("onleave", function(frame)
-				frameOptionsplayerUnsecure.text:SetTextColor(1,1,1);
-			end);
-			optionsAddScript("onenter", function(frame)
-				if (frame.label:GetAlpha() < 1) then
-					module:displayTooltip(frame, {L["CT_BuffMod/Options/Window/Sorting/NonExpiringBuffsLabel"], L["CT_BuffMod/Options/Window/Sorting/NonExpiringBuffsTip"] .. "#" .. textColor2}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
-					frameOptionsplayerUnsecure.text:SetTextColor(1, 1, 0);
-				end
-			end);
-		optionsEndFrame();
-
-		-- Group by
-		do
-			local menu = L["CT_BuffMod/Options/Window/Sorting/OrderDropdown"]; -- "#None#Debuffs#Cancelable buffs#Uncancelable buffs#All buffs#Weapons" -- the 7th option was previously #Consolidated, but that does nothing any more
-
-			optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Sorting/OrderLabel"]);
-
-			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Sorting/Order1Label"]);
-			optionsAddObject( 15,   20, "dropdown#tl:110:%y#s:140:%s#n:CT_BuffModDropdown_sortSeq1#i:sortSeq1#o:sortSeq1:" .. constants.FILTER_TYPE_DEBUFF .. menu);
-
-			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Sorting/Order2Label"]);
-			optionsAddObject( 15,   20, "dropdown#tl:110:%y#s:140:%s#n:CT_BuffModDropdown_sortSeq2#i:sortSeq2#o:sortSeq2:" .. constants.FILTER_TYPE_WEAPON .. menu);
-
-			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Sorting/Order3Label"]);
-			optionsAddObject( 15,   20, "dropdown#tl:110:%y#s:140:%s#n:CT_BuffModDropdown_sortSeq3#i:sortSeq3#o:sortSeq3:" .. constants.FILTER_TYPE_BUFF_CANCELABLE .. menu);
-
-			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Sorting/Order4Label"]);
-			optionsAddObject( 15,   20, "dropdown#tl:110:%y#s:140:%s#n:CT_BuffModDropdown_sortSeq4#i:sortSeq4#o:sortSeq4:" .. constants.FILTER_TYPE_BUFF_UNCANCELABLE .. menu);
-
-			optionsAddObject(-10,   14, "font#tl:66:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Sorting/Order5Label"]);
-			optionsAddObject( 15,   20, "dropdown#tl:110:%y#s:140:%s#n:CT_BuffModDropdown_sortSeq5#i:sortSeq5#o:sortSeq5:" .. constants.FILTER_TYPE_NONE .. menu);
-		end
 		
 		----------
 		-- Visibility

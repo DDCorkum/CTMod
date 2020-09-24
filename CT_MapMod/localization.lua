@@ -21,6 +21,15 @@ module.text = module.text or { };
 local L = module.text
 
 
+L["CT_MapMod/Map/DropDown/NewNote"] = "Add a new pin"
+L["CT_MapMod/Map/DropDown/AtPlayer"] = "at the player"
+L["CT_MapMod/Map/DropDown/AtPlayerErrorTip"] = "Requires an outdoor (non-instanced) zone with player present."
+L["CT_MapMod/Map/DropDown/AtWaypoint"] = "at the waypoint"
+L["CT_MapMod/Map/DropDown/AtWaypointErrorTip"] = "Requires a custom user waypoint on this map."
+L["CT_MapMod/Map/DropDown/AtCursor"] = "by clicking on the map"
+L["CT_MapMod/Map/DropDown/AtCursorTip"] = "Click on the map to place a new pin!"
+L["CT_MapMod/Map/DropDown/Options"] = "Options"
+
 -----------------------------------------------
 -- enUS (Default) Unlocalized Strings 
 
@@ -474,7 +483,6 @@ L["CT_MapMod/Herb/Talandra's Rose"] = "Talandras Rose"
 L["CT_MapMod/Herb/Terocone"] = "Terozapfen"
 L["CT_MapMod/Herb/Tiger Lily"] = "Tigerlilie"
 L["CT_MapMod/Herb/Twilight Jasmine"] = "Schattenjasmin"
-L["CT_MapMod/Herb/Vigil's Torch"] = "Wachtfackel"
 L["CT_MapMod/Herb/Whiptail"] = "Gertenrohr"
 L["CT_MapMod/Herb/Widowbloom"] = "Witwenblüte"
 L["CT_MapMod/Herb/Wild Steelbloom"] = "Wildstahlblume"
@@ -551,7 +559,6 @@ L["CT_MapMod/Ore/Titanium"] = "Titan"
 L["CT_MapMod/Ore/Trillium"] = "Trillium"
 L["CT_MapMod/Ore/True Iron"] = "Echteisen"
 L["CT_MapMod/Ore/Truesilver"] = "Echtsilber"
-L["CT_MapMod/Pin/Alt-Click to Edit"] = "Alt-Klick zum Editieren"
 L["CT_MapMod/Pin/Cancel"] = "Abbrechen"
 L["CT_MapMod/Pin/Delete"] = "Löschen"
 L["CT_MapMod/Pin/Description"] = "Beschreibung"
@@ -570,7 +577,6 @@ L["CT_MapMod/User/Green Square"] = "Grünes Quadrat"
 L["CT_MapMod/User/Grey Note"] = "Graue Notiz"
 L["CT_MapMod/User/Red Cross"] = "Rotes Kreuz"
 L["CT_MapMod/User/Red Dot"] = "Roter Punkt"
-L["CT_MapMod/User/Waypoint"] = "Wegpunkt"
 L["CT_MapMod/User/White Circle"] = "Weißer Kreis"
 
 

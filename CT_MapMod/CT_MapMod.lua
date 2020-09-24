@@ -38,22 +38,29 @@ local L = module.text;
 -- CT_MapMod:InsertOre()		-- Inserts a mining pin using a localized name and position, but avoiding duplicates
 -- CT_MapMod_PinMixin			-- Handles the appearance and behaviour of a single pin on a map
 
+
+--------------------------------------------
+-- Public dependencies (localized for performance)
+
+local WorldMapFrame = WorldMapFrame;
+local C_Map = C_Map;
+
+
 --------------------------------------------
 -- Private design
 
 local StaticNoteEditPanel;		-- Allows the manual editing of a pin's contents
 local CT_MapMod_DataProviderMixin;	-- Handles the creation, placement and removal of pins from a map
 
+
 --------------------------------------------
 -- Initialization
 
 function module:Initialize()				-- called via module.update("init") from CT_Library
 
-	-- Convert notes from older versions of the addon to the most recent (using function defined near bottom)
-	module:ConvertOldNotes();
-
 	-- load the DataProvider which has most of the horsepower
-	WorldMapFrame:AddDataProvider(CreateFromMixins(CT_MapMod_DataProviderMixin));
+	module.worldMapDataProvider = CreateFromMixins(CT_MapMod_DataProviderMixin);
+	WorldMapFrame:AddDataProvider(module.worldMapDataProvider);
 	
 	-- load an additional DataProvider to the FlightMapFrame in retail, so pins can appear on the continent flight map
 	if (module:getGameVersion() >= 8) then
@@ -87,6 +94,9 @@ function module:InsertPin(mapid, x, y, name, set, subset, descript)
 		if (note.x == x and note.y == y and note.name == name and note.set == set and note.subset == subset and note.descript == descript) then
 			note.datemodified = date("%Y%m%d");
 			note.version = MODULE_VERSION;
+			if (WorldMapFrame:IsShown() and set == "User") then
+				StaticNoteEditPanel():RequestFocus(module.worldMapDataProvider.pins[i]);
+			end
 			return;
 		end
 	end
@@ -100,6 +110,15 @@ function module:InsertPin(mapid, x, y, name, set, subset, descript)
 		["datemodified"] = date("%Y%m%d"),
 		["version"] = MODULE_VERSION
 	});
+	if (WorldMapFrame:IsShown()) then
+		local i = #CT_MapMod_Notes[mapid];
+		local pin = WorldMapFrame:AcquirePin("CT_MapMod_PinTemplate", mapid, i, x, y, name, descript, set, subset, datemodified, version);
+		module.worldMapDataProvider.pins[i] = pin;
+		if (set == "User") then
+			StaticNoteEditPanel():RequestFocus(pin);
+		end
+	end
+	
 end
 
 -- Deletes a pin from the i'th position on mapid, taking the very last remaining one and inserting it into the current position rather than shifting all the other notes down by one
@@ -111,6 +130,9 @@ function module:DeletePin(mapid, i)
 		else
 			local lastNoteInStack = tremove(CT_MapMod_Notes[mapid], #CT_MapMod_Notes[mapid]);
 			CT_MapMod_Notes[mapid] = lastNoteInStack;
+		end
+		if (WorldMapFrame:IsShown()) then
+			module.worldMapDataProvider:RefreshAllData();
 		end
 	end
 end
@@ -134,21 +156,22 @@ function public:InsertHerb(mapid, x, y, herb, descript, name)
 	end
 	for __, expansion in pairs(module.pinTypes["Herb"]) do
 		for __, kind in ipairs(expansion) do
-			if (L["CT_MapMod/Herb/" .. kind.name] == herb) then
-				herb = kind.name
-			end
-			if (kind.name == herb) then
-				if (kind.spawnsRandomly and not module:getOption("CT_MapMod_IncludeRandomSpawns")) then
-					-- this is an herb that appears randomly throughout the zone in place of others, such as Anchor's Weed
+			if (L["CT_MapMod/Herb/" .. kind] == herb or kind == herb) then
+				local isRandom = module.randomSpawns[kind];
+				if (type(isRandom) == "function") then
+					isRandom = isRandom();
+				end
+				if (isRandom and not module:getOption("CT_MapMod_IncludeRandomSpawns")) then
+					-- this is an kind that appears randomly throughout the zone in place of others, such as Anchor's Weed
 					return;
 				end
 				CT_MapMod_Notes[mapid] = CT_MapMod_Notes[mapid] or { };
 				for __, note in ipairs(CT_MapMod_Notes[mapid]) do
-					if ((note["name"] == herb) and (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.02)) then
-						--two herbs of the same kind not far apart
+					if ((note["name"] == kind) and (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.02)) then
+						--two kinds of the same kind not far apart
 						return;
 					elseif ((note["set"] == "Herb") and (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.01)) then
-						--two herbs of different kinds very close together
+						--two kinds of different kinds very close together
 						if (module:getOption("CT_MapMod_OverwriteGathering")) then
 							note["x"] = x;
 							note["y"] = y;
@@ -157,16 +180,16 @@ function public:InsertHerb(mapid, x, y, herb, descript, name)
 							elseif (note["descript"]:sub(1,8) == "Nearby: " and not note["descript"]:find(L["CT_MapMod/Herb/" .. note["subset"]],9)) then
 								note["descript"] = note["descript"] .. ", " .. L["CT_MapMod/Herb/" .. note["subset"]];
 							end
-							note["name"] = L["CT_MapMod/Herb/" .. herb];
-							note["subset"] = herb;
+							note["name"] = L["CT_MapMod/Herb/" .. kind];
+							note["subset"] = kind;
 							note["datemodified"] = date("%Y%m%d");
 							note["version"] = MODULE_VERSION
 						else
 							-- leave the existing note, but add details in the description
 							if (note["descript"] == "" or not note["descript"]) then
-								note["descript"] = "Nearby: " .. L["CT_MapMod/Herb/" .. herb];
-							elseif (note["descript"]:sub(1,8) == "Nearby: " and not note["descript"]:find(L["CT_MapMod/Herb/" .. herb],9)) then
-								note["descript"] = note["descript"] .. ", " .. L["CT_MapMod/Herb/" .. herb];
+								note["descript"] = "Nearby: " .. L["CT_MapMod/Herb/" .. kind];
+							elseif (note["descript"]:sub(1,8) == "Nearby: " and not note["descript"]:find(L["CT_MapMod/Herb/" .. kind],9)) then
+								note["descript"] = note["descript"] .. ", " .. L["CT_MapMod/Herb/" .. kind];
 							end											
 						end
 						return;
@@ -175,10 +198,10 @@ function public:InsertHerb(mapid, x, y, herb, descript, name)
 					end
 				end
 				if (not name) then
-					name = L["CT_MapMod/Herb/" .. herb];
+					name = L["CT_MapMod/Herb/" .. kind];
 				end
 				-- this point will not have been reached if the earlier rules were triggered, causing the function to return early
-				module:InsertPin(mapid, x, y, name, "Herb", herb, descript);
+				module:InsertPin(mapid, x, y, name, "Herb", kind, descript);
 				return; -- breaks the for loops
 			end
 		end
@@ -189,7 +212,7 @@ end
 -- Parameters:
 --	mapid		Number, Required	Corresponding to a uiMapID upon which the pin should appear
 --	x, y		Numbers, Required	Absolute coordinates on the map between 0 and 1
---	ore		String			Localized or non-localized name of the mining node or kind of ore (silently fails if it is a string that simply isn't recognized)
+--	ore		String			Localized name of the mining node or kind of ore (silently fails if it is a string that simply isn't recognized)
 --	descript	String			Optional text to include (defaults to nil)
 --	name		String			Optional name for the pin (defaults to a localized version of the ore)
 function public:InsertOre(mapid, x, y, ore, descript, name)
@@ -301,17 +324,18 @@ function public:InsertOre(mapid, x, y, ore, descript, name)
 	-- Now process the mining node
 	for __, expansion in pairs(module.pinTypes["Ore"]) do
 		for __, kind in ipairs(expansion) do
-			if (L["CT_MapMod/Ore/" .. kind.name] == ore) then
-				ore = kind.name
-			end
-			if (kind.name == ore) then
-				if (kind.spawnsRandomly and not module:getOption("CT_MapMod_IncludeRandomSpawns")) then
-					-- this is an herb that appears randomly throughout the zone in place of others, such as Anchor's Weed
+			if (L["CT_MapMod/Ore/" .. kind] == ore or kind == ore) then
+				local isRandom = module.randomSpawns[kind];
+				if (type(isRandom) == "function") then
+					isRandom = isRandom();
+				end
+				if (isRandom and not module:getOption("CT_MapMod_IncludeRandomSpawns")) then
+					-- this is an ore that appears randomly throughout the zone in place of others, such as Platinum
 					return;
 				end
 				CT_MapMod_Notes[mapid] = CT_MapMod_Notes[mapid] or { };
 				for __, note in ipairs(CT_MapMod_Notes[mapid]) do
-					if ((note["name"] == ore) and (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.02)) then 
+					if ((note["name"] == kind) and (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.02)) then 
 						--two veins of the same kind not far apart
 						return;
 					elseif ((note["set"] == "Ore") and (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.01)) then
@@ -325,14 +349,14 @@ function public:InsertOre(mapid, x, y, ore, descript, name)
 							elseif (note["descript"]:sub(1,8) == "Nearby: " and not note["descript"]:find(L["CT_MapMod/Ore/" .. note["subset"]],9)) then
 								note["descript"] = note["descript"] .. ", " .. L["CT_MapMod/Ore/" .. note["subset"]];
 							end
-							note["name"] = L["CT_MapMod/Ore/" .. ore];
-							note["subset"] = ore;
+							note["name"] = L["CT_MapMod/Ore/" .. kind];
+							note["subset"] = kind;
 						else
 							-- leave the existing note, but add details in the description
 							if (note["descript"] == "" or not note["descript"]) then
-								note["descript"] = "Nearby: " .. (L["CT_MapMod/Ore/" .. ore]);
-							elseif (note["descript"]:sub(1,8) == "Also nearby: " and not note["descript"]:find(L["CT_MapMod/Ore/" .. ore],9)) then
-								note["descript"] = note["descript"] .. ", " .. L["CT_MapMod/Ore/" .. ore];
+								note["descript"] = "Nearby: " .. (L["CT_MapMod/Ore/" .. kind]);
+							elseif (note["descript"]:sub(1,8) == "Also nearby: " and not note["descript"]:find(L["CT_MapMod/Ore/" .. kind],9)) then
+								note["descript"] = note["descript"] .. ", " .. L["CT_MapMod/Ore/" .. kind];
 							end
 						end
 						note["datemodified"] = date("%Y%m%d");
@@ -344,10 +368,10 @@ function public:InsertOre(mapid, x, y, ore, descript, name)
 					end
 				end
 				if (not name) then
-					name = L["CT_MapMod/Ore/" .. ore];
+					name = L["CT_MapMod/Ore/" .. kind];
 				end
 				-- this point will not have been reached if the earlier rules were triggered, causing the function to return early
-				module:InsertPin(mapid, x, y, name, "Ore", ore, descript);
+				module:InsertPin(mapid, x, y, name, "Ore", kind, descript);
 				return; -- breaks the for loops
 			end
 		end
@@ -363,13 +387,17 @@ function public:GetDataProvider()
 end
 
 CT_MapMod_DataProviderMixin = CreateFromMixins(MapCanvasDataProviderMixin);	-- this is a locally scoped variable, per the design at the top of the document
- 
+
 function CT_MapMod_DataProviderMixin:RemoveAllData()
 	self:GetMap():RemoveAllPinsByTemplate("CT_MapMod_PinTemplate");
 	StaticNoteEditPanel():Hide();
 end
  
 function CT_MapMod_DataProviderMixin:RefreshAllData(fromOnShow)
+	-- Initialization
+	self.pins = self.pins or { };
+	wipe(self.pins);
+
 	-- Clear the map
 	self:RemoveAllData();
 	module.PinHasFocus = nil;  --rather than calling this for each pin, just call it once when all pins are gone.
@@ -394,41 +422,35 @@ function CT_MapMod_DataProviderMixin:RefreshAllData(fromOnShow)
 			end
 		end
 	else	
-		local tabName, tabTexture, tabOffset, numEntries = GetSpellTabInfo(1);
-		for i=tabOffset + 1, tabOffset + numEntries, 1 do
-			local spellName, spellSubName = GetSpellBookItemName(i, BOOKTYPE_SPELL)
-		 	if (spellName == L["CT_MapMod/Map/ClassicHerbalist"]) then
-		 		module.isHerbalist = true;
-		 	elseif (spellName == L["CT_MapMod/Map/ClassicMiner"]) then
-		 		module.isMiner = true;
-		 	end
+		
+		-- these abilities are localized in ExpansionData.lua
+		if (GetSpellInfo(L["CT_MapMod/Map/ClassicHerbalist"])) then
+		 	module.isHerbalist = true;
+		end
+		if (GetSpellInfo(L["CT_MapMod/Map/ClassicMiner"])) then
+			module.isMiner = true;
 		end
 	end
-
+	
 	-- Fetch and push the pins to be used for this map
 	local mapid = self:GetMap():GetMapID();
-	if ( (mapid) and ((module:getOption("CT_MapMod_ShowOnFlightMaps") or 1) == 1) ) then
-		for key, val in pairs(module.flightMaps) do   --continent pins will appear in corresponding flight maps
-			if (mapid == key) then
-				mapid = val;
-			end
+	if (mapid) then	
+		if ((module:getOption("CT_MapMod_ShowOnFlightMaps") or 1) == 1) then
+			mapid = module.flightMaps.mapid or mapid;		
 		end
-	end
-	if (mapid and CT_MapMod_Notes[mapid]) then
-		for i, info in ipairs(CT_MapMod_Notes[mapid]) do
-			if (
-				-- if user is set to always (the default)
-				( (info["set"] == "User") and ((module:getOption("CT_MapMod_UserNoteDisplay") or 1) == 1) ) or
-
-				-- if herb is set to always, or if herb is set to auto (the default) and the toon is an herbalist
-				( (info["set"] == "Herb") and ((module:getOption("CT_MapMod_HerbNoteDisplay") or 1) == 1) and (module.isHerbalist) ) or
-				( (info["set"] == "Herb") and ((module:getOption("CT_MapMod_HerbNoteDisplay") or 1) == 2) ) or
-
-				-- if ore is set to always, or if ore is set to auto (the default) and the toon is a miner
-				( (info["set"] == "Ore") and ((module:getOption("CT_MapMod_OreNoteDisplay") or 1) == 1) and (module.isMiner) ) or
-				( (info["set"] == "Ore") and ((module:getOption("CT_MapMod_OreNoteDisplay") or 1) == 2) )
-			) then
-				self:GetMap():AcquirePin("CT_MapMod_PinTemplate", mapid, i, info["x"], info["y"], info["name"], info["descript"], info["set"], info["subset"], info["datemodified"], info["version"]);
+		if (CT_MapMod_Notes[mapid]) then
+			local showUser, showHerb, showOre = 
+				module:getOption("CT_MapMod_UserNoteDisplay") or 1,
+				module:getOption("CT_MapMod_HerbNoteDisplay") or 1,
+				module:getOption("CT_MapMod_OreNoteDisplay") or 1;
+			for i, info in ipairs(CT_MapMod_Notes[mapid]) do
+				if (
+					info["set"] == "User" and showUser == 1
+					or info["set"] == "Herb" and (showHerb == 1 and module.isHerbalist or showHerb == 2)
+					or info["set"] == "Ore" and (showOre == 1 and module.isMiner or showOre == 2)
+				) then
+					self.pins[i] = self:GetMap():AcquirePin("CT_MapMod_PinTemplate", mapid, i, info["x"], info["y"], info["name"], info["descript"], info["set"], info["subset"], info["datemodified"], info["version"]);
+				end
 			end
 		end
 	end
@@ -447,82 +469,24 @@ function CT_MapMod_PinMixin:OnLoad()
 	self:SetWidth(15);
 	self:SetHeight(15);
 	self.texture = self:CreateTexture(nil,"ARTWORK");
-	
-	-- Normally the notepanel would be created here, but instead it is deferred until the first onclick event
-	-- Otherwise, there could be a performance hit from creating notepanel skeletons that are never actually needed or used
-end
- 
-function CT_MapMod_PinMixin:OnAcquired(...) -- the arguments here are anything that are passed into AcquirePin after the pinTemplate
-	-- Override in your mixin, called when this pin is being acquired by a data provider but before its added to the map
-	self.mapid, self.i, self.x, self.y, self.name, self.descript, self.set, self.subset, self.datemodified, self.version = ...;
-	
-	-- Set basic properties for the pin itself
-	self:SetPosition(self.x, self.y);
-	self.texture:SetTexture("Interface\\RaidFrame\\UI-RaidFrame-Threat"); -- this is a catch-all to ensure every object has an icon, but it should be overridden below
-	if (self.set and self.subset) then
-		if (self.set == "Herb" or self.set == "Ore") then
-			-- The herb and ore lists are long, so they are subdivided between classic and expansions
-			for key, expansion in pairs(module.pinTypes[self.set]) do
-				for j, val in ipairs(expansion) do
-					if (val["name"] == self.subset) then
-						self.texture:SetTexture(val["icon"]);
-						if (val.texCoord) then
-							self.texture:SetTexCoord(val.texCoord.left, val.texCoord.right, val.texCoord.top, val.texCoord.bottom);
-						else
-							self.texture:SetTexCoord(0, 1, 0, 1);
-						end
-					end
-				end
-			end
-		else
-			-- presumably self.set == "User"
-			for i, val in ipairs(module.pinTypes[self.set]) do
-				if (val["name"] == self.subset) then
-					self.texture:SetTexture(val["icon"]);
-					if (val.texCoord) then
-						self.texture:SetTexCoord(val.texCoord.left, val.texCoord.right, val.texCoord.top, val.texCoord.bottom);
-					else
-						self.texture:SetTexCoord(0, 1, 0, 1);
-					end
-				end
-
-			end
-		
-		end
-	end
-	if (self.set == "User") then
-		self:SetHeight(module:getOption("CT_MapMod_UserNoteSize") or 24);
-		self:SetWidth(module:getOption("CT_MapMod_UserNoteSize") or 24);
-	elseif (self.set == "Herb") then
-		self:SetHeight(module:getOption("CT_MapMod_HerbNoteSize") or 14);
-		self:SetWidth(module:getOption("CT_MapMod_HerbNoteSize") or 14);
-	else
-		self:SetHeight(module:getOption("CT_MapMod_OreNoteSize") or 14);
-		self:SetWidth(module:getOption("CT_MapMod_OreNoteSize") or 14);
-	end
 	self.texture:SetAllPoints();
-	self:Show();
-		
-	-- create the ability to move the pin around
+	
+	-- Create the ability to move the pin around
 	self.isBeingDragged = nil;
 	self:RegisterForDrag("RightButton");
 	self:HookScript("OnDragStart", function()
 		if (module.PinHasFocus) then return; end
 		self.isBeingDragged = true;
-		local whileDragging;
-		function whileDragging()
+		local function whileDragging()
 			if (self.isBeingDragged) then
-				local x,y = self:GetMap():GetNormalizedCursorPosition();
+				local x, y = self:GetMap():GetNormalizedCursorPosition();
 				if (x and y) then
-					x = max(0.005, x);	-- clamping to the map
-					x = min(0.995, x);
-					y = max(0.005, y);
-					y = min(0.995, y);
-					self:SetPosition(x,y);
+					x, y = Clamp(x, 0.005, 0.995), Clamp(y, 0.005, 0.995); -- clamping to the map
+					self:SetPosition(x, y);
 				end
 				if (self.onXYChanged) then
 					-- callback created by the StaticNoteEditPanel to be aware of the new position
-					self.onXYChanged(x,y);
+					self.onXYChanged(x, y);
 				end
 				C_Timer.After(0.05, whileDragging);
 			end
@@ -534,25 +498,37 @@ function CT_MapMod_PinMixin:OnAcquired(...) -- the arguments here are anything t
 		self.isBeingDragged = nil;
 		local x,y = self:GetMap():GetNormalizedCursorPosition();
 		if (x and y) then
-			x = max(0.005, x);
-			x = min(0.995, x);
-			y = max(0.005, y);
-			y = min(0.995, y);
+			x, y = Clamp(x, 0.005, 0.995), Clamp(y, 0.005, 0.995); -- clamping to the map
 			CT_MapMod_Notes[self.mapid][self.i] ["x"] = x;
 			CT_MapMod_Notes[self.mapid][self.i] ["y"] = y;
 			self.x = x;
 			self.y = y;
-			self:SetPosition(x,y);
+			self:SetPosition(x, y);
 			if (self.onXYChanged) then
 				-- callback created by the StaticNoteEditPanel to be aware of the new position
-				self.onXYChanged(x,y);
+				self.onXYChanged(x, y);
 			end
 		end
 	end);
+end
+ 
+function CT_MapMod_PinMixin:OnAcquired(...) -- the arguments here are anything that are passed into AcquirePin after the pinTemplate
+	-- Override in your mixin, called when this pin is being acquired by a data provider but before its added to the map
+	self.mapid, self.i, self.x, self.y, self.name, self.descript, self.set, self.subset, self.datemodified, self.version = ...;
 	
-	-- make it absolutely impossible that the edit panel frame is still showing
-	StaticNoteEditPanel():Hide();
-	
+	-- Set basic properties for the pin itself
+	self:SetPosition(self.x, self.y);
+	local icon = module.pinIcons[self.subset];
+	if (type(icon) == "table") then
+		self.texture:SetTexture(icon.path);
+		self.texture:SetTexCoord(icon.left, icon.right, icon.top, icon.bottom);
+	else
+		self.texture:SetTexture(icon);
+		self.texture:SetTexCoord(0, 1, 0, 1);
+	end
+	local size = module:getOption("CT_MapMod_" .. self.set .. "NoteSize") or 24;
+	self:SetSize(size, size);
+	self:Show();
 end
  
 function CT_MapMod_PinMixin:OnReleased()
@@ -567,8 +543,8 @@ end
 do
 	local uiMapPoint =
 	{
-		uiMapID = 0;
-		position = CreateVector2D(0,0)
+		uiMapID = 0,
+		position = CreateVector2D(0,0),
 	}
 	local waypointLinkPattern = "|cffffff00|Hworldmap:%d:%d:%d|h[%s]|h|r";		-- uiMapID, x, y, MAP_PIN_HYPERLINK
 	function CT_MapMod_PinMixin:OnClick(button)	
@@ -593,33 +569,15 @@ function CT_MapMod_PinMixin:OnMouseEnter()
 	if (self.isBeingDragged) then
 		return;
 	end
-	local icon;
-	local texCoord;
-	if (self.set == "Herb" or self.set == "Ore") then
-		for key, expansion in pairs(module.pinTypes[self.set]) do
-			for i, type in ipairs(expansion) do
-				if (type["name"] == self.subset) then
-					icon = type["icon"]
-					texCoord = type.texCoord;
-				end
-			end
-		end
-	elseif (self.set == "User") then
-		for i, type in ipairs(module.pinTypes["User"]) do
-			if (type["name"] == self.subset) then
-				icon = type["icon"];
-				texCoord = type.texCoord;
-			end
-		end	
-	end
+	local icon = module.pinIcons[self.subset];
 	if ( self.x > 0.5 ) then
 		GameTooltip:SetOwner(self, "ANCHOR_LEFT");
 	else
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 	end
 	GameTooltip:ClearLines();
-	if (texCoord) then
-		GameTooltip:AddDoubleLine(patterns.texCoordIcon:format(icon, texCoord.width, texCoord.height, texCoord.left * texCoord.width, texCoord.right * texCoord.width, texCoord.top * texCoord.height, texCoord.bottom * texCoord.height, self.name), self.set, 0, 1, 0, 0.6, 0.6, 0.6);
+	if (type(icon) == "table") then
+		GameTooltip:AddDoubleLine(patterns.texCoordIcon:format(icon.path, icon.width, icon.height, icon.left * icon.width, icon.right * icon.width, icon.top * icon.height, icon.bottom * icon.height, self.name), self.set, 0, 1, 0, 0.6, 0.6, 0.6);
 	elseif (icon) then
 		GameTooltip:AddDoubleLine(patterns.basicIcon:format(icon, self.name), self.set, 0, 1, 0, 0.6, 0.6, 0.6);
 	else
@@ -635,15 +593,15 @@ function CT_MapMod_PinMixin:OnMouseEnter()
 	end
 	if (not module.PinHasFocus) then  -- clicking on pins won't do anything while the edit box is open for this or another pin
 		if (self.datemodified and self.version) then
-			GameTooltip:AddDoubleLine(L[GetModifiedClick("CHATLINK") ~= "SHIFT-BUTTON1" and "CT_MapMod/Pin/Shift-Click to Edit" or "CT_MapMod/Pin/Alt-Click to Edit"], self.datemodified .. " (" .. self.version .. ")", 0.00, 0.50, 0.90, 0.45, 0.45, 0.45);
+			GameTooltip:AddDoubleLine(L[GetModifiedClick("CHATLINK") ~= "SHIFT-BUTTON1" and "CT_MapMod/Pin/Shift-Click to Edit" or "CT_MapMod/Pin/Alt-Click to Edit"], self.datemodified .. " (" .. self.version .. ")", 0.2, 1.0, 0.2, 0.3, 0.3, 0.3);
 		else	
-			GameTooltip:AddLine(L[GetModifiedClick("CHATLINK") ~= "SHIFT-BUTTON1" and "CT_MapMod/Pin/Shift-Click to Edit" or "CT_MapMod/Pin/Alt-Click to Edit"], 0, 0.5, 0.9, 1);
+			GameTooltip:AddLine(L[GetModifiedClick("CHATLINK") ~= "SHIFT-BUTTON1" and "CT_MapMod/Pin/Shift-Click to Edit" or "CT_MapMod/Pin/Alt-Click to Edit"], 0.2, 1.0, 0.2);
 		end
-		GameTooltip:AddDoubleLine(L["CT_MapMod/Pin/Right-Click to Drag"], self.mapid, 0.00, 0.50, 0.90, 0.05, 0.05, 0.05 );
+		GameTooltip:AddDoubleLine(L["CT_MapMod/Pin/Right-Click to Drag"], "uiMapId " .. self.mapid, 0.2, 1.0, 0.2, 0.3, 0.3, 0.3 );
 		
 	else
 		if (self.datemodified and self.version) then
-			GameTooltip:AddDoubleLine(" ", self.datemodified .. " (" .. self.version .. ")", 0.00, 0.50, 0.90, 0.45, 0.45, 0.45);
+			GameTooltip:AddDoubleLine(" ", self.datemodified .. " (" .. self.version .. ")", 0.2, 1.0, 0.2, 0.3, 0.3, 0.3);
 		end
 	end
 	GameTooltip:Show();
@@ -774,9 +732,8 @@ do
 		
 		-- Closes the frame and removes pin from both the map and CT_MapMod_Notes
 		local function deletePressed()
-			tremove(CT_MapMod_Notes[pin.mapid],pin.i);
-			frame:Hide();
-			map:RefreshAll();		
+			module:DeletePin(pin.mapid, pin.i);
+			frame:Hide();	
 		end
 		
 		-- Creates the frame and its contents (called by the constructor)
@@ -908,67 +865,32 @@ do
 				dropdownEntry.func = function(self)
 					setDropDown.unapprovedValue = self.value;
 					UIDropDownMenu_SetText(setDropDown, L["CT_MapMod/Pin/" .. self.value]);
-					if (self.value == "User") then
-						pin:SetHeight(module:getOption("CT_MapMod_UserNoteSize") or 24);
-						pin:SetWidth(module:getOption("CT_MapMod_UserNoteSize") or 24);
-						if (pin.set == "User") then
-							-- return to the original pin type
-							subsetDropDown.unapprovedValue = pin.subset;
-							UIDropDownMenu_SetText(subsetDropDown, L["CT_MapMod/User/" .. pin.subset]);
-							for __, kind in ipairs(module.pinTypes["User"]) do
-								if (kind.name == self.value) then
-									pin.texture:SetTexture(kind.icon);
-									if (kind.texCoord) then
-										pin.texture:SetTexCoord(kind.texCoord.left, kind.texCoord.right, kind.texCoord.top, kind.texCoord.bottom);
-									else
-										pin.texture:SetTexCoord(0, 1, 0, 1);
-									end
-								end
-							end
+					pin:SetHeight(module:getOption("CT_MapMod_" .. self.value .. "NoteSize") or 24);
+					pin:SetWidth(module:getOption("CT_MapMod_" .. self.value .. "NoteSize") or 24);
+					if (pin.set == self.value) then
+						-- return to the pin's original icon
+						subsetDropDown.unapprovedValue = pin.subset;
+						UIDropDownMenu_SetText(subsetDropDown, L["CT_MapMod/" .. self.value .. "/" .. pin.subset]);
+						local icon = module.pinIcons[pin.subset];
+						if (type(icon) == "table") then
+							pin.texture:SetTexture(icon.path);
+							pin.SetTexCoord(icon.left, icon.right, icon.top, icon.bottom);
 						else
-							-- use the first icon on the list
-							local kind = module.pinTypes["User"][1]
-							subsetDropDown.unapprovedValue = kind.name;
-							UIDropDownMenu_SetText(subsetDropDown, L["CT_MapMod/User/" .. kind.name]);
-							pin.texture:SetTexture(kind.icon);
-							if (kind.texCoord) then
-								pin.texture:SetTexCoord(kind.texCoord.left, kind.texCoord.right, kind.texCoord.top, kind.texCoord.bottom);
-							else
-								pin.texture:SetTexCoord(0, 1, 0, 1);
-							end
+							pin.texture:SetTexture(icon);
+							pin.texture:SetTexCoord(0, 1, 0, 1);
 						end
 					else
-						-- herb or ore
-						pin:SetHeight(module:getOption("CT_MapMod_" .. self.value .. "NoteSize") or 14);
-						pin:SetWidth(module:getOption("CT_MapMod_" .. self.value .. "NoteSize") or 14);
-						if (pin.set == self.value) then
-							-- return to the pin's original icon
-							subsetDropDown.unapprovedValue = pin.subset;
-							UIDropDownMenu_SetText(subsetDropDown, L["CT_MapMod/" .. self.value .. "/" .. pin.subset]);
-							for __, expansion in pairs(module.pinTypes[self.value]) do
-								-- herbs and ore are divided into expansions because there are so many
-								for __, kind in ipairs(expansion) do
-									if (kind.name == pin.subset) then
-										pin.texture:SetTexture(kind.icon);
-										if (kind.texCoord) then
-											pin.texture:SetTexCoord(kind.texCoord.left, kind.texCoord.right, kind.texCoord.top, kind.texCoord.bottom);
-										else
-											pin.texture:SetTexCoord(0, 1, 0, 1);
-										end
-									end
-								end
-							end
+						-- use the first icon on the list
+						local name = self.value ~= "User" and module.pinTypes[self.value]["Classic"][1] or module.pinTypes[self.value][1];
+						subsetDropDown.unapprovedValue = name;
+						UIDropDownMenu_SetText(subsetDropDown, L["CT_MapMod/" .. self.value .. "/" .. name]);
+						local icon = module.pinIcons[name];
+						if (type(icon) == "table") then
+							pin.texture:SetTexture(icon.path);
+							pin.SetTexCoord(icon.left, icon.right, icon.top, icon.bottom);
 						else
-							-- use the first icon on the list
-							local kind = module.pinTypes[self.value]["Classic"][1];
-							subsetDropDown.unapprovedValue = kind.name;
-							UIDropDownMenu_SetText(subsetDropDown, L["CT_MapMod/" .. self.value .. "/" .. kind.name]);
-							pin.texture:SetTexture(kind.icon);
-							if (kind.texCoord) then
-								pin.texture:SetTexCoord(kind.texCoord.left, kind.texCoord.right, kind.texCoord.top, kind.texCoord.bottom);
-							else
-								pin.texture:SetTexCoord(0, 1, 0, 1);
-							end
+							pin.texture:SetTexture(icon);
+							pin.texture:SetTexCoord(0, 1, 0, 1);
 						end
 					end
 				end
@@ -997,57 +919,39 @@ do
 			UIDropDownMenu_JustifyText(setDropDown, "LEFT");
 
 			UIDropDownMenu_Initialize(subsetDropDown, function(frame, level, menuList)
-				local dropdownEntry = { };
-
 				local set = setDropDown.unapprovedValue or pin.set;
 
-				-- properties common to all
-				dropdownEntry.func = function(entry, arg1, arg2, checked)
+				-- on-click handler for dropdown menu items
+				local function onClick(entry, arg1, arg2, checked)
 					subsetDropDown.unapprovedValue = entry.value;
-					if (set == "User") then
-						UIDropDownMenu_SetText(subsetDropDown,L["CT_MapMod/User/" .. entry.value]);
-						for __, kind in ipairs(module.pinTypes["User"]) do
-							if (kind.name == entry.value) then
-								pin.texture:SetTexture(kind.icon);
-								if (kind.texCoord) then
-									pin.texture:SetTexCoord(kind.texCoord.left, kind.texCoord.right, kind.texCoord.top, kind.texCoord.bottom);
-								else
-									pin.texture:SetTexCoord(0, 1, 0, 1);
-								end
-							end
-						end
+					UIDropDownMenu_SetText(subsetDropDown,L["CT_MapMod/" .. set .. "/" .. entry.value]);
+					local icon = module.pinIcons[entry.value];
+					if (type(icon) == "table") then
+						pin.texture:SetTexture(icon.path);
+						pin.SetTexCoord(icon.left, icon.right, icon.top, icon.bottom);
 					else
-						-- herb or ore
-						UIDropDownMenu_SetText(subsetDropDown,L["CT_MapMod/" .. set .. "/" .. entry.value]);
-						for __, expansion in pairs(module.pinTypes[set]) do
-							for __, kind in ipairs(expansion) do
-								if (kind.name == entry.value) then
-									pin.texture:SetTexture(kind.icon);
-									if (kind.texCoord) then
-										pin.texture:SetTexCoord(kind.texCoord.left, kind.texCoord.right, kind.texCoord.top, kind.texCoord.bottom);
-									else
-										pin.texture:SetTexCoord(0, 1, 0, 1);
-									end
-								end
-						
-							end
-						end
+						pin.texture:SetTexture(icon);
+						pin.texture:SetTexCoord(0, 1, 0, 1);
 					end
 				end
 
 				
-				-- Create the dropdown entries
-				if (set == "User") then
-					for i, type in ipairs(module.pinTypes["User"]) do
-						dropdownEntry.text = L["CT_MapMod/User/" .. type["name"]] or type["name"];
-						dropdownEntry.value = type["name"];
-						dropdownEntry.icon = type["icon"];
-						if (type.texCoord) then
-							dropdownEntry.tCoordLeft = type.texCoord.left;
-							dropdownEntry.tCoordRight = type.texCoord.right;
-							dropdownEntry.tCoordTop = type.texCoord.top;
-							dropdownEntry.tCoordBottom = type.texCoord.bottom;
+				-- Dropdown builder
+				local function addEntries(tbl)
+					local dropdownEntry = module:getTable();
+					dropdownEntry.func = onClick;
+					for i, name in ipairs(tbl) do
+						dropdownEntry.text = L["CT_MapMod/" .. set .. "/" .. name] or name;
+						dropdownEntry.value = name;
+						local icon = module.pinIcons[name];
+						if (type(icon) == "table") then
+							dropdownEntry.icon = icon.path;
+							dropdownEntry.tCoordLeft = icon.left;
+							dropdownEntry.tCoordRight = icon.right;
+							dropdownEntry.tCoordTop = icon.top;
+							dropdownEntry.tCoordBottom = icon.bottom;
 						else
+							dropdownEntry.icon = icon;
 							dropdownEntry.tCoordLeft = nil;
 							dropdownEntry.tCoordRight = nil;
 							dropdownEntry.tCoordTop = nil;
@@ -1060,75 +964,33 @@ do
 						else
 							dropdownEntry.checked = false;
 						end
-						UIDropDownMenu_AddButton(dropdownEntry);
+						UIDropDownMenu_AddButton(dropdownEntry, level);
 					end
-				else	-- if set == herb or set == ore
-					if (module:getGameVersion() >= 8) then
-						for key, expansion in pairs(module.pinTypes[set]) do
-							if (level == 1) then
-								dropdownEntry.text = key;
-								dropdownEntry.hasArrow = true;
-								dropdownEntry.value = nil;
-								dropdownEntry.icon = nil;
-								dropdownEntry.menuList = key;
-								UIDropDownMenu_AddButton(dropdownEntry);
-							elseif (key == menuList) then
-								for i, type in ipairs(expansion) do
-									dropdownEntry.text = L["CT_MapMod/" .. set .. "/" .. type["name"]] or type["name"];
-									dropdownEntry.value = type["name"];
-									dropdownEntry.icon = type["icon"];
-									if (type.texCoord) then
-										dropdownEntry.tCoordLeft = type.texCoord.left;
-										dropdownEntry.tCoordRight = type.texCoord.right;
-										dropdownEntry.tCoordTop = type.texCoord.top;
-										dropdownEntry.tCoordBottom = type.texCoord.bottom;
-									else
-										dropdownEntry.tCoordLeft = nil;
-										dropdownEntry.tCoordRight = nil;
-										dropdownEntry.tCoordTop = nil;
-										dropdownEntry.tCoordBottom = nil;
-									end
-									dropdownEntry.hasArrow = nil;
-									dropdownEntry.menuList = nil;
-									if (dropdownEntry.value == (subsetDropDown.unapprovedValue or pin.subset)) then
-										dropdownEntry.checked = true;
-									elseif (not subsetDropDown.unapprovedValue and i == 1 and key == "Classic") then
-										dropdownEntry.checked = true;
-									else
-										dropdownEntry.checked = false;
-									end
-									UIDropDownMenu_AddButton(dropdownEntry,2);
-								end
-							end
-						end
-					else	-- if module:getGameVersion() == 1
-						for i, type in ipairs(module.pinTypes[set]["Classic"]) do
-							dropdownEntry.text = L["CT_MapMod/" .. set .. "/" .. type["name"]] or type["name"];
-							dropdownEntry.value = type["name"];
-							dropdownEntry.icon = type["icon"];
-							if (type.texCoord) then
-								dropdownEntry.tCoordLeft = type.texCoord.left;
-								dropdownEntry.tCoordRight = type.texCoord.right;
-								dropdownEntry.tCoordTop = type.texCoord.top;
-								dropdownEntry.tCoordBottom = type.texCoord.bottom;
-							else
-								dropdownEntry.tCoordLeft = nil;
-								dropdownEntry.tCoordRight = nil;
-								dropdownEntry.tCoordTop = nil;
-								dropdownEntry.tCoordBottom = nil;
-							end
-							dropdownEntry.hasArrow = nil;
-							dropdownEntry.menuList = nil;
-							if (dropdownEntry.value == (subsetDropDown.unapprovedValue or pin.subset)) then
-								dropdownEntry.checked = true;
-							elseif (not subsetDropDown.unapprovedValue and i == 1) then
-								dropdownEntry.checked = true;
-							else
-								dropdownEntry.checked = false;
-							end
+					module:freeTable(dropdownEntry);
+				end
+				
+				
+				if (set == "User") then
+					addEntries(module.pinTypes.User);
+				elseif (module:getGameVersion() >= 8) then
+					-- herbs and ore, with expansions
+					if (level == 1) then
+						local dropdownEntry = module:getTable();
+						for key, __ in pairs(module.pinTypes[set]) do
+							dropdownEntry.text = key;
+							dropdownEntry.hasArrow = true;
+							dropdownEntry.value = key;
+							dropdownEntry.icon = nil;
+							dropdownEntry.menuList = key;
 							UIDropDownMenu_AddButton(dropdownEntry);
 						end
+						module:freeTable(dropdownEntry);
+					elseif (menuList) then
+						addEntries(module.pinTypes[set][menuList]);
 					end
+				else
+					-- Herbs and ore, Classic only
+					addEntries(module.pinTypes[set]["Classic"]);
 				end
 			end);		
 		end
@@ -1155,22 +1017,6 @@ do
 			else
 				frame:SetFrameStrata("DIALOG");
 			end
-			--[[
-			frame:ClearAllPoints();
-			if (pin.x <= 0.5) then	
-				if (pin.y <= 0.5) then
-					frame:SetPoint("TOPLEFT",pin,"BOTTOMRIGHT",30,-30);
-				else
-					frame:SetPoint("BOTTOMLEFT",pin,"TOPRIGHT",30,30);
-				end
-			else
-				if (pin.y <= 0.5) then
-					frame:SetPoint("TOPRIGHT",pin,"BOTTOMLEFT",-30,-30);
-				else
-					frame:SetPoint("BOTTOMRIGHT",pin,"TOPLEFT",-30,30);
-				end	
-			end
-			--]]
 			frame:Show();
 			updateFields();
 		end
@@ -1193,347 +1039,354 @@ end
 -- UI elements added to the world map title bar
 
 function module:AddUIElements()
-	local newpinmousestart, alreadyInPosition;
-	module:getFrame	(
-		{
-			["button#n:CT_MapMod_WhereAmIButton#s:100:20#b:b:0:3#v:UIPanelButtonTemplate#" .. L["CT_MapMod/Map/Where am I?"]] = {
-				["onload"] = function (self)
-					self:HookScript("OnShow",function()
-						if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-							self:SetFrameStrata("FULLSCREEN_DIALOG");
-						end
-						self:ClearAllPoints();
-						local option = module:getOption("CT_MapMod_MapResetButtonPlacement") or 1;
-						if (option == 1) then
-							self:SetPoint("BOTTOM",WorldMapFrame.ScrollContainer,"BOTTOM",0,3);
-						elseif (option == 2) then
-							self:SetPoint("TOP",WorldMapFrame.ScrollContainer,"TOP",0,-1);
-						else
-							self:SetPoint("TOPLEFT",WorldMapFrame.ScrollContainer,"TOPLEFT",3,3);
-						end
-					end);
-				end,
-				["onclick"] = function(self, arg1)
-					WorldMapFrame:SetMapID(C_Map.GetBestMapForUnit("player"));
-				end,
-				["onenter"] = function(self)
-					GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, 15);
-					GameTooltip:SetText("CT: " .. L["CT_MapMod/Map/Reset the map"]);
-					GameTooltip:Show();
-				end,
-				["onleave"] = function(self)
-					GameTooltip:Hide();
+	local newpinmousestart;
+	module:getFrame ({
+		["button#n:CT_MapMod_WhereAmIButton#s:100:20#v:UIPanelButtonTemplate#" .. L["CT_MapMod/Map/Where am I?"]] = {
+			["onload"] = function (self)
+				module.mapResetButton = self;
+				if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+					self:SetFrameStrata("FULLSCREEN_DIALOG");
 				end
-			},
-			["button#n:CT_MapMod_CreateNoteButton#s:75:16#tr:tr:-125:-3#v:UIPanelButtonTemplate#" .. L["CT_MapMod/Map/New Pin"]] = {
-				["onload"] = function(self)
-					if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-						self:HookScript("OnShow", function()	
-							self:SetFrameStrata("FULLSCREEN_DIALOG");
-						end);
-					end
-					WorldMapFrame:AddCanvasClickHandler(function(canvas, button)
-						if (not module.isCreatingNote) then return; end
-						module.isCreatingNote = nil;
-						GameTooltip:Hide();
-						if (InCombatLockdown()) then return; end
-						local mapid = WorldMapFrame:GetMapID();
-						local x,y = WorldMapFrame:GetNormalizedCursorPosition();
-						if (mapid and x and y and x>=0 and y>=0 and x<=1 and y<=1 and (x~=0 or y~=0)) then
-							module:InsertPin(mapid, x, y, "New Note", "User", "Grey Note", "New note at cursor");
-							C_Timer.After(0.01,function() if (WorldMapFrame:GetMapID() ~= mapid) then WorldMapFrame:SetMapID(mapid) end end); --to add pins on the parts of a map in other zones
-							WorldMapFrame:RefreshAllDataProviders();
-						end
-					end);
-					self:RegisterForDrag("RightButton");
-					self:HookScript("OnDragStart", function()
-						if (not module.isCreatingNote) then
-							newpinmousestart = GetCursorPosition(); --only interested in the X coord
-							local value = module:getOption("CT_MapMod_CreateNoteButtonX") or -125;
-							if ((module:getGameVersion() == CT_GAME_VERSION_CLASSIC) or (WorldMapFrame:IsMaximized())) then
-								if (value < 75 - WorldMapFrame:GetWidth()) then module:setOption("CT_MapMod_CreateNoteButtonX", 75 - WorldMapFrame:GetWidth(), true, true); end
-							elseif (WorldMapFrame.SidePanelToggle.OpenButton:IsShown()) then
-								if (value < -535) then module:setOption("CT_MapMod_CreateNoteButtonX", -535, true, true); end
-							else
-								if (value < -820) then module:setOption("CT_MapMod_CreateNoteButtonX", -820, true, true); end
-							end
-							GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, -60);
-							GameTooltip:SetText("|cFF999999Drag to set distance from TOP RIGHT corner");
-							GameTooltip:Show();
-						end  
-					end);
-					self:HookScript("OnDragStop", function()
-						if (not newpinmousestart) then return; end
-						local value = module:getOption("CT_MapMod_CreateNoteButtonX") or -125;
-						value = value + (GetCursorPosition() - newpinmousestart);
-						if (value > -125) then value = -125; end
-						if ((module:getGameVersion() == CT_GAME_VERSION_CLASSIC) or (WorldMapFrame:IsMaximized())) then
-							if (value < 75 - WorldMapFrame:GetWidth()) then value = 75 - WorldMapFrame:GetWidth(); end
-						elseif (WorldMapFrame.SidePanelToggle.OpenButton:IsShown()) then
-							if (value < -535) then value = -535; end
-						else
-							if (value < -820) then value = -820; end
-						end
-						module:setOption("CT_MapMod_CreateNoteButtonX", value, true, true)
-						newpinmousestart = nil;
-						GameTooltip:Hide();
-						self:Disable();
-						self:Enable();
-					end);
-					local duration = 0;
-					self:HookScript("OnUpdate", function(newself, elapsed)
-						duration = duration + elapsed;
-						if (duration < .1) then return; end
-						duration = 0;
-						if (module.isCreatingNote) then
-							GameTooltip:SetOwner(newself);
-							GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, -60);
-							GameTooltip:SetText(L["CT_MapMod/Map/Click on the map where you want the pin"]);
-							GameTooltip:Show();
-						end
-						local value = module:getOption("CT_MapMod_CreateNoteButtonX") or -125;
-						if (newpinmousestart) then
-							alreadyInPosition = nil;
-							-- Currently dragging the frame
-							value = value + (GetCursorPosition() - newpinmousestart);
-							if (value > -125) then value = -125; end
-							if ((module:getGameVersion() == CT_GAME_VERSION_CLASSIC) or (WorldMapFrame:IsMaximized())) then
-								if (value < 75 - WorldMapFrame:GetWidth()) then value = 75 - WorldMapFrame:GetWidth(); end
-							elseif (WorldMapFrame.SidePanelToggle.OpenButton:IsShown()) then
-								if (value < -535) then value = -535; end
-							else
-								if (value < -820) then value = -820; end
-							end
-							self:ClearAllPoints();
-							self:SetPoint("TOPRIGHT",WorldMapFrame.BorderFrame,"TOPRIGHT",value,-3)
-						elseif (not alreadyInPosition) then
-							alreadyInPosition = true;
-							if (not WorldMapFrame.ctMaxMinHooked) then
-								WorldMapFrame.ctMaxMinHooked = true;
-								if (module:getGameVersion() >= 8) then
-									hooksecurefunc(WorldMapFrame.BorderFrame.MaximizeMinimizeFrame, "Maximize", function() alreadyInPosition = nil; end);
-									hooksecurefunc(WorldMapFrame.BorderFrame.MaximizeMinimizeFrame, "Minimize", function() alreadyInPosition = nil; end);
-								end
-							end
-							if (module:getGameVersion() >= 8 and not WorldMapFrame:IsMaximized() and WorldMapFrame.SidePanelToggle.OpenButton:IsShown()) then
-								-- Minimized without quest frame
-								if (value < -225 and value > -350) then value = -225; end
-								if (value < -350 and value > -477) then value = -477; end
-								if (value < -535) then value = -535; end
-							elseif (module:getGameVersion() >= 8 and not WorldMapFrame:IsMaximized() and WorldMapFrame.SidePanelToggle.CloseButton:IsShown()) then
-								-- Minimized with quest frame
-								if (value < -370 and value > -495) then value = -370; end
-								if (value < -495 and value > -622) then value = -622; end
-								if (value < -820) then value = -820; end
-							else
-								-- Maximized (or WoW Classic)
-								if (value < 75 - WorldMapFrame:GetWidth()) then value = 75 - WorldMapFrame:GetWidth(); end
-								if (value < -(WorldMapFrame:GetWidth()/2)+90 and value > -(WorldMapFrame:GetWidth()/2)) then value = -(WorldMapFrame:GetWidth()/2)+90; end
-								if (value < -(WorldMapFrame:GetWidth()/2) and value > -(WorldMapFrame:GetWidth()/2)-90) then value = -(WorldMapFrame:GetWidth()/2)-90; end
-							end
-							self:ClearAllPoints();
-							self:SetPoint("TOPRIGHT",WorldMapFrame.BorderFrame,"TOPRIGHT",value,-3)
-						end
-
-					end);
-					self:HookScript("OnHide",function()
-						alreadyInPosition = nil;
-						if (module.isCreatingNote) then
-							GameTooltip:Hide();
-							module.isCreatingNote = nil;
-						end
-					end);
-				end,
-				["onclick"] = function(self, arg1)
-					if ( arg1 == "LeftButton" ) then
-						if (module.isEditingNote or module.isCreatingNote or newpinmousestart) then
-							return;
-						else
-							module.isCreatingNote = true;
-							GameTooltip:SetText("Click on the map where you want the pin");
-						end
-					end
-				end,
-				["onenter"] = function(self)
-					if (not module.isCreatingNote and not newpinmousestart) then 
-						GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, -60);
-						GameTooltip:SetText(L["CT_MapMod/Map/Add a new pin to the map"]);
-						GameTooltip:AddLine(L["CT_MapMod/Map/Right-Click to Drag"], .5, .5, .5);
-						GameTooltip:Show();
-					end
-				end,
-				["onleave"] = function(self)
-					if (not module.isCreatingNote and not newpinmousestart) then GameTooltip:Hide(); end
-				end,
-			},
-		["button#n:CT_MapMod_OptionsButton#s:75:16#tr:tr:-50:-3#v:UIPanelButtonTemplate#Options"] = {
-				["onclick"] = function(self, arg1)
-					module:showModuleOptions(module.name);
-				end,
-				["onenter"] = function(self)
-					if (not module.isCreatingNote and not newpinmousestart) then
-						GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, -60);
-						GameTooltip:SetText("CT Map Options  (/ctmap)");
-						GameTooltip:AddLine(L["CT_MapMod/Map/Right-Click to Drag"], .5, .5, .5);
-						GameTooltip:Show();
-					end
-				end,
-				["onleave"] = function(self)
-					if (not module.isCreatingNote and not newpinmousestart) then
-						GameTooltip:Hide();
-					end
-				end,
-				["onload"] = function(self)
-					if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-						self:HookScript("OnShow", function()	
-							self:SetFrameStrata("FULLSCREEN_DIALOG");
-						end);
-					end
-					self:RegisterForDrag("RightButton");
-					local positionset = nil;
-					self:HookScript("OnShow", function()
-						-- deferring the positioning to guarantee the object it anchors to is loaded
-						if (not positionset) then
-							self:ClearAllPoints();
-							self:SetPoint("LEFT",CT_MapMod_CreateNoteButton,"RIGHT",0,0);
-							positionset = true;
-						end
-					end);
-					self:HookScript("OnDragStart", function()
-						if (not module.isCreatingNote) then
-							newpinmousestart = GetCursorPosition(); --only interested in the X coord
-							local value = module:getOption("CT_MapMod_CreateNoteButtonX") or -125;
-							if ((module:getGameVersion() == CT_GAME_VERSION_CLASSIC) or (WorldMapFrame:IsMaximized())) then
-								if (value < 75 - WorldMapFrame:GetWidth()) then module:setOption("CT_MapMod_CreateNoteButtonX", 75 - WorldMapFrame:GetWidth(), true, true); end
-							elseif (WorldMapFrame.SidePanelToggle.OpenButton:IsShown()) then
-								if (value < -535) then module:setOption("CT_MapMod_CreateNoteButtonX", -535, true, true); end
-							else
-								if (value < -820) then module:setOption("CT_MapMod_CreateNoteButtonX", -820, true, true); end
-							end
-							GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, -60);
-							GameTooltip:SetText("|cFF999999Drag to set distance from TOP RIGHT corner");
-							GameTooltip:Show();
-						end  
-					end);
-					self:HookScript("OnDragStop", function()
-						if (not newpinmousestart) then return; end
-						local value = module:getOption("CT_MapMod_CreateNoteButtonX") or -125;
-						value = value + (GetCursorPosition() - newpinmousestart);
-						if (value > -125) then value = -125; end
-						if ((module:getGameVersion() == CT_GAME_VERSION_CLASSIC) or (WorldMapFrame:IsMaximized())) then
-							if (value < 75 - WorldMapFrame:GetWidth()) then value = 75 - WorldMapFrame:GetWidth(); end
-						elseif (WorldMapFrame.SidePanelToggle.OpenButton:IsShown()) then
-							if (value < -535) then value = -535; end
-						else
-							if (value < -820) then value = -820; end
-						end
-						module:setOption("CT_MapMod_CreateNoteButtonX", value, true, true)
-						newpinmousestart = nil;
-						GameTooltip:Hide();
-						self:Disable();
-						self:Enable();
-					end);
-				end
-			},
-		["frame#n:CT_MapMod_pxy#s:80:16#b:b:-100:0"] = { 
-				["onload"] = function(self)
-					if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-						self:SetFrameStrata("FULLSCREEN_DIALOG");
-					end
-					module.pxy = self
-					self.text = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
-				end,
-				["onenter"] = function(self)
-					GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, 15);
-					local playerposition = C_Map.GetPlayerMapPosition(WorldMapFrame:GetMapID(),"player");
-					if (playerposition) then
-						GameTooltip:SetText("CT: Player Coords");
+				local function updatePosition(value)
+					self:ClearAllPoints();
+					if (value == 1) then
+						self:SetPoint("BOTTOM",WorldMapFrame.ScrollContainer,"BOTTOM",0,3);
+					elseif (value == 2) then
+						self:SetPoint("TOP",WorldMapFrame.ScrollContainer,"TOP",0,-1);
 					else
-						GameTooltip:SetText("Player coords not available here");
+						self:SetPoint("TOPLEFT",WorldMapFrame.ScrollContainer,"TOPLEFT",3,-40);
 					end
-					GameTooltip:Show();
-				end,
-				["onleave"] = function(self)
-					GameTooltip:Hide();
 				end
-			},
-		["frame#n:CT_MapMod_cxy#s:80:16#b:b:100:0"] =  { 
-				["onload"] = function(self)
-					if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-						self:SetFrameStrata("FULLSCREEN_DIALOG");
+				updatePosition(module:getOption("CT_MapMod_MapResetButtonPlacement") or 1);
+				self.updatePosition = updatePosition;
+				
+				local doAutoShow, autoShowTicker;
+				local function updateVisibility(value)
+					if (value == 1) then
+						doAutoShow = true;
+					elseif (value == 2) then
+						doAutoShow = false;
+						self:Show();
+					else
+						doAutoShow = false;
+						self:Hide();
 					end
-					module.cxy = self
-					self.text = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
-				end,
-				["onenter"] = function(self)
-					GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, 15);
-					GameTooltip:SetText("CT: Cursor Coords");
-					GameTooltip:Show();
-				end,
-				["onleave"] = function(self)
-					GameTooltip:Hide();
 				end
-			},
+				updateVisibility(module:getOption("CT_MapMod_ShowMapResetButton") or 1);
+				self.updateVisibility = updateVisibility;
+							
+				local function autoShow()
+					if (doAutoShow) then
+						if (WorldMapFrame:GetMapID() ~= C_Map.GetBestMapForUnit("player")) then
+							self:Show();
+						else
+							self:Hide();
+						end
+					end
+				end
+				
+				WorldMapFrame.ScrollContainer:HookScript("OnShow", function()
+					autoShow();
+					autoShowTicker = autoShowTicker or C_Timer.NewTicker(1, autoShow);
+				end);
+				
+				WorldMapFrame.ScrollContainer:HookScript("OnHide", function()
+					if (autoShowTicker) then
+						autoShowTicker:Cancel();
+						autoShowTicker = nil;
+					end
+				end);
+				
+				self:HookScript("OnClick", function()
+					WorldMapFrame:SetMapID(C_Map.GetBestMapForUnit("player"));
+					autoShow();
+				end);
+			end,
+			["onenter"] = function(self)
+				GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, 15);
+				GameTooltip:SetText("CT: " .. L["CT_MapMod/Map/Reset the map"]);
+				GameTooltip:Show();
+			end,
+			["onleave"] = function(self)
+				GameTooltip:Hide();
+			end
 		},
-		WorldMapFrame.BorderFrame
-	);
-			
-	local isShown, updateXYCoords;
-	function updateXYCoords()
-		if (not isShown) then return; end
-		local mapid = WorldMapFrame:GetMapID();
-		if (mapid) then
-			local playerposition = C_Map.GetPlayerMapPosition(mapid,"player");
-			if (playerposition) then
-				local px, py = playerposition:GetXY();
-				--px = math.floor(px*1000)/10;
-				--py = math.floor(py*1000)/10;
-				module.pxy.text:SetText(format("P: %.1f, %.1f", px*100, py*100));
-			else
-				module.pxy.text:SetText("-");
-			end
-			if (mapid == C_Map.GetBestMapForUnit("player")) then
-				module.pxy.text:SetTextColor(1,1,1,1);
-				if ((module:getOption("CT_MapMod_ShowMapResetButton") or 1) == 1) then
-					_G["CT_MapMod_WhereAmIButton"]:Hide();
-				end			
-			else
-				module.pxy.text:SetTextColor(1,1,1,.3);			
-				if ((module:getOption("CT_MapMod_ShowMapResetButton") or 1) == 1) then
-					_G["CT_MapMod_WhereAmIButton"]:Show();
-				end				
-			end
-		end
-		if (WorldMapFrame.ScrollContainer.Child:GetLeft()) then
-			local cx, cy = WorldMapFrame:GetNormalizedCursorPosition();
-			if (cx and cy) then
-				if (cx > 0 and cx < 1 and cy > 0 and cy < 1) then
-					module.cxy.text:SetTextColor(1,1,1,1);
-					module.cxy.text:SetText(format("C: %.1f, %.1f", cx*100, cy*100));
-				else
-					module.cxy.text:SetTextColor(1,1,1,.3);
-					cx = math.max(math.min(cx,1),0);
-					cy = math.max(math.min(cy,1),0);				
-					module.cxy.text:SetText(format("C: %d, %d", cx*100, cy*100));
-				end
+		["button#n:CT_MapMod_Button#s:32:32"] = {
+			"texture#all#i:enabled#Interface\\Addons\\CT_Library\\Images\\minimapIcon",  
 
-			end
-		end
-		C_Timer.After(0.10, updateXYCoords);
-	end
-	WorldMapFrame.ScrollContainer:HookScript("OnShow", function() isShown = true; updateXYCoords() end);
-	WorldMapFrame.ScrollContainer:HookScript("OnHide", function() isShown = false; end);
+			["onclick"] = function (self, button)
+				if (not self.dropdown) then
+					self.dropdown = CreateFrame("Frame", nil, self, "UIDropDownMenuTemplate");
+					UIDropDownMenu_Initialize(
+						self.dropdown,
+						function(frame, level, menuList)
+							local info = module:getTable();
+							info.notCheckable = true;
+							if (level == 1) then
+
+								-- CT_MapMod
+								info.text = MODULE_NAME;
+								info.isTitle = true;	
+								UIDropDownMenu_AddButton(info, 1);
+
+								-- Create a note
+								info.text = L["CT_MapMod/Map/DropDown/NewNote"];
+								info.isTitle = false;
+								info.hasArrow = true;
+								info.disabled = false;
+								info.menuList = "NewNote";
+								UIDropDownMenu_AddButton(info, 1);
+
+								-- Settings
+								info.text = L["CT_MapMod/Map/DropDown/Options"];
+								info.hasArrow = false;
+								info.func = function()
+									module:showModuleOptions(MODULE_NAME);
+								end
+								UIDropDownMenu_AddButton(info, 1);
+
+							elseif (menuList == "NewNote") then
+
+								-- New note at player
+								local mapID = WorldMapFrame:GetMapID();
+								local playerPosition = C_Map.GetPlayerMapPosition(mapID, "player");
+								if (playerPosition) then
+									local x, y = playerPosition:GetXY();
+									info.text = string.format("%s (%d,%d)", L["CT_MapMod/Map/DropDown/AtPlayer"], x*100, y*100);
+									info.func = function()
+										module:InsertPin(mapID, x, y, "New Note", "User", "Diamond", "New note under player");
+									end
+								else
+									info.disabled = true;
+									info.text = L["CT_MapMod/Map/DropDown/AtPlayer"];
+									info.tooltipTitle = L["CT_MapMod/Map/DropDown/AtPlayer"]
+									info.tooltipText = L["CT_MapMod/Map/DropDown/AtPlayerErrorTip"]
+								end
+								info.icon = module.pinIcons.Diamond;
+								UIDropDownMenu_AddButton(info, level);
+
+								-- New note at waypoint
+								if (WaypointLocationDataProviderMixin) then
+									local point = C_Map.HasUserWaypoint() and mapID and C_Map.GetUserWaypoint(mapID);
+									if (point and point.position and point.position.x and point.position.y) then
+										local x, y = point.position.x, point.position.y;
+										info.text = string.format("%s (%d,%d)", L["CT_MapMod/Map/DropDown/AtWaypoint"], x, y);
+										info.disabled = nil;
+										info.tooltipTitle = nil;
+										info.tooltipText = nil;	
+										info.func = function()
+											module:InsertPin(mapID, x, y, "Waypoint", "User", "Waypoint", "New note under waypoint");
+										end
+									else
+										info.text = L["CT_MapMod/Map/DropDown/AtWaypoint"];
+										info.disabled = true;
+										info.tooltipTitle = L["CT_MapMod/Map/DropDown/AtWaypoint"];
+										info.tooltipText = L["CT_MapMod/Map/DropDown/AtWaypointErrorTip"]
+									end
+									info.icon = module.pinIcons.Waypoint.path;
+									UIDropDownMenu_AddButton(info, level);
+								end
+
+								-- New note at cursor
+								info.text = L["CT_MapMod/Map/DropDown/AtCursor"];
+								info.disabled = nil;
+								info.tooltipTitle = L["CT_MapMod/Map/DropDown/AtCursor"];
+								info.tooltipText = L["CT_MapMod/Map/DropDown/AtCursorTip"];
+								info.icon = module.pinIcons["Grey Note"];
+								info.func = function()
+									module.isCreatingNote = true;
+								end
+								UIDropDownMenu_AddButton(info, level);
+							end
+							module:freeTable(info);
+						end,
+						"MENU"	-- causes it to be like a context menu
+					);
+				end
+				ToggleDropDownMenu(1, nil, self.dropdown, self, -50, 0);
+			end,
+			["ondragstart"] = function(self)
+				self.updateClamps();
+				self:StartMoving();
+			end,
+			["ondragstop"] = function(self)
+				self:StopMovingOrSizing();
+				self.setPosition();
+			end,
+			["onload"] = function(self)
+				local anchorFrom = WorldMapFrame.ScrollContainer;
+				local leftMinOffset = 140;
+				local rightMaxOffset = WaypointLocationDataProviderMixin and -84 or WorldMapFrame.BorderFrame.MaximizeMinimizeFrame and -52 or -20;
+				local yOff = -19;
+				self.updateClamps = function()
+					local scale = WorldFrame:GetEffectiveScale() / self:GetEffectiveScale();
+					self:SetClampRectInsets(
+						- anchorFrom:GetLeft() - leftMinOffset,
+						- anchorFrom:GetRight() + WorldFrame:GetRight()*scale,
+						- anchorFrom:GetTop() - 15 + WorldFrame:GetTop()*scale,
+						- anchorFrom:GetTop() + 45
+					);
+				end
+				self.updatePoint = function(anchor, xOff)
+					self:ClearAllPoints()
+					local maxWidth = anchorFrom:GetWidth() / 4;
+					xOff = Clamp(xOff, -maxWidth, maxWidth);
+					self:SetPoint("CENTER", anchorFrom, anchor, xOff, yOff);
+				end
+				self.setPosition = function()
+					local btnCenterX, mapLeftX, mapRightX, mapCenterX = self:GetCenter(), anchorFrom:GetLeft(), anchorFrom:GetRight(), anchorFrom:GetCenter();
+					btnCenterX = Clamp(btnCenterX, mapLeftX + leftMinOffset, mapRightX + rightMaxOffset);
+					local anchor, xOff;
+					if (abs(btnCenterX - mapRightX) < abs(btnCenterX - mapCenterX)) then
+						anchor, xOff = "TOPRIGHT", btnCenterX - mapRightX;
+					elseif (abs(btnCenterX - mapLeftX) < abs(btnCenterX - mapCenterX)) then
+						anchor, xOff = "TOPLEFT", btnCenterX - mapLeftX;
+					else
+						anchor, xOff = "TOP", btnCenterX - mapCenterX;
+					end
+					module:setOption("CT_MapMod_MapButton_Anchor", anchor, true);
+					module:setOption("CT_MapMod_MapButton_OffX", xOff, true);
+					self.updatePoint(anchor, xOff);
+				end
+				local function updatePosition()
+					self.updateClamps();
+					self.updatePoint(module:getOption("CT_MapMod_MapButton_Anchor") or "TOPRIGHT", module:getOption("CT_MapMod_MapButton_OffX") or 0);
+				end
+				if (WorldMapFrame.BorderFrame.MaximizeMinimizeFrame) then
+					hooksecurefunc(WorldMapFrame.BorderFrame.MaximizeMinimizeFrame, "Maximize", updatePosition);
+					hooksecurefunc(WorldMapFrame.BorderFrame.MaximizeMinimizeFrame, "Minimize", updatePosition);
+				else
+					-- Classic changes the map's position/scale to simulate older screens, so wait until the next frame
+					WorldMapFrame.ScrollContainer:HookScript("OnShow", function() C_Timer.After(0, updatePosition) end);
+				end
+				self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+				self:RegisterForDrag("LeftButton","RightButton");
+				self:SetClampedToScreen(true);
+				self:SetMovable(true);
+				if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+					self:SetFrameStrata("FULLSCREEN_DIALOG");
+				end
+			end,
+		},
+		["frame#n:CT_MapMod_pxy#s:80:16#b:b:-100:0"] = { 
+			["onload"] = function(self)
+				if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+					self:SetFrameStrata("FULLSCREEN_DIALOG");
+				end
+				module.pxy = self
+				local text = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
+				text:SetAllPoints();
+				local function updateText()
+					local mapid = WorldMapFrame:GetMapID();
+					if (mapid) then
+						local playerposition = C_Map.GetPlayerMapPosition(mapid,"player");
+						if (playerposition) then
+							local px, py = playerposition:GetXY();
+							text:SetText(format("P: %.1f, %.1f", px*100, py*100));
+						else
+							text:SetText("-");
+						end
+						if (mapid == C_Map.GetBestMapForUnit("player")) then
+							text:SetTextColor(1,1,1,1);		
+						else
+							text:SetTextColor(1,1,1,.3);			
+						end
+					end
+				end
+				self.updateText = updateText;
+			end,
+			["onenter"] = function(self)
+				GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, 15);
+				local playerposition = C_Map.GetPlayerMapPosition(WorldMapFrame:GetMapID(),"player");
+				if (playerposition) then
+					GameTooltip:SetText("CT: Player Coords");
+				else
+					GameTooltip:SetText("Player coords not available here");
+				end
+				GameTooltip:Show();
+			end,
+			["onleave"] = function(self)
+				GameTooltip:Hide();
+			end,
+			["onshow"] = function(self)
+				self.textTicker = self.textTicker or C_Timer.NewTicker(0.5, self.updateText);
+			end,
+			["onhide"] = function(self)
+				if (self.textTicker) then
+					self.textTicker:Cancel();
+					self.textTicker = nil;
+				end
+			end,
+		},
+		["frame#n:CT_MapMod_cxy#s:80:16#b:b:100:0"] =  { 
+			["onload"] = function(self)
+				if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+					self:SetFrameStrata("FULLSCREEN_DIALOG");
+				end
+				module.cxy = self
+				local text = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
+				text:SetAllPoints();
+				local function updateText()
+					if (WorldMapFrame.ScrollContainer.Child:GetLeft()) then
+						local cx, cy = WorldMapFrame:GetNormalizedCursorPosition();
+						if (cx and cy) then
+							if (cx > 0 and cx < 1 and cy > 0 and cy < 1) then
+								text:SetTextColor(1,1,1,1);
+								text:SetText(format("C: %.1f, %.1f", cx*100, cy*100));
+							else
+								text:SetTextColor(1,1,1,.3);
+								cx = math.max(math.min(cx,1),0);
+								cy = math.max(math.min(cy,1),0);				
+								text:SetText(format("C: %d, %d", cx*100, cy*100));
+							end
+
+						end
+					end
+				end
+				self.updateText = updateText;
+			end,
+			["onenter"] = function(self)
+				GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, 15);
+				GameTooltip:SetText("CT: Cursor Coords");
+				GameTooltip:Show();
+			end,
+			["onleave"] = function(self)
+				GameTooltip:Hide();
+			end,
+			["onshow"] = function(self)
+				self.textTicker = self.textTicker or C_Timer.NewTicker(0.1, self.updateText);
+			end,
+			["onhide"] = function(self)
+				if (self.textTicker) then
+					self.textTicker:Cancel();
+					self.textTicker = nil;
+				end
+			end,
+		},
+	}, WorldMapFrame.BorderFrame);
 	
+	-- Adding notes to the map by clicking on it
+	WorldMapFrame:AddCanvasClickHandler(function(canvas, button)
+		if (not module.isCreatingNote) then return; end
+		module.isCreatingNote = nil;
+		GameTooltip:Hide();
+		if (InCombatLockdown()) then return; end
+		local mapid = WorldMapFrame:GetMapID();
+		local x,y = WorldMapFrame:GetNormalizedCursorPosition();
+		if (mapid and x and y and x>=0 and y>=0 and x<=1 and y<=1 and (x~=0 or y~=0)) then
+			module:InsertPin(mapid, x, y, "New Note", "User", "Grey Note", "New note at cursor");
+			C_Timer.After(0.01,function() if (WorldMapFrame:GetMapID() ~= mapid) then WorldMapFrame:SetMapID(mapid) end end); --to add pins on the parts of a map in other zones
+		end
+	end);
 	
 	-- integrate extra features into the Shadowlands 9.0 waypoint pin
-	if (module:getGameVersion() >= 9) then
+	if (WaypointLocationPinMixin) then
 		hooksecurefunc(WaypointLocationPinMixin, "OnMouseClickAction", function(self)
 			local mapid = self:GetMap():GetMapID();
 			local x, y = self:GetPosition();
 			if (x and y and module.isCreatingNote) then
-				module:InsertPin(mapid, x, y, "Waypoint", "User", "Waypoint", "New note under waypoint")
+				module:InsertPin(mapid, x, y, "Waypoint", "User", "Waypoint", "New note under waypoint");
 				module.isCreatingNote = nil;
-				WorldMapFrame:RefreshAllDataProviders();
 			end
 		end);	
 	end
@@ -1551,23 +1404,22 @@ do
 	frame:RegisterEvent("PLAYER_REGEN_ENABLED");
 	frame:SetScript("OnEvent", function(self, event, arg1, arg2, arg3, arg4)
 		if (event == "UNIT_SPELLCAST_SENT" and arg1 == "player") then
-			
-			-- Stop quickly when we don't want to be doing this
-			if (InCombatLockdown() or IsInInstance()) then return; end
-
-			-- Where are we?  (If the answer isn't clear, also stop quickly)
-			local mapid = C_Map.GetBestMapForUnit("player");
-			if (not mapid) then return; end					-- could be nil when the player isn't on any real map
-			local position = C_Map.GetPlayerMapPosition(mapid,"player");
-			if not (position) then return; end				-- could be nil in places like the Warlords of Draenor garrison
-			local x,y = position:GetXY();
-			if (not x or not y or (x == 0 and y == 0)) then return; end	-- could be nil or 0 in dungeons and raids to prevent cheating
-
-			-- Herbalism and Mining
-			if (module.herbalismSkills[arg4] and (module:getOption("CT_MapMod_AutoGatherHerbs") or 1) == 1) then
-				module:InsertHerb(mapid, x, y, arg2);
-			elseif (module.miningSkills[arg4] and (module:getOption("CT_MapMod_AutoGatherOre") or 1) == 1) then
-				module:InsertOre(mapid, x, y, arg2);
+			if (module.gatheringSkills[arg4]) then
+				local mapId = C_Map.GetBestMapForUnit("player");
+				if (mapid) then
+					local position = C_Map.GetPlayerMapPosition(mapId,"player");	-- TODO: measure if checking for the type of skill first would be faster than doing these API calls
+					if (position) then
+						local x, y = position:GetXY();
+						if (x and y and (x ~= 0 or y ~= 0)) then			-- could be nil or 0 in dungeons and raids to prevent cheating
+							-- Herbalism and Mining
+							if (module.gatheringSkills[arg4] == "Herb" and (module:getOption("CT_MapMod_AutoGatherHerbs") or 1) == 1) then
+								module:InsertHerb(mapid, x, y, arg2);
+							elseif (module.gatheringSkills[arg4] == "Ore" and (module:getOption("CT_MapMod_AutoGatherOre") or 1) == 1) then
+								module:InsertOre(mapid, x, y, arg2);
+							end
+						end
+					end
+				end
 			end
 			
 		elseif (event == "PLAYER_REGEN_DISABLED") then
@@ -1591,29 +1443,24 @@ module.update = function(self, optName, value)
 		module.cxy:ClearAllPoints();
 		local position = module:getOption("CT_MapMod_ShowPlayerCoordsOnMap") or 2;
 		if (position == 1) then
+			module.pxy:Show();
 			module.pxy:SetPoint("TOP",WorldMapFrame.BorderFrame,"TOP",-105,-3);
 		elseif (position == 2) then
+			module.pxy:Show();
 			module.pxy:SetPoint("BOTTOM",WorldMapFrame.ScrollContainer,"BOTTOM",-100,3);
 		else
 			module.pxy:Hide();
 		end
-		module.pxy.text:SetAllPoints();
 		position = module:getOption("CT_MapMod_ShowCursorCoordsOnMap") or 2;
 		if (position == 1) then
+			module.cxy:Show();
 			module.cxy:SetPoint("TOP",WorldMapFrame.BorderFrame,"TOP",95,-3);
 		elseif (position == 2) then
+			module.cxy:Show();
 			module.cxy:SetPoint("BOTTOM",WorldMapFrame.ScrollContainer,"BOTTOM",100,3);
 		else
 			module.cxy:Hide();
-		end		
-		module.cxy.text:SetAllPoints();
-
-		CT_MapMod_CreateNoteButton:ClearAllPoints();
-		CT_MapMod_CreateNoteButton:SetPoint("TOPRIGHT",WorldMapFrame.BorderFrame,"TOPRIGHT",module:getOption("CT_MapMod_CreateNoteButtonX") or -125,-3)
-		
-		local showmapresetbutton = module:getOption("CT_MapMod_ShowMapResetButton") or 1;
-		if (showmapresetbutton == 3) then _G["CT_MapMod_WhereAmIButton"]:Hide(); end
-		
+		end
 	elseif (optName == "CT_MapMod_ShowPlayerCoordsOnMap") then
 		if (not module.pxy) then return; end
 		module.pxy:ClearAllPoints();
@@ -1626,33 +1473,25 @@ module.update = function(self, optName, value)
 		else
 			module.pxy:Hide();
 		end
-		module.pxy.text:SetAllPoints();
 	elseif (optName == "CT_MapMod_ShowCursorCoordsOnMap") then
 		if (not module.cxy) then return; end
 		module.cxy:ClearAllPoints();
 		if (value == 1) then
 			module.cxy:Show();
-			module.cxy:SetPoint("TOP",WorldMapFrame.BorderFrame,"TOP",65,-3);
+			module.cxy:SetPoint("TOP",WorldMapFrame.BorderFrame,"TOP",95,-3);
 		elseif (value == 2) then
 			module.cxy:Show();
 			module.cxy:SetPoint("BOTTOM",WorldMapFrame.ScrollContainer,"BOTTOM",100,3);		
 		else
 			module.cxy:Hide();
 		end
-		module.cxy.text:SetAllPoints();
 	elseif (optName == "CT_MapMod_ShowMapResetButton") then
-		if (not _G["CT_MapMod_WhereAmIButton"]) then return; end
-		if (value == 2) then _G["CT_MapMod_WhereAmIButton"]:Show();
-		elseif (value == 3) then _G["CT_MapMod_WhereAmIButton"]:Hide(); end
+		if (module.mapResetButton) then
+			module.mapResetButton.updateVisibility(value);
+		end
 	elseif (optName == "CT_MapMod_MapResetButtonPlacement") then
-		if (not _G["CT_MapMod_WhereAmIButton"]) then return; end
-		_G["CT_MapMod_WhereAmIButton"]:ClearAllPoints();
-		if (value == 1) then
-			_G["CT_MapMod_WhereAmIButton"]:SetPoint("BOTTOM",WorldMapFrame.ScrollContainer,"BOTTOM",0,3);
-		elseif (value == 2) then
-			_G["CT_MapMod_WhereAmIButton"]:SetPoint("TOP",WorldMapFrame.ScrollContainer,"TOP",0,-1);
-		else
-			_G["CT_MapMod_WhereAmIButton"]:SetPoint("TOPLEFT",WorldMapFrame.ScrollContainer,"TOPLEFT",3,3);
+		if (module.mapResetButton) then
+			module.mapResetButton.updatePosition(value);
 		end
 	elseif (optName == "CT_MapMod_UserNoteSize"
 		or optName == "CT_MapMod_HerbNoteSize"
@@ -1664,11 +1503,12 @@ module.update = function(self, optName, value)
 		or optName == "CT_MapMod_AlphaZoomedIn"
 		or optName == "CT_MapMod_ShowOnFlightMaps"
 	) then
-		WorldMapFrame:RefreshAllDataProviders();
+		if (WorldMapFrame:IsShown()) then
+			module.worldMapDataProvider:RefreshAllData();
+		end
 		CloseTaxiMap();
 	end
 end
-
 
 --------------------------------------------
 -- /ctmap options frame
@@ -1796,27 +1636,17 @@ module.frame = function()
 			optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:CT_MapMod_resetAll#" .. L["CT_MapMod/Options/Reset/ResetAllCheckbox"]); -- Reset options for all of your characters
 			optionsBeginFrame(   0,   30, "button#t:0:%y#s:120:%s#v:UIPanelButtonTemplate#" .. L["CT_MapMod/Options/Reset/ResetButton"]);  -- Reset options
 				optionsAddScript("onclick",
-					function(self)
+					function()
 						if (module:getOption("CT_MapMod_resetAll")) then
 							CT_MapModOptions = {};
-							ConsoleExec("RELOADUI");
 						else
-							-- eventually this should be replaced with code that wipes the variables completely away, to be truly "default"
-							module:setOption("CT_MapMod_CreateNoteButtonX",-125,true,false);
-							module:setOption("CT_MapMod_ShowPlayerCoordsOnMap",2,true,false);
-							module:setOption("CT_MapMod_ShowCursorCoordsOnMap",2,true,false);
-							module:setOption("CT_MapMod_AlphaZoomedOut",0.75,true,false);
-							module:setOption("CT_MapMod_AlphaZoomedIn",1.00,true,false);
-							module:setOption("CT_MapMod_UserNoteSize",24,true,false);
-							module:setOption("CT_MapMod_HerbNoteSize",14,true,false);
-							module:setOption("CT_MapMod_OreNoteSize",14,true,false);
-							module:setOption("CT_MapMod_UserNoteDisplay",1,true,false);
-							module:setOption("CT_MapMod_HerbNoteDisplay",1,true,false);
-							module:setOption("CT_MapMod_OreNoteDisplay",1,true,false);
-							module:setOption("CT_MapMod_ShowOnFlightMaps",1,true,false);
-							
-							ConsoleExec("RELOADUI");
+							if (type(CT_MapModOptions) ~= "table") then
+								CT_MapModOptions = {};
+							else
+								CT_MapModOptions[module:getCharKey()] = nil;
+							end
 						end
+						ConsoleExec("RELOADUI");
 					end
 				);
 			optionsEndFrame();
@@ -1827,56 +1657,3 @@ module.frame = function()
 
 	return "frame#all", optionsGetData();
 end
-
-
-
---------------------------------------------
--- Converting notes from older addon versions into the latest one
-
-
-function module:ConvertOldNotes()
-
-	-- Correcting mis-labelled herbs and removing anchor's weed
-	for mapid, notetable in pairs(CT_MapMod_Notes) do
-		local i = 1;
-		while notetable[i] do
-			local note = notetable[i]
-			if (not note["set"] or not note["subset"]) then
-				tremove(notetable, i);
-			elseif (note["set"] == "Herb" and note["subset"] == "Sea Stalk") then note["subset"] = "Sea Stalks";		 -- 8.0.1.4 to 8.0.1.5
-			elseif (note["set"] == "Herb" and note["subset"] == "Siren's Song") then note["subset"] = "Siren's Sting";	 -- 8.0.1.4 to 8.0.1.5
-			elseif (note["set"] == "Herb" and note["subset"] == "Talandras Rose") then note["subset"] = "Talandra's Rose";   -- 8.1.5.2 to 8.1.5.3
-			elseif (note["set"] == "Herb" and note["subset"] == "Arthas Tears") then note["subset"] = "Arthas' Tears";       -- 8.1.5.2 to 8.1.5.3
-			elseif (note["set"] == "Herb" and note["subset"] == "Anchor Weed" and note["name"] == "Anchor Weed" and note["descript"] == "") then
-				--removing anchor weed from pre-8.1.5.2, when "ignoregather" was added
-				-- but leaving in place if the user created or edited the note manually
-				if (note["version"] == "8.0.0.0" or
-					note["version"] == "8.0.5.0" or --mislabel of 8.0.1.5 during beta test
-					note["version"] == "8.0.1.1" or 
-					note["version"] == "8.0.1.2" or 
-					note["version"] == "8.0.1.3" or 
-					note["version"] == "8.0.1.4" or 
-					note["version"] == "8.0.1.5" or
-					note["version"] == "8.0.1.6" or
-					note["version"] == "8.0.1.7" or
-					note["version"] == "8.0.1.8" or
-					note["version"] == "8.1.0.0" or
-					note["version"] == "8.1.0.1" or
-					note["version"] == "8.1.0.2" or
-					note["version"] == "8.1.0.3" or
-					note["version"] == "8.1.5.1"
-				) then
-					tremove(notetable,i);
-				else
-					i = i + 1;
-				end
-			
-			else
-				i = i + 1;
-			end
-		end
-	end
-end
-
-
-

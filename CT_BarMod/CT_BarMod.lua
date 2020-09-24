@@ -781,15 +781,17 @@ module.update = function(self, optName, value)
 	self:bindingUpdate(optName, value);
 	self:useUpdate(optName, value);
 	self:optionUpdate(optName, value);
-	
-	-- Prevent the Mythic-Plus dungeon frame from being stuck behind any custom bar positions
-	if (module:getGameVersion() >= 5) then
-		local pendingChallengeUI = true;
-		hooksecurefunc("ChallengeMode_LoadUI", function()
-			if (pendingChallengeUI) then
-				pendingChallengeUI = nil;
+end
+
+-- Prevent the Mythic-Plus dungeon frame from being stuck behind any custom bar positions
+if (ChallengeMode_LoadUI) then
+	local pendingChallengeUI = true;
+	hooksecurefunc("ChallengeMode_LoadUI", function()
+		if (pendingChallengeUI) then
+			pendingChallengeUI = nil;
+			if (ChallengesKeystoneFrame and ChallengesKeystoneFrame:GetFrameLevel() < 14) then
 				ChallengesKeystoneFrame:SetFrameLevel(14);
 			end
-		end);
-	end
+		end
+	end);
 end

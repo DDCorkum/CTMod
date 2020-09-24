@@ -1,3 +1,6 @@
+CT_MapMod (8.3.7.3) 2020-09-23
+- Cosmetic and performance improvements; also further integration to waypoints
+
 CT_MapMod (8.3.7.2) 2020-09-05
 - Integration with the future Shadowlands waypoint system (usable on 9.0 PTR and Beta)
 
