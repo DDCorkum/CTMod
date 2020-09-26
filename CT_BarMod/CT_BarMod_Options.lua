@@ -1257,6 +1257,7 @@ module.frame = function()
 		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:defbarShowRange:true#Apply the 'Out of range' option");
 		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:defbarShowBindings:true#Apply 'Display key bindings' and 'range dot'");
 		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:defbarShowActionText:true#Apply the 'Display macro names' option");
+		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:defbarSetUnitAttributes:true#Apply the 'Unit attributes'");
 		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:defbarHideTooltip:true#Apply the 'Hide action button tooltips' option");
 		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:defbarShowCooldown:true#Apply the 'Display cooldown counts' option");
 	optionsEndFrame();
@@ -2007,6 +2008,29 @@ module.frame = function()
 				module:setRadioButtonTextures(self.pageAdvanced);
 			end
 		);
+		
+		
+		
+		----------
+		-- Unit Attributes
+		----------
+
+		optionsAddObject(-20,   14, "font#tl:15:%y#Unit Attributes");
+		local unitAttributeTooltip = {"Unit Attributes", "Which unit should spells target with each type of click?", "Note: this only applies to mouse clicks."}
+		local unitAttributeOptions = "#Default#Target#Player#Pet" .. (FocusFrame and "#Focus" or "");
+		optionsAddObject(-10,   14, "font#tl:10:%y#v:ChatFontNormal#Left click:");
+		optionsBeginFrame( 14,   20, "dropdown#tl:90:%y#s:150:%s#o:unitAttribute1" .. unitAttributeOptions);
+			optionsAddTooltip(unitAttributeTooltip);
+		optionsEndFrame();
+		optionsAddObject(-10,   14, "font#tl:10:%y#v:ChatFontNormal#Right click:");
+		optionsBeginFrame( 14,   20, "dropdown#tl:90:%y#s:150:%s#o:unitAttribute2" .. unitAttributeOptions);
+			optionsAddTooltip(unitAttributeTooltip);
+		optionsEndFrame();
+		optionsAddObject(-10,   14, "font#tl:10:%y#v:ChatFontNormal#Middle click:");
+		optionsBeginFrame( 14,   20, "dropdown#tl:90:%y#s:150:%s#o:unitAttribute3" .. unitAttributeOptions);
+			optionsAddTooltip(unitAttributeTooltip);
+		optionsEndFrame();
+			
 	optionsEndFrame();
 
 	----------
