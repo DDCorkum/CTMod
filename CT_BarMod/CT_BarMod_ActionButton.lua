@@ -37,6 +37,7 @@ local GetPossessInfo = GetPossessInfo;
 local InCombatLockdown = InCombatLockdown;
 local SetBinding = SetBinding;
 local SetBindingClick = SetBindingClick;
+local GetCVar = GetCVar or C_CVar.GetCVar;
 
 -- End Local Copies
 --------------------------------------------
@@ -340,7 +341,6 @@ function actionButton:constructor(buttonId, actionId, groupId, count, noInherit,
 	self:setBinding();
 
 	--self:setClickDirection( not not module:getOption("clickDirection"), not not module:getOption("clickIncluded") );
-	local GetCVar = GetCVar or C_CVar.GetCVar;
 	self:setClickDirection(
 		GetCVar("ActionButtonUseKeyDown") == "1",		-- "1" is the default value, meaning activate abilities when you press DOWN
 		module:getOption("onMouseDown")				-- this will be ignored if the CVar is disabled

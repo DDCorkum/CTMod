@@ -1343,6 +1343,7 @@ local skinObjects = {
 	{ "hotkey", "HotKey", "fs" },
 };
 
+local DEFAULT_TEX_COORD = {0, 1, 0, 1};
 function useButton:applySkin()
 	-- Apply a CT skin to the button.
 	local object, objectKey, objectSkin, objectType;
@@ -1382,7 +1383,7 @@ function useButton:applySkin()
 				object:SetTexture(objectSkin.Texture or "");  -- Assign texture filename.
 			end
 
-			object:SetTexCoord(unpack(objectSkin.TexCoords or {0, 1, 0, 1}));
+			object:SetTexCoord(unpack(objectSkin.TexCoords or DEFAULT_TEX_COORD));
 			object:SetDrawLayer(objectSkin.__CTBM__DrawLayer or "ARTWORK", objectSkin.__CTBM__SubLevel or 0)
 			object:SetBlendMode(objectSkin.BlendMode or "BLEND");
 			object:ClearAllPoints();
