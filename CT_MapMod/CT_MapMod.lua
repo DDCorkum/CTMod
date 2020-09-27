@@ -115,7 +115,7 @@ function module:InsertPin(mapID, x, y, name, set, subset, descript)
 	module:refreshVisibleDataProviders();
 	if (WorldMapFrame:IsShown()) then
 		if (set == "User") then
-			StaticNoteEditPanel():RequestFocus(module.worldMapDataProvider.pins[i]);
+			StaticNoteEditPanel():RequestFocus(module.worldMapDataProvider.pins[#CT_MapMod_Notes[mapID]]);
 		end
 	end
 	
