@@ -33,10 +33,10 @@ local L = module.text;
 --------------------------------------------
 -- Public design
 
--- CT_MapMod:GetDataProvider		-- Publicly accessible copy of a CT_MapMod data provider, so other addons can integrate CT_MapMod into their custom map.
+-- CT_MapMod:NewDataProvider()		-- Creates a new CT_MapMod data provider, so other addons can integrate CT_MapMod into their custom map.
 -- CT_MapMod:InsertHerb()		-- Inserts an herbalism pin using a localized name and position, but avoiding duplicates
 -- CT_MapMod:InsertOre()		-- Inserts a mining pin using a localized name and position, but avoiding duplicates
--- CT_MapMod_PinMixin			-- Handles the appearance and behaviour of a single pin on a map
+-- CT_MapMod_PinMixin			-- Handles the appearance and behaviour of a single pin on a map.
 
 
 --------------------------------------------
@@ -44,14 +44,14 @@ local L = module.text;
 
 local WorldMapFrame = WorldMapFrame;
 local C_Map = C_Map;
+local WaypointLocationDataProviderMixin = WaypointLocationDataProviderMixin;
 
 
 --------------------------------------------
 -- Private design
 
 local StaticNoteEditPanel;		-- Allows the manual editing of a pin's contents
-local CT_MapMod_DataProviderMixin;	-- Handles the creation, placement and removal of pins from a map
-
+-- CT_MapMod:IterateDataProviders()	-- Returns an iterator for all providers that were made with CT_MapMod:NewDataProvider()
 
 --------------------------------------------
 -- Initialization
@@ -59,22 +59,20 @@ local CT_MapMod_DataProviderMixin;	-- Handles the creation, placement and remova
 function module:Initialize()				-- called via module.update("init") from CT_Library
 
 	-- load the DataProvider which has most of the horsepower
-	module.worldMapDataProvider = CreateFromMixins(CT_MapMod_DataProviderMixin);
+	module.worldMapDataProvider = module:NewDataProvider();
 	WorldMapFrame:AddDataProvider(module.worldMapDataProvider);
 	
 	-- load an additional DataProvider to the FlightMapFrame in retail, so pins can appear on the continent flight map
-	if (module:getGameVersion() >= 8) then
-		if (FlightMapFrame) then
-			FlightMapFrame:AddDataProvider(CT_MapMod_DataProviderMixin);
-		else
-			local needFlightMap = true;
-			hooksecurefunc("FlightMap_LoadUI", function()
-				if (needFlightMap) then
-					needFlightMap = false;
-					FlightMapFrame:AddDataProvider(CreateFromMixins(CT_MapMod_DataProviderMixin))
-				end
-			end);
-		end
+	if (FlightMapFrame) then
+		FlightMapFrame:AddDataProvider(module:GetDataProvider());
+	elseif (FlightMap_LoadUI) then
+		local needFlightMap = true;
+		hooksecurefunc("FlightMap_LoadUI", function()
+			if (needFlightMap) then
+				needFlightMap = false;
+				FlightMapFrame:AddDataProvider(module:NewDataProvider())
+			end
+		end);
 	end
 	
 	-- add UI elements to the WorldMapFrame
@@ -87,20 +85,24 @@ end
 
 CT_MapMod_Notes = {}; 		-- Account-wide saved variable containing all of the information about pins
 
--- Inserts a new pin on a map; however, if an identical pin exists then it will simple refresh the existing one to prevent duplicates
-function module:InsertPin(mapid, x, y, name, set, subset, descript)
-	CT_MapMod_Notes[mapid] = CT_MapMod_Notes[mapid] or {}
-	for i, note in ipairs(CT_MapMod_Notes[mapid]) do
-		if (note.x == x and note.y == y and note.name == name and note.set == set and note.subset == subset and note.descript == descript) then
+-- Inserts a new pin on a map; however, if an essentially identical pin exists then it will simple refresh the existing one to prevent duplicates
+function module:InsertPin(mapID, x, y, name, set, subset, descript)
+	CT_MapMod_Notes[mapID] = CT_MapMod_Notes[mapID] or {}
+	for i, note in ipairs(CT_MapMod_Notes[mapID]) do
+		if (abs(note.x - x) + abs(note.y - y) < 0.001 and note.set == set) then
+			note.subset = subset;
+			note.descript = descript;
+			note.name = name;
 			note.datemodified = date("%Y%m%d");
 			note.version = MODULE_VERSION;
+			module:refreshVisibleDataProviders();
 			if (WorldMapFrame:IsShown() and set == "User") then
 				StaticNoteEditPanel():RequestFocus(module.worldMapDataProvider.pins[i]);
 			end
 			return;
 		end
 	end
-	tinsert(CT_MapMod_Notes[mapid], {
+	tinsert(CT_MapMod_Notes[mapID], {
 		["x"] = x,
 		["y"] = y,
 		["name"] = name,
@@ -110,42 +112,38 @@ function module:InsertPin(mapid, x, y, name, set, subset, descript)
 		["datemodified"] = date("%Y%m%d"),
 		["version"] = MODULE_VERSION
 	});
+	module:refreshVisibleDataProviders();
 	if (WorldMapFrame:IsShown()) then
-		local i = #CT_MapMod_Notes[mapid];
-		local pin = WorldMapFrame:AcquirePin("CT_MapMod_PinTemplate", mapid, i, x, y, name, descript, set, subset, datemodified, version);
-		module.worldMapDataProvider.pins[i] = pin;
 		if (set == "User") then
-			StaticNoteEditPanel():RequestFocus(pin);
+			StaticNoteEditPanel():RequestFocus(module.worldMapDataProvider.pins[i]);
 		end
 	end
 	
 end
 
--- Deletes a pin from the i'th position on mapid, taking the very last remaining one and inserting it into the current position rather than shifting all the other notes down by one
+-- Deletes a pin from the i'th position on mapID, taking the very last remaining one and inserting it into the current position rather than shifting all the other notes down by one
 -- (This is an alternative to using tremove in the middle of a big table, for performance reasons only)
-function module:DeletePin(mapid, i)
-	if (CT_MapMod_Notes[mapid] and CT_MapMod_Notes[mapid][i]) then
-		if (i == #CT_MapMod_Notes[mapid]) then
-			tremove(CT_MapMod_Notes[mapid], i);
+function module:DeletePin(mapID, i)
+	if (CT_MapMod_Notes[mapID] and CT_MapMod_Notes[mapID][i]) then
+		if (i == #CT_MapMod_Notes[mapID]) then
+			tremove(CT_MapMod_Notes[mapID], i);
 		else
-			local lastNoteInStack = tremove(CT_MapMod_Notes[mapid], #CT_MapMod_Notes[mapid]);
-			CT_MapMod_Notes[mapid] = lastNoteInStack;
+			local lastNoteInStack = tremove(CT_MapMod_Notes[mapID], #CT_MapMod_Notes[mapID]);
+			CT_MapMod_Notes[mapID][i] = lastNoteInStack;
 		end
-		if (WorldMapFrame:IsShown()) then
-			module.worldMapDataProvider:RefreshAllData();
-		end
+		module:refreshVisibleDataProviders();
 	end
 end
 
 -- Inserts a new herb node on the map, but subject to rules imposed by CT_MapMod to prevent duplication
 -- Parameters:
---	mapid		Number, Required	Corresponding to a uiMapID upon which the pin should appear
+--	mapID		Number, Required	Corresponding to a uiMapID upon which the pin should appear
 --	x, y		Numbers, Required	Absolute coordinates on the map between 0 and 1
 --	herb		String, Required	Localized or non-localized name of the herbalism node or kind of herb (silently fails if it is a string that simply isn't recognized)
 --	descript	String			Optional text to include (defaults to nil)
 --	name		String			Optional name for the pin (defaults to a localized version of the herb)
-function public:InsertHerb(mapid, x, y, herb, descript, name)
-	assert(type(mapid) == "number", "An AddOn is creating a CT_MapMod pin without identifying a valid map")
+function public:InsertHerb(mapID, x, y, herb, descript, name)
+	assert(type(mapID) == "number", "An AddOn is creating a CT_MapMod pin without identifying a valid map")
 	assert(type(x) == "number" and type(y) == "number" and x >= 0 and y >= 0 and x <= 1 and y <= 1, "An AddOn is creating a CT_MapMod pin without specifying valid cordinates");
 	assert(type(herb) == "string", "An AddOn is creating a CT_MapMod herbalism pin without identifying a kind of herbalism node")
 	if (type(descript) ~= "string") then
@@ -165,8 +163,8 @@ function public:InsertHerb(mapid, x, y, herb, descript, name)
 					-- this is an kind that appears randomly throughout the zone in place of others, such as Anchor's Weed
 					return;
 				end
-				CT_MapMod_Notes[mapid] = CT_MapMod_Notes[mapid] or { };
-				for __, note in ipairs(CT_MapMod_Notes[mapid]) do
+				CT_MapMod_Notes[mapID] = CT_MapMod_Notes[mapID] or { };
+				for __, note in ipairs(CT_MapMod_Notes[mapID]) do
 					if ((note["name"] == kind) and (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.02)) then
 						--two kinds of the same kind not far apart
 						return;
@@ -201,7 +199,7 @@ function public:InsertHerb(mapid, x, y, herb, descript, name)
 					name = L["CT_MapMod/Herb/" .. kind];
 				end
 				-- this point will not have been reached if the earlier rules were triggered, causing the function to return early
-				module:InsertPin(mapid, x, y, name, "Herb", kind, descript);
+				module:InsertPin(mapID, x, y, name, "Herb", kind, descript);
 				return; -- breaks the for loops
 			end
 		end
@@ -210,13 +208,13 @@ end
 
 -- Inserts a new ore node on the map, but subject to rules imposed by CT_MapMod to prevent duplication
 -- Parameters:
---	mapid		Number, Required	Corresponding to a uiMapID upon which the pin should appear
+--	mapID		Number, Required	Corresponding to a uiMapID upon which the pin should appear
 --	x, y		Numbers, Required	Absolute coordinates on the map between 0 and 1
 --	ore		String			Localized name of the mining node or kind of ore (silently fails if it is a string that simply isn't recognized)
 --	descript	String			Optional text to include (defaults to nil)
 --	name		String			Optional name for the pin (defaults to a localized version of the ore)
-function public:InsertOre(mapid, x, y, ore, descript, name)
-	assert(type(mapid) == "number", "An AddOn is creating a CT_MapMod pin without identifying a valid map")
+function public:InsertOre(mapID, x, y, ore, descript, name)
+	assert(type(mapID) == "number", "An AddOn is creating a CT_MapMod pin without identifying a valid map")
 	assert(type(x) == "number" and type(y) == "number" and x >= 0 and y >= 0 and x <= 1 and y <= 1, "An AddOn is creating a CT_MapMod pin without specifying valid cordinates");
 	assert(type(ore) == "string", "An AddOn is creating a CT_MapMod mining pin without identifying a kind of mining node")
 	if (type(descript) ~= "string") then
@@ -333,8 +331,8 @@ function public:InsertOre(mapid, x, y, ore, descript, name)
 					-- this is an ore that appears randomly throughout the zone in place of others, such as Platinum
 					return;
 				end
-				CT_MapMod_Notes[mapid] = CT_MapMod_Notes[mapid] or { };
-				for __, note in ipairs(CT_MapMod_Notes[mapid]) do
+				CT_MapMod_Notes[mapID] = CT_MapMod_Notes[mapID] or { };
+				for __, note in ipairs(CT_MapMod_Notes[mapID]) do
 					if ((note["name"] == kind) and (math.sqrt((note["x"]-x)^2+(note["y"]-y)^2)<.02)) then 
 						--two veins of the same kind not far apart
 						return;
@@ -371,7 +369,7 @@ function public:InsertOre(mapid, x, y, ore, descript, name)
 					name = L["CT_MapMod/Ore/" .. kind];
 				end
 				-- this point will not have been reached if the earlier rules were triggered, causing the function to return early
-				module:InsertPin(mapid, x, y, name, "Ore", kind, descript);
+				module:InsertPin(mapID, x, y, name, "Ore", kind, descript);
 				return; -- breaks the for loops
 			end
 		end
@@ -382,28 +380,46 @@ end
 -- DataProvider
 -- Manages the adding, updating, and removing of data like icons, blobs or text to the map canvas
 
-function public:GetDataProvider()
-	return CreateFromMixins(CT_MapMod_DataProviderMixin)
+local CT_MapMod_DataProviderMixin = CreateFromMixins(MapCanvasDataProviderMixin);
+
+do
+	local dataProviders = { };
+
+	function public:NewDataProvider()
+		local newProvider = CreateFromMixins(CT_MapMod_DataProviderMixin);
+		tinsert(dataProviders, newProvider);
+		return newProvider;
+	end
+
+	function module:refreshVisibleDataProviders()
+		for __, dataProvider in ipairs(dataProviders) do
+			local map = dataProvider:GetMap();
+			if (map and map:IsShown()) then
+				dataProvider:RefreshAllData();
+			end
+		end
+	end
 end
 
-CT_MapMod_DataProviderMixin = CreateFromMixins(MapCanvasDataProviderMixin);	-- this is a locally scoped variable, per the design at the top of the document
-
 function CT_MapMod_DataProviderMixin:RemoveAllData()
-	self:GetMap():RemoveAllPinsByTemplate("CT_MapMod_PinTemplate");
-	StaticNoteEditPanel():Hide();
+	if (self.pins) then
+		self:GetMap():RemoveAllPinsByTemplate("CT_MapMod_PinTemplate");
+		StaticNoteEditPanel():Hide();
+		module.PinHasFocus = nil;
+		wipe(self.pins);
+	end
 end
  
 function CT_MapMod_DataProviderMixin:RefreshAllData(fromOnShow)
 	-- Initialization
 	self.pins = self.pins or { };
-	wipe(self.pins);
 
 	-- Clear the map
 	self:RemoveAllData();
-	module.PinHasFocus = nil;  --rather than calling this for each pin, just call it once when all pins are gone.
 	
 	-- determine if the player is an herbalist or miner, for automatic showing of those kinds of notes
-	if (module:getGameVersion() >= 8) then
+	if (GetProfessions) then
+		-- Retail
 		local prof1, prof2 = GetProfessions();
 		if (prof1) then 
 			local __, icon = GetProfessionInfo(prof1)
@@ -422,8 +438,7 @@ function CT_MapMod_DataProviderMixin:RefreshAllData(fromOnShow)
 			end
 		end
 	else	
-		
-		-- these abilities are localized in ExpansionData.lua
+		-- Classic (localized using a script at the bottom of ExpansionData.lua)
 		if (GetSpellInfo(L["CT_MapMod/Map/ClassicHerbalist"])) then
 		 	module.isHerbalist = true;
 		end
@@ -433,23 +448,23 @@ function CT_MapMod_DataProviderMixin:RefreshAllData(fromOnShow)
 	end
 	
 	-- Fetch and push the pins to be used for this map
-	local mapid = self:GetMap():GetMapID();
-	if (mapid) then	
+	local mapID = self:GetMap():GetMapID();
+	if (mapID) then	
 		if ((module:getOption("CT_MapMod_ShowOnFlightMaps") or 1) == 1) then
-			mapid = module.flightMaps.mapid or mapid;		
+			mapID = module.flightMaps[mapID] or mapID;		
 		end
-		if (CT_MapMod_Notes[mapid]) then
+		if (CT_MapMod_Notes[mapID]) then
 			local showUser, showHerb, showOre = 
 				module:getOption("CT_MapMod_UserNoteDisplay") or 1,
 				module:getOption("CT_MapMod_HerbNoteDisplay") or 1,
 				module:getOption("CT_MapMod_OreNoteDisplay") or 1;
-			for i, info in ipairs(CT_MapMod_Notes[mapid]) do
+			for i, info in ipairs(CT_MapMod_Notes[mapID]) do
 				if (
 					info["set"] == "User" and showUser == 1
 					or info["set"] == "Herb" and (showHerb == 1 and module.isHerbalist or showHerb == 2)
 					or info["set"] == "Ore" and (showOre == 1 and module.isMiner or showOre == 2)
 				) then
-					self.pins[i] = self:GetMap():AcquirePin("CT_MapMod_PinTemplate", mapid, i, info["x"], info["y"], info["name"], info["descript"], info["set"], info["subset"], info["datemodified"], info["version"]);
+					self.pins[i] = self:GetMap():AcquirePin("CT_MapMod_PinTemplate", mapID, i, info["x"], info["y"], info["name"], info["descript"], info["set"], info["subset"], info["datemodified"], info["version"]);
 				end
 			end
 		end
@@ -499,8 +514,8 @@ function CT_MapMod_PinMixin:OnLoad()
 		local x,y = self:GetMap():GetNormalizedCursorPosition();
 		if (x and y) then
 			x, y = Clamp(x, 0.005, 0.995), Clamp(y, 0.005, 0.995); -- clamping to the map
-			CT_MapMod_Notes[self.mapid][self.i] ["x"] = x;
-			CT_MapMod_Notes[self.mapid][self.i] ["y"] = y;
+			CT_MapMod_Notes[self.mapID][self.i] ["x"] = x;
+			CT_MapMod_Notes[self.mapID][self.i] ["y"] = y;
 			self.x = x;
 			self.y = y;
 			self:SetPosition(x, y);
@@ -514,7 +529,7 @@ end
  
 function CT_MapMod_PinMixin:OnAcquired(...) -- the arguments here are anything that are passed into AcquirePin after the pinTemplate
 	-- Override in your mixin, called when this pin is being acquired by a data provider but before its added to the map
-	self.mapid, self.i, self.x, self.y, self.name, self.descript, self.set, self.subset, self.datemodified, self.version = ...;
+	self.mapID, self.i, self.x, self.y, self.name, self.descript, self.set, self.subset, self.datemodified, self.version = ...;
 	
 	-- Set basic properties for the pin itself
 	self:SetPosition(self.x, self.y);
@@ -540,7 +555,8 @@ function CT_MapMod_PinMixin:OnReleased()
 	self:Hide();
 end
 
-do
+-- Two variants of function CT_MapMod_PinMixin:OnClick(button), for retail vs Classic
+if (WaypointLocationDataProviderMixin) then
 	local uiMapPoint =
 	{
 		uiMapID = 0,
@@ -548,18 +564,26 @@ do
 	}
 	local waypointLinkPattern = "|cffffff00|Hworldmap:%d:%d:%d|h[%s]|h|r";		-- uiMapID, x, y, MAP_PIN_HYPERLINK
 	function CT_MapMod_PinMixin:OnClick(button)	
-		if (IsModifiedClick("CHATLINK") and module:getGameVersion() >= 9) then
-			-- Share the pin in chat
-			ChatEdit_InsertLink(waypointLinkPattern:format(self.mapid, self.x*10000, self.y*10000, MAP_PIN_HYPERLINK));
+		if (IsModifiedClick("CHATLINK") and C_Map.CanSetUserWaypointOnMap(self.mapID)) then
+			-- Share the pin in chat as a waypoint (using features introduced in Shadowlands)
+			ChatEdit_InsertLink(waypointLinkPattern:format(self.mapID, self.x*10000, self.y*10000, MAP_PIN_HYPERLINK));
 		elseif (button == "LeftButton" and (GetModifiedClick("CHATLINK") ~= "SHIFT-BUTTON1" and IsShiftKeyDown or IsAltKeyDown)()) then
 			-- Edit the pin, using shift-left unless that keybind is already used for CHATLINK
 			local panel = StaticNoteEditPanel();
 			panel:RequestFocus(self);
-		elseif (IsControlKeyDown() and module:getGameVersion() >= 9) then
-			-- Add a waypoint (beginning in Shadowlands)
-			uiMapPoint.uiMapID = self.mapid;
+		elseif (IsControlKeyDown() and C_Map.CanSetUserWaypointOnMap(self.mapID)) then
+			-- Set a waypoint centred on the pin (using features introduced in Shadowlands)
+			uiMapPoint.uiMapID = self.mapID;
 			uiMapPoint.position:SetXY(self.x, self.y);
 			C_Map.SetUserWaypoint(uiMapPoint);
+		end
+	end
+else
+	function CT_MapMod_PinMixin:OnClick(button)
+		if (button == "LeftButton" and (GetModifiedClick("CHATLINK") ~= "SHIFT-BUTTON1" and IsShiftKeyDown or IsAltKeyDown)()) then
+			-- Edit the pin, using shift-left unless that keybind is already used for CHATLINK
+			local panel = StaticNoteEditPanel();
+			panel:RequestFocus(self);
 		end
 	end
 end
@@ -586,7 +610,7 @@ function CT_MapMod_PinMixin:OnMouseEnter()
 	if ( self.descript ) then
 		GameTooltip:AddLine(self.descript, nil, nil, nil, 1);
 	end
-	if (module:getGameVersion() >= 9) then
+	if (WaypointLocationDataProviderMixin and C_Map.CanSetUserWaypointOnMap(self.mapID)) then
 		GameTooltip:AddLine(" ");
 		GameTooltip_AddNormalLine(GameTooltip, MAP_PIN_SHARING_TOOLTIP);
 		GameTooltip:AddLine(" ");
@@ -597,7 +621,7 @@ function CT_MapMod_PinMixin:OnMouseEnter()
 		else	
 			GameTooltip:AddLine(L[GetModifiedClick("CHATLINK") ~= "SHIFT-BUTTON1" and "CT_MapMod/Pin/Shift-Click to Edit" or "CT_MapMod/Pin/Alt-Click to Edit"], 0.2, 1.0, 0.2);
 		end
-		GameTooltip:AddDoubleLine(L["CT_MapMod/Pin/Right-Click to Drag"], "uiMapId " .. self.mapid, 0.2, 1.0, 0.2, 0.3, 0.3, 0.3 );
+		GameTooltip:AddDoubleLine(L["CT_MapMod/Pin/Right-Click to Drag"], "uiMapId " .. self.mapID, 0.2, 1.0, 0.2, 0.3, 0.3, 0.3 );
 		
 	else
 		if (self.datemodified and self.version) then
@@ -708,7 +732,7 @@ do
 		
 		-- Closes the frame and saves the new properties of pin to CT_MapMod_Notes
 		local function okayPressed()
-			CT_MapMod_Notes[pin.mapid][pin.i] = {
+			CT_MapMod_Notes[pin.mapID][pin.i] = {
 				["x"] = pin.x,
 				["y"] = pin.y,
 				["name"] = nameEditBox:GetText() or pin.name,
@@ -720,19 +744,19 @@ do
 			}
 			frame:Hide();
 			-- calling onAcquired will update tooltips and anything else that wasn't already changed
-			pin:OnAcquired(pin.mapid, pin.i, pin.x, pin.y, nameEditBox:GetText() or pin.name, descriptEditBox:GetText() or pin.descript, setDropDown.unapprovedValue, subsetDropDown.unapprovedValue, date("%Y%m%d"), MODULE_VERSION );	
+			pin:OnAcquired(pin.mapID, pin.i, pin.x, pin.y, nameEditBox:GetText() or pin.name, descriptEditBox:GetText() or pin.descript, setDropDown.unapprovedValue, subsetDropDown.unapprovedValue, date("%Y%m%d"), MODULE_VERSION );	
 		end
 
 		-- Closes the frame and restores pin to its original state
 		local function cancelPressed()
 			frame:Hide();
 			-- calling OnAcquired will reset everything user-visible to their original conditions
-			pin:OnAcquired(pin.mapid, pin.i, pin.x, pin.y, pin.name, pin.descript, pin.set, pin.subset, pin.datemodified, pin.version);		
+			pin:OnAcquired(pin.mapID, pin.i, pin.x, pin.y, pin.name, pin.descript, pin.set, pin.subset, pin.datemodified, pin.version);		
 		end
 		
 		-- Closes the frame and removes pin from both the map and CT_MapMod_Notes
 		local function deletePressed()
-			module:DeletePin(pin.mapid, pin.i);
+			module:DeletePin(pin.mapID, pin.i);
 			frame:Hide();	
 		end
 		
@@ -1146,6 +1170,15 @@ function module:AddUIElements()
 								UIDropDownMenu_AddButton(info, 1);
 
 							elseif (menuList == "NewNote") then
+								
+								-- New note at cursor
+								info.text = L["CT_MapMod/Map/DropDown/AtCursor"];
+								info.disabled = nil;
+								info.icon = module.pinIcons["Grey Note"];
+								info.func = function()
+									module.isCreatingNote = true;
+								end
+								UIDropDownMenu_AddButton(info, level);
 
 								-- New note at player
 								local mapID = WorldMapFrame:GetMapID();
@@ -1156,47 +1189,28 @@ function module:AddUIElements()
 									info.func = function()
 										module:InsertPin(mapID, x, y, "New Note", "User", "Diamond", "New note under player");
 									end
-								else
-									info.disabled = true;
-									info.text = L["CT_MapMod/Map/DropDown/AtPlayer"];
-									info.tooltipTitle = L["CT_MapMod/Map/DropDown/AtPlayer"]
-									info.tooltipText = L["CT_MapMod/Map/DropDown/AtPlayerErrorTip"]
+									info.icon = module.pinIcons.Diamond;
+									UIDropDownMenu_AddButton(info, level);
 								end
-								info.icon = module.pinIcons.Diamond;
-								UIDropDownMenu_AddButton(info, level);
-
+						
 								-- New note at waypoint
 								if (WaypointLocationDataProviderMixin) then
-									local point = C_Map.HasUserWaypoint() and mapID and C_Map.GetUserWaypoint(mapID);
-									if (point and point.position and point.position.x and point.position.y) then
-										local x, y = point.position.x, point.position.y;
-										info.text = string.format("%s (%d,%d)", L["CT_MapMod/Map/DropDown/AtWaypoint"], x, y);
-										info.disabled = nil;
-										info.tooltipTitle = nil;
-										info.tooltipText = nil;	
+									local position = C_Map.HasUserWaypoint() and C_Map.GetUserWaypointPositionForMap(mapID);
+									local x, y = position and position.x, position and position.y;
+									if (x and x <= 1 and y and y <= 1 and x >= 0 and y >= 0 and (x > 0 or y > 0)) then
+										info.text = string.format("%s (%d,%d)", L["CT_MapMod/Map/DropDown/AtWaypoint"], x*100, y*100);
 										info.func = function()
 											module:InsertPin(mapID, x, y, "Waypoint", "User", "Waypoint", "New note under waypoint");
 										end
-									else
-										info.text = L["CT_MapMod/Map/DropDown/AtWaypoint"];
-										info.disabled = true;
-										info.tooltipTitle = L["CT_MapMod/Map/DropDown/AtWaypoint"];
-										info.tooltipText = L["CT_MapMod/Map/DropDown/AtWaypointErrorTip"]
-									end
 									info.icon = module.pinIcons.Waypoint.path;
+									info.tCoordLeft = module.pinIcons.Waypoint.left;
+									info.tCoordRight = module.pinIcons.Waypoint.right;
+									info.tCoordBottom = module.pinIcons.Waypoint.bottom;
+									info.tCoordTop = module.pinIcons.Waypoint.top;
 									UIDropDownMenu_AddButton(info, level);
+									end
 								end
-
-								-- New note at cursor
-								info.text = L["CT_MapMod/Map/DropDown/AtCursor"];
-								info.disabled = nil;
-								info.tooltipTitle = L["CT_MapMod/Map/DropDown/AtCursor"];
-								info.tooltipText = L["CT_MapMod/Map/DropDown/AtCursorTip"];
-								info.icon = module.pinIcons["Grey Note"];
-								info.func = function()
-									module.isCreatingNote = true;
-								end
-								UIDropDownMenu_AddButton(info, level);
+								
 							end
 							module:freeTable(info);
 						end,
@@ -1277,16 +1291,16 @@ function module:AddUIElements()
 				local text = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
 				text:SetAllPoints();
 				local function updateText()
-					local mapid = WorldMapFrame:GetMapID();
-					if (mapid) then
-						local playerposition = C_Map.GetPlayerMapPosition(mapid,"player");
+					local mapID = WorldMapFrame:GetMapID();
+					if (mapID) then
+						local playerposition = C_Map.GetPlayerMapPosition(mapID,"player");
 						if (playerposition) then
 							local px, py = playerposition:GetXY();
 							text:SetText(format("P: %.1f, %.1f", px*100, py*100));
 						else
 							text:SetText("-");
 						end
-						if (mapid == C_Map.GetBestMapForUnit("player")) then
+						if (mapID == C_Map.GetBestMapForUnit("player")) then
 							text:SetTextColor(1,1,1,1);		
 						else
 							text:SetTextColor(1,1,1,.3);			
@@ -1371,21 +1385,21 @@ function module:AddUIElements()
 		module.isCreatingNote = nil;
 		GameTooltip:Hide();
 		if (InCombatLockdown()) then return; end
-		local mapid = WorldMapFrame:GetMapID();
+		local mapID = WorldMapFrame:GetMapID();
 		local x,y = WorldMapFrame:GetNormalizedCursorPosition();
-		if (mapid and x and y and x>=0 and y>=0 and x<=1 and y<=1 and (x~=0 or y~=0)) then
-			module:InsertPin(mapid, x, y, "New Note", "User", "Grey Note", "New note at cursor");
-			C_Timer.After(0.01,function() if (WorldMapFrame:GetMapID() ~= mapid) then WorldMapFrame:SetMapID(mapid) end end); --to add pins on the parts of a map in other zones
+		if (mapID and x and y and x>=0 and y>=0 and x<=1 and y<=1 and (x~=0 or y~=0)) then
+			module:InsertPin(mapID, x, y, "New Note", "User", "Grey Note", "New note at cursor");
+			C_Timer.After(0.01,function() if (WorldMapFrame:GetMapID() ~= mapID) then WorldMapFrame:SetMapID(mapID) end end); --to add pins on the parts of a map in other zones
 		end
 	end);
 	
 	-- integrate extra features into the Shadowlands 9.0 waypoint pin
 	if (WaypointLocationPinMixin) then
 		hooksecurefunc(WaypointLocationPinMixin, "OnMouseClickAction", function(self)
-			local mapid = self:GetMap():GetMapID();
+			local mapID = self:GetMap():GetMapID();
 			local x, y = self:GetPosition();
 			if (x and y and module.isCreatingNote) then
-				module:InsertPin(mapid, x, y, "Waypoint", "User", "Waypoint", "New note under waypoint");
+				module:InsertPin(mapID, x, y, "Waypoint", "User", "Waypoint", "New note under waypoint");
 				module.isCreatingNote = nil;
 			end
 		end);	
@@ -1405,17 +1419,17 @@ do
 	frame:SetScript("OnEvent", function(self, event, arg1, arg2, arg3, arg4)
 		if (event == "UNIT_SPELLCAST_SENT" and arg1 == "player") then
 			if (module.gatheringSkills[arg4]) then
-				local mapId = C_Map.GetBestMapForUnit("player");
-				if (mapid) then
-					local position = C_Map.GetPlayerMapPosition(mapId,"player");	-- TODO: measure if checking for the type of skill first would be faster than doing these API calls
+				local mapID = C_Map.GetBestMapForUnit("player");
+				if (mapID) then
+					local position = C_Map.GetPlayerMapPosition(mapID,"player");	-- TODO: measure if checking for the type of skill first would be faster than doing these API calls
 					if (position) then
 						local x, y = position:GetXY();
 						if (x and y and (x ~= 0 or y ~= 0)) then			-- could be nil or 0 in dungeons and raids to prevent cheating
 							-- Herbalism and Mining
 							if (module.gatheringSkills[arg4] == "Herb" and (module:getOption("CT_MapMod_AutoGatherHerbs") or 1) == 1) then
-								module:InsertHerb(mapid, x, y, arg2);
+								module:InsertHerb(mapID, x, y, arg2);
 							elseif (module.gatheringSkills[arg4] == "Ore" and (module:getOption("CT_MapMod_AutoGatherOre") or 1) == 1) then
-								module:InsertOre(mapid, x, y, arg2);
+								module:InsertOre(mapID, x, y, arg2);
 							end
 						end
 					end
