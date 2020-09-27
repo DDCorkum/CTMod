@@ -32,9 +32,9 @@ local function addon_UpdateOrientation(self, orientation)
 	local spacing;
 
 	orientation = orientation or "ACROSS";
-	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+	if (module:getGameVersion() >= 8) then
 		spacing = spacing or appliedOptions.bagsBarSpacing or 2;
-	elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+	else
 		spacing = spacing or appliedOptions.bagsBarSpacing or 4;
 	end
 
@@ -111,10 +111,10 @@ end
 
 local function addon_Register()
 	local x, y;
-	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+	if (module:getGameVersion() >= 8) then
 		x = 345;
 		y = 28;
-	elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+	else
 		x = 300;
 		y = 2;
 	end		

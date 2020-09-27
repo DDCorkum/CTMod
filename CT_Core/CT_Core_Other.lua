@@ -370,7 +370,7 @@ if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
 		UIParent_ManageFramePositions();
 	end
 
-elseif (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+else  -- if module:getGameVersion() >= 8
 
 	local old_QuestLogQuests_AddQuestButton = QuestLogQuests_AddQuestButton;
 
@@ -431,7 +431,7 @@ do
 	-- blocking to its original state.
 	module:regEvent("PLAYER_LEAVING_WORLD", restoreBlockState);
 	module:regEvent("BANKFRAME_CLOSED", restoreBlockState);
-	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+	if (GuildBankFrame) then
 		module:regEvent("GUILDBANKFRAME_CLOSED", restoreBlockState);
 	end
 
@@ -445,7 +445,7 @@ do
 
 	-- If the guild bank frame has just opened, and the user wants to block while
 	-- at the guild bank, then start blocking.
-	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+	if (GuildBankFrame) then
 		module:regEvent("GUILDBANKFRAME_OPENED", function()
 			if (blockOption) then
 				enableBlockState();
@@ -1188,18 +1188,18 @@ CT_Core_ContainerFrameItemButton_OnModifiedClick_Register(CT_Core_AddToAuctions)
 local function hide_gryphons(val)
 	if (CT_BottomBar) then return; end
 	if (val) then
-		if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+		if (module:getGameVersion() >= 8) then
 			MainMenuBarArtFrame.LeftEndCap:Hide();
 			MainMenuBarArtFrame.RightEndCap:Hide();
-		elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+		else
 			MainMenuBarLeftEndCap:Hide();
 			MainMenuBarRightEndCap:Hide();
 		end
 	else
-		if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+		if (module:getGameVersion() >= 8) then
 			MainMenuBarArtFrame.LeftEndCap:Show();
 			MainMenuBarArtFrame.RightEndCap:Show();
-		elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+		else
 			MainMenuBarLeftEndCap:Show();
 			MainMenuBarRightEndCap:Show();
 		end
@@ -1459,7 +1459,7 @@ do
 	end
 
 	for event, data in pairs(events) do
-		if (module:getGameVersion() == CT_GAME_VERSION_RETAIL or data.classic) then
+		if (module:getGameVersion() >= 8 or data.classic) then
 			-- register all events, or just the ones that are in WoW Classic
 			module:regEvent(event, onEvent);
 		end
@@ -1662,7 +1662,7 @@ do
 
 	local function getBlizzardExpandedWidth()
 		local width;
-		if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+		if (module:getGameVersion() >= 8) then
 			width = 235;
 		else
 			width = 195.4;
@@ -1983,9 +1983,9 @@ do
 					CT_Core_MinimizeWatchFrameButton:Hide();	-- hides the custom minimize button on classic only
 				end
 				-- Restore Blizzard's WatchFrame
-				if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+				if (module:getGameVersion() >= 8) then
 					WatchFrame:SetWidth(getBlizzardExpandedWidth());
-				elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+				else
 					QuestWatch_Update();
 				end
 				frameSetParent(WatchFrame, "UIParent");

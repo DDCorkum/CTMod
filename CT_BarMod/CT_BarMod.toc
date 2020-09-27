@@ -1,4 +1,4 @@
-## Interface: 80300
+## Interface: 90001
 ## Version: 8.3.7.3
 ## Title: CT_BarMod |cFF333333(BFA)
 ## Notes: Intuitive yet powerful action bar addon.

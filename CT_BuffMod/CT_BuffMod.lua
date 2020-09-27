@@ -1319,9 +1319,9 @@ function auraClass:checkExpiration()
 
 				-- Play a sound
 				if (globalObject.expirationSound) then
-					if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+					if (module:getGameVersion() >= 8) then
 						PlaySoundFile(569634); -- "Sound\\Spells\\misdirection_impact_head.wav"
-					elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+					else
 						PlaySound(3081); -- "TellMessage"
 					end
 				end
@@ -7026,10 +7026,14 @@ function primaryClass:registerAuraFrameEvents()
 	auraFrame:RegisterEvent("PLAYER_TARGET_CHANGED");
 	auraFrame:RegisterEvent("UNIT_PET");
 	auraFrame:RegisterEvent("UNIT_AURA");				-- Reminder: The secure aura routines also register UNIT_AURA
-	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
-		auraFrame:RegisterEvent("UNIT_ENTERED_VEHICLE");	-- WotLK and later
-		auraFrame:RegisterEvent("UNIT_EXITED_VEHICLE");		-- WotLK and later
-		auraFrame:RegisterEvent("PLAYER_FOCUS_CHANGED");	-- BC and later
+	if (VehicleMenuBar) then
+		-- Introduced in WotLK
+		auraFrame:RegisterEvent("UNIT_ENTERED_VEHICLE");
+		auraFrame:RegisterEvent("UNIT_EXITED_VEHICLE");
+	end
+	if (FocusFrame) then
+		-- Introduced in BC
+		auraFrame:RegisterEvent("PLAYER_FOCUS_CHANGED");
 	end
 
 end
@@ -7046,10 +7050,14 @@ function primaryClass:unregisterAuraFrameEvents()
 	auraFrame:UnregisterEvent("PLAYER_TARGET_CHANGED");
 	auraFrame:UnregisterEvent("UNIT_PET");
 	auraFrame:UnregisterEvent("UNIT_AURA");
-	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
-		auraFrame:UnregisterEvent("UNIT_ENTERED_VEHICLE");	-- WotLK and later
-		auraFrame:UnregisterEvent("UNIT_EXITED_VEHICLE");	-- WotLK and later
-		auraFrame:UnregisterEvent("PLAYER_FOCUS_CHANGED");	-- BC and later
+	if (VehicleMenuBar) then
+		-- Introduced in WotLK
+		auraFrame:UnregisterEvent("UNIT_ENTERED_VEHICLE");
+		auraFrame:UnregisterEvent("UNIT_EXITED_VEHICLE");
+	end
+	if (FocusFrame) then
+		-- Introduced in BC
+		auraFrame:UnregisterEvent("PLAYER_FOCUS_CHANGED");
 	end
 end
 
@@ -10387,7 +10395,8 @@ local function globalFrame_Init(self)
 	-- Register events
 	self:RegisterEvent("UNIT_AURA");
 	self:RegisterEvent("PLAYER_TARGET_CHANGED");
-	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+	if (FocusFrame) then
+		-- BC onwards
 		self:RegisterEvent("PLAYER_FOCUS_CHANGED");
 	end
 

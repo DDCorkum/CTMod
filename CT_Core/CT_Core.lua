@@ -362,7 +362,7 @@ module.frame = function()
 		optionsEndFrame();
 
 	-- Alternate Power Bar
-		if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+		if (module:getGameVersion() >= 8) then
 			optionsAddBookmark("Alternate Power Bar");
 			optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Alternate Power Bar");
 			optionsAddObject( -2, 5*14, "font#t:0:%y#s:0:%s#l:13:0#r#The game sometimes uses this bar to show the status of a quest, or your status in a fight, etc. The bar can vary in size, and its default position is centered near the bottom of the screen.#" .. textColor2 .. ":l");
@@ -379,7 +379,7 @@ module.frame = function()
 					end
 				);
 			optionsEndFrame();
-		elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+		else
 			optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Alternate Power Bar");
 			optionsAddObject( -2, 5*14, "font#t:0:%y#s:0:%s#l:13:0#r#The alternate power bar settings are disabled in WoW Classic#" .. textColor2 .. ":l");
 		end
@@ -438,7 +438,7 @@ module.frame = function()
 		optionsEndFrame();
 		-- refer to local variable bagAutomationEvents
 		for i, bagevent in ipairs(bagAutomationEvents) do
-			if (module:getGameVersion() == CT_GAME_VERSION_RETAIL or bagevent.classic) then
+			if (module:getGameVersion() >= 8 or bagevent.classic) then
 				-- Show options for all bag automation, or just the vanilla/classic ones
 				-- refer to the on-load script for the next frame
 				optionsAddObject( -18, 15, "font#tl:25:%y#v:GameFontNormal#n:" .. bagevent.openAll .. "Label#" .. bagevent.label);
@@ -640,7 +640,7 @@ module.frame = function()
 
 		-- Chat frame buttons
 		optionsAddObject( -2,   26, "checkbutton#tl:10:%y#o:chatArrows#Hide the chat buttons");
-		if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+		if (module:getGameVersion() >= 8) then
 			optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:friendsMicroButton#Hide the friends (social) button");
 		end
 

@@ -1,3 +1,6 @@
+CT_MailMod (9.0.1.1) 2020-09-25
+- Minor code cleanup; nothing substantive
+
 CT_MailMod (8.3.0.7) 2020-03-25
 - Added option to prevent editboxes from losing focus during common tasks
 - Localization, courtesy of 萌丶汉丶纸 (zhCH)

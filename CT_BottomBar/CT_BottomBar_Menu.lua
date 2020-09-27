@@ -422,7 +422,7 @@ local function addon_PostInit(self)
 end
 
 local function addon_Register()
-	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+	if (module:getGameVersion() >= 8) then
 		module:registerAddon(
 			"Menu Bar",  -- option name
 			"MenuBar",  -- used in frame names

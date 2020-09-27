@@ -335,7 +335,7 @@ function useButton:constructor(buttonId, actionId, groupId, count, ...)
 	SecureHandlerSetFrameRef(button, "SecureFrame", CT_BarMod_SecureFrame);
 
 	-- Assign to the button a reference to the SpellFlyout frame so we can hide it from the button's secure code.
-	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+	if (SpellFlyout) then
 		SecureHandlerSetFrameRef(button, "SpellFlyout", SpellFlyout);
 	end
 
@@ -893,7 +893,7 @@ local function CT_BarMod__ActionButton_UpdateOverlayGlow(self)
 end
 
 function useButton:updateOverlayGlow()
-	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+	if (module:getGameVersion() >= 8) then
 		CT_BarMod__ActionButton_UpdateOverlayGlow(self.button);
 	end
 end
@@ -2137,7 +2137,7 @@ module.useEnable = function(self)
 	self:regEvent("PLAYER_REGEN_DISABLED", combatFlagger);
 	self:regEvent("SPELL_UPDATE_CHARGES", eventHandler_UpdateCount);
 	self:regEvent("LOSS_OF_CONTROL_UPDATE", eventHandler_UpdateCooldown);
-	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+	if (module:getGameVersion() >= 8) then
 		self:regEvent("UNIT_ENTERING_VEHICLE", eventHandler_UpdateStateVehicle);
 		self:regEvent("UNIT_ENTERED_VEHICLE", eventHandler_UpdateStateVehicle);
 		self:regEvent("UNIT_EXITED_VEHICLE", eventHandler_UpdateStateVehicle);
@@ -2180,7 +2180,7 @@ module.useDisable = function(self)
 	self:unregEvent("PLAYER_REGEN_DISABLED", combatFlagger);
 	self:unregEvent("SPELL_UPDATE_CHARGES", eventHandler_UpdateCount);
 	self:unregEvent("UPDATE_SUMMONPETS_ACTION", eventHandler_updateSummonPets);
-	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+	if (module:getGameVersion() >= 8) then
 		self:unregEvent("UNIT_ENTERING_VEHICLE", eventHandler_UpdateStateVehicle);
 		self:unregEvent("UNIT_ENTERED_VEHICLE", eventHandler_UpdateStateVehicle);
 		self:unregEvent("UNIT_EXITED_VEHICLE", eventHandler_UpdateStateVehicle);

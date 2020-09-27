@@ -1206,7 +1206,7 @@ end
 -- Preventing the send-mail frame's edit boxes from losing focus during common tasks
 
 
-if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then		-- this resolves a nuisance introduced in WoW 8.3; not present in Classic (yet)
+if (module:getGameVersion() >= 8) then		-- this resolves a nuisance introduced in WoW 8.3; not present in Classic (yet)
 	local focus;
 	local enabled = true;	-- by default, this feature is on
 	
