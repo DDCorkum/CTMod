@@ -14,6 +14,12 @@
 local _G = getfenv(0);
 local module = _G["CT_MailMod"];
 
+
+--------------------------------------------
+-- Constants
+
+local MAX_CONTAINER_ITEMS = MAX_CONTAINER_ITEMS or 36;		-- This constant was deprecated in WoW 8.3
+
 --------------------------------------------
 -- Modified Stock UI for the Inbox
 

@@ -1231,7 +1231,7 @@ function module:AddUIElements()
 				local anchorFrom = WorldMapFrame.ScrollContainer;
 				local leftMinOffset = 140;
 				local rightMaxOffset = WaypointLocationDataProviderMixin and -84 or WorldMapFrame.BorderFrame.MaximizeMinimizeFrame and -52 or -20;
-				local yOff = -19;
+				local yOff = -18.5;
 				self.updateClamps = function()
 					local scale = WorldFrame:GetEffectiveScale() / self:GetEffectiveScale();
 					self:SetClampRectInsets(
@@ -1264,7 +1264,7 @@ function module:AddUIElements()
 				end
 				local function updatePosition()
 					self.updateClamps();
-					self.updatePoint(module:getOption("CT_MapMod_MapButton_Anchor") or "TOPRIGHT", module:getOption("CT_MapMod_MapButton_OffX") or 0);
+					self.updatePoint(module:getOption("CT_MapMod_MapButton_Anchor") or "TOPRIGHT", module:getOption("CT_MapMod_MapButton_OffX") or rightMaxOffset);
 				end
 				if (WorldMapFrame.BorderFrame.MaximizeMinimizeFrame) then
 					hooksecurefunc(WorldMapFrame.BorderFrame.MaximizeMinimizeFrame, "Maximize", updatePosition);
