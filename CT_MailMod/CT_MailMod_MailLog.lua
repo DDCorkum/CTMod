@@ -152,12 +152,6 @@ local function getLogTable()
 	return log;
 end
 
-local function getLogEntry(id)
-	-- Get the specified log entry from the mail log table.
-	local log = getLogTable();
-	return log[#log+1-id]; -- Reversed
-end
-
 function module:printLogMessage(success, mail, message)
 	-- Print a message in the chat window.
 	if (module.opt.printLog) then
@@ -297,6 +291,7 @@ function module:logOutgoing(success, mail, message)
 	end
 end
 
+
 --------------------------------------------
 -- Mail Log UI
 
@@ -348,10 +343,22 @@ do
 			["button#s:100:25#tr:-5:-5#n:CT_MailMod_Close_Button#v:GameMenuButtonTemplate#Close"] = {
 				["onclick"] = function(self)
 					HideUIPanel(CT_MailMod_MailLog);
-				end
+				end,
 			},
 			--"button#s:100:25#tr:-135:-38#n:CT_MailMod_ResetData_Button#v:GameMenuButtonTemplate#Reset Data",
 			"texture#tl:5:-67#br:tr:-5:-69#1:0.82:0",
+
+			["editbox#tl:50:-10#s:200:25#n:CT_MailMod_MailLog_FilterEditBox#v:SearchBoxTemplate"] = {
+				["onload"] = function(self)
+					self:HookScript("OnTextChanged", module.updateMailLog);
+				end,
+			},
+			
+			["button#tl:265:-10#s:25:25#?#v:GameMenuButtonTemplate"] = {
+				["onenter"] = function(self)
+					module:displayTooltip(self, {"Just start typing, or use filters such as...", "  action:|cff666666" .. module.text["CT_MailMod/MailLog/Open"] .. "|r|n  to|cff666666:Bob  |r|n  from:|cff666666" .. UnitName("player") .. "|r|n  date:|cff666666" .. date("%Y%m%d") .. "  (or other date/time formats)|r|n  subject:|cff666666HelloWorld!|r|n  money:|cff6666669000|r|n  item:|cff666666cloth|r|n  message:|cff666666foo|r#0.9:0.9:0.9"}, "ANCHOR_BOTTOMRIGHT");
+				end,
+			},
 
 			["frame#tl:5:-72#br:-5:5#i:scrollChildren"] = {
 				["frame#s:0:20#tl:0:0#r#i:1"] = scrollChild,
@@ -589,13 +596,15 @@ do
 				button:SetPoint("LEFT", parent, "LEFT", 530 + diff + id * 18, 0);
 				button:SetScript("OnEnter", itemOnEnter);
 				button:SetScript("OnLeave", itemOnLeave);
+				button.countFontString = button:CreateFontString(nil, "OVERLAY", "NumberFontNormalSmall");
+				button.countFontString:SetPoint("BOTTOMRIGHT", 1, -1);
 				return button;
 			end
 		end
 
 		local function formatPlayer(name)
 			if ( name == module:getPlayerName() ) then
-				name = "\124cff888888Me\124r";
+				name = "\124cff888888" .. name .. "\124r";
 			elseif ( module:nameIsPlayer(name) ) then
 				name = ("\124cffffd100%s\124r"):format(module:filterName(name));
 			else
@@ -705,6 +714,12 @@ do
 						item:SetNormalTexture(select(10, GetItemInfo(link)) or "Interface\\Icons\\INV_Misc_QuestionMark");
 						item.link = link;
 						item.count = count;
+						local num = tonumber(count);
+						if (num and num > 1) then
+							item.countFontString:SetText(num < 10 and num or "*");
+						else
+							item.countFontString:SetText("");
+						end
 						item:Show();
 					else
 						item:Hide();
@@ -747,17 +762,107 @@ do
 		end
 	end
 
-	updateMailLog = function()
-		FauxScrollFrame_Update(CT_MailMod_MailLog_ScrollFrame, #getLogTable(), 21, 20);
-		local offset = FauxScrollFrame_GetOffset(CT_MailMod_MailLog_ScrollFrame);
-		local tostring, children, frame = tostring, mailLogFrame.scrollChildren;
 
+
+	updateMailLog = function()
+		-- STEP 1: Create a filtered list of which items to show (by default, show all).
+		-- STEP 2: Update the scroll-bar for the filtered number of items
+		-- STEP 3: Show the filtered items based on where the scroll-bar is now.
+		
+		-- STEP 1:
+		local filter = CT_MailMod_MailLog_FilterEditBox:GetText():lower();
+		local filteredLog;
+		if (filter ~= "") then
+			filteredLog = {}
+			local success, action, message, receiver, sender, subject, money, timestamp;
+			local items = module:getTable();
+			local keywords = module:getTable();
+
+			local function checkAttachments(piece)	-- called within the for loop underneath
+				for y = 1, 16 do
+					if (items[y]) then
+						local link = items[y]:match("^([^/]+)/(.+)$");
+						local name = GetItemInfo(link);
+						if (name and name:lower():find(piece)) then
+							return true;
+						end
+					else
+						return false;
+					end
+				end
+			end
+			
+			for i, entry in ipairs(getLogTable()) do			
+				success, action, message, receiver,
+					sender, subject, money, timestamp,
+					items[1], items[2], items[3], items[4],
+					items[5], items[6], items[7], items[8],
+					items[9], items[10], items[11], items[12],
+					items[13], items[14], items[15], items[16] = decodeLogEntry(entry);
+				
+				action =
+					action == "returned" and module.text["CT_MailMod/MailLog/Return"]
+					or action == "deleted" and module.text["CT_MailMod/MailLog/Delete"]
+					or action == "outgoing" and module.text["CT_MailMod/MailLog/Send"]
+					or action == "incoming" and module.text["CT_MailMod/MailLog/Open"]
+					or "";
+
+				local success = true;
+				for piece in filter:gmatch("%S+") do
+					local property, value = piece:match("(.-):(.*)");
+					if (
+						property == "to" and (receiver == nil or not receiver:lower():find(value))
+						or property == "from" and (sender == nil or not sender:lower():find(value))
+						or property == "subject" and (subject == nil or not subject:lower():find(value))
+						or property == "message" and (message == nil or not message:lower():find(value))
+						or property == "action" and (action == nil or not action:lower():find(value))
+						or property == "date" and (timestamp == nil or not date("%b %d %Y%m%d %Y-%m-%d %H:%M:%S", timestamp):lower():find(value))
+						or property == "money" and (tonumber(money or 0) == 0 or not string.find(money, value))
+						or property == "item" and (items[1] == nil or not checkAttachments(value))
+						or (
+							property ~= "to" 
+							and property ~= "from" 
+							and property ~= "subject" 
+							and property ~= "message"
+							and property ~= "action"
+							and property ~= "date"
+							and property ~= "money"
+							and property ~= "item"
+						) and not (
+							receiver and receiver:lower():find(piece) 
+							or sender and sender:lower():find(piece)
+							or subject and subject:lower():find(piece) 
+							or message and message:lower():find(piece)
+							or action and action:lower():find(piece)
+							or date("%b %d %y%m%d %y-%m-%d %H:%M:%S", timestamp):lower():find(piece) 
+							or tonumber(piece) and money and string.find(money, piece)
+							or checkAttachments(piece)
+						)
+					) then
+						success = false;
+						break;
+					end
+				end
+				if (success) then
+					tinsert(filteredLog, entry);
+				end
+			end
+			module:freeTable(items);
+		else
+			filteredLog = getLogTable();
+		end
+		
+		-- STEP 2:
+		FauxScrollFrame_Update(CT_MailMod_MailLog_ScrollFrame, #filteredLog, 21, 20);
+		local offset = FauxScrollFrame_GetOffset(CT_MailMod_MailLog_ScrollFrame);
+		
+		-- STEP 3:
+		local children, frame = mailLogFrame.scrollChildren;
 		for i = 1, 21, 1 do
 			frame = children[tostring(i)];
-			local entry = getLogEntry(i+offset);
-			if ( entry ) then
+			if (filteredLog[#filteredLog+1-offset-i]) then  -- reversed, so that newer items are at the top
+				updateMailEntry(frame, i, decodeLogEntry(filteredLog[#filteredLog+1-offset-i]));
 				frame:Show();
-				updateMailEntry(frame, i, decodeLogEntry(entry));
 			else
 				frame:Hide();
 			end
