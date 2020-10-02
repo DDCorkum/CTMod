@@ -152,7 +152,7 @@ local function getLogTable()
 	return log;
 end
 
-local getFilteredTable, resetFilteredTable;
+local getFilteredTable;
 do
 	local filteredLog = {};
 	local appliedFilter;
@@ -419,7 +419,7 @@ do
 			end
 		}
 
-		return "frame#n:CT_MailMod_MailLog#s:" .. defaultLogWidth .. ":500", {
+		return "frame#n:CT_MailMod_MailLog#s:" .. defaultLogWidth .. ":584", {
 			"backdrop#tooltip#0:0:0:0.75",
 			"font#t:0:-10#v:GameFontNormalHuge#" .. module.text["CT_MailMod/MAIL_LOG"] .. "#1:1:1",
 
@@ -444,8 +444,17 @@ do
 
 			["editbox#tl:50:-10#s:200:25#n:CT_MailMod_MailLog_FilterEditBox#v:SearchBoxTemplate"] = {
 				["onload"] = function(self)
-					self:HookScript("OnTextChanged", module.updateMailLog);
-					self:SetMaxLetters(24);
+					local shouldScheduleUpdate = true;
+					self:HookScript("OnTextChanged", function()
+						if (shouldScheduleUpdate) then
+							shouldScheduleUpdate = false;
+							C_Timer.After(0.5,function()
+								module.updateMailLog()
+								shouldScheduleUpdate = true
+							end);
+						end
+					end);
+					self:SetMaxLetters(40);
 				end,
 			},
 			
@@ -457,26 +466,29 @@ do
 
 			["frame#tl:5:-72#br:-5:5#i:scrollChildren"] = {
 				["frame#s:0:20#tl:0:0#r#i:1"] = scrollChild,
-				["frame#s:0:20#tl:0:-20#r#i:2"] = scrollChild,
-				["frame#s:0:20#tl:0:-40#r#i:3"] = scrollChild,
-				["frame#s:0:20#tl:0:-60#r#i:4"] = scrollChild,
-				["frame#s:0:20#tl:0:-80#r#i:5"] = scrollChild,
-				["frame#s:0:20#tl:0:-100#r#i:6"] = scrollChild,
-				["frame#s:0:20#tl:0:-120#r#i:7"] = scrollChild,
-				["frame#s:0:20#tl:0:-140#r#i:8"] = scrollChild,
-				["frame#s:0:20#tl:0:-160#r#i:9"] = scrollChild,
-				["frame#s:0:20#tl:0:-180#r#i:10"] = scrollChild,
-				["frame#s:0:20#tl:0:-200#r#i:11"] = scrollChild,
-				["frame#s:0:20#tl:0:-220#r#i:12"] = scrollChild,
-				["frame#s:0:20#tl:0:-240#r#i:13"] = scrollChild,
-				["frame#s:0:20#tl:0:-260#r#i:14"] = scrollChild,
-				["frame#s:0:20#tl:0:-280#r#i:15"] = scrollChild,
-				["frame#s:0:20#tl:0:-300#r#i:16"] = scrollChild,
-				["frame#s:0:20#tl:0:-320#r#i:17"] = scrollChild,
-				["frame#s:0:20#tl:0:-340#r#i:18"] = scrollChild,
-				["frame#s:0:20#tl:0:-360#r#i:19"] = scrollChild,
-				["frame#s:0:20#tl:0:-380#r#i:20"] = scrollChild,
-				["frame#s:0:20#tl:0:-400#r#i:21"] = scrollChild,
+				["frame#s:0:21#tl:0:-21#r#i:2"] = scrollChild,
+				["frame#s:0:21#tl:0:-42#r#i:3"] = scrollChild,
+				["frame#s:0:21#tl:0:-63#r#i:4"] = scrollChild,
+				["frame#s:0:21#tl:0:-84#r#i:5"] = scrollChild,
+				["frame#s:0:21#tl:0:-105#r#i:6"] = scrollChild,
+				["frame#s:0:21#tl:0:-126#r#i:7"] = scrollChild,
+				["frame#s:0:21#tl:0:-147#r#i:8"] = scrollChild,
+				["frame#s:0:21#tl:0:-168#r#i:9"] = scrollChild,
+				["frame#s:0:21#tl:0:-189#r#i:10"] = scrollChild,
+				["frame#s:0:21#tl:0:-210#r#i:11"] = scrollChild,
+				["frame#s:0:21#tl:0:-231#r#i:12"] = scrollChild,
+				["frame#s:0:21#tl:0:-252#r#i:13"] = scrollChild,
+				["frame#s:0:21#tl:0:-273#r#i:14"] = scrollChild,
+				["frame#s:0:21#tl:0:-294#r#i:15"] = scrollChild,
+				["frame#s:0:21#tl:0:-315#r#i:16"] = scrollChild,
+				["frame#s:0:21#tl:0:-336#r#i:17"] = scrollChild,
+				["frame#s:0:21#tl:0:-357#r#i:18"] = scrollChild,
+				["frame#s:0:21#tl:0:-378#r#i:19"] = scrollChild,
+				["frame#s:0:21#tl:0:-399#r#i:20"] = scrollChild,
+				["frame#s:0:21#tl:0:-420#r#i:21"] = scrollChild,
+				["frame#s:0:21#tl:0:-441#r#i:22"] = scrollChild,
+				["frame#s:0:21#tl:0:-462#r#i:23"] = scrollChild,
+				["frame#s:0:21#tl:0:-483#r#i:24"] = scrollChild,
 			},
 
 			["onload"] = function(self)
@@ -694,7 +706,7 @@ do
 				button:SetScript("OnEnter", itemOnEnter);
 				button:SetScript("OnLeave", itemOnLeave);
 				button.countFontString = button:CreateFontString(nil, "OVERLAY", "NumberFontNormalSmall");
-				button.countFontString:SetPoint("BOTTOMRIGHT", 1, -1);
+				button.countFontString:SetPoint("BOTTOMRIGHT", 4, -1);
 				return button;
 			end
 		end
@@ -871,12 +883,12 @@ do
 		
 		
 		-- STEP 2:
-		FauxScrollFrame_Update(CT_MailMod_MailLog_ScrollFrame, #filteredLog, 21, 20);
+		FauxScrollFrame_Update(CT_MailMod_MailLog_ScrollFrame, #filteredLog, 24, 20);
 		local offset = FauxScrollFrame_GetOffset(CT_MailMod_MailLog_ScrollFrame);
 		
 		-- STEP 3:
 		local children, frame = mailLogFrame.scrollChildren;
-		for i = 1, 21, 1 do
+		for i = 1, 24, 1 do
 			frame = children[tostring(i)];
 			if (filteredLog[#filteredLog+1-offset-i]) then  -- reversed, so that newer items are at the top
 				updateMailEntry(frame, i, decodeLogEntry(filteredLog[#filteredLog+1-offset-i]));
