@@ -446,15 +446,20 @@ do
 				["onload"] = function(self)
 					local shouldScheduleUpdate = true;
 					self:HookScript("OnTextChanged", function()
+						-- Fast typers can punch several characters per second, causing latensy with each keystroke.
+						-- The same would happen holding a button, such as backspace, to add/remove several characters.
+						-- By only calling the update function no faster than once every 0.5 seconds, this prevents slowing the whole game.
 						if (shouldScheduleUpdate) then
 							shouldScheduleUpdate = false;
+							self:GetParent().scrollChildren:SetAlpha(0.3);
 							C_Timer.After(0.5,function()
+								self:GetParent().scrollChildren:SetAlpha(1);
 								module.updateMailLog()
 								shouldScheduleUpdate = true
 							end);
 						end
 					end);
-					self:SetMaxLetters(40);
+					self:SetMaxLetters(40);	  -- another safeguard to avoid latensy, as excessively long filters perform poorly
 				end,
 			},
 			
