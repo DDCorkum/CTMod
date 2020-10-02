@@ -1,4 +1,4 @@
-CT_BuffMod (8.3.7.3) 2020-09-23
+CT_BuffMod (9.0.1.1) 2020-09-23
 - More control over the sequence of grouping and sorting with non-secure frames.
 
 CT_BuffMod (8.3.7.2) 2020-09-05

@@ -1,4 +1,4 @@
-CT_MapMod (8.3.7.3) 2020-09-26
+CT_MapMod (9.0.1.1) 2020-09-26
 - Cosmetic and performance improvements; also further integration to waypoints
 - CT_MapMod:GetDataProvider() is now CT_MapMod:NewDataProvider()
 
