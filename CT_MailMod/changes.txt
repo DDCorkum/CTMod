@@ -1,4 +1,4 @@
-CT_MailMod (9.0.1.1) 2020-09-25
+CT_MailMod (9.0.1.1) 2020-10-02
 - Improvements to the /maillog UI: search filtering, prominent item stack counts, and more rows display at once.
 
 CT_MailMod (8.3.0.7) 2020-03-25
