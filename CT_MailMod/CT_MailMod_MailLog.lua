@@ -152,96 +152,117 @@ local function getLogTable()
 	return log;
 end
 
-local getFilteredTable;
+--------------------------------------------
+-- Filtering coroutine (preventing fps drop with large data sets, by doing a little work at a time)
+
+local filterProgress = 0;		-- The number of lines in the log table that have been processed so far.  Reset to zero whenever the filter changes, so the coroutine knows to redo its job.
+local notBusyFiltering = true;		-- Flag to permit other code chunks to get things in motion.
+local getFilteredTable;			-- Function to fetch the filter table, defined inside the do block below.
 do
-	local filteredLog = {};
-	local appliedFilter;
+	-- Subset of the entire mail log table based on the current filter (sometimes incomplete) 
+	local filteredLog = {};		
 	
-	function getFilteredTable()  -- local
-		local filter = CT_MailMod_MailLog_FilterEditBox:GetText():lower();
-		if (appliedFilter == nil) then
-			for i, entry in ipairs(getLogTable()) do
-				filteredLog[i] = entry;
-			end
-			appliedFilter = "";
-		elseif (filter ~= appliedFilter) then
-			appliedFilter = filter;
-			wipe(filteredLog);
-			local success, action, message, receiver, sender, subject, money, timestamp;
-			local items = module:getTable();
-
-			local function checkAttachments(piece)	-- called within the for loop underneath
-				for y = 1, 16 do
-					if (items[y]) then
-						local link = items[y]:match("^([^/]+)/(.+)$");
-						local name = GetItemInfo(link);
-						if (name and name:lower():find(piece)) then
-							return true;
-						end
-					else
-						return false;
-					end
+	-- Values decoded from an entry in the log table
+	local success, action, message, receiver, sender, subject, money, timestamp;
+	local items = {};
+	
+	-- Helper func, used by the coroutine to see if a pattern appears inside the localized names of any items.
+	local function checkAttachments(pattern)
+		for y = 1, 16 do
+			if (items[y]) then
+				local link = items[y]:match("^([^/]+)/(.+)$");
+				local name = GetItemInfo(link);
+				if (name and name:lower():find(pattern)) then
+					return true;
 				end
+			else
+				return false;
 			end
-			
-			for i, entry in ipairs(getLogTable()) do			
-				success, action, message, receiver,
-					sender, subject, money, timestamp,
-					items[1], items[2], items[3], items[4],
-					items[5], items[6], items[7], items[8],
-					items[9], items[10], items[11], items[12],
-					items[13], items[14], items[15], items[16] = decodeLogEntry(entry);
-				
-				action =
-					action == "returned" and module.text["CT_MailMod/MailLog/Return"]
-					or action == "deleted" and module.text["CT_MailMod/MailLog/Delete"]
-					or action == "outgoing" and module.text["CT_MailMod/MailLog/Send"]
-					or action == "incoming" and module.text["CT_MailMod/MailLog/Open"]
-					or "";
-
-				local success = true;
-				for piece in filter:gmatch("%S+") do
-					local property, value = piece:match("(.-):(.*)");
-					if (
-						property == "to" and (receiver == nil or not receiver:lower():find(value))
-						or property == "from" and (sender == nil or not sender:lower():find(value))
-						or property == "subject" and (subject == nil or not subject:lower():find(value))
-						or property == "message" and (message == nil or not message:lower():find(value))
-						or property == "action" and (action == nil or not action:lower():find(value))
-						or property == "date" and (timestamp == nil or not date("%b %d %Y%m%d %Y-%m-%d %H:%M:%S", timestamp):lower():find(value))
-						or property == "money" and (tonumber(money or 0) == 0 or not string.find(money, value))
-						or property == "item" and (items[1] == nil or not checkAttachments(value))
-						or (
-							property ~= "to" 
-							and property ~= "from" 
-							and property ~= "subject" 
-							and property ~= "message"
-							and property ~= "action"
-							and property ~= "date"
-							and property ~= "money"
-							and property ~= "item"
-						) and not (
-							receiver and receiver:lower():find(piece) 
-							or sender and sender:lower():find(piece)
-							or subject and subject:lower():find(piece) 
-							or message and message:lower():find(piece)
-							or action and action:lower():find(piece)
-							or date("%b %d %y%m%d %y-%m-%d %H:%M:%S", timestamp):lower():find(piece) 
-							or tonumber(piece) and money and string.find(money, piece)
-							or checkAttachments(piece)
-						)
-					) then
-						success = false;
-						break;
-					end
-				end
-				if (success) then
-					tinsert(filteredLog, entry);
-				end
-			end
-			module:freeTable(items);
 		end
+	end
 
+	function getFilteredTable()  -- local; mimics a coroutine without actually making one.
+		local filter = CT_MailMod_MailLog_FilterEditBox:GetText():lower();
+		local log = getLogTable();
+		if (filterProgress > #log or filterProgress < #filteredLog) then
+			wipe(filteredLog);
+			filterProgress = 0;
+		elseif (filterProgress == #log) then
+			return filteredLog;
+		end
+		
+		local startTime = debugprofilestop();
+		while (filterProgress < #log) do
+			filterProgress = filterProgress + 1;
+			local entry = log[filterProgress];
+
+			success, action, message, receiver,
+				sender, subject, money, timestamp,
+				items[1], items[2], items[3], items[4],
+				items[5], items[6], items[7], items[8],
+				items[9], items[10], items[11], items[12],
+				items[13], items[14], items[15], items[16] = decodeLogEntry(entry);
+
+			action =
+				action == "returned" and module.text["CT_MailMod/MailLog/Return"]
+				or action == "deleted" and module.text["CT_MailMod/MailLog/Delete"]
+				or action == "outgoing" and module.text["CT_MailMod/MailLog/Send"]
+				or action == "incoming" and module.text["CT_MailMod/MailLog/Open"]
+				or "";
+
+			local shouldInclude = true;
+			for piece in filter:gmatch("%S+") do
+				local property, value = piece:match("(.-):(.*)");
+				if (
+					property == "to" and (receiver == nil or not receiver:lower():find(value))
+					or property == "from" and (sender == nil or not sender:lower():find(value))
+					or property == "subject" and (subject == nil or not subject:lower():find(value))
+					or property == "message" and (message == nil or not message:lower():find(value))
+					or property == "action" and (action == nil or not action:lower():find(value))
+					or property == "date" and (timestamp == nil or not date("%b %d %Y%m%d %Y-%m-%d %H:%M:%S", timestamp):lower():find(value))
+					or property == "money" and (tonumber(money or 0) == 0 or not string.find(money, value))
+					or property == "item" and (items[1] == nil or not checkAttachments(value))
+					or (
+						property ~= "to" 
+						and property ~= "from" 
+						and property ~= "subject" 
+						and property ~= "message"
+						and property ~= "action"
+						and property ~= "date"
+						and property ~= "money"
+						and property ~= "item"
+					) and not (
+						receiver and receiver:lower():find(piece) 
+						or sender and sender:lower():find(piece)
+						or subject and subject:lower():find(piece) 
+						or message and message:lower():find(piece)
+						or action and action:lower():find(piece)
+						or date("%b %d %y%m%d %y-%m-%d %H:%M:%S", timestamp):lower():find(piece) 
+						or tonumber(piece) and money and string.find(money, piece)
+						or checkAttachments(piece)
+					)
+				) then
+					shouldInclude = false;
+					break;	-- only breaks the for loop, not the outer while loop
+				end
+			end
+			if (shouldInclude) then
+				tinsert(filteredLog, entry);
+			end
+
+		
+			-- If this loop has been running for over 20ms and still is not done, then defer some work until the next frame.  But only check once every 100 iterations.
+			if (filterProgress % 100 == 0 and filterProgress ~= #log and debugprofilestop() - startTime > 20) then
+				notBusyFiltering = false;
+				CT_MailMod_MailLog.scrollChildren:SetAlpha(0.7);
+				C_Timer.After(0, module.updateMailLog);
+				return false;	-- sorry, but we are NOT ready to display results to the user yet!
+			end
+		end
+		
+		-- If we get this far, then filtering has reached its conclusion!
+		notBusyFiltering = true;
+		CT_MailMod_MailLog.scrollChildren:SetAlpha(1);
 		return filteredLog;
 	end
 end
@@ -444,22 +465,20 @@ do
 
 			["editbox#tl:50:-10#s:200:25#n:CT_MailMod_MailLog_FilterEditBox#v:SearchBoxTemplate"] = {
 				["onload"] = function(self)
-					local shouldScheduleUpdate = true;
 					self:HookScript("OnTextChanged", function()
-						-- Fast typers can punch several characters per second, causing latensy with each keystroke.
-						-- The same would happen holding a button, such as backspace, to add/remove several characters.
-						-- By only calling the update function no faster than once every 0.5 seconds, this prevents slowing the whole game.
-						if (shouldScheduleUpdate) then
-							shouldScheduleUpdate = false;
-							self:GetParent().scrollChildren:SetAlpha(0.3);
-							C_Timer.After(0.5,function()
-								self:GetParent().scrollChildren:SetAlpha(1);
-								module.updateMailLog()
-								shouldScheduleUpdate = true
-							end);
+						-- There is a coroutine that will apply the filter 'a little bit at a time' to prevent fps drop.
+						-- Each time the coroutine resumes, it uses filterProgress to know where it should start from.
+						-- This also will refrain from going bonkers and consuming CPU usage when characters are changed rapidly (possible with fast typers, or holding backspace).
+						
+						filterProgress = 0;  -- Let the coroutine know to start from scratch on the next resume.
+						
+						if (notBusyFiltering) then
+							notBusyFiltering = false;
+							C_Timer.After(0.2, module.updateMailLog);	-- Multiple keystrokes in less than 0.2 sec will merge into a single call.
 						end
 					end);
-					self:SetMaxLetters(40);	  -- another safeguard to avoid latensy, as excessively long filters perform poorly
+					self:SetMaxLetters(255);	  -- another safeguard to avoid fps drops: excessively long filter texts perform poorly
+					self:SetScript("OnShow", nil);
 				end,
 			},
 			
@@ -494,6 +513,7 @@ do
 				["frame#s:0:21#tl:0:-441#r#i:22"] = scrollChild,
 				["frame#s:0:21#tl:0:-462#r#i:23"] = scrollChild,
 				["frame#s:0:21#tl:0:-483#r#i:24"] = scrollChild,
+				["onload"] = function(self) self:SetAlpha(0.7); end,
 			},
 
 			["onload"] = function(self)
@@ -882,25 +902,26 @@ do
 		-- STEP 1: Create a filtered list of which items to show (by default, show all).
 		-- STEP 2: Update the scroll-bar for the filtered number of items
 		-- STEP 3: Show the filtered items based on where the scroll-bar is now.
-		
 		-- STEP 1:
-		local filteredLog = getFilteredTable();
-		
-		
-		-- STEP 2:
-		FauxScrollFrame_Update(CT_MailMod_MailLog_ScrollFrame, #filteredLog, 24, 20);
-		local offset = FauxScrollFrame_GetOffset(CT_MailMod_MailLog_ScrollFrame);
-		
-		-- STEP 3:
-		local children, frame = mailLogFrame.scrollChildren;
-		for i = 1, 24, 1 do
-			frame = children[tostring(i)];
-			if (filteredLog[#filteredLog+1-offset-i]) then  -- reversed, so that newer items are at the top
-				updateMailEntry(frame, i, decodeLogEntry(filteredLog[#filteredLog+1-offset-i]));
-				frame:Show();
-			else
-				frame:Hide();
+		local filteredLog = getFilteredTable(); -- returns a table if filtering is done, or false if it is still in progress.  (When there are more than 500 entries, it will only sift through 500 each frame to prevent fps dropping.)
+		if (filteredLog) then
+
+			-- STEP 2:
+			FauxScrollFrame_Update(CT_MailMod_MailLog_ScrollFrame, #filteredLog, 24, 20);
+			local offset = FauxScrollFrame_GetOffset(CT_MailMod_MailLog_ScrollFrame);
+
+			-- STEP 3:
+			local children, frame = mailLogFrame.scrollChildren;
+			for i = 1, 24, 1 do
+				frame = children[tostring(i)];
+				if (filteredLog[#filteredLog+1-offset-i]) then  -- reversed, so that newer items are at the top
+					updateMailEntry(frame, i, decodeLogEntry(filteredLog[#filteredLog+1-offset-i]));
+					frame:Show();
+				else
+					frame:Hide();
+				end
 			end
+		
 		end
 	end
 
