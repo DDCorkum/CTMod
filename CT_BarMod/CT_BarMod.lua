@@ -783,15 +783,52 @@ module.update = function(self, optName, value)
 	self:optionUpdate(optName, value);
 end
 
--- Prevent the Mythic-Plus dungeon frame from being stuck behind any custom bar positions
-if (ChallengeMode_LoadUI) then
-	local pendingChallengeUI = true;
-	hooksecurefunc("ChallengeMode_LoadUI", function()
-		if (pendingChallengeUI) then
-			pendingChallengeUI = nil;
-			if (ChallengesKeystoneFrame and ChallengesKeystoneFrame:GetFrameLevel() < 14) then
-				ChallengesKeystoneFrame:SetFrameLevel(14);
+
+--------------------------------------------
+-- Prevent various frames from appearing behind custom bar positions
+
+do
+	local panels =
+	{
+		-- Two formats:
+		-- [optionName] = {needhook = "load-on-demand function to hook", futureFrame = "name of a frame that is loaded on demand"},
+		-- [optionName] = {frame = reference_to_a_frame_that_is_always_loaded},
+		
+		["pullForwardChallengeMode"] = ChallengeMode_LoadUI and {needHook = "ChallengeMode_LoadUI", futureFrame = "ChallengesKeystoneFrame"} or nil,
+		["pullForwardCovenantSanctum"] = CovenantSanctum_LoadUI and {needHook = "CovenantSanctum_LoadUI", futureFrame = "CovenantSanctumFrame"} or nil,
+	}
+	
+	local function pullPanelsForward(option, value)
+		local panel = panels[option];
+		if (panel) then
+			if (panel.needHook) then
+				hooksecurefunc(panel.needHook, function()
+					if (panel.futureFrame) then
+						panel.frame = _G[panel.futureFrame];
+						panel.futureFrame = nil;
+						pullPanelsForward(option, module:getOption(option));
+					end
+				end)
+				panel.needHook = nil;
+			elseif (panel.frame) then
+				panel.originalLevel = panel.originalLevel or panel.frame:GetFrameLevel();
+				if (value ~= false) then
+					panel.modified = true;
+					panel.frame:SetFrameLevel(max(14, panel.originalLevel));
+				elseif (panel.modified) then
+					panel.modified = false;
+					panel.frame:SetFrameLevel(panel.originalLevel);
+				end
 			end
+			
 		end
-	end);
+	end
+	
+	for option in pairs(panels) do
+		pullPanelsForward(option, module:getOption(option));
+	end
+	
+	function module:pullPanelsForward(option, value)
+		pullPanelsForward(option, value);
+	end
 end
