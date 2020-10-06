@@ -6,6 +6,10 @@
 -- Please do not modify or otherwise          --
 -- redistribute this without the consent of   --
 -- the CTMod Team. Thank you.                 --
+--                                            --
+-- Original credits to Cide and TS, c. 2005   --
+-- Maintained by Resike, 2014-2017            --
+-- Maintained by Dahk (DDCorkum), 2018-       --
 ------------------------------------------------
 
 
