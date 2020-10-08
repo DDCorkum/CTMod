@@ -1,5 +1,6 @@
-CT_MailMod (9.0.1.1) 2020-10-02
+CT_MailMod (9.0.1.1) 2020-10-07
 - Improvements to the /maillog UI: search filtering, prominent item stack counts, and more rows display at once.
+- Fix to logging the stack quantity on outgoing ("sent") mail; updating for an API change made in 7.0.3
 
 CT_MailMod (8.3.0.7) 2020-03-25
 - Added option to prevent editboxes from losing focus during common tasks
