@@ -64,7 +64,7 @@ module.pinTypes =
 			"Fireweed", "Gorgrond Flytrap", "Frostweed", "Nagrand Arrowbloom", "Starflower", "Talador Orchid", "Withered Herb",
 			"Aethril", "Astral Glory", "Dreamleaf", "Fel-Encrusted Herb", "Fjarnskaggl", "Foxflower", "Starlight Rose",
 			"Akunda's Bite", "Anchor Weed", "Riverbud", "Sea Stalks", "Siren's Sting", "Star Moss", "Winter's Kiss", "Zin'anthid",
-			"Death Blossom", "Marrowroot", "Rising Glory", "Vigil's Torch", "Widowbloom",
+			"Death Blossom", "Marrowroot", "Rising Glory", "Vigil's Torch", "Widowbloom", "Nightshade",
 		},
 	},
 	["Ore"] =
@@ -221,7 +221,7 @@ module.pinIcons =
 	["Rising Glory"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",
 	["Vigil's Torch"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",
 	["Widowbloom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",	
-	-- ["SL rare herb"] = "A SCARY ICON",
+	["Nightshade"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Nightshade",
 	
 	-- Ore --
 	
