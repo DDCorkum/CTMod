@@ -461,6 +461,9 @@ module.CTRA_Configuration_Consumables =
 ------------------------------------------------
 -- Filtering spells not available in the current expansion, and localizing to the current client name
 
+local playerLoginHappened = false;
+module:regEvent("PLAYER_LOGIN", function() playerLoginHappened = true; end);
+
 local function filterAndLocalize(table)
 	local entries = table[select(2, UnitClass("player"))];
 	if (entries) then
@@ -472,7 +475,7 @@ local function filterAndLocalize(table)
 				local spell = Spell:CreateFromSpellID(entry.id)
 				spell:ContinueOnSpellLoad(function()
 					entry.name = GetSpellInfo(entry.id)
-					if (module.ClickCastBroker) then
+					if (playerLoginHappened and module.ClickCastBroker) then
 						module.ClickCastBroker:Refresh();
 					end
 				end);
