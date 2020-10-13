@@ -132,7 +132,7 @@ module.frame = function()
 				" - " .. L["CT_MailMod/AutoCompleteFilter/Recent"] .. "#" .. textColor2,				
 			}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
 		optionsEndFrame();
-		if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+		if (module:getGameVersion() >= 8) then
 			optionsBeginFrame(6, 26, "checkbutton#tl:10:%y#o:sendmailProtectFocus:true#" .. L["CT_MailMod/Options/SendMail/ProtectEditFocusCheckButton"] .. "#l:268");
 				optionsAddTooltip({
 					L["CT_MailMod/Options/SendMail/ProtectEditFocusCheckButton"],
@@ -284,7 +284,7 @@ module.update = function(self, optName, value)
 			module:setOption("sendmailAutoCompleteOnline", true, false);
 			module:setOption("sendmailAutoCompleteAccount", true, false);
 		end
-		if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+		if (module:getGameVersion() >= 8) then
 			module.protectFocus(module:getOption("sendmailProtectFocus") ~= false);
 		end
 

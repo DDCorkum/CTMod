@@ -183,14 +183,11 @@ module:setSlashCmd(slashCommand, "/ctra", "/ctraid", "/ctraidassist");
 --------------------------------------------
 -- Extended Ready Checks
 
-local CTRAReadyCheck;
 function StaticCTRAReadyCheck()
-	if CTRAReadyCheck then
-		return CTRAReadyCheck;		-- this can only be created once (hense the name 'static')
-	end
-	
+
+	-- STATIC PUBLIC INTERFACE
 	local obj = { };
-	CTRAReadyCheck = obj;
+	StaticCTRAReadyCheck = function() return obj; end
 	
 	-- PRIVATE PROPERTIES
 	local extendReadyChecks = module:getOption("CTRA_ExtendReadyChecks") ~= false;
@@ -437,15 +434,11 @@ end
 --------------------------------------------
 -- CTRAFrames
 
-local CTRAFrames;
 function StaticCTRAFrames()
-	if CTRAFrames then
-		return CTRAFrames;		-- this can only be created once (hense the name 'static')
-	end
-	
-	-- PUBLIC INTERFACE
+
+	-- PUBLIC STATIC INTERFACE
 	local obj = { };
-	CTRAFrames = obj;
+	StaticCTRAFrames = function() return obj; end
 	
 	-- private properties, and where applicable their default values
 	local windows = { };			-- non-interactive frames that anchor and orient assigned collections of PlayerFrames, TargetFrames and LabelFrames
@@ -621,9 +614,8 @@ function StaticCTRAFrames()
 				elseif (key:sub(1,21) == "CTRAFrames_ClickCast_" and key:len() > 21) then
 					StaticClickCastBroker():Update(key:sub(22), val);
 				end
-				optionsWaiting[key] = nil;
 			end
-			--optionsWaiting = { };
+			wipe(optionsWaiting);
 		end
 		for i, window in ipairs(windows) do
 			if (option) then
@@ -1444,6 +1436,85 @@ function NewCTRAWindow(owningCTRAFrames)
 		["ShowTotalAbsorbs"] = 1,
 		["ShowIncomingHeals"] = 1,
 	};
+	local groupTypeFuncs =
+	{	-- Returns true if the given rosterEntry corresponds to a particular group, class or role.  Used in obj:Update()
+		-- {
+		--	[1] = property,			-- name of the associated saved variable to check for, if this category is to be displayed
+		--	[2] = sortFunc,			-- function to determine which units are included, receiving a rosterEntry as an argument
+		--	[3] = labelText,		-- label to show if ShowLabels is true (not yet implemented, 7 Jul 19)
+		-- }
+
+		{"ShowGroup1", function(rosterEntry) return rosterEntry.group == 1; end, "Group 1", "1",},
+		{"ShowGroup2", function(rosterEntry) return rosterEntry.group == 2; end, "Group 2", "2",},
+		{"ShowGroup3", function(rosterEntry) return rosterEntry.group == 3; end, "Group 3", "3",},
+		{"ShowGroup4", function(rosterEntry) return rosterEntry.group == 4; end, "Group 4", "4",},
+		{"ShowGroup5", function(rosterEntry) return rosterEntry.group == 5; end, "Group 5", "5",},
+		{"ShowGroup6", function(rosterEntry) return rosterEntry.group == 6; end, "Group 6", "6",},
+		{"ShowGroup7", function(rosterEntry) return rosterEntry.group == 7; end, "Group 7", "7",},
+		{"ShowGroup8", function(rosterEntry) return rosterEntry.group == 8; end, "Group 8", "8",},		
+		{	"ShowMyself",
+			function(rosterEntry) return rosterEntry.isPlayer; end,
+			"Myself",
+			"Self"
+		},
+		{
+			"ShowTanks",
+			function(rosterEntry) return rosterEntry.role == "TANK" or rosterEntry.role == "maintank" or rosterEntry.role == "mainassist"; end,
+			"Tanks",
+		},
+		{
+			"ShowHeals",
+			function(rosterEntry) return rosterEntry.role == "HEALER"; end,
+			"Healers",
+			"Heals",
+		},
+		{
+			"ShowMelee",
+			function(rosterEntry)
+				return rosterEntry.role == "DAMAGER" and (
+					rosterEntry.class == "WARRIOR"			
+					or rosterEntry.class == "PALADIN"
+					or (rosterEntry.class == "HUNTER" and GetInspectSpecialization(rosterEntry.unit) == 255)
+					or rosterEntry.class == "ROGUE"
+					or rosterEntry.class == "DEATHKNIGHT"
+					or (rosterEntry.class == "SHAMAN" and GetInspectSpecialization(rosterEntry.unit) == 263)
+					or rosterEntry.class == "MONK"
+					or (rosterEntry.class == "DRUID" and GetInspectSpecialization(rosterEntry.unit) == 103)
+					or rosterEntry.class == "DEMONHUNTER"
+				);
+			end,
+			"Melee",
+			"MDps"
+		},
+		{
+			"ShowRange",
+			function(rosterEntry)
+				return rosterEntry.role == "DAMAGER" and (
+				(rosterEntry.class == "HUNTER" and GetInspectSpecialization(rosterEntry.unit) ~= 255)   --if GetInspectSpecialization fails (returns 0) then we assume ranged just to at least show the player in a frame
+				or rosterEntry.class == "PRIEST"
+				or (rosterEntry.class == "SHAMAN" and GetInspectSpecialization(rosterEntry.unit) ~= 263)
+				or rosterEntry.class == "MAGE"
+				or rosterEntry.class == "WARLOCK"
+				or (rosterEntry.class == "DRUID" and GetInspectSpecialization(rosterEntry.unit) ~= 103)
+				);
+			end,
+			"Ranged",
+			"RDps"
+		},
+		{"ShowPets", function(rosterEntry) return rosterEntry.role == "PET"; end, "Pets", },
+		{"ShowDeathKnights", function(rosterEntry) return rosterEntry.class == "DEATHKNIGHT"; end, LOCALIZED_CLASS_NAMES_MALE.DEATHKNIGHT, },
+		{"ShowDemonHunters", function(rosterEntry) return rosterEntry.class == "DEMONHUNTER"; end, LOCALIZED_CLASS_NAMES_MALE.DEMONHUNTER, },
+		{"ShowDruids", function(rosterEntry) return rosterEntry.class == "DRUID"; end, LOCALIZED_CLASS_NAMES_MALE.DRUID,},
+		{"ShowHunters", function(rosterEntry) return rosterEntry.class == "HUNTER"; end, LOCALIZED_CLASS_NAMES_MALE.HUNTER,},
+		{"ShowMages", function(rosterEntry) return rosterEntry.class == "MAGE"; end, LOCALIZED_CLASS_NAMES_MALE.MAGE, },
+		{"ShowMonks", function(rosterEntry) return rosterEntry.class == "MONK"; end, LOCALIZED_CLASS_NAMES_MALE.MONK, },
+		{"ShowPaladins", function(rosterEntry) return rosterEntry.class == "PALADIN"; end, LOCALIZED_CLASS_NAMES_MALE.PALADIN, },
+		{"ShowPriests", function(rosterEntry) return rosterEntry.class == "PRIEST"; end, LOCALIZED_CLASS_NAMES_MALE.PRIEST, },
+		{"ShowRogues", function(rosterEntry) return rosterEntry.class == "ROGUE"; end, LOCALIZED_CLASS_NAMES_MALE.ROGUE, },
+		{"ShowShamans", function(rosterEntry) return rosterEntry.class == "SHAMAN"; end, LOCALIZED_CLASS_NAMES_MALE.SHAMAN, },
+		{"ShowWarlocks", function(rosterEntry) return rosterEntry.class == "WARLOCK"; end, LOCALIZED_CLASS_NAMES_MALE.WARLOCK, },
+		{"ShowWarriors", function(rosterEntry) return rosterEntry.class == "WARRIOR"; end, LOCALIZED_CLASS_NAMES_MALE.WARRIOR, },		
+	};
 
 	-- PRIVATE METHODS
 	
@@ -1795,85 +1866,7 @@ function NewCTRAWindow(owningCTRAFrames)
 		end
 
 		-- STEP 5:
-		local categories =
-		{
-			-- {
-			--	[1] = property,			-- name of the associated saved variable to check for, if this category is to be displayed
-			--	[2] = sortFunc,			-- function to determine which units are included
-			--	[3] = labelText,		-- label to show if ShowLabels is true (not yet implemented, 7 Jul 19)
-			-- }
-
-			{"ShowGroup1", function(rosterEntry) return rosterEntry.group == 1; end, "Group 1", "1",},
-			{"ShowGroup2", function(rosterEntry) return rosterEntry.group == 2; end, "Group 2", "2",},
-			{"ShowGroup3", function(rosterEntry) return rosterEntry.group == 3; end, "Group 3", "3",},
-			{"ShowGroup4", function(rosterEntry) return rosterEntry.group == 4; end, "Group 4", "4",},
-			{"ShowGroup5", function(rosterEntry) return rosterEntry.group == 5; end, "Group 5", "5",},
-			{"ShowGroup6", function(rosterEntry) return rosterEntry.group == 6; end, "Group 6", "6",},
-			{"ShowGroup7", function(rosterEntry) return rosterEntry.group == 7; end, "Group 7", "7",},
-			{"ShowGroup8", function(rosterEntry) return rosterEntry.group == 8; end, "Group 8", "8",},		
-			{	"ShowMyself",
-				function(rosterEntry) return rosterEntry.isPlayer; end,
-				"Myself",
-				"Self"
-			},
-			{
-				"ShowTanks",
-				function(rosterEntry) return rosterEntry.role == "TANK" or rosterEntry.role == "maintank" or rosterEntry.role == "mainassist"; end,
-				"Tanks",
-			},
-			{
-				"ShowHeals",
-				function(rosterEntry) return rosterEntry.role == "HEALER"; end,
-				"Healers",
-				"Heals",
-			},
-			{
-				"ShowMelee",
-				function(rosterEntry)
-					return rosterEntry.role == "DAMAGER" and (
-						rosterEntry.class == "WARRIOR"			
-						or rosterEntry.class == "PALADIN"
-						or (rosterEntry.class == "HUNTER" and GetInspectSpecialization(rosterEntry.unit) == 255)
-						or rosterEntry.class == "ROGUE"
-						or rosterEntry.class == "DEATHKNIGHT"
-						or (rosterEntry.class == "SHAMAN" and GetInspectSpecialization(rosterEntry.unit) == 263)
-						or rosterEntry.class == "MONK"
-						or (rosterEntry.class == "DRUID" and GetInspectSpecialization(rosterEntry.unit) == 103)
-						or rosterEntry.class == "DEMONHUNTER"
-					);
-				end,
-				"Melee",
-				"MDps"
-			},
-			{
-				"ShowRange",
-				function(rosterEntry)
-					return rosterEntry.role == "DAMAGER" and (
-					(rosterEntry.class == "HUNTER" and GetInspectSpecialization(rosterEntry.unit) ~= 255)   --if GetInspectSpecialization fails (returns 0) then we assume ranged just to at least show the player in a frame
-					or rosterEntry.class == "PRIEST"
-					or (rosterEntry.class == "SHAMAN" and GetInspectSpecialization(rosterEntry.unit) ~= 263)
-					or rosterEntry.class == "MAGE"
-					or rosterEntry.class == "WARLOCK"
-					or (rosterEntry.class == "DRUID" and GetInspectSpecialization(rosterEntry.unit) ~= 103)
-					);
-				end,
-				"Ranged",
-				"RDps"
-			},
-			{"ShowPets", function(rosterEntry) return rosterEntry.role == "PET"; end, "Pets", },
-			{"ShowDeathKnights", function(rosterEntry) return rosterEntry.class == "DEATHKNIGHT"; end, LOCALIZED_CLASS_NAMES_MALE.DEATHKNIGHT, },
-			{"ShowDemonHunters", function(rosterEntry) return rosterEntry.class == "DEMONHUNTER"; end, LOCALIZED_CLASS_NAMES_MALE.DEMONHUNTER, },
-			{"ShowDruids", function(rosterEntry) return rosterEntry.class == "DRUID"; end, LOCALIZED_CLASS_NAMES_MALE.DRUID,},
-			{"ShowHunters", function(rosterEntry) return rosterEntry.class == "HUNTER"; end, LOCALIZED_CLASS_NAMES_MALE.HUNTER,},
-			{"ShowMages", function(rosterEntry) return rosterEntry.class == "MAGE"; end, LOCALIZED_CLASS_NAMES_MALE.MAGE, },
-			{"ShowMonks", function(rosterEntry) return rosterEntry.class == "MONK"; end, LOCALIZED_CLASS_NAMES_MALE.MONK, },
-			{"ShowPaladins", function(rosterEntry) return rosterEntry.class == "PALADIN"; end, LOCALIZED_CLASS_NAMES_MALE.PALADIN, },
-			{"ShowPriests", function(rosterEntry) return rosterEntry.class == "PRIEST"; end, LOCALIZED_CLASS_NAMES_MALE.PRIEST, },
-			{"ShowRogues", function(rosterEntry) return rosterEntry.class == "ROGUE"; end, LOCALIZED_CLASS_NAMES_MALE.ROGUE, },
-			{"ShowShamans", function(rosterEntry) return rosterEntry.class == "SHAMAN"; end, LOCALIZED_CLASS_NAMES_MALE.SHAMAN, },
-			{"ShowWarlocks", function(rosterEntry) return rosterEntry.class == "WARLOCK"; end, LOCALIZED_CLASS_NAMES_MALE.WARLOCK, },
-			{"ShowWarriors", function(rosterEntry) return rosterEntry.class == "WARRIOR"; end, LOCALIZED_CLASS_NAMES_MALE.WARRIOR, },		
-		};
+		local categories = groupTypeFuncs;
 		local x = 0;
 		local y = 0;
 		local w = 0;
@@ -2083,15 +2076,11 @@ end
 --------------------------------------------
 -- Spells
 
-local clickCastBroker;
 function StaticClickCastBroker()
 
 	-- STATIC PUBLIC INTERFACE
-	if (clickCastBroker) then
-		return clickCastBroker;
-	end
 	local obj = { };
-	clickCastBroker = obj;
+	StaticClickCastBroker = function() return obj; end
 
 	-- PRIVATE PROPERTIES
 
@@ -2389,7 +2378,7 @@ function StaticClickCastBroker()
 	
 	-- CONSTRUCTOR
 	do
-		obj:Refresh();
+		module:regEvent("PLAYER_LOGIN", obj.Refresh);
 		module:regEvent("LEARNED_SPELL_IN_TAB", updateSpells);
 		if (module:getGameVersion() >= 8) then
 			module:regEvent("ACTIVE_TALENT_GROUP_CHANGED", updateSpells);
@@ -2450,6 +2439,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 	local aura1, aura2, aura3, aura4, aura5;
 	local statusTexture, statusFontString, statusNoticeBackground, statusAlarmBackground;
 	local durabilityAverage, durabilityTime;
+	local DEFAULT_DEBUFF_COLOR = {r = 1, g = 0, b = 0};
 	
 	-- PRIVATE FUNCTIONS
 
@@ -2466,7 +2456,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 			else
 				local removableDebuff = select(4, UnitAura(shownUnit, 1, "RAID HARMFUL"));
 				if (removableDebuff and owner:GetProperty("RemovableDebuffColor")) then
-					local color = DebuffTypeColor[removableDebuff] or {r = 1, g = 0, b = 0};
+					local color = DebuffTypeColor[removableDebuff] or DEFAULT_DEBUFF_COLOR;
 					local unit = (isPet and shownUnit:sub(1,-4)) or shownUnit;
 					if (UnitInRange(unit) or UnitIsUnit(unit, "player")) then
 						visualFrame:SetBackdropBorderColor(color.r, color.g, color.b, colorBorderAlpha*0.8 + 0.2);
@@ -2505,7 +2495,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 			else
 				local removableDebuff = select(4, UnitAura(shownUnit, 1, "RAID HARMFUL"));
 				if (removableDebuff and owner:GetProperty("RemovableDebuffColor")) then
-					local color = DebuffTypeColor[removableDebuff] or {r = 1, g = 0, b = 0};
+					local color = DebuffTypeColor[removableDebuff] or DEFAULT_DEBUFF_COLOR;
 					background:SetColorTexture(colorBackgroundRed/2 + color.r/2, colorBackgroundGreen/2 + color.g/2, colorBackgroundBlue/2 + color.b/2, colorBackgroundAlpha*0.8 + 0.2);
 					local unit = (isPet and shownUnit:sub(1,-4)) or shownUnit;
 					if (UnitInRange(unit) or UnitIsUnit(unit, "player")) then
@@ -3555,7 +3545,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 					configureAuras();
 				end
 			end
-			optionsWaiting = { };
+			wipe(optionsWaiting);
 		end
 		
 		-- STEP 3:
@@ -4215,7 +4205,7 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 					configureSecureButtons();
 				end
 			end
-			optionsWaiting = { };
+			wipe(optionsWaiting);
 		end
 		
 		-- STEP 3:

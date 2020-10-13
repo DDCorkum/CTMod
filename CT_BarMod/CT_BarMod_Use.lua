@@ -42,7 +42,11 @@ local defbarShowRange = true;
 local defbarShowCooldown = true;
 local defbarShowBindings = true;
 local defbarShowActionText = true;
+local defbarSetUnitAttributes = true;
 local defbarHideTooltip = true;
+
+local unitAttribute1, unitAttribute2, unitAttribute3 = nil, nil, nil;	-- @mouseover, @self or @focus on the left, right or middle buttons.
+local UNIT_ATTRIBUTES = {nil, "target", "player", "pet", FocusFrame and "focus" or nil}
 
 local inCombat = false;
 
@@ -331,7 +335,7 @@ function useButton:constructor(buttonId, actionId, groupId, count, ...)
 	SecureHandlerSetFrameRef(button, "SecureFrame", CT_BarMod_SecureFrame);
 
 	-- Assign to the button a reference to the SpellFlyout frame so we can hide it from the button's secure code.
-	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+	if (SpellFlyout) then
 		SecureHandlerSetFrameRef(button, "SpellFlyout", SpellFlyout);
 	end
 
@@ -608,6 +612,17 @@ function useButton:updateVisibility()
 	end
 end
 
+local needSetUnitTargetingAttributes;
+function useButton:updateUnitAttributes()
+	if (InCombatLockdown()) then
+		needSetUnitTargetingAttributes = true;
+	else
+		self.button:SetAttribute("unit1", unitAttribute1);
+		self.button:SetAttribute("unit2", unitAttribute2);
+		self.button:SetAttribute("unit3", unitAttribute3);
+	end
+end
+
 -- Update everything
 function useButton:update()
 	local actionId = self.actionId;
@@ -656,6 +671,7 @@ function useButton:update()
 	self:updateOpacity();
 --	self:updateState();  -- updateFlash() calls updateState().
 	self:updateFlash();
+	self:updateUnitAttributes();
 	if ( hasAction or actionMode == "cancel" or actionMode == "leave" ) then
 		self:updateUsable();
 		self:updateCooldown();
@@ -877,7 +893,7 @@ local function CT_BarMod__ActionButton_UpdateOverlayGlow(self)
 end
 
 function useButton:updateOverlayGlow()
-	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+	if (module:getGameVersion() >= 8) then
 		CT_BarMod__ActionButton_UpdateOverlayGlow(self.button);
 	end
 end
@@ -1343,6 +1359,7 @@ local skinObjects = {
 	{ "hotkey", "HotKey", "fs" },
 };
 
+local DEFAULT_TEX_COORD = {0, 1, 0, 1};
 function useButton:applySkin()
 	-- Apply a CT skin to the button.
 	local object, objectKey, objectSkin, objectType;
@@ -1382,7 +1399,7 @@ function useButton:applySkin()
 				object:SetTexture(objectSkin.Texture or "");  -- Assign texture filename.
 			end
 
-			object:SetTexCoord(unpack(objectSkin.TexCoords or {0, 1, 0, 1}));
+			object:SetTexCoord(unpack(objectSkin.TexCoords or DEFAULT_TEX_COORD));
 			object:SetDrawLayer(objectSkin.__CTBM__DrawLayer or "ARTWORK", objectSkin.__CTBM__SubLevel or 0)
 			object:SetBlendMode(objectSkin.BlendMode or "BLEND");
 			object:ClearAllPoints();
@@ -2010,6 +2027,52 @@ do
 end
 
 -----
+-- Unit
+-----
+
+do
+	local isReset, deferredForCombat = true, false;
+
+	local function CT_BarMod_ActionButton_UpdateUnitAttributes(self, ...)
+		-- set the attributes to custom values (by default, these values are 'nil' so this won't do anything)
+		self:SetAttribute("unit1", unitAttribute1);
+		self:SetAttribute("unit2", unitAttribute2);
+		self:SetAttribute("unit3", unitAttribute3);
+	end
+
+	local function CT_BarMod_ActionButton_ResetUnitAttributes(self)
+		-- Reset button to Blizzard default state.
+		self:SetAttribute("unit1", nil);
+		self:SetAttribute("unit2", nil);
+		self:SetAttribute("unit3", nil);
+	end
+
+	function CT_BarMod_UpdateActionButtonUnitAttributes()
+		if (InCombatLockdown()) then
+			deferredForCombat = true;
+		else
+			if (defbarSetUnitAttributes) then
+				updateBlizzardButtons(CT_BarMod_ActionButton_UpdateUnitAttributes);
+				isReset = nil;
+			elseif (isReset) then
+				return;
+			else
+				updateBlizzardButtons(CT_BarMod_ActionButton_ResetUnitAttributes);
+				isReset = true;
+			end
+		end
+	end
+	
+	module:regEvent("PLAYER_LOGIN", CT_BarMod_UpdateActionButtonUnitAttributes);
+	module:regEvent("PLAYER_REGEN_ENABLED", function()
+		if (deferredForCombat) then
+			deferredForCombat = nil;
+			CT_BarMod_UpdateActionButtonUnitAttributes();
+		end
+	end);
+end
+
+-----
 -- Tooltips
 -----
 do
@@ -2032,11 +2095,17 @@ end
 
 local function combatFlagger(event)
 	inCombat = ( event == "PLAYER_REGEN_DISABLED" );
-	if (event == "PLAYER_REGEN_ENABLED" and module.needSetActionBindings) then
-		wipeBindingCaches();			-- clears caches in this file
-		module:clearKeyBindingsCache();		-- clears caches in _KeyBindings		
-		module.setActionBindings();		-- sets override bindings in _KeyBindings
-		actionButtonList:updateBinding();	-- sets labels on all bars in this file
+	if (event == "PLAYER_REGEN_ENABLED") then
+		if (module.needSetActionBindings) then
+			wipeBindingCaches();			-- clears caches in this file
+			module:clearKeyBindingsCache();		-- clears caches in _KeyBindings		
+			module.setActionBindings();		-- sets override bindings in _KeyBindings
+			actionButtonList:updateBinding();	-- sets labels on all bars in this file
+		end
+		if (needSetUnitTargetingAttributes) then
+			needSetUnitTargetingAttributes = false;
+			actionButtonList:updateUnitAttributes();
+		end
 	end
 end
 
@@ -2068,7 +2137,7 @@ module.useEnable = function(self)
 	self:regEvent("PLAYER_REGEN_DISABLED", combatFlagger);
 	self:regEvent("SPELL_UPDATE_CHARGES", eventHandler_UpdateCount);
 	self:regEvent("LOSS_OF_CONTROL_UPDATE", eventHandler_UpdateCooldown);
-	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+	if (module:getGameVersion() >= 8) then
 		self:regEvent("UNIT_ENTERING_VEHICLE", eventHandler_UpdateStateVehicle);
 		self:regEvent("UNIT_ENTERED_VEHICLE", eventHandler_UpdateStateVehicle);
 		self:regEvent("UNIT_EXITED_VEHICLE", eventHandler_UpdateStateVehicle);
@@ -2111,7 +2180,7 @@ module.useDisable = function(self)
 	self:unregEvent("PLAYER_REGEN_DISABLED", combatFlagger);
 	self:unregEvent("SPELL_UPDATE_CHARGES", eventHandler_UpdateCount);
 	self:unregEvent("UPDATE_SUMMONPETS_ACTION", eventHandler_updateSummonPets);
-	if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+	if (module:getGameVersion() >= 8) then
 		self:unregEvent("UNIT_ENTERING_VEHICLE", eventHandler_UpdateStateVehicle);
 		self:unregEvent("UNIT_ENTERED_VEHICLE", eventHandler_UpdateStateVehicle);
 		self:unregEvent("UNIT_EXITED_VEHICLE", eventHandler_UpdateStateVehicle);
@@ -2181,7 +2250,22 @@ module.useUpdate = function(self, optName, value)
 		displayActionText = value;
 		actionButtonList:update();
 		CT_BarMod_UpdateActionButtonActionText();
-
+		
+	elseif ( optName == "unitAttribute1" ) then
+		unitAttribute1 = UNIT_ATTRIBUTES[value];
+		actionButtonList:updateUnitAttributes();
+		CT_BarMod_UpdateActionButtonUnitAttributes();
+		
+	elseif ( optName == "unitAttribute2" ) then
+		unitAttribute2 = UNIT_ATTRIBUTES[value];
+		actionButtonList:updateUnitAttributes();
+		CT_BarMod_UpdateActionButtonUnitAttributes();	
+		
+	elseif ( optName == "unitAttribute3" ) then
+		unitAttribute3 = UNIT_ATTRIBUTES[value];
+		actionButtonList:updateUnitAttributes();
+		CT_BarMod_UpdateActionButtonUnitAttributes();
+		
 	elseif ( optName == "displayCount" ) then
 		displayCount = value;
 		actionButtonList:updateCooldown();
@@ -2235,6 +2319,10 @@ module.useUpdate = function(self, optName, value)
 	elseif ( optName == "defbarShowActionText" ) then
 		defbarShowActionText = value;
 		CT_BarMod_UpdateActionButtonActionText();
+		
+	elseif ( optName == "defbarSetUnitAttributes" ) then
+		defbarSetUnitAttributes = value;
+		CT_BarMod_UpdateActionButtonUnitAttributes();
 
 	elseif ( optName == "defbarHideTooltip" ) then
 		defbarHideTooltip = value;
@@ -2260,11 +2348,19 @@ module.useUpdate = function(self, optName, value)
 		hideTooltip = self:getOption("hideTooltip");
 		useNonEmptyNormal = self:getOption("useNonEmptyNormal");
 		backdropShow = self:getOption("backdropShow");
+		local left, right, middle =
+			self:getOption("unitAttribute1"),
+			self:getOption("unitAttribute2"),
+			self:getOption("unitAttribute3");
+		unitAttribute1 = left and UNIT_ATTRIBUTES[left];		-- 'nil' is the default value.
+		unitAttribute2 = right and UNIT_ATTRIBUTES[right];
+		unitAttribute3 = middle and UNIT_ATTRIBUTES[middle];
 
 		defbarShowRange = module:getOption("defbarShowRange") ~= false;
 		defbarShowCooldown = module:getOption("defbarShowCooldown") ~= false;
 		defbarShowBindings = module:getOption("defbarShowBindings") ~= false;
 		defbarShowActionText = module:getOption("defbarShowActionText") ~= false;
+		defbarSetUnitAttributes = module:getOption("defbarSetUnitAttributes") ~= false;
 		defbarHideTooltip = module:getOption("defbarHideTooltip") ~= false;
 
 		if (hideGrid) then
@@ -2278,5 +2374,6 @@ module.useUpdate = function(self, optName, value)
 		CT_BarMod_UpdateActionButtonRange();
 		CT_BarMod_UpdateActionButtonHotkeys();
 		CT_BarMod_UpdateActionButtonActionText();
+		CT_BarMod_UpdateActionButtonUnitAttributes();
 	end
 end

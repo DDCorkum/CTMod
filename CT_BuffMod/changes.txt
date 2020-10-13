@@ -1,3 +1,6 @@
+CT_BuffMod (9.0.1.1) 2020-10-05
+- More control over the sequence of grouping and sorting with non-secure frames.
+
 CT_BuffMod (8.3.7.2) 2020-09-05
 - Option for non-secure frames to filter buffs with or without a duration
 

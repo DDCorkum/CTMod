@@ -141,8 +141,8 @@ end
 -- Returns the game version as a number.  If the arguments are true, appends the major patch in the hundredths and minor patch in ten-thousandths.
 do
 	-- constants
-	CT_GAME_VERSION_CLASSIC = 1;	-- These globals may be eliminated in the future.  They are included for backwards compatibility.
-	CT_GAME_VERSION_RETAIL  = 8; 
+	CT_GAME_VERSION_CLASSIC = 1;	-- These globals are being phased out, but remain for backwards compatibility.
+	CT_GAME_VERSION_RETAIL  = 9;
 	
 	local version, major, minor = strsplit(".", GetBuildInfo());
 	version, major, minor = tonumber(version) or 0, tonumber(major) or 0, tonumber(minor) or 0
@@ -835,7 +835,7 @@ function lib:getSpell(name)
 end
 
 lib:regEvent("LEARNED_SPELL_IN_TAB", updateSpellDatabase);
-if (lib:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+if (lib:getGameVersion() >= 8) then
 	lib:regEvent("PLAYER_TALENT_UPDATE", updateSpellDatabase);
 end
 

@@ -1,3 +1,8 @@
+CT_BarMod (9.0.1.1) 2020-10-04
+- Option to have left, right and middle mouse clicks target different units (player, focus, pet)
+- Changes to the ChallengeModeFrame (M+ keystones) in 8.3.0.11 are now optional (default: on).
+- The Shadowlands CovenantSanctumFrame is added to this new option.
+
 CT_BarMod (8.3.7.2) 2020-09-05
 - Custom bars update when spell icons change, such as Shadowlands Covenant abilities
 - Correction to the glow effect on macro buttons since 8.0.1

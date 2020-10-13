@@ -55,7 +55,7 @@ local function sendmailGetItemInfo(itemIndex)
 	local link = GetSendMailItemLink(itemIndex);
 	if (link) then
 		-- Return item link, and quantity
-		return link:match("|H(item:[^|]+)|h"), (select(3, GetSendMailItem(itemIndex)));
+		return link:match("|H(item:[^|]+)|h"), (select(4, GetSendMailItem(itemIndex)));
 	end
 	-- Link is nil if no item is attached to the slot.
 	return nil, nil;

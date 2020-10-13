@@ -152,10 +152,119 @@ local function getLogTable()
 	return log;
 end
 
-local function getLogEntry(id)
-	-- Get the specified log entry from the mail log table.
-	local log = getLogTable();
-	return log[#log+1-id]; -- Reversed
+--------------------------------------------
+-- Filtering coroutine (preventing fps drop with large data sets, by doing a little work at a time)
+
+local filterProgress = 0;		-- The number of lines in the log table that have been processed so far.  Reset to zero whenever the filter changes, so the coroutine knows to redo its job.
+local notBusyFiltering = true;		-- Flag to permit other code chunks to get things in motion.
+local getFilteredTable;			-- Function to fetch the filter table, defined inside the do block below.
+do
+	-- Subset of the entire mail log table based on the current filter (sometimes incomplete) 
+	local filteredLog = {};		
+	
+	-- Values decoded from an entry in the log table
+	local success, action, message, receiver, sender, subject, money, timestamp;
+	local items = {};
+	
+	-- Helper func, used by the coroutine to see if a pattern appears inside the localized names of any items.
+	local function checkAttachments(pattern)
+		for y = 1, 16 do
+			if (items[y]) then
+				local link = items[y]:match("^([^/]+)/(.+)$");
+				local name = GetItemInfo(link);
+				if (name and name:lower():find(pattern)) then
+					return true;
+				end
+			else
+				return false;
+			end
+		end
+	end
+
+	function getFilteredTable()  -- local; mimics a coroutine without actually making one.
+		local filter = CT_MailMod_MailLog_FilterEditBox:GetText():lower();
+		local log = getLogTable();
+		if (filterProgress > #log or filterProgress < #filteredLog) then
+			wipe(filteredLog);
+			filterProgress = 0;
+		elseif (filterProgress == #log) then
+			return filteredLog;
+		end
+		
+		local startTime = debugprofilestop();
+		while (filterProgress < #log) do
+			filterProgress = filterProgress + 1;
+			local entry = log[filterProgress];
+
+			success, action, message, receiver,
+				sender, subject, money, timestamp,
+				items[1], items[2], items[3], items[4],
+				items[5], items[6], items[7], items[8],
+				items[9], items[10], items[11], items[12],
+				items[13], items[14], items[15], items[16] = decodeLogEntry(entry);
+
+			action =
+				action == "returned" and module.text["CT_MailMod/MailLog/Return"]
+				or action == "deleted" and module.text["CT_MailMod/MailLog/Delete"]
+				or action == "outgoing" and module.text["CT_MailMod/MailLog/Send"]
+				or action == "incoming" and module.text["CT_MailMod/MailLog/Open"]
+				or "";
+
+			local shouldInclude = true;
+			for piece in filter:gmatch("%S+") do
+				local property, value = piece:match("(.-):(.*)");
+				if (
+					property == "to" and (receiver == nil or not receiver:lower():find(value))
+					or property == "from" and (sender == nil or not sender:lower():find(value))
+					or property == "subject" and (subject == nil or not subject:lower():find(value))
+					or property == "message" and (message == nil or not message:lower():find(value))
+					or property == "action" and (action == nil or not action:lower():find(value))
+					or property == "date" and (timestamp == nil or not date("%b %d %Y%m%d %Y-%m-%d %H:%M:%S", timestamp):lower():find(value))
+					or property == "money" and (tonumber(money or 0) == 0 or not string.find(money, value))
+					or property == "item" and (items[1] == nil or not checkAttachments(value))
+					or (
+						property ~= "to" 
+						and property ~= "from" 
+						and property ~= "subject" 
+						and property ~= "message"
+						and property ~= "action"
+						and property ~= "date"
+						and property ~= "money"
+						and property ~= "item"
+					) and not (
+						receiver and receiver:lower():find(piece) 
+						or sender and sender:lower():find(piece)
+						or subject and subject:lower():find(piece) 
+						or message and message:lower():find(piece)
+						or action and action:lower():find(piece)
+						or date("%b %d %y%m%d %y-%m-%d %H:%M:%S", timestamp):lower():find(piece) 
+						or tonumber(piece) and money and string.find(money, piece)
+						or checkAttachments(piece)
+					)
+				) then
+					shouldInclude = false;
+					break;	-- only breaks the for loop, not the outer while loop
+				end
+			end
+			if (shouldInclude) then
+				tinsert(filteredLog, entry);
+			end
+
+		
+			-- If this loop has been running for over 20ms and still is not done, then defer some work until the next frame.  But only check once every 100 iterations.
+			if (filterProgress % 100 == 0 and filterProgress ~= #log and debugprofilestop() - startTime > 20) then
+				notBusyFiltering = false;
+				CT_MailMod_MailLog.scrollChildren:SetAlpha(0.7);
+				C_Timer.After(0, module.updateMailLog);
+				return false;	-- sorry, but we are NOT ready to display results to the user yet!
+			end
+		end
+		
+		-- If we get this far, then filtering has reached its conclusion!
+		notBusyFiltering = true;
+		CT_MailMod_MailLog.scrollChildren:SetAlpha(1);
+		return filteredLog;
+	end
 end
 
 function module:printLogMessage(success, mail, message)
@@ -297,6 +406,7 @@ function module:logOutgoing(success, mail, message)
 	end
 end
 
+
 --------------------------------------------
 -- Mail Log UI
 
@@ -330,7 +440,7 @@ do
 			end
 		}
 
-		return "frame#n:CT_MailMod_MailLog#s:" .. defaultLogWidth .. ":500", {
+		return "frame#n:CT_MailMod_MailLog#s:" .. defaultLogWidth .. ":584", {
 			"backdrop#tooltip#0:0:0:0.75",
 			"font#t:0:-10#v:GameFontNormalHuge#" .. module.text["CT_MailMod/MAIL_LOG"] .. "#1:1:1",
 
@@ -348,33 +458,62 @@ do
 			["button#s:100:25#tr:-5:-5#n:CT_MailMod_Close_Button#v:GameMenuButtonTemplate#Close"] = {
 				["onclick"] = function(self)
 					HideUIPanel(CT_MailMod_MailLog);
-				end
+				end,
 			},
 			--"button#s:100:25#tr:-135:-38#n:CT_MailMod_ResetData_Button#v:GameMenuButtonTemplate#Reset Data",
 			"texture#tl:5:-67#br:tr:-5:-69#1:0.82:0",
 
+			["editbox#tl:50:-10#s:200:25#n:CT_MailMod_MailLog_FilterEditBox#v:SearchBoxTemplate"] = {
+				["onload"] = function(self)
+					self:HookScript("OnTextChanged", function()
+						-- There is a coroutine that will apply the filter 'a little bit at a time' to prevent fps drop.
+						-- Each time the coroutine resumes, it uses filterProgress to know where it should start from.
+						-- This also will refrain from going bonkers and consuming CPU usage when characters are changed rapidly (possible with fast typers, or holding backspace).
+						
+						filterProgress = 0;  -- Let the coroutine know to start from scratch on the next resume.
+						
+						if (notBusyFiltering) then
+							notBusyFiltering = false;
+							C_Timer.After(0.2, module.updateMailLog);	-- Multiple keystrokes in less than 0.2 sec will merge into a single call.
+						end
+					end);
+					self:SetMaxLetters(255);	  -- another safeguard to avoid fps drops: excessively long filter texts perform poorly
+					self:SetScript("OnShow", nil);
+				end,
+			},
+			
+			["button#tl:265:-10#s:25:25#?#v:GameMenuButtonTemplate"] = {
+				["onenter"] = function(self)
+					module:displayTooltip(self, {"Just start typing, or use filters such as...", "  action:|cff666666" .. module.text["CT_MailMod/MailLog/Open"] .. "|r|n  to|cff666666:Bob  |r|n  from:|cff666666" .. UnitName("player") .. "|r|n  date:|cff666666" .. date("%Y%m%d") .. "  (or other date/time formats)|r|n  subject:|cff666666HelloWorld!|r|n  money:|cff6666669000|r|n  item:|cff666666cloth|r|n  message:|cff666666foo|r#0.9:0.9:0.9"}, "ANCHOR_BOTTOMRIGHT");
+				end,
+			},
+
 			["frame#tl:5:-72#br:-5:5#i:scrollChildren"] = {
 				["frame#s:0:20#tl:0:0#r#i:1"] = scrollChild,
-				["frame#s:0:20#tl:0:-20#r#i:2"] = scrollChild,
-				["frame#s:0:20#tl:0:-40#r#i:3"] = scrollChild,
-				["frame#s:0:20#tl:0:-60#r#i:4"] = scrollChild,
-				["frame#s:0:20#tl:0:-80#r#i:5"] = scrollChild,
-				["frame#s:0:20#tl:0:-100#r#i:6"] = scrollChild,
-				["frame#s:0:20#tl:0:-120#r#i:7"] = scrollChild,
-				["frame#s:0:20#tl:0:-140#r#i:8"] = scrollChild,
-				["frame#s:0:20#tl:0:-160#r#i:9"] = scrollChild,
-				["frame#s:0:20#tl:0:-180#r#i:10"] = scrollChild,
-				["frame#s:0:20#tl:0:-200#r#i:11"] = scrollChild,
-				["frame#s:0:20#tl:0:-220#r#i:12"] = scrollChild,
-				["frame#s:0:20#tl:0:-240#r#i:13"] = scrollChild,
-				["frame#s:0:20#tl:0:-260#r#i:14"] = scrollChild,
-				["frame#s:0:20#tl:0:-280#r#i:15"] = scrollChild,
-				["frame#s:0:20#tl:0:-300#r#i:16"] = scrollChild,
-				["frame#s:0:20#tl:0:-320#r#i:17"] = scrollChild,
-				["frame#s:0:20#tl:0:-340#r#i:18"] = scrollChild,
-				["frame#s:0:20#tl:0:-360#r#i:19"] = scrollChild,
-				["frame#s:0:20#tl:0:-380#r#i:20"] = scrollChild,
-				["frame#s:0:20#tl:0:-400#r#i:21"] = scrollChild,
+				["frame#s:0:21#tl:0:-21#r#i:2"] = scrollChild,
+				["frame#s:0:21#tl:0:-42#r#i:3"] = scrollChild,
+				["frame#s:0:21#tl:0:-63#r#i:4"] = scrollChild,
+				["frame#s:0:21#tl:0:-84#r#i:5"] = scrollChild,
+				["frame#s:0:21#tl:0:-105#r#i:6"] = scrollChild,
+				["frame#s:0:21#tl:0:-126#r#i:7"] = scrollChild,
+				["frame#s:0:21#tl:0:-147#r#i:8"] = scrollChild,
+				["frame#s:0:21#tl:0:-168#r#i:9"] = scrollChild,
+				["frame#s:0:21#tl:0:-189#r#i:10"] = scrollChild,
+				["frame#s:0:21#tl:0:-210#r#i:11"] = scrollChild,
+				["frame#s:0:21#tl:0:-231#r#i:12"] = scrollChild,
+				["frame#s:0:21#tl:0:-252#r#i:13"] = scrollChild,
+				["frame#s:0:21#tl:0:-273#r#i:14"] = scrollChild,
+				["frame#s:0:21#tl:0:-294#r#i:15"] = scrollChild,
+				["frame#s:0:21#tl:0:-315#r#i:16"] = scrollChild,
+				["frame#s:0:21#tl:0:-336#r#i:17"] = scrollChild,
+				["frame#s:0:21#tl:0:-357#r#i:18"] = scrollChild,
+				["frame#s:0:21#tl:0:-378#r#i:19"] = scrollChild,
+				["frame#s:0:21#tl:0:-399#r#i:20"] = scrollChild,
+				["frame#s:0:21#tl:0:-420#r#i:21"] = scrollChild,
+				["frame#s:0:21#tl:0:-441#r#i:22"] = scrollChild,
+				["frame#s:0:21#tl:0:-462#r#i:23"] = scrollChild,
+				["frame#s:0:21#tl:0:-483#r#i:24"] = scrollChild,
+				["onload"] = function(self) self:SetAlpha(0.7); end,
 			},
 
 			["onload"] = function(self)
@@ -391,6 +530,8 @@ do
 				scrollFrame:SetScript("OnVerticalScroll", function(self, offset, ...)
 					FauxScrollFrame_OnVerticalScroll(self, offset, 20, updateMailLog);
 				end);
+				scrollFrame:SetFrameLevel(scrollFrame:GetFrameLevel() + 1);
+				
 
 				-- Resizing frames
 				local onUpdate = function(self, elapsed, ...)
@@ -589,13 +730,15 @@ do
 				button:SetPoint("LEFT", parent, "LEFT", 530 + diff + id * 18, 0);
 				button:SetScript("OnEnter", itemOnEnter);
 				button:SetScript("OnLeave", itemOnLeave);
+				button.countFontString = button:CreateFontString(nil, "OVERLAY", "NumberFontNormalSmall");
+				button.countFontString:SetPoint("BOTTOMRIGHT", 4, -1);
 				return button;
 			end
 		end
 
 		local function formatPlayer(name)
 			if ( name == module:getPlayerName() ) then
-				name = "\124cff888888Me\124r";
+				name = "\124cff888888" .. name .. "\124r";
 			elseif ( module:nameIsPlayer(name) ) then
 				name = ("\124cffffd100%s\124r"):format(module:filterName(name));
 			else
@@ -705,6 +848,12 @@ do
 						item:SetNormalTexture(select(10, GetItemInfo(link)) or "Interface\\Icons\\INV_Misc_QuestionMark");
 						item.link = link;
 						item.count = count;
+						local num = tonumber(count);
+						if (num and num > 1) then
+							item.countFontString:SetText(num < 10 and num or "*");
+						else
+							item.countFontString:SetText("");
+						end
 						item:Show();
 					else
 						item:Hide();
@@ -747,20 +896,32 @@ do
 		end
 	end
 
-	updateMailLog = function()
-		FauxScrollFrame_Update(CT_MailMod_MailLog_ScrollFrame, #getLogTable(), 21, 20);
-		local offset = FauxScrollFrame_GetOffset(CT_MailMod_MailLog_ScrollFrame);
-		local tostring, children, frame = tostring, mailLogFrame.scrollChildren;
 
-		for i = 1, 21, 1 do
-			frame = children[tostring(i)];
-			local entry = getLogEntry(i+offset);
-			if ( entry ) then
-				frame:Show();
-				updateMailEntry(frame, i, decodeLogEntry(entry));
-			else
-				frame:Hide();
+
+	updateMailLog = function()
+		-- STEP 1: Create a filtered list of which items to show (by default, show all).
+		-- STEP 2: Update the scroll-bar for the filtered number of items
+		-- STEP 3: Show the filtered items based on where the scroll-bar is now.
+		-- STEP 1:
+		local filteredLog = getFilteredTable(); -- returns a table if filtering is done, or false if it is still in progress.  (When there are more than 500 entries, it will only sift through 500 each frame to prevent fps dropping.)
+		if (filteredLog) then
+
+			-- STEP 2:
+			FauxScrollFrame_Update(CT_MailMod_MailLog_ScrollFrame, #filteredLog, 24, 20);
+			local offset = FauxScrollFrame_GetOffset(CT_MailMod_MailLog_ScrollFrame);
+
+			-- STEP 3:
+			local children, frame = mailLogFrame.scrollChildren;
+			for i = 1, 24, 1 do
+				frame = children[tostring(i)];
+				if (filteredLog[#filteredLog+1-offset-i]) then  -- reversed, so that newer items are at the top
+					updateMailEntry(frame, i, decodeLogEntry(filteredLog[#filteredLog+1-offset-i]));
+					frame:Show();
+				else
+					frame:Hide();
+				end
 			end
+		
 		end
 	end
 

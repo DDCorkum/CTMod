@@ -933,7 +933,7 @@ local function CT_BarMod_Shift_OnEvent(self, event, arg1, ...)
 		PetActionBarFrame:HookScript("OnShow", CT_BarMod_Shift_UIParent_ManageFramePositions);
 		PetActionBarFrame:HookScript("OnHide", CT_BarMod_Shift_UIParent_ManageFramePositions);
 
-		if (module:getGameVersion() == CT_GAME_VERSION_RETAIL) then
+		if (module:getGameVersion() >= 8) then
 		
 			PossessBarFrame:HookScript("OnShow", CT_BarMod_Shift_UIParent_ManageFramePositions);
 			PossessBarFrame:HookScript("OnHide", CT_BarMod_Shift_UIParent_ManageFramePositions);		
