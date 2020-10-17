@@ -1741,26 +1741,6 @@ local function updateBlizzardButtons(func)
 	end
 end
 
---[[
-	-- not currently in use
-	local function updateSingleBlizzardButtonByAction(func, action)
-		action = tonumber(action)
-		if (action and action > 0) then
-			if (action <= 12) then
-				func(_G["ActionButton" .. action]);
-			elseif (action >= 25 and action <= 36) then
-				func(_G["MultiBarRightButton" .. (action - 24)]);
-			elseif (action >= 37 and action <= 48) then
-				func(_G["MultiBarLeftButton" .. (action - 36)]);
-			elseif (action >= 49 and action <= 56) then
-				func(_G["MultiBarBottomRightButton" .. (action - 48)]);
-			elseif (action >= 61 and action <= 72) then
-				func(_G["MultiBarBottomLeftButton" .. (action - 60)]);
-			end
-		end
-	end
---]]
-
 do
 	local function setBlizzardButtonAttributes(button)
 		action = ActionButton_GetPagedID(button)
@@ -1972,13 +1952,26 @@ end
 -----
 do
 	local isReset = true;
+	
+	local dummyFunc = CreateFrame("Frame"):CreateFontString(nil, "ARTWORK").SetText;
 
-	local function CT_BarMod_ActionButton_UpdateActionText(self, ...)
-		-- The game already sets the value correctly for consumables, so just hide anything that is NOT a consumable
-		if (defbarShowActionText and displayActionText == false and self.isConsumable == false and self.isStackable == false) then
-			local name = self.Name;
-			if (name) then
-				name:SetText("");
+	local function CT_BarMod_ActionButton_HookActionText(button)
+		hooksecurefunc(button.Name, "SetText", function(text)
+			-- It's only appropriate to overwrite what Blizzard did in very narrow circumstances.
+			if (defbarShowActionText and displayActionText == false and text ~= "" and button.isConsumable ~= true and button.isStackable ~= true) then
+				dummyFunc(button.Name, "")
+			end
+		end);
+	end
+
+	local function CT_BarMod_ActionButton_UpdateActionText(self)
+		-- Unlike the hook, it may be necessary to restore deleted text when the user changes settings
+		if (defbarShowActionText) then
+			-- isConsumable and isStackable may be nil instead of false if the bar was disabled during a /reload and the user later chooses to enable it in the settings.
+			if (displayActionText == false and self.isConsumable ~= true and self.isStackable ~= true) then
+				dummyFunc(self.Name, "")
+			else
+				dummyFunc(self.Name, GetActionText(self.action))
 			end
 		end
 	end
@@ -2009,12 +2002,7 @@ do
 		end
 	end
 	
-	if (ActionBarActionButtonMixin) then
-		hooksecurefunc(ActionBarActionButtonMixin, "Update", CT_BarMod_ActionButton_UpdateActionText);
-	else
-		hooksecurefunc("ActionButton_Update", CT_BarMod_ActionButton_UpdateActionText);
-	end
-
+	updateBlizzardButtons(CT_BarMod_ActionButton_HookActionText);
 end
 
 -----
