@@ -1741,6 +1741,26 @@ local function updateBlizzardButtons(func)
 	end
 end
 
+--[[
+	-- not currently in use
+	local function updateSingleBlizzardButtonByAction(func, action)
+		action = tonumber(action)
+		if (action and action > 0) then
+			if (action <= 12) then
+				func(_G["ActionButton" .. action]);
+			elseif (action >= 25 and action <= 36) then
+				func(_G["MultiBarRightButton" .. (action - 24)]);
+			elseif (action >= 37 and action <= 48) then
+				func(_G["MultiBarLeftButton" .. (action - 36)]);
+			elseif (action >= 49 and action <= 56) then
+				func(_G["MultiBarBottomRightButton" .. (action - 48)]);
+			elseif (action >= 61 and action <= 72) then
+				func(_G["MultiBarBottomLeftButton" .. (action - 60)]);
+			end
+		end
+	end
+--]]
+
 do
 	local function setBlizzardButtonAttributes(button)
 		action = ActionButton_GetPagedID(button)
@@ -1954,15 +1974,11 @@ do
 	local isReset = true;
 
 	local function CT_BarMod_ActionButton_UpdateActionText(self, ...)
-		if (defbarShowActionText) then
-			local name = self.Name;		--  _G[self:GetName() .. "Name"];
+		-- The game already sets the value correctly for consumables, so just hide anything that is NOT a consumable
+		if (defbarShowActionText and displayActionText == false and self.isConsumable == false and self.isStackable == false) then
+			local name = self.Name;
 			if (name) then
-				local actionId = self.action;
-				if ( displayActionText and not self.isConsumable and not self.isStackable ) then
-					name:SetText(GetActionText(actionId));
-				else
-					name:SetText("");
-				end
+				name:SetText("");
 			end
 		end
 	end
@@ -1973,7 +1989,7 @@ do
 		local name = self.Name;		--  _G[self:GetName() .. "Name"];
 		if (name) then
 			local actionId = self.action;
-			if ( not self.isConsumable and not self.isStackable ) then
+			if ( not (self.isConsumable or self.isStackable) ) then
 				name:SetText(GetActionText(actionId));
 			else
 				name:SetText("");
@@ -1993,37 +2009,12 @@ do
 		end
 	end
 	
-	module:regEvent("UPDATE_MACROS", CT_BarMod_UpdateActionButtonActionText);
-	module:regEvent("ACTIONBAR_PAGE_CHANGED", CT_BarMod_UpdateActionButtonActionText);
-	module:regEvent("PLAYER_LOGIN", function()
-		-- apply the settings now that the user is logged in
-		CT_BarMod_UpdateActionButtonActionText();
-		
-		-- hook all the buttons to reapply settings
-		updateBlizzardButtons(function (button)
-			-- in case something was dragged to this slot
-			button:HookScript("OnReceiveDrag", CT_BarMod_ActionButton_UpdateActionText);
+	if (ActionBarActionButtonMixin) then
+		hooksecurefunc(ActionBarActionButtonMixin, "Update", CT_BarMod_ActionButton_UpdateActionText);
+	else
+		hooksecurefunc("ActionButton_Update", CT_BarMod_ActionButton_UpdateActionText);
+	end
 
-			-- in case something was dragged from this slot
-			button:HookScript("OnDragStop", CT_BarMod_ActionButton_UpdateActionText);
-
-			-- when the buttons first appear!
-			button:HookScript("OnShow", CT_BarMod_ActionButton_UpdateActionText);
-
-			-- during mouseover
-			button:HookScript("OnEnter", CT_BarMod_ActionButton_UpdateActionText);
-		end);
-		
-		-- hook the MacroFrame to reapply settings (this is done only after PLAYER_LOGIN to cut down on false positives while the game boots up)
-		local function hookMacroFrame(__, name)
-			if (name == "Blizzard_MacroUI") then
-				MacroFrame:HookScript("OnHide", CT_BarMod_UpdateActionButtonActionText);
-				module:unregEvent("ADDON_LOADED", hookMacroFrame);
-			end
-			
-		end
-		module:regEvent("ADDON_LOADED", hookMacroFrame);
-	end);
 end
 
 -----

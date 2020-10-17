@@ -1,3 +1,6 @@
+CT_BarMod (9.0.1.2) 2020-10-17
+- More consistently hides macro names from the default Blizzard action bars.
+
 CT_BarMod (9.0.1.1) 2020-10-04
 - Option to have left, right and middle mouse clicks target different units (player, focus, pet)
 - Changes to the ChallengeModeFrame (M+ keystones) in 8.3.0.11 are now optional (default: on).
