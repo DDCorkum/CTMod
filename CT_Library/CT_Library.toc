@@ -1,5 +1,5 @@
 ## Interface: 90001
-## Version: 9.0.1.1
+## Version: 9.0.1.2
 ## Title: CT_Library |cFF333333(BFA)
 ## Notes: Library features for CTMod. 
 ## DefaultState: Enabled
@@ -8,6 +8,8 @@
 
 Libs\LibStub\LibStub.lua
 Libs\UIDropDown_TownlongYak_Workarounds.lua
+Libs\LibDeflate.lua
+Libs\Ace3\AceSerializer-3.0.lua
 
 CT_Library.lua
 localization.lua

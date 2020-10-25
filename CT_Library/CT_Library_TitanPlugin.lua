@@ -94,8 +94,7 @@ For this example plugin, we show the standard Titan buttons plus options to dete
 	-- level 1 menu
 	if L_UIDROPDOWNMENU_MENU_LEVEL == 1 then
 		TitanPanelRightClickMenu_AddTitle(TitanPlugins[TS.id].menuText);
-		local modules = CT:getInstalledModules();
-		for i, module in ipairs(modules) do
+		for i, module in CT:iterateModules() do
 			info = {};
 			info.text = module.name;
 

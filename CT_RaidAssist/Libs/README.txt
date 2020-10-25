@@ -1,3 +1,11 @@
+This file should be read in conjunction with README.txt in CT_Library
+
+
+
+------
+
+
+
 CTRA embeds information-sharing libraries that are common to other raid addons, to ensure the widest compatibility.
 
 However, to protect personal privacy, these embedded libraries are modified with an opt-out feature.
@@ -17,10 +25,11 @@ Thus, if you truly wish to opt out, you must also uninstall other addons who don
 
 
 No changes to the embedded libraries are made other than this opt-in/out capability, at the top and bottom of each file.
-The CTMod team acknowledges the library authors at the top of each file, and thanks them for their public contributions.
+The CTMod team acknowledges the library authors at the top of each file, and appologizes if this has inadvertently
+violated the spirit of any license.
 
 
 
 D.D. Corkum, aka Dahk Celes
 CTMod Contributor, 2017 to present
-23 Mar 2020
+23 Mar 2020 (edited 22 Oct 2020)

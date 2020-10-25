@@ -1,3 +1,6 @@
+CT_Library (9.0.1.2) 2020-10-25
+- Added means to import/export settings with different accounts via the clipboard
+
 CT_Library (9.0.1.1) 2020-10-01
 - Updated for Shadowlands
 

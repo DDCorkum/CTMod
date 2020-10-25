@@ -2059,7 +2059,7 @@ do
 			-- setting the scale to 1 during the save is a hack to change how CT_Library behaves
 			frame:SetScale(1);
 			module:stopMovable("WATCHFRAME");  -- stops moving and saves the current anchor point; except when noSave flag is set which only happens when starting up the game
-			frame:SetScale((module:getOption("CTCore_WatchFrameScale")/100) or 1);
+			frame:SetScale((module:getOption("CTCore_WatchFrameScale") or 100)/100);
 		end
 	end
 
