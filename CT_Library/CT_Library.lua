@@ -1938,9 +1938,7 @@ end
 
 objectHandlers.slider = function(self, parent, name, virtual, option, text, values)
 	local slider = CreateFrame("Slider", name, parent, virtual or "OptionsSliderTemplate");
-	local title = _G[name .. "Text"];
-	local low = _G[name .. "Low"];
-	local high = _G[name .. "High"];
+	local title, low, high = slider.Text, slider.Low, slider.High;
 	local titleText, lowText, highText = splitString(text, colonSeparator);
 	local minValue, maxValue, step = splitString(values, colonSeparator);
 
@@ -3495,6 +3493,43 @@ local function closeClipboardPanel()
 	clipboardPanel.editBox:SetText("");
 end
 
+local function validateClipboard()
+	local text = clipboardPanel.editBox:GetText();
+	if (strlen(text) < 2) then
+		clipboardPanel.warning:SetText("");
+		clipboardPanel.acceptButton:Disable();
+	elseif (lib:hash(text:sub(2))%64+38 ~= text:byte(1)) then
+		clipboardPanel.warning:SetText("|cffee6666The string appears incomplete or corrupted")
+		clipboardPanel.acceptButton:Disable();
+	else
+		text = lib:decode256From64(text);
+		text = lib:decompress(text);
+		local importTable = lib:deserializeTable(text);
+		if (importTable) then
+			clipboardPanel.acceptButton:Enable();
+			if (importTable.exportGameVersion ~= lib:getGameVersion(true)) then
+				clipboardPanel.warning:SetText("|cffcccc33Warning: the game version does not match.")
+			else
+				clipboardPanel.warning:SetText("")
+				for key, val in pairs(importTable) do
+					local module = lib:getModule(key)
+					if (module) then
+						if (module.version ~= val.exportVersion) then
+							clipboardPanel.warning:SetText("|cffcccc33Warning: one or more addon versions do not match.");
+							break;
+						end
+					elseif (key ~= "exportGameVersion") then
+						clipboardPanel.warning:SetText("|cffcccc33Warning: settings for missing or inactive addons will be ignored.");
+					end
+				end
+			end
+		else
+			clipboardPanel.warning:SetText("|cffee6666The string is not recognized.")
+			clipboardPanel.acceptButton:Disable();
+		end
+	end
+end
+
 local function copyFromClipboard()
 	local text = clipboardPanel.editBox:GetText();
 	text = lib:decode256From64(text);
@@ -3503,13 +3538,13 @@ local function copyFromClipboard()
 	if (importTable) then
 		local success;
 		for __, module in ipairs(modules) do
-			if (module.options and module.name and module.version) then
-				if (importTable[module.name..module.version]) then
+			if (module.options and module.name) then
+				if (importTable[module.name]) then
 					module.options["CHAR-Unknown- Import String"] = {};
-					lib:copyTable(importTable[module.name..module.version], module.options["CHAR-Unknown- Import String"]);
+					lib:copyTable(importTable[module.name], module.options["CHAR-Unknown- Import String"]);
 					success = true;
 				else
-					module.options["CHAR-Unknown-  Import String"] = nil
+					module.options["CHAR-Unknown- Import String"] = nil
 				end
 			end
 		end
@@ -3535,6 +3570,9 @@ local function openClipboardPanel(text)
 		clipboardPanel.label = clipboardPanel:CreateFontString(nil, "ARTWORK", "ChatFontNormal");
 		clipboardPanel.label:SetPoint("TOP", 0, -40);
 		
+		clipboardPanel.warning = clipboardPanel:CreateFontString(nil, "ARTWORK", "ChatFontNormal");
+		clipboardPanel.warning:SetPoint("BOTTOM", 0, 60);
+		
 		clipboardPanel.acceptButton = CreateFrame("Button", nil, clipboardPanel, "UIPanelButtonTemplate");
 		clipboardPanel.acceptButton:SetText("Begin Import");
 		clipboardPanel.acceptButton:SetSize(120, 30);
@@ -3553,14 +3591,8 @@ local function openClipboardPanel(text)
 		clipboardPanel.editBox = CreateFrame("EditBox", nil, clipboardPanel, "InputBoxTemplate");
 		clipboardPanel.editBox:SetSize(300, 50);
 		clipboardPanel.editBox:SetPoint("CENTER");
-		clipboardPanel.editBox:HookScript("OnTextChanged", function()
-			local content = clipboardPanel.editBox:GetText()
-			if (strlen(content) < 2 or lib:hash(content:sub(2))%64+38 ~= content:byte(1)) then
-				clipboardPanel.acceptButton:Disable();
-			else
-				clipboardPanel.acceptButton:Enable();
-			end
-		end);
+		clipboardPanel.editBox:HookScript("OnTextChanged", validateClipboard);
+		
 	end
 	clipboardPanel:Show();
 	actions.confirmImport:SetChecked(false);
@@ -3590,15 +3622,15 @@ local function export(self)
 		end
 	
 		local options, success;
-		local exportOptions = {};
+		local exportOptions = {["exportGameVersion"] = lib:getGameVersion(true)};
 		local fromOptions;
 
 		for modnum, addon in ipairs(modules) do
 			if ( addon ~= module and addon.options and addon.name and addon.version) then
 				fromOptions = addon.options[fromChar];
 				if ( fromOptions and addonIsChecked(addon.name) and module:getOption("canExport") ) then
-					exportOptions[addon.name .. addon.version] = {}
-					lib:copyTable(fromOptions, exportOptions[addon.name .. addon.version])
+					exportOptions[addon.name] = {["exportVersion"] = addon.version}
+					lib:copyTable(fromOptions, exportOptions[addon.name])
 					success = true;
 				end
 			end

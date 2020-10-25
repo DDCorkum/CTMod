@@ -1,6 +1,7 @@
-CT_BarMod (9.0.1.2) 2020-10-17
+CT_BarMod (9.0.1.2) 2020-10-25
 - More consistently hides macro names from the default Blizzard action bars
 - Empty space between buttons no longer prevents interacting with the WorldFrame
+- Changing the number of buttons no longer throws an error in Shadowlands
 
 CT_BarMod (9.0.1.1) 2020-10-04
 - Option to have left, right and middle mouse clicks target different units (player, focus, pet)
