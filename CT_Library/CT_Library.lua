@@ -3215,7 +3215,7 @@ local function populateAddonsList(char)
 		actions.confirmExport:Show();
 		actions.exportNote:Show();
 		actions.exportButton:Show();
-		actions.deleteNote:SetText("Reset to default settings and /reload");
+		actions.deleteNote:SetText(L["CT_Library/SettingsImport/Actions/DeleteSelfNote"]);
 	else
 		actions.confirmImport:Show();
 		actions.importNote:Show();
@@ -3223,7 +3223,7 @@ local function populateAddonsList(char)
 		actions.confirmExport:Hide();
 		actions.exportNote:Hide();
 		actions.exportButton:Hide();
-		actions.deleteNote:SetText("Reset that profile to default settings");
+		actions.deleteNote:SetText(L["CT_Library/SettingsImport/Actions/DeleteOtherNote"]);
 	end
 
 	return numAddons;
@@ -3499,65 +3499,75 @@ local function validateClipboard()
 		clipboardPanel.warning:SetText("");
 		clipboardPanel.acceptButton:Disable();
 	elseif (lib:hash(text:sub(2))%64+38 ~= text:byte(1)) then
-		clipboardPanel.warning:SetText("|cffee6666The string appears incomplete or corrupted")
+		clipboardPanel.warning:SetText(L["CT_Library/SettingsImport/Clipboard/ChecksumAlert"])
+		clipboardPanel.warning:SetTextColor(0.9, 0.4, 0.4);
 		clipboardPanel.acceptButton:Disable();
 	else
 		text = lib:decode256From64(text);
 		text = lib:decompress(text);
 		local importTable = lib:deserializeTable(text);
 		if (importTable) then
-			clipboardPanel.acceptButton:Enable();
+			local warn, found;
 			if (importTable.exportGameVersion ~= lib:getGameVersion(true)) then
-				clipboardPanel.warning:SetText("|cffcccc33Warning: the game version does not match.")
-			else
-				clipboardPanel.warning:SetText("")
-				for key, val in pairs(importTable) do
-					local module = lib:getModule(key)
-					if (module) then
-						if (module.version ~= val.exportVersion) then
-							clipboardPanel.warning:SetText("|cffcccc33Warning: one or more addon versions do not match.");
-							break;
-						end
-					elseif (key ~= "exportGameVersion") then
-						clipboardPanel.warning:SetText("|cffcccc33Warning: settings for missing or inactive addons will be ignored.");
+				warn = true;
+				clipboardPanel.warning:SetText(L["CT_Library/SettingsImport/Clipboard/GameVersionWarning"]);
+				clipboardPanel.warning:SetTextColor(0.7, 0.7, 0.3);
+			end
+			for key, val in pairs(importTable) do
+				local module = lib:getModule(key)
+				if (module) then
+					found = true;
+					if (module.version ~= val.exportVersion and warn == nil) then
+						warn = true;
+						clipboardPanel.warning:SetText(L["CT_Library/SettingsImport/Clipboard/AddOnVersionWarning"]);
+						clipboardPanel.warning:SetTextColor(0.7, 0.7, 0.3);
+						
 					end
+				elseif (key ~= "exportGameVersion" and warn == nil) then
+					warn = true;
+					clipboardPanel.warning:SetText(L["CT_Library/SettingsImport/Clipboard/AddOnMissingWarning"]);
+					clipboardPanel.warning:SetTextColor(0.7, 0.7, 0.3);
 				end
 			end
+			if (found) then
+				if (warn == nil) then
+					clipboardPanel.warning:SetText(L["CT_Library/SettingsImport/Clipboard/StringValidMessage"]);
+					clipboardPanel.warning:SetTextColor(0.4, 0.9, 0.4);
+				end
+				clipboardPanel.acceptButton:Enable();
+				return importTable;
+			else
+				clipboardPanel.warning:SetText(L["CT_Library/SettingsImport/Clipboard/NoAddOnsAlert"]);
+				clipboardPanel.warning:SetTextColor(0.9, 0.4, 0.4);
+				clipboardPanel.acceptButton:Disable();
+			end
 		else
-			clipboardPanel.warning:SetText("|cffee6666The string is not recognized.")
+			clipboardPanel.warning:SetText(L["CT_Library/SettingsImport/Clipboard/FailureAlert"]);
+			clipboardPanel.warning:SetTextColor(0.9, 0.4, 0.4);
 			clipboardPanel.acceptButton:Disable();
 		end
 	end
 end
 
 local function copyFromClipboard()
-	local text = clipboardPanel.editBox:GetText();
-	text = lib:decode256From64(text);
-	text = lib:decompress(text);
-	local importTable = lib:deserializeTable(text)
+	local importTable = validateClipboard();	-- returns nil if there is any reason to anticipate failure
 	if (importTable) then
-		local success;
 		for __, module in ipairs(modules) do
 			if (module.options and module.name) then
 				if (importTable[module.name]) then
 					module.options["CHAR-Unknown- Import String"] = {};
 					lib:copyTable(importTable[module.name], module.options["CHAR-Unknown- Import String"]);
-					success = true;
 				else
 					module.options["CHAR-Unknown- Import String"] = nil
 				end
 			end
 		end
-		if (success) then
-			importRealm = " Import String";
-			module:setOption("char", "CHAR-Unknown- Import String", true);
-			UIDropDownMenu_SetText(CT_LibraryDropdown0, " Import String (1)");
-			UIDropDownMenu_SetText(CT_LibraryDropdown1, "Most Recent");
-		end
-	else
-		print("Something went wrong decoding the string, sorry.");
+		importRealm = " Import String";
+		module:setOption("char", "CHAR-Unknown- Import String", true);
+		UIDropDownMenu_SetText(CT_LibraryDropdown0, " Import String (1)");
+		UIDropDownMenu_SetText(CT_LibraryDropdown1, "Unknown");
+		closeClipboardPanel();
 	end
-	closeClipboardPanel();
 end
 
 local function openClipboardPanel(text)
@@ -3574,16 +3584,16 @@ local function openClipboardPanel(text)
 		clipboardPanel.warning:SetPoint("BOTTOM", 0, 60);
 		
 		clipboardPanel.acceptButton = CreateFrame("Button", nil, clipboardPanel, "UIPanelButtonTemplate");
-		clipboardPanel.acceptButton:SetText("Begin Import");
+		clipboardPanel.acceptButton:SetText(CONTINUE);  -- GlobalStrings.lua
 		clipboardPanel.acceptButton:SetSize(120, 30);
 		clipboardPanel.acceptButton:SetPoint("BOTTOMRIGHT", clipboardPanel, "BOTTOM", -27, 20);
 		clipboardPanel.acceptButton:HookScript("OnClick", copyFromClipboard);
 		clipboardPanel.acceptButton:HookScript("OnEnter", function()
-			lib:displayTooltip(clipboardPanel.acceptButton, {"Begin Import", "Temporarily adds '~Import String' to the server drop down menu."}, "CT_ABOVEBELOW", 0, 0, clipboardPanel);
+			lib:displayTooltip(clipboardPanel.acceptButton, {CONTINUE, L["CT_Library/SettingsImport/Clipboard/AcceptTip"]}, "CT_ABOVEBELOW", 0, 0, clipboardPanel);
 		end);
 		
 		clipboardPanel.cancelButton = CreateFrame("Button", nil, clipboardPanel, "UIPanelButtonTemplate");
-		clipboardPanel.cancelButton:SetText("Cancel");
+		clipboardPanel.cancelButton:SetText(CANCEL);  -- GlobalStrings.lua
 		clipboardPanel.cancelButton:SetSize(120, 30);
 		clipboardPanel.cancelButton:SetPoint("BOTTOMLEFT", clipboardPanel, "BOTTOM", 27, 20);
 		clipboardPanel.cancelButton:HookScript("OnClick", closeClipboardPanel);
@@ -3591,7 +3601,9 @@ local function openClipboardPanel(text)
 		clipboardPanel.editBox = CreateFrame("EditBox", nil, clipboardPanel, "InputBoxTemplate");
 		clipboardPanel.editBox:SetSize(300, 50);
 		clipboardPanel.editBox:SetPoint("CENTER");
-		clipboardPanel.editBox:HookScript("OnTextChanged", validateClipboard);
+		clipboardPanel.editBox:SetScript("OnEscapePressed", closeClipboardPanel);
+		clipboardPanel.editBox:SetScript("OnHide", closeClipboardPanel);
+		-- OnTextChanged and OnEnterPressed are set dynamically
 		
 	end
 	clipboardPanel:Show();
@@ -3602,15 +3614,22 @@ local function openClipboardPanel(text)
 	module:setOption("canDelete", nil, true);
 	module:setOption("canExport", nil, true);
 	if (type(text) == "string") then
-		clipboardPanel.editBox:SetText(text)
-		clipboardPanel.acceptButton:Hide()
-		clipboardPanel.label:SetText("Copy the entire string below.|n|cffffff00Warning: it might be possible to identify you from your settings.")
-		clipboardPanel.cancelButton:SetText("Close")
+		clipboardPanel.editBox:SetScript("OnTextChanged", nil);
+		clipboardPanel.editBox:SetScript("OnEnterPressed", closeClipboardPanel);
+		clipboardPanel.editBox:SetText(text);
+		clipboardPanel.acceptButton:Hide();
+		clipboardPanel.warning:Hide();
+		clipboardPanel.label:SetText("Copy the entire string below.|n|cffffff00Warning: it might be possible to identify you from your settings.");
+		clipboardPanel.cancelButton:SetText("Close");
+		
 	else
-		clipboardPanel.editBox:SetText("")
-		clipboardPanel.acceptButton:Show()
-		clipboardPanel.label:SetText("Paste the entire string below.|n|cffffff00This is a beta feature; use at own risk.")
-		clipboardPanel.cancelButton:SetText("Cancel")
+		clipboardPanel.editBox:SetScript("OnTextChanged", validateClipboard);
+		clipboardPanel.editBox:SetScript("OnEnterPressed", copyFromClipboard );
+		clipboardPanel.editBox:SetText("");
+		clipboardPanel.acceptButton:Show();
+		clipboardPanel.warning:Show();
+		clipboardPanel.label:SetText("Paste the entire string below.|n|cffffff00This is a beta feature; use at own risk.");
+		clipboardPanel.cancelButton:SetText("Cancel");
 	end
 end
 
@@ -3714,17 +3733,17 @@ end
 module.frame = function()
 	local addonsTable = { };
 	local optionsTable = {
-		"font#tl:5:-5#v:GameFontNormalLarge#Select a profile",
+		"font#tl:5:-5#v:GameFontNormalLarge#" .. L["CT_Library/SettingsImport/Profiles/Heading"],
 	
-		"font#tl:20:-30#v:GameFontNormal#Option 1 - My characters",
-		"font#tl:40:-50#n:CT_LibraryDropdown0Label#v:ChatFontNormal#Server:",
+		"font#tl:20:-30#v:GameFontNormal#" .. L["CT_Library/SettingsImport/Profiles/InternalSubHeading"],
+		"font#tl:40:-50#n:CT_LibraryDropdown0Label#v:ChatFontNormal#" .. L["CT_Library/SettingsImport/Profiles/InternalServerLabel"],
 		"dropdown#s:155:20#tl:100:-51#o:char#n:CT_LibraryDropdown0#i:serverDropdown",
 
-		"font#tl:40:-75#n:CT_LibraryDropdown1Label#v:ChatFontNormal#Character:",
+		"font#tl:40:-75#n:CT_LibraryDropdown1Label#v:ChatFontNormal#" .. L["CT_Library/SettingsImport/Profiles/InternalCharacterLabel"],
 		"dropdown#s:155:20#tl:100:-76#o:char#n:CT_LibraryDropdown1#i:charDropdown",
 
-		"font#tl:20:-100#v:GameFontNormal#Option 2 - Import from another account",
-		["button#t:0:-120#s:150:20#v:UIPanelButtonTemplate#Use Import String"] = {
+		"font#tl:20:-100#v:GameFontNormal#" .. L["CT_Library/SettingsImport/Profiles/ExternalSubHeading"],
+		["button#t:0:-120#s:150:20#v:UIPanelButtonTemplate#" .. L["CT_Library/SettingsImport/Profiles/ExternalButton"]] = {
 			["onclick"] = openClipboardPanel,
 		},
 
@@ -3742,10 +3761,10 @@ module.frame = function()
 		["frame#tl:0:-150#r#i:addons#hidden"] = addonsTable,
 
 		["frame#i:actions#hidden"] = {
-			"font#tl:5:0#i:title#v:GameFontNormalLarge#Select Action",
+			"font#tl:5:0#i:title#v:GameFontNormalLarge#" .. L["CT_Library/SettingsImport/Actions/Heading"],
 
 			"checkbutton#tl:20:-25#i:confirmImport#s:25:25#o:canImport#I want to IMPORT the selected settings.",
-			"font#t:0:-45#i:importNote#s:0:20#l#r#Overwrite the current profile and /reload#0.5:0.5:0.5",
+			"font#t:0:-45#i:importNote#s:0:20#l#r#" .. L["CT_Library/SettingsImport/Actions/ImportNote"] .. "#0.5:0.5:0.5",
 			["button#t:0:-65#s:155:30#i:importButton#v:UIPanelButtonTemplate#Import Settings"] = {
 				["onclick"] = import,
 				["onenter"] = function(self)
@@ -3771,7 +3790,7 @@ module.frame = function()
 			
 			
 			"checkbutton#tl:20:-25#i:confirmExport#s:25:25#o:canExport#I want to EXPORT the selected settings.#hidden",
-			"font#t:0:-45#i:exportNote#s:0:20#l#r#Manual copy/paste to another account#0.5:0.5:0.5#hidden",
+			"font#t:0:-45#i:exportNote#s:0:20#l#r#" .. L["CT_Library/SettingsImport/Actions/ExportNote"] .. "#0.5:0.5:0.5#hidden",
 			["button#t:0:-65#s:155:30#i:exportButton#v:UIPanelButtonTemplate#Generate String#hidden"] = {
 				["onclick"] = export,
 				["onenter"] = function(self)
@@ -3786,7 +3805,7 @@ module.frame = function()
 	};
 
 	-- Fill in our addons table
-	tinsert(addonsTable, "font#tl:5:0#v:GameFontNormalLarge#Select AddOns");
+	tinsert(addonsTable, "font#tl:5:0#v:GameFontNormalLarge#" .. L["CT_Library/SettingsImport/AddOns/Heading"]);
 
 	-- Populate with addons
 	local num = 0;
