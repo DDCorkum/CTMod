@@ -370,19 +370,18 @@ if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
 		UIParent_ManageFramePositions();
 	end
 
-else  -- if module:getGameVersion() >= 8
-
-	local old_QuestLogQuests_AddQuestButton = QuestLogQuests_AddQuestButton;
-
-	function QuestLogQuests_AddQuestButton(prevButton, questLogIndex, poiTable, title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isBounty, isStory, isHidden, isScaling, layoutIndex)
-		if (title and level and level > 0 and displayLevels) then
-			if (suggestedGroup and suggestedGroup > 0) then
-				title = "[" .. level .. "+] " .. title;
-			else
-				title = "[" .. level .. "] " .. title;
+else  -- if module:getGameVersion() >= 9
+	
+	local dummySetText = CreateFrame("Frame"):CreateFontString(nil, "ARTWORK").SetText;	-- prevents an infinite loop by the hook below
+	QuestScrollFrame.titleFramePool.creationFunc = function(self)
+		local frame = CreateFrame(self.frameType, nil, self.parent, self.frameTemplate);
+		hooksecurefunc(frame.Text, "SetText", function(fontString, text)
+			local info = C_QuestLog.GetInfo(frame.questLogIndex);
+			if (displayLevels and info and info.level and info.level > 0) then
+				dummySetText(fontString, "[" .. info.level .. (info.suggestedGroup > 0 and "+] " or "] ") .. text);
 			end
-		end
-		return old_QuestLogQuests_AddQuestButton(prevButton, questLogIndex, poiTable, title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isBounty, isStory, isHidden, isScaling, layoutIndex);
+		end)
+		return frame;
 	end
 end
 
@@ -2060,7 +2059,7 @@ do
 			-- setting the scale to 1 during the save is a hack to change how CT_Library behaves
 			frame:SetScale(1);
 			module:stopMovable("WATCHFRAME");  -- stops moving and saves the current anchor point; except when noSave flag is set which only happens when starting up the game
-			frame:SetScale((module:getOption("CTCore_WatchFrameScale")/100) or 1);
+			frame:SetScale((module:getOption("CTCore_WatchFrameScale") or 100)/100);
 		end
 	end
 

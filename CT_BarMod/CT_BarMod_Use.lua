@@ -1952,17 +1952,26 @@ end
 -----
 do
 	local isReset = true;
+	
+	local dummyFunc = CreateFrame("Frame"):CreateFontString(nil, "ARTWORK").SetText;
 
-	local function CT_BarMod_ActionButton_UpdateActionText(self, ...)
+	local function CT_BarMod_ActionButton_HookActionText(button)
+		hooksecurefunc(button.Name, "SetText", function(text)
+			-- It's only appropriate to overwrite what Blizzard did in very narrow circumstances.
+			if (defbarShowActionText and displayActionText == false and text ~= "" and button.isConsumable ~= true and button.isStackable ~= true) then
+				dummyFunc(button.Name, "")
+			end
+		end);
+	end
+
+	local function CT_BarMod_ActionButton_UpdateActionText(self)
+		-- Unlike the hook, it may be necessary to restore deleted text when the user changes settings
 		if (defbarShowActionText) then
-			local name = self.Name;		--  _G[self:GetName() .. "Name"];
-			if (name) then
-				local actionId = self.action;
-				if ( displayActionText and not self.isConsumable and not self.isStackable ) then
-					name:SetText(GetActionText(actionId));
-				else
-					name:SetText("");
-				end
+			-- isConsumable and isStackable may be nil instead of false if the bar was disabled during a /reload and the user later chooses to enable it in the settings.
+			if (displayActionText == false and self.isConsumable ~= true and self.isStackable ~= true) then
+				dummyFunc(self.Name, "")
+			else
+				dummyFunc(self.Name, GetActionText(self.action))
 			end
 		end
 	end
@@ -1973,7 +1982,7 @@ do
 		local name = self.Name;		--  _G[self:GetName() .. "Name"];
 		if (name) then
 			local actionId = self.action;
-			if ( not self.isConsumable and not self.isStackable ) then
+			if ( not (self.isConsumable or self.isStackable) ) then
 				name:SetText(GetActionText(actionId));
 			else
 				name:SetText("");
@@ -1993,37 +2002,7 @@ do
 		end
 	end
 	
-	module:regEvent("UPDATE_MACROS", CT_BarMod_UpdateActionButtonActionText);
-	module:regEvent("ACTIONBAR_PAGE_CHANGED", CT_BarMod_UpdateActionButtonActionText);
-	module:regEvent("PLAYER_LOGIN", function()
-		-- apply the settings now that the user is logged in
-		CT_BarMod_UpdateActionButtonActionText();
-		
-		-- hook all the buttons to reapply settings
-		updateBlizzardButtons(function (button)
-			-- in case something was dragged to this slot
-			button:HookScript("OnReceiveDrag", CT_BarMod_ActionButton_UpdateActionText);
-
-			-- in case something was dragged from this slot
-			button:HookScript("OnDragStop", CT_BarMod_ActionButton_UpdateActionText);
-
-			-- when the buttons first appear!
-			button:HookScript("OnShow", CT_BarMod_ActionButton_UpdateActionText);
-
-			-- during mouseover
-			button:HookScript("OnEnter", CT_BarMod_ActionButton_UpdateActionText);
-		end);
-		
-		-- hook the MacroFrame to reapply settings (this is done only after PLAYER_LOGIN to cut down on false positives while the game boots up)
-		local function hookMacroFrame(__, name)
-			if (name == "Blizzard_MacroUI") then
-				MacroFrame:HookScript("OnHide", CT_BarMod_UpdateActionButtonActionText);
-				module:unregEvent("ADDON_LOADED", hookMacroFrame);
-			end
-			
-		end
-		module:regEvent("ADDON_LOADED", hookMacroFrame);
-	end);
+	updateBlizzardButtons(CT_BarMod_ActionButton_HookActionText);
 end
 
 -----

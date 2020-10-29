@@ -157,25 +157,35 @@ end
 -- existing users' bars will be in the same place.
 local firstButtonOffset = 12;
 
-local function groupOnEnter(obj)
-	local group = module:getGroup(obj.groupId);
-	if (not group.isHovered) then
-		group.isHovered = true;
+local function groupOnLeave(group)
+	group.isHovered = nil;
+	if (group.barMouseover) then
+		group.frame:SetAlpha((InCombatLockdown() and group.barFadedCombat) or group.barFaded or 0)
+	else
 		group.frame:SetAlpha(group.opacity or 1)
 	end
 end
 
-local function groupOnLeave(obj)
-	local group = module:getGroup(obj.groupId);
-	if (group.isHovered) then
-		group.isHovered = nil;
-		if (group.barMouseover) then
-			group.frame:SetAlpha((InCombatLockdown() and group.barFadedCombat) or group.barFaded or 0)
-		else
-			group.frame:SetAlpha(group.opacity or 1)
-		end
+local function groupCheckHover(group)
+	if (group.overlay:IsMouseOver() == true) then
+		C_Timer.After(0.1, function() groupCheckHover(group) end);
+	else
+		group.overlay:SetMouseMotionEnabled(true);
+		groupOnLeave(group);
 	end
 end
+
+local function groupOnEnter(obj)
+	local group = module:getGroup(obj.groupId);
+	if (not group.isHovered) then
+		group.overlay:SetMouseMotionEnabled(false);
+		group.isHovered = true;
+		group.frame:SetAlpha(group.opacity or 1);
+		groupCheckHover(group);
+	end
+end
+
+
 
 local function groupOnCombatStart(group)
 	if (not group.isHovered) then
@@ -197,8 +207,8 @@ local function groupOnCombatEnd(group)
 	end	
 end
 
-module.groupOnLeave = groupOnLeave;
-module.groupOnEnter = groupOnEnter;
+module.groupOnLeave = function() end -- no longer needed
+module.groupOnEnter = groupOnEnter
 
 function module:setDragOnTop(onTop)
 	-- Show group drag frames on top or behind the action buttons.
@@ -699,10 +709,11 @@ function group:new(groupId)
 	overlay.background:SetColorTexture(1, 1, 1, 0);
 	overlay.background:SetVertexColor(1, 1, 1, 1);
 	overlay.background:Show();
+	
 	overlay:Show();
 	overlay.groupId = groupId;
 	overlay:HookScript("OnEnter", groupOnEnter);
-	overlay:HookScript("OnLeave", groupOnLeave);
+	overlay:SetMouseClickEnabled(false);
 	overlay:HookScript("OnEvent", function(__, event)
 		if (event == "PLAYER_REGEN_DISABLED") then
 			C_Timer.After(0.001, function()

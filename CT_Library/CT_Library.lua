@@ -34,7 +34,7 @@ setmetatable(lib, { __index = libPublic });
 _G[LIBRARY_NAME] = libPublic;
 
 -- Private attributes
-local modules = {};		-- Collection of registered CT modules
+local modules = {};		-- Contains two references to each installed module: by number and by name.  See lib:iterateModules() and lib:getModule(name)
 local movables, frame, eventTable;
 local timerRepeatingFuncs, timerFuncs = {}, {};
 local numSlashCmds, localizations, tableList, defaultValues;
@@ -65,6 +65,7 @@ end
 
 local ChatFrame1 = ChatFrame1;
 
+local bit = bit;
 local floor = floor;
 local format = format;
 local gsub = gsub;
@@ -122,8 +123,12 @@ local function getPrintText(...)
 	return str;
 end
 
-function lib:getInstalledModules()
-	return modules;
+function lib:iterateModules()
+	return ipairs(modules);
+end
+
+function lib:getModule(name)
+	return modules[name]
 end
 
 -- Clears a table
@@ -621,19 +626,19 @@ end
 
 local function loadAddon(self, event, addon)
 	if ( modules ) then
-		-- Scan our modules to see if we have a matching addon
-		local updateFunc;
-		for key, value in ipairs(modules) do
-			if ( value.name == addon ) then
-				-- Initialize options
-				value.options = _G[addon.."Options"];
+		local module = modules[addon];
+		if (module) then
+			-- Initialize options
+			module.options = _G[addon.."Options"];
+			
+			-- Delete older import data
+			if ( module.options ) then
+				module.options["CHAR-Unknown- Import String"] = nil;
+			end
 
-				-- Run any update function we might have
-				updateFunc = value.update;
-				if ( updateFunc ) then
-					updateFunc(value, "init");
-				end
-				return;
+			-- Run any update function we might have
+			if ( module.update ) then
+				module:update("init");
 			end
 		end
 	end
@@ -879,13 +884,13 @@ local function registerLocalizationMeta(module)
 	setmetatable(module.text, meta);
 end
 
+-- Registers a module having a unique name and an optional index (defaulting to #modules)
 local function registerModule(module, position)
-	for k, v in ipairs(modules) do
-		if (v.name == module.name) then
-			-- Module is already registered.
-			return;
-		end
+	if modules[module.name] then
+		-- Module is already registered
+		return;
 	end
+	modules[module.name] = module;
 	if ( position ) then
 		module.ctposition = position;
 		tinsert(modules, position, module);
@@ -915,7 +920,8 @@ end
 -- Furthermore, creates sub-table module.publicInterface that may be used by modules to limit their public exposure
 -- 
 function libPublic:registerModule(module)
-	assert(type(module) == "table", "An AddOn attempted to register itself with CTMod without providing the necessary parameter");
+	assert(type(module) == "table", "An AddOn attempted to register itself with CTMod without passing its table");
+	assert(type(module.name) == "string", "An unnamed addon attempted to register with CTMod.");
 	registerModule(module);
 end
 
@@ -1314,6 +1320,127 @@ end
 
 -- End Frame Misc
 -----------------------------------------------
+
+-----------------------------------------------
+-- Compression, hashing and character encoding
+
+do
+	-- This section uses LibDeflate by Hauquiain He, for the following:
+	--   (a) Adler-32 checksum per RFC 1950; and
+	--   (b) Compression and Decompression.
+
+	-- LibDeflate is governed by the zlib license found at the top of <Libs/LibDeflate.lua>
+	-- LibDeflate.lua also has an encoding methods which is comparable to other popular addons having other license types, but CTMod implements its own encoding to avoid license conflicts.
+
+
+	-- Returns four hexadecimal characters representing a Adler32 hash
+	function lib:hash(text)
+		if (type(text) == "string") then
+			return LibStub:GetLibrary("LibDeflate"):Adler32(text)
+		end
+	end
+
+	-- Compresses a string using LibDeflate's algorithm
+	function lib:compress(text)
+		if (type(text) == "string") then
+			return LibStub:GetLibrary("LibDeflate"):CompressDeflate(text)
+		end
+	end
+
+	-- Decompresses a string using LibDeflate's algorithm
+	function lib:decompress(text)
+		if (type(text) == "string") then
+			return LibStub:GetLibrary("LibDeflate"):DecompressDeflate(text)
+		end
+	end
+
+	-- Encodes a string of raw bytes into visible UTF-8 characters with a checksum for easier transmission
+	function lib:encode256To64(text)
+		
+		-- argument validation
+		if (type(text) ~= "string" or strlen(text) < 1) then
+			return
+		end
+		
+		-- base 256 to 64
+		local value = 0
+		local bitsAvail = 0
+		local encodedParts = lib:getTable()
+		for i = 1, text:len() do
+			value, bitsAvail = value*256 + text:byte(i), bitsAvail + 8
+			while (bitsAvail >= 6) do
+				bitsAvail = bitsAvail - 6
+				tinsert(encodedParts, string.char(floor(value/2^bitsAvail)+38))
+				value = value % 2^bitsAvail
+			end
+		end
+		while (bitsAvail > 0) do
+			bitsAvail = bitsAvail - 6
+			tinsert(encodedParts, string.char(floor(value/2^bitsAvail)+38))
+			value = value % 2^bitsAvail
+		end
+		
+		-- append a checksum and return the rest
+		local retVal = table.concat(encodedParts)
+		retVal = string.char(lib:hash(retVal)%64+38) .. retVal
+		lib:freeTable(encodedParts)
+		return retVal
+	end
+
+	-- Decodes single-byte, visible UTF-8 characters back to a raw bit stream, but returns nil if the checksum fails
+	function lib:decode256From64(text)
+		if (type(text) ~= "string" or strlen(text) < 2 or lib:hash(text:sub(2))%64+38 ~= text:byte(1)) then
+			return
+		end
+		
+		-- base 64 to 256
+		local value = 0
+		local bitsAvail = 0
+		local decodedParts = lib:getTable()
+		for i = 2, text:len() do
+			value, bitsAvail = value*64 + text:byte(i) - 38, bitsAvail + 6
+			if (bitsAvail >= 8) then
+				bitsAvail = bitsAvail - 8
+				tinsert(decodedParts, string.char(floor(value/2^bitsAvail)))
+				value = value % 2^bitsAvail
+			end
+		end	
+
+		local retVal = table.concat(decodedParts)
+		lib:freeTable(decodedParts)
+		return retVal
+	end
+
+end
+
+-- End compression, hashing and character encoding
+-----------------------------------------------
+
+
+-----------------------------------------------
+-- Table serializing
+
+-- This section uses AceSerializer-3.0 by Nevcairiel et al.
+-- Ace3 is protected by the license in <Libs/Ace3/Ace3-License.txt>
+
+function lib:serializeTable(tbl)
+	if (type(tbl) == "table") then
+		return LibStub:GetLibrary("AceSerializer-3.0"):Serialize(tbl)
+	end
+end
+
+function lib:deserializeTable(text)
+	if (type(text) == "string") then
+		local success, tbl = LibStub:GetLibrary("AceSerializer-3.0"):Deserialize(text)
+		if (success) then
+			return tbl
+		end
+	end
+end
+
+-- End table serializing
+-----------------------------------------------
+
 
 -----------------------------------------------
 -- Frame Creation
@@ -1811,9 +1938,7 @@ end
 
 objectHandlers.slider = function(self, parent, name, virtual, option, text, values)
 	local slider = CreateFrame("Slider", name, parent, virtual or "OptionsSliderTemplate");
-	local title = _G[name .. "Text"];
-	local low = _G[name .. "Low"];
-	local high = _G[name .. "High"];
+	local title, low, high = slider.Text, slider.Low, slider.High;
 	local titleText, lowText, highText = splitString(text, colonSeparator);
 	local minValue, maxValue, step = splitString(values, colonSeparator);
 
@@ -3055,7 +3180,7 @@ local function populateAddonsList(char)
 	-- Position action frame
 	obj = optionsFrame.actions;
 	obj:ClearAllPoints();
-	obj:SetPoint("TOPLEFT", optionsFrame, "TOPLEFT", 0, -105 + (-20 * num));
+	obj:SetPoint("TOPLEFT", optionsFrame, "TOPLEFT", 0, -160 + (-20 * num));
 	obj:SetWidth(300)
 	obj:SetHeight(150)
 	--obj:SetPoint("RIGHT", optionsFrame);
@@ -3074,6 +3199,32 @@ local function populateAddonsList(char)
 
 	fromChar = char;
 	addonsFrame:Show();
+	
+	-- It is not permissible to import from yourself to yourself
+	local actions = optionsFrame.actions;
+	module:setOption("canImport", nil, true);
+	module:setOption("canDelete", nil, true);
+	module:setOption("canExport", nil, true);
+	actions.confirmImport:SetChecked(false);
+	actions.confirmDelete:SetChecked(false);
+	actions.confirmExport:SetChecked(false);
+	if (char == getCharKey()) then
+		actions.confirmImport:Hide();
+		actions.importNote:Hide();
+		actions.importButton:Hide();
+		actions.confirmExport:Show();
+		actions.exportNote:Show();
+		actions.exportButton:Show();
+		actions.deleteNote:SetText(L["CT_Library/SettingsImport/Actions/DeleteSelfNote"]);
+	else
+		actions.confirmImport:Show();
+		actions.importNote:Show();
+		actions.importButton:Show();
+		actions.confirmExport:Hide();
+		actions.exportNote:Hide();
+		actions.exportButton:Hide();
+		actions.deleteNote:SetText(L["CT_Library/SettingsImport/Actions/DeleteOtherNote"]);
+	end
 
 	return numAddons;
 end
@@ -3089,9 +3240,6 @@ local function populateCharDropdownInit()
 		lib:clearTable(importDropdownEntry);
 		lib:clearTable(importFlaggedCharacters);
 	end
-
-	-- Prevent ourself from being added
-	importFlaggedCharacters[getCharKey()] = true;
 
 	for key, value in ipairs(modules) do
 		options = value.options;
@@ -3114,7 +3262,11 @@ local function populateCharDropdownInit()
 	for key, value in ipairs(players) do
 		name, realm = value:match("^CHAR%-([^-]+)%-(.+)$");
 		if ( name and realm ) then
-			importDropdownEntry.text = name; -- .. ", " .. realm;
+			if (value == getCharKey()) then
+				importDropdownEntry.text = "|cffffff00" .. name;
+			else
+				importDropdownEntry.text = name;
+			end
 			importDropdownEntry.value = value;
 			importDropdownEntry.checked = nil;
 			importDropdownEntry.func = dropdownClick;
@@ -3149,6 +3301,7 @@ local function populateServerDropdownInit()
 	local servers = {};
 	local serversort = {};
 	local name, realm, options;
+	local clipboardPanel;
 
 	if ( not importDropdownEntry ) then
 		importDropdownEntry = { };
@@ -3260,7 +3413,7 @@ local function clearUserSettings(key, addon)
 end
 
 local function import()
-	if ( fromChar ) then
+	if ( fromChar and not InCombatLockdown() ) then
 		if (not module:getOption("canImport")) then
 			return;
 		end
@@ -3291,11 +3444,10 @@ local function import()
 end
 
 local function delete()
-	if ( fromChar ) then
+	if ( fromChar and not InCombatLockdown()) then
 		if (not module:getOption("canDelete")) then
 			return;
 		end
-		local charKey = getCharKey();
 		local options, success;
 		local fromOptions;
 
@@ -3327,8 +3479,197 @@ local function delete()
 					populateServerDropdown();
 				end
 			end
+			if (fromChar == getCharKey()) then
+				C_UI.Reload();
+			end
 		else
 			print(L["CT_Library/SettingsImport/NoAddonsSelected"]);
+		end
+	end
+end
+
+local function closeClipboardPanel()
+	clipboardPanel:Hide()
+	clipboardPanel.editBox:SetText("");
+end
+
+local function validateClipboard()
+	local text = clipboardPanel.editBox:GetText();
+	if (strlen(text) < 2) then
+		clipboardPanel.warning:SetText("");
+		clipboardPanel.acceptButton:Disable();
+	elseif (lib:hash(text:sub(2))%64+38 ~= text:byte(1)) then
+		clipboardPanel.warning:SetText(L["CT_Library/SettingsImport/Clipboard/ChecksumAlert"])
+		clipboardPanel.warning:SetTextColor(0.9, 0.4, 0.4);
+		clipboardPanel.acceptButton:Disable();
+	else
+		text = lib:decode256From64(text);
+		text = lib:decompress(text);
+		local importTable = lib:deserializeTable(text);
+		if (importTable) then
+			local warn, found;
+			if (importTable.exportGameVersion ~= lib:getGameVersion(true)) then
+				warn = true;
+				clipboardPanel.warning:SetText(L["CT_Library/SettingsImport/Clipboard/GameVersionWarning"]);
+				clipboardPanel.warning:SetTextColor(0.7, 0.7, 0.3);
+			end
+			for key, val in pairs(importTable) do
+				local module = lib:getModule(key)
+				if (module) then
+					found = true;
+					if (module.version ~= val.exportVersion and warn == nil) then
+						warn = true;
+						clipboardPanel.warning:SetText(L["CT_Library/SettingsImport/Clipboard/AddOnVersionWarning"]);
+						clipboardPanel.warning:SetTextColor(0.7, 0.7, 0.3);
+						
+					end
+				elseif (key ~= "exportGameVersion" and warn == nil) then
+					warn = true;
+					clipboardPanel.warning:SetText(L["CT_Library/SettingsImport/Clipboard/AddOnMissingWarning"]);
+					clipboardPanel.warning:SetTextColor(0.7, 0.7, 0.3);
+				end
+			end
+			if (found) then
+				if (warn == nil) then
+					clipboardPanel.warning:SetText(L["CT_Library/SettingsImport/Clipboard/StringValidMessage"]);
+					clipboardPanel.warning:SetTextColor(0.4, 0.9, 0.4);
+				end
+				clipboardPanel.acceptButton:Enable();
+				return importTable;
+			else
+				clipboardPanel.warning:SetText(L["CT_Library/SettingsImport/Clipboard/NoAddOnsAlert"]);
+				clipboardPanel.warning:SetTextColor(0.9, 0.4, 0.4);
+				clipboardPanel.acceptButton:Disable();
+			end
+		else
+			clipboardPanel.warning:SetText(L["CT_Library/SettingsImport/Clipboard/FailureAlert"]);
+			clipboardPanel.warning:SetTextColor(0.9, 0.4, 0.4);
+			clipboardPanel.acceptButton:Disable();
+		end
+	end
+end
+
+local function copyFromClipboard()
+	local importTable = validateClipboard();	-- returns nil if there is any reason to anticipate failure
+	if (importTable) then
+		for __, module in ipairs(modules) do
+			if (module.options and module.name) then
+				if (importTable[module.name]) then
+					module.options["CHAR-Unknown- Import String"] = {};
+					lib:copyTable(importTable[module.name], module.options["CHAR-Unknown- Import String"]);
+				else
+					module.options["CHAR-Unknown- Import String"] = nil
+				end
+			end
+		end
+		importRealm = " Import String";
+		module:setOption("char", "CHAR-Unknown- Import String", true);
+		UIDropDownMenu_SetText(CT_LibraryDropdown0, " Import String (1)");
+		UIDropDownMenu_SetText(CT_LibraryDropdown1, "Unknown");
+		closeClipboardPanel();
+	end
+end
+
+local function openClipboardPanel(text)
+	if (not clipboardPanel) then
+		clipboardPanel = CreateFrame("Frame", nil, CTCONTROLPANEL, "UIPanelDialogTemplate");
+		clipboardPanel:SetFrameLevel("10");
+		clipboardPanel:SetSize(400, 200);
+		clipboardPanel:SetPoint("CENTER", UIParent);
+		
+		clipboardPanel.label = clipboardPanel:CreateFontString(nil, "ARTWORK", "ChatFontNormal");
+		clipboardPanel.label:SetPoint("TOP", 0, -40);
+		
+		clipboardPanel.warning = clipboardPanel:CreateFontString(nil, "ARTWORK", "ChatFontNormal");
+		clipboardPanel.warning:SetPoint("BOTTOM", 0, 60);
+		
+		clipboardPanel.acceptButton = CreateFrame("Button", nil, clipboardPanel, "UIPanelButtonTemplate");
+		clipboardPanel.acceptButton:SetText(CONTINUE);  -- GlobalStrings.lua
+		clipboardPanel.acceptButton:SetSize(120, 30);
+		clipboardPanel.acceptButton:SetPoint("BOTTOMRIGHT", clipboardPanel, "BOTTOM", -27, 20);
+		clipboardPanel.acceptButton:HookScript("OnClick", copyFromClipboard);
+		clipboardPanel.acceptButton:HookScript("OnEnter", function()
+			lib:displayTooltip(clipboardPanel.acceptButton, {CONTINUE, L["CT_Library/SettingsImport/Clipboard/AcceptTip"]}, "CT_ABOVEBELOW", 0, 0, clipboardPanel);
+		end);
+		
+		clipboardPanel.cancelButton = CreateFrame("Button", nil, clipboardPanel, "UIPanelButtonTemplate");
+		clipboardPanel.cancelButton:SetText(CANCEL);  -- GlobalStrings.lua
+		clipboardPanel.cancelButton:SetSize(120, 30);
+		clipboardPanel.cancelButton:SetPoint("BOTTOMLEFT", clipboardPanel, "BOTTOM", 27, 20);
+		clipboardPanel.cancelButton:HookScript("OnClick", closeClipboardPanel);
+		
+		clipboardPanel.editBox = CreateFrame("EditBox", nil, clipboardPanel, "InputBoxTemplate");
+		clipboardPanel.editBox:SetSize(300, 50);
+		clipboardPanel.editBox:SetPoint("CENTER");
+		clipboardPanel.editBox:SetScript("OnEscapePressed", closeClipboardPanel);
+		clipboardPanel.editBox:SetScript("OnHide", closeClipboardPanel);
+		-- OnTextChanged and OnEnterPressed are set dynamically
+		
+	end
+	clipboardPanel:Show();
+	actions.confirmImport:SetChecked(false);
+	actions.confirmDelete:SetChecked(false);
+	actions.confirmExport:SetChecked(false);
+	module:setOption("canImport", nil, true);
+	module:setOption("canDelete", nil, true);
+	module:setOption("canExport", nil, true);
+	if (type(text) == "string") then
+		clipboardPanel.editBox:SetScript("OnTextChanged", nil);
+		clipboardPanel.editBox:SetScript("OnEnterPressed", closeClipboardPanel);
+		clipboardPanel.editBox:SetText(text);
+		clipboardPanel.acceptButton:Hide();
+		clipboardPanel.warning:Hide();
+		clipboardPanel.label:SetText("Copy the entire string below.|n|cffffff00Warning: it might be possible to identify you from your settings.");
+		clipboardPanel.cancelButton:SetText("Close");
+		
+	else
+		clipboardPanel.editBox:SetScript("OnTextChanged", validateClipboard);
+		clipboardPanel.editBox:SetScript("OnEnterPressed", copyFromClipboard );
+		clipboardPanel.editBox:SetText("");
+		clipboardPanel.acceptButton:Show();
+		clipboardPanel.warning:Show();
+		clipboardPanel.label:SetText("Paste the entire string below.|n|cffffff00This is a beta feature; use at own risk.");
+		clipboardPanel.cancelButton:SetText("Cancel");
+	end
+end
+
+local function export(self)
+	-- STEP 1: Serialize each 
+	if ( fromChar ) then
+		if (not module:getOption("canExport")) then
+			return;
+		end
+	
+		local options, success;
+		local exportOptions = {["exportGameVersion"] = lib:getGameVersion(true)};
+		local fromOptions;
+
+		for modnum, addon in ipairs(modules) do
+			if ( addon ~= module and addon.options and addon.name and addon.version) then
+				fromOptions = addon.options[fromChar];
+				if ( fromOptions and addonIsChecked(addon.name) and module:getOption("canExport") ) then
+					exportOptions[addon.name] = {["exportVersion"] = addon.version}
+					lib:copyTable(fromOptions, exportOptions[addon.name])
+					success = true;
+				end
+			end
+		end
+
+		module:setOption("canExport", nil, true);
+
+		if ( not success ) then
+			print(L["CT_Library/SettingsImport/NoAddonsSelected"]);
+			return;
+		end
+
+		local text = lib:serializeTable(exportOptions);
+		text = lib:compress(text);
+		text = lib:encode256To64(text);
+		
+		if (text) then
+			openClipboardPanel(text)
+		else
+			print("Sorry, something has gone wrong.")
 		end
 	end
 end
@@ -3355,7 +3696,10 @@ module.update = function(self, type, value)
 		local actions = optionsFrame.actions;
 		if (value) then
 			actions.deleteButton:Enable();
+			actions.confirmImport:SetChecked(false);
+			actions.confirmExport:SetChecked(false);
 			module:setOption("canImport", nil, true);
+			module:setOption("canExport", nil, true);
 		else
 			actions.deleteButton:Disable();
 		end
@@ -3364,24 +3708,44 @@ module.update = function(self, type, value)
 		local actions = optionsFrame.actions;
 		if (value) then
 			actions.importButton:Enable();
+			actions.confirmDelete:SetChecked(false);
+			actions.confirmExport:SetChecked(false);
 			module:setOption("canDelete", nil, true);
+			module:setOption("canExport", nil, true);
 		else
 			actions.importButton:Disable();
 		end
 		actions.confirmImport:SetChecked(value);
+	elseif (type == "canExport") then
+		local actions = optionsFrame.actions;
+		if (value) then
+			actions.exportButton:Enable()
+			actions.confirmImport:SetChecked(false);
+			actions.confirmDelete:SetChecked(false);
+			module:setOption("canImport", nil, true);
+			module:setOption("canDelete", nil, true);
+		else
+			actions.exportButton:Disable();
+		end
 	end
 end
 
 module.frame = function()
 	local addonsTable = { };
 	local optionsTable = {
-		"font#tl:5:-5#v:GameFontNormalLarge#Import From",
+		"font#tl:5:-5#v:GameFontNormalLarge#" .. L["CT_Library/SettingsImport/Profiles/Heading"],
+	
+		"font#tl:20:-30#v:GameFontNormal#" .. L["CT_Library/SettingsImport/Profiles/InternalSubHeading"],
+		"font#tl:40:-50#n:CT_LibraryDropdown0Label#v:ChatFontNormal#" .. L["CT_Library/SettingsImport/Profiles/InternalServerLabel"],
+		"dropdown#s:155:20#tl:100:-51#o:char#n:CT_LibraryDropdown0#i:serverDropdown",
 
-		"font#tl:20:-30#n:CT_LibraryDropdown0Label#v:ChatFontNormal#Server:",
-		"dropdown#s:175:20#tl:80:-31#o:char#n:CT_LibraryDropdown0#i:serverDropdown",
+		"font#tl:40:-75#n:CT_LibraryDropdown1Label#v:ChatFontNormal#" .. L["CT_Library/SettingsImport/Profiles/InternalCharacterLabel"],
+		"dropdown#s:155:20#tl:100:-76#o:char#n:CT_LibraryDropdown1#i:charDropdown",
 
-		"font#tl:20:-55#n:CT_LibraryDropdown1Label#v:ChatFontNormal#Character:",
-		"dropdown#s:175:20#tl:80:-56#o:char#n:CT_LibraryDropdown1#i:charDropdown",
+		"font#tl:20:-100#v:GameFontNormal#" .. L["CT_Library/SettingsImport/Profiles/ExternalSubHeading"],
+		["button#t:0:-120#s:150:20#v:UIPanelButtonTemplate#" .. L["CT_Library/SettingsImport/Profiles/ExternalButton"]] = {
+			["onclick"] = openClipboardPanel,
+		},
 
 		["onload"] = function(self)
 			optionsFrame, addonsFrame = self, self.addons;
@@ -3391,28 +3755,57 @@ module.frame = function()
 
 			module:setOption("canImport", nil, true);
 			module:setOption("canDelete", nil, true);
+			module:setOption("canExport", nil, true);
 		end,
 
-		["frame#tl:0:-85#r#i:addons#hidden"] = addonsTable,
+		["frame#tl:0:-150#r#i:addons#hidden"] = addonsTable,
 
 		["frame#i:actions#hidden"] = {
-			"font#tl:5:0#i:title#v:GameFontNormalLarge#Select Action",
+			"font#tl:5:0#i:title#v:GameFontNormalLarge#" .. L["CT_Library/SettingsImport/Actions/Heading"],
 
 			"checkbutton#tl:20:-25#i:confirmImport#s:25:25#o:canImport#I want to IMPORT the selected settings.",
-			["button#t:0:-50#s:155:30#i:importButton#v:UIPanelButtonTemplate#Import Settings"] = {
-				["onclick"] = import
+			"font#t:0:-45#i:importNote#s:0:20#l#r#" .. L["CT_Library/SettingsImport/Actions/ImportNote"] .. "#0.5:0.5:0.5",
+			["button#t:0:-65#s:155:30#i:importButton#v:UIPanelButtonTemplate#Import Settings"] = {
+				["onclick"] = import,
+				["onenter"] = function(self)
+					self:GetParent().importNote:SetTextColor(0.7, 0.7, 0.3);
+				end,
+				["onleave"] = function(self)
+					self:GetParent().importNote:SetTextColor(0.5, 0.5, 0.5);
+				end,
 			},
-			"font#t:0:-80#i:note#s:0:20#l#r#(Note: Importing settings will reload your UI)#0.5:0.5:0.5",
+			
 
-			"checkbutton#tl:20:-110#i:confirmDelete#s:25:25#o:canDelete#I want to DELETE the selected settings.",
-			["button#t:0:-135#s:155:30#i:deleteButton#v:UIPanelButtonTemplate#Delete Settings"] = {
-				["onclick"] = delete
+			"checkbutton#tl:20:-105#i:confirmDelete#s:25:25#o:canDelete#I want to DELETE the selected settings.",
+			"font#t:0:-125#i:deleteNote#s:0:20#l#r##0.5:0.5:0.5",
+			["button#t:0:-145#s:155:30#i:deleteButton#v:UIPanelButtonTemplate#Delete Settings"] = {
+				["onclick"] = delete,
+				["onenter"] = function(self)
+					self:GetParent().deleteNote:SetTextColor(0.9, 0.4, 0.4);
+				end,
+				["onleave"] = function(self)
+					self:GetParent().deleteNote:SetTextColor(0.5, 0.5, 0.5);
+				end,
 			},
+			
+			
+			"checkbutton#tl:20:-25#i:confirmExport#s:25:25#o:canExport#I want to EXPORT the selected settings.#hidden",
+			"font#t:0:-45#i:exportNote#s:0:20#l#r#" .. L["CT_Library/SettingsImport/Actions/ExportNote"] .. "#0.5:0.5:0.5#hidden",
+			["button#t:0:-65#s:155:30#i:exportButton#v:UIPanelButtonTemplate#Generate String#hidden"] = {
+				["onclick"] = export,
+				["onenter"] = function(self)
+					self:GetParent().exportNote:SetTextColor(0.7, 0.7, 0.3);
+				end,
+				["onleave"] = function(self)
+					self:GetParent().exportNote:SetTextColor(0.5, 0.5, 0.5);
+				end,
+			},
+			
 		},
 	};
 
 	-- Fill in our addons table
-	tinsert(addonsTable, "font#tl:5:0#v:GameFontNormalLarge#Import Settings For");
+	tinsert(addonsTable, "font#tl:5:0#v:GameFontNormalLarge#" .. L["CT_Library/SettingsImport/AddOns/Heading"]);
 
 	-- Populate with addons
 	local num = 0;

@@ -101,7 +101,7 @@ local function minimapFrameSkeleton()
 						minimapdropdown,
 						function()
 							if (UIDROPDOWNMENU_MENU_LEVEL == 1) then
-								for i, mod in ipairs(module:getInstalledModules()) do
+								for i, mod in module:iterateModules() do
 									if (i>2) then
 										info = {};
 										info.text = mod.name;
