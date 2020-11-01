@@ -87,11 +87,7 @@ function module:UpdateStatusBarTextString(textStatusBar, settings, lockShow)
 		intermediateFrame:SetFrameLevel(5);
 		intermediateFrame:SetAllPoints();
 		textString = intermediateFrame:CreateFontString(nil, "OVERLAY", "TextStatusBarText");
-		if (UnitFramesImproved) then
-			textString:SetPoint("CENTER", textStatusBar, "BOTTOM", 0, textStatusBar:GetHeight()/2);
-		else
-			textString:SetPoint("CENTER", textStatusBar);
-		end
+		textString:SetPoint("CENTER", textStatusBar);
 		textStatusBar.ctTextString = textString;
 		
 		-- prevent the default text string from ever appearing
