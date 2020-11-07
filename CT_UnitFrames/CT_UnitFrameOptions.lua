@@ -612,11 +612,7 @@ end
 
 -- function to open and close the window, that can be recognized by CT_Library (to bypass the CTMod panel)
 module.customOpenFunction = function()
-	if ( CT_UnitFramesOptionsFrame:IsVisible() ) then
-		HideUIPanel(CT_UnitFramesOptionsFrame);
-	else
-		ShowUIPanel(CT_UnitFramesOptionsFrame);
-	end
+	CT_UnitFramesOptionsFrame:Show()
 end
 
 -- Slash command

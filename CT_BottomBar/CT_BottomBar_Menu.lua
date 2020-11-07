@@ -282,7 +282,7 @@ local function addon_OnDelayedUpdate(self, value)
 end
 
 --------------------------------------------
--- Hooks
+-- Movement Hooks
 
 local function addon_Hooked_MicroButton_SetPoint(...)
 	if (ctAddon.isDisabled) then
@@ -370,6 +370,36 @@ end
 	-- have finished and then we will call addon_update() during the
 	-- next OnUpdate.
 --]]
+
+--------------------------------------------
+-- HelpTip Hooks
+
+-- Prevents help tips from being off screen (ie, the "you need to select a talent" message)
+
+do
+	local lastParent, lastInfo, lastRelativeRegion
+
+	local function addon_Hooked_HelpTip_Show(__, parent, info, relativeRegion)
+		lastParent, lastInfo, lastRelativeRegion = parent, info, relativeRegion
+	end
+
+	local function addon_Hooked_MicroButton_ShowAlert(microButton)
+		if (lastRelativeRegion == microButton and ctAddon.isDisabled == false) then
+			if (ctAddon.orientation == "DOWN") then
+				HelpTip:HideAllSystem("MicroButtons")
+				lastInfo.targetPoint = microButton:GetLeft() > UIParent:GetRight()/2 and HelpTip.Point.LeftEdgeCenter or HelpTip.Point.RightEdgeCenter
+				HelpTip:Show(lastParent, lastInfo, lastRelativeRegion)
+			elseif (microButton:GetBottom() > UIParent:GetTop()/2) then
+				HelpTip:HideAllSystem("MicroButtons")
+				lastInfo.targetPoint = HelpTip.Point.BottomEdgeCenter
+				HelpTip:Show(lastParent, lastInfo, lastRelativeRegion)
+			end
+		end
+	end
+
+	hooksecurefunc(HelpTip, "Show", addon_Hooked_HelpTip_Show)
+	hooksecurefunc("MainMenuMicroButton_ShowAlert", addon_Hooked_MicroButton_ShowAlert)
+end
 
 --------------------------------------------
 -- Enable, disable, initialize, register.

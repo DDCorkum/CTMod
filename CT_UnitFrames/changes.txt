@@ -1,5 +1,6 @@
-CT_UnitFrames (9.0.1.3) 2020-10-31
+CT_UnitFrames (9.0.1.3) 2020-11-07
 - Resolving an addon conflict with UnitFramesImproved
+- Fix to closing the options menu while in combat
 
 CT_UnitFrames (8.3.7.1) 2020-08-21
 - Shadowlands BackdropTemplate compatibility
