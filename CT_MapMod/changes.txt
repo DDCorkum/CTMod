@@ -1,5 +1,6 @@
 CT_MapMod (9.0.1.3) 2020-09-30
 - New option to show undiscovered flight paths at flight masters
+- Fix to the default pin size for herbs and ore (14); it was wrongly the same as user notes (24)
 
 CT_MapMod (9.0.1.1) 2020-09-26
 - Cosmetic and performance improvements; also further integration to waypoints

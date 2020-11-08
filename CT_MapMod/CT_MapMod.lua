@@ -542,7 +542,7 @@ function CT_MapMod_PinMixin:OnAcquired(...) -- the arguments here are anything t
 		self.texture:SetTexture(icon);
 		self.texture:SetTexCoord(0, 1, 0, 1);
 	end
-	local size = module:getOption("CT_MapMod_" .. self.set .. "NoteSize") or 24;
+	local size = module:getOption("CT_MapMod_" .. self.set .. "NoteSize") or self.set == "User" and 24 or 14;
 	self:SetSize(size, size);
 	self:Show();
 end

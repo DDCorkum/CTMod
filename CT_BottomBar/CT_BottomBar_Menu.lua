@@ -376,7 +376,7 @@ end
 
 -- Prevents help tips from being off screen (ie, the "you need to select a talent" message)
 
-do
+if (HelpTip) then  -- not in Classic
 	local lastParent, lastInfo, lastRelativeRegion
 
 	local function addon_Hooked_HelpTip_Show(__, parent, info, relativeRegion)
