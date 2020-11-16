@@ -1267,6 +1267,10 @@ module.frame = function()
 		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:defbarSetUnitAttributes:true#Apply the 'Unit attributes'");
 		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:defbarHideTooltip:true#Apply the 'Hide action button tooltips' option");
 		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:defbarShowCooldown:true#Apply the 'Display cooldown counts' option");
+		
+		optionsAddObject( -2, 3*14, "font#t:0:%y#s:0:%s#l:20:0#r#After learning a new ability, prevent hidden bars from reappearing (such as in the tutorial).#" .. textColor2 .. ":l");
+		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:disableIconIntro:true#Disable icon intro animations");
+		
 	optionsEndFrame();
 
 	----------
@@ -1439,6 +1443,8 @@ module.frame = function()
 		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:hideExtraBar5#Hide the game's Bottom Right Bar"); -- Page 5 (Bar 5)
 		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:hideExtraBar3#Hide the game's Right Bar"); -- Page 3 (Bar 3)
 		optionsAddObject(  6,   26, "checkbutton#tl:62:%y#o:hideExtraBar4#i:hideExtraBar4#Hide the game's Right Bar 2"); -- Page 4 (Bar 4)
+		
+		
 
 		optionsAddScript("onshow",
 			function(self)

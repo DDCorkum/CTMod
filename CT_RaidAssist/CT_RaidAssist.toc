@@ -1,5 +1,5 @@
 ## Interface: 90001
-## Version: 9.0.1.1
+## Version: 9.0.1.3
 ## Title: CT_RaidAssist |cFF333333(BFA)
 ## Author: TS & Cide (Original), Dargen (MT Addon), DDC (Redesign)
 ## Notes: Monitor raid HP and click cast buffs, debuff removals, resurrections

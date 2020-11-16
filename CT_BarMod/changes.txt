@@ -1,3 +1,6 @@
+CT_BarMod (9.0.1.3) 2020-11-15
+- Preventing the game from making default bars reappear when learning new abilities
+
 CT_BarMod (9.0.1.2) 2020-10-25
 - More consistently hides macro names from the default Blizzard action bars
 - Empty space between buttons no longer prevents interacting with the WorldFrame

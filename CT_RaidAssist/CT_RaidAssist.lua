@@ -1900,10 +1900,12 @@ function NewCTRAWindow(owningCTRAFrames)
 						if (self:GetProperty("ShowDuplicatesOnceOnly")) then
 							rosterEntry.requestShow = nil;
 						end
-						if (self:GetProperty("ShowGroupLabels")) then
-							if (w == 0 and category[3]) then
+						if (self:GetProperty("ShowGroupLabels")) then	
+							if (w == 0) then
 								labelsShown = labelsShown + 1
-								if not(labels[labelsShown]) then
+							end
+							if (category[3]) then
+								if (not labels[labelsShown]) then
 									labels[labelsShown] = windowFrame:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall");
 									labels[labelsShown].id = labelsShown;
 									labels[labelsShown]:SetJustifyH("CENTER");
@@ -1912,10 +1914,6 @@ function NewCTRAWindow(owningCTRAFrames)
 									labels[labelsShown]:SetTextColor(1,1,1);
 									anchorLabel(labels[labelsShown]);
 								end
-								labels[labelsShown]:SetText(category[3] or "");
-								category[3] = nil;
-							elseif (category[3]) then
-								-- this isn't the first frame in this column
 								local text = labels[labelsShown]:GetText();
 								if (text and text ~= "") then
 									if (text:sub(1,6) == "Group ") then
