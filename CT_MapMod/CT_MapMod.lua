@@ -317,9 +317,32 @@ function public:InsertOre(mapID, x, y, ore, descript, name)
 		end
 		-- following
 		if (ore:sub(-9) == " жила" and ore:len() > 9) then
-			ore = ore:sub(1,-10);				--changes "Медная жила" to "Медная"
+			ore = ore:sub(1,-10);				-- changes "Медная жила" to "Медная"
 		end
-		
+	elseif (GetLocale() == "zhCH") then
+		-- exceptions first, then normal rules for everything else
+		if (ore == "活性魔石") then
+			ore = "魔石矿石"					-- Living Leystone
+		elseif (ore == "黑曜石碎块" or ore == "巨型黑曜石石板") then
+			ore = "黑曜石矿"					-- Obsidium
+		else
+			-- normal rules: prefix characters
+			if (ore:sub(1,3) == "富" and ore:len() > 3) then
+				ore = ore:sub(4)			-- changes 富瑟银矿 (Rich Thorium Vein) to 瑟银矿, and later rule adds 石 to make 瑟银矿石 (Thorium Ore)
+			elseif (ore:sub(1,9) == "纯净的" and ore:len() > 9) then
+				ore = ore:sub(10)			-- changes 纯净的萨隆邪铁矿脉 (Pure Saronite Deposit) to 萨隆邪铁矿脉, and a later rule replaces 脉 with 石 to make 萨隆邪铁矿石 (Saronite Ore)
+			elseif (ore:sub(1,15) == "软泥覆盖的" and ore:len() > 15) then
+				ore = ore:sub(16)			-- changes 软泥覆盖的秘银矿脉 (Ooze Covered Mithril Deposit) to 秘银矿脉, and a later rule replaces 脉 with 石 to make 秘银矿石 (Mithril Ore)
+			end
+			-- normal rules: suffix characters
+			if (ore:sub(-3) == "脉" and ore:len() > 3) then
+				ore = ore:sub(1,-4) .. "石"		-- changes 魔铁矿脉 (Fel Iron Deposit) to 魔铁矿石 (Fel Iron Ore)
+			elseif (ore:sub(-3) == "层" and ore:len() > 3) then
+				ore = ore:sub(1,-4) .. "石"		-- changes 魔石矿层 (Leystone Seam) to 魔石矿石 (Leystone Ore)
+			elseif (ore:sub(-3) ~= "石") then
+				ore = ore .. "石"			-- changes 铜矿 (Copper Vein) to 铜矿石 (Copper Ore)
+			end
+		end
 	end
 
 	-- Now process the mining node
