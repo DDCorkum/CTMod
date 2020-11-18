@@ -832,29 +832,3 @@ do
 		pullPanelsForward(option, value);
 	end
 end
-
---------------------------------------------
--- Prevent hidden default bars from appearing when a new ability is acquired.
-
-if (IconIntroTracker) then
-	local oldFunc = IconIntroTracker:GetScript("OnEvent")
-	IconIntroTracker:SetScript("OnEvent", function(...)
-		if (module:getOption("disableIconIntro") == false and not InCombatLockdown()) then
-			oldFunc(...)
-		end
-	end)
-end
-
-if (NPE_LoadUI) then
-	local firstTime = true
-	hooksecurefunc("NPE_LoadUI", function()
-		if (firstTime) then
-			firstTime = false
-			hooksecurefunc(NPE_TutorialDragButton, "Show", function(self) 
-				if (module:getOption("disableIconIntro") ~= false and not InCombatLockdown()) then
-					C_Timer.After(2, function() NPE_TutorialDragButton.Hide(self) end)
-				end
-			end)
-		end
-	end)
-end
