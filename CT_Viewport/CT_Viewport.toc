@@ -1,6 +1,6 @@
 ## Interface: 90002
 ## Version: 8.3.7.1
-## Title: CT_Viewport |cFF333333(BFA)
+## Title: CT_Viewport |cFF333333(SL)
 ## Notes: Allows you to change the rendered world's size.
 ## DefaultState: Enabled
 ## SavedVariablesPerCharacter: CT_Viewport_Saved, CT_ViewportOptions

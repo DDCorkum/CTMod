@@ -1,6 +1,6 @@
 ## Interface: 90002
 ## Version: 9.0.1.1
-## Title: CT_BuffMod |cFF333333(BFA)
+## Title: CT_BuffMod |cFF333333(SL)
 ## Notes: Customizable buff display.
 ## DefaultState: Enabled
 ## SavedVariables: CT_BuffModOptions

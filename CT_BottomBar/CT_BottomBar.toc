@@ -1,6 +1,6 @@
 ## Interface: 90002
 ## Version: 9.0.2.1
-## Title: CT_BottomBar |cFF333333(BFA)
+## Title: CT_BottomBar |cFF333333(SL)
 ## Notes: Breaks up the main menu bar into movable pieces.
 ## DefaultState: Enabled
 ## SavedVariables: CT_BottomBarOptions

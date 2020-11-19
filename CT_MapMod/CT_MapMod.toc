@@ -1,6 +1,6 @@
 ## Interface: 90002
 ## Version: 9.0.2.1
-## Title: CT_MapMod |cFF333333(BFA)
+## Title: CT_MapMod |cFF333333(SL)
 ## Notes: Pins the World Map with points of interest and herb/ore nodes
 ## DefaultState: Enabled
 ## Author: Dahk (DDCorkum) using earlier work by Cide, TS, Resike
