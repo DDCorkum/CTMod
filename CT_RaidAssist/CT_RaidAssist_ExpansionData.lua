@@ -198,13 +198,22 @@ module.CTRA_Configuration_BossAuras =
 	[24327] = 0,		-- Zul'Gurub - Hakkar the Soulflayer: Cause Insanity
 	[24328] = 0,		-- Zul'Gurub - Hakkar the Soulflayer: Corrupted Blood
 	[25189] = 0,		-- Ruins of Ahn'Qiraj - Ossirian the Unscarred: Enveloping Winds
-	[785] = 0,		-- Temple of Ahn'Qiraj - The Prohpet Skeram: True Fulfillment
 	[25646] = 3,		-- Temple of Ahn'Qiraj - Battleguard Sartura: Mortal Wound
 	[25812] = 2,		-- Temple of Ahn'Qiraj - The Bug Trio; Yauj, Vem and Kri: Toxic Volley
 	[25991] = 2,		-- Temple of Ahn'Qiraj - Viscidus: Poison Bolt Volley
 	[26050] = 5,		-- Temple of Ahn'Qiraj - Princess Huhuran: Acid Spit
 	[26476] = 5,		-- Temple of Ahn'Qiraj - C'Thun: Digestive Acid
-	
+	[25991] = 0,		-- Naxxramas - Grand Widow Faerlina: Poison Bolt Volley
+	[28622] = 0,		-- Naxxramas - Maexxna: Web Wrap
+	[28776] = 0,		-- Naxxramas - Maexxna: Necrotic Poison
+	[28213] = 0,		-- Naxxramas - Noth the Plaguebringer: Curse of the Plaguebringer
+	[28832] = 5,		-- Naxxramas - The Four Horsemen: Mark of Korth'azz
+	[28833] = 5,		-- Naxxramas - The Four Horsemen: Mark of Blaumeux
+	[28834] = 5,		-- Naxxramas - The Four Horsemen: Mark of Mograine
+	[28835] = 5,		-- Naxxramas - The Four Horsemen: Mark of Zeliek
+	[28169] = 0,		-- Naxxramas - Grobbulus: Mutating Injection
+	[28059] = 0,		-- Naxxramas - Thaddius: Positive Charge
+	[28084] = 0,		-- Naxxramas - Thaddius: Negative Charge
 
 	-- Battle for Azeroth
 	[240443] = 1,		-- Mythic Plus: Bursting
