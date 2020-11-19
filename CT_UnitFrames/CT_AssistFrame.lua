@@ -13,7 +13,7 @@ local module = select(2,...);
 
 --------------------------------------------
 -- This is a modified version of Blizzard's TargetFrame
--- (originally based on the 3.2 source)
+-- (originally based on the 3.2 source, adapted since)
 -- plus some additional functions.
 -- This file displays targettarget, and targettargettarget frames.
 
@@ -62,6 +62,8 @@ function CT_AssistFrame_OnLoad(self)
 	self.borderTexture = _G[thisName.."TextureFrameTexture"];
 	self.highLevelTexture = _G[thisName.."TextureFrameHighLevelTexture"];
 	self.pvpIcon = _G[thisName.."TextureFramePVPIcon"];
+	self.prestigePortrait = _G[thisName.."TextureFramePrestigePortrait"];
+	self.prestigeBadge = _G[thisName.."TextureFramePrestigeBadge"];
 	self.leaderIcon = _G[thisName.."TextureFrameLeaderIcon"];
 	self.raidTargetIcon = _G[thisName.."TextureFrameRaidTargetIcon"];
 	self.questIcon = _G[thisName.."TextureFrameQuestIcon"];
@@ -96,11 +98,15 @@ function CT_AssistFrame_OnLoad(self)
 		nil, -- threatFrame,
 		nil, -- "player",
 		nil, -- _G[thisName.."NumericalThreat"],
-		_G[thisName.."MyHealPredictionBar"],
-		_G[thisName.."OtherHealPredictionBar"],
-		_G[thisName.."TotalAbsorbBar"],
-		_G[thisName.."TotalAbsorbBarOverlay"],
-		_G[thisName.."TextureFrameOverAbsorbGlow"]
+		UnitGetIncomingHeals and _G[thisName.."MyHealPredictionBar"],		-- classic compatibility
+		UnitGetIncomingHeals and _G[thisName.."OtherHealPredictionBar"],
+		UnitGetTotalHealAbsorbs and _G[thisName.."TotalAbsorbBar"],
+		UnitGetTotalHealAbsorbs and _G[thisName.."TotalAbsorbBarOverlay"],
+		UnitGetTotalHealAbsorbs and _G[thisName.."TextureFrameOverAbsorbGlow"],
+		UnitGetTotalHealAbsorbs and _G[thisName.."TextureFrameOverHealAbsorbGlow"],
+		UnitGetTotalHealAbsorbs and _G[thisName.."HealAbsorbBar"],
+		UnitGetTotalHealAbsorbs and _G[thisName.."HealAbsorbBarLeftShadow"],
+		UnitGetTotalHealAbsorbs and _G[thisName.."HealAbsorbBarRightShadow"]
 	);
 
 	self.noTextPrefix = true;
@@ -112,7 +118,7 @@ function CT_AssistFrame_OnLoad(self)
 	if ( self.showLevel ) then
 		self:RegisterUnitEvent("UNIT_LEVEL", unit1);
 	end
-	self:RegisterUnitEvent("UNIT_FACTION", unit1);
+	self:RegisterUnitEvent("UNIT_FACTION", unit1, "player");
 	if ( self.showClassification ) then
 		self:RegisterUnitEvent("UNIT_CLASSIFICATION_CHANGED", unit1);
 	end
@@ -219,9 +225,12 @@ end
 
 function CT_AssistFrame_OnEvent(self, event, ...)
 	-- self == The main unit frame
-	UnitFrame_OnEvent(self, event, ...);
-
 	local arg1 = ...;
+
+	if (arg1 == "player" or arg1 == "targettarget") then	-- in case you are targeting yourself
+		UnitFrame_OnEvent(self, event, "targettarget");
+	end
+	
 	if ( event == "PLAYER_ENTERING_WORLD" ) then
 		if (CT_UnitFramesOptions.shallDisplayAssist) then
 			RegisterUnitWatch(self);
@@ -265,22 +274,16 @@ function CT_AssistFrame_OnEvent(self, event, ...)
 --		end
 
 	elseif ( event == "UNIT_FACTION" ) then
-		if ( arg1 == "player" ) then
-			CT_AssistFrame_CheckFaction(self);
-			if ( self.showLevel ) then
-				CT_AssistFrame_CheckLevel(self);
-			end
+		CT_AssistFrame_CheckFaction(self);
+		if ( self.showLevel ) then
+			CT_AssistFrame_CheckLevel(self);
 		end
 
---	elseif ( event == "UNIT_CLASSIFICATION_CHANGED" ) then
---		if ( arg1 == self.unit ) then
---			CT_AssistFrame_CheckClassification(self);
---		end
+	elseif ( event == "UNIT_CLASSIFICATION_CHANGED" ) then
+		CT_AssistFrame_CheckClassification(self);
 
---	elseif ( event == "UNIT_AURA" ) then
---		if ( arg1 == self.unit ) then
---			CT_AssistFrame_UpdateAuras(self);
---		end
+	elseif ( event == "UNIT_AURA" ) then
+		CT_AssistFrame_UpdateAuras(self);
 
 	elseif ( event == "PLAYER_FLAGS_CHANGED" ) then
 		if ( arg1 == self.unit and self.showLeader ) then
@@ -412,12 +415,38 @@ function CT_AssistFrame_CheckFaction(self)
 	if ( self.showPVP ) then
 		local factionGroup = UnitFactionGroup(self.unit);
 		if ( UnitIsPVPFreeForAll(self.unit) ) then
-			self.pvpIcon:SetTexture("Interface\\TargetingFrame\\UI-PVP-FFA");
-			self.pvpIcon:Show();
+			local honorLevel = UnitHonorLevel and UnitHonorLevel(self.unit);
+			local honorRewardInfo = honorLevel and C_PvP.GetHonorRewardInfo and C_PvP.GetHonorRewardInfo(honorLevel);
+			if (honorRewardInfo) then
+				self.prestigePortrait:SetAtlas("honorsystem-portrait-neutral", false);
+				self.prestigeBadge:SetTexture(honorRewardInfo.badgeFileDataID);
+				self.prestigePortrait:Show();
+				self.prestigeBadge:Show();
+				self.pvpIcon:Hide();
+			else
+				self.prestigePortrait:Hide();
+				self.prestigeBadge:Hide();
+				self.pvpIcon:SetTexture("Interface\\TargetingFrame\\UI-PVP-FFA");
+				self.pvpIcon:Show();
+			end
 		elseif ( factionGroup and factionGroup ~= "Neutral" and UnitIsPVP(self.unit) ) then
-			self.pvpIcon:SetTexture("Interface\\TargetingFrame\\UI-PVP-"..factionGroup);
-			self.pvpIcon:Show();
+			local honorLevel = UnitHonorLevel and UnitHonorLevel(self.unit);
+			local honorRewardInfo = honorLevel and C_PvP.GetHonorRewardInfo and C_PvP.GetHonorRewardInfo(honorLevel);
+			if (honorRewardInfo) then
+				self.prestigePortrait:SetAtlas("honorsystem-portrait-"..factionGroup, false);
+				self.prestigeBadge:SetTexture(honorRewardInfo.badgeFileDataID);
+				self.prestigePortrait:Show();
+				self.prestigeBadge:Show();
+				self.pvpIcon:Hide();
+			else
+				self.prestigePortrait:Hide();
+				self.prestigeBadge:Hide();
+				self.pvpIcon:SetTexture("Interface\\TargetingFrame\\UI-PVP-"..factionGroup);
+				self.pvpIcon:Show();
+			end		
 		else
+			self.prestigePortrait:Hide();
+			self.prestigeBadge:Hide();
 			self.pvpIcon:Hide();
 		end
 	end
@@ -531,10 +560,7 @@ function CT_AssistFrame_UpdateAuras(self)
 	local selfName = self:GetName();
 	local canAssist = UnitCanAssist("player", self.unit);
 
-	local filter;
-	if ( SHOW_CASTABLE_BUFFS == "1" and canAssist ) then
-		filter = "RAID";
-	end
+	local filter		-- intentionally nil
 
 	for i=1, MAX_TARGET_BUFFS do
 		name, icon, count, debuffType, duration, expirationTime, caster, canStealOrPurge, _ , spellId = UnitBuff(self.unit, i, filter);
@@ -602,12 +628,6 @@ function CT_AssistFrame_UpdateAuras(self)
 	local frameBorder;
 	local numDebuffs = 0;
 	local isEnemy = UnitCanAttack("player", self.unit);
-
-	if ( SHOW_DISPELLABLE_DEBUFFS == "1" and canAssist ) then
-		filter = "RAID";
-	else
-		filter = nil;
-	end
 
 	local frameNum = 1;
 	local index = 1;
@@ -1051,7 +1071,7 @@ end
 
 function CT_TargetofAssist_OnShow(self)
 	-- self == The "target of" unit frame
-	CT_AssistFrame_UpdateAuras(self:GetParent());
+	-- CT_AssistFrame_UpdateAuras(self:GetParent());
 end
 
 function CT_TargetofAssist_OnHide(self)
@@ -1081,6 +1101,14 @@ function CT_TargetofAssist_Update(self, elapsed)
 	CT_TargetofAssist_CheckDead(self);
 	CT_TargetofAssist_HealthCheck(self);
 	RefreshDebuffs(self, self.unit);
+end
+
+function CT_TargetofAssist_OnEvent(self, event, ...)
+	if (event == "UNIT_AURA") then
+		RefreshDebuffs(self, self.unit);
+	else
+		UnitFrame_OnEvent(self, event, ...);
+	end
 end
 
 function CT_TargetofAssist_CheckDead(self)
@@ -1261,8 +1289,6 @@ local function CT_AssistFrame_TextStatusBar_UpdateTextString(bar)
 			module:UpdateStatusBarTextString(bar, CT_UnitFramesOptions.styles[4][3], 0)
 			module:UpdateBesideBarTextString(bar, CT_UnitFramesOptions.styles[4][4], self.manaBesideText)
 		end
-	else
-		print("foo");
 	end
 end
 

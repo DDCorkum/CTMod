@@ -256,6 +256,9 @@
 			<Layer level="ARTWORK">
 				<Texture name="$parentMyHealPredictionBar" inherits="MyHealPredictionBarTemplate"/>
 				<Texture name="$parentOtherHealPredictionBar" inherits="OtherHealPredictionBarTemplate"/>
+				<Texture name="$parentHealAbsorbBar" inherits="HealAbsorbBarTemplate"/>
+				<Texture name="$parentHealAbsorbBarLeftShadow" inherits="HealAbsorbBarLeftShadowTemplate"/>
+        			<Texture name="$parentHealAbsorbBarRightShadow" inherits="HealAbsorbBarRightShadowTemplate"/>
 				<Texture name="$parentTotalAbsorbBar" inherits="TotalAbsorbBarTemplate"/>
 			</Layer>
 			<Layer level="ARTWORK" textureSubLevel="1">
@@ -355,6 +358,12 @@
 								</Anchor>
 							</Anchors>
 						</Texture>
+						<Texture name="$parentPrestigePortrait" hidden="true">
+							<Size x="50" y="52" />
+							<Anchors>
+								<Anchor point="TOPRIGHT" x="-15" y="-13" />
+							</Anchors>
+						</Texture>
 						<Texture name="$parentRaidTargetIcon" file="Interface\TargetingFrame\UI-RaidTargetingIcons" hidden="true">
 							<Size>
 								<AbsDimension x="26" y="26"/>
@@ -379,7 +388,16 @@
 								<Anchor point="CENTER" relativePoint="RIGHT" x="-44" y="10"/>
 							</Anchors>
 						</Texture>
+					</Layer>
+					<Layer level="ARTWORK" textureSubLevel="1">
 						<Texture name="$parentOverAbsorbGlow" inherits="OverAbsorbGlowTemplate"/>
+						<Texture name="$parentOverHealAbsorbGlow" inherits="OverHealAbsorbGlowTemplate"/>
+						<Texture name="$parentPrestigeBadge" hidden="true">
+							<Size x="30" y="30" />
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="$parentPrestigePortrait" relativePoint="CENTER" />
+							</Anchors>
+						</Texture>
 					</Layer>
 				</Layers>
 				<Frames>
@@ -769,7 +787,7 @@
 				CT_TargetofAssist_OnHide(self);
 			</OnHide>
 			<OnEvent>
-				UnitFrame_OnEvent(self, event, ...);
+				CT_TargetofAssist_OnEvent(self, event, ...);
 			</OnEvent>
 		</Scripts>
 	</Button>
