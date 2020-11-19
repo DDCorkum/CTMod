@@ -1,4 +1,4 @@
-## Interface: 90001
+## Interface: 90002
 ## Version: 9.0.1.1
 ## Title: CT_MailMod |cFF333333(BFA)
 ## Notes: Heavily improves the in-game mail functionality.

@@ -1,4 +1,4 @@
-## Interface: 90001
+## Interface: 90002
 ## Version: 9.0.1.1
 ## Title: CT_PartyBuffs |cFF333333(BFA)
 ## Notes: Shows buffs at party member frames.

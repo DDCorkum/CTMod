@@ -270,6 +270,24 @@ module.CTRA_Configuration_BossAuras =
 	[309961] = 2,		-- Ny'alotha - Il'gynoth: Eye of N'Zoth
 	[315954] = 2,		-- Ny'alotha - Carapace of N'Zoth: Black Scar
 	[306973] = 0,		-- Ny'alotha - Carapace of N'Zoth: Madness Bomb
+	
+	-- Shadowlands
+	[342074] = 0,		-- Castle Nathria - Shriekwing: Echolocation
+	[328897] = 1,		-- Castle Nathria - Shriekwing: Exsanguinated
+	[334971] = 2,		-- Castle Nathria - Huntsman Altimor: Jagged Claws
+	[334852] = 0,		-- Castle Nathria - Huntsman Altimor: Petrifying Howl
+	[332295] = 5,		-- Castle Nathria - Hungering Destroyer: Growing Hunger
+	[329298] = 0,		-- Castle Nathria - Hungering Destroyer: Gluttonous Miasma
+	[334755] = 5,		-- Castle Nathria - Hungering Destroyer: Essence Sap
+	[325361] = 0,		-- Castle Nathria - Artificer Xy'Mox: Glyph of Destruction
+	[328437] = 0,		-- Castle Nathria - Artificer Xy'Mox: Dimensional Tear
+	[340860] = 0,		-- Castle Nathria - Artificer Xy'Mox: Withering Touch
+	[326271] = 0,		-- Castle Nathria - Artificer Xy'Mox: Statis Trap
+	[326456] = 5,		-- Castle Nathria - Sun King's Salvation: Burning Remnants
+	[325877] = 0,		-- Castle Nathria - Sun King's Salvation: Ember Blast
+	[325442] = 2,		-- Castle Nathria - Sun King's Salvation: Vanquished
+	
+	
 }
 
 

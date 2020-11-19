@@ -1,4 +1,4 @@
-## Interface: 90001
+## Interface: 90002
 ## Version: 9.0.2.1
 ## Title: CT_UnitFrames |cFF333333(BFA)
 ## Notes: Changes display of hp/mana values and adds a percentage.
