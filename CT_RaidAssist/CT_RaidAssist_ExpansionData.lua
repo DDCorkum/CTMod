@@ -166,6 +166,11 @@ module.CTRA_Configuration_RezAbilities =
 -- value:	0 to always show, or a positive integer to show when the stack count is this number or greater
 module.CTRA_Configuration_BossAuras =
 {
+	-- Mythic Plus Affixes
+	[240443] = 2,		-- Mythic Plus: Bursting
+	[209858] = 20,		-- Mythic Plus: Necrotic
+	[240559] = 1,		-- Mythic Plus: Grievous
+	
 	-- Classic
 	[19702] = 0,		-- Molten Core - Lucifron: Impending Doom
 	[19703] = 0,		-- Molten Core - Lucifron: Lucifron's Curse
@@ -216,9 +221,6 @@ module.CTRA_Configuration_BossAuras =
 	[28084] = 0,		-- Naxxramas - Thaddius: Negative Charge
 
 	-- Battle for Azeroth
-	[240443] = 1,		-- Mythic Plus: Bursting
-	[209858] = 20,		-- Mythic Plus: Necrotic
-	[240559] = 1,		-- Mythic Plus: Grievous
 	[255558] = 0,		-- Atal'Dazar - Priestess Alun'za: Tainted Blood
 	[255371] = 0,		-- Atal'Dazar - Rezan: Terrifying Visage
 	[255421] = 0,		-- Atal'Dazar - Rezan: Devour
@@ -295,8 +297,27 @@ module.CTRA_Configuration_BossAuras =
 	[326456] = 5,		-- Castle Nathria - Sun King's Salvation: Burning Remnants
 	[325877] = 0,		-- Castle Nathria - Sun King's Salvation: Ember Blast
 	[325442] = 2,		-- Castle Nathria - Sun King's Salvation: Vanquished
-	
-	
+	[325382] = 2,		-- Castle Nathria - Lady Inerva Darkvein: Warped Desires
+	[325908] = 0,		-- Castle Nathria - Lady Inerva Darkvein: Shared Cognition
+	[324983] = 0,		-- Castle Nathria - Lady Inerva Darkvein: Shared Suffering
+	[337110] = 1,		-- Castle Nathria - The Council of Blood: Dreadbolt Volley
+	[327773] = 5,		-- Castle Nathria - The Council of Blood: Drain Essence
+	[346681] = 2,		-- Castle Nathria - The Council of Blood: Soul Spikes
+	[346690] = 1,		-- Castle Nathria - The Council of Blood: Duelist's Riposte
+	[327503] = 1,		-- Castle Nathria - The Council of Blood: Evasive Lunge
+	[330848] = 1,		-- Castle Nathria - The Council of Blood: Wrong Moves
+	[347350] = 1,		-- Castle Nathria - The Council of Blood: Dancing Fever
+	[335295] = 0,		-- Castle Nathria - Sludgefist: Shattering Chain
+	[335354] = 0,		-- Castle Nathria - Sludgefist: Chain Slam
+	[339690] = 0,		-- Castle Nathria - Stone Legion Generals: Crystalize
+	[343881] = 2,		-- Castle Nathria - Stone Legion Generals: Serrated Tear
+	[333913] = 1,		-- Castle Nathria - Stone Legion Generals: Wicked Laceration
+	[334765] = 0,		-- Castle Nathria - Stone Legion Generals: Heart Rend
+	[334771] = 0,		-- Castle Nathria - Stone Legion Generals: Heart Hemorrhage
+	[326699] = 2,		-- Castle Nathria - Sire Denathrius: Burden of Sin
+	[329875] = 3,		-- Castle Nathria - Sire Denathrius: Carnage
+	[329181] = 1,		-- Castle Nathria - Sire Denathrius: Wracking Pain
+	[332585] = 5,		-- Castle Nathria - Sire Denathrius: Scorn
 }
 
 
@@ -481,6 +502,23 @@ module.CTRA_Configuration_Consumables =
 	[297116] = 168315, -- Famine Evaluator And Snack Table (Agi)
 	[297117] = 168315, -- Famine Evaluator And Snack Table (Int)
 	[297118] = 168315, -- Famine Evaluator And Snack Table (Str)
+	
+	-- Shadowlands
+	--[321389] = 171286,	-- Embalmer's Oil	-- placeholder until a future CTRA version; it won't work like this because it is a weapon enchant
+	--[320798] = 171295,	-- Shadowcore Oil	-- placeholder until a future CTRA version; it won't work like this because it is a weapon enchant
+	[307175] = 171276,	-- Spectral Flask of Power
+	[307187] = 171278,	-- Spectral Flask of Stamina
+	[308525] = 172069,	-- Banana Beef Pudding (22 Sta)
+	[308514] = 172051,	-- Steak a la Mode (30 Ver)
+	[308488] = 172045,	-- Tenebrous Crown Roast Aspic (30 Hst)
+	[308434] = 172041,	-- Spinefin Souffle and Fries (30 Cri)
+	[308506] = 172049,	-- Iridescent Ravioli with Apple Sauce (30 Mas)
+	[327701] = true,	-- Surprisingly Palatable Feast (18 Str)
+	[327704] = true,	-- Surprisingly Palatable Feast (18 Int)
+	[327705] = true,	-- Surprisingly Palatable Feast (18 Agi)
+	[327706] = true,	-- Feast of Gluttonous Hedonism (20 Str)
+	[327708] = true,	-- Feast of Gluttonous Hedonism (20 Int)
+	[327709] = true,	-- Feast of Gluttonous Hedonism (20 Agi)	
 } 
 
 

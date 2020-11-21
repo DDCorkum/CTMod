@@ -1,6 +1,6 @@
 CT_RaidAssist (9.0.2.1) 2020-11-17
 - Fixed a bug when using labels in collapsed-frames mode
-- Adding encounter debuffs for part of Castle Nathria
+- Adding encounter debuffs for Castle Nathria and Classic Naxx
 
 CT_RaidAssist (8.3.7.3) 2020-10-11
 - Fixed asynchronous spell loading in Classic for click casting without using /reload
