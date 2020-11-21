@@ -76,8 +76,10 @@ function module:Initialize()				-- called via module.update("init") from CT_Libr
 	end)
 	
 	-- TaxiFrame (WoD alternative to FlightMapFrame)
-	if (TaxiFrame) then
+	if (module:getGameVersion() >= 2) then
 		module:configureTaxiFrame()
+	else
+		module:configureClassicTaxiFrame()
 	end
 
 end
@@ -1537,6 +1539,71 @@ function module.configureTaxiFrame()
 	end
 	
 	TaxiFrame:HookScript("OnShow", CT_MapMod_TaxiFrame_OnShow)
+	
+end
+
+--------------------------------------------
+-- TaxiFrame (classic alternative)
+
+function module.configureClassicTaxiFrame()
+
+	local showUnreachable = module:getOption("CT_MapMod_ShowUnreachableFlightPaths") == true
+		
+	local function creationFunc(self)
+		local frame = CreateFrame("Frame", nil, TaxiFrame)
+		--frame:SetFrameLevel(1)
+		frame:SetSize(8, 8)
+		frame.tex = frame:CreateTexture(nil, "BACKGROUND", -8)
+		frame.tex:SetTexture("Interface\\TaxiFrame\\UI-Taxi-Icon-Nub")
+		frame.tex:SetAllPoints()
+		return frame
+	end
+	local function resetFunc(self, obj)
+		obj:Hide()
+	end
+	
+	local flightMarkers = CreateObjectPool(creationFunc, resetFunc)
+	
+	local function CT_MapMod_TaxiFrameClassic_OnShow()
+		if (showUnreachable) then
+			local mapID = C_Map.GetBestMapForUnit("player")
+			if (mapID) then
+				local mapInfo = C_Map.GetMapInfo(mapID)
+				if (mapInfo) then
+					mapID = mapInfo.parentMapID
+					local nodes = C_TaxiMap.GetTaxiNodesForMap(mapID)
+					local wrongFaction = UnitFactionGroup("player") == "Horde" and Enum.FlightPathFaction.Alliance or Enum.FlightPathFaction.Horde
+					for __, node in pairs(nodes) do
+						if (node.faction ~= wrongFaction) then
+							local pin = flightMarkers:Acquire()
+							local x, y = node.position:GetXY()
+							pin:SetPoint("CENTER", TaxiRouteMap, "TOPLEFT", (mapID == 1415 and x-0.15 or x-0.166) * TaxiRouteMap:GetWidth() * (mapID == 1415 and 1.52 or 1.5), - (mapID == 1415 and y-0.09 or y) * TaxiRouteMap:GetHeight() * (mapID == 1415 and 1.09 or 1))
+							pin:Show()
+							pin.text = node.name
+						end
+					end
+				end
+			end
+		end
+	end
+	
+	local function CT_MapMod_TaxiFrameClassic_OnHide()
+		flightMarkers:ReleaseAll()
+	end
+	
+	function module.updateTaxiFrame(option, value)	-- until this exists, module.update() is smart enough not to try calling it
+		if (option == "CT_MapMod_ShowUnreachableFlightPaths" and value ~= showUnreachable) then
+			showUnreachable = value
+			if (TaxiFrame:IsShown()) then
+				-- reset the appearance
+				CT_MapMod_TaxiFrameClassic_OnHide()
+				CT_MapMod_TaxiFrameClassic_OnShow()
+			end
+		end
+	end
+	
+	TaxiFrame:HookScript("OnShow", CT_MapMod_TaxiFrameClassic_OnShow)
+	TaxiFrame:HookScript("OnHide", CT_MapMod_TaxiFrameClassic_OnHide)
 	
 end
 
