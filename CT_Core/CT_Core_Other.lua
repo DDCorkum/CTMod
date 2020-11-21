@@ -885,10 +885,6 @@ end
 local displayTimers;
 local castingBarFrames = { "CastingBarFrame", "TargetFrameSpellBar", "FocusFrameSpellBar", "CT_CastingBarFrame" };
 
-function foofoo(self, secondsElapsed)
-
-end
-
 local function castingtimer_createFS(castBarFrame)
 	local countDownText = castBarFrame:CreateFontString(nil, "ARTWORK", "GameFontHighlight");
 	castBarFrame.countDownText = countDownText;
