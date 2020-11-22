@@ -1,3 +1,9 @@
+CT_UnitFrames (9.0.2.1) 2020-11-18
+- Resolving an addon conflict with UnitFramesImproved
+- Fix to health/power bar text sometimes appearing obscured in behind
+- Fix to closing the options menu while in combat (UIPanel restrictions)
+- Updates to focus and assist frames
+
 CT_UnitFrames (8.3.7.1) 2020-08-21
 - Shadowlands BackdropTemplate compatibility
 - Improvements for PTR and Beta compatibility

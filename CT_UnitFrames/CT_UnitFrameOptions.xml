@@ -234,7 +234,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				</Anchors>
 				<Scripts>
 					<OnClick>
-						HideUIPanel(self:GetParent());
+						self:GetParent():Hide();
 					</OnClick>
 				</Scripts>
 				<NormalTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Up"/>

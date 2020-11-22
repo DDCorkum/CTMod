@@ -83,11 +83,18 @@ function module:UpdateStatusBarTextString(textStatusBar, settings, lockShow)
 	local textString =  textStatusBar.ctTextString;			
 	if (not textString) then
 		-- create our string
-		local intermediateFrame = CreateFrame("Frame", nil, textStatusBar);
-		intermediateFrame:SetFrameLevel(5);
+		local intermediateFrame = CreateFrame("Frame", nil, textStatusBar);	-- +1 frameLevel
+		intermediateFrame:SetAllPoints();
+		intermediateFrame = CreateFrame("Frame", nil, intermediateFrame);	-- +2 frameLevel
+		intermediateFrame:SetAllPoints();
+		intermediateFrame = CreateFrame("Frame", nil, intermediateFrame);	-- +3 frameLevel
 		intermediateFrame:SetAllPoints();
 		textString = intermediateFrame:CreateFontString(nil, "OVERLAY", "TextStatusBarText");
-		textString:SetPoint("CENTER", textStatusBar);
+		if (UnitFramesImproved) then
+			textString:SetPoint("CENTER", textStatusBar, "BOTTOM", 0, textStatusBar:GetHeight()/2);
+		else
+			textString:SetPoint("CENTER", textStatusBar);
+		end
 		textStatusBar.ctTextString = textString;
 		
 		-- prevent the default text string from ever appearing

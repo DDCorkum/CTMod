@@ -50,33 +50,38 @@ local WaypointLocationDataProviderMixin = WaypointLocationDataProviderMixin;
 --------------------------------------------
 -- Private design
 
-local StaticNoteEditPanel;		-- Allows the manual editing of a pin's contents
--- CT_MapMod:IterateDataProviders()	-- Returns an iterator for all providers that were made with CT_MapMod:NewDataProvider()
+local StaticNoteEditPanel;			-- Allows the manual editing of a pin's contents
 
 --------------------------------------------
 -- Initialization
 
 function module:Initialize()				-- called via module.update("init") from CT_Library
 
-	-- load the DataProvider which has most of the horsepower
-	module.worldMapDataProvider = module:NewDataProvider();
-	WorldMapFrame:AddDataProvider(module.worldMapDataProvider);
+	-- Up to two tasks for each frame:
+	--	(1) installing a DataProvider that will do most of the horsepower; and
+	--	(2) installing unique UI customizations applicable only to that frame.
+
+	-- WorldMapFrame
+	module.worldMapDataProvider = module:NewDataProvider()
+	WorldMapFrame:AddDataProvider(module.worldMapDataProvider)
+	module:configureWorldMapFrame()
 	
-	-- load an additional DataProvider to the FlightMapFrame in retail, so pins can appear on the continent flight map
-	if (FlightMapFrame) then
-		FlightMapFrame:AddDataProvider(module:GetDataProvider());
-	elseif (FlightMap_LoadUI) then
-		local needFlightMap = true;
-		hooksecurefunc("FlightMap_LoadUI", function()
-			if (needFlightMap) then
-				needFlightMap = false;
-				FlightMapFrame:AddDataProvider(module:NewDataProvider())
-			end
-		end);
+	-- FlightMapFrame (loaded asynchrously when first visiting a flight master)
+	hooksecurefunc("FlightMap_LoadUI", function()
+		if (module.flightMapDataProvider == nil) then
+			module.flightMapDataProvider = module:NewDataProvider()
+			FlightMapFrame:AddDataProvider(module.flightMapDataProvider)
+			module:configureFlightMapFrame()
+		end
+	end)
+	
+	-- TaxiFrame (WoD alternative to FlightMapFrame)
+	if (module:getGameVersion() >= 2) then
+		module:configureTaxiFrame()
+	else
+		module:configureClassicTaxiFrame()
 	end
-	
-	-- add UI elements to the WorldMapFrame
-	module:AddUIElements();
+
 end
 
 --------------------------------------------
@@ -314,9 +319,32 @@ function public:InsertOre(mapID, x, y, ore, descript, name)
 		end
 		-- following
 		if (ore:sub(-9) == " жила" and ore:len() > 9) then
-			ore = ore:sub(1,-10);				--changes "Медная жила" to "Медная"
+			ore = ore:sub(1,-10);				-- changes "Медная жила" to "Медная"
 		end
-		
+	elseif (GetLocale() == "zhCH") then
+		-- exceptions first, then normal rules for everything else
+		if (ore == "活性魔石") then
+			ore = "魔石矿石"					-- Living Leystone
+		elseif (ore == "黑曜石碎块" or ore == "巨型黑曜石石板") then
+			ore = "黑曜石矿"					-- Obsidium
+		else
+			-- normal rules: prefix characters
+			if (ore:sub(1,3) == "富" and ore:len() > 3) then
+				ore = ore:sub(4)			-- changes 富瑟银矿 (Rich Thorium Vein) to 瑟银矿, and later rule adds 石 to make 瑟银矿石 (Thorium Ore)
+			elseif (ore:sub(1,9) == "纯净的" and ore:len() > 9) then
+				ore = ore:sub(10)			-- changes 纯净的萨隆邪铁矿脉 (Pure Saronite Deposit) to 萨隆邪铁矿脉, and a later rule replaces 脉 with 石 to make 萨隆邪铁矿石 (Saronite Ore)
+			elseif (ore:sub(1,15) == "软泥覆盖的" and ore:len() > 15) then
+				ore = ore:sub(16)			-- changes 软泥覆盖的秘银矿脉 (Ooze Covered Mithril Deposit) to 秘银矿脉, and a later rule replaces 脉 with 石 to make 秘银矿石 (Mithril Ore)
+			end
+			-- normal rules: suffix characters
+			if (ore:sub(-3) == "脉" and ore:len() > 3) then
+				ore = ore:sub(1,-4) .. "石"		-- changes 魔铁矿脉 (Fel Iron Deposit) to 魔铁矿石 (Fel Iron Ore)
+			elseif (ore:sub(-3) == "层" and ore:len() > 3) then
+				ore = ore:sub(1,-4) .. "石"		-- changes 魔石矿层 (Leystone Seam) to 魔石矿石 (Leystone Ore)
+			elseif (ore:sub(-3) ~= "石") then
+				ore = ore .. "石"			-- changes 铜矿 (Copper Vein) to 铜矿石 (Copper Ore)
+			end
+		end
 	end
 
 	-- Now process the mining node
@@ -450,9 +478,7 @@ function CT_MapMod_DataProviderMixin:RefreshAllData(fromOnShow)
 	-- Fetch and push the pins to be used for this map
 	local mapID = self:GetMap():GetMapID();
 	if (mapID) then	
-		if ((module:getOption("CT_MapMod_ShowOnFlightMaps") or 1) == 1) then
-			mapID = module.flightMaps[mapID] or mapID;		
-		end
+		mapID = module:getOption("CT_MapMod_ShowOnFlightMaps") ~= false and module.flightMaps[mapID] or mapID;		
 		if (CT_MapMod_Notes[mapID]) then
 			local showUser, showHerb, showOre = 
 				module:getOption("CT_MapMod_UserNoteDisplay") or 1,
@@ -541,7 +567,7 @@ function CT_MapMod_PinMixin:OnAcquired(...) -- the arguments here are anything t
 		self.texture:SetTexture(icon);
 		self.texture:SetTexCoord(0, 1, 0, 1);
 	end
-	local size = module:getOption("CT_MapMod_" .. self.set .. "NoteSize") or 24;
+	local size = module:getOption("CT_MapMod_" .. self.set .. "NoteSize") or self.set == "User" and 24 or 14;
 	self:SetSize(size, size);
 	self:Show();
 end
@@ -1062,7 +1088,7 @@ end
 --------------------------------------------
 -- UI elements added to the world map title bar
 
-function module:AddUIElements()
+function module.configureWorldMapFrame()
 	local newpinmousestart;
 	module:getFrame ({
 		["button#n:CT_MapMod_WhereAmIButton#s:100:20#v:UIPanelButtonTemplate#" .. L["CT_MapMod/Map/Where am I?"]] = {
@@ -1408,6 +1434,180 @@ end
 
 
 --------------------------------------------
+-- FlightMapFrame (flight paths except WoD)
+
+function module.configureFlightMapFrame()
+
+	local showUnreachable = module:getOption("CT_MapMod_ShowUnreachableFlightPaths") == true
+
+	local hookedPins = {}				-- used to hook things only once, and also to undo hooks when an optin is turned off
+
+	function module.updateFlightMapFrame(option, value)	-- until this exists, module.update() is smart enough not to try calling it
+		if (option == "CT_MapMod_ShowUnreachableFlightPaths" and value ~= showUnreachable) then
+			showUnreachable = value
+			for pin in pairs(hookedPins) do
+				pin.SetShown, pin.ctSetShown = pin.ctSetShown, pin.SetShown
+				pin.OnClick, pin.ctOnClick = pin.ctOnClick, pin.OnClick
+			end
+			if (FlightMapFrame:IsShown()) then
+				FlightMapFrame:RefreshAllDataProviders()
+			end
+		end
+	end
+
+	local currentNodeID = 0;
+	local underseaNodes = {[521] = true, [522] = true, [523] = true, [524] = true, [525] = true, [526] = true, [607] = true, [609] = true, [611] = true, [612] = true}
+	local function CT_MapMod_FlightPointPinTemplate_SetShown(pin, value)
+		return pin.ctSetShown(pin, value or underseaNodes[currentNodeID] == underseaNodes[pin.taxiNodeData.nodeID])
+	end
+	
+	local function CT_MapMod_FlightPointPinTemplate_OnClick(pin, button)
+		if (pin.taxiNodeData.state == Enum.FlightPathState.Reachable) then
+			return pin.ctOnClick(pin, button)
+		end
+	end
+	
+	local function CT_MapMod_FlightMapFrame_OnShow(frame)
+		local needReload = false
+		for pin in FlightMapFrame:EnumeratePinsByTemplate("FlightMap_FlightPointPinTemplate") do
+			if (pin.taxiNodeData.state == 0 and pin.taxiNodeData.nodeID ~= currentNodeID) then
+				currentNodeID = pin.taxiNodeData.nodeID
+				needReload = true
+			end
+			if (hookedPins[pin] == nil) then
+				hookedPins[pin] = true
+				if (showUnreachable) then
+					pin.SetShown, pin.ctSetShown = CT_MapMod_FlightPointPinTemplate_SetShown, pin.SetShown
+					pin.OnClick, pin.ctOnClick = CT_MapMod_FlightPointPinTemplate_OnClick, pin.OnClick
+					pin:SetShown(pin.taxiNodeData.state ~= Enum.FlightPathState.Unreachable)
+				else
+					pin.ctSetShown = CT_MapMod_FlightPointPinTemplate_SetShown
+					pin.ctOnClick = CT_MapMod_FlightPointPinTemplate_OnClick
+				end
+				needReload = true
+			end
+		end
+		if (needReload) then
+			FlightMapFrame:RefreshAllDataProviders()
+		end
+	end
+	
+	FlightMapFrame:HookScript("OnShow", CT_MapMod_FlightMapFrame_OnShow)
+end
+
+--------------------------------------------
+-- TaxiFrame (flight paths in WoD)
+
+function module.configureTaxiFrame()
+
+	local showUnreachable = module:getOption("CT_MapMod_ShowUnreachableFlightPaths") == true
+
+	local hookedButtons = {}
+	
+	function module.updateTaxiFrame(option, value)	-- until this exists, module.update() is smart enough not to try calling it
+		if (option == "CT_MapMod_ShowUnreachableFlightPaths" and value ~= showUnreachable) then
+			showUnreachable = value
+			for __, button in ipairs(hookedButtons) do
+				button.Hide, button.ctHide = button.ctHide, button.Hide
+			end
+			if (TaxiFrame:IsShown()) then
+				-- reset the appearance
+				TaxiFrame_OnShow(TaxiFrame)
+			end
+		end
+	end
+	
+	local function CT_MapMod_TaxiFrame_OnHide(button)
+		button:SetShown(button:GetID() <= NumTaxiNodes())
+	end
+	
+	local function CT_MapMod_TaxiFrame_OnShow()
+		local needReload
+		for i = #hookedButtons + 1, NUM_TAXI_BUTTONS do
+			local button = _G["TaxiButton" .. i]
+			hookedButtons[i] = button
+			if(showUnreachable) then
+				button.Hide, button.ctHide = button.Show, button.Hide
+				needReload = true
+			else
+				button.ctHide = button.Show
+			end
+		end
+		if (needReload) then
+			TaxiFrame_OnShow(TaxiFrame)
+		end
+	end
+	
+	TaxiFrame:HookScript("OnShow", CT_MapMod_TaxiFrame_OnShow)
+	
+end
+
+--------------------------------------------
+-- TaxiFrame (classic alternative)
+
+function module.configureClassicTaxiFrame()
+
+	local showUnreachable = module:getOption("CT_MapMod_ShowUnreachableFlightPaths") == true
+		
+	local function creationFunc(self)
+		local frame = CreateFrame("Frame", nil, TaxiFrame)
+		--frame:SetFrameLevel(1)
+		frame:SetSize(8, 8)
+		frame.tex = frame:CreateTexture(nil, "BACKGROUND", -8)
+		frame.tex:SetTexture("Interface\\TaxiFrame\\UI-Taxi-Icon-Nub")
+		frame.tex:SetAllPoints()
+		return frame
+	end
+	local function resetFunc(self, obj)
+		obj:Hide()
+	end
+	
+	local flightMarkers = CreateObjectPool(creationFunc, resetFunc)
+	
+	local function CT_MapMod_TaxiFrameClassic_OnShow()
+		if (showUnreachable) then
+			local mapID = C_Map.GetBestMapForUnit("player")
+			if (mapID) then
+				local mapInfo = C_Map.GetMapInfo(mapID)
+				if (mapInfo) then
+					mapID = mapInfo.parentMapID
+					local nodes = C_TaxiMap.GetTaxiNodesForMap(mapID)
+					local wrongFaction = UnitFactionGroup("player") == "Horde" and Enum.FlightPathFaction.Alliance or Enum.FlightPathFaction.Horde
+					for __, node in pairs(nodes) do
+						if (node.faction ~= wrongFaction) then
+							local pin = flightMarkers:Acquire()
+							local x, y = node.position:GetXY()
+							pin:SetPoint("CENTER", TaxiRouteMap, "TOPLEFT", (mapID == 1415 and x-0.15 or x-0.166) * TaxiRouteMap:GetWidth() * (mapID == 1415 and 1.52 or 1.5), - (mapID == 1415 and y-0.09 or y) * TaxiRouteMap:GetHeight() * (mapID == 1415 and 1.09 or 1))
+							pin:Show()
+							pin.text = node.name
+						end
+					end
+				end
+			end
+		end
+	end
+	
+	local function CT_MapMod_TaxiFrameClassic_OnHide()
+		flightMarkers:ReleaseAll()
+	end
+	
+	function module.updateTaxiFrame(option, value)	-- until this exists, module.update() is smart enough not to try calling it
+		if (option == "CT_MapMod_ShowUnreachableFlightPaths" and value ~= showUnreachable) then
+			showUnreachable = value
+			if (TaxiFrame:IsShown()) then
+				-- reset the appearance
+				CT_MapMod_TaxiFrameClassic_OnHide()
+				CT_MapMod_TaxiFrameClassic_OnShow()
+			end
+		end
+	end
+	
+	TaxiFrame:HookScript("OnShow", CT_MapMod_TaxiFrameClassic_OnShow)
+	TaxiFrame:HookScript("OnHide", CT_MapMod_TaxiFrameClassic_OnHide)
+	
+end
+
+--------------------------------------------
 -- Auto-Gathering
 
 do	
@@ -1451,8 +1651,17 @@ end
 -- Options handling
 
 module.update = function(self, optName, value)
-	if (optName == "init") then		
-		module:Initialize();  -- handles things that arn't related to options
+	if (optName == "init") then
+
+		-- converting a dropdown into a checkbox in 9.0.1.3
+		if (module:getOption("CT_MapMod_ShowOnFlightMaps") == 2) then
+			module:setOption("CT_MapMod_ShowOnFlightMaps", false, true)
+		end
+	
+		-- initialize the overall UI
+		module:Initialize();
+		
+		-- handle options
 		module.pxy:ClearAllPoints();
 		module.cxy:ClearAllPoints();
 		local position = module:getOption("CT_MapMod_ShowPlayerCoordsOnMap") or 2;
@@ -1517,10 +1726,14 @@ module.update = function(self, optName, value)
 		or optName == "CT_MapMod_AlphaZoomedIn"
 		or optName == "CT_MapMod_ShowOnFlightMaps"
 	) then
-		if (WorldMapFrame:IsShown()) then
-			module.worldMapDataProvider:RefreshAllData();
+		module:refreshVisibleDataProviders();
+	elseif (optName == "CT_MapMod_ShowUnreachableFlightPaths") then
+		if (module.updateFlightMapFrame) then
+			module.updateFlightMapFrame(optName, value);
 		end
-		CloseTaxiMap();
+		if (module.updateTaxiFrame) then
+			module.updateTaxiFrame(optName, value);
+		end
 	end
 end
 
@@ -1537,45 +1750,23 @@ module:setSlashCmd(slashCommand, "/ctmapmod", "/ctmap", "/mapmod", "/ctcarte", "
 -- frFR: /ctcarte
 -- deDE: /ctkarte
 
-local theOptionsFrame;
-
-local optionsFrameList;
-local function optionsInit()
-	optionsFrameList = module:framesInit();
-end
-local function optionsGetData()
-	return module:framesGetData(optionsFrameList);
-end
-local function optionsAddFrame(offset, size, details, data)
-	module:framesAddFrame(optionsFrameList, offset, size, details, data);
-end
-local function optionsAddObject(offset, size, details)
-	module:framesAddObject(optionsFrameList, offset, size, details);
-end
-local function optionsAddScript(name, func)
-	module:framesAddScript(optionsFrameList, name, func);
-end
-
-local function optionsAddTooltip(text)
-	module:framesAddScript(optionsFrameList, "onenter", function(obj) module:displayTooltip(obj, text, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL); end);
-end
-
-local function optionsBeginFrame(offset, size, details, data)
-	module:framesBeginFrame(optionsFrameList, offset, size, details, data);
-end
-local function optionsEndFrame()
-	module:framesEndFrame(optionsFrameList);
-end
-
 -- Options frame
 module.frame = function()
+	local optionsFrameList = module:framesInit()
+	
+	-- helper funcs
+	local optionsAddFrame = function(offset, size, details, data) module:framesAddFrame(optionsFrameList, offset, size, details, data); end
+	local optionsAddObject = function(offset, size, details) module:framesAddObject(optionsFrameList, offset, size, details); end
+	local optionsAddScript = function(name, func) module:framesAddScript(optionsFrameList, name, func); end
+	local optionsAddTooltip = function(text) module:framesAddScript(optionsFrameList, "onenter", function(obj) module:displayTooltip(obj, text, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL); end); end
+	local optionsBeginFrame = function(offset, size, details, data) module:framesBeginFrame(optionsFrameList, offset, size, details, data); end
+	local optionsEndFrame = function() module:framesEndFrame(optionsFrameList); end
+
 	local textColor0 = "1.0:1.0:1.0";
 	local textColor1 = "0.9:0.9:0.9";
 	local textColor2 = "0.7:0.7:0.7";
 	local textColor3 = "0.9:0.72:0.0";
 	local xoffset, yoffset;
-
-	optionsInit();
 
 	optionsBeginFrame(-5, 0, "frame#tl:0:%y#r");
 		-- Tips
@@ -1638,10 +1829,15 @@ module.frame = function()
 		optionsAddObject(-5,    8, "font#t:0:%y#s:0:%s#l:13:0#r#Alpha when zoomed in#" .. textColor1 .. ":l");
 		optionsAddFrame( -5,   28, "slider#tl:24:%y#s:169:15#o:CT_MapMod_AlphaZoomedIn:1.00##0.50:1.00:0.05");
 		
-		if (module:getGameVersion() >= 8) then
-			optionsAddObject(-5,   50, "font#t:0:%y#s:0:%s#l:13:0#r#Pins added to continents (via the World Map) \nmay also appear at flight masters.#" .. textColor2 .. ":l");
-			optionsAddObject(-5,   14, "font#t:0:%y#s:0:%s#l:13:0#r#Also show pins on flight maps#" .. textColor1 .. ":l");
-			optionsAddObject(-5,   24, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_ShowOnFlightMaps#n:CT_MapMod_ShowOnFlightMaps#" .. L["CT_MapMod/Options/Always"] .. "#" .. L["CT_MapMod/Options/Disabled"]);
+		-- Flight Masters
+		if (FlightMap_LoadUI or TaxiFrame) then
+			optionsAddObject(-20,  17, "font#tl:5:%y#v:GameFontNormalLarge#" .. FLIGHT_MAP);
+			optionsBeginFrame( -15,  20, "checkbutton#tl:10:%y#o:CT_MapMod_ShowOnFlightMaps:true#" .. L["CT_MapMod/Options/FlightMaps/ShowOnFlightMapsCheckButton"] .. "#l:268");
+				optionsAddTooltip({L["CT_MapMod/Options/FlightMaps/ShowOnFlightMapsCheckButton"], L["CT_MapMod/Options/FlightMaps/ShowOnFlightMapsTip"]});
+			optionsEndFrame()
+			optionsBeginFrame( -15,  20, "checkbutton#tl:10:%y#o:CT_MapMod_ShowUnreachableFlightPaths#" .. L["CT_MapMod/Options/FlightMaps/ShowUnreachableFlightPathsCheckButton"] .. "#l:268");
+				optionsAddTooltip({L["CT_MapMod/Options/FlightMaps/ShowUnreachableFlightPathsCheckButton"], L["CT_MapMod/Options/FlightMaps/ShowUnreachableFlightPathsTip"]});
+			optionsEndFrame()
 		end
 		
 		-- Reset Options
@@ -1669,5 +1865,5 @@ module.frame = function()
 		
 	optionsEndFrame();
 
-	return "frame#all", optionsGetData();
+	return "frame#all", module:framesGetData(optionsFrameList);
 end

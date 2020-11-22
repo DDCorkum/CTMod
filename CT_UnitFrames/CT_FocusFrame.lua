@@ -13,7 +13,7 @@ local module = select(2, ...);
 
 --------------------------------------------
 -- This is a modified version of Blizzard's TargetFrame
--- (originally based on the 3.2 source)
+-- (originally based on the 3.2 source, adapted since)
 -- plus some additional functions.
 -- This file displays focus, and focustarget frames.
 
@@ -61,6 +61,8 @@ function CT_FocusFrame_OnLoad(self)
 	self.borderTexture = _G[thisName.."TextureFrameTexture"];
 	self.highLevelTexture = _G[thisName.."TextureFrameHighLevelTexture"];
 	self.pvpIcon = _G[thisName.."TextureFramePVPIcon"];
+	self.prestigePortrait = _G[thisName.."TextureFramePrestigePortrait"];
+	self.prestigeBadge = _G[thisName.."TextureFramePrestigeBadge"];
 	self.leaderIcon = _G[thisName.."TextureFrameLeaderIcon"];
 	self.raidTargetIcon = _G[thisName.."TextureFrameRaidTargetIcon"];
 	self.questIcon = _G[thisName.."TextureFrameQuestIcon"];
@@ -95,11 +97,15 @@ function CT_FocusFrame_OnLoad(self)
 		threatFrame,
 		"player",
 		_G[thisName.."NumericalThreat"],
-		_G[thisName.."MyHealPredictionBar"],
-		_G[thisName.."OtherHealPredictionBar"],
-		_G[thisName.."TotalAbsorbBar"],
-		_G[thisName.."TotalAbsorbBarOverlay"],
-		_G[thisName.."TextureFrameOverAbsorbGlow"]
+		UnitGetIncomingHeals and _G[thisName.."MyHealPredictionBar"],		-- classic compatibility
+		UnitGetIncomingHeals and _G[thisName.."OtherHealPredictionBar"],
+		UnitGetTotalHealAbsorbs and _G[thisName.."TotalAbsorbBar"],
+		UnitGetTotalHealAbsorbs and _G[thisName.."TotalAbsorbBarOverlay"],
+		UnitGetTotalHealAbsorbs and _G[thisName.."TextureFrameOverAbsorbGlow"],
+		UnitGetTotalHealAbsorbs and _G[thisName.."TextureFrameOverHealAbsorbGlow"],
+		UnitGetTotalHealAbsorbs and _G[thisName.."HealAbsorbBar"],
+		UnitGetTotalHealAbsorbs and _G[thisName.."HealAbsorbBarLeftShadow"],
+		UnitGetTotalHealAbsorbs and _G[thisName.."HealAbsorbBarRightShadow"]
 	);
 
 	self.noTextPrefix = true;
@@ -254,12 +260,10 @@ function CT_FocusFrame_OnEvent(self, event, ...)
 		--end
 
 	elseif ( event == "UNIT_FACTION" ) then
-		--if ( arg1 == self.unit or arg1 == "player" ) then
-			CT_FocusFrame_CheckFaction(self);
-			if ( self.showLevel ) then
-				CT_FocusFrame_CheckLevel(self);
-			end
-		--end
+		CT_FocusFrame_CheckFaction(self);
+		if ( self.showLevel ) then
+			CT_FocusFrame_CheckLevel(self);
+		end
 
 	elseif ( event == "UNIT_CLASSIFICATION_CHANGED" ) then
 		if ( arg1 == self.unit ) then
@@ -396,12 +400,38 @@ function CT_FocusFrame_CheckFaction(self)
 	if ( self.showPVP ) then
 		local factionGroup = UnitFactionGroup(self.unit);
 		if ( UnitIsPVPFreeForAll(self.unit) ) then
-			self.pvpIcon:SetTexture("Interface\\TargetingFrame\\UI-PVP-FFA");
-			self.pvpIcon:Show();
+			local honorLevel = UnitHonorLevel and UnitHonorLevel(self.unit);
+			local honorRewardInfo = honorLevel and C_PvP.GetHonorRewardInfo and C_PvP.GetHonorRewardInfo(honorLevel);
+			if (honorRewardInfo) then
+				self.prestigePortrait:SetAtlas("honorsystem-portrait-neutral", false);
+				self.prestigeBadge:SetTexture(honorRewardInfo.badgeFileDataID);
+				self.prestigePortrait:Show();
+				self.prestigeBadge:Show();
+				self.pvpIcon:Hide();
+			else
+				self.prestigePortrait:Hide();
+				self.prestigeBadge:Hide();
+				self.pvpIcon:SetTexture("Interface\\TargetingFrame\\UI-PVP-FFA");
+				self.pvpIcon:Show();
+			end
 		elseif ( factionGroup and factionGroup ~= "Neutral" and UnitIsPVP(self.unit) ) then
-			self.pvpIcon:SetTexture("Interface\\TargetingFrame\\UI-PVP-"..factionGroup);
-			self.pvpIcon:Show();
+			local honorLevel = UnitHonorLevel and UnitHonorLevel(self.unit);
+			local honorRewardInfo = honorLevel and C_PvP.GetHonorRewardInfo and C_PvP.GetHonorRewardInfo(honorLevel);
+			if (honorRewardInfo) then
+				self.prestigePortrait:SetAtlas("honorsystem-portrait-"..factionGroup, false);
+				self.prestigeBadge:SetTexture(honorRewardInfo.badgeFileDataID);
+				self.prestigePortrait:Show();
+				self.prestigeBadge:Show();
+				self.pvpIcon:Hide();
+			else
+				self.prestigePortrait:Hide();
+				self.prestigeBadge:Hide();
+				self.pvpIcon:SetTexture("Interface\\TargetingFrame\\UI-PVP-"..factionGroup);
+				self.pvpIcon:Show();
+			end		
 		else
+			self.prestigePortrait:Hide();
+			self.prestigeBadge:Hide();
 			self.pvpIcon:Hide();
 		end
 	end
@@ -516,11 +546,8 @@ function CT_FocusFrame_UpdateAuras(self)
 	local selfName = self:GetName();
 	local canAssist = UnitCanAssist("player", self.unit);
 
-	local filter;
-	if ( SHOW_CASTABLE_BUFFS == "1" and canAssist ) then
-		filter = "RAID";
-	end
-
+	local filter		-- intentionally nil
+	
 	for i=1, MAX_TARGET_BUFFS do
 		name, icon, count, debuffType, duration, expirationTime, caster, canStealOrPurge, _ , spellId = UnitBuff(self.unit, i, filter);
 
@@ -586,12 +613,6 @@ function CT_FocusFrame_UpdateAuras(self)
 	local frameBorder;
 	local numDebuffs = 0;
 	local isEnemy = UnitCanAttack("player", self.unit);
-
-	if ( SHOW_DISPELLABLE_DEBUFFS == "1" and canAssist ) then
-		filter = "RAID";
-	else
-		filter = nil;
-	end
 
 	local frameNum = 1;
 	local index = 1;
@@ -1016,10 +1037,7 @@ function CT_TargetofFocus_OnLoad(self)
 		_G[thisName.."HealthBar"],
 		_G[thisName.."TextureFrameHealthBarText"],
 		_G[thisName.."ManaBar"],
-		_G[thisName.."TextureFrameManaBarText"],
-		nil,
-		nil,
-		nil
+		_G[thisName.."TextureFrameManaBarText"]
 	);
 	SetTextStatusBarTextZeroText(frame.healthbar, DEAD);
 	frame:RegisterUnitEvent("UNIT_AURA", unit2);
@@ -1066,6 +1084,14 @@ function CT_TargetofFocus_Update(self, elapsed)
 	CT_TargetofFocus_CheckDead(self);
 	CT_TargetofFocus_HealthCheck(self);
 	RefreshDebuffs(self, self.unit);
+end
+
+function CT_TargetofFocus_OnEvent(self, event, ...)
+	if (event == "UNIT_AURA") then
+		RefreshDebuffs(self, self.unit);
+	else
+		UnitFrame_OnEvent(self, event, ...);
+	end
 end
 
 function CT_TargetofFocus_CheckDead(self)
@@ -1336,7 +1362,6 @@ function CT_FocusFrame_ToggleStandardFocus()
 			frame:RegisterUnitEvent("UNIT_CLASSIFICATION_CHANGED", unit1);
 			frame:RegisterUnitEvent("PLAYER_FLAGS_CHANGED", unit1);
 		end
-		frame:RegisterUnitEvent("UNIT_AURA", unit1);
 		if (UnitExists("focus")) then
 			frame:Show();
 		end

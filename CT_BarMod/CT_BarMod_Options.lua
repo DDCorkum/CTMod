@@ -772,6 +772,48 @@ local function CT_BarMod_UpdateVisibility()
 end
 module.CT_BarMod_UpdateVisibility = CT_BarMod_UpdateVisibility;
 
+
+--------------------------------------------
+-- Suppress action bars from reappearing when learning abilities
+
+do
+	local isSuppressing
+	
+	function module.suppressActionBarController(enable)
+		if (enable) then
+			ActionBarController:UnregisterEvent("ACTIONBAR_SHOW_BOTTOMLEFT")
+			isSuppressing = true
+		elseif (isSuppressing) then
+			ActionBarController:RegisterEvent("ACTIONBAR_SHOW_BOTTOMLEFT")
+			isSuppressing = false
+		end
+	end
+	
+	module.suppressActionBarController(module:getOption("disableIconIntro") ~= false)
+	
+
+	module:regEvent("ACTIONBAR_SHOW_BOTTOMLEFT", function()
+		if (isSuppressing) then
+			local __, bottomRight, sideRight, sideLeft = GetActionBarToggles()
+			SetActionBarToggles(false, bottomRight, sideRight, sideLeft)
+		end
+	end)
+
+	if (NPE_LoadUI) then
+		local firstTime = true
+		hooksecurefunc("NPE_LoadUI", function()
+			if (GetTutorialsEnabled() and C_PlayerInfo.IsPlayerNPERestricted() and firstTime) then
+				firstTime = false
+				hooksecurefunc(NPE_TutorialDragButton, "Show", function(self) 
+					if (isSuppressing) then
+						C_Timer.After(2, function() NPE_TutorialDragButton.Hide(self) end)
+					end
+				end)
+			end
+		end)
+	end
+end
+
 ----------
 -- Help button tooltips
 
@@ -1254,21 +1296,31 @@ module.frame = function()
 	optionsEndFrame();
 
 	----------
-	-- Blizzard Action Buttons
+	-- Default Blizzard
 	----------
 
 	optionsBeginFrame(-30, 0, "frame#tl:0:%y#br:tr:0:%b");
-		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Blizzard Action Buttons");
-
+		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Blizzard Bars");
+		
+		-- Blizzard Action Buttons
+		optionsAddObject(-10,   17, "font#tl:20:%y#v:GameFontNormal#Blizzard Action Buttons");
 		optionsAddObject( -2, 3*14, "font#t:0:%y#s:0:%s#l:20:0#r#Select which of the following CT_BarMod options to also apply to the buttons on Blizzard's action bars.#" .. textColor2 .. ":l");
 		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:defbarShowRange:true#Apply the 'Out of range' option");
 		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:defbarShowBindings:true#Apply 'Display key bindings' and 'range dot'");
 		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:defbarShowActionText:true#Apply the 'Display macro names' option");
 		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:defbarSetUnitAttributes:true#Apply the 'Unit attributes'");
 		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:defbarHideTooltip:true#Apply the 'Hide action button tooltips' option");
-		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:defbarShowCooldown:true#Apply the 'Display cooldown counts' option");
-	optionsEndFrame();
+		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:defbarShowCooldown:true#Apply the 'Display cooldown counts' option");	
 
+		-- Blizzard Bottom-Left Bar
+		optionsAddObject(-10,   17, "font#tl:20:%y#v:GameFontNormal#Blizzard Bottom-Left Bar");
+		optionsAddObject( -2, 3*14, "font#t:0:%y#s:0:%s#l:20:0#r#When learning a new ability, the game turns on the 'Bottom Left Bar' if the main action bar is already full.#" .. textColor2 .. ":l");
+		optionsBeginFrame( -5,   26, "checkbutton#tl:20:%y#o:disableIconIntro:true#Stop new abilities from turning bars on");
+			optionsAddTooltip({"Stop new abilities from turning bars on", "This has no effect if the bar is already turned on.#0.9:0.9:0.9"});
+		optionsEndFrame();
+	optionsEndFrame();
+	
+	
 	----------
 	-- Default Bar Positions
 	----------
@@ -1439,6 +1491,8 @@ module.frame = function()
 		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:hideExtraBar5#Hide the game's Bottom Right Bar"); -- Page 5 (Bar 5)
 		optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:hideExtraBar3#Hide the game's Right Bar"); -- Page 3 (Bar 3)
 		optionsAddObject(  6,   26, "checkbutton#tl:62:%y#o:hideExtraBar4#i:hideExtraBar4#Hide the game's Right Bar 2"); -- Page 4 (Bar 4)
+		
+		
 
 		optionsAddScript("onshow",
 			function(self)
@@ -2539,6 +2593,9 @@ module.optionUpdate = function(self, optName, value)
 		local fontTypeName = fontTypeListSorted[fontTypeNum];
 		module:setOption("cooldownFontTypeName", fontTypeName, true);
 		updateCooldownFont();
+		
+	elseif (optName == "disableIconIntro" ) then
+		module.suppressActionBarController(value)
 
 	elseif ( optName == "init" ) then
 		-- Convert the skin ID into a dropdown menu number.
