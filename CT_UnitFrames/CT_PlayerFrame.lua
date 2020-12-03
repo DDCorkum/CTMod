@@ -65,8 +65,8 @@ end
 hooksecurefunc("TextStatusBar_UpdateTextString", CT_PetFrame_TextStatusBar_UpdateTextString);
 
 function module:ShowPlayerFrameBarText()
-	UnitFrameHealthBar_Update(PlayerFrameHealthBar, "player");
-	UnitFrameManaBar_Update(PlayerFrameManaBar, "player");
+	-- UnitFrameHealthBar_Update(PlayerFrameHealthBar, "player");
+	-- UnitFrameManaBar_Update(PlayerFrameManaBar, "player");
 	CT_PlayerFrame_HealthTextStatusBar_UpdateTextString(PlayerFrameHealthBar)
 	CT_PlayerFrame_ManaTextStatusBar_UpdateTextString(PlayerFrameManaBar)
 end

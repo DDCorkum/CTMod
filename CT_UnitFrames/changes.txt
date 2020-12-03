@@ -1,5 +1,5 @@
 CT_UnitFrames (9.0.2.2) 2020-12-03
-- Commenting out legacy party-frame code that became redundant in 8.3.0.9, and might have been causing taint
+- Commenting out legacy code that was kept in 8.3.0.9, but on second look seems unnecessary and might be causing taint
 
 CT_UnitFrames (9.0.2.1) 2020-11-18
 - Resolving an addon conflict with UnitFramesImproved
