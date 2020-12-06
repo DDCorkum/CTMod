@@ -88,7 +88,7 @@ module.pinTypes =
 			"Blackrock", "True Iron",
 			"Leystone", "Felslate",
 			"Monelite", "Storm Silver", "Platinum", "Osmenite",
-			"Laestrite", "Oxxein", "Phaedrum", "Sinvyr", "Solenium",
+			"Laestrite", "Oxxein", "Phaedrum", "Sinvyr", "Solenium", "Elethium"
 		},
 	},
 };

@@ -1,3 +1,6 @@
+CT_MapMod (9.0.2.2) 2020-12-06
+- Shadowlands localization, and Elethium nodes in the Maw
+
 CT_MapMod (9.0.2.1) 2020-11-20
 - New option to show undiscovered flight paths at flight masters (off by default)
 - Fix to the default pin size for herbs and ore (14); it was wrongly the same as user notes (24)
