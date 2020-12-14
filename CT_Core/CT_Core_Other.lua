@@ -1301,6 +1301,112 @@ hooksecurefunc("PlayerFrame_DetachCastBar", castingbar_PlayerFrame_DetachCastBar
 hooksecurefunc("PlayerFrame_AttachCastBar", castingbar_PlayerFrame_AttachCastBar);
 
 --------------------------------------------
+-- Movable LossOfControlFrame
+
+local movableLoC_UpdateVisibility, movableLoC_UpdatePosition, movableLoC_UpdateDragging
+
+if (LossOfControlFrame) then
+
+	-- STEP 1: Create a helper that can be moved around
+	-- STEP 2: Create a mock background that will appear only when dragging the frame
+	-- STEP 3: Attach the LossOfControlFrame and hook its OnShow/Hide to avoid duplicating the mock background
+	-- STEP 4: Configure functions to implement setting changes
+
+	local isMovable;
+	local isDragging;
+
+	-- STEP 1:
+	
+	local movableFrame = CreateFrame("Frame", nil, UIParent)
+	movableFrame:SetSize(256, 112)
+	movableFrame:SetPoint("CENTER")
+	movableFrame:SetClampedToScreen(true)
+	module:regEvent("PLAYER_LOGIN", function()
+		module:registerMovable("movableLossOfControlFrame", movableFrame, true)
+	end)
+	movableFrame:SetScript("OnMouseDown", function()
+		module:moveMovable("movableLossOfControlFrame")
+	end)
+	movableFrame:SetScript("OnMouseUp", function()
+		module:stopMovable("movableLossOfControlFrame")
+	end)
+	
+	-- STEP 2:
+	
+	movableFrame:DisableDrawLayer("BACKGROUND")	-- only enabled when required
+	
+	movableFrame.blackBg = movableFrame:CreateTexture(nil, "BACKGROUND")
+	movableFrame.blackBg:SetSize(256, 58)
+	movableFrame.blackBg:SetPoint("CENTER")
+	movableFrame.blackBg:SetVertexColor(1.0, 1.0, 1.0, 0.6)
+	movableFrame.blackBg:SetTexture("Interface\\Cooldown\\LoC-ShadowBG")
+	
+	movableFrame.RedLineTop = movableFrame:CreateTexture(nil, "BACKGROUND")
+	movableFrame.RedLineTop:SetSize(236, 27)
+	movableFrame.RedLineTop:SetPoint("TOP")
+	movableFrame.RedLineTop:SetTexture("Interface\\Cooldown\\Loc-RedLine")
+	
+	movableFrame.RedLineBottom = movableFrame:CreateTexture(nil, "BACKGROUND")
+	movableFrame.RedLineBottom:SetSize(236, 27)
+	movableFrame.RedLineBottom:SetPoint("BOTTOM")
+	movableFrame.RedLineBottom:SetTexture("Interface\\Cooldown\\Loc-RedLine")
+	movableFrame.RedLineBottom:SetTexCoord(0, 1, 1, 0)
+	
+	-- STEP 3:
+	
+	LossOfControlFrame:SetParent(movableFrame)
+	LossOfControlFrame:HookScript("OnHide", function()
+		if (isMovable and isDragging) then
+			movableFrame:EnableDrawLayer("BACKGROUND")
+		end
+	end)
+	LossOfControlFrame:HookScript("OnShow", function()
+		movableFrame:DisableDrawLayer("BACKGROUND")
+	end)
+
+	-- STEP 4:
+
+	function movableLoC_UpdateVisibility(show)
+		movableFrame:SetShown(show ~= false)
+	end
+	
+	function movableLoC_UpdatePosition(enable)
+		if (enable) then
+			isMovable = true
+			LossOfControlFrame:SetPoint("CENTER", movableFrame)
+			if (isDragging) then
+				movableFrame:EnableMouse(true)
+				if (not LossOfControlFrame:IsShown()) then
+					movableFrame:EnableDrawLayer("BACKGROUND")
+				end
+			end
+		elseif (isMovable) then
+			isMovable = false
+			LossOfControlFrame:SetPoint("CENTER", UIParent)
+			movableFrame:EnableMouse(false)
+			movableFrame:DisableDrawLayer("BACKGROUND")
+		end
+	end
+	
+	function movableLoC_UpdateDragging(drag)
+		if (drag) then
+			isDragging = true
+			movableFrame:EnableMouse(true)
+			if (isMovable) then
+				movableFrame:EnableMouse(true)
+				if (not LossOfControlFrame:IsShown()) then
+					movableFrame:EnableDrawLayer("BACKGROUND")
+				end
+			end
+		elseif (isDragging) then
+			isDragging = false
+			movableFrame:EnableMouse(false)
+			movableFrame:DisableDrawLayer("BACKGROUND")
+		end
+	end
+end
+
+--------------------------------------------
 -- Open/close bags
 do
 	-- As of WoW 4.1:
@@ -2640,6 +2746,9 @@ local modFunctions = {
 	["hideGryphons"] = hide_gryphons,
 	["castingbarEnabled"] = castingbar_Update,
 	["castingbarMovable"] = castingbar_ToggleHelper,
+	["showLossOfControlFrame"] = movableLoC_UpdateVisibility,
+	["moveLossOfControlFrame"] = movableLoC_UpdatePosition,
+	["dragLossOfControlFrame"] = movableLoC_UpdateDragging,
 };
 
 

@@ -268,6 +268,9 @@ end
 local function optionsAddScript(name, func)
 	module:framesAddScript(optionsFrameList, name, func);
 end
+local function optionsAddTooltip(text)
+	module:framesAddScript(optionsFrameList, "onenter", function(obj) module:displayTooltip(obj, text, "CT_ABOVEBELOW", 0, 0, CT_CONTROLPANEL) end)
+end
 local function optionsBeginFrame(offset, size, details, data)
 	module:framesBeginFrame(optionsFrameList, offset, size, details, data);
 end
@@ -752,6 +755,21 @@ module.frame = function()
 			optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Hide Gryphons#" .. textColor2 .. ":l");
 			optionsAddObject( -5,   26, "font#tl:0:%y#v:GameFontNormal#This feature is now in CT_BottomBar#" .. textColor2 .. ":l");
 		end
+
+	-- LossOfControlFrame
+		if (LossOfControlFrame) then
+			optionsAddBookmark("Loss of Control");
+			optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Loss of Control");
+			optionsAddObject( -5, 2*13, "font#t:0:%y#s:0:%s#l#r#Alerts when you are stunned, polymorphed or mind-controlled#" .. textColor2 .. ":l");
+			optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:showLossOfControlFrame:true#Show the alert");
+			optionsBeginFrame(  6,   26, "checkbutton#tl:40:%y#o:moveLossOfControlFrame#Display in a custom location");
+				optionsAddTooltip({"Display in a custom location", "Move to anywhere on the screen, or leave in the middle (default)#" .. textColor2});
+			optionsEndFrame()
+			optionsBeginFrame(  6,   26, "checkbutton#tl:40:%y#o:dragLossOfControlFrame#Show the dragging anchor");
+				optionsAddTooltip({"Show the dragging anchor", "Show the anchor to drag into a custom position, then hide the anchor to leave it there#" .. textColor2});
+			optionsEndFrame()
+		end
+
 
 	-- Merchant options
 		optionsAddBookmark("Merchant");
