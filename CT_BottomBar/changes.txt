@@ -1,4 +1,4 @@
-CT_BottomBar (9.0.1.3) 2020-11-07
+CT_BottomBar (9.0.2.1) 2020-11-07
 - Better placement of help tips around moved and vertically-oriented micro buttons
 
 CT_BottomBar (9.0.1.1) 2020-09-26
