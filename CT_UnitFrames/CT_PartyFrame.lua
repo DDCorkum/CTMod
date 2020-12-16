@@ -115,23 +115,23 @@ function module:AnchorPartyFrameSideText()
 end
 
 function module:ShowPartyFrameBarText()
-	UnitFrameHealthBar_Update(PartyMemberFrame1HealthBar, "party1");
-	UnitFrameManaBar_Update(PartyMemberFrame1ManaBar, "party1");
+	--UnitFrameHealthBar_Update(PartyMemberFrame1HealthBar, "party1");
+	--UnitFrameManaBar_Update(PartyMemberFrame1ManaBar, "party1");
 	CT_PartyFrame_TextStatusBar_UpdateTextString(PartyMemberFrame1HealthBar);
 	CT_PartyFrame_TextStatusBar_UpdateTextString(PartyMemberFrame1ManaBar);
 
-	UnitFrameHealthBar_Update(PartyMemberFrame2HealthBar, "party2");
-	UnitFrameManaBar_Update(PartyMemberFrame2ManaBar, "party2");
+	--UnitFrameHealthBar_Update(PartyMemberFrame2HealthBar, "party2");
+	--UnitFrameManaBar_Update(PartyMemberFrame2ManaBar, "party2");
 	CT_PartyFrame_TextStatusBar_UpdateTextString(PartyMemberFrame2HealthBar);
 	CT_PartyFrame_TextStatusBar_UpdateTextString(PartyMemberFrame2ManaBar);
 	
-	UnitFrameHealthBar_Update(PartyMemberFrame3HealthBar, "party3");
-	UnitFrameManaBar_Update(PartyMemberFrame3ManaBar, "party3");
+	--UnitFrameHealthBar_Update(PartyMemberFrame3HealthBar, "party3");
+	--UnitFrameManaBar_Update(PartyMemberFrame3ManaBar, "party3");
 	CT_PartyFrame_TextStatusBar_UpdateTextString(PartyMemberFrame3HealthBar);
 	CT_PartyFrame_TextStatusBar_UpdateTextString(PartyMemberFrame3ManaBar);
 
-	UnitFrameHealthBar_Update(PartyMemberFrame4HealthBar, "party4");
-	UnitFrameManaBar_Update(PartyMemberFrame4ManaBar, "party4");
+	--UnitFrameHealthBar_Update(PartyMemberFrame4HealthBar, "party4");
+	--UnitFrameManaBar_Update(PartyMemberFrame4ManaBar, "party4");
 	CT_PartyFrame_TextStatusBar_UpdateTextString(PartyMemberFrame4HealthBar);
 	CT_PartyFrame_TextStatusBar_UpdateTextString(PartyMemberFrame4ManaBar);
 end

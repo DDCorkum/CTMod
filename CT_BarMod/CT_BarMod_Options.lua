@@ -790,7 +790,6 @@ do
 	end
 	
 	module.suppressActionBarController(module:getOption("disableIconIntro") ~= false)
-	
 
 	module:regEvent("ACTIONBAR_SHOW_BOTTOMLEFT", function()
 		if (isSuppressing) then
@@ -799,6 +798,38 @@ do
 		end
 	end)
 
+end
+
+--------------------------------------------
+-- Silence new-ability frames once dragging spells to custom CT frames
+
+do
+	local isControlling
+
+	function module.controlZoneAbilityFrame(enable)
+		isControlling = enable
+	end
+	
+	module.controlZoneAbilityFrame(module:getOption("newZoneAbilities") ~= false)
+	
+	if (ZoneAbilityFrame) then
+		hooksecurefunc(ZoneAbilityFrame, "UpdateDisplayedZoneAbilities", function(frame)
+			if (isControlling and #frame.previousZoneAbilities == 1 and frame:IsShown() and not InCombatLockdown()) then
+				local spellID = frame.previousZoneAbilities[1]["spellID"]
+				if (spellID) then
+					local actionIDs = C_ActionBar.FindSpellActionButtons(spellID)
+					if (actionIDs) then for __, actionID in ipairs(actionIDs) do
+						local button = _G["CT_BarModActionButton" .. actionID]
+						if (button and button:IsVisible()) then
+							frame:Hide()
+							return
+						end
+					end end
+				end
+			end
+		end)
+	end
+	
 	if (NPE_LoadUI) then
 		local firstTime = true
 		hooksecurefunc("NPE_LoadUI", function()
@@ -812,6 +843,7 @@ do
 			end
 		end)
 	end
+
 end
 
 ----------
@@ -1313,10 +1345,13 @@ module.frame = function()
 		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:defbarShowCooldown:true#Apply the 'Display cooldown counts' option");	
 
 		-- Blizzard Bottom-Left Bar
-		optionsAddObject(-10,   17, "font#tl:20:%y#v:GameFontNormal#Blizzard Bottom-Left Bar");
-		optionsAddObject( -2, 3*14, "font#t:0:%y#s:0:%s#l:20:0#r#When learning a new ability, the game turns on the 'Bottom Left Bar' if the main action bar is already full.#" .. textColor2 .. ":l");
-		optionsBeginFrame( -5,   26, "checkbutton#tl:20:%y#o:disableIconIntro:true#Stop new abilities from turning bars on");
-			optionsAddTooltip({"Stop new abilities from turning bars on", "This has no effect if the bar is already turned on.#0.9:0.9:0.9"});
+		optionsAddObject(-10,   17, "font#tl:20:%y#v:GameFontNormal#Learning Abilities");
+		optionsAddObject( -2, 3*14, "font#t:0:%y#s:0:%s#l:20:0#r#These options take effect when levelling up or learning a special zone ability.#" .. textColor2 .. ":l");
+		optionsBeginFrame( -5,   26, "checkbutton#tl:20:%y#o:disableIconIntro:true#Prevent disabled bars from turning on");
+			optionsAddTooltip({"Prevent disabled bars from turning on", "Prevents the 'bottom left' action bar from turning itself on when the action bar is full.#0.9:0.9:0.9"});
+		optionsEndFrame();
+		optionsBeginFrame( -5,   26, "checkbutton#tl:20:%y#o:newZoneAbilities:true#Clear new zone abilities via custom bars");
+			optionsAddTooltip({"Stop new abilities from turning bars on", "After dragging a newly-learned ability to a custom CT bar, this will interrupt any default animations or bonus buttons#0.9:0.9:0.9"});
 		optionsEndFrame();
 	optionsEndFrame();
 	
@@ -2596,6 +2631,9 @@ module.optionUpdate = function(self, optName, value)
 		
 	elseif (optName == "disableIconIntro" ) then
 		module.suppressActionBarController(value)
+		
+	elseif (optName == "newZoneAbilities" ) then
+		module.controlZoneAbilityFrame(value)
 
 	elseif ( optName == "init" ) then
 		-- Convert the skin ID into a dropdown menu number.
