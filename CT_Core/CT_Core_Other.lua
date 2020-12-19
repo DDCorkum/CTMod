@@ -1330,6 +1330,7 @@ if (LossOfControlFrame) then
 	movableFrame:SetScript("OnMouseUp", function()
 		module:stopMovable("movableLossOfControlFrame")
 	end)
+	movableFrame:EnableMouse(false)	-- the previous OnMouseDown/OnMouseUp will automatically enable it; but we only want it to respond when necessary
 	
 	-- STEP 2:
 	
@@ -1391,7 +1392,6 @@ if (LossOfControlFrame) then
 	function movableLoC_UpdateDragging(drag)
 		if (drag) then
 			isDragging = true
-			movableFrame:EnableMouse(true)
 			if (isMovable) then
 				movableFrame:EnableMouse(true)
 				if (not LossOfControlFrame:IsShown()) then
