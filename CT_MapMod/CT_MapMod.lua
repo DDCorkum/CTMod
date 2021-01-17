@@ -691,11 +691,7 @@ function CT_MapMod_PinMixin:ApplyCurrentScale()
 end
 
 function CT_MapMod_PinMixin:ApplyCurrentAlpha()
-	if ((module:getGameVersion() == CT_GAME_VERSION_CLASSIC) or (WorldMapFrame:IsMaximized())) then
-		self:SetAlpha(Lerp( 0.3 + 0.7*((module:getOption("CT_MapMod_AlphaZoomedOut")) or 0.75), module:getOption("CT_MapMod_AlphaZoomedIn") or 1.00, Saturate(1.00 * self:GetMap():GetCanvasZoomPercent())));
-	else
-		self:SetAlpha(Lerp( 0.0 + 1.0*((module:getOption("CT_MapMod_AlphaZoomedOut")) or 0.75), module:getOption("CT_MapMod_AlphaZoomedIn") or 1.00, Saturate(1.00 * self:GetMap():GetCanvasZoomPercent())));
-	end  	
+	self:SetAlpha(Lerp( 1.0*((module:getOption("CT_MapMod_AlphaZoomedOut")) or 0.85), module:getOption("CT_MapMod_AlphaZoomedIn") or 1.00, Saturate(1.00 * self:GetMap():GetCanvasZoomPercent())));
 end
 
 --------------------------------------------
@@ -1778,16 +1774,20 @@ module.frame = function()
 		--Add Features to World Map
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_MapMod/Options/Add Features/Heading"]); -- Add Features to World Map
 		
-		optionsAddObject(-5,   50, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MapMod/Options/Add Features/Coordinates/Line 1"] .. "#" .. textColor2 .. ":l"); --Coordinates show where you are on the map, and where your mouse cursor is
-		optionsAddObject(-5,   14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MapMod/Options/Add Features/Coordinates/ShowPlayerCoordsOnMapLabel"] .. "#" .. textColor1 .. ":l"); -- Show player coordinates
-		optionsAddObject(-5,   24, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_ShowPlayerCoordsOnMap:2#n:CT_MapMod_ShowPlayerCoordsOnMap#" .. L["CT_MapMod/Options/At Top"] .. "#" .. L["CT_MapMod/Options/At Bottom"] .. "#" .. L["CT_MapMod/Options/Disabled"]);
-		optionsAddObject(-5,   14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MapMod/Options/Add Features/Coordinates/ShowCursorCoordsOnMapLabel"] .. "#" .. textColor1 .. ":l"); -- Show cursor coordinates
-		optionsAddObject(-5,   24, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_ShowCursorCoordsOnMap:2#n:CT_MapMod_ShowCursorCoordsOnMap#" .. L["CT_MapMod/Options/At Top"] .. "#" .. L["CT_MapMod/Options/At Bottom"] .. "#" .. L["CT_MapMod/Options/Disabled"]);
+		optionsAddObject(-15,   14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MapMod/Options/Add Features/Coordinates/ShowPlayerCoordsOnMapLabel"] .. "#" .. textColor3 .. ":l"); -- Show player coordinates
+		optionsBeginFrame(-10,   24, "dropdown#tl:5:%y#s:100:20#o:CT_MapMod_ShowPlayerCoordsOnMap:2#n:CT_MapMod_ShowPlayerCoordsOnMap#" .. L["CT_MapMod/Options/At Top"] .. "#" .. L["CT_MapMod/Options/At Bottom"] .. "#" .. L["CT_MapMod/Options/Disabled"]);
+			optionsAddTooltip({L["CT_MapMod/Options/Add Features/Coordinates/ShowPlayerCoordsOnMapLabel"],L["CT_MapMod/Options/Add Features/Coordinates/Line 1"] .. "#" .. textColor2});
+		optionsEndFrame();
+		optionsAddObject(-15,   14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MapMod/Options/Add Features/Coordinates/ShowCursorCoordsOnMapLabel"] .. "#" .. textColor3 .. ":l"); -- Show cursor coordinates
+		optionsBeginFrame(-10,   24, "dropdown#tl:5:%y#s:100:20#o:CT_MapMod_ShowCursorCoordsOnMap:2#n:CT_MapMod_ShowCursorCoordsOnMap#" .. L["CT_MapMod/Options/At Top"] .. "#" .. L["CT_MapMod/Options/At Bottom"] .. "#" .. L["CT_MapMod/Options/Disabled"]);
+			optionsAddTooltip({L["CT_MapMod/Options/Add Features/Coordinates/ShowCursorCoordsOnMapLabel"],L["CT_MapMod/Options/Add Features/Coordinates/Line 1"] .. "#" .. textColor2});
+		optionsEndFrame();
 		
-		optionsAddObject(-5,   50, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MapMod/Options/Add Features/WhereAmI/Line 1"] .. "#" .. textColor2 .. ":l"); -- The 'Where am I?' button resets the map to your location.
-		optionsAddObject(-5,   14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MapMod/Options/Add Features/WhereAmI/ShowMapResetButtonLabel"] .. "#" .. textColor1 .. ":l"); -- Show 'Where am I' button
-		optionsAddObject(-5,   24, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_ShowMapResetButton#n:CT_MapMod_ShowMapResetButton#" .. L["CT_MapMod/Options/Auto"] .. "#" .. L["CT_MapMod/Options/Always"] .. "#" .. L["CT_MapMod/Options/Disabled"]);
-		optionsBeginFrame(-5,   24, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_MapResetButtonPlacement#n:CT_MapMod_MapResetButtonPlacement#" .. L["CT_MapMod/Options/At Bottom"] .. "#" .. L["CT_MapMod/Options/At Top"] .. "#" .. L["CT_MapMod/Options/At Top Left"]);
+		optionsAddObject(-15,   14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MapMod/Options/Add Features/WhereAmI/ShowMapResetButtonLabel"] .. "#" .. textColor3 .. ":l"); -- Show 'Where am I' button
+		optionsBeginFrame(-10,   24, "dropdown#tl:5:%y#s:100:20#o:CT_MapMod_ShowMapResetButton#n:CT_MapMod_ShowMapResetButton#" .. L["CT_MapMod/Options/Auto"] .. "#" .. L["CT_MapMod/Options/Always"] .. "#" .. L["CT_MapMod/Options/Disabled"]);
+			optionsAddTooltip({L["CT_MapMod/Options/Add Features/WhereAmI/ShowMapResetButtonLabel"],L["CT_MapMod/Options/Add Features/WhereAmI/Line 1"] .. "#" .. textColor2, L["CT_MapMod/Options/Auto"] .. " - " .. SPELL_FAILED_INCORRECT_AREA .. "#" .. textColor2});
+		optionsEndFrame();
+		optionsBeginFrame(24,   24, "dropdown#tl:140:%y#s:100:20#o:CT_MapMod_MapResetButtonPlacement#n:CT_MapMod_MapResetButtonPlacement#" .. L["CT_MapMod/Options/At Bottom"] .. "#" .. L["CT_MapMod/Options/At Top"] .. "#" .. L["CT_MapMod/Options/At Top Left"]);
 			optionsAddScript("onupdate",	
 				function(self)
 					if (module:getOption("CT_MapMod_ShowMapResetButton") == 3) then
@@ -1797,45 +1797,52 @@ module.frame = function()
 					end
 				end
 			);
+			optionsAddTooltip({L["CT_MapMod/Options/Add Features/WhereAmI/ShowMapResetButtonLabel"],L["CT_MapMod/Options/Add Features/WhereAmI/Line 1"] .. "#" .. textColor2});
 		optionsEndFrame();
 		
 		--Create and Display Pins
 		optionsAddObject(-20,  17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_MapMod/Options/Pins/Heading"]); -- Create and Display Pins
 		
-		optionsAddObject(-5,   50, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MapMod/Options/Pins/User/Line 1"] .. "#" .. textColor2 .. ":l"); -- Identify points of interest on the map with custom icons
-		optionsAddObject(-5,   14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MapMod/Options/Pins/User/UserNoteDisplayLabel"] .. "#" .. textColor1 .. ":l"); -- Show custom user notes
-		optionsAddObject(-5,   24, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_UserNoteDisplay#n:CT_MapMod_UserNoteDisplay#" .. L["CT_MapMod/Options/Always"] .. "#" .. L["CT_MapMod/Options/Disabled"]);
-		optionsAddObject(-5,    8, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MapMod/Options/Pins/Icon Size"] .. "#" .. textColor1 .. ":l"); -- Icon size
-		optionsAddFrame( -5,   28, "slider#tl:24:%y#s:169:15#o:CT_MapMod_UserNoteSize:24##10:26:0.5");
+		optionsAddObject(-15,  14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MapMod/Options/Pins/User/UserNoteDisplayLabel"] .. "#" .. textColor3 .. ":l"); -- Show custom user notes
+		optionsBeginFrame(-10,  24, "dropdown#tl:5:%y#s:100:20#o:CT_MapMod_UserNoteDisplay#n:CT_MapMod_UserNoteDisplay#" .. L["CT_MapMod/Options/Always"] .. "#" .. L["CT_MapMod/Options/Disabled"]);
+			optionsAddTooltip({L["CT_MapMod/Options/Pins/User/UserNoteDisplayLabel"],L["CT_MapMod/Options/Pins/User/Line 1"] .. "#" .. textColor2});
+		optionsEndFrame()
+		optionsAddFrame(  24,  28, "slider#tl:160:%y#s:120:15#o:CT_MapMod_UserNoteSize:24#" .. L["CT_MapMod/Options/Pins/Icon Size"] .. " - <value>:" .. SMALL .. ":" .. LARGE .. "#10:26:0.5");
 		
-		optionsAddObject(-5,   50, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MapMod/Options/Pins/Gathering/Line 1"] .. "#" .. textColor2 .. ":l"); -- Identify herbalist and mining nodes on the map.
-		optionsAddObject(-5,   14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MapMod/Options/Pins/Gathering/HerbNoteDisplayLabel"] .. "#" .. textColor1 .. ":l"); -- Show herb nodes
-		optionsAddObject(-5,   24, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_HerbNoteDisplay#n:CT_MapMod_HerbNoteDisplay#" .. L["CT_MapMod/Options/Auto"] .. "#" .. L["CT_MapMod/Options/Always"] .. "#" .. L["CT_MapMod/Options/Disabled"]);
-		optionsAddObject(-5,    8, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MapMod/Options/Pins/Icon Size"] .. "#" .. textColor1 .. ":l");
-		optionsAddFrame( -5,   28, "slider#tl:24:%y#s:169:15#o:CT_MapMod_HerbNoteSize:14##10:26:0.5");
-		optionsAddObject(-5,   14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MapMod/Options/Pins/Gathering/OreNoteDisplayLabel"] .. "#" .. textColor1 .. ":l"); -- Show mining nodes
-		optionsAddObject(-5,   24, "dropdown#tl:5:%y#s:150:20#o:CT_MapMod_OreNoteDisplay#n:CT_MapMod_OreNoteDisplay#" .. L["CT_MapMod/Options/Auto"] .. "#" .. L["CT_MapMod/Options/Always"] .. "#" .. L["CT_MapMod/Options/Disabled"]);
-		optionsAddObject(-5,    8, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MapMod/Options/Pins/Icon Size"] .. "#" .. textColor1 .. ":l"); -- Icon size
-		optionsAddFrame( -5,   28, "slider#tl:24:%y#s:169:15#o:CT_MapMod_OreNoteSize:14##10:26:0.5");
-		optionsBeginFrame(-5,  26, "checkbutton#tl:10:%y#o:CT_MapMod_IncludeRandomSpawns#" .. L["CT_MapMod/Options/Pins/IncludeRandomSpawnsCheckButton"]); -- Include randomly-spawning rare nodes
-			optionsAddTooltip({L["CT_MapMod/Options/Pins/IncludeRandomSpawnsCheckButton"], L["CT_MapMod/Options/Pins/IncludeRandomSpawnsTip"]});
+		optionsAddObject(-15,  14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MapMod/Options/Pins/Gathering/HerbNoteDisplayLabel"] .. "#" .. textColor3 .. ":l"); -- Show herb nodes
+		optionsBeginFrame(-10,   24, "dropdown#tl:5:%y#s:100:20#o:CT_MapMod_HerbNoteDisplay#n:CT_MapMod_HerbNoteDisplay#" .. L["CT_MapMod/Options/Auto"] .. "#" .. L["CT_MapMod/Options/Always"] .. "#" .. L["CT_MapMod/Options/Disabled"]);
+			optionsAddTooltip({L["CT_MapMod/Options/Pins/Gathering/HerbNoteDisplayLabel"],L["CT_MapMod/Options/Pins/Gathering/Line 1"] .. "#" .. textColor2, L["CT_MapMod/Options/Auto"] .. " - " .. UNIT_SKINNABLE_HERB .. "#" .. textColor2});
+		optionsEndFrame()
+		optionsAddFrame( 24,   28, "slider#tl:160:%y#s:120:15#o:CT_MapMod_HerbNoteSize:14#" .. L["CT_MapMod/Options/Pins/Icon Size"] .. " - <value>:" .. SMALL .. ":" .. LARGE .. "#10:26:0.5");
+		
+		optionsAddObject(-15,   14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MapMod/Options/Pins/Gathering/OreNoteDisplayLabel"] .. "#" .. textColor3 .. ":l"); -- Show mining nodes
+		optionsBeginFrame(-5,   24, "dropdown#tl:5:%y#s:100:20#o:CT_MapMod_OreNoteDisplay#n:CT_MapMod_OreNoteDisplay#" .. L["CT_MapMod/Options/Auto"] .. "#" .. L["CT_MapMod/Options/Always"] .. "#" .. L["CT_MapMod/Options/Disabled"]);
+			optionsAddTooltip({L["CT_MapMod/Options/Pins/Gathering/OreNoteDisplayLabel"],L["CT_MapMod/Options/Pins/Gathering/Line 1"] .. "#" .. textColor2, L["CT_MapMod/Options/Auto"] .. " - " .. UNIT_SKINNABLE_ROCK .. "#" .. textColor2});
+		optionsEndFrame()
+		optionsAddObject( 24,   28, "slider#tl:160:%y#s:120:15#o:CT_MapMod_OreNoteSize:14#" .. L["CT_MapMod/Options/Pins/Icon Size"] .. " - <value>:" .. SMALL .. ":" .. LARGE .. "#10:26:0.5");
+		
+		optionsBeginFrame(-15,  26, "checkbutton#tl:10:%y#o:CT_MapMod_IncludeRandomSpawns#" .. L["CT_MapMod/Options/Pins/IncludeRandomSpawnsCheckButton"]); -- Include randomly-spawning rare nodes
+			optionsAddTooltip({L["CT_MapMod/Options/Pins/IncludeRandomSpawnsCheckButton"], L["CT_MapMod/Options/Pins/IncludeRandomSpawnsTip"] .. "#" .. textColor2});
 		optionsEndFrame();
 		optionsBeginFrame(-5,  26, "checkbutton#tl:10:%y#o:CT_MapMod_OverwriteGathering#" .. L["CT_MapMod/Options/Pins/OverwriteGatheringCheckButton"]); -- Include randomly-spawning rare nodes
-			optionsAddTooltip({L["CT_MapMod/Options/Pins/OverwriteGatheringCheckButton"], L["CT_MapMod/Options/Pins/OverwriteGatheringTip"]});
+			optionsAddTooltip({L["CT_MapMod/Options/Pins/OverwriteGatheringCheckButton"], L["CT_MapMod/Options/Pins/OverwriteGatheringTip"] .. "#" .. textColor2});
 		optionsEndFrame();
-		optionsAddObject(-5,   50, "font#t:0:%y#s:0:%s#l:13:0#r#Reduce pin alpha to see other map features.\n(More alpha = more opaque)#" .. textColor2 .. ":l");
-		optionsAddObject(-5,    8, "font#t:0:%y#s:0:%s#l:13:0#r#Alpha when zoomed out#" .. textColor1 .. ":l");
-		optionsAddFrame( -5,   28, "slider#tl:24:%y#s:169:15#o:CT_MapMod_AlphaZoomedOut:0.75##0.50:1.00:0.05");
-		optionsAddObject(-5,    8, "font#t:0:%y#s:0:%s#l:13:0#r#Alpha when zoomed in#" .. textColor1 .. ":l");
-		optionsAddFrame( -5,   28, "slider#tl:24:%y#s:169:15#o:CT_MapMod_AlphaZoomedIn:1.00##0.50:1.00:0.05");
+		
+		optionsAddObject(-15,   14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. OBJECT_ALPHA .. "#" .. textColor3 .. ":l");
+		optionsBeginFrame(-20,   28, "slider#tl:24:%y#s:120:15#o:CT_MapMod_AlphaZoomedOut:0.85#Zoomed out - <value>:50%:100%#0.50:1.00:0.05");
+			optionsAddTooltip({"Alpha while zoomed out fully", "Reduce pin alpha to see other map features.#" .. textColor2, "(Less alpha = less opaque)#" .. textColor2});
+		optionsEndFrame();
+		optionsBeginFrame(28,   28, "slider#tl:160:%y#s:120:15#o:CT_MapMod_AlphaZoomedIn:1.00#Zoomed in - <value>:50%:100%#0.50:1.00:0.05");
+			optionsAddTooltip({"Alpha while zoomed in fully", "Reduce pin alpha to see other map features.#" .. textColor2, "(Less alpha = less opaque)#" .. textColor2});
+		optionsEndFrame();
 		
 		-- Flight Masters
 		if (FlightMap_LoadUI or TaxiFrame) then
 			optionsAddObject(-20,  17, "font#tl:5:%y#v:GameFontNormalLarge#" .. FLIGHT_MAP);
-			optionsBeginFrame( -15,  20, "checkbutton#tl:10:%y#o:CT_MapMod_ShowOnFlightMaps:true#" .. L["CT_MapMod/Options/FlightMaps/ShowOnFlightMapsCheckButton"] .. "#l:268");
+			optionsBeginFrame( -15,  26, "checkbutton#tl:10:%y#o:CT_MapMod_ShowOnFlightMaps:true#" .. L["CT_MapMod/Options/FlightMaps/ShowOnFlightMapsCheckButton"] .. "#l:268");
 				optionsAddTooltip({L["CT_MapMod/Options/FlightMaps/ShowOnFlightMapsCheckButton"], L["CT_MapMod/Options/FlightMaps/ShowOnFlightMapsTip"]});
 			optionsEndFrame()
-			optionsBeginFrame( -15,  20, "checkbutton#tl:10:%y#o:CT_MapMod_ShowUnreachableFlightPaths#" .. L["CT_MapMod/Options/FlightMaps/ShowUnreachableFlightPathsCheckButton"] .. "#l:268");
+			optionsBeginFrame( -5,  26, "checkbutton#tl:10:%y#o:CT_MapMod_ShowUnreachableFlightPaths#" .. L["CT_MapMod/Options/FlightMaps/ShowUnreachableFlightPathsCheckButton"] .. "#l:268");
 				optionsAddTooltip({L["CT_MapMod/Options/FlightMaps/ShowUnreachableFlightPathsCheckButton"], L["CT_MapMod/Options/FlightMaps/ShowUnreachableFlightPathsTip"]});
 			optionsEndFrame()
 		end

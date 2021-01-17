@@ -217,10 +217,10 @@ module.pinIcons =
 	
 	-- Shadowlands
 	["Death Blossom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_DeathBlossom",
-	["Marrowroot"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",
-	["Rising Glory"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",
-	["Vigil's Torch"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",
-	["Widowbloom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",	
+	["Marrowroot"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Marrowroot",
+	["Rising Glory"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_RisingGlory",
+	["Vigil's Torch"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_VigilsTorch",
+	["Widowbloom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Widowbloom",	
 	["Nightshade"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Nightshade",
 	
 	-- Ore --
@@ -289,6 +289,7 @@ module.randomSpawns =
 	["Platinum"] = true,
 	-- Shadowlands
 	["Nightshade"] = function() return C_Map.GetBestMapForUnit("player") ~= 1543; end,
+	["Death Blossom"] = true,
 	["Elethium"] = function() return C_Map.GetBestMapForUnit("player") ~= 1543; end,
 }
 
@@ -320,6 +321,7 @@ module.flightMaps =
 --	val			String, Required		Must evaluate to "Herb" or "Ore"
 module.gatheringSkills =
 {
+	-- Herbalism
 	  [2366] = "Herb",
 	  [2368] = "Herb",
 	  [3570] = "Herb",
@@ -339,7 +341,9 @@ module.gatheringSkills =
 	[265834] = "Herb",
 	[265835] = "Herb",
 	[309780] = "Herb",	-- Shadowlands
-	   [186] = "Ore",	-- Mining
+
+	-- Mining
+	   [186] = "Ore",
 	  [2575] = "Ore",	-- Classic Apprentice
 	  [2576] = "Ore",	-- Classic Journeyman
 	  [3564] = "Ore",	-- Classic Expert
