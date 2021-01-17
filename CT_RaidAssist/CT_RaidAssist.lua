@@ -1356,7 +1356,7 @@ end
 --------------------------------------------
 -- CTRAWindow
 
-function NewCTRAWindow(owningCTRAFrames)
+function NewCTRAWindow(owningCTRAFrames)	-- local at the top of this file
 	
 	-- public interface
 	local obj = { };
@@ -1373,6 +1373,7 @@ function NewCTRAWindow(owningCTRAFrames)
 	local roster = { };		-- list of the current raid or group used when constructing CTRAPlayerFrame and CTRATargetFrame objects
 	local currentOptions = { };	-- current options of this window
 	local pendingOptions = { };	-- options awaiting application to this window
+
 	local defaultOptions = 		-- configuration data for the default options in showing a window
 	{
 		["ShowGroup1"] = true,		-- default is to show groups 1 to 8
@@ -1436,12 +1437,14 @@ function NewCTRAWindow(owningCTRAFrames)
 		["ShowTotalAbsorbs"] = 1,
 		["ShowIncomingHeals"] = 1,
 	};
+
 	local groupTypeFuncs =
-	{	-- Returns true if the given rosterEntry corresponds to a particular group, class or role.  Used in obj:Update()
+	{	-- Constants and sorting functions used in obj:Update()
 		-- {
 		--	[1] = property,			-- name of the associated saved variable to check for, if this category is to be displayed
 		--	[2] = sortFunc,			-- function to determine which units are included, receiving a rosterEntry as an argument
-		--	[3] = labelText,		-- label to show if ShowLabels is true (not yet implemented, 7 Jul 19)
+		--	[3] = labelText,		-- label to show if ShowLabels is true
+		--	[4] = labelAbbrText,		-- abbreviated label to show when multiple groups/classes/roles appear in the same column or row
 		-- }
 
 		{"ShowGroup1", function(rosterEntry) return rosterEntry.group == 1; end, "Group 1", "1",},
@@ -1881,8 +1884,9 @@ function NewCTRAWindow(owningCTRAFrames)
 		for __, label in pairs(labels) do
 			label:SetText("");
 		end
-		local playersShown, labelsShown = 0, 0;
-		for __, category in pairs(categories) do  -- (from step 2)
+		local playersShown, labelsShown = 0, 0;	
+		for __, category in pairs(categories) do  -- (from step 2)	
+			local firstFrameOfCategory = true; -- to manage group labels when wrapping and merging are both active
 			if self:GetProperty(category[1]) then
 
 				-- this group must be shown, if there is anyone in it to show
@@ -1904,16 +1908,16 @@ function NewCTRAWindow(owningCTRAFrames)
 							if (w == 0) then
 								labelsShown = labelsShown + 1
 							end
-							if (category[3]) then
-								if (not labels[labelsShown]) then
-									labels[labelsShown] = windowFrame:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall");
-									labels[labelsShown].id = labelsShown;
-									labels[labelsShown]:SetJustifyH("CENTER");
-									labels[labelsShown]:SetJustifyV("MIDDLE");
-									labels[labelsShown]:SetScale(self:GetProperty("PlayerFrameScale")/100);
-									labels[labelsShown]:SetTextColor(1,1,1);
-									anchorLabel(labels[labelsShown]);
-								end
+							if (not labels[labelsShown]) then
+								labels[labelsShown] = windowFrame:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall");
+								labels[labelsShown].id = labelsShown;
+								labels[labelsShown]:SetJustifyH("CENTER");
+								labels[labelsShown]:SetJustifyV("MIDDLE");
+								labels[labelsShown]:SetScale(self:GetProperty("PlayerFrameScale")/100);
+								labels[labelsShown]:SetTextColor(1,1,1);
+								anchorLabel(labels[labelsShown]);
+							end
+							if (firstFrameOfCategory) then
 								local text = labels[labelsShown]:GetText();
 								if (text and text ~= "") then
 									if (text:sub(1,6) == "Group ") then
@@ -1923,9 +1927,9 @@ function NewCTRAWindow(owningCTRAFrames)
 								else
 									labels[labelsShown]:SetText(category[3]);
 								end
-								category[3] = nil;
 							end
 						end
+						firstFrameOfCategory = false;
 
 						-- move the anchor (and wrap to a new col/row if necessary) for the next person, and keep track of the max number of rows and columns in use
 						w = w + 1;
