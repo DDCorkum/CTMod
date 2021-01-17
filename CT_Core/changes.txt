@@ -1,4 +1,7 @@
-CT_Core (9.0.2.2) 2020-13-20
+CT_Core (9.0.2.3) 2020-12-23
+- The anchor to move LossOfControlFrame will no longer interfere with mouse clicks
+
+CT_Core (9.0.2.2) 2020-12-21
 - Added option to move the LossOfControlFrame
 
 CT_Core (9.0.2.1) 2020-11-20
