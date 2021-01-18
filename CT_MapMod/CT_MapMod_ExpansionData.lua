@@ -239,6 +239,7 @@ module.pinIcons =
 	-- Burning Crusade
 	["Fel Iron"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_FelIronVein",
 	["Khorium"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_KhoriumVein",
+	
 	-- Wrath of the Lich King
 	["Cobalt"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CobaltVein",
 	["Saronite"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_SaroniteVein",
@@ -269,12 +270,12 @@ module.pinIcons =
 	["Osmenite"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Elementium",
 	
 	-- Shadowlands
-	["Laestrite"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Elementium",
-	["Oxxein"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein",
-	["Phaedrum"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein",
-	["Sinvyr"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_SaroniteVein",
-	["Solenium"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_GoldVein",
-	["Elethium"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_StormSilver",
+	["Laestrite"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Laestrite",
+	["Oxxein"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Oxxein",
+	["Phaedrum"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Phaedrum",
+	["Sinvyr"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Sinvyr",
+	["Solenium"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Solenium",
+	["Elethium"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Elethium",
 }
 setmetatable(module.pinIcons, {__index = function() return "Interface\\RaidFrame\\UI-RaidFrame-Threat" end})
 
@@ -287,9 +288,9 @@ module.randomSpawns =
 	-- Battle for Azeroth
 	["Anchor Weed"] = true,
 	["Platinum"] = true,
+	
 	-- Shadowlands
 	["Nightshade"] = function() return C_Map.GetBestMapForUnit("player") ~= 1543; end,
-	["Death Blossom"] = true,
 	["Elethium"] = function() return C_Map.GetBestMapForUnit("player") ~= 1543; end,
 }
 

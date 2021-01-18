@@ -809,10 +809,10 @@ do
 			end
 			
 			-- STEP 2:
-			local textColor0 = "1.0:1.0:1.0";
-			local textColor1 = "0.9:0.9:0.9";
-			local textColor2 = "0.7:0.7:0.7";
-			local textColor3 = "0.9:0.72:0.0";
+			local textColor0 = "#1.0:1.0:1.0";
+			local textColor1 = "#0.9:0.9:0.9";
+			local textColor2 = "#0.7:0.7:0.7";
+			local textColor3 = "#0.9:0.72:0.0";
 			module:getFrame (
 				{	["button#s:80:25#br:b:-42:10#v:GameMenuButtonTemplate#" .. L["CT_MapMod/Pin/Okay"]] = {
 						["onclick"] = okayPressed,
@@ -823,7 +823,7 @@ do
 					["button#s:80:25#bl:b:42:10#v:GameMenuButtonTemplate#" .. L["CT_MapMod/Pin/Delete"]] = {
 						["onclick"] = deletePressed,
 					},
-					["font#l:tr:-100:-25#x#" .. textColor2 .. ":l"] = { },
+					["font#l:tr:-100:-25#x" .. textColor2 .. ":l"] = { },
 					["editbox#l:tr:-85:-25#s:30:18"] = { 
 						["onload"] = function(self)
 							xEditBox = self;
@@ -835,7 +835,7 @@ do
 							end);
 						end,
 					},
-					["font#l:tr:-55:-25#y#" .. textColor2 .. ":l"] = { },
+					["font#l:tr:-55:-25#y" .. textColor2 .. ":l"] = { },
 					["editbox#l:tr:-40:-25#s:30:18"] = { 
 						["onload"] = function(self)
 							yEditBox = self;
@@ -847,7 +847,7 @@ do
 							end);
 						end,
 					},
-					["font#l:tl:15:-25#" .. L["CT_MapMod/Pin/Name"] .. "#" .. textColor2 .. ":l"] = { },
+					["font#l:tl:15:-25#" .. L["CT_MapMod/Pin/Name"] .. textColor2 .. ":l"] = { },
 					["editbox#l:tl:55:-25#s:150:18"] = { 
 						["onload"] = function(self)
 							nameEditBox = self;
@@ -869,9 +869,9 @@ do
 							end);
 						end,
 					},	
-					["font#l:tl:15:-50#" .. L["CT_MapMod/Pin/Type"] .. "#" .. textColor2 .. ":l"] = { },
-					["font#l:t:5:-50#" .. L["CT_MapMod/Pin/Icon"] .. "#" .. textColor2 .. ":l"] = { },
-					["font#l:tl:15:-75#" .. L["CT_MapMod/Pin/Description"] .. "#" .. textColor2 .. ":l"] = { },
+					["font#l:tl:15:-50#" .. L["CT_MapMod/Pin/Type"] .. textColor2 .. ":l"] = { },
+					["font#l:t:5:-50#" .. L["CT_MapMod/Pin/Icon"] .. textColor2 .. ":l"] = { },
+					["font#l:tl:15:-75#" .. L["CT_MapMod/Pin/Description"] .. textColor2 .. ":l"] = { },
 					["editbox#tl:tl:15:-84#br:tl:315:-144#ChatFontSmall"] = {
 						["onload"] = function(self)
 							descriptEditBox = self;
@@ -1758,34 +1758,34 @@ module.frame = function()
 	local optionsBeginFrame = function(offset, size, details, data) module:framesBeginFrame(optionsFrameList, offset, size, details, data); end
 	local optionsEndFrame = function() module:framesEndFrame(optionsFrameList); end
 
-	local textColor0 = "1.0:1.0:1.0";
-	local textColor1 = "0.9:0.9:0.9";
-	local textColor2 = "0.7:0.7:0.7";
-	local textColor3 = "0.9:0.72:0.0";
+	local textColor0 = "#1.0:1.0:1.0";
+	local textColor1 = "#0.9:0.9:0.9";
+	local textColor2 = "#0.7:0.7:0.7";
+	local textColor3 = "#0.9:0.72:0.0";
 	local xoffset, yoffset;
 
 	optionsBeginFrame(-5, 0, "frame#tl:0:%y#r");
 		-- Tips
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_MapMod/Options/Tips/Heading"]); -- Tips
-		optionsAddObject( -2, 3*14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MapMod/Options/Tips/Line 1"] .. "#" .. textColor2 .. ":l"); --You can use /ctmap, /ctmapmod, or /mapmod to open this options window directly.
-		optionsAddObject( -5, 3*14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MapMod/Options/Tips/Line 2"] .. "#" .. textColor2 .. ":l"); --Add pins to the world map using the 'new note' button at the top corner of the map!
+		optionsAddObject( -2, 3*14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MapMod/Options/Tips/Line 1"] .. textColor2 .. ":l"); --You can use /ctmap, /ctmapmod, or /mapmod to open this options window directly.
+		optionsAddObject( -5, 3*14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MapMod/Options/Tips/Line 2"] .. textColor2 .. ":l"); --Add pins to the world map using the 'new note' button at the top corner of the map!
 		
 		
 		--Add Features to World Map
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_MapMod/Options/Add Features/Heading"]); -- Add Features to World Map
 		
-		optionsAddObject(-15,   14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MapMod/Options/Add Features/Coordinates/ShowPlayerCoordsOnMapLabel"] .. "#" .. textColor3 .. ":l"); -- Show player coordinates
+		optionsAddObject(-15,   14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MapMod/Options/Add Features/Coordinates/ShowPlayerCoordsOnMapLabel"] .. textColor1 .. ":l"); -- Show player coordinates
 		optionsBeginFrame(-10,   24, "dropdown#tl:5:%y#s:100:20#o:CT_MapMod_ShowPlayerCoordsOnMap:2#n:CT_MapMod_ShowPlayerCoordsOnMap#" .. L["CT_MapMod/Options/At Top"] .. "#" .. L["CT_MapMod/Options/At Bottom"] .. "#" .. L["CT_MapMod/Options/Disabled"]);
-			optionsAddTooltip({L["CT_MapMod/Options/Add Features/Coordinates/ShowPlayerCoordsOnMapLabel"],L["CT_MapMod/Options/Add Features/Coordinates/Line 1"] .. "#" .. textColor2});
+			optionsAddTooltip({L["CT_MapMod/Options/Add Features/Coordinates/ShowPlayerCoordsOnMapLabel"],L["CT_MapMod/Options/Add Features/Coordinates/Line 1"] .. textColor2});
 		optionsEndFrame();
-		optionsAddObject(-15,   14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MapMod/Options/Add Features/Coordinates/ShowCursorCoordsOnMapLabel"] .. "#" .. textColor3 .. ":l"); -- Show cursor coordinates
+		optionsAddObject(-15,   14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MapMod/Options/Add Features/Coordinates/ShowCursorCoordsOnMapLabel"] .. textColor1 .. ":l"); -- Show cursor coordinates
 		optionsBeginFrame(-10,   24, "dropdown#tl:5:%y#s:100:20#o:CT_MapMod_ShowCursorCoordsOnMap:2#n:CT_MapMod_ShowCursorCoordsOnMap#" .. L["CT_MapMod/Options/At Top"] .. "#" .. L["CT_MapMod/Options/At Bottom"] .. "#" .. L["CT_MapMod/Options/Disabled"]);
-			optionsAddTooltip({L["CT_MapMod/Options/Add Features/Coordinates/ShowCursorCoordsOnMapLabel"],L["CT_MapMod/Options/Add Features/Coordinates/Line 1"] .. "#" .. textColor2});
+			optionsAddTooltip({L["CT_MapMod/Options/Add Features/Coordinates/ShowCursorCoordsOnMapLabel"],L["CT_MapMod/Options/Add Features/Coordinates/Line 1"] .. textColor2});
 		optionsEndFrame();
 		
-		optionsAddObject(-15,   14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MapMod/Options/Add Features/WhereAmI/ShowMapResetButtonLabel"] .. "#" .. textColor3 .. ":l"); -- Show 'Where am I' button
+		optionsAddObject(-15,   14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MapMod/Options/Add Features/WhereAmI/ShowMapResetButtonLabel"] .. textColor1 .. ":l"); -- Show 'Where am I' button
 		optionsBeginFrame(-10,   24, "dropdown#tl:5:%y#s:100:20#o:CT_MapMod_ShowMapResetButton#n:CT_MapMod_ShowMapResetButton#" .. L["CT_MapMod/Options/Auto"] .. "#" .. L["CT_MapMod/Options/Always"] .. "#" .. L["CT_MapMod/Options/Disabled"]);
-			optionsAddTooltip({L["CT_MapMod/Options/Add Features/WhereAmI/ShowMapResetButtonLabel"],L["CT_MapMod/Options/Add Features/WhereAmI/Line 1"] .. "#" .. textColor2, L["CT_MapMod/Options/Auto"] .. " - " .. SPELL_FAILED_INCORRECT_AREA .. "#" .. textColor2});
+			optionsAddTooltip({L["CT_MapMod/Options/Add Features/WhereAmI/ShowMapResetButtonLabel"],L["CT_MapMod/Options/Add Features/WhereAmI/Line 1"] .. textColor2, L["CT_MapMod/Options/Auto"] .. " - " .. SPELL_FAILED_INCORRECT_AREA .. textColor2});
 		optionsEndFrame();
 		optionsBeginFrame(24,   24, "dropdown#tl:140:%y#s:100:20#o:CT_MapMod_MapResetButtonPlacement#n:CT_MapMod_MapResetButtonPlacement#" .. L["CT_MapMod/Options/At Bottom"] .. "#" .. L["CT_MapMod/Options/At Top"] .. "#" .. L["CT_MapMod/Options/At Top Left"]);
 			optionsAddScript("onupdate",	
@@ -1797,43 +1797,43 @@ module.frame = function()
 					end
 				end
 			);
-			optionsAddTooltip({L["CT_MapMod/Options/Add Features/WhereAmI/ShowMapResetButtonLabel"],L["CT_MapMod/Options/Add Features/WhereAmI/Line 1"] .. "#" .. textColor2});
+			optionsAddTooltip({L["CT_MapMod/Options/Add Features/WhereAmI/ShowMapResetButtonLabel"],L["CT_MapMod/Options/Add Features/WhereAmI/Line 1"] .. textColor2});
 		optionsEndFrame();
 		
 		--Create and Display Pins
 		optionsAddObject(-20,  17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_MapMod/Options/Pins/Heading"]); -- Create and Display Pins
 		
-		optionsAddObject(-15,  14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MapMod/Options/Pins/User/UserNoteDisplayLabel"] .. "#" .. textColor3 .. ":l"); -- Show custom user notes
+		optionsAddObject(-15,  14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MapMod/Options/Pins/User/UserNoteDisplayLabel"] .. textColor1 .. ":l"); -- Show custom user notes
 		optionsBeginFrame(-10,  24, "dropdown#tl:5:%y#s:100:20#o:CT_MapMod_UserNoteDisplay#n:CT_MapMod_UserNoteDisplay#" .. L["CT_MapMod/Options/Always"] .. "#" .. L["CT_MapMod/Options/Disabled"]);
-			optionsAddTooltip({L["CT_MapMod/Options/Pins/User/UserNoteDisplayLabel"],L["CT_MapMod/Options/Pins/User/Line 1"] .. "#" .. textColor2});
+			optionsAddTooltip({L["CT_MapMod/Options/Pins/User/UserNoteDisplayLabel"],L["CT_MapMod/Options/Pins/User/Line 1"] .. textColor2});
 		optionsEndFrame()
 		optionsAddFrame(  24,  28, "slider#tl:160:%y#s:120:15#o:CT_MapMod_UserNoteSize:24#" .. L["CT_MapMod/Options/Pins/Icon Size"] .. " - <value>:" .. SMALL .. ":" .. LARGE .. "#10:26:0.5");
 		
-		optionsAddObject(-15,  14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MapMod/Options/Pins/Gathering/HerbNoteDisplayLabel"] .. "#" .. textColor3 .. ":l"); -- Show herb nodes
+		optionsAddObject(-15,  14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MapMod/Options/Pins/Gathering/HerbNoteDisplayLabel"] .. textColor1 .. ":l"); -- Show herb nodes
 		optionsBeginFrame(-10,   24, "dropdown#tl:5:%y#s:100:20#o:CT_MapMod_HerbNoteDisplay#n:CT_MapMod_HerbNoteDisplay#" .. L["CT_MapMod/Options/Auto"] .. "#" .. L["CT_MapMod/Options/Always"] .. "#" .. L["CT_MapMod/Options/Disabled"]);
-			optionsAddTooltip({L["CT_MapMod/Options/Pins/Gathering/HerbNoteDisplayLabel"],L["CT_MapMod/Options/Pins/Gathering/Line 1"] .. "#" .. textColor2, L["CT_MapMod/Options/Auto"] .. " - " .. UNIT_SKINNABLE_HERB .. "#" .. textColor2});
+			optionsAddTooltip({L["CT_MapMod/Options/Pins/Gathering/HerbNoteDisplayLabel"],L["CT_MapMod/Options/Pins/Gathering/Line 1"] .. textColor2, L["CT_MapMod/Options/Auto"] .. " - " .. UNIT_SKINNABLE_HERB .. textColor2});
 		optionsEndFrame()
 		optionsAddFrame( 24,   28, "slider#tl:160:%y#s:120:15#o:CT_MapMod_HerbNoteSize:14#" .. L["CT_MapMod/Options/Pins/Icon Size"] .. " - <value>:" .. SMALL .. ":" .. LARGE .. "#10:26:0.5");
 		
-		optionsAddObject(-15,   14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MapMod/Options/Pins/Gathering/OreNoteDisplayLabel"] .. "#" .. textColor3 .. ":l"); -- Show mining nodes
+		optionsAddObject(-15,   14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_MapMod/Options/Pins/Gathering/OreNoteDisplayLabel"] .. textColor1 .. ":l"); -- Show mining nodes
 		optionsBeginFrame(-5,   24, "dropdown#tl:5:%y#s:100:20#o:CT_MapMod_OreNoteDisplay#n:CT_MapMod_OreNoteDisplay#" .. L["CT_MapMod/Options/Auto"] .. "#" .. L["CT_MapMod/Options/Always"] .. "#" .. L["CT_MapMod/Options/Disabled"]);
-			optionsAddTooltip({L["CT_MapMod/Options/Pins/Gathering/OreNoteDisplayLabel"],L["CT_MapMod/Options/Pins/Gathering/Line 1"] .. "#" .. textColor2, L["CT_MapMod/Options/Auto"] .. " - " .. UNIT_SKINNABLE_ROCK .. "#" .. textColor2});
+			optionsAddTooltip({L["CT_MapMod/Options/Pins/Gathering/OreNoteDisplayLabel"],L["CT_MapMod/Options/Pins/Gathering/Line 1"] .. textColor2, L["CT_MapMod/Options/Auto"] .. " - " .. UNIT_SKINNABLE_ROCK .. textColor2});
 		optionsEndFrame()
 		optionsAddObject( 24,   28, "slider#tl:160:%y#s:120:15#o:CT_MapMod_OreNoteSize:14#" .. L["CT_MapMod/Options/Pins/Icon Size"] .. " - <value>:" .. SMALL .. ":" .. LARGE .. "#10:26:0.5");
 		
 		optionsBeginFrame(-15,  26, "checkbutton#tl:10:%y#o:CT_MapMod_IncludeRandomSpawns#" .. L["CT_MapMod/Options/Pins/IncludeRandomSpawnsCheckButton"]); -- Include randomly-spawning rare nodes
-			optionsAddTooltip({L["CT_MapMod/Options/Pins/IncludeRandomSpawnsCheckButton"], L["CT_MapMod/Options/Pins/IncludeRandomSpawnsTip"] .. "#" .. textColor2});
+			optionsAddTooltip({L["CT_MapMod/Options/Pins/IncludeRandomSpawnsCheckButton"], L["CT_MapMod/Options/Pins/IncludeRandomSpawnsTip"] .. textColor2});
 		optionsEndFrame();
 		optionsBeginFrame(-5,  26, "checkbutton#tl:10:%y#o:CT_MapMod_OverwriteGathering#" .. L["CT_MapMod/Options/Pins/OverwriteGatheringCheckButton"]); -- Include randomly-spawning rare nodes
-			optionsAddTooltip({L["CT_MapMod/Options/Pins/OverwriteGatheringCheckButton"], L["CT_MapMod/Options/Pins/OverwriteGatheringTip"] .. "#" .. textColor2});
+			optionsAddTooltip({L["CT_MapMod/Options/Pins/OverwriteGatheringCheckButton"], L["CT_MapMod/Options/Pins/OverwriteGatheringTip"] .. textColor2});
 		optionsEndFrame();
 		
-		optionsAddObject(-15,   14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. OBJECT_ALPHA .. "#" .. textColor3 .. ":l");
+		optionsAddObject(-15,   14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. OBJECT_ALPHA .. textColor3 .. ":l");
 		optionsBeginFrame(-20,   28, "slider#tl:24:%y#s:120:15#o:CT_MapMod_AlphaZoomedOut:0.85#Zoomed out - <value>:50%:100%#0.50:1.00:0.05");
-			optionsAddTooltip({"Alpha while zoomed out fully", "Reduce pin alpha to see other map features.#" .. textColor2, "(Less alpha = less opaque)#" .. textColor2});
+			optionsAddTooltip({"Alpha while zoomed out fully", "Reduce pin alpha to see other map features." .. textColor2, "(Less alpha = less opaque)" .. textColor2});
 		optionsEndFrame();
 		optionsBeginFrame(28,   28, "slider#tl:160:%y#s:120:15#o:CT_MapMod_AlphaZoomedIn:1.00#Zoomed in - <value>:50%:100%#0.50:1.00:0.05");
-			optionsAddTooltip({"Alpha while zoomed in fully", "Reduce pin alpha to see other map features.#" .. textColor2, "(Less alpha = less opaque)#" .. textColor2});
+			optionsAddTooltip({"Alpha while zoomed in fully", "Reduce pin alpha to see other map features." .. textColor2, "(Less alpha = less opaque)" .. textColor2});
 		optionsEndFrame();
 		
 		-- Flight Masters
@@ -1868,7 +1868,7 @@ module.frame = function()
 				);
 			optionsEndFrame();
 		optionsEndFrame();
-		optionsAddObject(  0, 3*13, "font#t:0:%y#s:0:%s#l#r#" .. L["CT_MapMod/Options/Reset/Line 1"] .. "#" .. textColor2); --Note: This will reset the options to default and then reload your UI.
+		optionsAddObject(  0, 3*13, "font#t:0:%y#s:0:%s#l#r#" .. L["CT_MapMod/Options/Reset/Line 1"] .. textColor2); --Note: This will reset the options to default and then reload your UI.
 		
 	optionsEndFrame();
 
