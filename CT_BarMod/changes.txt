@@ -1,3 +1,6 @@
+CT_BarMod (9.0.2.4) 2021-01-21
+- Avoiding wasted CPU usage during initial login when player inventory data arrives
+
 CT_BarMod (9.0.2.2) 2020-12-03
 - Hiding ZoneAbilityFrame after an ability is dragged to a custom bar
 

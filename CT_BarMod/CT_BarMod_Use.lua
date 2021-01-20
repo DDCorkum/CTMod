@@ -1585,11 +1585,40 @@ end
 --------------------------------------------
 -- Event Handlers
 
-local function eventHandler_UpdateAll(event, unit)
-	if ( event ~= "UNIT_INVENTORY_CHANGED" or unit == "player" ) then
+local deferredInventory = false;
+
+local function eventHandler_UpdateAll(event, unit)	-- temporary function that changes at PLAYER_LOGIN (see below)
+	if (event ~= "UNIT_INVENTORY_CHANGED") then
 		actionButtonList:update();
+	elseif (unit == "player") then
+		deferredInventory = true;		-- to avoid wasting CPU usage, repeated calls at login to UNIT_INVENTORY_CHANGED will be consolidated to a single trip at PLAYER_LOGIN
 	end
 end
+
+local function eventHandler_PlayerLogin()
+
+	-- see eventHandler_UpdateBindings()
+	wipeBindingCaches();
+	module.setActionBindings();
+	actionButtonList:updateBinding();
+
+	-- execute any UNIT_INVENTORY_CHANGED trips that were deferred until PLAYER_LOGIN
+	if (deferredInventory) then
+		actionButtonList:update();
+	end
+	
+	-- rewrite eventHandler_UpdateAll() to begin reacting to UNIT_INVENTORY_CHANGED as it happens (player unitId only)
+	function eventHandler_UpdateAll(event, unit)
+		if (event ~= "UNIT_INVENTORY_CHANGED") then
+			actionButtonList:update();
+		elseif (unit == "player") then
+			actionButtonList:update();
+		end	
+	end
+	
+end
+
+
 
 --local function eventHandler_HideGrid()
 --	actionButtonList:hideGrid();
@@ -1654,6 +1683,8 @@ local function eventHandler_UpdateBindings()
 	wipeBindingCaches();
 	module.setActionBindings();
 	actionButtonList:updateBinding();
+	
+	-- also see eventHandler_PlayerLogin();
 end
 
 local function eventHandler_CheckRepeat()
@@ -2106,7 +2137,7 @@ module.useEnable = function(self)
 	self:regEvent("TRADE_SKILL_SHOW", eventHandler_UpdateState);
 	self:regEvent("TRADE_SKILL_CLOSE", eventHandler_UpdateState);
 	self:regEvent("UPDATE_BINDINGS", eventHandler_UpdateBindings);
-	self:regEvent("PLAYER_LOGIN", eventHandler_UpdateBindings);
+	self:regEvent("PLAYER_LOGIN", eventHandler_PlayerLogin);
 	self:regEvent("PLAYER_ENTER_COMBAT", eventHandler_CheckRepeat);
 	self:regEvent("PLAYER_LEAVE_COMBAT", eventHandler_CheckRepeat);
 	self:regEvent("STOP_AUTOREPEAT_SPELL", eventHandler_CheckRepeat);
@@ -2149,7 +2180,7 @@ module.useDisable = function(self)
 	self:unregEvent("TRADE_SKILL_SHOW", eventHandler_UpdateState);
 	self:unregEvent("TRADE_SKILL_CLOSE", eventHandler_UpdateState);
 	self:unregEvent("UPDATE_BINDINGS", eventHandler_UpdateBindings);
-	self:unregEvent("PLAYER_LOGIN", eventHandler_UpdateBindings);
+	self:unregEvent("PLAYER_LOGIN", eventHandler_PlayerLogin);
 	self:unregEvent("PLAYER_ENTER_COMBAT", eventHandler_CheckRepeat);
 	self:unregEvent("PLAYER_LEAVE_COMBAT", eventHandler_CheckRepeat);
 	self:unregEvent("STOP_AUTOREPEAT_SPELL", eventHandler_CheckRepeat);
