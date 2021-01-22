@@ -1585,13 +1585,17 @@ end
 --------------------------------------------
 -- Event Handlers
 
-local deferredInventory = false;
+local loginFinished, updateAfterLogin = false, false;
 
-local function eventHandler_UpdateAll(event, unit)	-- temporary function that changes at PLAYER_LOGIN (see below)
+local function eventHandler_UpdateAll(event, unit)
 	if (event ~= "UNIT_INVENTORY_CHANGED") then
 		actionButtonList:update();
 	elseif (unit == "player") then
-		deferredInventory = true;		-- to avoid wasting CPU usage, repeated calls at login to UNIT_INVENTORY_CHANGED will be consolidated to a single trip at PLAYER_LOGIN
+		if (loggedFinished) then
+			actionButtonList:update();
+		else
+			updateAfterLogin = true;	-- UNIT_INVENTORY_CHANGED happens several times during a fresh login.  This delays the call until one frame after PLAYER_LOGIN
+		end
 	end
 end
 
@@ -1602,20 +1606,13 @@ local function eventHandler_PlayerLogin()
 	module.setActionBindings();
 	actionButtonList:updateBinding();
 
-	-- execute any UNIT_INVENTORY_CHANGED trips that were deferred until PLAYER_LOGIN
-	if (deferredInventory) then
-		actionButtonList:update();
-	end
-	
-	-- rewrite eventHandler_UpdateAll() to begin reacting to UNIT_INVENTORY_CHANGED as it happens (player unitId only)
-	function eventHandler_UpdateAll(event, unit)
-		if (event ~= "UNIT_INVENTORY_CHANGED") then
+	-- see eventHandler_UpdateAll()
+	C_Timer.After(0, function()
+		if (updateAfterLogin) then
 			actionButtonList:update();
-		elseif (unit == "player") then
-			actionButtonList:update();
-		end	
-	end
-	
+		end
+		loginFinished = true;
+	end);
 end
 
 
