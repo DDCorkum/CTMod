@@ -1173,6 +1173,10 @@ function StaticCTRAFrames()
 					optionsWindowizeObject("EnablePowerBar");
 					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Appearance/EnablePowerBarCheckButton"],L["CT_RaidAssist/Options/Window/Appearance/EnablePowerBarTooltip"] .. textColor1});
 				optionsEndFrame();
+				optionsBeginFrame(-10, 26, "checkbutton#tl:10:%y#n:CTRAWindow_ShowHealthTextCheckButton:false#" .. L["CT_RaidAssist/Options/Window/Appearance/ShowHealthTextCheckButton"] .. "#l:268");
+					optionsWindowizeObject("ShowHealthText");
+					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Appearance/ShowHealthTextCheckButton"],L["CT_RaidAssist/Options/Window/Appearance/ShowHealthTextTooltip"] .. textColor1});
+				optionsEndFrame();
 				optionsBeginFrame(0, 26, "checkbutton#tl:10:%y#n:CTRAWindow_EnableTargetFrameCheckButton:true#" .. L["CT_RaidAssist/Options/Window/Appearance/EnableTargetFrameCheckButton"] .. "#l:268");
 					optionsWindowizeObject("EnableTargetFrame");
 					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Appearance/EnableTargetFrameCheckButton"],L["CT_RaidAssist/Options/Window/Appearance/EnableTargetFrameTooltip"] .. textColor1});
@@ -1246,7 +1250,21 @@ function StaticCTRAFrames()
 											selectedWindow = 1;
 										end
 										return windows[selectedWindow]:GetUnitNameFont();
-									end
+									end,
+									GetCountFont = function()
+										if (not selectedWindow) then
+											windows[1] = NewCTRAWindow(self);
+											selectedWindow = 1;
+										end
+										return windows[selectedWindow]:GetCountFont();
+									end,
+									GetHealthBarFont = function()
+										if (not selectedWindow) then
+											windows[1] = NewCTRAWindow(self);
+											selectedWindow = 1;
+										end
+										return windows[selectedWindow]:GetHealthBarFont();
+									end,
 								},
 								frame,
 								true	-- this flag informs the frame it is a dummy representation of a real one
@@ -1368,7 +1386,9 @@ function NewCTRAWindow(owningCTRAFrames)	-- local at the top of this file
 	local windowFrame;		-- appearance of the window itself
 	local playerFrames = { };	-- CTRAPlayerFrame objects
 	local targetFrames = { };	-- CTRATargetFrame objects
-	local font;			-- Font object shared by all player and target frames within this window for the unit name
+	local nameFont;			-- Font object shared by all player and target frames within this window for the unit name
+	local countFont;		-- Font object shared by all buff frames within this window for the stacks count
+	local healthBarFont;		-- Font object shared by all health bars within this window for the health percentage
 	local labels = { };		-- FontStrings above each group
 	local roster = { };		-- list of the current raid or group used when constructing CTRAPlayerFrame and CTRATargetFrame objects
 	local currentOptions = { };	-- current options of this window
@@ -1436,6 +1456,7 @@ function NewCTRAWindow(owningCTRAFrames)	-- local at the top of this file
 		["TargetPower"] = false,
 		["ShowTotalAbsorbs"] = 1,
 		["ShowIncomingHeals"] = 1,
+		["ShowHealthText"] = false,
 	};
 
 	local groupTypeFuncs =
@@ -1557,12 +1578,16 @@ function NewCTRAWindow(owningCTRAFrames)	-- local at the top of this file
 		module:blockOverflowText(label, 87 + obj:GetProperty("HorizontalSpacing")/2);
 	end
 	
-	local function updateFont()
-		font = font or CreateFont("CTRAWindow" .. (windowID or 1) .. "Font")
+	local function updateFonts()
+		nameFont = nameFont or CreateFont("CTRAWindow" .. (windowID or 1) .. "NameFont")
+		countFont = countFont or CreateFont("CTRAWindow" .. (windowID or 1) .. "CountFont")
+		healthBarFont = healthBarFont or CreateFont("CTRAWindow" .. (windowID or 1) .. "HealthBarFont")
 		local scale, UIScale = obj:GetProperty("PlayerFrameScale"), windowFrame:GetEffectiveScale();
-		local fontHeight = floor(11.2 * UIScale * (0.25 + scale*0.0075));
-		font:SetFont("Fonts\\FRIZQT__.TTF", fontHeight, "");
-		return font;
+		local fontHeight = 2 + floor(9 * UIScale * scale*0.01);
+		nameFont:SetFont("Fonts\\FRIZQT__.TTF", fontHeight, obj:GetProperty("HealthBarAsBackground") and "OUTLINE" or "");
+		healthBarFont:SetFont("Fonts\\FRIZQT__.TTF", fontHeight-1, "OUTLINE");
+		countFont:SetFont("Fonts\\ARIALN.TTF", fontHeight, "OUTLINE")
+		return nameFont, countFont, healthBarFont;
 	end
 	
 	-- PUBLIC METHODS
@@ -1592,7 +1617,7 @@ function NewCTRAWindow(owningCTRAFrames)	-- local at the top of this file
 		if (not anchorFrame or not windowFrame) then
 			-- anchor to handle positioning, with assistance from CT_Library
 			anchorFrame = CreateFrame("Frame", nil, UIParent);
-			anchorFrame:SetSize(80,20);
+			anchorFrame:SetSize(80,16);
 			anchorFrame:SetFrameLevel(4);	-- places it above windowFrame (1), and above the visualFrame (2) and secureButton (3) components of CTRAPlayerFrame
 			--the frame's anchor point will be set later in step 4
 			anchorFrame.texture = anchorFrame:CreateTexture(nil,"BACKGROUND");
@@ -1619,7 +1644,7 @@ function NewCTRAWindow(owningCTRAFrames)	-- local at the top of this file
 			);
 			-- indicator which window this is
 			anchorFrame.text = anchorFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-			anchorFrame.text:SetPoint("LEFT", anchorFrame, "LEFT", 10, 0);
+			anchorFrame.text:SetPoint("LEFT", anchorFrame, "LEFT", 5, 0);
 			anchorFrame.text:SetTextColor(1,1,1,1);
 			
 			-- window that player frames reside in
@@ -1756,7 +1781,7 @@ function NewCTRAWindow(owningCTRAFrames)	-- local at the top of this file
 		if (not InCombatLockdown()) then
 			for key, val in pairs(pendingOptions) do
 				if (key == "PlayerFrameScale") then
-					updateFont();
+					updateFonts();
 					for __, label in ipairs(labels) do
 						label:SetScale(val/100);
 					end					
@@ -1774,6 +1799,8 @@ function NewCTRAWindow(owningCTRAFrames)	-- local at the top of this file
 					for __, label in ipairs(labels) do
 						anchorLabel(label);
 					end
+				elseif (key == "HealthBarAsBackground") then
+					updateFonts();
 				end
 			end
 			wipe(pendingOptions);
@@ -2068,7 +2095,15 @@ function NewCTRAWindow(owningCTRAFrames)	-- local at the top of this file
 	end
 	
 	function obj:GetUnitNameFont()
-		return font or updateFont()
+		return nameFont or updateFonts()
+	end
+	
+	function obj:GetCountFont()
+		return countFont or select(2,updateFonts())
+	end
+	
+	function obj:GetHealthBarFont()
+		return healthBarFont or select(3,updateFonts())
 	end
 		
 	-- public constructor
@@ -2424,12 +2459,12 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 	
 	-- graphical textures and fontstrings of visualFrame
 	local background;
-	local border = { };
 	local colorBackgroundRed, colorBackgroundGreen, colorBackgroundBlue, colorBackgroundAlpha;
 	local colorBackgroundDeadOrGhostRed, colorBackgroundDeadOrGhostGreen, colorBackgroundDeadOrGhostBlue, colorBackgroundDeadOrGhostAlpha;
 	local colorBorderRed, colorBorderGreen, colorBorderBlue, colorBorderAlpha;
 	local colorBorderBeyondRangeRed, colorBorderBeyondRangeGreen, colorBorderBeyondRangeBlue, colorBorderBeyondRangeAlpha;
 	local healthBarFullCombat, healthBarZeroCombat, healthBarFullNoCombat, healthBarZeroNoCombat;
+	local healthBarText;
 	local absorbBarFullCombat, absorbBarZeroCombat, absorbBarFullNoCombat, absorbBarZeroNoCombat, absorbBarOverlay;
 	local incomingBarFullCombat, incomingBarZeroCombat, incomingBarFullNoCombat, incomingBarZeroNoCombat;
 	local healthBarWidth;
@@ -2531,9 +2566,8 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 	
 	-- infrequently configures the backdrop and borders according to user settings; see createBackdrop()
 	local function configureBackdrop()
-		-- NOTE: This is anticipated to change in Patch 9.0.1
-		border.edgeSize = 10 + 2 * owner:GetProperty("BorderThickness");
-		visualFrame:SetBackdrop(border);	
+		visualFrame.backdropInfo.edgeSize = 10 + 2 * owner:GetProperty("BorderThickness");
+		visualFrame:ApplyBackdrop();	
 		colorBackgroundRed, colorBackgroundGreen, colorBackgroundBlue, colorBackgroundAlpha = unpack(owner:GetProperty("ColorBackground"));
 		colorBackgroundDeadOrGhostRed, colorBackgroundDeadOrGhostGreen, colorBackgroundDeadOrGhostBlue, colorBackgroundDeadOrGhostAlpha = unpack(owner:GetProperty("ColorBackgroundDeadOrGhost"));	
 		colorBorderRed, colorBorderGreen, colorBorderBlue, colorBorderAlpha = unpack(owner:GetProperty("ColorBorder"));
@@ -2545,7 +2579,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 		background = visualFrame:CreateTexture(nil, "BACKGROUND");
 		background:SetPoint("TOPLEFT", visualFrame, 3, -3);
 		background:SetPoint("BOTTOMRIGHT", visualFrame, -3, 3);	
-		border.edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border";
+		visualFrame.backdropInfo = {edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border"};
 		
 		-- period range check that affects the border only
 		C_Timer.NewTicker(2, updateBackdropBorder);
@@ -2608,6 +2642,11 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 				incomingBarFullCombat:SetAlpha(0);
 				incomingBarZeroCombat:SetAlpha(0);
 			end
+			if (healthRatio < 1) then
+				healthBarText:SetText(string.format("%d%%", healthRatio*100));
+			else
+				healthBarText:SetText("");
+			end
 		else
 			-- the unit is dead, or maybe doesn't even exist, so show nothing!
 			healthBarFullCombat:SetAlpha(0);
@@ -2623,6 +2662,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 			incomingBarZeroCombat:SetAlpha(0);
 			incomingBarFullNoCombat:SetAlpha(0);
 			incomingBarZeroNoCombat:SetAlpha(0);
+			healthBarText:SetText("");
 		end
 	end
 
@@ -2632,10 +2672,13 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 			healthBarFullCombat:SetPoint("TOPLEFT", visualFrame, "TOPLEFT", 4,  -4);
 			healthBarFullCombat:SetPoint("BOTTOMLEFT", visualFrame, "BOTTOMLEFT", 4, 4);
 			healthBarWidth = 82;
+			local effectiveScale = visualFrame:GetEffectiveScale();
+			healthBarText:SetPoint("BOTTOM", healthBarFullCombat, 0, 7 * effectiveScale);
 		else
-			healthBarFullCombat:SetPoint("TOPLEFT", visualFrame, "BOTTOMLEFT", 10, 18);
+			healthBarFullCombat:SetPoint("TOPLEFT", visualFrame, "BOTTOMLEFT", 10, 19);
 			healthBarFullCombat:SetPoint("BOTTOMLEFT", visualFrame, "BOTTOMLEFT", 10, 12);
 			healthBarWidth = 70;
+			healthBarText:SetPoint("BOTTOM", healthBarFullCombat);
 		end
 			
 		local r,g,b,a;
@@ -2695,6 +2738,8 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 			incomingBarFullNoCombat:Show();
 			incomingSetting = owner:GetProperty("ShowIncomingHeals") == 2;
 		end
+		
+		healthBarText:SetShown(owner:GetProperty("ShowHealthText"));
 	end
 	
 	-- permanently creates health, absorb and incoming bar textures
@@ -2762,6 +2807,10 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 		absorbBarOverlay:SetVertTile(true);
 		absorbBarOverlay:SetHorizTile(true);
 		
+		healthBarText = healthBarText or visualFrame:CreateFontString(nil, "ARTWORK", nil , 1)
+		healthBarText:SetIgnoreParentScale(true);
+		healthBarText:SetFontObject(owner:GetHealthBarFont());
+		
 		-- initial configuration
 		configureHealthBar();
 	end
@@ -2817,7 +2866,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 		if (owner:GetProperty("HealthBarAsBackground")) then	-- the powerBar shifts in size and location to align nicely with the healthBar
 			powerBar:SetPoint("BOTTOMLEFT", visualFrame, 4, 4);		
 		else
-			powerBar:SetPoint("BOTTOMLEFT", visualFrame, 10, 6);
+			powerBar:SetPoint("BOTTOMLEFT", visualFrame, 10, 5);
 		end
 		powerBarWidth = (owner:GetProperty("HealthBarAsBackground") and 82) or 70;
 	end
@@ -2826,7 +2875,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 	local function createPowerBar()
 		powerBar = powerBar or visualFrame:CreateTexture(nil, "ARTWORK", nil, 1);
 		powerBar:SetTexture("Interface\\TargetingFrame\\UI-StatusBar");
-		powerBar:SetHeight(6);
+		powerBar:SetHeight(7);
 		
 		-- initial configuration
 		configurePowerBar();
@@ -3025,8 +3074,8 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 	-- infrequently configures unitNameFontString according to user settings
 	local configureUnitNameFontString = function()	
 		local effectiveScale = visualFrame:GetEffectiveScale();
-		unitNameFontString:SetPoint("BOTTOMLEFT", visualFrame, "LEFT", 13 * effectiveScale, 1.5);
-		unitNameFontString:SetPoint("BOTTOMRIGHT", visualFrame, "RIGHT", -13 * effectiveScale, 1.5);
+		unitNameFontString:SetPoint("BOTTOMLEFT", visualFrame, "LEFT", 13 * effectiveScale, 2.5 * effectiveScale);
+		unitNameFontString:SetPoint("BOTTOMRIGHT", visualFrame, "RIGHT", -13 * effectiveScale, 2.5 * effectiveScale);
 	end
 	
 	-- permanently creates unitNameFontString
@@ -3047,7 +3096,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 		frame.count = count or 0;
 		frame.debuffType = debuffType;
 		if (frame.text) then
-			if (frame.count > 0) then
+			if (frame.count > 1) then
 				local color = DebuffTypeColor[debuffType or ""] or DebuffTypeColor[""];
 				frame.text:SetText(count < 100 and count or "*");
 				frame.text:SetTextColor(1 - (1-color.r)/2, 1 - (1-color.g)/2, 1 - (1-color.b)/2);
@@ -3071,7 +3120,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 		local numShown = 0;
 		wipe(auraBossShown);
 		local frame = auraBoss1;
-		local encounter = module:isInEncounter() or select(3, GetInstanceInfo()) == 8;	-- raid fights, or mythic plus dungeons
+		local encounter = true or module:isInEncounter() or select(3, GetInstanceInfo()) == 8;	-- raid fights, or mythic plus dungeons
 		if(encounter and shownUnit and UnitExists(shownUnit) and owner:GetProperty("ShowBossAuras")) then		
 			for auraIndex = 1, 40 do
 				local name, icon, count, debuffType, duration, expirationTime, __, __, __, spellId = UnitBuff(shownUnit, auraIndex);
@@ -3101,7 +3150,17 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 					break;
 				end
 			end
-			auraBoss1:SetPoint("CENTER", 8 - 8 * min(4,numShown), -2.5);
+			auraBoss1:SetPoint("BOTTOM", 8 - 8 * min(4,numShown), 5);
+			if (numShown > 0) then
+				healthBarText:SetPoint("RIGHT", visualFrame, "CENTER");
+				healthBarText:SetPoint("LEFT", visualFrame, -10, 0);
+			else
+				healthBarText:SetPoint("RIGHT", visualFrame);
+				healthBarText:SetPoint("LEFT", visualFrame);
+			end
+		else
+			healthBarText:SetPoint("RIGHT", visualFrame);
+			healthBarText:SetPoint("LEFT", visualFrame);
 		end
 		while (numShown  < 4) do
 			numShown = numShown + 1;
@@ -3182,7 +3241,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 
 		local function constructAuraBoss()
 			frame = CreateFrame("Frame", nil, visualFrame);
-			frame:SetSize(12,12);
+			frame:SetSize(16,16);
 			frame.texture = frame:CreateTexture(nil, "OVERLAY", nil, 2)
 			frame.texture:SetAllPoints();
 			frame.texture:SetTexCoord(0.04,0.96,0.04,0.96);
@@ -3191,9 +3250,9 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 			frame.cooldown:SetDrawEdge(false);
 			frame.cooldown:SetReverse(true);
 			frame.text = frame:CreateFontString(nil, "OVERLAY", nil, 2);		-- just ahead non-boss auras, if there are enough of them
-			frame.text:SetFontObject(owner:GetUnitNameFont());
+			frame.text:SetFontObject(owner:GetCountFont());
 			frame.text:SetIgnoreParentScale(true);
-			frame.text:SetPoint("TOP", frame, "BOTTOM");
+			frame.text:SetPoint("BOTTOM", frame, 1, 0);
 			return frame;
 		end
 
@@ -3217,9 +3276,9 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 		aura3.next = aura4;
 		aura4.next = aura5;
 		
-		auraBoss2:SetPoint("LEFT", auraBoss1, "RIGHT", 4, 0);
-		auraBoss3:SetPoint("LEFT", auraBoss2, "RIGHT", 4, 0);
-		auraBoss4:SetPoint("LEFT", auraBoss3, "RIGHT", 4, 0);
+		auraBoss2:SetPoint("LEFT", auraBoss1, "RIGHT", 1, 0);
+		auraBoss3:SetPoint("LEFT", auraBoss2, "RIGHT", 1, 0);
+		auraBoss4:SetPoint("LEFT", auraBoss3, "RIGHT", 1, 0);
 		
 		-- initial configuration
 		configureAuras();
@@ -3509,11 +3568,13 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 				if (key == "PlayerFrameScale") then
 					visualFrame:SetScale((val or 100)/100);
 					configureUnitNameFontString();
+					configureHealthBar();
 				elseif (
 					   key == "ColorUnitFullHealthCombat"
 					or key == "ColorUnitZeroHealthCombat"
 					or key == "ColorUnitFullHealthNoCombat"
 					or key == "ColorUnitZeroHealthNoCombat"
+					or key == "ShowHealthText"
 				) then
 					configureHealthBar();
 				elseif (
@@ -3538,6 +3599,10 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 					key == "CTRAFrames_ClickCast_UseCliqueAddon"
 				) then
 					configureCliqueIntegration(val);
+				elseif (
+					key == "BorderThickness"
+				) then
+					configureBackdrop();
 				else
 					-- must be missing an option; so just reconfigure several!  (This is bad; don't do it)
 					configureBackdrop();
@@ -3745,6 +3810,7 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 	local background, border;
 	local healthBarFullCombat, healthBarZeroCombat, healthBarFullNoCombat, healthBarZeroNoCombat;
 	local absorbBarFullCombat, absorbBarZeroCombat, absorbBarFullNoCombat, absorbBarZeroNoCombat, absorbBarOverlay;
+	local healthBarText;
 	local incomingBarFullCombat, incomingBarZeroCombat, incomingBarFullNoCombat, incomingBarZeroNoCombat;
 	local incomingSetting, absorbSetting;
 	local healthBarWidth;
@@ -3837,6 +3903,10 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 		
 		absorbBarOverlay:SetVertTile(true);
 		absorbBarOverlay:SetHorizTile(true);
+		
+		healthBarText = healthBarText or visualFrame:CreateFontString(nil, "ARTWORK", nil , 1)
+		healthBarText:SetFontObject(owner:GetHealthBarFont());
+		healthBarText:SetIgnoreParentScale(true);
 	end
 	
 	-- configures the health, total-absorb and incoming-heal bars according to user settings
@@ -3844,12 +3914,15 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 		if (owner:GetProperty("HealthBarAsBackground")) then
 			healthBarFullCombat:SetPoint("TOPLEFT", visualFrame, "TOPLEFT", 4,  -4);
 			healthBarFullCombat:SetPoint("BOTTOMLEFT", visualFrame, "BOTTOMLEFT", 4, 4);
-			healthBarWidth = 82;
+			healthBarWidth = 82;	
 		else
 			healthBarFullCombat:SetPoint("TOPLEFT", visualFrame, "TOPLEFT", 10, -16);
 			healthBarFullCombat:SetPoint("BOTTOMLEFT", visualFrame, "TOPLEFT", 10, -20);
-			healthBarWidth = 70;
+			healthBarWidth = 70;	
 		end
+
+		local effectiveScale = visualFrame:GetEffectiveScale();
+		healthBarText:SetPoint("TOP", visualFrame, "CENTER", 0, -1 * effectiveScale);
 		
 		local r,g,b,a;
 		r,g,b,a = unpack(owner:GetProperty("ColorUnitFullHealthCombat"));
@@ -3908,6 +3981,8 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 			incomingBarFullNoCombat:Show();	
 			incomingSetting = owner:GetProperty("ShowIncomingHeals") == 2
 		end
+		
+		healthBarText:SetShown(owner:GetProperty("ShowHealthText"));
 	end
 	
 	-- updates the health, total-absorb and incoming-heal bars to reflect game state
@@ -3979,6 +4054,11 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 					incomingBarFullCombat:SetAlpha(0);
 					incomingBarZeroCombat:SetAlpha(0);
 				end
+				if (healthRatio < 1) then
+					healthBarText:SetText(string.format("%d%%", healthRatio*100));
+				else
+					healthBarText:SetText("");
+				end
 			else
 				-- the unit is dead, or maybe doesn't even exist, so show nothing!
 				healthBarFullCombat:SetAlpha(0);
@@ -3994,6 +4074,7 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 				incomingBarZeroCombat:SetAlpha(0);
 				incomingBarFullNoCombat:SetAlpha(0);
 				incomingBarZeroNoCombat:SetAlpha(0);
+				healthBarText:SetText("");
 			end
 		end
 	end
@@ -4190,6 +4271,7 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 				if (key == "PlayerFrameScale") then
 					visualFrame:SetScale((val or 100)/100);
 					configureUnitNameFontString();
+					configureHealthBar();
 				elseif (
 					key == "ColorTargetFrameBackground"
 					or key == "ColorTargetFrameBorder"
