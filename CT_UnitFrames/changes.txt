@@ -1,3 +1,6 @@
+CT_UnitFrames (9.0.2.4) 2021-01-30
+- Fixed a race condition depending on the order that PLAYER_LOGIN scripts fired
+
 CT_UnitFrames (9.0.2.2) 2020-12-03
 - Commenting out legacy code that was kept in 8.3.0.9, but on second look seems unnecessary and might be causing taint
 
