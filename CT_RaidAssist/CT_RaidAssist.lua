@@ -2567,7 +2567,12 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 	-- infrequently configures the backdrop and borders according to user settings; see createBackdrop()
 	local function configureBackdrop()
 		visualFrame.backdropInfo.edgeSize = 10 + 2 * owner:GetProperty("BorderThickness");
-		visualFrame:ApplyBackdrop();	
+		if (visualFrame.ApplyBackdrop) then
+			visualFrame:ApplyBackdrop();
+		else
+			-- classic
+			visualFrame:SetBackdrop(visualFrame.backdropInfo);
+		end
 		colorBackgroundRed, colorBackgroundGreen, colorBackgroundBlue, colorBackgroundAlpha = unpack(owner:GetProperty("ColorBackground"));
 		colorBackgroundDeadOrGhostRed, colorBackgroundDeadOrGhostGreen, colorBackgroundDeadOrGhostBlue, colorBackgroundDeadOrGhostAlpha = unpack(owner:GetProperty("ColorBackgroundDeadOrGhost"));	
 		colorBorderRed, colorBorderGreen, colorBorderBlue, colorBorderAlpha = unpack(owner:GetProperty("ColorBorder"));
