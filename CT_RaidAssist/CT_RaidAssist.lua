@@ -1173,7 +1173,7 @@ function StaticCTRAFrames()
 					optionsWindowizeObject("EnablePowerBar");
 					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Appearance/EnablePowerBarCheckButton"],L["CT_RaidAssist/Options/Window/Appearance/EnablePowerBarTooltip"] .. textColor1});
 				optionsEndFrame();
-				optionsBeginFrame(-10, 26, "checkbutton#tl:10:%y#n:CTRAWindow_ShowHealthTextCheckButton:false#" .. L["CT_RaidAssist/Options/Window/Appearance/ShowHealthTextCheckButton"] .. "#l:268");
+				optionsBeginFrame(0, 26, "checkbutton#tl:10:%y#n:CTRAWindow_ShowHealthTextCheckButton:false#" .. L["CT_RaidAssist/Options/Window/Appearance/ShowHealthTextCheckButton"] .. "#l:268");
 					optionsWindowizeObject("ShowHealthText");
 					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Appearance/ShowHealthTextCheckButton"],L["CT_RaidAssist/Options/Window/Appearance/ShowHealthTextTooltip"] .. textColor1});
 				optionsEndFrame();

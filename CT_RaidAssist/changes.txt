@@ -1,4 +1,4 @@
-CT_RaidAssist (9.0.2.4) 2021-01-30
+CT_RaidAssist (9.0.2.4) 2021-01-31
 - Optional health percentage on raid frames
 - Updated border thickness setting for Shadowlands
 - Small visual tweaks to size, position and fonts

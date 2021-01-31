@@ -335,6 +335,8 @@ L["CT_RaidAssist/Options/Window/Appearance/Heading"] = "Aussehen"
 L["CT_RaidAssist/Options/Window/Appearance/HealthBarAsBackgroundCheckButton"] = "Gesundheit als vollflächigen Hintergrund anzeigen"
 L["CT_RaidAssist/Options/Window/Appearance/HealthBarAsBackgroundTooltip"] = "Füllt den gesamten Hintergrund als eine große Gesundheitsanzeige auf. Andernfalls ist die Gesundheitsanzeige lediglich eine kleine Leiste am unteren Rand."
 L["CT_RaidAssist/Options/Window/Appearance/Line1"] = "Soll CTRA im alten oder neueren Design angezeigt werden?"
+L["CT_RaidAssist/Options/Window/Appearance/ShowHealthTextCheckButton"] = "Gesundheit in Prozent anzeigen"
+L["CT_RaidAssist/Options/Window/Appearance/ShowHealthTextTooltip"] = "Fügt bei Verwundung den Text vor der Gesundheitsleiste ein"
 L["CT_RaidAssist/Options/Window/Appearance/ShowIncomingHealsDropDown"] = "#Ja#Nur meine Heilung#Nein"
 L["CT_RaidAssist/Options/Window/Appearance/ShowIncomingHealsLabel"] = "Eingehende Heilung zeigen:"
 L["CT_RaidAssist/Options/Window/Appearance/ShowIncomingHealsTip"] = [=[Verlängert die HP Leiste (nicht über volle HP hinaus) um eingehende Heilung anzuzeigen von...
