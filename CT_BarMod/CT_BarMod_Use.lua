@@ -21,6 +21,7 @@ local displayBindings = true;
 local displayRangeDot = true;
 local displayActionText = true;
 local displayCount = true;
+local displayRecharge = true;
 local colorLack = 1;
 local buttonLock = false;
 local buttonLockKey = 3;
@@ -40,6 +41,7 @@ local normalTexture2 = "Interface\\Buttons\\UI-Quickslot2"; -- square texture th
 
 local defbarShowRange = true;
 local defbarShowCooldown = true;
+local defbarShowRecharge = true;
 local defbarShowBindings = true;
 local defbarShowActionText = true;
 local defbarSetUnitAttributes = true;
@@ -679,6 +681,7 @@ function useButton:update()
 		self:updateVisibility();
 	else
 		button.cooldown:Hide();
+		button.recharge:Hide();
 		self:updateVisibility();
 	end
 	
@@ -1037,6 +1040,8 @@ end
 function useButton:updateCooldown()
 	local actionCooldown, controlCooldown;
 	local cooldown = self.button.cooldown;
+	local recharge = self.button.recharge;
+	
 	-- Action cooldown
 	local start, duration, enable = GetActionCooldown(self.actionId);
 	if ( start > 0 and enable > 0 ) then
@@ -1051,6 +1056,7 @@ function useButton:updateCooldown()
 		stopCooldown(cooldown);
 		actionCooldown = false;
 	end
+	
 	-- Loss of control cooldown
 	local start, duration = GetActionLossOfControlCooldown(self.actionId);
 	--cooldown:SetLossOfControlCooldown(start, duration);
@@ -1059,11 +1065,21 @@ function useButton:updateCooldown()
 	else
 		controlCooldown = false;
 	end
+	
 	-- Hide/show the cooldown
 	if (actionCooldown or controlCooldown) then
 		cooldown:Show();
 	else
 		cooldown:Hide();
+	end
+	
+	-- Recharge animation
+	local current, maxCharges, start, duration, modRate = GetActionCharges(self.actionId);
+	if (displayRecharge and current > 0 and current < maxCharges) then
+		recharge:SetCooldown(start, duration, modRate);
+		recharge:Show();
+	else
+		recharge:Hide();
 	end
 end
 
@@ -1927,6 +1943,22 @@ do
 end
 
 -----
+-- Cooldown Recharge
+-----
+do
+	local oldStartChargeCooldown = StartChargeCooldown	-- prehooking StartChargeCooldown() in ActionButton.lua
+	
+	function StartChargeCooldown(parent, chargeStart, ...)
+		if (displayRecharge == false and defbarShowRecharge) then
+			return oldStartChargeCooldown(parent, 0, ...)	-- setting chargeStart to zero will result in a subsequent call to ClearChargeCooldown(parent)
+		else
+			return oldStartChargeCooldown(parent, chargeStart, ...)
+		end
+	end
+	
+end
+
+-----
 -- Hotkeys (key bindings, range dot)
 -----
 do
@@ -2272,9 +2304,13 @@ module.useUpdate = function(self, optName, value)
 		unitAttribute3 = UNIT_ATTRIBUTES[value];
 		actionButtonList:updateUnitAttributes();
 		CT_BarMod_UpdateActionButtonUnitAttributes();
-		
+			
 	elseif ( optName == "displayCount" ) then
 		displayCount = value;
+		actionButtonList:updateCooldown();
+
+	elseif ( optName == "displayRecharge" ) then
+		displayRecharge = value;
 		actionButtonList:updateCooldown();
 
 	elseif ( optName == "hideGlow" ) then
@@ -2319,6 +2355,10 @@ module.useUpdate = function(self, optName, value)
 		defbarShowCooldown = value;
 		CT_BarMod_UpdateActionButtonCooldown();
 
+	elseif ( optName == "defbarShowRecharge" ) then
+		defbarShowRecharge = value;
+		CT_BarMod_UpdateActionButtonCooldown();
+
 	elseif ( optName == "defbarShowBindings" ) then
 		defbarShowBindings = value;
 		CT_BarMod_UpdateActionButtonHotkeys();
@@ -2348,6 +2388,7 @@ module.useUpdate = function(self, optName, value)
 		displayRangeDot = self:getOption("displayRangeDot") ~= false;
 		displayActionText = self:getOption("displayActionText") ~= false;
 		displayCount = self:getOption("displayCount") ~= false;
+		displayRecharge = self:getOption("displayRecharge") ~= false;
 		hideGlow = self:getOption("hideGlow");
 		buttonLock = self:getOption("buttonLock");
 		buttonLockKey = self:getOption("buttonLockKey") or 3;
@@ -2365,6 +2406,7 @@ module.useUpdate = function(self, optName, value)
 
 		defbarShowRange = module:getOption("defbarShowRange") ~= false;
 		defbarShowCooldown = module:getOption("defbarShowCooldown") ~= false;
+		defbarShowRecharge = module:getOption("defbarShowRecharge") ~= false;
 		defbarShowBindings = module:getOption("defbarShowBindings") ~= false;
 		defbarShowActionText = module:getOption("defbarShowActionText") ~= false;
 		defbarSetUnitAttributes = module:getOption("defbarSetUnitAttributes") ~= false;
