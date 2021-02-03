@@ -1946,16 +1946,11 @@ end
 -- Cooldown Recharge
 -----
 do
-	local oldStartChargeCooldown = StartChargeCooldown	-- prehooking StartChargeCooldown() in ActionButton.lua
-	
-	function StartChargeCooldown(parent, chargeStart, ...)
-		if (displayRecharge == false and defbarShowRecharge) then
-			return oldStartChargeCooldown(parent, 0, ...)	-- setting chargeStart to zero will result in a subsequent call to ClearChargeCooldown(parent)
-		else
-			return oldStartChargeCooldown(parent, chargeStart, ...)
+	hooksecurefunc("StartChargeCooldown", function(parent, chargeStart)
+		if (chargeStart ~= 0 and displayRecharge == false and defbarShowRecharge) then
+			ClearChargeCooldown(parent)
 		end
-	end
-	
+	end)
 end
 
 -----
