@@ -42,9 +42,7 @@ module.initialValues =
 
 module.currOffset = {0, 0, 0, 0}
 
-CT_Viewport_Saved = { 0, 0, 0, 0, 0, 0, 0 };
-
-local frameClearAllPoints, frameSetAllPoints, frameSetPoint;
+local frameClearAllPoints, frameSetAllPoints, frameSetPoint, savedViewport;
 
 -- Public API
 
@@ -278,7 +276,13 @@ function module.ApplyViewport(left, right, top, bottom, r, g, b)
 	g = ( g or 0 );
 	b = ( b or 0 );
 
-	CT_Viewport_Saved = { left, right, top, bottom, r, g, b }; -- Need to reverse top and bottom because of how it works
+	savedViewport[1] = left;
+	savedViewport[2] = right;
+	savedViewport[3] = top;
+	savedViewport[4] = bottom;
+	savedViewport[5] = r;
+	savedViewport[6] = g;
+	savedViewport[7] = b;
 
 	local update = true;
 	if (WorldFrame:IsProtected() and InCombatLockdown()) then
@@ -321,30 +325,30 @@ end
 function module.ApplySavedViewport()
 	local screenRes = module.screenRes;
 	if screenRes then
-		CT_Viewport_Saved[1] = min(tonumber(CT_Viewport_Saved[1]), screenRes[1]/2 - 1);
-		CT_Viewport_Saved[2] = min(tonumber(CT_Viewport_Saved[2]), screenRes[1]/2 - 1);
-		if (CT_Viewport_Saved[1] + CT_Viewport_Saved[2] > screenRes[1] - 100) then
-			CT_Viewport_Saved[1] = screenRes[1]/2 - 50;
-			CT_Viewport_Saved[2] = screenRes[1]/2 - 50;
+		savedViewport[1] = min(tonumber(savedViewport[1]), screenRes[1]/2 - 1);
+		savedViewport[2] = min(tonumber(savedViewport[2]), screenRes[1]/2 - 1);
+		if (savedViewport[1] + savedViewport[2] > screenRes[1] - 100) then
+			savedViewport[1] = screenRes[1]/2 - 50;
+			savedViewport[2] = screenRes[1]/2 - 50;
 		end
-		CT_Viewport_Saved[3] = min(tonumber(CT_Viewport_Saved[3]), screenRes[2]/2 - 1);
-		CT_Viewport_Saved[4] = min(tonumber(CT_Viewport_Saved[4]), screenRes[2]/2 - 1);
-		if (CT_Viewport_Saved[3] + CT_Viewport_Saved[4] > screenRes[2] - 100) then
-			CT_Viewport_Saved[3] = screenRes[2]/2 - 50;
-			CT_Viewport_Saved[4] = screenRes[2]/2 - 50;
+		savedViewport[3] = min(tonumber(savedViewport[3]), screenRes[2]/2 - 1);
+		savedViewport[4] = min(tonumber(savedViewport[4]), screenRes[2]/2 - 1);
+		if (savedViewport[3] + savedViewport[4] > screenRes[2] - 100) then
+			savedViewport[3] = screenRes[2]/2 - 50;
+			savedViewport[4] = screenRes[2]/2 - 50;
 		end
 	end
-	if (tonumber(CT_Viewport_Saved[1]) + tonumber(CT_Viewport_Saved[2]) + tonumber(CT_Viewport_Saved[3]) + tonumber(CT_Viewport_Saved[4]) > 0 and not module:getOption("CTVP_SuppressLoadingMessage")) then
+	if (tonumber(savedViewport[1]) + tonumber(savedViewport[2]) + tonumber(savedViewport[3]) + tonumber(savedViewport[4]) > 0 and not module:getOption("CTVP_SuppressLoadingMessage")) then
 		C_Timer.After(8, function() print("|cFFFFFF00CT_Viewport is currently active! |n      |r/ctvp|cFFFFFF00 to tweak settings |n      |r/ctvp 0 0 0 0|cFFFFFF00 to restore default"); end);
 	end
 	module.ApplyViewport(
-		CT_Viewport_Saved[1],
-		CT_Viewport_Saved[2],
-		CT_Viewport_Saved[3],
-		CT_Viewport_Saved[4],
-		CT_Viewport_Saved[5],
-		CT_Viewport_Saved[6],
-		CT_Viewport_Saved[7]
+		savedViewport[1],
+		savedViewport[2],
+		savedViewport[3],
+		savedViewport[4],
+		savedViewport[5],
+		savedViewport[6],
+		savedViewport[7]
 	);
 end
 
@@ -526,9 +530,24 @@ function module.Init(width, height)
 end
 
 -- Handlers 
-
+CT_Viewport_Saved = {}
 function module:update(option, value)
 	if (option == "init") then
+		-- The former savedViewport that was previously per-character until 9.0.2.4, which prevented importing/exporting
+		savedViewport = module:getOption("savedViewport");
+		if (#CT_Viewport_Saved > 0) then
+			-- converting from an olds note format
+			savedViewport = {}
+			savedViewport[1], savedViewport[2], savedViewport[3], savedViewport[4], savedViewport[5], savedViewport[6], savedViewport[7]
+				= CT_Viewport_Saved[1], CT_Viewport_Saved[2], CT_Viewport_Saved[3], CT_Viewport_Saved[4], CT_Viewport_Saved[5], CT_Viewport_Saved[6], CT_Viewport_Saved[7]
+			module:setOption("savedViewport", savedViewport, true);
+			wipe(CT_Viewport_Saved)
+		elseif (savedViewport == nil) then
+			module:setOption("savedViewport", {0, 0, 0, 0, 0, 0, 0}, true);
+			savedViewport = module:getOption("savedViewport");
+		end
+
+	
 		-- The former on-load and VARIABLES_LOADED until 9.0.0.1
 		local dummyFrame = CreateFrame("Frame");
 		frameClearAllPoints = dummyFrame.ClearAllPoints;
@@ -1017,13 +1036,13 @@ function module.frame()
 			frame:HookScript("OnShow", function()
 				if ( CT_ViewportInnerFrame:GetLeft() ) then
 					module.ApplyInnerViewport(
-						CT_Viewport_Saved[1],
-						CT_Viewport_Saved[2],
-						CT_Viewport_Saved[3],
-						CT_Viewport_Saved[4],
-						CT_Viewport_Saved[5],
-						CT_Viewport_Saved[6],
-						CT_Viewport_Saved[7]
+						savedViewport[1],
+						savedViewport[2],
+						savedViewport[3],
+						savedViewport[4],
+						savedViewport[5],
+						savedViewport[6],
+						savedViewport[7]
 					);
 				else
 					module.hasAppliedViewport = nil;
@@ -1060,13 +1079,13 @@ function module.frame()
 					end
 					if ( CT_ViewportInnerFrame ) then
 						module.ApplyInnerViewport(
-							CT_Viewport_Saved[1],
-							CT_Viewport_Saved[2],
-							CT_Viewport_Saved[3],
-							CT_Viewport_Saved[4],
-							CT_Viewport_Saved[5],
-							CT_Viewport_Saved[6],
-							CT_Viewport_Saved[7]
+							savedViewport[1],
+							savedViewport[2],
+							savedViewport[3],
+							savedViewport[4],
+							savedViewport[5],
+							savedViewport[6],
+							savedViewport[7]
 						);
 					else
 						module.hasAppliedViewport = nil;

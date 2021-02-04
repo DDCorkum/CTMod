@@ -1,3 +1,6 @@
+CT_Viewport (9.0.2.4) 2020-02-03
+- Settings now exportable between characters, but with the unintended consequence of resetting
+
 CT_Viewport (8.3.7.1) 2020-07-18
 - Unified with the CT Control Panel to resolve Shadowlands BackdropTemplate compatibility
 - Added option to remove the alert message when loading the game with a custom viewport
