@@ -217,10 +217,10 @@ module.pinIcons =
 	
 	-- Shadowlands
 	["Death Blossom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_DeathBlossom",
-	["Marrowroot"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",
-	["Rising Glory"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",
-	["Vigil's Torch"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",
-	["Widowbloom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",	
+	["Marrowroot"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Marrowroot",
+	["Rising Glory"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_RisingGlory",
+	["Vigil's Torch"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_VigilsTorch",
+	["Widowbloom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Widowbloom",	
 	["Nightshade"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Nightshade",
 	
 	-- Ore --
@@ -239,6 +239,7 @@ module.pinIcons =
 	-- Burning Crusade
 	["Fel Iron"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_FelIronVein",
 	["Khorium"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_KhoriumVein",
+	
 	-- Wrath of the Lich King
 	["Cobalt"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CobaltVein",
 	["Saronite"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_SaroniteVein",
@@ -269,12 +270,12 @@ module.pinIcons =
 	["Osmenite"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Elementium",
 	
 	-- Shadowlands
-	["Laestrite"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Elementium",
-	["Oxxein"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein",
-	["Phaedrum"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein",
-	["Sinvyr"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_SaroniteVein",
-	["Solenium"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_GoldVein",
-	["Elethium"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_StormSilver",
+	["Laestrite"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Laestrite",
+	["Oxxein"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Oxxein",
+	["Phaedrum"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Phaedrum",
+	["Sinvyr"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Sinvyr",
+	["Solenium"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Solenium",
+	["Elethium"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Elethium",
 }
 setmetatable(module.pinIcons, {__index = function() return "Interface\\RaidFrame\\UI-RaidFrame-Threat" end})
 
@@ -287,6 +288,7 @@ module.randomSpawns =
 	-- Battle for Azeroth
 	["Anchor Weed"] = true,
 	["Platinum"] = true,
+	
 	-- Shadowlands
 	["Nightshade"] = function() return C_Map.GetBestMapForUnit("player") ~= 1543; end,
 	["Elethium"] = function() return C_Map.GetBestMapForUnit("player") ~= 1543; end,
@@ -320,6 +322,7 @@ module.flightMaps =
 --	val			String, Required		Must evaluate to "Herb" or "Ore"
 module.gatheringSkills =
 {
+	-- Herbalism
 	  [2366] = "Herb",
 	  [2368] = "Herb",
 	  [3570] = "Herb",
@@ -339,7 +342,9 @@ module.gatheringSkills =
 	[265834] = "Herb",
 	[265835] = "Herb",
 	[309780] = "Herb",	-- Shadowlands
-	   [186] = "Ore",	-- Mining
+
+	-- Mining
+	   [186] = "Ore",
 	  [2575] = "Ore",	-- Classic Apprentice
 	  [2576] = "Ore",	-- Classic Journeyman
 	  [3564] = "Ore",	-- Classic Expert

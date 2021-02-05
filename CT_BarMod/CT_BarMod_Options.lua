@@ -1314,6 +1314,7 @@ module.frame = function()
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Cooldowns");
 
 		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:displayCount:true#Display cooldown counts");
+		
 
 		optionsAddObject( -5,   14, "font#tl:60:%y#v:ChatFontNormal#Color:");
 		optionsAddObject( 14,   16, "colorswatch#tl:100:%y#s:16:%s#o:cooldownFontColor:" ..r.. "," ..g.. "," ..b.. "," ..a.. "#true");
@@ -1325,6 +1326,8 @@ module.frame = function()
 		optionsAddObject( 14,   20, "dropdown#tl:80:%y#n:CT_BarModDropdownCooldownStyle#o:cooldownFontStyleNum:" .. fontDefaultStyleNum .. styles);
 
 		optionsAddFrame( -20,   17, "slider#t:0:%y#s:175:%s#o:cooldownFontSize:" .. fontDefaultSize .. "#Size = <value>#10:30:1");
+		
+		optionsAddObject(-10,   26, "checkbutton#tl:20:%y#o:displayRecharge:true#Display recharge sweep");
 	optionsEndFrame();
 
 	----------
@@ -1343,6 +1346,7 @@ module.frame = function()
 		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:defbarSetUnitAttributes:true#Apply the 'Unit attributes'");
 		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:defbarHideTooltip:true#Apply the 'Hide action button tooltips' option");
 		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:defbarShowCooldown:true#Apply the 'Display cooldown counts' option");	
+		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:defbarShowRecharge:true#Apply the 'Display recharge sweep' option");
 
 		-- Blizzard Bottom-Left Bar
 		optionsAddObject(-10,   17, "font#tl:20:%y#v:GameFontNormal#Learning Abilities");

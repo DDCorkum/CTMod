@@ -213,6 +213,10 @@ local function getActionButton(buttonId)
 
 		button.cooldown = CreateFrame("Cooldown", nil, parent, "CooldownFrameTemplate");
 		button.cooldown:SetDrawEdge(false);
+		
+		button.recharge = CreateFrame("Cooldown", nil, parent, "CooldownFrameTemplate");
+		button.recharge:SetDrawSwipe(false);
+		button.recharge:SetHideCountdownNumbers(true);
 
 		button.FlyoutArrow = parent:CreateTexture(nil, "ARTWORK", "ActionBarFlyoutButton-ArrowUp");
 		button.FlyoutArrow:SetDrawLayer("ARTWORK", 2);
@@ -324,6 +328,7 @@ function actionButton:constructor(buttonId, actionId, groupId, count, noInherit,
 
 	button.object = self;
 	button.cooldown.object = self;
+	button.recharge.object = self;
 	button.action = actionId; -- For use by ActionButton_UpdateFlyout()
 	button.ctbarmod = true;  -- Our button.
 

@@ -60,7 +60,7 @@ local function UpdateStanceBar(self)
 
 	self.helperFrame:ClearAllPoints();
 	self.helperFrame:SetPoint("TOPLEFT", self.frame, "TOPLEFT", -5, 5);
-	self.helperFrame:SetPoint("BOTTOMRIGHT", self.frame, "BOTTOMRIGHT", 5, -5);
+	self.helperFrame:SetPoint("BOTTOM", self.frame, "BOTTOM", 0, -5);
 end
 
 local function EnableStanceBar(self)
@@ -81,8 +81,19 @@ local function InitStanceBar(self)
 
 	module.ctStanceBar = self;
 
-	local frame = CreateFrame("Frame", "CT_BottomBar_" .. self.frameName .. "_GuideFrame");
-	self.helperFrame = frame;
+	self.helperFrame = CreateFrame("Frame", "CT_BottomBar_" .. self.frameName .. "_GuideFrame");
+	local function resizeHelperFrame()
+		self.helperFrame:SetPoint("RIGHT", StanceButton5 and StanceButton5:IsShown() and StanceButton5 or StanceButton4 and StanceButton4:IsShown() and StanceButton4 or StanceButton3 and StanceButton3:IsShown() and StanceButton3 or StanceButton2 and StanceButton2:IsShown() and StanceButton2 or self.frame, "RIGHT", 5, 0);
+	end
+	StanceButton2:HookScript("OnShow", resizeHelperFrame);
+	StanceButton2:HookScript("OnHide", resizeHelperFrame);
+	StanceButton3:HookScript("OnShow", resizeHelperFrame);
+	StanceButton3:HookScript("OnHide", resizeHelperFrame);
+	StanceButton4:HookScript("OnShow", resizeHelperFrame);
+	StanceButton4:HookScript("OnHide", resizeHelperFrame);
+	StanceButton5:HookScript("OnShow", resizeHelperFrame);
+	StanceButton5:HookScript("OnHide", resizeHelperFrame);
+	resizeHelperFrame();
 	
 	self.frame:SetHeight(32);
 	self.frame:SetWidth(29);

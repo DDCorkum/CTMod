@@ -52,7 +52,7 @@ local function CT_PartyFrame_TextStatusBar_UpdateTextString(bar)
 		
 		bar.ctUsePartyFontSize = true;
 		
-		textString = bar.textRight;
+		local textString = bar.textRight;
 		if (textString.ctSize ~= (CT_UnitFramesOptions.partyTextSize or 3) + 6) then
 			textString.ctSize = (CT_UnitFramesOptions.partyTextSize or 3) + 6;
 			textString.ctControlled = "ChangeSize"
@@ -82,7 +82,7 @@ local function CT_PartyFrame_TextStatusBar_UpdateTextString(bar)
 	end
 end
 
-module:regEvent("PLAYER_LOGIN", function()
+local function CT_PartyFrame_OnAddonLoaded()
 	local bars = {PartyMemberFrame1HealthBar, PartyMemberFrame1ManaBar, PartyMemberFrame2HealthBar, PartyMemberFrame2ManaBar, PartyMemberFrame3HealthBar, PartyMemberFrame3ManaBar, PartyMemberFrame4HealthBar, PartyMemberFrame4ManaBar};
 	local textRight = {CT_PartyFrame1HealthRight, CT_PartyFrame1ManaRight, CT_PartyFrame2HealthRight, CT_PartyFrame2ManaRight, CT_PartyFrame3HealthRight, CT_PartyFrame3ManaRight, CT_PartyFrame4HealthRight, CT_PartyFrame4ManaRight};
 	for i=1, 8 do
@@ -92,9 +92,12 @@ module:regEvent("PLAYER_LOGIN", function()
 		bars[i].textRight = textRight[i];
 		bars[i].type = i%2 == 1 and "health" or "mana";
 	end
-end);
+	module:unregEvent("ADDON_LOADED", CT_PartyFrame_OnAddonLoaded);
+end
 
---[[	-- replaced by hooks onto each specific frame during PLAYER_LOGIN
+module:regEvent("ADDON_LOADED", CT_PartyFrame_OnAddonLoaded);
+
+--[[	-- replaced by hooks onto each specific frame during ADDON_LOADED
 	hooksecurefunc("TextStatusBar_UpdateTextString", CT_PartyFrame_TextStatusBar_UpdateTextString);
 	hooksecurefunc("ShowTextStatusBarText", CT_PartyFrame_TextStatusBar_UpdateTextString);
 	hooksecurefunc("HideTextStatusBarText", CT_PartyFrame_TextStatusBar_UpdateTextString);

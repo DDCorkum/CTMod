@@ -21,6 +21,7 @@ local displayBindings = true;
 local displayRangeDot = true;
 local displayActionText = true;
 local displayCount = true;
+local displayRecharge = true;
 local colorLack = 1;
 local buttonLock = false;
 local buttonLockKey = 3;
@@ -40,6 +41,7 @@ local normalTexture2 = "Interface\\Buttons\\UI-Quickslot2"; -- square texture th
 
 local defbarShowRange = true;
 local defbarShowCooldown = true;
+local defbarShowRecharge = true;
 local defbarShowBindings = true;
 local defbarShowActionText = true;
 local defbarSetUnitAttributes = true;
@@ -679,6 +681,7 @@ function useButton:update()
 		self:updateVisibility();
 	else
 		button.cooldown:Hide();
+		button.recharge:Hide();
 		self:updateVisibility();
 	end
 	
@@ -1037,6 +1040,8 @@ end
 function useButton:updateCooldown()
 	local actionCooldown, controlCooldown;
 	local cooldown = self.button.cooldown;
+	local recharge = self.button.recharge;
+	
 	-- Action cooldown
 	local start, duration, enable = GetActionCooldown(self.actionId);
 	if ( start > 0 and enable > 0 ) then
@@ -1051,6 +1056,7 @@ function useButton:updateCooldown()
 		stopCooldown(cooldown);
 		actionCooldown = false;
 	end
+	
 	-- Loss of control cooldown
 	local start, duration = GetActionLossOfControlCooldown(self.actionId);
 	--cooldown:SetLossOfControlCooldown(start, duration);
@@ -1059,11 +1065,21 @@ function useButton:updateCooldown()
 	else
 		controlCooldown = false;
 	end
+	
 	-- Hide/show the cooldown
 	if (actionCooldown or controlCooldown) then
 		cooldown:Show();
 	else
 		cooldown:Hide();
+	end
+	
+	-- Recharge animation
+	local current, maxCharges, start, duration, modRate = GetActionCharges(self.actionId);
+	if (displayRecharge and current > 0 and current < maxCharges) then
+		recharge:SetCooldown(start, duration, modRate);
+		recharge:Show();
+	else
+		recharge:Hide();
 	end
 end
 
@@ -1585,11 +1601,37 @@ end
 --------------------------------------------
 -- Event Handlers
 
+local loginFinished, updateAfterLogin = false, false;
+
 local function eventHandler_UpdateAll(event, unit)
-	if ( event ~= "UNIT_INVENTORY_CHANGED" or unit == "player" ) then
+	if (event ~= "UNIT_INVENTORY_CHANGED") then
 		actionButtonList:update();
+	elseif (unit == "player") then
+		if (loggedFinished) then
+			actionButtonList:update();
+		else
+			updateAfterLogin = true;	-- UNIT_INVENTORY_CHANGED happens several times during a fresh login.  This delays the call until one frame after PLAYER_LOGIN
+		end
 	end
 end
+
+local function eventHandler_PlayerLogin()
+
+	-- see eventHandler_UpdateBindings()
+	wipeBindingCaches();
+	module.setActionBindings();
+	actionButtonList:updateBinding();
+
+	-- see eventHandler_UpdateAll()
+	C_Timer.After(0, function()
+		if (updateAfterLogin) then
+			actionButtonList:update();
+		end
+		loginFinished = true;
+	end);
+end
+
+
 
 --local function eventHandler_HideGrid()
 --	actionButtonList:hideGrid();
@@ -1654,6 +1696,8 @@ local function eventHandler_UpdateBindings()
 	wipeBindingCaches();
 	module.setActionBindings();
 	actionButtonList:updateBinding();
+	
+	-- also see eventHandler_PlayerLogin();
 end
 
 local function eventHandler_CheckRepeat()
@@ -1899,6 +1943,17 @@ do
 end
 
 -----
+-- Cooldown Recharge
+-----
+do
+	hooksecurefunc("StartChargeCooldown", function(parent, chargeStart)
+		if (chargeStart ~= 0 and displayRecharge == false and defbarShowRecharge) then
+			ClearChargeCooldown(parent)
+		end
+	end)
+end
+
+-----
 -- Hotkeys (key bindings, range dot)
 -----
 do
@@ -2106,7 +2161,7 @@ module.useEnable = function(self)
 	self:regEvent("TRADE_SKILL_SHOW", eventHandler_UpdateState);
 	self:regEvent("TRADE_SKILL_CLOSE", eventHandler_UpdateState);
 	self:regEvent("UPDATE_BINDINGS", eventHandler_UpdateBindings);
-	self:regEvent("PLAYER_LOGIN", eventHandler_UpdateBindings);
+	self:regEvent("PLAYER_LOGIN", eventHandler_PlayerLogin);
 	self:regEvent("PLAYER_ENTER_COMBAT", eventHandler_CheckRepeat);
 	self:regEvent("PLAYER_LEAVE_COMBAT", eventHandler_CheckRepeat);
 	self:regEvent("STOP_AUTOREPEAT_SPELL", eventHandler_CheckRepeat);
@@ -2149,7 +2204,7 @@ module.useDisable = function(self)
 	self:unregEvent("TRADE_SKILL_SHOW", eventHandler_UpdateState);
 	self:unregEvent("TRADE_SKILL_CLOSE", eventHandler_UpdateState);
 	self:unregEvent("UPDATE_BINDINGS", eventHandler_UpdateBindings);
-	self:unregEvent("PLAYER_LOGIN", eventHandler_UpdateBindings);
+	self:unregEvent("PLAYER_LOGIN", eventHandler_PlayerLogin);
 	self:unregEvent("PLAYER_ENTER_COMBAT", eventHandler_CheckRepeat);
 	self:unregEvent("PLAYER_LEAVE_COMBAT", eventHandler_CheckRepeat);
 	self:unregEvent("STOP_AUTOREPEAT_SPELL", eventHandler_CheckRepeat);
@@ -2244,9 +2299,13 @@ module.useUpdate = function(self, optName, value)
 		unitAttribute3 = UNIT_ATTRIBUTES[value];
 		actionButtonList:updateUnitAttributes();
 		CT_BarMod_UpdateActionButtonUnitAttributes();
-		
+			
 	elseif ( optName == "displayCount" ) then
 		displayCount = value;
+		actionButtonList:updateCooldown();
+
+	elseif ( optName == "displayRecharge" ) then
+		displayRecharge = value;
 		actionButtonList:updateCooldown();
 
 	elseif ( optName == "hideGlow" ) then
@@ -2291,6 +2350,10 @@ module.useUpdate = function(self, optName, value)
 		defbarShowCooldown = value;
 		CT_BarMod_UpdateActionButtonCooldown();
 
+	elseif ( optName == "defbarShowRecharge" ) then
+		defbarShowRecharge = value;
+		CT_BarMod_UpdateActionButtonCooldown();
+
 	elseif ( optName == "defbarShowBindings" ) then
 		defbarShowBindings = value;
 		CT_BarMod_UpdateActionButtonHotkeys();
@@ -2320,6 +2383,7 @@ module.useUpdate = function(self, optName, value)
 		displayRangeDot = self:getOption("displayRangeDot") ~= false;
 		displayActionText = self:getOption("displayActionText") ~= false;
 		displayCount = self:getOption("displayCount") ~= false;
+		displayRecharge = self:getOption("displayRecharge") ~= false;
 		hideGlow = self:getOption("hideGlow");
 		buttonLock = self:getOption("buttonLock");
 		buttonLockKey = self:getOption("buttonLockKey") or 3;
@@ -2337,6 +2401,7 @@ module.useUpdate = function(self, optName, value)
 
 		defbarShowRange = module:getOption("defbarShowRange") ~= false;
 		defbarShowCooldown = module:getOption("defbarShowCooldown") ~= false;
+		defbarShowRecharge = module:getOption("defbarShowRecharge") ~= false;
 		defbarShowBindings = module:getOption("defbarShowBindings") ~= false;
 		defbarShowActionText = module:getOption("defbarShowActionText") ~= false;
 		defbarSetUnitAttributes = module:getOption("defbarSetUnitAttributes") ~= false;

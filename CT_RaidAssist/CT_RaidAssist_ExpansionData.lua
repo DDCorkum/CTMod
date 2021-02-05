@@ -166,6 +166,10 @@ module.CTRA_Configuration_RezAbilities =
 -- value:	0 to always show, or a positive integer to show when the stack count is this number or greater
 module.CTRA_Configuration_BossAuras =
 {
+	-- Debug Testing
+	--[1459] = 0,		-- Arcane Intellect
+	--[333049] = 2,		-- Fevered Incantation
+
 	-- Mythic Plus Affixes
 	[240443] = 2,		-- Mythic Plus: Bursting
 	[209858] = 20,		-- Mythic Plus: Necrotic

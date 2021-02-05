@@ -624,7 +624,7 @@ end
 -----------------------------------------------
 -- Initializing
 
-local function loadAddon(self, event, addon)
+local function loadAddon(event, addon)
 	if ( modules ) then
 		local module = modules[addon];
 		if (module) then
@@ -698,10 +698,6 @@ function lib:unregEvent(event, func)
 end
 
 local function eventHandler(self, event, ...)
-	if ( event == "ADDON_LOADED" ) then
-		loadAddon(self, event, ...);
-	end
-
 	local eventFuncs = eventTable[event];
 	if ( type(eventFuncs) == "table" ) then
 		for key, value in ipairs(eventFuncs) do
@@ -712,7 +708,7 @@ local function eventHandler(self, event, ...)
 	end
 end
 
-frame:RegisterEvent("ADDON_LOADED");
+lib:regEvent("ADDON_LOADED", loadAddon);
 frame:SetScript("OnEvent", eventHandler);
 
 -- Schedule timers

@@ -1,3 +1,11 @@
+CT_RaidAssist (9.0.2.4) 2021-01-31
+- Optional health percentage on raid frames
+- Updated border thickness setting for Shadowlands
+- Small visual tweaks to size, position and fonts
+
+CT_RaidAssist (9.0.2.3) 2021-01-17
+- Fixed a different issue introduced in 9.0.2.1 to labels that affected all modes
+
 CT_RaidAssist (9.0.2.1) 2020-11-17
 - Fixed a bug when using labels in collapsed-frames mode
 - Adding encounter debuffs for Castle Nathria and Classic Naxx
