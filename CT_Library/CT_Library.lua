@@ -2794,7 +2794,7 @@ local function selectControlPanelModule(self)
 	end
 
 	parent = parent.parent;
-	local title = module.optionsName or (module.name .. " Options");
+	local title = module.displayName or module.name;
 	if ( not selectedModule ) then
 		-- First selection, resize the window smoothly
 		if ( not isExternal ) then
@@ -2877,17 +2877,8 @@ local function controlPanelSkeleton()
 					version = module.version;
 					obj = listing[tostring(num)];
 					obj:SetID(num);
-					obj:Show();
-
-					-- localize the title of these two modules specifically
-					if (num == 701 and module.name == "|c00FFFFCCSettings Import|r" and L["CT_Library/SettingsImport/Heading"]) then
-						module.name = "|c00FFFFCC" .. L["CT_Library/SettingsImport/Heading"] .. "|r";
-					elseif (num == 702 and module.name == "|c00FFFFCCHelp|r" and L["CT_Library/Help/Heading"]) then
-						module.name = "|c00FFFFCC" .. L["CT_Library/Help/Heading"] .. "|r";
-					end
-					
-					obj:SetText(module.name);
-
+					obj:Show();			
+					obj:SetText(module.displayName or module.name);
 					
 					if ( version and version ~= "" ) then
 						obj.version:SetText("|c007F7F7Fv|r"..module.version);
@@ -3140,12 +3131,13 @@ lib:updateSlashCmd(displayControlPanel, "/ct", "/ctmod");
 -- Initialization
 local module = { };
 module.name = "Settings Import"; -- this is changed to a localized string during the button's onLoad
-module.optionsName = "Settings Import";
 module.version = "";
 -- Register as module 1 only, since this will code will get executed once per different
 -- version of CT_Library. We don't want multiple copies showing up in the
 -- control panel.
 registerModule(module, 1);
+
+module:regEvent("PLAYER_LOGIN", function() module.displayName = "|cFFFFFFCC" .. L["CT_Library/SettingsImport/Heading"]; end);
 
 local optionsFrame, addonsFrame, checkAllButton, fromChar;
 
@@ -3846,13 +3838,14 @@ end
 
 -- Initialization
 local module = { };
-module.name = "|c00FFFFCCHelp|r";
-module.optionsName = "Help";
+module.name = "Help";
 module.version = LIBRARY_VERSION;
 -- Register as module 2 only, since this will code will get executed once per different
 -- version of CT_Library. We don't want multiple copies showing up in the
 -- control panel.
 registerModule(module, 2);
+
+module:regEvent("PLAYER_LOGIN", function() module.displayName = "|cFFFFFFCC" .. L["CT_Library/Help/Heading"]; end);
 
 local helpFrameList;
 local function helpInit()
