@@ -631,9 +631,14 @@ local function loadAddon(event, addon)
 			-- Initialize options
 			module.options = _G[addon.."Options"];
 			
-			-- Delete older import data
+			-- Delete leftovers from settings import
 			if ( module.options ) then
+				-- previously-used export strings
 				module.options["CHAR-Unknown- Import String"] = nil;
+				
+				-- backup data is only intended to be available after a single /reload
+				module.options["CHAR-Unknown- Temporary Backup"] = module.options["CHAR-Unknown- Interim Backup"]
+				module.options["CHAR-Unknown- Interim Backup"] = nil;
 			end
 
 			-- Run any update function we might have
@@ -3134,7 +3139,7 @@ lib:updateSlashCmd(displayControlPanel, "/ct", "/ctmod");
 
 -- Initialization
 local module = { };
-module.name = "|c00FFFFCCSettings Import|r"; -- this is changed to a localized string during the button's onLoad
+module.name = "Settings Import"; -- this is changed to a localized string during the button's onLoad
 module.optionsName = "Settings Import";
 module.version = "";
 -- Register as module 1 only, since this will code will get executed once per different
@@ -3142,7 +3147,7 @@ module.version = "";
 -- control panel.
 registerModule(module, 1);
 
-local optionsFrame, addonsFrame, fromChar;
+local optionsFrame, addonsFrame, checkAllButton, fromChar;
 
 -- Dropdown Handling
 local importDropdownEntry, importFlaggedCharacters;
@@ -3176,7 +3181,7 @@ local function populateAddonsList(char)
 	-- Position action frame
 	obj = optionsFrame.actions;
 	obj:ClearAllPoints();
-	obj:SetPoint("TOPLEFT", optionsFrame, "TOPLEFT", 0, -160 + (-20 * num));
+	obj:SetPoint("TOPLEFT", optionsFrame, "TOPLEFT", 0, -180 + (-20 * num));
 	obj:SetWidth(300)
 	obj:SetHeight(150)
 	--obj:SetPoint("RIGHT", optionsFrame);
@@ -3221,6 +3226,8 @@ local function populateAddonsList(char)
 		actions.exportButton:Hide();
 		actions.deleteNote:SetText(L["CT_Library/SettingsImport/Actions/DeleteOtherNote"]);
 	end
+	
+	checkAllButton:SetChecked(false);
 
 	return numAddons;
 end
@@ -3306,9 +3313,6 @@ local function populateServerDropdownInit()
 		lib:clearTable(importDropdownEntry);
 		lib:clearTable(importFlaggedCharacters);
 	end
-
-	-- Prevent ourself from being added
-	importFlaggedCharacters[getCharKey()] = true;
 
 	for key, value in ipairs(modules) do
 		options = value.options;
@@ -3422,6 +3426,7 @@ local function import()
 			if ( options and addon ~= module ) then
 				fromOptions = options[fromChar];
 				if ( fromOptions and addonIsChecked(addon.name) and module:getOption("canImport") ) then
+					options["CHAR-Unknown- Interim Backup"] = fromChar ~= "CHAR-Unknown- Temporary Backup" and options[charKey] or nil
 					options[charKey] = {};
 					lib:copyTable(fromOptions, options[charKey]);
 					success = true;
@@ -3432,7 +3437,7 @@ local function import()
 		module:setOption("canImport", nil, true);
 
 		if ( success ) then
-			ConsoleExec("reloadui");
+			C_UI.Reload();
 		else
 			print(L["CT_Library/SettingsImport/NoAddonsSelected"]);
 		end
@@ -3452,6 +3457,9 @@ local function delete()
 			if ( options and addon ~= module ) then
 				fromOptions = options[fromChar];
 				if ( fromOptions and addonIsChecked(addon.name) and module:getOption("canDelete") ) then
+					if (fromChar == getCharKey()) then
+						options["CHAR-Unknown- Interim Backup"] = fromOptions;
+					end
 					options[fromChar] = nil;
 					success = true;
 				end
@@ -3461,6 +3469,9 @@ local function delete()
 		module:setOption("canDelete", nil, true);
 
 		if ( success ) then
+			if (fromChar == getCharKey()) then
+				C_UI.Reload();
+			end
 			local count;
 			count = populateAddonsList(fromChar);
 			if (count == 0) then
@@ -3474,9 +3485,6 @@ local function delete()
 					importRealm = nil;
 					populateServerDropdown();
 				end
-			end
-			if (fromChar == getCharKey()) then
-				C_UI.Reload();
 			end
 		else
 			print(L["CT_Library/SettingsImport/NoAddonsSelected"]);
@@ -3754,6 +3762,23 @@ module.frame = function()
 			module:setOption("canExport", nil, true);
 		end,
 
+		["checkbutton#tl:24:-170#s:18:18#i:checkAllButton#Select all"] = {
+			["onclick"] = function(button)
+				local num = 1
+				while (addonsFrame[tostring(num)]) do
+					if (addonsFrame[tostring(num)]:IsShown()) then
+						addonsFrame[tostring(num)]:SetChecked(button:GetChecked())
+					end
+					num = num + 1
+				end
+			end,
+			["onload"] = function(button)
+				checkAllButton = button;
+				button:SetAlpha(0.75);
+				button.text:SetFontObject(GameFontNormalSmall)
+			end,
+		},
+		
 		["frame#tl:0:-150#r#i:addons#hidden"] = addonsTable,
 
 		["frame#i:actions#hidden"] = {
@@ -3802,13 +3827,13 @@ module.frame = function()
 
 	-- Fill in our addons table
 	tinsert(addonsTable, "font#tl:5:0#v:GameFontNormalLarge#" .. L["CT_Library/SettingsImport/AddOns/Heading"]);
-
+	
 	-- Populate with addons
 	local num = 0;
 	for key, value in ipairs(modules) do
 		if ( value ~= module and value.options ) then
 			num = num + 1;
-			tinsert(addonsTable, "checkbutton#i:"..num.."#tl:20:-"..(num * 20));
+			tinsert(addonsTable, "checkbutton#i:"..num.."#tl:20:-"..((num+1)  * 20));
 		end
 	end
 

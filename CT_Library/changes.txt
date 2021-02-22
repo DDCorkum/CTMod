@@ -1,3 +1,6 @@
+CT_Library (9.0.2.5) 2021-02-21
+- Improvements to importing and exporting settings
+
 CT_Library (9.0.2.4) 2021-02-03
 - Small change to accomodate a module calling lib:unregEvent("ADDON_LOADED")
 
