@@ -69,6 +69,12 @@ L["CT_Library/SettingsImport/Clipboard/StringValidMessage"] = "Validation passed
 L["CT_Library/SettingsImport/Heading"] = "Settings Import"
 L["CT_Library/SettingsImport/NoAddonsSelected"] = "No addons are selected."
 L["CT_Library/SettingsImport/Profiles/ExternalButton"] = "Use import string"
+L["CT_Library/SettingsImport/Profiles/ExternalButtonTip"] = [=[Copy settings from another account or classic/retail edition using text
+
+To generate a string:
+(1) Log onto the character you wish to export from
+(2) Select your own profile in the drop down menu
+(3) An export button will now appear below the addon list]=]
 L["CT_Library/SettingsImport/Profiles/ExternalSubHeading"] = "Option 2 - Import from another account"
 L["CT_Library/SettingsImport/Profiles/Heading"] = "Select a profile"
 L["CT_Library/SettingsImport/Profiles/InternalCharacterLabel"] = "Character:"

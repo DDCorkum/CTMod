@@ -3572,6 +3572,7 @@ local function openClipboardPanel(text)
 		clipboardPanel:SetFrameLevel("10");
 		clipboardPanel:SetSize(400, 200);
 		clipboardPanel:SetPoint("CENTER", UIParent);
+		clipboardPanel:EnableMouse(true);
 		
 		clipboardPanel.label = clipboardPanel:CreateFontString(nil, "ARTWORK", "ChatFontNormal");
 		clipboardPanel.label:SetPoint("TOP", 0, -40);
@@ -3741,6 +3742,9 @@ module.frame = function()
 		"font#tl:20:-100#v:GameFontNormal#" .. L["CT_Library/SettingsImport/Profiles/ExternalSubHeading"],
 		["button#t:0:-120#s:150:20#v:UIPanelButtonTemplate#" .. L["CT_Library/SettingsImport/Profiles/ExternalButton"]] = {
 			["onclick"] = openClipboardPanel,
+			["onenter"] = function(button)
+				lib:displayTooltip(button, {L["CT_Library/SettingsImport/Profiles/ExternalButton"],L["CT_Library/SettingsImport/Profiles/ExternalButtonTip"] .. "#0.9:0.9:0.9"},"CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
+			end,
 		},
 
 		["onload"] = function(self)
