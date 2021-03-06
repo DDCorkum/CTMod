@@ -1,3 +1,6 @@
+CT_Viewport (9.0.5.1) 2020-03-06
+- Logging onto a toon unused since 8.3.7.1 and earlier will no longer reset settings on other toons
+
 CT_Viewport (9.0.2.4) 2020-02-03
 - Settings now exportable between characters, but with the unintended consequence of resetting
 

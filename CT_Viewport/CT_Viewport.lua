@@ -30,6 +30,22 @@ module.text = module.text or { };
 local L = module.text;
 
 
+-- Temporary code; keep until late 2021.  When removing this, also remove temporary code from module:update()
+CT_Viewport_Saved = CT_Viewport_Saved or {}
+CT_ViewportBackup = CT_ViewportBackup or {}
+
+local oldSetOption = module.setOption
+function module:setOption(option, value, charOnly)
+	oldSetOption(self, option, value, charOnly);
+	if (charOnly) then
+		CT_ViewportBackup[module:getCharKey()] = CT_ViewportBackup[module:getCharKey()] or {}
+		CT_ViewportBackup[module:getCharKey()][option] = value
+	end
+end
+
+
+
+
 module.initialValues =
 {
 	[1] = 563,
@@ -42,7 +58,7 @@ module.initialValues =
 
 module.currOffset = {0, 0, 0, 0}
 
-local frameClearAllPoints, frameSetAllPoints, frameSetPoint, savedViewport;
+local frameClearAllPoints, frameSetAllPoints, frameSetPoint;
 
 -- Public API
 
@@ -276,13 +292,7 @@ function module.ApplyViewport(left, right, top, bottom, r, g, b)
 	g = ( g or 0 );
 	b = ( b or 0 );
 
-	savedViewport[1] = left;
-	savedViewport[2] = right;
-	savedViewport[3] = top;
-	savedViewport[4] = bottom;
-	savedViewport[5] = r;
-	savedViewport[6] = g;
-	savedViewport[7] = b;
+	module:setOption("savedViewport", {left, right, top, bottom, r, g, b}, true);
 
 	local update = true;
 	if (WorldFrame:IsProtected() and InCombatLockdown()) then
@@ -324,6 +334,7 @@ end
 
 function module.ApplySavedViewport()
 	local screenRes = module.screenRes;
+	local savedViewport = module:getOption("savedViewport")
 	if screenRes then
 		savedViewport[1] = min(tonumber(savedViewport[1]), screenRes[1]/2 - 1);
 		savedViewport[2] = min(tonumber(savedViewport[2]), screenRes[1]/2 - 1);
@@ -529,24 +540,26 @@ function module.Init(width, height)
 	end
 end
 
--- Handlers 
-CT_Viewport_Saved = {}
 function module:update(option, value)
 	if (option == "init") then
-		-- The former savedViewport that was previously per-character until 9.0.2.4, which prevented importing/exporting
-		savedViewport = module:getOption("savedViewport");
+		
+		local savedViewport = module:getOption("savedViewport") or {0,0,0,0,0,0,0};
+		
+		-- Temporary code from 9.0.2.4 and 9.0.5.1; also remove temporary code at the very top
 		if (#CT_Viewport_Saved > 0) then
-			-- converting from an olds note format
-			savedViewport = {}
+			
+			-- avoid deleting other toons' data when migrating saved variable types
+			for charKey, val in pairs(CT_ViewportBackup) do	
+				module.options[charKey] = val;
+			end
+
+			-- convert from an olds note format
 			savedViewport[1], savedViewport[2], savedViewport[3], savedViewport[4], savedViewport[5], savedViewport[6], savedViewport[7]
 				= CT_Viewport_Saved[1], CT_Viewport_Saved[2], CT_Viewport_Saved[3], CT_Viewport_Saved[4], CT_Viewport_Saved[5], CT_Viewport_Saved[6], CT_Viewport_Saved[7]
-			module:setOption("savedViewport", savedViewport, true);
 			wipe(CT_Viewport_Saved)
-		elseif (savedViewport == nil) then
-			module:setOption("savedViewport", {0, 0, 0, 0, 0, 0, 0}, true);
-			savedViewport = module:getOption("savedViewport");
 		end
 
+		module:setOption("savedViewport", savedViewport, true)
 	
 		-- The former on-load and VARIABLES_LOADED until 9.0.0.1
 		local dummyFrame = CreateFrame("Frame");
@@ -1058,6 +1071,7 @@ function module.frame()
 			frame:HookScript("OnUpdate", function(__, elapsed)
 				local iframe = CT_ViewportInnerFrame;
 				local screenRes = module.screenRes;
+				local savedViewport = module:getOption("savedViewport")
 
 				if ( not module.hasAppliedViewport ) then
 					module.hasAppliedViewport = 1;

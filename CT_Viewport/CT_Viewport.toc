@@ -4,7 +4,7 @@
 ## Notes: Allows you to change the rendered world's size.
 ## DefaultState: Enabled
 ## SavedVariablesPerCharacter: CT_Viewport_Saved
-## SavedVariables: CT_ViewportOptions
+## SavedVariables: CT_ViewportOptions, CT_ViewportBackup
 ## Dependencies: CT_Library
 
 CT_Viewport.lua
