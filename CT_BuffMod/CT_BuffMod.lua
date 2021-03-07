@@ -2517,14 +2517,14 @@ local function auraButton_updateAppearance(button)
 
 	if (fsTimeleft and frameObject.fontSize) then
 		if (frameObject.fontSize == 1 and fsTimeleft.font ~= "ChatFontNormal") then
-			fsTimeleft:SetFont("Fonts\\ARIALN.TTF", 14, "");
+			fsTimeleft:SetFontObject("ChatFontNormal");
 			fsTimeleft.font = "ChatFontNormal";
 		elseif (frameObject.fontSize == 2 and fsTimeleft.font ~= "ChatFontSmall") then
-			fsTimeleft:SetFont("Fonts\\ARIALN.TTF", 12, "");
+			fsTimeleft:SetFontObject("ChatFontSmall");
 			fsTimeleft.font = "ChatFontSmall";
-		elseif (frameObject.fontSize == 3 and fsTimeleft.font ~= "ChatFontLarge") then
-			fsTimeleft:SetFont("Fonts\\ARIALN.TTF", 16, "");	-- there is no such thing as "ChatFontLarge"
-			fsTimeleft.font = "ChatFontLarge";
+		elseif (frameObject.fontSize == 3 and fsTimeleft.font ~= "CT_BuffMod_ChatFontLarge") then
+			fsTimeleft:SetFontObject("CT_BuffMod_ChatFontLarge");
+			fsTimeleft.font = "CT_BuffMod_ChatFontLarge";
 		end
 	end
 
@@ -2603,14 +2603,14 @@ local function auraButton_updateAppearance(button)
 			end
 			if (frameObject.fontSize) then
 				if (frameObject.fontSize == 1 and fsName.font ~= "GameFontNormal") then
-					fsName:SetFont("Fonts\\FRIZQT__.TTF", 12, "");
+					fsName:SetFontObject("GameFontNormal");
 					fsName.font = "GameFontNormal";
 				elseif (frameObject.fontSize == 2 and fsName.font ~= "GameFontNormalSmall") then
-					fsName:SetFont("Fonts\\FRIZQT__.TTF", 10, "");
+					fsName:SetFontObject("GameFontNormalSmall");
 					fsName.font = "GameFontNormalSmall";
-				elseif (frameObject.fontSize == 3 and fsName.font ~= "GameFontNormalLarge") then
-					fsName:SetFont("Fonts\\FRIZQT__.TTF", 14, "");		-- the actual GameFontNormalLarge is 16, but that's too big!
-					fsName.font = "GameFontNormalLarge";
+				elseif (frameObject.fontSize == 3 and fsName.font ~= "CT_BuffMod_GameFontNormalMed2") then
+					fsName:SetFontObject("CT_BuffMod_GameFontNormalMed2");
+					fsName.font = "CT_BuffMod_GameFontNormalMed2";
 				end
 			end
 		elseif ( fsName ) then
