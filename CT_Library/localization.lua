@@ -170,6 +170,7 @@ L["CT_Library/SettingsImport/Clipboard/StringValidMessage"] = "Überprüfung abg
 L["CT_Library/SettingsImport/Heading"] = "Einstellungen importieren"
 L["CT_Library/SettingsImport/NoAddonsSelected"] = "Keine Module ausgewählt."
 L["CT_Library/SettingsImport/Profiles/ExternalButton"] = "Importstring verwenden"
+L["CT_Library/SettingsImport/Profiles/ExternalButtonTip"] = "Kopiert Einstellungen von einem anderen Account oder Classic/Retail Edition mit Hilfe eines Textstrings. Um einen String zu erzeugen: (1) In den Charakter, von dem exportiert werden soll, einloggen (2) Das eigene Profil im DropDown Menü auswählen (3) Ein Export Button erscheint nun unterhalb der Addonliste"
 L["CT_Library/SettingsImport/Profiles/ExternalSubHeading"] = "Option 2 - Von anderem Account importieren"
 L["CT_Library/SettingsImport/Profiles/Heading"] = "Ein Profil auswählen"
 L["CT_Library/SettingsImport/Profiles/InternalCharacterLabel"] = "Charakter:"
@@ -180,7 +181,7 @@ L["CT_Library/SettingsImport/Profiles/InternalSubHeading"] = "Option 1 - Meine C
 -----------------------------------------------
 -- esES Localizations
 
-elseif (GetLocale() == "esES") then
+elseif (GetLocale() == "esES" or GetLocale() == "esMX") then
 
 L["CT_Library/Help/About/Credits"] = [=[CTMod originado en Vanilla by Cide y TS
 Resike y Dahk unieron en '14 y '17]=]
@@ -222,8 +223,45 @@ L["CT_Library/Help/Heading"] = "帮助"
 L["CT_Library/Help/WhatIs/Heading"] = "什么是CTMod?"
 L["CT_Library/Help/WhatIs/Line1"] = "CTMod包含几个模块:"
 L["CT_Library/Help/WhatIs/NotInstalled"] = "未安装"
+L["CT_Library/SettingsImport/Actions/DeleteOtherNote"] = "将该配置重置为默认设置"
+L["CT_Library/SettingsImport/Actions/DeleteSelfNote"] = "重置当前配置并/reload"
+L["CT_Library/SettingsImport/Actions/ExportNote"] = "手动复制/粘贴到另一个战网"
+L["CT_Library/SettingsImport/Actions/Heading"] = "选择操作"
+L["CT_Library/SettingsImport/Actions/ImportNote"] = "覆盖当前的配置并/reload"
+L["CT_Library/SettingsImport/AddOns/Heading"] = "选择插件"
+L["CT_Library/SettingsImport/Clipboard/AcceptTip"] = "下一步:  选择要导入的插件"
+L["CT_Library/SettingsImport/Clipboard/AddOnMissingWarning"] = "警告:  字符串包含一个缺失或未激活的插件"
+L["CT_Library/SettingsImport/Clipboard/AddOnVersionWarning"] = "警告:  字符串是用不同的插件版本制作的"
+L["CT_Library/SettingsImport/Clipboard/ChecksumAlert"] = "字符串不完整或损坏"
+L["CT_Library/SettingsImport/Clipboard/FailureAlert"] = "解析字符串时出现未知错误"
+L["CT_Library/SettingsImport/Clipboard/GameVersionWarning"] = "警告:  字符串是用不同的游戏版本制作的"
+L["CT_Library/SettingsImport/Clipboard/NoAddOnsAlert"] = "在字符串中没有找到匹配的插件"
+L["CT_Library/SettingsImport/Clipboard/StringValidMessage"] = "验证通过:  字符串显示可用"
 L["CT_Library/SettingsImport/Heading"] = "设置导入"
 L["CT_Library/SettingsImport/NoAddonsSelected"] = "未选择任何加载项."
+L["CT_Library/SettingsImport/Profiles/ExternalButton"] = "使用导入字符串"
+L["CT_Library/SettingsImport/Profiles/ExternalSubHeading"] = "选项2 - 从另一个战网导入"
+L["CT_Library/SettingsImport/Profiles/Heading"] = "选择一个配置"
+L["CT_Library/SettingsImport/Profiles/InternalCharacterLabel"] = "角色:"
+L["CT_Library/SettingsImport/Profiles/InternalServerLabel"] = "服务器:"
+L["CT_Library/SettingsImport/Profiles/InternalSubHeading"] = "选项1 - 我的角色"
+
+
+-----------------------------------------------
+-- ptBR Localizations
+-- Credits: BansheeLyris, pedrayy
+
+elseif (GetLocale() == "ptBR") then
+
+L["CT_Library/Help/About/Credits"] = "CTMod originou-se no Vanilla por Cide e TS Resike, e Dahk juntou-se à equipe em 2014 e 2017"
+L["CT_Library/Help/About/Heading"] = "Sobre CTMod"
+L["CT_Library/Help/About/Updates"] = "Atualizações disponíveis em: "
+L["CT_Library/SettingsImport/Actions/DeleteOtherNote"] = "Redefinir este perfil para as configurações padrão"
+L["CT_Library/SettingsImport/Actions/DeleteSelfNote"] = "Redefinir o perfil atual e recarregar a interface"
+L["CT_Library/SettingsImport/Actions/ExportNote"] = "Manualmente copiar/colar para outra conta"
+L["CT_Library/SettingsImport/Actions/Heading"] = "Selecionar ação"
+L["CT_Library/SettingsImport/Actions/ImportNote"] = "Sobrescrever o perfil atual e recarregar a interface"
+L["CT_Library/SettingsImport/AddOns/Heading"] = "Selecionar AddOns"
 
 
 end
