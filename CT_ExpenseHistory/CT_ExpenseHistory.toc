@@ -1,4 +1,4 @@
-## Interface: 90002
+## Interface: 90005
 ## Version: 8.3.7.1
 ## Title: CT_ExpenseHistory |cFF333333(SL)
 ## Notes: Detailed log of character expenses.
