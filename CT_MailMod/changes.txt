@@ -1,3 +1,6 @@
+CT_Core (9.0.5.2) 2020-03-09
+- Compatibility with LibUIDropDownMenu-4.0 now used by Titan Panel (see CT_Library_TitanPlugin.lua)
+
 CT_MailMod (9.0.1.1) 2020-10-07
 - Improvements to the /maillog UI: search filtering, prominent item stack counts, and more rows display at once.
 - Fix to logging the stack quantity on outgoing ("sent") mail; updating for an API change made in 7.0.3

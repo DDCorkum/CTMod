@@ -1,5 +1,6 @@
 CT_Library (9.0.5.2) 2021-03-09
 - All TOCs marked with X-Part-Of for integration to "Addon Control Panel" by Sylvanaar
+- Compatibility with LibUIDropDownMenu-4.0 now used by Titan Panel
 
 CT_Library (9.0.5.1) 2021-02-26
 - Improvements to importing and exporting settings

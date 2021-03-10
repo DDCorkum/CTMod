@@ -91,6 +91,8 @@ For this example plugin, we show the standard Titan buttons plus options to dete
 -- but note the Titan get / set routines and other Titan routines being used.
 -- SDK : "TitanPanelRightClickMenu_AddTitle" is used to place the title in the (sub)menu
 
+	local DDM = LibStub:GetLibrary("LibUIDropDownMenu-4.0");
+
 	-- level 1 menu
 	if L_UIDROPDOWNMENU_MENU_LEVEL == 1 then
 		TitanPanelRightClickMenu_AddTitle(TitanPlugins[TS.id].menuText);
@@ -111,16 +113,16 @@ For this example plugin, we show the standard Titan buttons plus options to dete
 				end;
 			end		
 			if (i > 2) then
-				L_UIDropDownMenu_AddButton(info);
+				DDM:UIDropDownMenu_AddButton(info);
 			elseif (i == 1) then
 				info1 = info;
 			else
 				info2 = info;
 			end
 		end
-		L_UIDropDownMenu_AddSeparator(1);
-		L_UIDropDownMenu_AddButton(info1);
-		L_UIDropDownMenu_AddButton(info2);
+		DDM:UIDropDownMenu_AddSeparator(1);
+		DDM:UIDropDownMenu_AddButton(info1);
+		DDM:UIDropDownMenu_AddButton(info2);
 		
 		-- SDK : "TitanPanelRightClickMenu_AddSpacer" is used to put a blank line in the menu
 		TitanPanelRightClickMenu_AddSpacer();     
@@ -128,7 +130,7 @@ For this example plugin, we show the standard Titan buttons plus options to dete
 		-- SDK : The routine above is used to put a "Hide" (localized) in the menu.
 	
 	elseif (_G[L_UIDROPDOWNMENU_MENU_VALUE] and _G[L_UIDROPDOWNMENU_MENU_VALUE].externalDropDown_Initialize) then
-		_G[L_UIDROPDOWNMENU_MENU_VALUE].externalDropDown_Initialize("L_")	-- "L_" instructs it to use LibUIDropDownMenu for compatiblity
+		_G[L_UIDROPDOWNMENU_MENU_VALUE]:externalDropDown_Initialize(function(...) DDM:UIDropDownMenu_AddButton(...); end, L_UIDROPDOWNMENU_MENU_LEVEL)
 	end
 
 end
