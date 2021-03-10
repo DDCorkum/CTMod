@@ -30,19 +30,24 @@ module.text = module.text or { };
 local L = module.text;
 
 
-module.initialValues =
-{
-	[1] = 563,
-	[2] = 937,
-	[3] = 736,
-	[4] = 455,
-	[5] = 187.5,		-- 375 until 9.0.0.1
-	[6] = 140.5		-- 281 until 9.0.0.1
-};
+-- Temporary code.  When removing this, also remove temporary code from module:update()
+CT_Viewport_Saved = CT_Viewport_Saved or {}
+CT_ViewportBackup = CT_ViewportBackup or {}
+
+local oldSetOption = module.setOption
+function module:setOption(option, value, charOnly)
+	oldSetOption(self, option, value, charOnly);
+	if (charOnly) then
+		CT_ViewportBackup[module:getCharKey()] = CT_ViewportBackup[module:getCharKey()] or {}
+		CT_ViewportBackup[module:getCharKey()][option] = value
+	end
+end
 
 module.currOffset = {0, 0, 0, 0}
 
-local frameClearAllPoints, frameSetAllPoints, frameSetPoint, savedViewport;
+local frameClearAllPoints, frameSetAllPoints, frameSetPoint;
+local savedViewport		-- current settings
+local ivalues = {0,0,0,0,0,0};	-- limits for the inner frame in the options panel
 
 -- Public API
 
@@ -55,13 +60,13 @@ end
 -- Returns the current custom viewport settings as four variables: L, R, T, B
 function public:GetViewportSettings()
 	local offset = module.currOffset;
-	return tonumber(offset[1]), tonumber(offset[2]), tonumber(offset[3]), tonumber(offset[4]);	--tonumber is just cheating to create a new copy of the number
+	return tonumber(offset[1]), tonumber(offset[2]), tonumber(offset[3]), tonumber(offset[4]), tonumber(savedViewport[1]), tonumber(savedViewport[2]), tonumber(savedViewport[3]), tonumber(savedViewport[4]);	--tonumber is just cheating to create a new copy of the number
 end
 
 -- Slash command to display the frame
 SlashCmdList["VIEWPORT"] = function(msg)
 	module:showModuleOptions(module.name);
-	local iStart, iEnd, left, right, top, bottom = string.find(msg, "^(%d+) (%d+) (%d+) (%d+)$");
+	local iStart, iEnd, left, right, top, bottom = string.find(msg, "^(%d+%.?%d?) (%d+%.?%d?) (%d+%.?%d?) (%d+%.?%d?)$");
 	if ( left and right and top and bottom ) then
 		local screenRes = module.screenRes;
 		if not screenRes then
@@ -76,10 +81,10 @@ SlashCmdList["VIEWPORT"] = function(msg)
 			module.CheckKeepSettings();
 		end
 		
-		CT_ViewportLeftEB:SetText(floor(left + 0.1));
-		CT_ViewportRightEB:SetText(floor(right + 0.1));
-		CT_ViewportTopEB:SetText(floor(top + 0.1));
-		CT_ViewportBottomEB:SetText(floor(bottom + 0.1));
+		CT_ViewportLeftEB:SetText(0.5*floor(left*2 + 0.1));
+		CT_ViewportRightEB:SetText(0.5*floor(right*2 + 0.1));
+		CT_ViewportTopEB:SetText(0.5*floor(top*2 + 0.1));
+		CT_ViewportBottomEB:SetText(0.5*floor(bottom*2 + 0.1));
 		
 		module.ApplyViewport(left, right, top, bottom);
 		module.ApplyInnerViewport(left, right, top, bottom);
@@ -107,7 +112,6 @@ end
 -- Resizing functions
 function module.Resize(button, anchorPoint)
 	module.UpdateInnerFrameBounds();
-	local ivalues = module.initialValues;
 	local iframe = CT_ViewportInnerFrame;
 
 	button:GetParent():StartSizing(anchorPoint);
@@ -185,12 +189,6 @@ end
 function module.UpdateInnerFrameBounds()
 	local bframe = CT_ViewportBorderFrame;
 
-	if (not module.initialValues) then
-		module.initialValues = {};
-	end
-
-	local ivalues = module.initialValues;
-
 	-- Calculate limits of inner frame using the border frame since it will
 	-- always be in a fixed position, unlike the inner frame whose edges may get
 	-- dragged by the user.
@@ -236,7 +234,6 @@ function module.ApplyViewport(left, right, top, bottom, r, g, b)
 
 	if ( not left and CT_ViewportInnerFrame) then
 		module.UpdateInnerFrameBounds()
-		local ivalues = module.initialValues;
 		local iframe = CT_ViewportInnerFrame;
 
 		if (ivalues[5] == 0) then
@@ -276,13 +273,14 @@ function module.ApplyViewport(left, right, top, bottom, r, g, b)
 	g = ( g or 0 );
 	b = ( b or 0 );
 
-	savedViewport[1] = left;
-	savedViewport[2] = right;
-	savedViewport[3] = top;
-	savedViewport[4] = bottom;
+	savedViewport[1] = floor(left*2+0.1)*.5;
+	savedViewport[2] = floor(right*2+0.1)*.5;
+	savedViewport[3] = floor(top*2+0.1)*.5;
+	savedViewport[4] = floor(bottom*2+0.1)*.5;
 	savedViewport[5] = r;
 	savedViewport[6] = g;
 	savedViewport[7] = b;
+	module:setOption("savedViewport", savedViewport, true);
 
 	local update = true;
 	if (WorldFrame:IsProtected() and InCombatLockdown()) then
@@ -398,19 +396,18 @@ end
 -- Apply saved settings to the inner viewport
 function module.ApplyInnerViewport(left, right, top, bottom, r, g, b)
 	local screenRes = module.screenRes;
-	local ivalues = module.initialValues;
 	local iframe = CT_ViewportInnerFrame;
 
-	CT_ViewportLeftEB:SetText(floor(left + 0.1));
-	CT_ViewportRightEB:SetText(floor(right + 0.1));
-	CT_ViewportTopEB:SetText(floor(top + 0.1));
-	CT_ViewportBottomEB:SetText(floor(bottom + 0.1));
+	CT_ViewportLeftEB:SetText(0.5*floor(left*2 + 0.1));
+	CT_ViewportRightEB:SetText(0.5*floor(right*2 + 0.1));
+	CT_ViewportTopEB:SetText(0.5*floor(top*2 + 0.1));
+	CT_ViewportBottomEB:SetText(0.5*floor(bottom*2 + 0.1));
 
 	module.currOffset = {
-		floor(left + 0.1),
-		floor(right + 0.1),
-		floor(top + 0.1),
-		floor(bottom + 0.1)
+		0.5*floor(left*2 + 0.1),
+		0.5*floor(right*2 + 0.1),
+		0.5*floor(top*2 + 0.1),
+		0.5*floor(bottom*2 + 0.1)
 	};
 
 	if (CT_ViewportAspectRatioNewText) then
@@ -508,14 +505,13 @@ function module.Init(width, height)
 		x, y = module.GetCurrentResolution(GetScreenResolutions());
 	end
 	if ( x and y ) then
-		local modifier;
-		if (y == 0) then
+--[[		if (y == 0) then
 			modifier = 0;
 		else
 			modifier = x / y;
 		end
 		if ( modifier ~= (4 / 3) ) then
-			local newViewportHeight = 224.8 / modifier;  -- module.initialValues[6] / modifier;
+			local newViewportHeight = ivalues[6] / modifier;  -- ivalues[6] / modifier;
 			if (CT_ViewportInnerFrame) then
 				CT_ViewportInnerFrame:SetHeight(newViewportHeight);
 				--CT_ViewportBorderFrame:SetHeight(newViewportHeight + 8);
@@ -523,30 +519,33 @@ function module.Init(width, height)
 				module.pendingViewportHeight = newViewportHeight;
 			end
 		end
+--]]
 		module.screenRes = { x, y };
 		--CT_Viewport:SetHeight(210 + CT_ViewportBorderFrame:GetHeight());
 		module.awaitingValues = true;
 	end
 end
 
--- Handlers 
-CT_Viewport_Saved = {}
 function module:update(option, value)
 	if (option == "init") then
-		-- The former savedViewport that was previously per-character until 9.0.2.4, which prevented importing/exporting
-		savedViewport = module:getOption("savedViewport");
+		
+		savedViewport = module:getOption("savedViewport") or {0,0,0,0,0,0,0};
+		
+		-- Temporary code from 9.0.2.4 and 9.0.5.1; also remove temporary code at the very top
 		if (#CT_Viewport_Saved > 0) then
-			-- converting from an olds note format
-			savedViewport = {}
+			
+			-- avoid deleting other toons' data when migrating saved variable types
+			for charKey, val in pairs(CT_ViewportBackup) do	
+				module.options[charKey] = val;
+			end
+
+			-- convert from an olds note format
 			savedViewport[1], savedViewport[2], savedViewport[3], savedViewport[4], savedViewport[5], savedViewport[6], savedViewport[7]
 				= CT_Viewport_Saved[1], CT_Viewport_Saved[2], CT_Viewport_Saved[3], CT_Viewport_Saved[4], CT_Viewport_Saved[5], CT_Viewport_Saved[6], CT_Viewport_Saved[7]
-			module:setOption("savedViewport", savedViewport, true);
 			wipe(CT_Viewport_Saved)
-		elseif (savedViewport == nil) then
-			module:setOption("savedViewport", {0, 0, 0, 0, 0, 0, 0}, true);
-			savedViewport = module:getOption("savedViewport");
 		end
 
+		module:setOption("savedViewport", savedViewport, true)
 	
 		-- The former on-load and VARIABLES_LOADED until 9.0.0.1
 		local dummyFrame = CreateFrame("Frame");
@@ -614,13 +613,13 @@ function module.frame()
 	optionsAddObject( 14, 1*14, "font#tl:115:%y#" .. L["CT_Viewport/Options/Tips/Line3"] .. textColor2 .. ":l:190");
 	optionsAddObject(  0, 1*14, "font#tl:15:%y#/ctvp 5 20 15 0" .. textColor1 .. ":l");
 	optionsAddObject( 14, 1*14, "font#tl:115:%y#" .. L["CT_Viewport/Options/Tips/Line4"] .. textColor2 .. ":l:190");
-	optionsAddObject(-10, 1*14, "font#tl:5:%y#" .. L["CT_Viewport/Options/Tips/Line5"] .. textColor2 .. ":l:300");
+	--optionsAddObject(-10, 1*14, "font#tl:5:%y#" .. L["CT_Viewport/Options/Tips/Line5"] .. textColor2 .. ":l:300");  "Alternatively, set custom values below."  Removed, because its rendundant.
 
 	-- Heading
 	optionsAddObject(-10, 17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_Viewport/Options/Viewport/Heading"]);
 	
 	-- Apply/Cancel/Keep Settings
-	optionsBeginFrame(-10, 32, "button#tr:t:-10:%y#s:125:32#v:GameMenuButtonTemplate#" .. L["CT_Viewport/Options/Viewport/ApplyButton"]);
+	optionsBeginFrame(-8, 32, "button#tr:t:-10:%y#s:125:32#v:GameMenuButtonTemplate#" .. L["CT_Viewport/Options/Viewport/ApplyButton"]);
 		optionsAddScript("onload", function(button)
 			module.applyButton = button;
 			button:HookScript("OnClick", function()
@@ -654,11 +653,11 @@ function module.frame()
 	optionsEndFrame();
 	
 	-- Manual edit boxes (top, left, right and bottom)
-	optionsBeginFrame(-10, 32, "editbox#t:0:%y#n:CT_ViewportTopEB#i:3#ChatFontNormal");
+	optionsBeginFrame(-8, 32, "editbox#t:0:%y#n:CT_ViewportTopEB#i:3#ChatFontNormal");
 		optionsAddScript("onload", function(eb)
 			eb:SetAutoFocus(false);
-			eb:SetMaxLetters(4);
-			eb:SetSize(35, 25);
+			eb:SetMaxLetters(5);
+			eb:SetSize(40, 25);
 			eb:SetJustifyH("CENTER");
 
 			eb.texL = eb:CreateTexture(nil, "BACKGROUND")
@@ -722,11 +721,11 @@ function module.frame()
 		end);
 	optionsEndFrame();
 	
-	optionsBeginFrame(-56.25, 32, "editbox#tl:tl:8:%y#n:CT_ViewportLeftEB#i:1#ChatFontNormal");
+	optionsBeginFrame(32, 32, "editbox#tl:tl:8:%y#n:CT_ViewportLeftEB#i:1#ChatFontNormal");
 		optionsAddScript("onload", function(eb)
 			eb:SetAutoFocus(false);
-			eb:SetMaxLetters(4);
-			eb:SetSize(35, 25);
+			eb:SetMaxLetters(5);
+			eb:SetSize(40, 25);
 			eb:SetJustifyH("CENTER");
 
 			eb.texL = eb:CreateTexture(nil, "BACKGROUND")
@@ -793,8 +792,8 @@ function module.frame()
 	optionsBeginFrame( 32, 32, "editbox#tr:tr:-8:%y#n:CT_ViewportRightEB#i:2#ChatFontNormal");
 		optionsAddScript("onload", function(eb)
 			eb:SetAutoFocus(false);
-			eb:SetMaxLetters(4);
-			eb:SetSize(35, 25);
+			eb:SetMaxLetters(5);
+			eb:SetSize(40, 25);
 			eb:SetJustifyH("CENTER");
 
 			eb.texL = eb:CreateTexture(nil, "BACKGROUND")
@@ -858,11 +857,11 @@ function module.frame()
 		end);	
 	optionsEndFrame();
 	
-	optionsBeginFrame(-56.25, 32, "editbox#t:0:%y#n:CT_ViewportBottomEB#i:4#ChatFontNormal");
+	optionsBeginFrame(-180, 32, "editbox#t:0:%y#n:CT_ViewportBottomEB#i:4#ChatFontNormal");
 		optionsAddScript("onload", function(eb)
 			eb:SetAutoFocus(false);
-			eb:SetMaxLetters(4);
-			eb:SetSize(35, 25);
+			eb:SetMaxLetters(5);
+			eb:SetSize(40, 25);
 			eb:SetJustifyH("CENTER");
 
 			eb.texL = eb:CreateTexture(nil, "BACKGROUND")
@@ -927,7 +926,8 @@ function module.frame()
 	optionsEndFrame();
 		
 	-- Draggable Borders and Inner Frame (representing the viewport)
-	optionsBeginFrame(180, 150, "frame#t:0:%y#s:191.5:144.5#n:CT_ViewportBorderFrame");
+	
+	optionsBeginFrame(215, 180, "frame#t:0:%y#s:240:180#n:CT_ViewportBorderFrame");
 		optionsAddScript("onload", function(frame)
 			Mixin(frame, BackdropTemplateMixin or {});
 			frame:SetBackdrop({
@@ -941,16 +941,25 @@ function module.frame()
 	optionsEndFrame();
 	
 	optionsBeginFrame(0, 0, "frame#n:CT_ViewportInnerFrame");
-		optionsAddScript("onload", function(frame)
+		optionsAddScript("onshow", function(frame)
 			frame:ClearAllPoints();
 			frame:SetPoint("TOPLEFT", CT_ViewportBorderFrame, "TOPLEFT", 4, -4);
-			frame:SetMaxResize(187.5, 140.5);		-- 1/2 the size of the original CT_Viewport frame beginning in 9.0.0.1
-			frame:SetMinResize(93.75, 70.25);		-- The screen cannot shrink by more than 50 in either height or width
+			frame:SetMaxResize(CT_ViewportBorderFrame:GetWidth()-4, CT_ViewportBorderFrame:GetHeight()-4);
+			frame:SetMinResize((CT_ViewportBorderFrame:GetWidth()-4)/2, (CT_ViewportBorderFrame:GetHeight()-4)/2)
 			frame:SetResizable(true);
-			if (module.pendingViewportHeight) then
-				frame:SetHeight(module.pendingViewportHeight);
-				module.pendingViewportHeight = nil;
-			end
+			module.UpdateInnerFrameBounds();
+			module.ApplyInnerViewport(
+				savedViewport[1],
+				savedViewport[2],
+				savedViewport[3],
+				savedViewport[4],
+				savedViewport[5],
+				savedViewport[6],
+				savedViewport[7]
+			);
+			frame:SetScript("OnShow", nil);
+		end);
+		optionsAddScript("onload", function(frame)
 			Mixin(frame, BackdropTemplateMixin or {});
 			frame:SetBackdrop({
 				edgeFile = "Interface\\ChatFrame\\ChatFrameBackground";
@@ -1033,21 +1042,6 @@ function module.frame()
 	
 	optionsBeginFrame(0, 0, "frame")
 		optionsAddScript("onload", function(frame)
-			frame:HookScript("OnShow", function()
-				if ( CT_ViewportInnerFrame:GetLeft() ) then
-					module.ApplyInnerViewport(
-						savedViewport[1],
-						savedViewport[2],
-						savedViewport[3],
-						savedViewport[4],
-						savedViewport[5],
-						savedViewport[6],
-						savedViewport[7]
-					);
-				else
-					module.hasAppliedViewport = nil;
-				end
-			end);
 			
 			frame:HookScript("OnHide", function()
 				module.isResizing = nil;
@@ -1057,44 +1051,20 @@ function module.frame()
 			
 			frame:HookScript("OnUpdate", function(__, elapsed)
 				local iframe = CT_ViewportInnerFrame;
+				local bframe = CT_ViewportBorderFrame;
 				local screenRes = module.screenRes;
 
-				if ( not module.hasAppliedViewport ) then
-					module.hasAppliedViewport = 1;
+				if ( module.awaitingValues ) then
+					module.awaitingValues = nil;
 
-					iframe:ClearAllPoints();
-					iframe:SetPoint("TOPLEFT", "CT_ViewportBorderFrame", "TOPLEFT", 4, -4);
-					iframe:SetPoint("BOTTOMRIGHT", "CT_ViewportBorderFrame", "BOTTOMRIGHT", -4, 4);
-
-				elseif ( module.hasAppliedViewport == 1 ) then
-					module.hasAppliedViewport = 2;
-
-					if ( module.awaitingValues ) then
-						module.awaitingValues = nil;
-
-						CT_ViewportLeftEB.limitation = screenRes[1] / 2 - 1;
-						CT_ViewportRightEB.limitation = screenRes[1] / 2 - 1;
-						CT_ViewportTopEB.limitation = screenRes[2] / 2 - 1;
-						CT_ViewportBottomEB.limitation = screenRes[2] / 2 - 1;
-					end
-					if ( CT_ViewportInnerFrame ) then
-						module.ApplyInnerViewport(
-							savedViewport[1],
-							savedViewport[2],
-							savedViewport[3],
-							savedViewport[4],
-							savedViewport[5],
-							savedViewport[6],
-							savedViewport[7]
-						);
-					else
-						module.hasAppliedViewport = nil;
-					end
+					CT_ViewportLeftEB.limitation = screenRes[1] / 2 - 1;
+					CT_ViewportRightEB.limitation = screenRes[1] / 2 - 1;
+					CT_ViewportTopEB.limitation = screenRes[2] / 2 - 1;
+					CT_ViewportBottomEB.limitation = screenRes[2] / 2 - 1;
 				end
 
 				if ( module.isResizing ) then
 					module.UpdateInnerFrameBounds()
-					local ivalues = module.initialValues;
 
 					local right, left, top, bottom;
 
@@ -1126,16 +1096,16 @@ function module.frame()
 						bottom = 0;
 					end
 
-					CT_ViewportLeftEB:SetText(floor(left + 0.1));
-					CT_ViewportRightEB:SetText(floor(right + 0.1));
-					CT_ViewportTopEB:SetText(floor(top + 0.1));
-					CT_ViewportBottomEB:SetText(floor(bottom + 0.1));
+					CT_ViewportLeftEB:SetText(0.5*floor(left*2 + 0.1));
+					CT_ViewportRightEB:SetText(0.5*floor(right*2 + 0.1));
+					CT_ViewportTopEB:SetText(0.5*floor(top*2 + 0.1));
+					CT_ViewportBottomEB:SetText(0.5*floor(bottom*2 + 0.1));
 
 					module.currOffset = {
-						floor(left + 0.1),
-						floor(right + 0.1),
-						floor(top + 0.1),
-						floor(bottom + 0.1)
+						0.5*floor(left*2 + 0.1),
+						0.5*floor(right*2 + 0.1),
+						0.5*floor(top*2 + 0.1),
+						0.5*floor(bottom*2 + 0.1)
 					};
 
 					if ( module.elapsed ) then

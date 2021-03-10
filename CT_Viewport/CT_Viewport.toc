@@ -1,10 +1,10 @@
-## Interface: 90002
-## Version: 8.3.7.1
+## Interface: 90005
+## Version: 9.0.5.1
 ## Title: CT_Viewport |cFF333333(SL)
 ## Notes: Allows you to change the rendered world's size.
 ## DefaultState: Enabled
 ## SavedVariablesPerCharacter: CT_Viewport_Saved
-## SavedVariables: CT_ViewportOptions
+## SavedVariables: CT_ViewportOptions, CT_ViewportBackup
 ## Dependencies: CT_Library
 
 CT_Viewport.lua

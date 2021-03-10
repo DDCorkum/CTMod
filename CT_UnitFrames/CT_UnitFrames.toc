@@ -1,4 +1,4 @@
-## Interface: 90002
+## Interface: 90005
 ## Version: 9.0.2.4
 ## Title: CT_UnitFrames |cFF333333(SL)
 ## Notes: Changes display of hp/mana values and adds a percentage.

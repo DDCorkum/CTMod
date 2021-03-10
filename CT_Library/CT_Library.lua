@@ -631,9 +631,14 @@ local function loadAddon(event, addon)
 			-- Initialize options
 			module.options = _G[addon.."Options"];
 			
-			-- Delete older import data
+			-- Delete leftovers from settings import
 			if ( module.options ) then
+				-- previously-used export strings
 				module.options["CHAR-Unknown- Import String"] = nil;
+				
+				-- backup data is only intended to be available after a single /reload
+				module.options["CHAR-Unknown- Temporary Backup"] = module.options["CHAR-Unknown- Interim Backup"]
+				module.options["CHAR-Unknown- Interim Backup"] = nil;
 			end
 
 			-- Run any update function we might have
@@ -2789,7 +2794,7 @@ local function selectControlPanelModule(self)
 	end
 
 	parent = parent.parent;
-	local title = module.optionsName or (module.name .. " Options");
+	local title = module.displayName or module.name;
 	if ( not selectedModule ) then
 		-- First selection, resize the window smoothly
 		if ( not isExternal ) then
@@ -2872,17 +2877,8 @@ local function controlPanelSkeleton()
 					version = module.version;
 					obj = listing[tostring(num)];
 					obj:SetID(num);
-					obj:Show();
-
-					-- localize the title of these two modules specifically
-					if (num == 701 and module.name == "|c00FFFFCCSettings Import|r" and L["CT_Library/SettingsImport/Heading"]) then
-						module.name = "|c00FFFFCC" .. L["CT_Library/SettingsImport/Heading"] .. "|r";
-					elseif (num == 702 and module.name == "|c00FFFFCCHelp|r" and L["CT_Library/Help/Heading"]) then
-						module.name = "|c00FFFFCC" .. L["CT_Library/Help/Heading"] .. "|r";
-					end
-					
-					obj:SetText(module.name);
-
+					obj:Show();			
+					obj:SetText(module.displayName or module.name);
 					
 					if ( version and version ~= "" ) then
 						obj.version:SetText("|c007F7F7Fv|r"..module.version);
@@ -3134,15 +3130,16 @@ lib:updateSlashCmd(displayControlPanel, "/ct", "/ctmod");
 
 -- Initialization
 local module = { };
-module.name = "|c00FFFFCCSettings Import|r"; -- this is changed to a localized string during the button's onLoad
-module.optionsName = "Settings Import";
+module.name = "Settings Import"; -- this is changed to a localized string during the button's onLoad
 module.version = "";
 -- Register as module 1 only, since this will code will get executed once per different
 -- version of CT_Library. We don't want multiple copies showing up in the
 -- control panel.
 registerModule(module, 1);
 
-local optionsFrame, addonsFrame, fromChar;
+module:regEvent("PLAYER_LOGIN", function() module.displayName = "|cFFFFFFCC" .. L["CT_Library/SettingsImport/Heading"]; end);
+
+local optionsFrame, addonsFrame, checkAllButton, fromChar;
 
 -- Dropdown Handling
 local importDropdownEntry, importFlaggedCharacters;
@@ -3176,7 +3173,7 @@ local function populateAddonsList(char)
 	-- Position action frame
 	obj = optionsFrame.actions;
 	obj:ClearAllPoints();
-	obj:SetPoint("TOPLEFT", optionsFrame, "TOPLEFT", 0, -160 + (-20 * num));
+	obj:SetPoint("TOPLEFT", optionsFrame, "TOPLEFT", 0, -180 + (-20 * num));
 	obj:SetWidth(300)
 	obj:SetHeight(150)
 	--obj:SetPoint("RIGHT", optionsFrame);
@@ -3221,6 +3218,8 @@ local function populateAddonsList(char)
 		actions.exportButton:Hide();
 		actions.deleteNote:SetText(L["CT_Library/SettingsImport/Actions/DeleteOtherNote"]);
 	end
+	
+	checkAllButton:SetChecked(false);
 
 	return numAddons;
 end
@@ -3306,9 +3305,6 @@ local function populateServerDropdownInit()
 		lib:clearTable(importDropdownEntry);
 		lib:clearTable(importFlaggedCharacters);
 	end
-
-	-- Prevent ourself from being added
-	importFlaggedCharacters[getCharKey()] = true;
 
 	for key, value in ipairs(modules) do
 		options = value.options;
@@ -3422,6 +3418,7 @@ local function import()
 			if ( options and addon ~= module ) then
 				fromOptions = options[fromChar];
 				if ( fromOptions and addonIsChecked(addon.name) and module:getOption("canImport") ) then
+					options["CHAR-Unknown- Interim Backup"] = fromChar ~= "CHAR-Unknown- Temporary Backup" and options[charKey] or nil
 					options[charKey] = {};
 					lib:copyTable(fromOptions, options[charKey]);
 					success = true;
@@ -3432,7 +3429,7 @@ local function import()
 		module:setOption("canImport", nil, true);
 
 		if ( success ) then
-			ConsoleExec("reloadui");
+			C_UI.Reload();
 		else
 			print(L["CT_Library/SettingsImport/NoAddonsSelected"]);
 		end
@@ -3452,6 +3449,9 @@ local function delete()
 			if ( options and addon ~= module ) then
 				fromOptions = options[fromChar];
 				if ( fromOptions and addonIsChecked(addon.name) and module:getOption("canDelete") ) then
+					if (fromChar == getCharKey()) then
+						options["CHAR-Unknown- Interim Backup"] = fromOptions;
+					end
 					options[fromChar] = nil;
 					success = true;
 				end
@@ -3461,6 +3461,9 @@ local function delete()
 		module:setOption("canDelete", nil, true);
 
 		if ( success ) then
+			if (fromChar == getCharKey()) then
+				C_UI.Reload();
+			end
 			local count;
 			count = populateAddonsList(fromChar);
 			if (count == 0) then
@@ -3474,9 +3477,6 @@ local function delete()
 					importRealm = nil;
 					populateServerDropdown();
 				end
-			end
-			if (fromChar == getCharKey()) then
-				C_UI.Reload();
 			end
 		else
 			print(L["CT_Library/SettingsImport/NoAddonsSelected"]);
@@ -3572,6 +3572,7 @@ local function openClipboardPanel(text)
 		clipboardPanel:SetFrameLevel("10");
 		clipboardPanel:SetSize(400, 200);
 		clipboardPanel:SetPoint("CENTER", UIParent);
+		clipboardPanel:EnableMouse(true);
 		
 		clipboardPanel.label = clipboardPanel:CreateFontString(nil, "ARTWORK", "ChatFontNormal");
 		clipboardPanel.label:SetPoint("TOP", 0, -40);
@@ -3741,6 +3742,9 @@ module.frame = function()
 		"font#tl:20:-100#v:GameFontNormal#" .. L["CT_Library/SettingsImport/Profiles/ExternalSubHeading"],
 		["button#t:0:-120#s:150:20#v:UIPanelButtonTemplate#" .. L["CT_Library/SettingsImport/Profiles/ExternalButton"]] = {
 			["onclick"] = openClipboardPanel,
+			["onenter"] = function(button)
+				lib:displayTooltip(button, {L["CT_Library/SettingsImport/Profiles/ExternalButton"],L["CT_Library/SettingsImport/Profiles/ExternalButtonTip"] .. "#0.9:0.9:0.9"},"CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
+			end,
 		},
 
 		["onload"] = function(self)
@@ -3754,6 +3758,23 @@ module.frame = function()
 			module:setOption("canExport", nil, true);
 		end,
 
+		["checkbutton#tl:24:-170#s:18:18#i:checkAllButton#Select all"] = {
+			["onclick"] = function(button)
+				local num = 1
+				while (addonsFrame[tostring(num)]) do
+					if (addonsFrame[tostring(num)]:IsShown()) then
+						addonsFrame[tostring(num)]:SetChecked(button:GetChecked())
+					end
+					num = num + 1
+				end
+			end,
+			["onload"] = function(button)
+				checkAllButton = button;
+				button:SetAlpha(0.75);
+				button.text:SetFontObject(GameFontNormalSmall)
+			end,
+		},
+		
 		["frame#tl:0:-150#r#i:addons#hidden"] = addonsTable,
 
 		["frame#i:actions#hidden"] = {
@@ -3802,13 +3823,13 @@ module.frame = function()
 
 	-- Fill in our addons table
 	tinsert(addonsTable, "font#tl:5:0#v:GameFontNormalLarge#" .. L["CT_Library/SettingsImport/AddOns/Heading"]);
-
+	
 	-- Populate with addons
 	local num = 0;
 	for key, value in ipairs(modules) do
 		if ( value ~= module and value.options ) then
 			num = num + 1;
-			tinsert(addonsTable, "checkbutton#i:"..num.."#tl:20:-"..(num * 20));
+			tinsert(addonsTable, "checkbutton#i:"..num.."#tl:20:-"..((num+1)  * 20));
 		end
 	end
 
@@ -3821,13 +3842,14 @@ end
 
 -- Initialization
 local module = { };
-module.name = "|c00FFFFCCHelp|r";
-module.optionsName = "Help";
+module.name = "Help";
 module.version = LIBRARY_VERSION;
 -- Register as module 2 only, since this will code will get executed once per different
 -- version of CT_Library. We don't want multiple copies showing up in the
 -- control panel.
 registerModule(module, 2);
+
+module:regEvent("PLAYER_LOGIN", function() module.displayName = "|cFFFFFFCC" .. L["CT_Library/Help/Heading"]; end);
 
 local helpFrameList;
 local function helpInit()

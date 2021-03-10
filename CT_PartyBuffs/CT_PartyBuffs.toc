@@ -1,4 +1,4 @@
-## Interface: 90002
+## Interface: 90005
 ## Version: 9.0.1.1
 ## Title: CT_PartyBuffs |cFF333333(SL)
 ## Notes: Shows buffs at party member frames.

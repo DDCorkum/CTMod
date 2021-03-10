@@ -1,4 +1,4 @@
-## Interface: 90002
+## Interface: 90005
 ## Version: 9.0.1.1
 ## Title: CT_MailMod |cFF333333(SL)
 ## Notes: Heavily improves the in-game mail functionality.

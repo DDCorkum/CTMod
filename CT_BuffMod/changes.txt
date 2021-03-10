@@ -1,3 +1,6 @@
+CT_BuffMod (9.0.2.5) 2020-03-06
+- Improved: compatibility to game font addons and non-latin character sets
+
 CT_BuffMod (9.0.1.1) 2020-10-05
 - More control over the sequence of grouping and sorting with non-secure frames.
 
