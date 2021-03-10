@@ -1,10 +1,11 @@
 ## Interface: 90005
 ## Version: 9.0.2.4
-## Title: CT_BottomBar |cFF333333(SL)
+## Title: CT_BottomBar |cFF333333(SL)|r
 ## Notes: Breaks up the main menu bar into movable pieces.
 ## DefaultState: Enabled
 ## SavedVariables: CT_BottomBarOptions
 ## Dependencies: CT_Library
+## X-Part-Of: CT-Library
 
 CT_BottomBar.lua
 CT_BottomBar_MainMenu.lua

@@ -1,9 +1,10 @@
 ## Interface: 90005
 ## Version: 9.0.1.1
-## Title: CT_PartyBuffs |cFF333333(SL)
+## Title: CT_PartyBuffs |cFF333333(SL)|r
 ## Notes: Shows buffs at party member frames.
 ## DefaultState: Enabled
 ## SavedVariables: CT_PartyBuffsOptions
 ## Dependencies: CT_Library
+## X-Part-Of: CT-Library
 
 CT_PartyBuffs.xml

@@ -1,10 +1,11 @@
 ## Interface: 90005
 ## Version: 9.0.5.1
-## Title: CT_BuffMod |cFF333333(SL)
+## Title: CT_BuffMod |cFF333333(SL)|r
 ## Notes: Customizable buff display.
 ## DefaultState: Enabled
 ## SavedVariables: CT_BuffModOptions
 ## Dependencies: CT_Library
+## X-Part-Of: CT-Library
 
 CT_BuffMod.xml
 CT_BuffMod.lua

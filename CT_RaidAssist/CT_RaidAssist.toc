@@ -1,12 +1,13 @@
 ## Interface: 90005
 ## Version: 9.0.2.4
-## Title: CT_RaidAssist |cFF333333(SL)
+## Title: CT_RaidAssist |cFF333333(SL)|r
 ## Author: TS & Cide (Original), Dargen (MT Addon), DDC (Redesign)
 ## Notes: Monitor raid HP and click cast buffs, debuff removals, resurrections
 ## DefaultState: Enabled
 ## LoadOnDemand: 0
 ## Dependencies: CT_Library
 ## SavedVariables: CT_RaidAssistOptions
+## X-Part-Of: CT-Library
 
 # Durability tracking on both retail and classic, modified to include the opt-out feature
 Libs/LibDurability.lua

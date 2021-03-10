@@ -1,10 +1,11 @@
 ## Interface: 90005
 ## Version: 9.0.2.4
-## Title: CT_UnitFrames |cFF333333(SL)
+## Title: CT_UnitFrames |cFF333333(SL)|r
 ## Notes: Changes display of hp/mana values and adds a percentage.
 ## DefaultState: Enabled
 ## SavedVariables: CT_UnitFramesOptions
 ## Dependencies: CT_Library
+## X-Part-Of: CT-Library
 
 CT_UnitFrames.lua
 CT_PlayerFrame.xml

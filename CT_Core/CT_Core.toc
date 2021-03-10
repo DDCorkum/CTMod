@@ -1,10 +1,11 @@
 ## Interface: 90005
 ## Version: 9.0.2.3
-## Title: CT_Core |cFF333333(SL)
+## Title: CT_Core |cFF333333(SL)|r
 ## Notes: General nifty features for CTMod.
 ## DefaultState: Enabled
 ## SavedVariables: CT_CoreOptions
 ## Dependencies: CT_Library
+## X-Part-Of: CT-Library
 
 CT_Core.lua
 CT_Core_Chat.lua

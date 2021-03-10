@@ -1,10 +1,11 @@
 ## Interface: 90005
 ## Version: 9.0.1.1
-## Title: CT_MailMod |cFF333333(SL)
+## Title: CT_MailMod |cFF333333(SL)|r
 ## Notes: Heavily improves the in-game mail functionality.
 ## DefaultState: Enabled
 ## SavedVariables: CT_MailModOptions
 ## Dependencies: CT_Library
+## X-Part-Of: CT-Library
 
 CT_MailMod.lua
 localization.lua

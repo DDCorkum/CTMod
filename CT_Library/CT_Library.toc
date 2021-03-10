@@ -1,6 +1,6 @@
 ## Interface: 90005
 ## Version: 9.0.5.1
-## Title: CT_Library |cFF333333(SL)
+## Title: CT_Library |cFFCC6600CTMod|r |cFF333333(SL)|r
 ## Notes: Library features for CTMod. 
 ## DefaultState: Enabled
 ## Author: Cide, TS, Resike, Dahk
