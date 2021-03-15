@@ -1,4 +1,7 @@
-CT_BuffMod (9.0.2.5) 2020-03-06
+CT_BuffMod (9.0.5.2) 2020-03-14
+- Fixed: obscure bug in 9.0.5.1 relating to a custom larger font
+
+CT_BuffMod (9.0.5.1) 2020-03-06
 - Improved: compatibility to game font addons and non-latin character sets
 
 CT_BuffMod (9.0.1.1) 2020-10-05
