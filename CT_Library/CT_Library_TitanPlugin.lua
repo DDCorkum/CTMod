@@ -91,7 +91,13 @@ For this example plugin, we show the standard Titan buttons plus options to dete
 -- but note the Titan get / set routines and other Titan routines being used.
 -- SDK : "TitanPanelRightClickMenu_AddTitle" is used to place the title in the (sub)menu
 
-	local DDM = LibStub:GetLibrary("LibUIDropDownMenu-4.0");
+	local DDM = LibStub:GetLibrary("LibUIDropDownMenu-4.0", true)
+	
+	-- compatibility with older versions of TitanPanel using LibUIDropDownMenu-2.0
+	DDM = DDM or {
+		UIDropDownMenu_AddSeparator = function(self, ...) L_UIDropDownMenu_AddSeparator(...) end,
+		UIDropDownMenu_AddButton = function(self, ...) L_UIDropDownMenu_AddButton(...) end,
+	}
 
 	-- level 1 menu
 	if L_UIDROPDOWNMENU_MENU_LEVEL == 1 then
