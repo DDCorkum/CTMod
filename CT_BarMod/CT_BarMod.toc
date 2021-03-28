@@ -1,11 +1,12 @@
 ## Interface: 90005
 ## Version: 9.0.2.4
-## Title: CT_BarMod |cFF333333(SL)
+## Title: CT_BarMod |cFF333333(SL)|r
 ## Notes: Intuitive yet powerful action bar addon.
 ## DefaultState: Enabled
 ## SavedVariables: CT_BarModOptions
 ## Dependencies: CT_Library
 ## OptionalDeps: Masque
+## X-Part-Of: CT-Library
 
 CT_BarMod.lua
 CT_BarMod_ActionButton.lua

@@ -2523,6 +2523,11 @@ local function auraButton_updateAppearance(button)
 			fsTimeleft:SetFontObject("ChatFontSmall");
 			fsTimeleft.font = "ChatFontSmall";
 		elseif (frameObject.fontSize == 3 and fsTimeleft.font ~= "CT_BuffMod_ChatFontLarge") then
+			if (not CT_BuffMod_ChatFontLarge) then
+				CreateFont("CT_BuffMod_ChatFontLarge");
+				local fname, fsize, fargs = ChatFontNormal:GetFont();
+				CT_BuffMod_ChatFontLarge:SetFont(fname, fsize + 2, fargs);
+			end
 			fsTimeleft:SetFontObject("CT_BuffMod_ChatFontLarge");
 			fsTimeleft.font = "CT_BuffMod_ChatFontLarge";
 		end
@@ -2609,6 +2614,11 @@ local function auraButton_updateAppearance(button)
 					fsName:SetFontObject("GameFontNormalSmall");
 					fsName.font = "GameFontNormalSmall";
 				elseif (frameObject.fontSize == 3 and fsName.font ~= "CT_BuffMod_GameFontNormalMed2") then
+					if (not CT_BuffMod_GameFontNormalMed2) then
+						CreateFont("CT_BuffMod_GameFontNormalMed2");
+						local fname, fsize, fargs = GameFontNormal:GetFont();
+						CT_BuffMod_GameFontNormalMed2:SetFont(fname, fsize + 2, fargs);		-- GameFontLarge is just a bit too big
+					end
 					fsName:SetFontObject("CT_BuffMod_GameFontNormalMed2");
 					fsName.font = "CT_BuffMod_GameFontNormalMed2";
 				end

@@ -122,7 +122,7 @@ local function minimapFrameSkeleton()
 									end
 								end
 							elseif (_G[UIDROPDOWNMENU_MENU_VALUE] and _G[UIDROPDOWNMENU_MENU_VALUE].externalDropDown_Initialize) then
-								_G[UIDROPDOWNMENU_MENU_VALUE].externalDropDown_Initialize()
+								_G[UIDROPDOWNMENU_MENU_VALUE]:externalDropDown_Initialize()
 							end
 						end,
 						"MENU"  --causes it to be like a context menu
@@ -996,17 +996,15 @@ end
 -- Options
 
 -- used by the minimap and titan-panel plugins
-module.externalDropDown_Initialize = function(useLibUIDropDownMenu)		-- useLibUIDropDownMenu used for compatibility with TitanPanel for arith's LibUIDropDownMenu
+function module:externalDropDown_Initialize(addButtonFunc, level)		-- customAddButtonFunc allows integration with LibUIDropDownMenu used by Titan Panel
+	addButtonFunc = addButtonFunc or UIDropDownMenu_AddButton
+	level = level or UIDROPDOWNMENU_MENU_LEVEL
 	local info = { };
 	info.text = "CT_Core";
 	info.isTitle = 1;
 	info.justifyH = "CENTER";
 	info.notCheckable = 1;
-	if (useLibUIDropDownMenu == "L_") then
-		L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL); 	
-	else
-		UIDropDownMenu_AddButton(info, UIDROPDOWNMENU_MENU_LEVEL);
-	end
+	addButtonFunc(info, level);
 	
 	if (not sectionYOffsets) then
 		module:frame();
@@ -1022,11 +1020,7 @@ module.externalDropDown_Initialize = function(useLibUIDropDownMenu)		-- useLibUI
 				CT_LibraryOptionsScrollFrameScrollBar:SetValue(item.offset);
 			end
 		end
-		if (useLibUIDropDownMenu == "L_") then
-			L_UIDropDownMenu_AddButton(info, L_UIDROPDOWNMENU_MENU_LEVEL);
-		else
-			UIDropDownMenu_AddButton(info, UIDROPDOWNMENU_MENU_LEVEL);
-		end
+		addButtonFunc(info, level);
 	end
 	
 end

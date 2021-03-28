@@ -1,9 +1,10 @@
 ## Interface: 90005
 ## Version: 8.3.0.7
-## Title: CT_Timer |cFF333333(SL)
+## Title: CT_Timer |cFF333333(SL)|r
 ## Notes: Shows a timer that counts both up and down.
 ## DefaultState: Enabled
 ## SavedVariables: CT_TimerOptions
 ## Dependencies: CT_Library
+## X-Part-Of: CT-Library
 
 CT_Timer.xml
