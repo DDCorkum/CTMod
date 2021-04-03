@@ -1,3 +1,6 @@
+CT_Core (9.0.5.3) 2021-04-02
+- Change to LibUIDropDownMenu-4.0 integration from 9.0.5.2
+
 CT_Core (9.0.5.2) 2020-03-09
 - Compatibility with LibUIDropDownMenu-4.0 now used by Titan Panel (see CT_Library_TitanPlugin.lua)
 

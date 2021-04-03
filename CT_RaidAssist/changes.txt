@@ -1,3 +1,6 @@
+CT_RaidAssist (9.0.5.3) 2021-04-02
+- Range check now happens every 1s, instead of 2s
+
 CT_RaidAssist (9.0.2.4) 2021-01-31
 - Optional health percentage on raid frames
 - Updated border thickness setting for Shadowlands

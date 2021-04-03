@@ -387,7 +387,7 @@ module.update = function(self, optName, value)
 end
 
 
-function module:externalDropDown_Initialize(addButtonFunc, level)		-- customAddButtonFunc allows integration with LibUIDropDownMenu used by Titan Panel
+function module:externalDropDown_Initialize(level, addButtonFunc)		-- addButtonFunc allows integration with LibUIDropDownMenu used by Titan Panel
 	addButtonFunc = addButtonFunc or UIDropDownMenu_AddButton
 	level = level or UIDROPDOWNMENU_MENU_LEVEL
 	info = { };

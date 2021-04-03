@@ -114,8 +114,12 @@ For this example plugin, we show the standard Titan buttons plus options to dete
 				info.value = module.name;
 			else
 				-- opens the customOpenFunction() if it exists, or just opens the standard module options
-				info.func = module.customOpenFunction or function()
-					CT:showModuleOptions(module.name);
+				info.func = function(...)
+					if (module.customOpenFunction) then
+						module:customOpenFunction(...);
+					else
+						CT:showModuleOptions(module.name);
+					end
 				end;
 			end		
 			if (i > 2) then
@@ -136,7 +140,7 @@ For this example plugin, we show the standard Titan buttons plus options to dete
 		-- SDK : The routine above is used to put a "Hide" (localized) in the menu.
 	
 	elseif (_G[L_UIDROPDOWNMENU_MENU_VALUE] and _G[L_UIDROPDOWNMENU_MENU_VALUE].externalDropDown_Initialize) then
-		_G[L_UIDROPDOWNMENU_MENU_VALUE]:externalDropDown_Initialize(function(...) DDM:UIDropDownMenu_AddButton(...); end, L_UIDROPDOWNMENU_MENU_LEVEL)
+		_G[L_UIDROPDOWNMENU_MENU_VALUE]:externalDropDown_Initialize(L_UIDROPDOWNMENU_MENU_LEVEL, function(...) DDM:UIDropDownMenu_AddButton(...); end)
 	end
 
 end

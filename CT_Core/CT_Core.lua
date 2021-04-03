@@ -122,7 +122,7 @@ local function minimapFrameSkeleton()
 									end
 								end
 							elseif (_G[UIDROPDOWNMENU_MENU_VALUE] and _G[UIDROPDOWNMENU_MENU_VALUE].externalDropDown_Initialize) then
-								_G[UIDROPDOWNMENU_MENU_VALUE]:externalDropDown_Initialize()
+								_G[UIDROPDOWNMENU_MENU_VALUE]:externalDropDown_Initialize(UIDROPDOWNMENU_MENU_LEVEL)
 							end
 						end,
 						"MENU"  --causes it to be like a context menu
@@ -996,7 +996,7 @@ end
 -- Options
 
 -- used by the minimap and titan-panel plugins
-function module:externalDropDown_Initialize(addButtonFunc, level)		-- customAddButtonFunc allows integration with LibUIDropDownMenu used by Titan Panel
+function module:externalDropDown_Initialize(level, addButtonFunc)		-- customAddButtonFunc allows integration with LibUIDropDownMenu used by Titan Panel
 	addButtonFunc = addButtonFunc or UIDropDownMenu_AddButton
 	level = level or UIDROPDOWNMENU_MENU_LEVEL
 	local info = { };
