@@ -7,7 +7,7 @@
 
 
 Libs\LibStub\LibStub.lua
-Libs\UIDropDown_TownlongYak_Workarounds.lua
+Libs\TaintLess.xml
 Libs\LibDeflate.lua
 Libs\Ace3\AceSerializer-3.0.lua
 
