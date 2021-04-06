@@ -42,4 +42,4 @@ CTMod Contributor, 2017 to present
 
 
 
-Update 5 April 2021:  LibDurability.lua is CC BY-NC-SA 3.0 per CurseForge; and this extends also to the modifications at the top and bottom of that file.  No change to the license for the rest of CTMod should be inferred.  ...ddc
+Update 5 April 2021:  LibDurability.lua is CC BY-NC-SA 3.0 per CurseForge (http://creativecommons.org/licenses/by-nc-sa/3.0/); and this extends also to the modifications at the top and bottom of that file.  No change to the license for the rest of CTMod should be inferred.  ...ddc
