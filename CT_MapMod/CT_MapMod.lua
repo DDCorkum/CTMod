@@ -675,7 +675,7 @@ function CT_MapMod_PinMixin:ApplyCurrentScale()
 	local startScale = 0.80;
 	local endScale = 1.60;
 	local scaleFactor = 1;
-	if ((module:getGameVersion() == CT_GAME_VERSION_CLASSIC) or (WorldMapFrame:IsMaximized())) then
+	if (WorldMapFrame.IsMaximized == nil or (WorldMapFrame:IsMaximized())) then
 		-- This is WoW Classic, or this is WoW Retail and the window is maximized
 		scale = 1.5 / self:GetMap():GetCanvasScale() * Lerp(startScale, endScale, Saturate(scaleFactor * self:GetMap():GetCanvasZoomPercent()))
 	else
@@ -1058,11 +1058,7 @@ do
 			frame:SetPoint("TOP", map, "BOTTOM", 0, -10);
 			frame:SetClampedToScreen(true);
 			frame:SetClampRectInsets(-20, 20, 20, -20);
-			if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-				frame:SetFrameStrata("FULLSCREEN_DIALOG");
-			else
-				frame:SetFrameStrata("DIALOG");
-			end
+			frame:SetFrameStrata(WorldMapFrame:GetFrameStrata() == "FULLSCREEN" and "FULLSCREEN_DIALOG" or "DIALOG");
 			frame:Show();
 			updateFields();
 		end
@@ -1090,7 +1086,7 @@ function module.configureWorldMapFrame()
 		["button#n:CT_MapMod_WhereAmIButton#s:100:20#v:UIPanelButtonTemplate#" .. L["CT_MapMod/Map/Where am I?"]] = {
 			["onload"] = function (self)
 				module.mapResetButton = self;
-				if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+				if (WorldMapFrame:GetFrameStrata() == "FULLSCREEN") then
 					self:SetFrameStrata("FULLSCREEN_DIALOG");
 				end
 				local function updatePosition(value)
@@ -1188,6 +1184,10 @@ function module.configureWorldMapFrame()
 								info.hasArrow = false;
 								info.func = function()
 									module:showModuleOptions(MODULE_NAME);
+									if (WorldMapFrame:GetFrameStrata() == "FULLSCREEN") then
+										-- so the options are visible on classic
+										CTCONTROLPANEL:SetFrameStrata("FULLSCREEN_DIALOG");
+									end
 								end
 								UIDropDownMenu_AddButton(info, 1);
 
@@ -1299,14 +1299,14 @@ function module.configureWorldMapFrame()
 				self:RegisterForDrag("LeftButton","RightButton");
 				self:SetClampedToScreen(true);
 				self:SetMovable(true);
-				if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+				if (WorldMapFrame:GetFrameStrata() == "FULLSCREEN") then
 					self:SetFrameStrata("FULLSCREEN_DIALOG");
 				end
 			end,
 		},
 		["frame#n:CT_MapMod_pxy#s:80:16#b:b:-100:0"] = { 
 			["onload"] = function(self)
-				if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+				if (WorldMapFrame:GetFrameStrata() == "FULLSCREEN") then
 					self:SetFrameStrata("FULLSCREEN_DIALOG");
 				end
 				module.pxy = self
@@ -1356,7 +1356,7 @@ function module.configureWorldMapFrame()
 		},
 		["frame#n:CT_MapMod_cxy#s:80:16#b:b:100:0"] =  { 
 			["onload"] = function(self)
-				if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+				if (WorldMapFrame:GetFrameStrata() == "FULLSCREEN") then
 					self:SetFrameStrata("FULLSCREEN_DIALOG");
 				end
 				module.cxy = self
