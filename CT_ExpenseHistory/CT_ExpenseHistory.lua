@@ -40,7 +40,6 @@ local L = module.text
 CT_EH_History = { };
 CT_EH_DISPLAYTHRESHOLD = 1; -- 1 Silver
 CT_EH_NUMCLASSPILES = 8;
-CT_EH_Version = 1.3;
 CT_EH_LogSort = {
 	["curr"] = 1,
 	["way"] = 1 -- Desc
@@ -392,32 +391,15 @@ function CT_EH_OnShow()
 end
 
 function CT_EH_OnEvent(event)
-	if ( event == "PLAYER_ENTERING_WORLD" ) then
+	if ( event == "PLAYER_LOGIN" ) then
+		CT_EH_History["startUsage"] = CT_EH_History["startUsage"] or time();
+		
 		local player = UnitName("player") .. "@" .. GetRealmName();
-		-- Initialize
-		if ( not CT_EH_History["startUsage"] ) then
-			CT_EH_History["startUsage"] = time();
-		elseif ( not CT_EH_History["version"] ) then
-			-- We used version 1.0 previously
-			CT_EH_History["startUsage"] = CT_EH_History["startUsage"] * (24*3600);
-		end
-		CT_EH_History["version"] = CT_EH_Version;
-		if ( not CT_EH_History[player] ) then
-			CT_EH_History[player] = {
-				["class"] = UnitClass("player"),
-				["key"] = player
-			};
-		end
-		-- Save the non-localized class name so we don't need to translate
-		-- the localized class to a non-localized one. This value is new
-		-- as of version 1.3 (Sep 30 2008, while preparing for WotLK).
-		--
-		-- Keep in mind that there may still be old players in the table
-		-- that do not have this non-localized class value, so they will
-		-- still need to have their class translated into a non-localized
-		-- class. This translation is still performed in CT_EH_GetStats().
 		local class, filename = UnitClass("player");
-		CT_EH_History[player].filename = filename;
+		
+		CT_EH_History[player] = CT_EH_History[player] or { ["key"] = player };
+		CT_EH_History[player].class = class	-- if a toon is deleted and remade as a new class, this will update it
+		CT_EH_History[player].filename = filename
 	end
 end
 
