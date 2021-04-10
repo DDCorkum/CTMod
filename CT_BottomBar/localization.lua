@@ -28,6 +28,10 @@ local L = module.text
 -- enUS (Default) Unlocalized Strings
 
 L["CT_BottomBar/Options/ActionBarPage"] = "Arrows Page-Up/Down"
+L["CT_BottomBar/Options/AddonList/CommonBarsSubheading"] = "Common Button Bars"
+L["CT_BottomBar/Options/AddonList/InformationalBarsSubheading"] = "Informational Display Bars"
+L["CT_BottomBar/Options/AddonList/SpecialBarsSubheading"] = "Special Button Bars"
+L["CT_BottomBar/Options/AddonList/StatusTrackingBarsSubheading"] = "Status Tracking Bars"
 L["CT_BottomBar/Options/BagsBar"] = "Bags Bar"
 L["CT_BottomBar/Options/ClassBar"] = "Class Bar"
 L["CT_BottomBar/Options/ClassicKeyRingButton"] = "Key Ring Button"
@@ -42,9 +46,9 @@ L["CT_BottomBar/Options/General/BackgroundTextures/HideMenuAndBagsCheckButton"] 
 L["CT_BottomBar/Options/General/BackgroundTextures/Line1"] = "Control the grey backgrounds behind the default UI bar positions"
 L["CT_BottomBar/Options/General/BackgroundTextures/ShowLionsCheckButton"] = "Show lions instead of gryphons"
 L["CT_BottomBar/Options/General/Heading"] = "Important General Options"
+L["CT_BottomBar/Options/MenuBar"] = "Menu Bar"
 L["CT_BottomBar/Options/MovableBars/Activate"] = "Activate"
 L["CT_BottomBar/Options/MovableBars/Hide"] = "Hide"
-L["CT_BottomBar/Options/MenuBar"] = "Menu Bar"
 L["CT_BottomBar/Options/PetBar"] = "Pet Bar"
 L["CT_BottomBar/Options/RepBar"] = "Reputation Bar"
 L["CT_BottomBar/Options/StanceBar"] = "Stance Bar"

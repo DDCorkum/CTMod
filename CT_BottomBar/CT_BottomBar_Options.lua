@@ -96,6 +96,11 @@ module.updateOptionFromOutside = function(optName, value)
 	end
 end
 
+local addonTitles = { }
+function module:insertAddonTitle(title)
+	addonTitles[#module.addons + 1] = title	
+end
+
 ------------------------------------------------
 -- Show the drag frames.
 
@@ -633,12 +638,13 @@ module.frame = function()
 		optionsAddObject(-15,   17, "font#tl:5:%y#v:GameFontNormalLarge#Movable Bars");
 
 		optionsAddObject(-10, 3*14, "font#t:0:%y#s:0:%s#l:15:0#r#Activate a bar to control it with this addon.  Deactivate it to restore the original condition.#" .. textColor2 .. ":l");
-		optionsAddObject( -5, 3*14, "font#t:0:%y#s:0:%s#l:15:0#r#If a bar does not deactivate as expected, try\n/console reloadui#" .. textColor2 .. ":l");
 
 		do
-			local off = -15;
 			local left, color;
 			for key, obj in ipairs(module.addons) do
+				if (addonTitles[key]) then
+					optionsAddObject(-10,  14, "font#tl:15:%y#" .. addonTitles[key] .. "#" .. textColor3 .. ":l");
+				end
 				if ( obj.frames and (not obj.settings.hideFromBarList)) then
 					if (obj.settings.optionsIndentBarName) then
 						left = 35;
@@ -647,13 +653,14 @@ module.frame = function()
 						left = 15;
 						color = textColor0;
 					end
-					optionsAddObject(off,   14, "font#tl:" .. left .. ":%y#" .. obj.addonName .. "#" .. color .. ":l:150");
+					optionsAddObject( -5,   14, "font#tl:" .. left .. ":%y#" .. obj.addonName .. "#" .. color .. ":l:150");
 					optionsAddObject( 21,   26, "checkbutton#tl:150:%y" .. "#i:enable" .. obj.optionName .. "#o:enable" .. obj.optionName .. ":true#" .. L["CT_BottomBar/Options/MovableBars/Activate"]);
 					optionsAddObject( 26,   26, "checkbutton#tl:230:%y" .. "#i:" .. obj.optionName .. "#o:" .. obj.optionName .. ((obj:isDefaultHidden() and ":true") or "") .. "#" .. L["CT_BottomBar/Options/MovableBars/Hide"]);
 				end
-				off = -5;
 			end
 		end
+
+		optionsAddObject( -5, 3*14, "font#t:0:%y#s:0:%s#l:15:0#r#If a bar does not (de)activate as expected, try\n/console reloadui before resetting#" .. textColor2 .. ":l");
 
 		optionsBeginFrame( -14,   30, "button#t:0:%y#s:200:%s#n:CT_BottomBar_ResetPositions_Button#v:GameMenuButtonTemplate#Reset bar positions");
 			optionsAddScript("onclick",

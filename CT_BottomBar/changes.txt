@@ -1,3 +1,6 @@
+CT_BottomBar (9.0.5.3) 2021-04-10
+- Changes in anticipation of Classic-TBC
+
 CT_BottomBar (9.0.2.4) 2021-02-01
 - The draggable guide frame around the Stance Bar expands for classes with several stances
 

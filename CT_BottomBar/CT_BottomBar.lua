@@ -32,6 +32,7 @@ module.version = MODULE_VERSION;
 
 _G[MODULE_NAME] = module;
 CT_Library:registerModule(module);
+local L = module.text;	-- see localization.lua
 
 module.loadedAddons = {};
 
@@ -545,7 +546,7 @@ local function registerEvents()
 
 	local frame = CT_BottomBar_Frame;
 
-	if (module:getGameVersion() >= 3) then
+	if (VehicleMenuBar) then
 		-- frame:RegisterEvent("UNIT_ENTERING_VEHICLE");
 		-- frame:RegisterEvent("UNIT_EXITING_VEHICLE");
 		frame:RegisterEvent("UNIT_ENTERED_VEHICLE");
@@ -693,34 +694,60 @@ module.update = function(self, optName, value)
 	-- Load the addons (bars).
 	do
 		-- We want to do this before initializing the applied options table.
-		--
-		-- "Experience Bar" needs to load before "Reputation Bar".
-		--
-		if (module:getGameVersion() >= 2) then	
-			module:loadAddon("Action Bar Arrows");
-			module:loadAddon("Bags Bar");
-			module:loadAddon("Class Bar");
-			module:loadAddon("Extra Bar");
-			module:loadAddon("Menu Bar");
-			module:loadAddon("Pet Bar");
-			module:loadAddon("Possess Bar");
-			module:loadAddon("MultiCastBar");  -- Totem bar
-			module:loadAddon("Vehicle Bar");
-			module:loadAddon("Status Bar");	-- replaced the experience and reputation bars in WoW 8.0
-			module:loadAddon("Framerate Bar");
-			module:loadAddon("Talking Head");
-		elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-			module:loadAddon("Action Bar Arrows");
-			module:loadAddon("Bags Bar");
-			module:loadAddon("Experience Bar");
-			module:loadAddon("Reputation Bar");  -- Show after exp bar in options window
-			module:loadAddon("Menu Bar");
-			module:loadAddon("Pet Bar");
-			module:loadAddon("MultiCastBar");  -- Totem bar
-			module:loadAddon("Framerate Bar");
-			module:loadAddon("Classic Performance Bar");
+		
+		-- Common Button Bars
+		module:insertAddonTitle(L["CT_BottomBar/Options/AddonList/CommonBarsSubheading"])
+		module:loadAddon("Action Bar Arrows");
+		module:loadAddon("Bags Bar");
+		module:loadAddon("Menu Bar");
+		if (KeyRingButton) then
 			module:loadAddon("Classic Key Ring Button");
-			module:loadAddon("Stance Bar");
+		end
+			
+		-- Special Button Bars
+		module:insertAddonTitle(L["CT_BottomBar/Options/AddonList/SpecialBarsSubheading"])
+		module:loadAddon("Pet Bar");
+		if (MultiCastActionBarFrame) then
+			-- note: in the source code of CT_BottomBar_MultiCast.lua, the last line is commented out making this fruitless
+			module:loadAddon("MultiCastBar");
+		end
+		if (PossessBarFrame) then
+			-- WoD onwards
+			module:loadAddon("Possess Bar");	
+		end
+		if (module:getGameVersion() == 1) then
+			-- Classic
+			module:loadAddon("Stance Bar")
+		else
+			-- Retail
+			module:loadAddon("Class Bar");
+		end
+		if (ExtraActionBarFrame) then
+			module:loadAddon("Extra Bar");
+		end
+		if (MainMenuBarVehicleLeaveButton) then
+			module:loadAddon("Vehicle Bar");
+		end
+
+		-- Status Tracking (Exp/Rep) Bars
+		module:insertAddonTitle(L["CT_BottomBar/Options/AddonList/StatusTrackingBarsSubheading"])
+		if (StatusTrackingBarMixin) then
+			-- Retail
+			module:loadAddon("Status Bar");
+		else
+			-- Classic
+			module:loadAddon("Experience Bar");
+			module:loadAddon("Reputation Bar");	-- must come after experience bar
+		end
+		
+		-- Informational Bars
+		module:insertAddonTitle(L["CT_BottomBar/Options/AddonList/InformationalBarsSubheading"])
+		module:loadAddon("Framerate Bar");
+		if (MainMenuBarPerformanceBarFrameButton) then
+			module:loadAddon("Classic Performance Bar");
+		end
+		if (TalkingHead_LoadUI) then
+			module:loadAddon("Talking Head");
 		end
 	end
 
