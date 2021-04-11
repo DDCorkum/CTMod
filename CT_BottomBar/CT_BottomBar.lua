@@ -725,7 +725,7 @@ module.update = function(self, optName, value)
 		if (ExtraActionBarFrame) then
 			module:loadAddon("Extra Bar");
 		end
-		if (MainMenuBarVehicleLeaveButton) then
+		if (VehicleSeatIndicator) then
 			module:loadAddon("Vehicle Bar");
 		end
 
