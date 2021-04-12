@@ -314,6 +314,34 @@ module.flightMaps =
 };
 
 
+-- Classic Flight Path x/y scaling and offsets
+-- 	key			Number, Required		GetTaxiMapID() when at a flight master using FlightMapFrame
+--	val			Table, Required			xOff and yOff are added to the x/y coords, and everything is multiplied by xScale/yScale
+module.classicFlightMapSizes = 
+{
+	[1414] = { xOff = -0.15, xScale = 1.52, yOff = -0.09, yScale = 1.09 },	-- Classic Kalimdor
+	[1415] = { xOff = -0.166, xScale = 1.5, yOff = -0, yScale = 1 },	-- Classic Eastern Kingdoms
+	[1945] = { xOff = -0.166, xScale = 1.52, yOff = 0.071, yScale = 0.92 },		-- The Burning Crusade Classic
+	
+};
+
+
+-- Data points to omit from the taxi map
+-- 	key			Number, Required		TaxiNodeID
+module.ignoreClassicTaxiNodes = 
+{
+	[103] = true,
+	[104] = true,
+	[105] = true,
+	[106] = true,
+	[107] = true,
+	[108] = true,
+	[109] = true,
+	[110] = true,
+	
+};
+
+
 ------------------------------------------------
 -- Gathering Professions
 

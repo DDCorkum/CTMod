@@ -76,7 +76,7 @@ function module:Initialize()				-- called via module.update("init") from CT_Libr
 	end)
 	
 	-- TaxiFrame (WoD alternative to FlightMapFrame)
-	if (module:getGameVersion() >= 2) then
+	if (module:getGameVersion() >= 6) then
 		module:configureTaxiFrame()
 	else
 		module:configureClassicTaxiFrame()
@@ -1570,10 +1570,10 @@ function module.configureClassicTaxiFrame()
 					local nodes = C_TaxiMap.GetTaxiNodesForMap(mapID)
 					local wrongFaction = UnitFactionGroup("player") == "Horde" and Enum.FlightPathFaction.Alliance or Enum.FlightPathFaction.Horde
 					for __, node in pairs(nodes) do
-						if (node.faction ~= wrongFaction) then
+						if (node.faction ~= wrongFaction and not module.ignoreClassicTaxiNodes[node.nodeID]) then
 							local pin = flightMarkers:Acquire()
 							local x, y = node.position:GetXY()
-							pin:SetPoint("CENTER", TaxiRouteMap, "TOPLEFT", (mapID == 1415 and x-0.15 or x-0.166) * TaxiRouteMap:GetWidth() * (mapID == 1415 and 1.52 or 1.5), - (mapID == 1415 and y-0.09 or y) * TaxiRouteMap:GetHeight() * (mapID == 1415 and 1.09 or 1))
+							pin:SetPoint("CENTER", TaxiRouteMap, "TOPLEFT", (x + module.classicFlightMapSizes[mapID].xOff) * TaxiRouteMap:GetWidth() * (module.classicFlightMapSizes[mapID].xScale), - (y + (module.classicFlightMapSizes[mapID].yOff)) * TaxiRouteMap:GetHeight() * (module.classicFlightMapSizes[mapID].yScale))
 							pin:Show()
 							pin.text = node.name
 						end
