@@ -926,6 +926,25 @@ function module.frame()
 		
 	-- Draggable Borders and Inner Frame (representing the viewport)
 	
+	-- called once only, by either CT_ViewportBorderFrame:OnLoad() or CT_ViewportInnerFrame:OnLoad() -- whichever happens last
+	local function attachBorderAndInner()
+		CT_ViewportInnerFrame:ClearAllPoints();
+		CT_ViewportInnerFrame:SetPoint("TOPLEFT", CT_ViewportBorderFrame, "TOPLEFT", 4, -4);
+		CT_ViewportInnerFrame:SetMaxResize(CT_ViewportBorderFrame:GetWidth()-4, CT_ViewportBorderFrame:GetHeight()-4);
+		CT_ViewportInnerFrame:SetMinResize((CT_ViewportBorderFrame:GetWidth()-4)/2, (CT_ViewportBorderFrame:GetHeight()-4)/2)
+		CT_ViewportInnerFrame:SetResizable(true);
+		module.UpdateInnerFrameBounds();
+		module.ApplyInnerViewport(
+			savedViewport[1],
+			savedViewport[2],
+			savedViewport[3],
+			savedViewport[4],
+			savedViewport[5],
+			savedViewport[6],
+			savedViewport[7]
+		);	
+	end
+	
 	optionsBeginFrame(215, 180, "frame#t:0:%y#s:240:180#n:CT_ViewportBorderFrame");
 		optionsAddScript("onload", function(frame)
 			Mixin(frame, BackdropTemplateMixin or {});
@@ -936,28 +955,13 @@ function module.frame()
 				tileSize = 3.2;
 			});
 			frame:SetBackdropBorderColor(1, 0, 0, 1);
+			if (CT_ViewportInnerFrame) then
+				attachBorderAndInner();
+			end
 		end);
 	optionsEndFrame();
 	
 	optionsBeginFrame(0, 0, "frame#n:CT_ViewportInnerFrame");
-		optionsAddScript("onshow", function(frame)
-			frame:ClearAllPoints();
-			frame:SetPoint("TOPLEFT", CT_ViewportBorderFrame, "TOPLEFT", 4, -4);
-			frame:SetMaxResize(CT_ViewportBorderFrame:GetWidth()-4, CT_ViewportBorderFrame:GetHeight()-4);
-			frame:SetMinResize((CT_ViewportBorderFrame:GetWidth()-4)/2, (CT_ViewportBorderFrame:GetHeight()-4)/2)
-			frame:SetResizable(true);
-			module.UpdateInnerFrameBounds();
-			module.ApplyInnerViewport(
-				savedViewport[1],
-				savedViewport[2],
-				savedViewport[3],
-				savedViewport[4],
-				savedViewport[5],
-				savedViewport[6],
-				savedViewport[7]
-			);
-			frame:SetScript("OnShow", nil);
-		end);
 		optionsAddScript("onload", function(frame)
 			Mixin(frame, BackdropTemplateMixin or {});
 			frame:SetBackdrop({
@@ -1031,6 +1035,10 @@ function module.frame()
 			frame.resizeBottom:SetFrameLevel(frame:GetFrameLevel());
 			frame.resizeBottom:HookScript("OnMouseDown", function(button) module.Resize(button, "BOTTOM") end);
 			frame.resizeBottom:HookScript("OnMouseUp", function(button) module.StopResize(button) end);
+			
+			if (CT_ViewportBorderFrame) then
+				attachBorderAndInner();
+			end
 		end);
 	optionsEndFrame();
 
