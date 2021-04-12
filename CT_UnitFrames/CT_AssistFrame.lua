@@ -66,10 +66,10 @@ function CT_AssistFrame_OnLoad(self)
 	self.prestigeBadge = _G[thisName.."TextureFramePrestigeBadge"];
 	self.leaderIcon = _G[thisName.."TextureFrameLeaderIcon"];
 	self.raidTargetIcon = _G[thisName.."TextureFrameRaidTargetIcon"];
-	self.questIcon = _G[thisName.."TextureFrameQuestIcon"];
+	self.questIcon = UnitIsQuestBoss and _G[thisName.."TextureFrameQuestIcon"];
 	self.levelText = _G[thisName.."TextureFrameLevelText"];
 	self.deadText = _G[thisName.."TextureFrameDeadText"];
-	self.petBattleIcon = _G[thisName.."TextureFramePetBattleIcon"];
+	self.petBattleIcon = PetBattleFrame and _G[thisName.."TextureFramePetBattleIcon"];
 	self.TOT_AURA_ROW_WIDTH = TOT_AURA_ROW_WIDTH;
 	-- set simple frame
 	if ( not self.showLevel ) then
@@ -98,15 +98,15 @@ function CT_AssistFrame_OnLoad(self)
 		nil, -- threatFrame,
 		nil, -- "player",
 		nil, -- _G[thisName.."NumericalThreat"],
-		UnitGetIncomingHeals and _G[thisName.."MyHealPredictionBar"],		-- classic compatibility
-		UnitGetIncomingHeals and _G[thisName.."OtherHealPredictionBar"],
-		UnitGetTotalHealAbsorbs and _G[thisName.."TotalAbsorbBar"],
-		UnitGetTotalHealAbsorbs and _G[thisName.."TotalAbsorbBarOverlay"],
-		UnitGetTotalHealAbsorbs and _G[thisName.."TextureFrameOverAbsorbGlow"],
-		UnitGetTotalHealAbsorbs and _G[thisName.."TextureFrameOverHealAbsorbGlow"],
-		UnitGetTotalHealAbsorbs and _G[thisName.."HealAbsorbBar"],
-		UnitGetTotalHealAbsorbs and _G[thisName.."HealAbsorbBarLeftShadow"],
-		UnitGetTotalHealAbsorbs and _G[thisName.."HealAbsorbBarRightShadow"]
+		UnitGetIncomingHeals and _G[thisName.."MyHealPredictionBar"] or _G[thisName.."MyHealPredictionBar"]:Hide() and nil,		-- classic compatibility
+		UnitGetIncomingHeals and _G[thisName.."OtherHealPredictionBar"] or _G[thisName.."OtherHealPredictionBar"]:Hide() and nil,
+		UnitGetTotalHealAbsorbs and _G[thisName.."TotalAbsorbBar"] or _G[thisName.."TotalAbsorbBar"]:Hide() and nil,
+		UnitGetTotalHealAbsorbs and _G[thisName.."TotalAbsorbBarOverlay"] or _G[thisName.."TotalAbsorbBarOverlay"]:Hide() and nil,
+		UnitGetTotalHealAbsorbs and _G[thisName.."TextureFrameOverAbsorbGlow"] or _G[thisName.."TextureFrameOverAbsorbGlow"]:Hide() and nil,
+		UnitGetTotalHealAbsorbs and _G[thisName.."TextureFrameOverHealAbsorbGlow"] or _G[thisName.."TextureFrameOverHealAbsorbGlow"]:Hide() and nil,
+		UnitGetTotalHealAbsorbs and _G[thisName.."HealAbsorbBar"] or _G[thisName.."HealAbsorbBar"]:Hide() and nil,
+		UnitGetTotalHealAbsorbs and _G[thisName.."HealAbsorbBarLeftShadow"] or _G[thisName.."HealAbsorbBarLeftShadow"]:Hide() and nil,
+		UnitGetTotalHealAbsorbs and _G[thisName.."HealAbsorbBarRightShadow"] or _G[thisName.."HealAbsorbBarRightShadow"]:Hide() and nil
 	);
 
 	self.noTextPrefix = true;
@@ -164,8 +164,11 @@ function CT_AssistFrame_OnLoad(self)
 	-- Set alpha of heal prediction bars to 0 so that they do not
 	-- briefly appear as full length bars when our frame is
 	-- initially shown. We'll restore this 0.001sec after OnShow
-	self.myHealPredictionBar:SetAlpha(0);
-	self.otherHealPredictionBar:SetAlpha(0);
+	if (self.myHealPredictionBar) then
+		-- Retail
+		self.myHealPredictionBar:SetAlpha(0);
+		self.otherHealPredictionBar:SetAlpha(0);
+	end
 end
 
 function CT_AssistFrame_Update(self)
@@ -215,8 +218,8 @@ function CT_AssistFrame_Update(self)
 		if ( self.portrait ) then
 			self.portrait:SetAlpha(1.0);
 		end
-		CT_AssistFrame_CheckBattlePet(self);
 		if ( self.petBattleIcon ) then
+			CT_AssistFrame_CheckBattlePet(self);
 			self.petBattleIcon:SetAlpha(1.0);
 		end
 		CT_AssistHealthCheck(self.healthbar);
@@ -340,10 +343,12 @@ end
 
 function CT_AssistFrame_OnShow(self)
 	-- self == The main unit frame
-	C_Timer.After(0.01, function()
-		self.myHealPredictionBar:SetAlpha(1);
-		self.otherHealPredictionBar:SetAlpha(1);
-	end);
+	if (self.myHealPredictionBar) then
+		C_Timer.After(0.01, function()
+			self.myHealPredictionBar:SetAlpha(1);
+			self.otherHealPredictionBar:SetAlpha(1);
+		end);
+	end
 	CT_AssistFrame_Update(self);
 
 	-- self.ctUpdateTicker = self.ctUpdateTicker or C_Timer.NewTicker(0.1, function() CT_FocusFrame_Update(self) end);	
@@ -373,7 +378,7 @@ function CT_AssistFrame_CheckLevel(self)
 	if ( UnitIsCorpse(self.unit) ) then
 		self.levelText:Hide();
 		self.highLevelTexture:Show();
-	elseif ( UnitIsWildBattlePet(self.unit) or UnitIsBattlePetCompanion(self.unit) ) then
+	elseif ( self.petBattleIcon and (UnitIsWildBattlePet(self.unit) or UnitIsBattlePetCompanion(self.unit)) ) then
 		local petLevel = UnitBattlePetLevel(self.unit);
 		self.levelText:SetVertexColor(1.0, 0.82, 0.0);
 		self.levelText:SetText( petLevel );
