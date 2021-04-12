@@ -224,11 +224,13 @@ function CT_FocusFrame_OnEvent(self, event, ...)
 			RegisterUnitWatch(self);
 		else
 			UnregisterUnitWatch(self);
+			self:Hide();
 		end
 		if (CT_UnitFramesOptions.shallDisplayTargetofFocus) then
 			RegisterUnitWatch(self.totFrame);
 		else
 			UnregisterUnitWatch(self.totFrame);
+			self.totFrame:Hide();
 		end
 		if (not InCombatLockdown()) then
 			CT_UnitFrames_ResetDragLink(_G[self:GetName().."_Drag"]);
@@ -338,7 +340,9 @@ function CT_FocusFrame_OnShow(self)
 	end
 
 	-- self.ctUpdateTicker = self.ctUpdateTicker or C_Timer.NewTicker(0.1, function() CT_FocusFrame_Update(self) end);	
-	self.ctThreatTicker = self.ctThreatTicker or C_Timer.NewTicker(0.5, function() UnitFrame_UpdateThreatIndicator(self.threatIndicator, self.threatNumericIndicator, self.feedbackUnit); end);
+	if (UnitFrame_UpdateThreatIndicator) then
+		self.ctThreatTicker = self.ctThreatTicker or C_Timer.NewTicker(0.5, function() UnitFrame_UpdateThreatIndicator(self.threatIndicator, self.threatNumericIndicator, self.feedbackUnit); end);
+	end
 end
 
 function CT_FocusFrame_OnHide(self)

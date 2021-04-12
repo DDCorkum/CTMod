@@ -239,11 +239,13 @@ function CT_AssistFrame_OnEvent(self, event, ...)
 			RegisterUnitWatch(self);
 		else
 			UnregisterUnitWatch(self);
+			self:Hide();
 		end
 		if (CT_UnitFramesOptions.shallDisplayTargetofAssist) then
 			RegisterUnitWatch(self.totFrame);
 		else
 			UnregisterUnitWatch(self.totFrame);
+			self.totFrame:Hide();
 		end
 		if (not InCombatLockdown()) then
 			CT_UnitFrames_ResetDragLink(_G[self:GetName().."_Drag"]);
@@ -1161,10 +1163,12 @@ function CT_Assist_Spellbar_OnLoad(self)
 	parent.auraRows = 0;
 
 	--self.unit = unit1;
-
-	self:RegisterEvent("PLAYER_TARGET_CHANGED");
-	self:RegisterEvent("CVAR_UPDATE");
-	self:RegisterEvent("VARIABLES_LOADED");
+	
+	if (UnitChannelInfo) then
+		self:RegisterEvent("PLAYER_TARGET_CHANGED");
+		self:RegisterEvent("CVAR_UPDATE");
+		self:RegisterEvent("VARIABLES_LOADED");
+	end
 
 	CastingBarFrame_OnLoad(self, unit1, false, true);
 

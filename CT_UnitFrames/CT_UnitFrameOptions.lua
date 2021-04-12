@@ -536,7 +536,7 @@ function CT_UnitFrameOptions_SetOptionsFrame(name)
 		CT_UnitFramesOptionsFramePlayerOptions:Enable();
 		CT_UnitFramesOptionsFramePartyOptions:Enable();
 		CT_UnitFramesOptionsFrameTargetOptions:Enable();
-		CT_UnitFramesOptionsFrameAssistOptions:Disable();
+		CT_UnitFramesOptionsFrameAssistOptions:Enable();
 		CT_UnitFramesOptionsFrameFocusOptions:Disable();
 	end
 
