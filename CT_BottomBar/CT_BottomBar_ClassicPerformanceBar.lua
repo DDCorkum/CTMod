@@ -24,6 +24,26 @@ local isEnabled = nil;
 --------------------------------------------
 -- Performance Monitor
 
+local function updatePosition(self)
+	if (isEnabled) then
+		local x1, y1, w1, h1 = self.frame:GetRect()
+		h1 = MainMenuBarPerformanceBarFrame:GetHeight()
+		local x2, y2, w2, h2 = KeyRingButton:GetRect()
+		if (KeyRingButton:IsShown() 
+			and ((x1 > x2 and x1 < x2 + w2) or (x1 + w1 > x2 and x1 + w1 < x2 + w2))
+			and ((y2 > y1 and y2 < y1 + h1) or (y2 + h2 > y1 and y2 + y2 < h1 + h1))
+		) then
+			-- colides with the KeyRingButon, so move left.
+			MainMenuBarPerformanceBarFrame:SetPoint("BOTTOMRIGHT", self.frame, 0, 0);
+		else
+			MainMenuBarPerformanceBarFrame:SetPoint("BOTTOMRIGHT", self.frame, 8, 0);
+		end
+		MainMenuBarPerformanceBar:SetDrawLayer("BACKGROUND", -1);
+	else
+		MainMenuBarPerformanceBarFrame:SetPoint("BOTTOMRIGHT", MainMenuBar, KeyRingButton:IsShown() and -235 or -227, -10);
+	end
+end
+
 local function addon_Update(self)
 	-- Update the frame
 	-- self == actionbar arrows bar object
@@ -31,17 +51,13 @@ local function addon_Update(self)
 	self.helperFrame:ClearAllPoints();
 	self.helperFrame:SetPoint("TOPLEFT", MainMenuBarPerformanceBarFrame, "TOPLEFT", -5, 5);
 	self.helperFrame:SetPoint("BOTTOMRIGHT", MainMenuBarPerformanceBarFrame, "BOTTOMRIGHT", 5, 0);
-
 end
 
-local function updatePosition(self)
-	if (isEnabled) then
-		MainMenuBarPerformanceBarFrame:SetPoint("BOTTOMRIGHT", self.frame, 0, 0);
-		self.frame:SetClampRectInsets(5,5,35,15);
-	else
-		MainMenuBarPerformanceBarFrame:SetPoint("BOTTOMRIGHT", MainMenuBar, -235, -10);
-	end
-end
+
+
+KeyRingButton:HookScript("OnShow", function()
+	updatePosition(module.ctClassicPerformanceBar);
+end)
 
 local function addon_Enable(self)
 	isEnabled = true;
@@ -61,11 +77,18 @@ local function addon_Init(self)
 
 	module.ctClassicPerformanceBar = self;
 
-	self.frame:SetFrameLevel(1);
-
 	local frame = CreateFrame("Frame", "CT_BottomBar_" .. self.frameName .. "_GuideFrame");
 	self.helperFrame = frame;
-
+	
+	self.frame:SetClampRectInsets(5,5,35,15);
+	
+	frame2 = CT_BottomBar_ClassicPerformanceBar_Framebutton;
+	frame2:HookScript("OnMouseUp", function()
+		updatePosition(self)
+	end);
+	
+	foo = function() updatePosition(self) end
+	
 	return true;
 end
 

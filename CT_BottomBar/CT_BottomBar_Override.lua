@@ -26,18 +26,26 @@ local frame_EnableMouse;
 --------------------------------------------
 -- Miscellaneous
 
+local checkVehicleUI = not not VehicleSeatIndicator
+
 function module:hasVehicleUI()
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return false; end
-	local hasVehicleUI = CT_BottomBar_SecureFrame:GetAttribute("has-vehicleui");
-	local hasSkin = UnitVehicleSkin("player") and UnitVehicleSkin("player") ~= "";
-	return hasVehicleUI and hasSkin;
+	if (checkVehicleUI) then
+		local hasVehicleUI = CT_BottomBar_SecureFrame:GetAttribute("has-vehicleui");
+		local hasSkin = UnitVehicleSkin("player") and UnitVehicleSkin("player") ~= "";
+		return hasVehicleUI and hasSkin;
+	else
+		return false;
+	end
 end
 
 function module:hasOverrideUI()
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return false; end
-	local hasOverrideUI = CT_BottomBar_SecureFrame:GetAttribute("has-overridebar");
-	local hasSkin = GetOverrideBarSkin() and GetOverrideBarSkin() ~= "";
-	return hasOverrideUI and hasSkin;
+	if (checkVehicleUI) then
+		local hasOverrideUI = CT_BottomBar_SecureFrame:GetAttribute("has-overridebar");
+		local hasSkin = GetOverrideBarSkin() and GetOverrideBarSkin() ~= "";
+		return hasOverrideUI and hasSkin;
+	else
+		return false;
+	end
 end
 
 --------------------------------------------

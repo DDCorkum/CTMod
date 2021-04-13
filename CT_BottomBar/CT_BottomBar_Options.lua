@@ -1076,7 +1076,7 @@ function module:optionsInitApplied()
 	appliedOptions.disableDefaultActionBar = module:getOption("disableDefaultActionBar") ~= false;
 
 	appliedOptions.bagsBarHideBags = not not module:getOption("bagsBarHideBags");
-	appliedOptions.bagsBarSpacing = module:getOption("bagsBarSpacing") or 2;
+	appliedOptions.bagsBarSpacing = module:getOption("bagsBarSpacing");	-- if nil, the addon knows what to do for each version of the game
 
 	if (module.ctExpBar and module.ctRepBar) then
 		-- Make sure the enable Rep and Exp bar appliedOptions, and the .isDisabled property are synchronized.

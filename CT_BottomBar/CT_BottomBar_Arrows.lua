@@ -43,7 +43,7 @@ local function addon_Update(self)
 	objUp:ClearAllPoints();
 
 	objDown:SetPoint("TOPRIGHT", self.frame, 0, 0);
-	objUp:SetPoint("BOTTOMLEFT", objDown, "TOPLEFT", 0, (module:getGameVersion() == CT_GAME_VERSION_CLASSIC and -12) or 0);
+	objUp:SetPoint("BOTTOMRIGHT", self.frame, 0, (module:getGameVersion() <= 7 and -12) or 0);
 end
 
 local function addon_Enable(self)
@@ -54,7 +54,7 @@ local function addon_Enable(self)
 	else
 		CT_BB_PageNumber = self.frame:CreateFontString(nil,"OVERLAY","GameFontNormalSmall");
 		CT_BB_PageNumber:SetText(GetActionBarPage());
-		CT_BB_PageNumber:SetPoint("LEFT",self.frame,"RIGHT",(module:getGameVersion() == CT_GAME_VERSION_CLASSIC and 2) or 5, (module:getGameVersion() == CT_GAME_VERSION_CLASSIC and -6) or 0);
+		CT_BB_PageNumber:SetPoint("CENTER", self.frame, "RIGHT", (module:getGameVersion() <= 7 and 4) or 5, (module:getGameVersion() <= 7 and -6) or 0);
 		self.frame:RegisterEvent("ACTIONBAR_PAGE_CHANGED");
 		self.frame:SetScript("OnEvent",function(newself, event, ...)
 			if (event == "ACTIONBAR_PAGE_CHANGED") then
@@ -92,7 +92,7 @@ local function addon_Register()
 		module.text["CT_BottomBar/Options/ActionBarPage"],  -- shown in options window & tooltips
 		"Page",  -- title for horizontal orientation
 		nil,  -- title for vertical orientation
-		{ "BOTTOMLEFT", ctRelativeFrame, "BOTTOM",  (module:getGameVersion() == CT_GAME_VERSION_CLASSIC and -5) or -6, (module:getGameVersion() == CT_GAME_VERSION_CLASSIC and 25.5) or 24},
+		{ "BOTTOMLEFT", ctRelativeFrame, "BOTTOM",  (module:getGameVersion() <= 7 and -4.9) or -6, (module:getGameVersion() <= 7 and 26) or 24},
 		{ -- settings
 			orientation = "ACROSS",
 		},

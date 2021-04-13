@@ -606,25 +606,27 @@ local function hook_UIParent_ManageFramePositions()
 	PetActionBarFrame:HookScript("OnHide", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
 
 	
-	if (module:getGameVersion() >= 2) then
+	if (PossessBarFrame) then
 	
 		-- From PossessActionBarFrame.xml
 		PossessBarFrame:HookScript("OnShow", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
 		PossessBarFrame:HookScript("OnHide", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
-
+	end
+	
+	if (MultiCastActionBarFrame) then
 		-- From MultiCastActionBarFrame.xml
 		MultiCastActionBarFrame:HookScript("OnShow", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
 		MultiCastActionBarFrame:HookScript("OnHide", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
 	
-	elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-
-		-- From MainMenuBar.xml
-		-- (Requires overhaul in WoW 8.0.1) MainMenuBarMaxLevelBar:HookScript("OnShow", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
-		-- (Requires overhaul in WoW 8.0.1) MainMenuBarMaxLevelBar:HookScript("OnHide", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
-	
-		-- From ReputationFrame.xml
-		-- (Requires overhaul in WoW 8.0.1) ReputationWatchBar:HookScript("OnHide", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
 	end
+	
+
+	-- From MainMenuBar.xml
+	-- (Replaced with StatusTrackingBar in 8.0.1) MainMenuBarMaxLevelBar:HookScript("OnShow", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
+	-- (Replaced with StatusTrackingBar in 8.0.1) MainMenuBarMaxLevelBar:HookScript("OnHide", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
+	
+	-- From ReputationFrame.xml
+	-- (Replaced with StatusTrackingBar in 8.0.1) ReputationWatchBar:HookScript("OnHide", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
 	
 end
 
@@ -715,7 +717,7 @@ module.update = function(self, optName, value)
 			-- WoD onwards
 			module:loadAddon("Possess Bar");	
 		end
-		if (module:getGameVersion() == 1) then
+		if (module:getGameVersion() <= 2) then
 			-- Classic
 			module:loadAddon("Stance Bar")
 		else
