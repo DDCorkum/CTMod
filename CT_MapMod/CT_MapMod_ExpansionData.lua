@@ -316,13 +316,12 @@ module.flightMaps =
 
 -- Classic Flight Path x/y scaling and offsets
 -- 	key			Number, Required		GetTaxiMapID() when at a flight master using FlightMapFrame
---	val			Table, Required			xOff and yOff are added to the x/y coords, and everything is multiplied by xScale/yScale
-module.classicFlightMapSizes = 
+--	val			Table, Required			mapID is the worldmap uiMapID, xOff and yOff are added to the x/y coords, and everything is multiplied by xScale/yScale
+module.classicTaxiMaps = 
 {
-	[1414] = { xOff = -0.15, xScale = 1.52, yOff = -0.09, yScale = 1.09 },	-- Classic Kalimdor
-	[1415] = { xOff = -0.166, xScale = 1.5, yOff = -0, yScale = 1 },	-- Classic Eastern Kingdoms
-	[1945] = { xOff = -0.166, xScale = 1.52, yOff = 0.071, yScale = 0.92 },		-- The Burning Crusade Classic
-	
+	[1463] = { mapID = 1415, xOff = -0.152, xScale = 1.52, yOff = -0.084, yScale = 1.094 },		-- Classic Eastern Kingdoms
+	[1464] = { mapID = 1414, xOff = -0.164, xScale = 1.5, yOff = -0.01, yScale = 1 },		-- Classic Kalimdor
+	[987] = { mapID = 1945, xOff = -0.166, xScale = 1.52, yOff = 0.071, yScale = 0.92 },		-- The Burning Crusade Classic
 };
 
 

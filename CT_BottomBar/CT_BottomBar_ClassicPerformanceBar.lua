@@ -54,11 +54,6 @@ local function addon_Update(self)
 end
 
 
-
-KeyRingButton:HookScript("OnShow", function()
-	updatePosition(module.ctClassicPerformanceBar);
-end)
-
 local function addon_Enable(self)
 	isEnabled = true;
 	updatePosition(self);
@@ -87,8 +82,9 @@ local function addon_Init(self)
 		updatePosition(self)
 	end);
 	
-	foo = function() updatePosition(self) end
-	
+	KeyRingButton:HookScript("OnShow", function()
+		updatePosition(module.ctClassicPerformanceBar);
+	end)	
 	return true;
 end
 

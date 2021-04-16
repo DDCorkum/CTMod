@@ -1434,7 +1434,7 @@ end
 
 function module.configureFlightMapFrame()
 
-	local showUnreachable = module:getOption("CT_MapMod_ShowUnreachableFlightPaths") == true
+	local showUnreachable = module:getOption("CT_MapMod_ShowUnreachableFlightPaths") ~= false
 
 	local hookedPins = {}				-- used to hook things only once, and also to undo hooks when an optin is turned off
 
@@ -1496,7 +1496,7 @@ end
 
 function module.configureTaxiFrame()
 
-	local showUnreachable = module:getOption("CT_MapMod_ShowUnreachableFlightPaths") == true
+	local showUnreachable = module:getOption("CT_MapMod_ShowUnreachableFlightPaths") ~= false
 
 	local hookedButtons = {}
 	
@@ -1543,7 +1543,7 @@ end
 
 function module.configureClassicTaxiFrame()
 
-	local showUnreachable = module:getOption("CT_MapMod_ShowUnreachableFlightPaths") == true
+	local showUnreachable = module:getOption("CT_MapMod_ShowUnreachableFlightPaths") ~= false
 		
 	local function creationFunc(self)
 		local frame = CreateFrame("Frame", nil, TaxiFrame)
@@ -1562,18 +1562,17 @@ function module.configureClassicTaxiFrame()
 	
 	local function CT_MapMod_TaxiFrameClassic_OnShow()
 		if (showUnreachable) then
-			local mapID = C_Map.GetBestMapForUnit("player")
-			if (mapID) then
-				local mapInfo = C_Map.GetMapInfo(mapID)
-				if (mapInfo) then
-					mapID = mapInfo.parentMapID
-					local nodes = C_TaxiMap.GetTaxiNodesForMap(mapID)
+			local taxiMap = GetTaxiMapID()
+			if (taxiMap) then
+				local data = module.classicTaxiMaps[taxiMap]
+				if (data) then
+					local nodes = C_TaxiMap.GetTaxiNodesForMap(data.mapID)
 					local wrongFaction = UnitFactionGroup("player") == "Horde" and Enum.FlightPathFaction.Alliance or Enum.FlightPathFaction.Horde
 					for __, node in pairs(nodes) do
 						if (node.faction ~= wrongFaction and not module.ignoreClassicTaxiNodes[node.nodeID]) then
 							local pin = flightMarkers:Acquire()
 							local x, y = node.position:GetXY()
-							pin:SetPoint("CENTER", TaxiRouteMap, "TOPLEFT", (x + module.classicFlightMapSizes[mapID].xOff) * TaxiRouteMap:GetWidth() * (module.classicFlightMapSizes[mapID].xScale), - (y + (module.classicFlightMapSizes[mapID].yOff)) * TaxiRouteMap:GetHeight() * (module.classicFlightMapSizes[mapID].yScale))
+							pin:SetPoint("CENTER", TaxiRouteMap, "TOPLEFT", (x + data.xOff) * TaxiRouteMap:GetWidth() * (data.xScale), - (y + (data.yOff)) * TaxiRouteMap:GetHeight() * (data.yScale))
 							pin:Show()
 							pin.text = node.name
 						end
@@ -1648,11 +1647,6 @@ end
 
 module.update = function(self, optName, value)
 	if (optName == "init") then
-
-		-- converting a dropdown into a checkbox in 9.0.1.3
-		if (module:getOption("CT_MapMod_ShowOnFlightMaps") == 2) then
-			module:setOption("CT_MapMod_ShowOnFlightMaps", false, true)
-		end
 	
 		-- initialize the overall UI
 		module:Initialize();
@@ -1842,7 +1836,7 @@ module.frame = function()
 			optionsBeginFrame( -15,  26, "checkbutton#tl:10:%y#o:CT_MapMod_ShowOnFlightMaps:true#" .. L["CT_MapMod/Options/FlightMaps/ShowOnFlightMapsCheckButton"] .. "#l:268");
 				optionsAddTooltip({L["CT_MapMod/Options/FlightMaps/ShowOnFlightMapsCheckButton"], L["CT_MapMod/Options/FlightMaps/ShowOnFlightMapsTip"]});
 			optionsEndFrame()
-			optionsBeginFrame( -5,  26, "checkbutton#tl:10:%y#o:CT_MapMod_ShowUnreachableFlightPaths#" .. L["CT_MapMod/Options/FlightMaps/ShowUnreachableFlightPathsCheckButton"] .. "#l:268");
+			optionsBeginFrame( -5,  26, "checkbutton#tl:10:%y#o:CT_MapMod_ShowUnreachableFlightPaths:true#" .. L["CT_MapMod/Options/FlightMaps/ShowUnreachableFlightPathsCheckButton"] .. "#l:268");
 				optionsAddTooltip({L["CT_MapMod/Options/FlightMaps/ShowUnreachableFlightPathsCheckButton"], L["CT_MapMod/Options/FlightMaps/ShowUnreachableFlightPathsTip"]});
 			optionsEndFrame()
 		end
