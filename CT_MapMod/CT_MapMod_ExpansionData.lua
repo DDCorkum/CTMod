@@ -398,7 +398,8 @@ module.gatheringSkills =
 ------------------------------------------------
 -- Localization
 
-if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+if (not GetProfessions) then
+	-- This isn't required from classic onwards
 	local findOre = Spell:CreateFromSpellID(2580);
 	findOre:ContinueOnSpellLoad(
 		function() 

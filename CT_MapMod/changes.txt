@@ -1,6 +1,7 @@
-CT_MapMod (9.0.5.3) 2021-04-15
+CT_MapMod (9.0.5.3) 2021-04-18
 - Classic and TBC only: opening the options menu from inside the fullscreen map will cause the menu to pop in front
-- Undiscovered flight paths updated for TBC and now on by default
+- Undiscovered flight paths updated for TBC and now on by default in all game editions
+- Other compatibility changes for TBC Classic
 
 CT_MapMod (9.0.2.4) 2021-01-17
 - Added custom icons for Shadowlands herbs
