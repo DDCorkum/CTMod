@@ -1774,29 +1774,29 @@ do
 	--	Does not open or close any bags.
 
 	local events = {
-		["BANKFRAME_OPENED"]      = {option = "bankOpenBags", open = true, backpack = "bankOpenBackpack", nobags = "bankOpenNoBags", bank = "bankOpenBankBags", classic = true},
-		["BANKFRAME_CLOSED"]      = {option = "bankCloseBags", classic = true},
+		["BANKFRAME_OPENED"]      = {option = "bankOpenBags", open = true, backpack = "bankOpenBackpack", nobags = "bankOpenNoBags", bank = "bankOpenBankBags"},
+		["BANKFRAME_CLOSED"]      = {option = "bankCloseBags"},
 
-		["GUILDBANKFRAME_OPENED"] = {option = "gbankOpenBags", open = true, backpack = "gbankOpenBackpack", nobags = "gbankOpenNoBags"},
-		["GUILDBANKFRAME_CLOSED"] = {option = "gbankCloseBags"},
+		["GUILDBANKFRAME_OPENED"] = GuildBankframe and {option = "gbankOpenBags", open = true, backpack = "gbankOpenBackpack", nobags = "gbankOpenNoBags"},
+		["GUILDBANKFRAME_CLOSED"] = GuildBankFrame and {option = "gbankCloseBags"},
 
-		["MERCHANT_SHOW"]         = {option = "merchantOpenBags", open = true, backpack = "merchantOpenBackpack", nobags = "merchantOpenNoBags", classic = true},
-		["MERCHANT_CLOSED"]       = {option = "merchantCloseBags", classic = true},
+		["MERCHANT_SHOW"]         = {option = "merchantOpenBags", open = true, backpack = "merchantOpenBackpack", nobags = "merchantOpenNoBags"},
+		["MERCHANT_CLOSED"]       = {option = "merchantCloseBags"},
 
-		["AUCTION_HOUSE_SHOW"]    = {option = "auctionOpenBags", open = true, backpack = "auctionOpenBackpack", nobags = "auctionOpenNoBags", classic = true},
-		["AUCTION_HOUSE_CLOSED"]  = {option = "auctionCloseBags", classic = true},
+		["AUCTION_HOUSE_SHOW"]    = {option = "auctionOpenBags", open = true, backpack = "auctionOpenBackpack", nobags = "auctionOpenNoBags"},
+		["AUCTION_HOUSE_CLOSED"]  = {option = "auctionCloseBags"},
 
-		["TRADE_SHOW"]            = {option = "tradeOpenBags", open = true, backpack = "tradeOpenBackpack", nobags = "tradeOpenNoBags", classic = true},
-		["TRADE_CLOSED"]          = {option = "tradeCloseBags", classic = true},
+		["TRADE_SHOW"]            = {option = "tradeOpenBags", open = true, backpack = "tradeOpenBackpack", nobags = "tradeOpenNoBags"},
+		["TRADE_CLOSED"]          = {option = "tradeCloseBags"},
 
-		["VOID_STORAGE_OPEN"]     = {option = "voidOpenBags", open = true, backpack = "voidOpenBackpack", nobags = "voidOpenNoBags"},
-		["VOID_STORAGE_CLOSE"]    = {option = "voidCloseBags"},
+		["VOID_STORAGE_OPEN"]     = VoidStorageFrame and {option = "voidOpenBags", open = true, backpack = "voidOpenBackpack", nobags = "voidOpenNoBags"},
+		["VOID_STORAGE_CLOSE"]    = VoidStorageFrame and {option = "voidCloseBags"},
 
-		["OBLITERUM_FORGE_SHOW"]     = {option = "obliterumOpenBags", open = true, backpack = "obliterumOpenBackpack", nobags = "obliterumOpenNoBags"},
-		["OBLITERUM_FORGE_CLOSE"]    = {option = "obliterumCloseBags"},
+		["OBLITERUM_FORGE_SHOW"]     = ObliterumForgeFrame and {option = "obliterumOpenBags", open = true, backpack = "obliterumOpenBackpack", nobags = "obliterumOpenNoBags"},
+		["OBLITERUM_FORGE_CLOSE"]    = ObliterumForgeFrame and {option = "obliterumCloseBags"},
 		
-		["SCRAPPING_MACHINE_SHOW"]     = {option = "scrappingOpenBags", open = true, backpack = "scrappingOpenBackpack", nobags = "scrappingOpenNoBags"},
-		["SCRAPPING_MACHINE_CLOSE"]    = {option = "scrappingCloseBags"},
+		["SCRAPPING_MACHINE_SHOW"]     = ScrappingMachineFrame and {option = "scrappingOpenBags", open = true, backpack = "scrappingOpenBackpack", nobags = "scrappingOpenNoBags"},
+		["SCRAPPING_MACHINE_CLOSE"]    = ScrappingMachineFrame and {option = "scrappingCloseBags"},
 
 	};
 
@@ -1813,11 +1813,6 @@ do
 			return;
 		end
 		
-		if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC and not data.classic) then
-			-- This didn't exist in vanilla/classic WoW, so go no further
-			return;
-		end
-
 		if (data.open) then
 			-- This is an open event.
 			local openAllBags;
@@ -1869,10 +1864,8 @@ do
 	end
 
 	for event, data in pairs(events) do
-		if (module:getGameVersion() >= 8 or data.classic) then
-			-- register all events, or just the ones that are in WoW Classic
-			module:regEvent(event, onEvent);
-		end
+		-- register all events, or just the ones that are in WoW Classic
+		module:regEvent(event, onEvent);
 	end
 end
 
@@ -2560,7 +2553,7 @@ do
 			},
 
 			["onload"] = function(self)
-				if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+				if (WatchFrame == QuestWatchFrame) then	-- classic
 					module:getFrame(
 					{
 						["button#s:16:16#n:CT_Core_MinimizeWatchFrameButton#tl:tr:CT_WatchFrame"] = 
