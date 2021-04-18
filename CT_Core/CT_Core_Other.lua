@@ -2563,25 +2563,31 @@ do
 								button:GetNormalTexture():SetTexCoord(0.0, 0.5, 0.5, 1.0);
 								button:SetPushedTexture("Interface\\Buttons\\UI-Panel-QuestHideButton");
 								button:GetPushedTexture():SetTexCoord(0.5, 1.0, 0.5, 1.0);
-								button:SetHighlightTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight")
+								button:SetHighlightTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight");
 								button:GetHighlightTexture():SetBlendMode("ADD");
 								button:SetDisabledTexture("Interface\\Buttons\\UI-Panel-QuestHideButton-disabled");
 								button:Hide();
+								button.fs = button:CreateFontString(nil, "BACKGROUND", "GameFontNormalSmall");
+								button.fs:SetPoint("RIGHT", button, "LEFT", -2, 0);
+								button.fs:SetText(OBJECTIVES_TRACKER_LABEL or "foo");
+								button.fs:Hide();
 							end;
 							["onclick"] = function(button)
 								if (CT_WatchFrame:IsShown()) then
 									classicIsMinimized = true;
 									button:GetNormalTexture():SetTexCoord(0.0, 0.5, 0.0, 0.5);
 									button:GetPushedTexture():SetTexCoord(0.5, 1.0, 0.0, 0.5);
+									button.fs:Show();
 								else
 									classicIsMinimized = false;
 									button:GetNormalTexture():SetTexCoord(0.0, 0.5, 0.5, 1.0);
 									button:GetPushedTexture():SetTexCoord(0.5, 1.0, 0.5, 1.0);
+									button.fs:Hide();
 								end
 								updateVisibility();
 								PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
 							end
-						}
+						},
 					},
 					UIParent);
 				end
