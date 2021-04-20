@@ -1294,9 +1294,6 @@ end
 --[[	-- replaced by CT_FocusFrame_TextStatusBar_OnLoad(bar)
  
 	function CT_FocusFrame_ShowTextStatusBarText(bar)
-		if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-			return;
-		end
 		local self = CT_FocusFrame;
 		if (bar == self.healthbar or bar == self.manabar) then
 			CT_FocusFrame_TextStatusBar_UpdateTextString(bar);
@@ -1305,9 +1302,6 @@ end
 
 
 	function CT_FocusFrame_HideTextStatusBarText(bar)
-		if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-			return;
-		end
 		local self = CT_FocusFrame;
 		if (bar == self.healthbar or bar == self.manabar) then
 			CT_FocusFrame_TextStatusBar_UpdateTextString(bar);
@@ -1348,9 +1342,6 @@ end
 -- Toggle the default UI's focus frame.
 
 function CT_FocusFrame_ToggleStandardFocus()
-	if (_G["CT_Library"]:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
 	if (InCombatLockdown()) then
 		return;
 	end

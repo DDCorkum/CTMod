@@ -1144,7 +1144,5 @@ local function addon_Register()
 	);
 end
 
-if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-	CT_BottomBar_MainMenuExpBar_CreateFrames();
-	module.loadedAddons["Experience Bar"] = addon_Register;
-end
+CT_BottomBar_MainMenuExpBar_CreateFrames();
+module.loadedAddons["Experience Bar"] = addon_Register;

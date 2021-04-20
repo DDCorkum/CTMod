@@ -598,12 +598,10 @@ end
 
 function CT_UnitFramesOptions_MakeFontLikeRetail_CB_OnClick(self, checked)
 	CT_UnitFramesOptions.makeFontLikeRetail = (not not checked); -- false if checked == nil, true if 1
-	module:ShowPlayerFrameBarText();
-	module:ShowPartyFrameBarText();
-	module:ShowTargetFrameBarText();
-	if (module:getGameVersion() >= 2) then
-		module:ShowAssistFrameBarText();
-		module:ShowFocusFrameBarText();
+	if (CT_UnitFramesOptions.makeFontLikeRetail) then
+		CT_UnitFrames_TextStatusBarText:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE");
+	else
+		CT_UnitFrames_TextStatusBarText:CopyFontObject(TextStatusBarText);
 	end
 end
 

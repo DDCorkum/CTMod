@@ -1,4 +1,4 @@
-CT_BarMod (9.0.5.3) 2021-02-16
+CT_BarMod (9.0.5.3) 2021-02-19
 - Changes in anticipation of The Burning Crusade Classic
 
 CT_BarMod (9.0.2.4) 2021-02-02

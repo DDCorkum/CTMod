@@ -362,7 +362,8 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 						CT_UnitFramesOptions_MakeFontLikeRetail_CB_OnClick(self, self:GetChecked());
 					</OnClick>
 					<OnLoad>
-						if (CT_UnitFrames:getGameVersion() ~= CT_GAME_VERSION_CLASSIC) then
+						if (TextStatusBarText:GetFont() == "Font\\FRIZQT__.TTF") then
+							-- 2.3.0 onwards, but not the 2.5.1 TBC Classic Beta
 							self:Hide();
 						end
 					</OnLoad>
@@ -701,6 +702,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 								CT_UnitFramesOptions.partyTextSize = self:GetValue();
 								_G[self:GetName().."Text"]:SetText(CT_UFO_PARTYTEXTSIZE .. " = "..self:GetValue()+6);
 								CT_UnitFramesOptions_Radio_Update();
+								CT_UnitFrames_PartyStatusBarText:SetFont("Fonts\\ARIALN.TTF", self:GetValue()+6, "OUTLINE");
 							</OnValueChanged>
 						</Scripts>
 					</Slider>

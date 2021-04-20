@@ -53,7 +53,7 @@ end
 
 local animFlag;
 
-if (module:getGameVersion() >= 3) then
+if (OverrideActionBar) then
 	-- WoW Classic does not have an OverrideActionBar
 	OverrideActionBar.slideOut:HookScript("OnPlay",
 		function(self)
@@ -103,98 +103,74 @@ local overrideFrames = {
 };
 
 local function override_Hooked_SetAlpha(self, alpha)
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return false; end
-	-- Hook of the SetAlpha function for the override bar frames.
-	-- Something other than CT_BottomBar is calling the frame's :SetAlpha().
+	if (OverrideActionBar) then
+		-- Hook of the SetAlpha function for the override bar frames.
+		-- Something other than CT_BottomBar is calling the frame's :SetAlpha().
 
-	-- Keep track of the last update value.
-	self.ctSaveAlpha = alpha;
-	-- If we have the override bar hidden, then "hide" the frame.
-	if (isOverrideHidden) then
-		if (self.ctInUse) then
-			-- We are using the frame in CT_BottomBar.
-			-- Set the value to the one we are using.
-			alpha = self.ctUseAlpha;
-		else
-			-- Set the value to 0 to "hide" the frame.
-			alpha = 0;
+		-- Keep track of the last update value.
+		self.ctSaveAlpha = alpha;
+		-- If we have the override bar hidden, then "hide" the frame.
+		if (isOverrideHidden) then
+			if (self.ctInUse) then
+				-- We are using the frame in CT_BottomBar.
+				-- Set the value to the one we are using.
+				alpha = self.ctUseAlpha;
+			else
+				-- Set the value to 0 to "hide" the frame.
+				alpha = 0;
+			end
+			frame_SetAlpha(self, alpha);
+	--	else
+	--		-- We have shown the override bar, or we haven't done anything with it yet.
+	--		-- Allow the change to stick. Don't override it.
 		end
-		frame_SetAlpha(self, alpha);
---	else
---		-- We have shown the override bar, or we haven't done anything with it yet.
---		-- Allow the change to stick. Don't override it.
 	end
 end
 
 local function override_Hooked_EnableMouse(self, enable)
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return false; end
-	-- Hook of the EnableMouse function for the override bar frames.
-	-- Something other than CT_BottomBar is calling the frame's :EnableMouse().
+	if (OverrideActionBar) then
+		-- Hook of the EnableMouse function for the override bar frames.
+		-- Something other than CT_BottomBar is calling the frame's :EnableMouse().
 
-	-- Keep track of the last update value.
-	self.ctSaveMouse = enable;
-	-- If we have the override bar hidden, then "hide" the frame.
-	if (isOverrideHidden) then
-		if (self.ctInUse) then
-			-- We are using the frame in CT_BottomBar.
-			-- Set the value to the one we are using.
-			enable = self.ctUseMouse;
-		else
-			-- Set the value to false to "hide" the frame.
-			enable = false;
+		-- Keep track of the last update value.
+		self.ctSaveMouse = enable;
+		-- If we have the override bar hidden, then "hide" the frame.
+		if (isOverrideHidden) then
+			if (self.ctInUse) then
+				-- We are using the frame in CT_BottomBar.
+				-- Set the value to the one we are using.
+				enable = self.ctUseMouse;
+			else
+				-- Set the value to false to "hide" the frame.
+				enable = false;
+			end
+			if (not (self:IsProtected() and InCombatLockdown())) then
+				frame_EnableMouse(self, enable);
+			end
+	--	else
+	--		-- We have shown the override bar, or we haven't done anything with it yet.
+	--		-- Allow the change to stick. Don't override it.
 		end
-		if (not (self:IsProtected() and InCombatLockdown())) then
-			frame_EnableMouse(self, enable);
-		end
---	else
---		-- We have shown the override bar, or we haven't done anything with it yet.
---		-- Allow the change to stick. Don't override it.
 	end
 end
 
 local function override_HideFrames()
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return false; end
-	-- Hide the override bar frames.
-	local frame, alpha, mouse;
-	local inCombatLockdown = InCombatLockdown();
+	if (OverrideActionBar) then
+		-- Hide the override bar frames.
+		local frame, alpha, mouse;
+		local inCombatLockdown = InCombatLockdown();
 
-	for i, name in ipairs(overrideFrames) do
-		frame = _G[name];
-		if (frame and frame.ctInUse) then
-			-- We are using the frame in CT_BottomBar.
-			-- Set the values to the ones being used.
-			alpha = frame.ctUseAlpha;
-			mouse = frame.ctUseMouse;
-		else
-			-- Set the values so that we "hide" the frame.
-			alpha = 0;
-			mouse = false;
-		end
-		frame_SetAlpha(frame, alpha);
-		if (not (frame:IsProtected() and inCombatLockdown)) then
-			frame_EnableMouse(frame, mouse);
-		end
-	end
-end
-
-local function override_ShowFrames()
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return false; end
-	-- Show the override bar frames.
-	local frame, alpha, mouse;
-	local inCombatLockdown = InCombatLockdown();
-
-	for i, name in ipairs(overrideFrames) do
-		frame = _G[name];
-		if (frame) then
-			if (frame.ctInUse) then
+		for i, name in ipairs(overrideFrames) do
+			frame = _G[name];
+			if (frame and frame.ctInUse) then
 				-- We are using the frame in CT_BottomBar.
 				-- Set the values to the ones being used.
 				alpha = frame.ctUseAlpha;
 				mouse = frame.ctUseMouse;
 			else
-				-- Set the values so that we "show" the frame by restoring the saved values.
-				alpha = frame.ctSaveAlpha;
-				mouse = frame.ctSaveMouse;
+				-- Set the values so that we "hide" the frame.
+				alpha = 0;
+				mouse = false;
 			end
 			frame_SetAlpha(frame, alpha);
 			if (not (frame:IsProtected() and inCombatLockdown)) then
@@ -204,66 +180,97 @@ local function override_ShowFrames()
 	end
 end
 
+local function override_ShowFrames()
+	if (OverrideActionBar) then
+		-- Show the override bar frames.
+		local frame, alpha, mouse;
+		local inCombatLockdown = InCombatLockdown();
+
+		for i, name in ipairs(overrideFrames) do
+			frame = _G[name];
+			if (frame) then
+				if (frame.ctInUse) then
+					-- We are using the frame in CT_BottomBar.
+					-- Set the values to the ones being used.
+					alpha = frame.ctUseAlpha;
+					mouse = frame.ctUseMouse;
+				else
+					-- Set the values so that we "show" the frame by restoring the saved values.
+					alpha = frame.ctSaveAlpha;
+					mouse = frame.ctSaveMouse;
+				end
+				frame_SetAlpha(frame, alpha);
+				if (not (frame:IsProtected() and inCombatLockdown)) then
+					frame_EnableMouse(frame, mouse);
+				end
+			end
+		end
+	end
+end
+
 function module:showOverrideActionBar()
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return false; end
-	-- We have not shown it yet, or it is hidden.
-	if (InCombatLockdown()) then
-		-- Don't do anything while in combat lockdown.
-		-- Don't call :needOverrideUpdate. When the player gets out of combat, another
-		-- function will be called and it will attempt to show or hide the override bar.
-		return false;
-	end
-	if (module:isBlizzardAnimating()) then
-		-- We'll need to use the OnUpdate to wait for the animation to stop.
-		module:needOverrideUpdate(1); -- 1 == need to show override bar
-		return false;
-	end
+	if (OverrideActionBar) then
+		-- We have not shown it yet, or it is hidden.
+		if (InCombatLockdown()) then
+			-- Don't do anything while in combat lockdown.
+			-- Don't call :needOverrideUpdate. When the player gets out of combat, another
+			-- function will be called and it will attempt to show or hide the override bar.
+			return false;
+		end
+		if (module:isBlizzardAnimating()) then
+			-- We'll need to use the OnUpdate to wait for the animation to stop.
+			module:needOverrideUpdate(1); -- 1 == need to show override bar
+			return false;
+		end
 
-	-- Show the override bar frames.
-	override_ShowFrames();
+		-- Show the override bar frames.
+		override_ShowFrames();
 
-	isOverrideHidden = false;  -- We have now shown it.
-	module:needOverrideUpdate(nil);  -- No longer need to update the override bar.
-	return true;
+		isOverrideHidden = false;  -- We have now shown it.
+		module:needOverrideUpdate(nil);  -- No longer need to update the override bar.
+		return true;
+	end
 end
 
 function module:hideOverrideActionBar()
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return false; end
-	-- Hide the override action bar.
-	-- Returns: true if the bar was successfully hidden.
-	--         false if the bar failed to be hidden.
+	if (OverrideActionBar) then
+		-- Hide the override action bar.
+		-- Returns: true if the bar was successfully hidden.
+		--         false if the bar failed to be hidden.
 
-	-- We have not hidden it yet, or it is shown.
-	if (InCombatLockdown()) then
-		-- We can't do anything while in combat lockdown.
-		-- Don't call :needOverrideUpdate. When the player gets out of combat, another
-		-- function will be called and it will attempt to show or hide the override bar.
-		return false;
+		-- We have not hidden it yet, or it is shown.
+		if (InCombatLockdown()) then
+			-- We can't do anything while in combat lockdown.
+			-- Don't call :needOverrideUpdate. When the player gets out of combat, another
+			-- function will be called and it will attempt to show or hide the override bar.
+			return false;
+		end
+		if (module:isBlizzardAnimating()) then
+			-- We'll need to use the OnUpdate to wait for the animation to stop.
+			module:needOverrideUpdate(2); -- 2 == need to hide override bar
+			return false;
+		end
+
+		-- Hide the override bar frames.
+		override_HideFrames();
+
+		isOverrideHidden = true;  -- We have now hidden it.
+		module:needOverrideUpdate(nil);  -- No longer need to update the override bar.
+		return true;
 	end
-	if (module:isBlizzardAnimating()) then
-		-- We'll need to use the OnUpdate to wait for the animation to stop.
-		module:needOverrideUpdate(2); -- 2 == need to hide override bar
-		return false;
-	end
-
-	-- Hide the override bar frames.
-	override_HideFrames();
-
-	isOverrideHidden = true;  -- We have now hidden it.
-	module:needOverrideUpdate(nil);  -- No longer need to update the override bar.
-	return true;
 end
 
 function module:override_OnUpdate(value)
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return false; end
-	-- Called by CT_BottomBar_OnUpdateFunc when we need to update the override bar
-	-- because we were previously unable to do so.
-	if (value == 1) then
-		-- Show the override action bar.
-		module:showOverrideActionBar();
-	elseif (value == 2) then
-		-- Hide the override action bar.
-		module:hideOverrideActionBar();
+	if (OverrideActionBar) then
+		-- Called by CT_BottomBar_OnUpdateFunc when we need to update the override bar
+		-- because we were previously unable to do so.
+		if (value == 1) then
+			-- Show the override action bar.
+			module:showOverrideActionBar();
+		elseif (value == 2) then
+			-- Hide the override action bar.
+			module:hideOverrideActionBar();
+		end
 	end
 end
 
@@ -271,27 +278,27 @@ end
 -- Initialize
 
 function module:initOverrideActionBar()
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return false; end
-	-- Initialize the override action bar
-	frame_SetAlpha = module.frame_SetAlpha;
-	frame_EnableMouse = module.frame_EnableMouse;
+	if (OverrideActionBar) then
+		-- Initialize the override action bar
+		frame_SetAlpha = module.frame_SetAlpha;
+		frame_EnableMouse = module.frame_EnableMouse;
 
-	local frame;
-	for i, name in ipairs(overrideFrames) do
-		frame = _G[name];
-		frame.ctInUse = false;
-		frame.ctUseAlpha = 0;
-		frame.ctUseMouse = false;
-		frame.ctSaveAlpha = frame:GetAlpha();
-		frame.ctSaveMouse = frame:IsMouseEnabled();
-		-- Hook some of the frame's functions.
-		hooksecurefunc(frame, "SetAlpha", override_Hooked_SetAlpha);
-		hooksecurefunc(frame, "EnableMouse", override_Hooked_EnableMouse);
+		local frame;
+		for i, name in ipairs(overrideFrames) do
+			frame = _G[name];
+			frame.ctInUse = false;
+			frame.ctUseAlpha = 0;
+			frame.ctUseMouse = false;
+			frame.ctSaveAlpha = frame:GetAlpha();
+			frame.ctSaveMouse = frame:IsMouseEnabled();
+			-- Hook some of the frame's functions.
+			hooksecurefunc(frame, "SetAlpha", override_Hooked_SetAlpha);
+			hooksecurefunc(frame, "EnableMouse", override_Hooked_EnableMouse);
+		end
 	end
 end
 
 function module:overrideInit()
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return false; end
 	-- Initialize this lua file.
 	appliedOptions = module.appliedOptions;
 end
