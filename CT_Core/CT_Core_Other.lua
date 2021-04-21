@@ -2569,7 +2569,7 @@ do
 								button:Hide();
 								button.fs = button:CreateFontString(nil, "BACKGROUND", "GameFontNormalSmall");
 								button.fs:SetPoint("RIGHT", button, "LEFT", -2, 0);
-								button.fs:SetText(OBJECTIVES_TRACKER_LABEL or "foo");
+								button.fs:SetText(OBJECTIVES_TRACKER_LABEL);
 								button.fs:Hide();
 							end;
 							["onclick"] = function(button)

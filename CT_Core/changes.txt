@@ -1,4 +1,4 @@
-CT_Core (9.0.5.3) 2021-04-18
+CT_Core (9.0.5.3) 2021-04-20
 - Change to LibUIDropDownMenu-4.0 integration from 9.0.5.2
 - Changes in anticipation of The Burning Crusade Classic
 
