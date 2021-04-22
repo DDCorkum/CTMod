@@ -489,7 +489,8 @@ local function addon_Register()
 			--PVPMicroButton, -- old 8
 			--HelpMicroButton -- old 14
 		);
-	elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+	else
+		-- Classic
 		module:registerAddon(
 			"Menu Bar",  -- option name
 			"MenuBar",  -- used in frame names

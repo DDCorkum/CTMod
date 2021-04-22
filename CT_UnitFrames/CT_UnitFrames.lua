@@ -25,6 +25,24 @@ CT_Library:registerModule(module);
 _G[MODULE_NAME] = module;
 
 --------------------------------------------
+-- Initialization
+
+do
+	CreateFont("CT_UnitFrames_TextStatusBarText")
+	CT_UnitFrames_TextStatusBarText:CopyFontObject(TextStatusBarText)
+	CreateFont("CT_UnitFrames_PartyStatusBarText")
+	CT_UnitFrames_PartyStatusBarText:SetFont("Fonts\\FRIZQT__.TTF", 9, "OUTLINE")
+	module:regEvent("PLAYER_LOGIN", function()
+		if (CT_UnitFramesOptions.makeFontLikeRetail) then
+			CT_UnitFrames_TextStatusBarText:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
+		end
+		if (CT_UnitFramesOptions.partyTextSize) then
+			CT_UnitFrames_PartyStatusBarText:SetFont("Fonts\\FRIZQT__.TTF", 6 + CT_UnitFramesOptions.partyTextSize, "OUTLINE")
+		end
+	end)
+end
+
+--------------------------------------------
 -- Frame dragging
 
 function CT_UnitFrames_LinkFrameDrag(frame, drag, point, relative, x, y)
@@ -76,8 +94,7 @@ local prefixedValuesPattern = "%s " .. valuesPattern;
 
 function module:UpdateStatusBarTextString(textStatusBar, settings, lockShow)
 	-- STEP 1: Avoid taint by creating creating a custom FontString called ctTextString
-	-- STEP 2: In Classic only, change the fonts if they have not been changed already
-	-- STEP 3: Set the text as desired
+	-- STEP 2: Set the text as desired
 
 	-- STEP 1:
 	local textString =  textStatusBar.ctTextString;			
@@ -89,7 +106,8 @@ function module:UpdateStatusBarTextString(textStatusBar, settings, lockShow)
 		intermediateFrame:SetAllPoints();
 		intermediateFrame = CreateFrame("Frame", nil, intermediateFrame);	-- +3 frameLevel
 		intermediateFrame:SetAllPoints();
-		textString = intermediateFrame:CreateFontString(nil, "OVERLAY", "TextStatusBarText");
+		textString = intermediateFrame:CreateFontString(nil, "OVERLAY");
+		textString:SetFontObject(textStatusBar.ctUsePartyFontSize and CT_UnitFrames_PartyStatusBarText or CT_UnitFrames_TextStatusBarText);
 		if (UnitFramesImproved) then
 			textString:SetPoint("CENTER", textStatusBar, "BOTTOM", 0, textStatusBar:GetHeight()/2);
 		else
@@ -102,30 +120,8 @@ function module:UpdateStatusBarTextString(textStatusBar, settings, lockShow)
 			textStatusBar.TextString:SetAlpha(0);
 		end
 	end
-
-	-- STEP 2:
-	if (textStatusBar.ctUsePartyFontSize) then
-		if (textString.ctSize ~= (CT_UnitFramesOptions.partyTextSize or 3) + 6) then
-			textString.ctSize = (CT_UnitFramesOptions.partyTextSize or 3) + 6
-			textString.ctControlled = "ChangeSize"
-		end
-	else
-		textString.ctSize = 10
-	end
-	if (module:getGameVersion() == 1) then
-		if (textString.ctControlled ~= "Retail" and CT_UnitFramesOptions.makeFontLikeRetail) then
-			textString:SetFont("Fonts\\FRIZQT__.TTF", textString.ctSize, "OUTLINE");
-			textString.ctControlled = "Retail";
-		elseif (textString.ctControlled ~= "Classic" and not CT_UnitFramesOptions.makeFontLikeRetail) then
-			textString:SetFont("Fonts\\ARIALN.TTF", textStatusBar.ctUsePartyFontSize and textString.ctSize + 3 or textString.ctSize + 4, "OUTLINE");
-			textString.ctControlled = "Classic";	
-		end
-	elseif (textString.ctControlled == "ChangeSize") then
-		textString.ctControlled = nil;
-		textString:SetFont("Fonts\\FRIZQT__.TTF", textString.ctSize, "OUTLINE");
-	end
 	
-	-- STEP 3:
+	-- STEP 2:
 	if (lockShow == nil) then lockShow = textStatusBar.lockShow; end
 	local value = textStatusBar:GetValue();
 	local valueMin, valueMax = textStatusBar:GetMinMaxValues();

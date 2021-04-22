@@ -29,20 +29,6 @@ local public = _G[MODULE_NAME]
 module.text = module.text or { };
 local L = module.text;
 
-
--- Temporary code.  When removing this, also remove temporary code from module:update()
-CT_Viewport_Saved = CT_Viewport_Saved or {}
-CT_ViewportBackup = CT_ViewportBackup or {}
-
-local oldSetOption = module.setOption
-function module:setOption(option, value, charOnly)
-	oldSetOption(self, option, value, charOnly);
-	if (charOnly) then
-		CT_ViewportBackup[module:getCharKey()] = CT_ViewportBackup[module:getCharKey()] or {}
-		CT_ViewportBackup[module:getCharKey()][option] = value
-	end
-end
-
 module.currOffset = {0, 0, 0, 0}
 
 local frameClearAllPoints, frameSetAllPoints, frameSetPoint;
@@ -531,18 +517,31 @@ function module:update(option, value)
 		
 		savedViewport = module:getOption("savedViewport") or {0,0,0,0,0,0,0};
 		
-		-- Temporary code from 9.0.2.4 and 9.0.5.1; also remove temporary code at the very top
-		if (#CT_Viewport_Saved > 0) then
+		-- Temporary code to transition from 9.0.2.4 to 9.0.5.x
+		if (CT_Viewport_Saved) then
 			
-			-- avoid deleting other toons' data when migrating saved variable types
-			for charKey, val in pairs(CT_ViewportBackup) do	
-				module.options[charKey] = val;
-			end
+			CT_ViewportBackup = CT_ViewportBackup or {}
 
-			-- convert from an olds note format
-			savedViewport[1], savedViewport[2], savedViewport[3], savedViewport[4], savedViewport[5], savedViewport[6], savedViewport[7]
-				= CT_Viewport_Saved[1], CT_Viewport_Saved[2], CT_Viewport_Saved[3], CT_Viewport_Saved[4], CT_Viewport_Saved[5], CT_Viewport_Saved[6], CT_Viewport_Saved[7]
-			wipe(CT_Viewport_Saved)
+			local oldSetOption = module.setOption
+			function module:setOption(option, value, charOnly)
+				oldSetOption(self, option, value, charOnly);
+				if (charOnly) then
+					CT_ViewportBackup[module:getCharKey()] = CT_ViewportBackup[module:getCharKey()] or {}
+					CT_ViewportBackup[module:getCharKey()][option] = value
+				end
+			end
+			
+			if (#CT_Viewport_Saved > 0) then
+				-- avoid deleting other toons' data when migrating saved variable types
+				for charKey, val in pairs(CT_ViewportBackup) do	
+					module.options[charKey] = val;
+				end
+
+				-- convert from an olds note format
+				savedViewport[1], savedViewport[2], savedViewport[3], savedViewport[4], savedViewport[5], savedViewport[6], savedViewport[7]
+					= CT_Viewport_Saved[1], CT_Viewport_Saved[2], CT_Viewport_Saved[3], CT_Viewport_Saved[4], CT_Viewport_Saved[5], CT_Viewport_Saved[6], CT_Viewport_Saved[7]
+				wipe(CT_Viewport_Saved)
+			end
 		end
 
 		module:setOption("savedViewport", savedViewport, true)
@@ -927,6 +926,25 @@ function module.frame()
 		
 	-- Draggable Borders and Inner Frame (representing the viewport)
 	
+	-- called once only, by either CT_ViewportBorderFrame:OnLoad() or CT_ViewportInnerFrame:OnLoad() -- whichever happens last
+	local function attachBorderAndInner()
+		CT_ViewportInnerFrame:ClearAllPoints();
+		CT_ViewportInnerFrame:SetPoint("TOPLEFT", CT_ViewportBorderFrame, "TOPLEFT", 4, -4);
+		CT_ViewportInnerFrame:SetMaxResize(CT_ViewportBorderFrame:GetWidth()-4, CT_ViewportBorderFrame:GetHeight()-4);
+		CT_ViewportInnerFrame:SetMinResize((CT_ViewportBorderFrame:GetWidth()-4)/2, (CT_ViewportBorderFrame:GetHeight()-4)/2)
+		CT_ViewportInnerFrame:SetResizable(true);
+		module.UpdateInnerFrameBounds();
+		module.ApplyInnerViewport(
+			savedViewport[1],
+			savedViewport[2],
+			savedViewport[3],
+			savedViewport[4],
+			savedViewport[5],
+			savedViewport[6],
+			savedViewport[7]
+		);	
+	end
+	
 	optionsBeginFrame(215, 180, "frame#t:0:%y#s:240:180#n:CT_ViewportBorderFrame");
 		optionsAddScript("onload", function(frame)
 			Mixin(frame, BackdropTemplateMixin or {});
@@ -937,28 +955,13 @@ function module.frame()
 				tileSize = 3.2;
 			});
 			frame:SetBackdropBorderColor(1, 0, 0, 1);
+			if (CT_ViewportInnerFrame) then
+				attachBorderAndInner();
+			end
 		end);
 	optionsEndFrame();
 	
 	optionsBeginFrame(0, 0, "frame#n:CT_ViewportInnerFrame");
-		optionsAddScript("onshow", function(frame)
-			frame:ClearAllPoints();
-			frame:SetPoint("TOPLEFT", CT_ViewportBorderFrame, "TOPLEFT", 4, -4);
-			frame:SetMaxResize(CT_ViewportBorderFrame:GetWidth()-4, CT_ViewportBorderFrame:GetHeight()-4);
-			frame:SetMinResize((CT_ViewportBorderFrame:GetWidth()-4)/2, (CT_ViewportBorderFrame:GetHeight()-4)/2)
-			frame:SetResizable(true);
-			module.UpdateInnerFrameBounds();
-			module.ApplyInnerViewport(
-				savedViewport[1],
-				savedViewport[2],
-				savedViewport[3],
-				savedViewport[4],
-				savedViewport[5],
-				savedViewport[6],
-				savedViewport[7]
-			);
-			frame:SetScript("OnShow", nil);
-		end);
 		optionsAddScript("onload", function(frame)
 			Mixin(frame, BackdropTemplateMixin or {});
 			frame:SetBackdrop({
@@ -1032,6 +1035,10 @@ function module.frame()
 			frame.resizeBottom:SetFrameLevel(frame:GetFrameLevel());
 			frame.resizeBottom:HookScript("OnMouseDown", function(button) module.Resize(button, "BOTTOM") end);
 			frame.resizeBottom:HookScript("OnMouseUp", function(button) module.StopResize(button) end);
+			
+			if (CT_ViewportBorderFrame) then
+				attachBorderAndInner();
+			end
 		end);
 	optionsEndFrame();
 

@@ -1,3 +1,7 @@
+CT_BarMod (9.0.5.3) 2021-02-19
+- Spells requiring reagents now also show properly when using macros
+- Other changes in anticipation of The Burning Crusade Classic
+
 CT_BarMod (9.0.2.4) 2021-02-02
 - Avoiding wasted CPU usage during initial login when player inventory data arrives
 - Optional recharge animation for abilities recharging while off cooldown

@@ -17,7 +17,7 @@ function CT_TargetFrameOnEvent(self, event, arg1, ...)
 	if ( event == "PLAYER_ENTERING_WORLD" ) then
 		if (inworld == nil) then
 			inworld = 1;
-			if (module:getGameVersion() >= 2) then
+			if (UnitFrame_UpdateThreatIndicator) then
 				hooksecurefunc("UnitFrame_UpdateThreatIndicator", CT_TargetFrame_UpdateThreatIndicator);
 			end
 			CT_TargetFrame_SetClassPosition(true);

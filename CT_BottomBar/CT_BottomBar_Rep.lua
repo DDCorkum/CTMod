@@ -831,7 +831,5 @@ local function addon_Register()
 	);
 end
 
-if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-	CT_BottomBar_ReputationWatchBar_CreateFrames();
-	module.loadedAddons["Reputation Bar"] = addon_Register;
-end
+CT_BottomBar_ReputationWatchBar_CreateFrames();
+module.loadedAddons["Reputation Bar"] = addon_Register;

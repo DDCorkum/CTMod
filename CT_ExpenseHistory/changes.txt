@@ -1,3 +1,6 @@
+CT_ExpenseHistory (9.0.5.3) 2021-04-15
+- Minor code cleanup; nothing substantive
+
 CT_ExpenseHistory (8.3.7.1) 2020-07-19
 - Shadowlands BackdropTemplate compatibility
 - Correcting the French translations

@@ -1,5 +1,5 @@
 ## Interface: 90005
-## Version: 9.0.5.2
+## Version: 9.0.5.3
 ## Title: CT_Core |cFF333333(SL)|r
 ## Notes: General nifty features for CTMod.
 ## DefaultState: Enabled

@@ -19,28 +19,30 @@ CT_Library embeds the following addon libraries:
 - LibStub by Kaelten et al. (public domain)
 - LibDeflate by Haoqian He (zlib license)
 - AceSerializer-3.0 by Nevcairiel et al. (see Libs\Ace3\Ace3-License.txt)
-
-CT_Library also embeds work by foxlit at Townlong-Yak, to mitigate 'taint' 
-issues in World of Warcraft's API associated with UIDropDownMenu. 
-These workarounds are not disibuted with an explicit license so care should be
-taken to review the original work at Townlong-Yak. (Presumably TLY intends 
-for addons to widely use this code while giving credit where it is due.)
+- TaintLess by foxlit (unmodified distribution of xml authorized)
 
 To limit download sizes, CT_Library excludes extra files from each library
 such as tutorials/instructions or .xml and .toc files that simply point 
 to the main code in the .lua.   Please contact the CTMod team if you need 
 any help to find these original files from the library authors.
-(Hint: they are all on popular download sites, like CurseForge.)
+(Hint: they are all on CurseForge, WoWI, or TLY.)
 
 
 
 ------------------------------
 -- CT_RaidAssist
 
-CT_RaidAssist embeds other libraries to provide addon communication that
-is compatible with non-CT addons.  This is done so users do not feel
-pressured to use any single addon (CT or otherwise) to participate
-in a raiding guild.
+CT_RaidAssist embeds the following addon libraries:
+- LibDurability by funkehdude (CC BY-NC-SA 3.0)
+- LibHealComm by Shadowed, Azilroka and xbeebs (license unknown), which includes CallbackHandler by nevcairiel (BSD license) and ChatThrottleLib by Mikk (license unknown)
+
+These libraries permit the modern implementation of CT_RaidAssist to
+be compatible with non-CT addons for raid management tasks like
+checking durability and predicting incoming heals in WoW Classic.
+
+Using a common library allows users more freedom to choose any
+compatible addon, so they do not feel pressured to use any
+particular one (CT or otherwise) to participate in a raiding guild.
 
 To further give users control over their privacy, CT_RaidAssist also
 adds a single conditional statement at the top of certain embedded 
@@ -53,8 +55,7 @@ team appologizes if this has inadvertently violated the spirit of any license.
 
 
 
-
 D.D. Corkum
 aka. Dahk Celes
 CTMod Team
-25 Oct 2020
+25 Oct 2020 (Updated 5 April 2021)

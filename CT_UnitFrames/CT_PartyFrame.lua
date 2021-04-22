@@ -51,24 +51,6 @@ local function CT_PartyFrame_TextStatusBar_UpdateTextString(bar)
 	if (CT_UnitFramesOptions) then
 		
 		bar.ctUsePartyFontSize = true;
-		
-		local textString = bar.textRight;
-		if (textString.ctSize ~= (CT_UnitFramesOptions.partyTextSize or 3) + 6) then
-			textString.ctSize = (CT_UnitFramesOptions.partyTextSize or 3) + 6;
-			textString.ctControlled = "ChangeSize"
-		end
-		if (module:getGameVersion() == 1) then
-			if (textString.ctControlled ~= "Retail" and CT_UnitFramesOptions.makeFontLikeRetail) then
-				textString:SetFont("Fonts\\FRIZQT__.TTF", textString.ctSize, "OUTLINE");
-				textString.ctControlled = "Retail";
-			elseif (textString.ctControlled ~= "Classic" and not CT_UnitFramesOptions.makeFontLikeRetail) then
-				textString:SetFont("Fonts\\ARIALN.TTF", textString.ctSize + 3, "OUTLINE");
-				textString.ctControlled = "Classic";	
-			end
-		elseif (textString.ctControlled == "ChangeSize") then
-			textString.ctControlled = nil;
-			textString:SetFont("Fonts\\FRIZQT__.TTF", textString.ctSize, "OUTLINE");
-		end
 
 		-- apply changes for the health and mana bars
 		if (bar.type == "health") then	

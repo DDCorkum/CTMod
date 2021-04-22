@@ -76,7 +76,7 @@ function module:Initialize()				-- called via module.update("init") from CT_Libr
 	end)
 	
 	-- TaxiFrame (WoD alternative to FlightMapFrame)
-	if (module:getGameVersion() >= 2) then
+	if (module:getGameVersion() >= 6) then
 		module:configureTaxiFrame()
 	else
 		module:configureClassicTaxiFrame()
@@ -675,7 +675,7 @@ function CT_MapMod_PinMixin:ApplyCurrentScale()
 	local startScale = 0.80;
 	local endScale = 1.60;
 	local scaleFactor = 1;
-	if ((module:getGameVersion() == CT_GAME_VERSION_CLASSIC) or (WorldMapFrame:IsMaximized())) then
+	if (WorldMapFrame.IsMaximized == nil or (WorldMapFrame:IsMaximized())) then
 		-- This is WoW Classic, or this is WoW Retail and the window is maximized
 		scale = 1.5 / self:GetMap():GetCanvasScale() * Lerp(startScale, endScale, Saturate(scaleFactor * self:GetMap():GetCanvasZoomPercent()))
 	else
@@ -1058,11 +1058,7 @@ do
 			frame:SetPoint("TOP", map, "BOTTOM", 0, -10);
 			frame:SetClampedToScreen(true);
 			frame:SetClampRectInsets(-20, 20, 20, -20);
-			if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-				frame:SetFrameStrata("FULLSCREEN_DIALOG");
-			else
-				frame:SetFrameStrata("DIALOG");
-			end
+			frame:SetFrameStrata(WorldMapFrame:GetFrameStrata() == "FULLSCREEN" and "FULLSCREEN_DIALOG" or "DIALOG");
 			frame:Show();
 			updateFields();
 		end
@@ -1090,7 +1086,7 @@ function module.configureWorldMapFrame()
 		["button#n:CT_MapMod_WhereAmIButton#s:100:20#v:UIPanelButtonTemplate#" .. L["CT_MapMod/Map/Where am I?"]] = {
 			["onload"] = function (self)
 				module.mapResetButton = self;
-				if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+				if (WorldMapFrame:GetFrameStrata() == "FULLSCREEN") then
 					self:SetFrameStrata("FULLSCREEN_DIALOG");
 				end
 				local function updatePosition(value)
@@ -1188,6 +1184,10 @@ function module.configureWorldMapFrame()
 								info.hasArrow = false;
 								info.func = function()
 									module:showModuleOptions(MODULE_NAME);
+									if (WorldMapFrame:GetFrameStrata() == "FULLSCREEN") then
+										-- so the options are visible on classic
+										CTCONTROLPANEL:SetFrameStrata("FULLSCREEN_DIALOG");
+									end
 								end
 								UIDropDownMenu_AddButton(info, 1);
 
@@ -1299,14 +1299,14 @@ function module.configureWorldMapFrame()
 				self:RegisterForDrag("LeftButton","RightButton");
 				self:SetClampedToScreen(true);
 				self:SetMovable(true);
-				if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+				if (WorldMapFrame:GetFrameStrata() == "FULLSCREEN") then
 					self:SetFrameStrata("FULLSCREEN_DIALOG");
 				end
 			end,
 		},
 		["frame#n:CT_MapMod_pxy#s:80:16#b:b:-100:0"] = { 
 			["onload"] = function(self)
-				if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+				if (WorldMapFrame:GetFrameStrata() == "FULLSCREEN") then
 					self:SetFrameStrata("FULLSCREEN_DIALOG");
 				end
 				module.pxy = self
@@ -1356,7 +1356,7 @@ function module.configureWorldMapFrame()
 		},
 		["frame#n:CT_MapMod_cxy#s:80:16#b:b:100:0"] =  { 
 			["onload"] = function(self)
-				if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+				if (WorldMapFrame:GetFrameStrata() == "FULLSCREEN") then
 					self:SetFrameStrata("FULLSCREEN_DIALOG");
 				end
 				module.cxy = self
@@ -1434,7 +1434,7 @@ end
 
 function module.configureFlightMapFrame()
 
-	local showUnreachable = module:getOption("CT_MapMod_ShowUnreachableFlightPaths") == true
+	local showUnreachable = module:getOption("CT_MapMod_ShowUnreachableFlightPaths") ~= false
 
 	local hookedPins = {}				-- used to hook things only once, and also to undo hooks when an optin is turned off
 
@@ -1496,7 +1496,7 @@ end
 
 function module.configureTaxiFrame()
 
-	local showUnreachable = module:getOption("CT_MapMod_ShowUnreachableFlightPaths") == true
+	local showUnreachable = module:getOption("CT_MapMod_ShowUnreachableFlightPaths") ~= false
 
 	local hookedButtons = {}
 	
@@ -1543,7 +1543,7 @@ end
 
 function module.configureClassicTaxiFrame()
 
-	local showUnreachable = module:getOption("CT_MapMod_ShowUnreachableFlightPaths") == true
+	local showUnreachable = module:getOption("CT_MapMod_ShowUnreachableFlightPaths") ~= false
 		
 	local function creationFunc(self)
 		local frame = CreateFrame("Frame", nil, TaxiFrame)
@@ -1562,18 +1562,17 @@ function module.configureClassicTaxiFrame()
 	
 	local function CT_MapMod_TaxiFrameClassic_OnShow()
 		if (showUnreachable) then
-			local mapID = C_Map.GetBestMapForUnit("player")
-			if (mapID) then
-				local mapInfo = C_Map.GetMapInfo(mapID)
-				if (mapInfo) then
-					mapID = mapInfo.parentMapID
-					local nodes = C_TaxiMap.GetTaxiNodesForMap(mapID)
+			local taxiMap = GetTaxiMapID()
+			if (taxiMap) then
+				local data = module.classicTaxiMaps[taxiMap]
+				if (data) then
+					local nodes = C_TaxiMap.GetTaxiNodesForMap(data.mapID)
 					local wrongFaction = UnitFactionGroup("player") == "Horde" and Enum.FlightPathFaction.Alliance or Enum.FlightPathFaction.Horde
 					for __, node in pairs(nodes) do
-						if (node.faction ~= wrongFaction) then
+						if (node.faction ~= wrongFaction and not module.ignoreClassicTaxiNodes[node.nodeID]) then
 							local pin = flightMarkers:Acquire()
 							local x, y = node.position:GetXY()
-							pin:SetPoint("CENTER", TaxiRouteMap, "TOPLEFT", (mapID == 1415 and x-0.15 or x-0.166) * TaxiRouteMap:GetWidth() * (mapID == 1415 and 1.52 or 1.5), - (mapID == 1415 and y-0.09 or y) * TaxiRouteMap:GetHeight() * (mapID == 1415 and 1.09 or 1))
+							pin:SetPoint("CENTER", TaxiRouteMap, "TOPLEFT", (x + data.xOff) * TaxiRouteMap:GetWidth() * (data.xScale), - (y + (data.yOff)) * TaxiRouteMap:GetHeight() * (data.yScale))
 							pin:Show()
 							pin.text = node.name
 						end
@@ -1648,11 +1647,6 @@ end
 
 module.update = function(self, optName, value)
 	if (optName == "init") then
-
-		-- converting a dropdown into a checkbox in 9.0.1.3
-		if (module:getOption("CT_MapMod_ShowOnFlightMaps") == 2) then
-			module:setOption("CT_MapMod_ShowOnFlightMaps", false, true)
-		end
 	
 		-- initialize the overall UI
 		module:Initialize();
@@ -1842,7 +1836,7 @@ module.frame = function()
 			optionsBeginFrame( -15,  26, "checkbutton#tl:10:%y#o:CT_MapMod_ShowOnFlightMaps:true#" .. L["CT_MapMod/Options/FlightMaps/ShowOnFlightMapsCheckButton"] .. "#l:268");
 				optionsAddTooltip({L["CT_MapMod/Options/FlightMaps/ShowOnFlightMapsCheckButton"], L["CT_MapMod/Options/FlightMaps/ShowOnFlightMapsTip"]});
 			optionsEndFrame()
-			optionsBeginFrame( -5,  26, "checkbutton#tl:10:%y#o:CT_MapMod_ShowUnreachableFlightPaths#" .. L["CT_MapMod/Options/FlightMaps/ShowUnreachableFlightPathsCheckButton"] .. "#l:268");
+			optionsBeginFrame( -5,  26, "checkbutton#tl:10:%y#o:CT_MapMod_ShowUnreachableFlightPaths:true#" .. L["CT_MapMod/Options/FlightMaps/ShowUnreachableFlightPathsCheckButton"] .. "#l:268");
 				optionsAddTooltip({L["CT_MapMod/Options/FlightMaps/ShowUnreachableFlightPathsCheckButton"], L["CT_MapMod/Options/FlightMaps/ShowUnreachableFlightPathsTip"]});
 			optionsEndFrame()
 		end

@@ -122,7 +122,7 @@ local function minimapFrameSkeleton()
 									end
 								end
 							elseif (_G[UIDROPDOWNMENU_MENU_VALUE] and _G[UIDROPDOWNMENU_MENU_VALUE].externalDropDown_Initialize) then
-								_G[UIDROPDOWNMENU_MENU_VALUE]:externalDropDown_Initialize()
+								_G[UIDROPDOWNMENU_MENU_VALUE]:externalDropDown_Initialize(UIDROPDOWNMENU_MENU_LEVEL)
 							end
 						end,
 						"MENU"  --causes it to be like a context menu
@@ -820,7 +820,7 @@ module.frame = function()
 
 		--Quest Log
 		optionsAddObject(-20, 1*13, "font#tl:15:%y#Quest Log");
-		optionsBeginFrame(-5,   26, "checkbutton#tl:10:%y#o:questLevels#Display quest levels in the Quest Log");
+		optionsBeginFrame(-5,   26, "checkbutton#tl:10:%y#o:questLevels:" .. (module:getGameVersion() < 7 and "true" or "false") .. "#Display quest levels in the Quest Log");
 			optionsAddScript("onenter",
 				function(button)
 					module:displayTooltip(button, {"|cFFCCCCCCAdds |r[1] |cFFCCCCCCor |r[60+] |cFFCCCCCCin front of the quest title","|cFF999999May not take effect until you close and open the quest log"}, "ANCHOR_RIGHT",30,0);
@@ -996,7 +996,7 @@ end
 -- Options
 
 -- used by the minimap and titan-panel plugins
-function module:externalDropDown_Initialize(addButtonFunc, level)		-- customAddButtonFunc allows integration with LibUIDropDownMenu used by Titan Panel
+function module:externalDropDown_Initialize(level, addButtonFunc)		-- customAddButtonFunc allows integration with LibUIDropDownMenu used by Titan Panel
 	addButtonFunc = addButtonFunc or UIDropDownMenu_AddButton
 	level = level or UIDROPDOWNMENU_MENU_LEVEL
 	local info = { };

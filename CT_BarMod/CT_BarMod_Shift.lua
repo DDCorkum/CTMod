@@ -511,25 +511,27 @@ end
 -- Shift the possess bar.
 
 local function CT_BarMod_Shift_Possess_areWeShifting()
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		-- there isn't a possess bar in Vanilla/Classic!
-		return false;
-	elseif (CT_BottomBar and CT_BottomBar.ctPossess) then
-		-- This version of CT_BottomBar supports deactivation of this bar.
-		if (not CT_BottomBar.ctPossess.isDisabled) then
-			-- The bar is activated.
+	if (PossessBarFrame) then
+		if (CT_BottomBar and CT_BottomBar.ctPossess) then
+			-- This version of CT_BottomBar supports deactivation of this bar.
+			if (not CT_BottomBar.ctPossess.isDisabled) then
+				-- The bar is activated.
+				-- Let CT_BottomBar handle it.
+				return false;
+			end
+			-- This bar has been deactivated by CT_BottomBar.
+			-- We will handle it.
+		elseif (CT_BottomBar) then
+			-- This version of CT_BottomBar does not support deactivation of this bar.
 			-- Let CT_BottomBar handle it.
 			return false;
 		end
-		-- This bar has been deactivated by CT_BottomBar.
-		-- We will handle it.
-	elseif (CT_BottomBar) then
-		-- This version of CT_BottomBar does not support deactivation of this bar.
-		-- Let CT_BottomBar handle it.
+		-- We will handle shifting of this bar.
+		return true;
+	else
+		-- Classic
 		return false;
 	end
-	-- We will handle shifting of this bar.
-	return true;
 end
 
 local possessIsShifted;
@@ -649,34 +651,31 @@ local function CT_BarMod_Shift_Possess_UpdateState()
 end
 
 local function CT_BarMod_Shift_Possess_Init()
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		-- there isn't a possess bar in Vanilla/Classic!
-		return false;
+	if (PossessBarFrame) then	-- Classic vs. Retail
+		local frame1, frame2;
+
+		-- Our frame for the possess action buttons
+		frame1 = CreateFrame("Frame", "CT_BarMod_PossessBarFrame");
+		frame2 = PossessBarFrame;
+
+		frame1:SetParent(UIParent);
+		frame1:EnableMouse(false);
+		frame1:SetHeight(frame2:GetHeight());
+		frame1:SetWidth(frame2:GetWidth());
+		frame1:SetPoint("BOTTOMLEFT", frame2, "TOPLEFT", 0, 0)
+		frame1:SetAlpha(1);
+		frame1:Hide();
+
+		for i = 1, 2 do
+			hooksecurefunc(_G["PossessButton" .. i], "SetPoint", CT_BarMod_Shift_Possess_SetPoint);
+			hooksecurefunc(_G["PossessButton" .. i], "SetAllPoints", CT_BarMod_Shift_Possess_SetPoint);
+		end
+
+		hooksecurefunc("PossessBar_Update", CT_BarMod_Shift_Possess_Update);
+		hooksecurefunc("PossessBar_UpdateState", CT_BarMod_Shift_Possess_UpdateState);
+
+		CT_BarMod_Shift_Possess_UpdatePositions();
 	end
-	
-	local frame1, frame2;
-
-	-- Our frame for the possess action buttons
-	frame1 = CreateFrame("Frame", "CT_BarMod_PossessBarFrame");
-	frame2 = PossessBarFrame;
-
-	frame1:SetParent(UIParent);
-	frame1:EnableMouse(false);
-	frame1:SetHeight(frame2:GetHeight());
-	frame1:SetWidth(frame2:GetWidth());
-	frame1:SetPoint("BOTTOMLEFT", frame2, "TOPLEFT", 0, 0)
-	frame1:SetAlpha(1);
-	frame1:Hide();
-
-	for i = 1, 2 do
-		hooksecurefunc(_G["PossessButton" .. i], "SetPoint", CT_BarMod_Shift_Possess_SetPoint);
-		hooksecurefunc(_G["PossessButton" .. i], "SetAllPoints", CT_BarMod_Shift_Possess_SetPoint);
-	end
-
-	hooksecurefunc("PossessBar_Update", CT_BarMod_Shift_Possess_Update);
-	hooksecurefunc("PossessBar_UpdateState", CT_BarMod_Shift_Possess_UpdateState);
-
-	CT_BarMod_Shift_Possess_UpdatePositions();
 end
 
 -------------------------------
@@ -933,21 +932,21 @@ local function CT_BarMod_Shift_OnEvent(self, event, arg1, ...)
 		PetActionBarFrame:HookScript("OnShow", CT_BarMod_Shift_UIParent_ManageFramePositions);
 		PetActionBarFrame:HookScript("OnHide", CT_BarMod_Shift_UIParent_ManageFramePositions);
 
-		if (module:getGameVersion() >= 8) then
-		
+		if (PossessBarFrame) then
 			PossessBarFrame:HookScript("OnShow", CT_BarMod_Shift_UIParent_ManageFramePositions);
 			PossessBarFrame:HookScript("OnHide", CT_BarMod_Shift_UIParent_ManageFramePositions);		
-
+		end
+		
+		if (MultiCastActionBarFrame) then
 			MultiCastActionBarFrame:HookScript("OnShow", CT_BarMod_Shift_UIParent_ManageFramePositions);
 			MultiCastActionBarFrame:HookScript("OnHide", CT_BarMod_Shift_UIParent_ManageFramePositions);
+		end
 		
-		elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-	
+		if (module:getGameVersion() <= 7) then
+			-- Classic
 			ReputationWatchBar:HookScript("OnHide", CT_BarMod_Shift_UIParent_ManageFramePositions);
-			
 			MainMenuBarMaxLevelBar:HookScript("OnShow", CT_BarMod_Shift_UIParent_ManageFramePositions);
 			MainMenuBarMaxLevelBar:HookScript("OnHide", CT_BarMod_Shift_UIParent_ManageFramePositions);
-	
 		end
 	end
 

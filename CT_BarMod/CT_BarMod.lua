@@ -413,92 +413,93 @@ function module:setAttributes()
 end
 
 local function initUpdateButtonType()
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		return;
-	end
-	
+
 	-- Wrap the OnShow and OnHide scripts of the possess button that cancels possession so that
 	-- we know when Blizzard has shown or hidden it. They do so after checking the "enable" return
 	-- value from GetPossessInfo() which is something we can't do from secure code, so we'll let
 	-- them do it and notify us indirectly via these wrappers.
 
-	CT_BarMod_SecureFrame:SetAttribute("updateButtonType",
-	[=[
-		-- This will update the "type" attribute of the action buttons that have
-		-- an actionMode of "cancel"
-		-- an actionMode of "leave"
+	if (PossessBarFrame) then
+		-- not in classic
 
-		-- self == CT_BarMod_SecureFrame
-		-- select(1, ...) == true if the possess cancel button is enabled
+		CT_BarMod_SecureFrame:SetAttribute("updateButtonType",
+		[=[
+			-- This will update the "type" attribute of the action buttons that have
+			-- an actionMode of "cancel"
+			-- an actionMode of "leave"
 
---		local secureFrame = self;
---		local showCancel = secureFrame:GetAttribute("showcancel");
+			-- self == CT_BarMod_SecureFrame
+			-- select(1, ...) == true if the possess cancel button is enabled
 
-		local enabled = select(1, ...);
-		local groupNum = 1;
-		local groupFrame = self:GetFrameRef("group" .. groupNum);
-		while (groupFrame) do
-			local actionId;
-			local actionMode;
-			local buttonNum = 1;
-			local buttonFrame = groupFrame:GetFrameRef("child" .. buttonNum);
-			while (buttonFrame) do
-				actionId = buttonFrame:GetAttribute("action");
-				actionMode = buttonFrame:GetAttribute("actionMode");
-				if (actionMode == "cancel") then
-					--
-					-- For similar "type" attribute code see also:
-					-- 1) setActionPage_Secure in CT_BarMod_Use.lua
-					-- 2) secureFrame_OnAttributeChanged in CT_BarMod.lua
-					-- 3) initUpdateButtonType() in CT_BarMod.lua
-					--
-					if (enabled) then
+	--		local secureFrame = self;
+	--		local showCancel = secureFrame:GetAttribute("showcancel");
+
+			local enabled = select(1, ...);
+			local groupNum = 1;
+			local groupFrame = self:GetFrameRef("group" .. groupNum);
+			while (groupFrame) do
+				local actionId;
+				local actionMode;
+				local buttonNum = 1;
+				local buttonFrame = groupFrame:GetFrameRef("child" .. buttonNum);
+				while (buttonFrame) do
+					actionId = buttonFrame:GetAttribute("action");
+					actionMode = buttonFrame:GetAttribute("actionMode");
+					if (actionMode == "cancel") then
+						--
+						-- For similar "type" attribute code see also:
+						-- 1) setActionPage_Secure in CT_BarMod_Use.lua
+						-- 2) secureFrame_OnAttributeChanged in CT_BarMod.lua
+						-- 3) initUpdateButtonType() in CT_BarMod.lua
+						--
+						if (enabled) then
+							buttonFrame:SetAttribute("type", "click");
+						else
+							buttonFrame:SetAttribute("type", nil);
+						end
+					elseif (actionMode == "leave") then
+						--
+						-- For similar "type" attribute code see also:
+						-- 1) setActionPage_Secure in CT_BarMod_Use.lua
+						-- 2) secureFrame_OnAttributeChanged in CT_BarMod.lua
+						-- 3) initUpdateButtonType() in CT_BarMod.lua
+						--
 						buttonFrame:SetAttribute("type", "click");
 					else
-						buttonFrame:SetAttribute("type", nil);
+						if (buttonFrame:GetAttribute("type") ~= "action") then
+							buttonFrame:SetAttribute("type", "action");
+						end
 					end
-				elseif (actionMode == "leave") then
-					--
-					-- For similar "type" attribute code see also:
-					-- 1) setActionPage_Secure in CT_BarMod_Use.lua
-					-- 2) secureFrame_OnAttributeChanged in CT_BarMod.lua
-					-- 3) initUpdateButtonType() in CT_BarMod.lua
-					--
-					buttonFrame:SetAttribute("type", "click");
-				else
-					if (buttonFrame:GetAttribute("type") ~= "action") then
-						buttonFrame:SetAttribute("type", "action");
-					end
+					buttonNum = buttonNum + 1;
+					buttonFrame = groupFrame:GetFrameRef("child" .. buttonNum);
 				end
-				buttonNum = buttonNum + 1;
-				buttonFrame = groupFrame:GetFrameRef("child" .. buttonNum);
+				groupNum = groupNum + 1;
+				groupFrame = self:GetFrameRef("group" .. groupNum);
 			end
-			groupNum = groupNum + 1;
-			groupFrame = self:GetFrameRef("group" .. groupNum);
-		end
-	]=]);
+		]=]);
 
-	SecureHandlerWrapScript(_G["PossessButton" .. (POSSESS_CANCEL_SLOT or 2)], "OnShow", CT_BarMod_SecureFrame,
-		[=[
-			local enabled = true;
-			control:SetAttribute("showcancel", enabled);
-			control:RunAttribute("updateButtonType", enabled);
-			return nil; -- we want the wrapped handler to execute
-		]=]
-	);
+		SecureHandlerWrapScript(_G["PossessButton" .. (POSSESS_CANCEL_SLOT or 2)], "OnShow", CT_BarMod_SecureFrame,
+			[=[
+				local enabled = true;
+				control:SetAttribute("showcancel", enabled);
+				control:RunAttribute("updateButtonType", enabled);
+				return nil; -- we want the wrapped handler to execute
+			]=]
+		);
 
-	SecureHandlerWrapScript(_G["PossessButton" .. (POSSESS_CANCEL_SLOT or 2)], "OnHide", CT_BarMod_SecureFrame,
-		[=[
-			local enabled = false;
-			control:SetAttribute("showcancel", enabled);
-			control:RunAttribute("updateButtonType", enabled);
-			return nil; -- we want the wrapped handler to execute
-		]=]
-	);
+		SecureHandlerWrapScript(_G["PossessButton" .. (POSSESS_CANCEL_SLOT or 2)], "OnHide", CT_BarMod_SecureFrame,
+			[=[
+				local enabled = false;
+				control:SetAttribute("showcancel", enabled);
+				control:RunAttribute("updateButtonType", enabled);
+				return nil; -- we want the wrapped handler to execute
+			]=]
+		);
 
-	-- Set the initial value of the attribute in case Blizzard has already shown/hidden the button.
-	local texture, name, enabled = GetPossessInfo(POSSESS_CANCEL_SLOT or 2);
-	CT_BarMod_SecureFrame:SetAttribute("showcancel", enabled or false);
+		-- Set the initial value of the attribute in case Blizzard has already shown/hidden the button.
+		local texture, name, enabled = GetPossessInfo(POSSESS_CANCEL_SLOT or 2);
+		CT_BarMod_SecureFrame:SetAttribute("showcancel", enabled or false);
+	end
 end
 
 local function secureFrame_updateButton_unsecure(self, groupNum, buttonNum)

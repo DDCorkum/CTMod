@@ -314,6 +314,33 @@ module.flightMaps =
 };
 
 
+-- Classic Flight Path x/y scaling and offsets
+-- 	key			Number, Required		GetTaxiMapID() when at a flight master using FlightMapFrame
+--	val			Table, Required			mapID is the worldmap uiMapID, xOff and yOff are added to the x/y coords, and everything is multiplied by xScale/yScale
+module.classicTaxiMaps = 
+{
+	[1463] = { mapID = 1415, xOff = -0.152, xScale = 1.52, yOff = -0.084, yScale = 1.094 },		-- Classic Eastern Kingdoms
+	[1464] = { mapID = 1414, xOff = -0.164, xScale = 1.5, yOff = -0.01, yScale = 1 },		-- Classic Kalimdor
+	[987] = { mapID = 1945, xOff = -0.166, xScale = 1.52, yOff = 0.071, yScale = 0.92 },		-- The Burning Crusade Classic
+};
+
+
+-- Data points to omit from the taxi map
+-- 	key			Number, Required		TaxiNodeID
+module.ignoreClassicTaxiNodes = 
+{
+	[103] = true,
+	[104] = true,
+	[105] = true,
+	[106] = true,
+	[107] = true,
+	[108] = true,
+	[109] = true,
+	[110] = true,
+	
+};
+
+
 ------------------------------------------------
 -- Gathering Professions
 
@@ -371,7 +398,8 @@ module.gatheringSkills =
 ------------------------------------------------
 -- Localization
 
-if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+if (not GetProfessions) then
+	-- This isn't required from classic onwards
 	local findOre = Spell:CreateFromSpellID(2580);
 	findOre:ContinueOnSpellLoad(
 		function() 

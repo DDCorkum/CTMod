@@ -335,11 +335,8 @@ local setActionPage_unsecure = function(self, page)
 	-- Blizzard doesn't update the page number font string on the
 	-- action bar arrows when you get into a vehicle, even though
 	-- the game has changed the action bar page to 1 (GetActionBarPage() == 1).
-	if (module:getGameVersion() >= 8) then
-		MainMenuBarArtFrame.PageNumber:SetText(GetActionBarPage());   --Changed in WoW 8.0.1
-	elseif (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		MainMenuBarPageNumber:SetText(GetActionBarPage());
-	end
+	(MainMenuBarPageNumber or MainMenuBarArtFrame.PageNumber):SetText(GetActionBarPage());   --Changed in WoW 8.0.1
+
 
 	-- Update our key bindings list if the window is visible.
 	module.keybindings_buttonsUpdateList();
@@ -841,7 +838,7 @@ defaultPositions[3] = {
 	[12] = {"BOTTOMLEFT", "BOTTOM", -516, 65, "ACROSS", "AB"},  -- Bar 12, Action Bar position
 };
 
-if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+if (module:getGameVersion() <= 7) then
 	-- override positions to fit better with classic
 	defaultPositions[1][12][4] = 45;
 	defaultPositions[2][12][4] = 45;

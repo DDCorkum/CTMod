@@ -27,10 +27,11 @@ local questLogPrefixes = {
 };
 
 local function toggleDisplayLevels(enable)
-	displayLevels = enable;
+	-- defaults to true only prior to Legion, when level scaling was first introduced
+	displayLevels = enable or module:getGameVersion() < 7 and enable == nil
 end
 
-if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+if (module:getGameVersion() == 1) then
 
 	
 	--[[
@@ -56,8 +57,8 @@ if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
 
 	
 	
-	-- THIS IS IS A HARDER BUT MORE ELEGANT APPROACH STARTING IN 8.2.5.4
-	-- IT OVERLOADS QuestLog_Update(self) ON LINE 111 AND QuesWatch_Update() ON LINE 616 OF QuestLogFrame.lua
+	-- THIS IS IS A HARDER APPROACH STARTING IN 8.2.5.4
+	-- IT OVERLOADS QuestLog_Update(self) ON LINE 111 AND QuestWatch_Update() ON LINE 616 OF QuestLogFrame.lua
 	-- DOING SO LIMITS THE SCOPE TO THE DISPLAY OF QUESTS IN THE QUEST TRACKER, FOR BETTER COMPATIBILITY TO OTHER ADDONS
 
 	QuestLog_Update = function(self)
@@ -369,6 +370,314 @@ if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
 	
 		UIParent_ManageFramePositions();
 	end
+
+elseif (module:getGameVersion() == 2) then
+
+	hooksecurefunc("QuestLog_Update", function(self)
+		local numEntries, numQuests = GetNumQuestLogEntries();
+		if ( numEntries == 0 ) then
+			EmptyQuestLogFrame:Show();
+			QuestLogFrameAbandonButton:Disable();
+			QuestLogFrame.hasTimer = nil;
+			QuestLogDetailScrollFrame:Hide();
+			QuestLogExpandButtonFrame:Hide();
+		else
+			EmptyQuestLogFrame:Hide();
+			QuestLogFrameAbandonButton:Enable();
+			QuestLogDetailScrollFrame:Show();
+			QuestLogExpandButtonFrame:Show();
+		end
+
+		-- Update Quest Count
+		QuestLogUpdateQuestCount(numQuests);
+
+		-- ScrollFrame update
+		FauxScrollFrame_Update(QuestLogListScrollFrame, numEntries, QUESTS_DISPLAYED, QUESTLOG_QUEST_HEIGHT, nil, nil, nil, QuestLogHighlightFrame, 293, 316 )
+
+		-- Update the quest listing
+		QuestLogHighlightFrame:Hide();
+
+		local questIndex, questLogTitle, questTitleTag, questNumGroupMates, questNormalText, questHighlight, questCheck;
+		local questLogTitleText, level, questTag, isHeader, isCollapsed, isComplete, color;
+		local numPartyMembers, partyMembersOnQuest, tempWidth, textWidth;
+		for i=1, QUESTS_DISPLAYED, 1 do
+			questIndex = i + FauxScrollFrame_GetOffset(QuestLogListScrollFrame);
+			questLogTitle = _G["QuestLogTitle"..i];
+			questTitleTag = _G["QuestLogTitle"..i.."Tag"];
+			questNumGroupMates = _G["QuestLogTitle"..i.."GroupMates"];
+			questCheck = _G["QuestLogTitle"..i.."Check"];
+			questNormalText = _G["QuestLogTitle"..i.."NormalText"];
+			questHighlight = _G["QuestLogTitle"..i.."Highlight"];
+			if ( questIndex <= numEntries ) then
+				questLogTitleText, level, questTag, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isBounty, isStory, isHidden, isScaling = GetQuestLogTitle(questIndex);
+-- CT_CORE MODIFICATION STARTS HERE
+				if (displayLevels and questLogTitleText and level and level > 0) then
+					if (questTag) then
+						questLogTitleText = "[" .. level .. "+] " .. questLogTitleText;
+					else
+						questLogTitleText = "[" .. level .. "] " .. questLogTitleText;
+					end
+				end
+-- CT_CORE MODIFICATION ENDS HERE
+				if ( isHeader ) then
+					if ( questLogTitleText ) then
+						questLogTitle:SetText(questLogTitleText);
+					else
+						questLogTitle:SetText("");
+					end
+
+					if ( isCollapsed ) then
+						questLogTitle:SetNormalTexture("Interface\\Buttons\\UI-PlusButton-Up");
+					else
+						questLogTitle:SetNormalTexture("Interface\\Buttons\\UI-MinusButton-Up"); 
+					end
+					questHighlight:SetTexture("Interface\\Buttons\\UI-PlusButton-Hilight");
+					questNumGroupMates:SetText("");
+					questCheck:Hide();
+				else
+					questLogTitle:SetText("  "..questLogTitleText);
+					--Set Dummy text to get text width *SUPER HACK*
+					QuestLogDummyText:SetText("  "..questLogTitleText);
+
+					questLogTitle:SetNormalTexture("");
+					questHighlight:SetTexture("");
+
+					-- If not a header see if any nearby group mates are on this quest
+					partyMembersOnQuest = 0;
+					for j=1, GetNumSubgroupMembers() do
+						if ( IsUnitOnQuest(questIndex, "party"..j) ) then
+							partyMembersOnQuest = partyMembersOnQuest + 1;
+						end
+					end
+					if ( partyMembersOnQuest > 0 ) then
+						questNumGroupMates:SetText("["..partyMembersOnQuest.."]");
+					else
+						questNumGroupMates:SetText("");
+					end
+				end
+				-- Save if its a header or not
+				questLogTitle.isHeader = isHeader;
+
+				-- Set the quest tag
+				if ( isComplete and isComplete < 0 ) then
+					questTag = FAILED;
+				elseif ( isComplete and isComplete > 0 ) then
+					questTag = COMPLETE;
+				end
+				if ( questTag ) then
+					questTitleTag:SetText("("..questTag..")");
+					-- Shrink text to accomdate quest tags without wrapping
+					tempWidth = 275 - 15 - questTitleTag:GetWidth();
+
+					if ( QuestLogDummyText:GetWidth() > tempWidth ) then
+						textWidth = tempWidth;
+					else
+						textWidth = QuestLogDummyText:GetWidth();
+					end
+
+					questNormalText:SetWidth(tempWidth);
+
+					-- If there's quest tag position check accordingly
+					questCheck:Hide();
+					if ( IsQuestWatched(questIndex) ) then
+						if ( questNormalText:GetWidth() + 24 < 275 ) then
+							questCheck:SetPoint("LEFT", questLogTitle, "LEFT", textWidth+24, 0);
+						else
+							questCheck:SetPoint("LEFT", questLogTitle, "LEFT", textWidth+10, 0);
+						end
+						questCheck:Show();
+					end
+				else
+					questTitleTag:SetText("");
+					-- Reset to max text width
+					if ( questNormalText:GetWidth() > 275 ) then
+						questNormalText:SetWidth(260);
+					end
+
+					-- Show check if quest is being watched
+					questCheck:Hide();
+					if ( IsQuestWatched(questIndex) ) then
+						if ( questNormalText:GetWidth() + 24 < 275 ) then
+							questCheck:SetPoint("LEFT", questLogTitle, "LEFT", QuestLogDummyText:GetWidth()+24, 0);
+						else
+							questCheck:SetPoint("LEFT", questNormalText, "LEFT", questNormalText:GetWidth(), 0);
+						end
+						questCheck:Show();
+					end
+				end
+
+				-- Color the quest title and highlight according to the difficulty level
+				if ( isHeader ) then
+					color = QuestDifficultyColors["header"];
+				else
+					color = GetQuestDifficultyColor(level);
+				end
+				questLogTitle:SetNormalFontObject(color.font);
+				questTitleTag:SetTextColor(color.r, color.g, color.b);
+				questNumGroupMates:SetTextColor(color.r, color.g, color.b);
+				questLogTitle.r = color.r;
+				questLogTitle.g = color.g;
+				questLogTitle.b = color.b;
+				questLogTitle:Show();
+
+				-- Place the highlight and lock the highlight state
+				if ( QuestLogFrame.selectedButtonID and GetQuestLogSelection() == questIndex ) then
+					QuestLogSkillHighlight:SetVertexColor(questLogTitle.r, questLogTitle.g, questLogTitle.b);
+					QuestLogHighlightFrame:SetPoint("TOPLEFT", "QuestLogTitle"..i, "TOPLEFT", 0, 0);
+					QuestLogHighlightFrame:Show();
+					questTitleTag:SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+					questNumGroupMates:SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+					questLogTitle:LockHighlight();
+				else
+					questLogTitle:UnlockHighlight();
+				end
+
+			else
+				questLogTitle:Hide();
+			end
+		end
+
+		-- Set the expand/collapse all button texture
+		local numHeaders = 0;
+		local notExpanded = 0;
+		-- Somewhat redundant loop, but cleaner than the alternatives
+		for i=1, numEntries, 1 do
+			local index = i;
+			local questLogTitleText, level, questTag, isHeader, isCollapsed = GetQuestLogTitle(i);
+			if ( questLogTitleText and isHeader ) then
+				numHeaders = numHeaders + 1;
+				if ( isCollapsed ) then
+					notExpanded = notExpanded + 1;
+				end
+			end
+		end
+		-- If all headers are not expanded then show collapse button, otherwise show the expand button
+		if ( notExpanded ~= numHeaders ) then
+			QuestLogCollapseAllButton.collapsed = nil;
+			QuestLogCollapseAllButton:SetNormalTexture("Interface\\Buttons\\UI-MinusButton-Up");
+		else
+			QuestLogCollapseAllButton.collapsed = 1;
+			QuestLogCollapseAllButton:SetNormalTexture("Interface\\Buttons\\UI-PlusButton-Up");
+		end
+
+		-- Update Quest Count
+		QuestLogQuestCount:SetText(format(QUEST_LOG_COUNT_TEMPLATE, numQuests, MAX_QUESTLOG_QUESTS));
+
+		-- If no selection then set it to the first available quest
+		if ( GetQuestLogSelection() == 0 ) then
+			QuestLog_SetFirstValidSelection();
+		end
+
+		-- Determine whether the selected quest is pushable or not
+		if ( numEntries == 0 ) then
+			QuestFramePushQuestButton:Disable();
+		elseif ( GetQuestLogPushable() and IsInGroup() ) then
+			QuestFramePushQuestButton:Enable();
+		else
+			QuestFramePushQuestButton:Disable();
+		end
+	end); -- end posthook of QuestLog_Update
+	
+	hooksecurefunc("QuestWatch_Update", function(self)
+		local numObjectives;
+		local questWatchMaxWidth = 0;
+		local tempWidth;
+		local watchText;
+		local text, type, finished;
+		local questTitle
+		local watchTextIndex = 1;
+		local questIndex;
+		local objectivesCompleted;
+
+		for i=1, GetNumQuestWatches() do
+			questIndex = GetQuestIndexForWatch(i);
+			if ( questIndex ) then
+				numObjectives = GetNumQuestLeaderBoards(questIndex);
+
+				--If there are objectives set the title
+				if ( numObjectives > 0 ) then
+					-- Set title
+					watchText = _G["QuestWatchLine"..watchTextIndex];
+-- CT_CORE MODIFICATION STARTS HERE
+					-- watchText:SetText(GetQuestLogTitle(questIndex));
+					local questLogTitleText, level, questTag = GetQuestLogTitle(questIndex);
+					if (displayLevels and questLogTitleText and level and level > 0) then
+						if (questTag) then
+							questLogTitleText = "[" .. level .. "+] " .. questLogTitleText;
+						else
+							questLogTitleText = "[" .. level .. "] " .. questLogTitleText;
+						end
+					end
+					watchText:SetText(questLogTitleText);
+-- CT_CORE MODIFICATION ENDS HERE
+					tempWidth = watchText:GetWidth();
+					-- Set the anchor of the title line a little lower
+					if ( watchTextIndex > 1 ) then
+						watchText:SetPoint("TOPLEFT", "QuestWatchLine"..(watchTextIndex - 1), "BOTTOMLEFT", 0, -4);
+					end
+					watchText:Show();
+					if ( tempWidth > questWatchMaxWidth ) then
+						questWatchMaxWidth = tempWidth;
+					end
+					watchTextIndex = watchTextIndex + 1;
+					objectivesCompleted = 0;
+					for j=1, numObjectives do
+						text, type, finished = GetQuestLogLeaderBoard(j, questIndex);
+						watchText = _G["QuestWatchLine"..watchTextIndex];
+						-- Set Objective text
+						watchText:SetText(" - "..text);
+						-- Color the objectives
+						if ( finished ) then
+							watchText:SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+							objectivesCompleted = objectivesCompleted + 1;
+						else
+							watchText:SetTextColor(0.8, 0.8, 0.8);
+						end
+						tempWidth = watchText:GetWidth();
+						if ( tempWidth > questWatchMaxWidth ) then
+							questWatchMaxWidth = tempWidth;
+						end
+						watchText:SetPoint("TOPLEFT", "QuestWatchLine"..(watchTextIndex - 1), "BOTTOMLEFT", 0, 0);
+						watchText:Show();
+						watchTextIndex = watchTextIndex + 1;
+					end
+					-- Brighten the quest title if all the quest objectives were met
+					watchText = _G["QuestWatchLine"..watchTextIndex-numObjectives-1];
+					if ( objectivesCompleted == numObjectives ) then
+						watchText:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b);
+					else
+						watchText:SetTextColor(0.75, 0.61, 0);
+					end
+				end
+			end
+		end
+
+		-- Set tracking indicator
+		if ( GetNumQuestWatches() > 0 ) then
+			QuestLogTrackTracking:SetVertexColor(0, 1.0, 0);
+		else
+			QuestLogTrackTracking:SetVertexColor(1.0, 0, 0);
+		end
+
+		-- If no watch lines used then hide the frame and return
+		if ( watchTextIndex == 1 ) then
+			QuestWatchFrame:Hide();
+			return;
+		else
+			QuestWatchFrame:Show();
+			QuestWatchFrame:SetHeight(watchTextIndex * 13);
+			QuestWatchFrame:SetWidth(questWatchMaxWidth + 10);
+		end
+
+		-- Hide unused watch lines
+		for i=watchTextIndex, MAX_QUESTWATCH_LINES do
+			_G["QuestWatchLine"..i]:Hide();
+		end
+
+		UIParent_ManageFramePositions();
+	end); -- end post-hook of QuestWatch_Update()
+	
+
 
 else  -- if module:getGameVersion() >= 9
 	
@@ -1465,29 +1774,29 @@ do
 	--	Does not open or close any bags.
 
 	local events = {
-		["BANKFRAME_OPENED"]      = {option = "bankOpenBags", open = true, backpack = "bankOpenBackpack", nobags = "bankOpenNoBags", bank = "bankOpenBankBags", classic = true},
-		["BANKFRAME_CLOSED"]      = {option = "bankCloseBags", classic = true},
+		["BANKFRAME_OPENED"]      = {option = "bankOpenBags", open = true, backpack = "bankOpenBackpack", nobags = "bankOpenNoBags", bank = "bankOpenBankBags"},
+		["BANKFRAME_CLOSED"]      = {option = "bankCloseBags"},
 
-		["GUILDBANKFRAME_OPENED"] = {option = "gbankOpenBags", open = true, backpack = "gbankOpenBackpack", nobags = "gbankOpenNoBags"},
-		["GUILDBANKFRAME_CLOSED"] = {option = "gbankCloseBags"},
+		["GUILDBANKFRAME_OPENED"] = GuildBankframe and {option = "gbankOpenBags", open = true, backpack = "gbankOpenBackpack", nobags = "gbankOpenNoBags"},
+		["GUILDBANKFRAME_CLOSED"] = GuildBankFrame and {option = "gbankCloseBags"},
 
-		["MERCHANT_SHOW"]         = {option = "merchantOpenBags", open = true, backpack = "merchantOpenBackpack", nobags = "merchantOpenNoBags", classic = true},
-		["MERCHANT_CLOSED"]       = {option = "merchantCloseBags", classic = true},
+		["MERCHANT_SHOW"]         = {option = "merchantOpenBags", open = true, backpack = "merchantOpenBackpack", nobags = "merchantOpenNoBags"},
+		["MERCHANT_CLOSED"]       = {option = "merchantCloseBags"},
 
-		["AUCTION_HOUSE_SHOW"]    = {option = "auctionOpenBags", open = true, backpack = "auctionOpenBackpack", nobags = "auctionOpenNoBags", classic = true},
-		["AUCTION_HOUSE_CLOSED"]  = {option = "auctionCloseBags", classic = true},
+		["AUCTION_HOUSE_SHOW"]    = {option = "auctionOpenBags", open = true, backpack = "auctionOpenBackpack", nobags = "auctionOpenNoBags"},
+		["AUCTION_HOUSE_CLOSED"]  = {option = "auctionCloseBags"},
 
-		["TRADE_SHOW"]            = {option = "tradeOpenBags", open = true, backpack = "tradeOpenBackpack", nobags = "tradeOpenNoBags", classic = true},
-		["TRADE_CLOSED"]          = {option = "tradeCloseBags", classic = true},
+		["TRADE_SHOW"]            = {option = "tradeOpenBags", open = true, backpack = "tradeOpenBackpack", nobags = "tradeOpenNoBags"},
+		["TRADE_CLOSED"]          = {option = "tradeCloseBags"},
 
-		["VOID_STORAGE_OPEN"]     = {option = "voidOpenBags", open = true, backpack = "voidOpenBackpack", nobags = "voidOpenNoBags"},
-		["VOID_STORAGE_CLOSE"]    = {option = "voidCloseBags"},
+		["VOID_STORAGE_OPEN"]     = VoidStorageFrame and {option = "voidOpenBags", open = true, backpack = "voidOpenBackpack", nobags = "voidOpenNoBags"},
+		["VOID_STORAGE_CLOSE"]    = VoidStorageFrame and {option = "voidCloseBags"},
 
-		["OBLITERUM_FORGE_SHOW"]     = {option = "obliterumOpenBags", open = true, backpack = "obliterumOpenBackpack", nobags = "obliterumOpenNoBags"},
-		["OBLITERUM_FORGE_CLOSE"]    = {option = "obliterumCloseBags"},
+		["OBLITERUM_FORGE_SHOW"]     = ObliterumForgeFrame and {option = "obliterumOpenBags", open = true, backpack = "obliterumOpenBackpack", nobags = "obliterumOpenNoBags"},
+		["OBLITERUM_FORGE_CLOSE"]    = ObliterumForgeFrame and {option = "obliterumCloseBags"},
 		
-		["SCRAPPING_MACHINE_SHOW"]     = {option = "scrappingOpenBags", open = true, backpack = "scrappingOpenBackpack", nobags = "scrappingOpenNoBags"},
-		["SCRAPPING_MACHINE_CLOSE"]    = {option = "scrappingCloseBags"},
+		["SCRAPPING_MACHINE_SHOW"]     = ScrappingMachineFrame and {option = "scrappingOpenBags", open = true, backpack = "scrappingOpenBackpack", nobags = "scrappingOpenNoBags"},
+		["SCRAPPING_MACHINE_CLOSE"]    = ScrappingMachineFrame and {option = "scrappingCloseBags"},
 
 	};
 
@@ -1504,11 +1813,6 @@ do
 			return;
 		end
 		
-		if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC and not data.classic) then
-			-- This didn't exist in vanilla/classic WoW, so go no further
-			return;
-		end
-
 		if (data.open) then
 			-- This is an open event.
 			local openAllBags;
@@ -1560,10 +1864,8 @@ do
 	end
 
 	for event, data in pairs(events) do
-		if (module:getGameVersion() >= 8 or data.classic) then
-			-- register all events, or just the ones that are in WoW Classic
-			module:regEvent(event, onEvent);
-		end
+		-- register all events, or just the ones that are in WoW Classic
+		module:regEvent(event, onEvent);
 	end
 end
 
@@ -2251,7 +2553,7 @@ do
 			},
 
 			["onload"] = function(self)
-				if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+				if (WatchFrame == QuestWatchFrame) then	-- classic
 					module:getFrame(
 					{
 						["button#s:16:16#n:CT_Core_MinimizeWatchFrameButton#tl:tr:CT_WatchFrame"] = 
@@ -2261,25 +2563,31 @@ do
 								button:GetNormalTexture():SetTexCoord(0.0, 0.5, 0.5, 1.0);
 								button:SetPushedTexture("Interface\\Buttons\\UI-Panel-QuestHideButton");
 								button:GetPushedTexture():SetTexCoord(0.5, 1.0, 0.5, 1.0);
-								button:SetHighlightTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight")
+								button:SetHighlightTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight");
 								button:GetHighlightTexture():SetBlendMode("ADD");
 								button:SetDisabledTexture("Interface\\Buttons\\UI-Panel-QuestHideButton-disabled");
 								button:Hide();
+								button.fs = button:CreateFontString(nil, "BACKGROUND", "GameFontNormalSmall");
+								button.fs:SetPoint("RIGHT", button, "LEFT", -2, 0);
+								button.fs:SetText(OBJECTIVES_TRACKER_LABEL);
+								button.fs:Hide();
 							end;
 							["onclick"] = function(button)
 								if (CT_WatchFrame:IsShown()) then
 									classicIsMinimized = true;
 									button:GetNormalTexture():SetTexCoord(0.0, 0.5, 0.0, 0.5);
 									button:GetPushedTexture():SetTexCoord(0.5, 1.0, 0.0, 0.5);
+									button.fs:Show();
 								else
 									classicIsMinimized = false;
 									button:GetNormalTexture():SetTexCoord(0.0, 0.5, 0.5, 1.0);
 									button:GetPushedTexture():SetTexCoord(0.5, 1.0, 0.5, 1.0);
+									button.fs:Hide();
 								end
 								updateVisibility();
 								PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
 							end
-						}
+						},
 					},
 					UIParent);
 				end
@@ -2487,211 +2795,203 @@ local powerbaraltShowAnchor;
 
 local powerbaralt__createAnchorFrame;
 
-local function powerbaralt_reanchor()
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return; end
-	PlayerPowerBarAlt:ClearAllPoints();
-	PlayerPowerBarAlt:SetPoint("CENTER", powerbaraltAnchorFrame, "CENTER", 0, 0);
-end
+local powerbaralt_toggleStatus, powerbaralt_toggleMovable, powerbaralt_toggleAnchor;	-- defined within the conditional chunk below
 
-local function powerbaralt_resetPosition()
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return; end
-	local self = powerbaraltAnchorFrame;
-	self:ClearAllPoints();
-	self:SetPoint("BOTTOM", UIParent, "BOTTOM", 0, 150);
-end
-
-module.powerbaralt_resetPosition = powerbaralt_resetPosition;
-
-local function powerbaralt_updateAnchorVisibility()
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return; end
-	local self = powerbaraltAnchorFrame;
-	if (not self) then
-		powerbaralt__createAnchorFrame();
-		self = powerbaraltAnchorFrame;
-	end
-	if (powerbaraltEnabled and powerbaraltMovable) then
-		if (PlayerPowerBarAlt:IsShown()) then
-			self:Hide();
-		else
-			if (powerbaraltShowAnchor) then
-				self:Show();
-			else
-				self:Hide();
-			end
-		end
-	else
-		self:Hide();
-	end
-end
-
-local function powerbaralt_isModifiedButton()
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return; end
-	local modifier = module:getOption("powerbaraltModifier") or 1;
-	local alt = IsAltKeyDown();
-	local control = IsControlKeyDown();
-	local shift = IsShiftKeyDown();
-
-	if (modifier == 1) then
-		return not alt and not control and not shift;
-	elseif (modifier == 2 and alt) then
-		return not control and not shift;
-	elseif (modifier == 3 and control) then
-		return not alt and not shift;
-	elseif (modifier == 4 and shift) then
-		return not alt and not control;
-	else
-		return false;
-	end
-end
-
-local function powerbaralt_onMouseDown(self, button)
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return; end
-	if (powerbaraltEnabled and powerbaraltMovable) then
-		if ( button == "LeftButton" and powerbaralt_isModifiedButton() ) then
-			module:moveMovable(self.movable);
-		end
-	end
-end
-
-local function powerbaralt_onMouseUp(self, button)
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return; end
-	if (powerbaraltEnabled and powerbaraltMovable) then
-		if ( button == "LeftButton" ) then
-			module:stopMovable(self.movable);
-		elseif ( button == "RightButton" and powerbaralt_isModifiedButton() ) then
-			powerbaralt_resetPosition();
-			module:stopMovable(self.movable);
-		end
-	end
-end
-
-local function powerbaralt_UIParent_ManageFramePositions()
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return; end
-	if (powerbaraltEnabled) then
-		powerbaralt_reanchor();
-	end
-end
-
-local function powerbaralt_onEvent(self, event, arg1, ...)
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return; end
-	if (event == "PLAYER_LOGIN") then
-		PlayerPowerBarAlt:HookScript("OnMouseDown",
-			function(self, button)
-				powerbaralt_onMouseDown(powerbaraltAnchorFrame, button);
-			end
-		);
-		PlayerPowerBarAlt:HookScript("OnMouseUp",
-			function(self, button)
-				powerbaralt_onMouseUp(powerbaraltAnchorFrame, button);
-			end
-		);
-		PlayerPowerBarAlt:HookScript("OnShow",
-			function(self)
-				powerbaralt_updateAnchorVisibility();
-			end
-		);
-		PlayerPowerBarAlt:HookScript("OnHide",
-			function(self)
-				powerbaralt_updateAnchorVisibility();
-			end
-		);
-
-		hooksecurefunc("UIParent_ManageFramePositions", powerbaralt_UIParent_ManageFramePositions);
-		-- By now GetCVar("uiScale") has a value, so if Blizzard_CombatLog is already loaded
-		-- then it won't cause an error when it tries to multiply by the uiScale.
-		UIParent_ManageFramePositions();
-	end
-end
-
-local function powerbaralt_createAnchorFrame()
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return; end
-	local movable = "PowerBarAltAnchor";
-
-	local self = CreateFrame("Button", "CT_Core_PlayerPowerBarAltAnchorFrame", UIParent);
-
-	powerbaraltAnchorFrame = self;
-
-	self:SetWidth(110);
-	self:SetHeight(32);
-	powerbaralt_resetPosition();
-
-	local fs = self:CreateFontString(nil, "OVERLAY", "GameFontHighlight");
-	fs:SetWidth(self:GetWidth());
-	fs:SetHeight(self:GetHeight());
-	fs:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 0);
-	fs:Show();
-	fs:SetText("Alternate Power\nBar anchor");
-
-	local tex = self:CreateTexture(nil, "ARTWORK");
-	self.tex = tex;
-	tex:SetPoint("TOPLEFT", self);
-	tex:SetPoint("BOTTOMRIGHT", self);
-	tex:Show();
-	tex:SetTexture("Interface\\Tooltips\\UI-Tooltip-Background");
-	tex:SetVertexColor(0.7, 0.7, 0.7, 0.8);
-
-	self:SetScript("OnMouseDown", powerbaralt_onMouseDown);
-	self:SetScript("OnMouseUp", powerbaralt_onMouseUp);
-	self:SetScript("OnEvent", powerbaralt_onEvent);
-
-	module:registerMovable(movable, self, true);
-	self.movable = movable;
-
-	self:RegisterEvent("PLAYER_LOGIN");
-	self:Hide();
-end
-
-powerbaralt__createAnchorFrame = powerbaralt_createAnchorFrame;
-
-local function powerbaralt_toggleStatus(enable)
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return; end
-	-- Use custom bar position
-	powerbaraltEnabled = enable;
-	powerbaralt_updateAnchorVisibility();
-	if (powerbaraltEnabled) then
-		powerbaralt_reanchor();
-	else
-		-- When entering the world for the FIRST time after starting the game, GetCVar("uiScale")
-		-- returns nil when CT_Core loads (ie. at ADDON_LOADED event time). The game hasn't had
-		-- time to update the setting yet. This is also the case for GetCVarBool("scriptErrors").
-		--
-		-- When the Blizzard_CombatLog addon gets loaded, it hooks the FCF_DockUpdate function
-		-- which gets called by the UIParent_ManageFramePositions function in UIParent.lua.
-		--
-		-- If there is an addon that loads before CT_Core and causes the Blizzard_CombatLog addon
-		-- to load, then we want to avoid calling UIParent_ManageFramePositions while GetCVar("uiScale")
-		-- is nil. If we do call it when the uiScale is nil, then the Blizzard_CombatLog code will cause an error
-		-- when it gets to the Blizzard_CombatLog_AdjustCombatLogHeight() function in Blizzard_CombatLog.lua.
-		-- That code tries to multiply by GetCVar("uiScale"), and since it is still nil then there will
-		-- be an error.
-		--
-		-- Blizzard's code won't display the error (see BasicControls.xml) because GetCVarBool("scriptErrors")
-		-- is still nil when CT_Core loads. The user won't see the error unless they have an addon that loads
-		-- before CT_Core and traps and displays errors.
-		--
-		-- To avoid this error we will only call UIParent_ManageFramePositions() when the uiScale has
-		-- a value. This is the place in this addon where UIParent_ManageFramePositions() may get called
-		-- at ADDON_LOADED time by CT_Libary (during the "init" options step).
-
+if (PlayerPowerBarAlt) then
+	local function powerbaralt_reanchor()
 		PlayerPowerBarAlt:ClearAllPoints();
-		if (GetCVar("uiScale")) then
+		PlayerPowerBarAlt:SetPoint("CENTER", powerbaraltAnchorFrame, "CENTER", 0, 0);
+	end
+
+	local function powerbaralt_resetPosition()
+		local self = powerbaraltAnchorFrame;
+		self:ClearAllPoints();
+		self:SetPoint("BOTTOM", UIParent, "BOTTOM", 0, 150);
+	end
+
+	module.powerbaralt_resetPosition = powerbaralt_resetPosition;
+
+	local function powerbaralt_updateAnchorVisibility()
+		local self = powerbaraltAnchorFrame;
+		if (not self) then
+			powerbaralt__createAnchorFrame();
+			self = powerbaraltAnchorFrame;
+		end
+		if (powerbaraltEnabled and powerbaraltMovable) then
+			if (PlayerPowerBarAlt:IsShown()) then
+				self:Hide();
+			else
+				if (powerbaraltShowAnchor) then
+					self:Show();
+				else
+					self:Hide();
+				end
+			end
+		else
+			self:Hide();
+		end
+	end
+
+	local function powerbaralt_isModifiedButton()
+		local modifier = module:getOption("powerbaraltModifier") or 1;
+		local alt = IsAltKeyDown();
+		local control = IsControlKeyDown();
+		local shift = IsShiftKeyDown();
+
+		if (modifier == 1) then
+			return not alt and not control and not shift;
+		elseif (modifier == 2 and alt) then
+			return not control and not shift;
+		elseif (modifier == 3 and control) then
+			return not alt and not shift;
+		elseif (modifier == 4 and shift) then
+			return not alt and not control;
+		else
+			return false;
+		end
+	end
+
+	local function powerbaralt_onMouseDown(self, button)
+		if (powerbaraltEnabled and powerbaraltMovable) then
+			if ( button == "LeftButton" and powerbaralt_isModifiedButton() ) then
+				module:moveMovable(self.movable);
+			end
+		end
+	end
+
+	local function powerbaralt_onMouseUp(self, button)
+		if (powerbaraltEnabled and powerbaraltMovable) then
+			if ( button == "LeftButton" ) then
+				module:stopMovable(self.movable);
+			elseif ( button == "RightButton" and powerbaralt_isModifiedButton() ) then
+				powerbaralt_resetPosition();
+				module:stopMovable(self.movable);
+			end
+		end
+	end
+
+	local function powerbaralt_UIParent_ManageFramePositions()
+		if (powerbaraltEnabled) then
+			powerbaralt_reanchor();
+		end
+	end
+
+	local function powerbaralt_onEvent(self, event, arg1, ...)
+		if (event == "PLAYER_LOGIN") then
+			PlayerPowerBarAlt:HookScript("OnMouseDown",
+				function(self, button)
+					powerbaralt_onMouseDown(powerbaraltAnchorFrame, button);
+				end
+			);
+			PlayerPowerBarAlt:HookScript("OnMouseUp",
+				function(self, button)
+					powerbaralt_onMouseUp(powerbaraltAnchorFrame, button);
+				end
+			);
+			PlayerPowerBarAlt:HookScript("OnShow",
+				function(self)
+					powerbaralt_updateAnchorVisibility();
+				end
+			);
+			PlayerPowerBarAlt:HookScript("OnHide",
+				function(self)
+					powerbaralt_updateAnchorVisibility();
+				end
+			);
+
+			hooksecurefunc("UIParent_ManageFramePositions", powerbaralt_UIParent_ManageFramePositions);
+			-- By now GetCVar("uiScale") has a value, so if Blizzard_CombatLog is already loaded
+			-- then it won't cause an error when it tries to multiply by the uiScale.
 			UIParent_ManageFramePositions();
 		end
 	end
-end
 
-local function powerbaralt_toggleMovable(movable)
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return; end
-	-- Unlock bar
-	powerbaraltMovable = movable;
-	powerbaralt_updateAnchorVisibility();
-end
+	local function powerbaralt_createAnchorFrame()
+		local movable = "PowerBarAltAnchor";
 
-local function powerbaralt_toggleAnchor(show)
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then return; end
-	-- Show anchor when bar is hidden
-	powerbaraltShowAnchor = show;
-	powerbaralt_updateAnchorVisibility();
+		local self = CreateFrame("Button", "CT_Core_PlayerPowerBarAltAnchorFrame", UIParent);
+
+		powerbaraltAnchorFrame = self;
+
+		self:SetWidth(110);
+		self:SetHeight(32);
+		powerbaralt_resetPosition();
+
+		local fs = self:CreateFontString(nil, "OVERLAY", "GameFontHighlight");
+		fs:SetWidth(self:GetWidth());
+		fs:SetHeight(self:GetHeight());
+		fs:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 0);
+		fs:Show();
+		fs:SetText("Alternate Power\nBar anchor");
+
+		local tex = self:CreateTexture(nil, "ARTWORK");
+		self.tex = tex;
+		tex:SetPoint("TOPLEFT", self);
+		tex:SetPoint("BOTTOMRIGHT", self);
+		tex:Show();
+		tex:SetTexture("Interface\\Tooltips\\UI-Tooltip-Background");
+		tex:SetVertexColor(0.7, 0.7, 0.7, 0.8);
+
+		self:SetScript("OnMouseDown", powerbaralt_onMouseDown);
+		self:SetScript("OnMouseUp", powerbaralt_onMouseUp);
+		self:SetScript("OnEvent", powerbaralt_onEvent);
+
+		module:registerMovable(movable, self, true);
+		self.movable = movable;
+
+		self:RegisterEvent("PLAYER_LOGIN");
+		self:Hide();
+	end
+
+	powerbaralt__createAnchorFrame = powerbaralt_createAnchorFrame;
+
+	function powerbaralt_toggleStatus(enable)	-- local
+		-- Use custom bar position
+		powerbaraltEnabled = enable;
+		powerbaralt_updateAnchorVisibility();
+		if (powerbaraltEnabled) then
+			powerbaralt_reanchor();
+		else
+			-- When entering the world for the FIRST time after starting the game, GetCVar("uiScale")
+			-- returns nil when CT_Core loads (ie. at ADDON_LOADED event time). The game hasn't had
+			-- time to update the setting yet. This is also the case for GetCVarBool("scriptErrors").
+			--
+			-- When the Blizzard_CombatLog addon gets loaded, it hooks the FCF_DockUpdate function
+			-- which gets called by the UIParent_ManageFramePositions function in UIParent.lua.
+			--
+			-- If there is an addon that loads before CT_Core and causes the Blizzard_CombatLog addon
+			-- to load, then we want to avoid calling UIParent_ManageFramePositions while GetCVar("uiScale")
+			-- is nil. If we do call it when the uiScale is nil, then the Blizzard_CombatLog code will cause an error
+			-- when it gets to the Blizzard_CombatLog_AdjustCombatLogHeight() function in Blizzard_CombatLog.lua.
+			-- That code tries to multiply by GetCVar("uiScale"), and since it is still nil then there will
+			-- be an error.
+			--
+			-- Blizzard's code won't display the error (see BasicControls.xml) because GetCVarBool("scriptErrors")
+			-- is still nil when CT_Core loads. The user won't see the error unless they have an addon that loads
+			-- before CT_Core and traps and displays errors.
+			--
+			-- To avoid this error we will only call UIParent_ManageFramePositions() when the uiScale has
+			-- a value. This is the place in this addon where UIParent_ManageFramePositions() may get called
+			-- at ADDON_LOADED time by CT_Libary (during the "init" options step).
+
+			PlayerPowerBarAlt:ClearAllPoints();
+			if (GetCVar("uiScale")) then
+				UIParent_ManageFramePositions();
+			end
+		end
+	end
+
+	function powerbaralt_toggleMovable(movable)	-- local
+		-- Unlock bar
+		powerbaraltMovable = movable;
+		powerbaralt_updateAnchorVisibility();
+	end
+
+	function powerbaralt_toggleAnchor(show)		-- local
+		-- Show anchor when bar is hidden
+		powerbaraltShowAnchor = show;
+		powerbaralt_updateAnchorVisibility();
+	end
 end
 
 --------------------------------------------

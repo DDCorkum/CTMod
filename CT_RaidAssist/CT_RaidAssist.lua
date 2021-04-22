@@ -2586,8 +2586,8 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 		background:SetPoint("BOTTOMRIGHT", visualFrame, -3, 3);	
 		visualFrame.backdropInfo = {edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border"};
 		
-		-- period range check that affects the border only
-		C_Timer.NewTicker(2, updateBackdropBorder);
+		-- frequent range check that affects the border only
+		C_Timer.NewTicker(1, updateBackdropBorder);
 		
 		-- initial configuration
 		configureBackdrop()
