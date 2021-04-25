@@ -1525,7 +1525,7 @@ function NewCTRAWindow(owningCTRAFrames)	-- local at the top of this file
 			"Ranged",
 			"RDps"
 		},
-		{"ShowPets", function(rosterEntry) return rosterEntry.role == "PET"; end, "Pets", },
+		{"ShowPets", function(rosterEntry) return rosterEntry.role == "PET"; end, PETS, },
 		{"ShowDeathKnights", function(rosterEntry) return rosterEntry.class == "DEATHKNIGHT"; end, LOCALIZED_CLASS_NAMES_MALE.DEATHKNIGHT, },
 		{"ShowDemonHunters", function(rosterEntry) return rosterEntry.class == "DEMONHUNTER"; end, LOCALIZED_CLASS_NAMES_MALE.DEMONHUNTER, },
 		{"ShowDruids", function(rosterEntry) return rosterEntry.class == "DRUID"; end, LOCALIZED_CLASS_NAMES_MALE.DRUID,},
