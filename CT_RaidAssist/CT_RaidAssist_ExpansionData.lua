@@ -84,7 +84,7 @@ module.CTRA_Configuration_FriendlyRemoves =
 	["DRUID"] =										
 	{											
 		{["id"] = 88423, ["button"] = 2, ["modifier"] = "nomod"},		-- Nature's Cure (Retail some specs)
-		{["id"] = 2782, ["button"] = 2, ["modifier"] = (module:getGameVersion() == 1 and "mod:shift" or "nomod")},	-- Remove Curse (Classic 2:shift) or Remove Corruption (Retail other specs 2:nomod)
+		{["id"] = 2782, ["button"] = 2, ["modifier"] = (module:getGameVersion() <= 3 and "mod:shift" or "nomod")},	-- Remove Curse in classic, or Remove Corruption in retail
 		{["id"] = 2893, ["button"] = 2, ["modifier"] = "nomod"},		-- Abolish Poison (Classic after lvl 26)
 		{["id"] = 8946, ["button"] = 2, ["modifier"] = "nomod"},  		-- Cure Poison (Classic until lvl 26)
 	},
@@ -106,9 +106,7 @@ module.CTRA_Configuration_FriendlyRemoves =
 	{	
 		{["id"] = 527, ["button"] = 2, ["modifier"] = "nomod"},			-- Purify (Retail some specs) / Dispel Magic (Classic)
 		{["id"] = 213634, ["button"] = 2, ["modifier"] = "nomod"},		-- Purify Disease (Retail other specs)
-		module:getGameVersion() <= 4
-			and {["id"] = 528, ["button"] = 2, ["modifier"] = "mod:shift"}	-- Cure Disease (Classic until Cataclysm)
-			or nil,	
+		{["id"] = 528, ["button"] = 2, ["modifier"] = "mod:shift"},		-- Cure Disease (Classic)
 	},
 	["SHAMAN"] =
 	{
@@ -223,6 +221,10 @@ module.CTRA_Configuration_BossAuras =
 	[28169] = 0,		-- Naxxramas - Grobbulus: Mutating Injection
 	[28059] = 0,		-- Naxxramas - Thaddius: Positive Charge
 	[28084] = 0,		-- Naxxramas - Thaddius: Negative Charge
+	
+	-- The Burning Crusade
+	[29833] = 0,		-- Karazhan - Attumen the Huntsman: Intangible Presence
+	
 
 	-- Battle for Azeroth
 	[255558] = 0,		-- Atal'Dazar - Priestess Alun'za: Tainted Blood

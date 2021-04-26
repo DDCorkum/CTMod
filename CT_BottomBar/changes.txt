@@ -1,3 +1,6 @@
+CT_BottomBar (9.0.5.4) 2021-04-26
+- Fixed: Classic experience bar appearing during gameplay in the top corner on Retail (bug introduced in 9.0.5.3)
+
 CT_BottomBar (9.0.5.3) 2021-04-19
 - Improved how the classic performance monitor moves around the key ring button
 - Fixed the default bag spacing on classic

@@ -1,5 +1,5 @@
 ## Interface: 90005
-## Version: 9.0.5.3
+## Version: 9.0.5.4
 ## Title: CT_BottomBar |cFF333333(SL)|r
 ## Notes: Breaks up the main menu bar into movable pieces.
 ## DefaultState: Enabled
