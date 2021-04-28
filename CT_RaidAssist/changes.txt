@@ -1,3 +1,6 @@
+CT_RaidAssist (9.0.5.4) 2021-04-25
+- Minor code cleanup; nothing substantive
+
 CT_RaidAssist (9.0.5.3) 2021-04-02
 - Range check now happens every 1s, instead of 2s
 - Updated LibDurability.lua to r23, and added remark in that file to clarify it is CC BY-NC-SA 3.0 (per CurseForge)

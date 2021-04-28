@@ -1144,5 +1144,7 @@ local function addon_Register()
 	);
 end
 
-CT_BottomBar_MainMenuExpBar_CreateFrames();
-module.loadedAddons["Experience Bar"] = addon_Register;
+if (not StatusTrackingBarMixin) then
+	CT_BottomBar_MainMenuExpBar_CreateFrames();
+	module.loadedAddons["Experience Bar"] = addon_Register;
+end

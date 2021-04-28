@@ -831,5 +831,7 @@ local function addon_Register()
 	);
 end
 
-CT_BottomBar_ReputationWatchBar_CreateFrames();
-module.loadedAddons["Reputation Bar"] = addon_Register;
+if (not StatusTrackingBarMixin) then
+	CT_BottomBar_ReputationWatchBar_CreateFrames();
+	module.loadedAddons["Reputation Bar"] = addon_Register;
+end
