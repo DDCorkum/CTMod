@@ -1,4 +1,4 @@
-## Interface: 90005
+## Interface: 11307
 ## Version: 9.0.5.4
 ## Title: CT_RaidAssist
 ## Author: TS & Cide (Original), Dargen (MT Addon), DDC (Redesign)
@@ -13,9 +13,9 @@
 Libs/LibDurability.lua
 
 # Incoming heals/absorbs tracking on Classic only, modified to include the opt-out feature
-# Classic Only # Libs/LibHealComm-4.0/CallbackHandler-1.0.lua
-# Classic Only # Libs/LibHealComm-4.0/ChatThrottleLib.lua
-# Classic Only # Libs/LibHealComm-4.0/LibHealComm-4.0.lua
+Libs/LibHealComm-4.0/CallbackHandler-1.0.lua
+Libs/LibHealComm-4.0/ChatThrottleLib.lua
+Libs/LibHealComm-4.0/LibHealComm-4.0.lua
 
 # CTRA (for both retail and classic)
 CT_RaidAssist.lua

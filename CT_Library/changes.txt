@@ -1,3 +1,6 @@
+CT_Library (9.1.0.1) 2021-05-02
+- Adopting the CT_Module-Classic.toc and CT_Module-BCC.toc format so that a single package will work in all three game editions
+
 CT_Library (9.0.5.3) 2021-04-02
 - Changes to how 9.0.5.2 integrated Titan Panel (LibUIDropDownMenu-4.0) updates, to resolve other issues with optional arguments
 - Updates to how 8.3.0.1 avoids drop down taint, using foxlit's new TaintLess library
