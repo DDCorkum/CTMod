@@ -1,3 +1,6 @@
+CT_MapMod (9.1.0.1) 2021-05-04
+- Classic and TBC only: added more polish to displaying undiscovered flight paths.
+
 CT_MapMod (9.0.5.3) 2021-04-18
 - Classic and TBC only: opening the options menu from inside the fullscreen map will cause the menu to pop in front
 - Undiscovered flight paths updated for TBC and now on by default in all game editions

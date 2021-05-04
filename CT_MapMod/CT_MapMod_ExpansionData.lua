@@ -321,7 +321,7 @@ module.classicTaxiMaps =
 {
 	[1463] = { mapID = 1415, xOff = -0.152, xScale = 1.52, yOff = -0.084, yScale = 1.094 },		-- Classic Eastern Kingdoms
 	[1464] = { mapID = 1414, xOff = -0.164, xScale = 1.5, yOff = -0.01, yScale = 1 },		-- Classic Kalimdor
-	[987] = { mapID = 1945, xOff = -0.166, xScale = 1.52, yOff = 0.071, yScale = 0.92 },		-- The Burning Crusade Classic
+	[987] = { mapID = 1945, xOff = -0.146, xScale = 1.48, yOff = 0.071, yScale = 0.92 },		-- Outland
 };
 
 
@@ -329,7 +329,12 @@ module.classicTaxiMaps =
 -- 	key			Number, Required		TaxiNodeID
 module.ignoreClassicTaxiNodes = 
 {
-	[103] = true,
+	[84] = true,	-- Plaguewood Tower, Eastern Plaguelands
+	[85] = true,	-- Northpass Tower, Eastern Plaguelands
+	[86] = true,	-- Eastwall Tower, Eastern Plaguelands
+	[87] = true,	-- Crown Guard Tower, Eastern Plaguelands
+	[95] = true,	-- As the Crow Flies quest, Zangermarsh
+	[103] = true,	-- Halaa PvP, Nagrand
 	[104] = true,
 	[105] = true,
 	[106] = true,
@@ -337,6 +342,24 @@ module.ignoreClassicTaxiNodes =
 	[108] = true,
 	[109] = true,
 	[110] = true,
+	[113] = true,	-- Nethrandamus quest, Netherstorm
+	[131] = true,	-- Horde hellfire start, Hellfire Peninsula
+	[132] = true,	-- Horde hellfire end, Hellfire Peninsula
+	[133] = true, 	-- Alliance bombing run start, Hellfire Peninsula
+	[134] = true, 	-- Alliance bombing run end8, Hellfire Peninsula
+	[135] = true,	-- Horde bombing run start, Hellfire Peninsula
+	[136] = true,	-- Horde bombing run finish, Hellfire Peninsula
+	[137] = true,	-- Alliance Shatter Point bombing run end, Hellfire Peninsula
+	[138] = true,	-- Alliance Shatter Point bombing run end, Hellfire Peninsula
+	[145] = true,	-- Stealth Flight quest start, Netherstorm
+	[147] = true,	-- Force Camp quest, Hellfire Peninsula
+	[148] = true,	-- Shatter Point questing8, Hellfire Peninsula
+	[152] = true,	-- Manaforge Ultris quest start, Netherstorm
+	[153] = true,	-- Manaforge Ultris quest end, Netherstorm
+	[157] = true,	-- Vision Guide quest, Blade's Edge Mountaints
+	[169] = true,	-- Netherwing Ledge quest, Shadowmoon Valley
+	
+	
 	
 };
 
