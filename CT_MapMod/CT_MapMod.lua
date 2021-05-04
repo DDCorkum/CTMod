@@ -1547,7 +1547,6 @@ function module.configureClassicTaxiFrame()
 		
 	local function creationFunc(self)
 		local frame = CreateFrame("Frame", nil, TaxiFrame)
-		frame:SetFrameLevel(5)
 		frame:SetSize(8, 8)
 		frame.tex = frame:CreateTexture(nil, "BACKGROUND", -8)
 		frame.tex:SetTexture("Interface\\TaxiFrame\\UI-Taxi-Icon-Nub")
