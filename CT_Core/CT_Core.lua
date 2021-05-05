@@ -30,12 +30,12 @@ CT_Library:registerModule(module);
 local bagAutomationEvents = {
 	{shortlabel = "AH", label = "Auction House", openAll = "auctionOpenBags", backpack = "auctionOpenBackpack", nobags = "auctionOpenNoBags", close = "auctionCloseBags", show = true},
 	{shortlabel = "Bank", label = "Player Bank", openAll = "bankOpenBags", backpack = "bankOpenBackpack", nobags = "bankOpenNoBags", bank = "bankOpenBankBags", close = "bankCloseBags", show = true},
-	{shortlabel = "G-Bank", label = "Guild Bank", openAll = "gbankOpenBags", backpack = "gbankOpenBackpack", nobags = "gbankOpenNoBags", close = "gbankCloseBags", show = GuildBankFrame},
+	{shortlabel = "G-Bank", label = "Guild Bank", openAll = "gbankOpenBags", backpack = "gbankOpenBackpack", nobags = "gbankOpenNoBags", close = "gbankCloseBags", show = GuildBankFrame_LoadUI},
 	{shortlabel = "Merchant", label = "Merchant Frame", openAll =  "merchantOpenBags", backpack = "merchantOpenBackpack", nobags = "merchantOpenNoBags", close = "merchantCloseBags", show = true},
 	{shortlabel = "Trading", label = "Player Trading Frame", openAll = "tradeOpenBags", backpack = "tradeOpenBackpack", nobags = "tradeOpenNoBags", close = "tradeCloseBags", show = true},
-	{shortlabel = "Void-Stg", label = "Void Storage", openAll = "voidOpenBags", backpack = "voidOpenBackpack", nobags = "voidOpenNoBags", close = "voidCloseBags", show = VoidStorageFrame},
-	{shortlabel = "Obliterum", label = "Obliterum Forge (Legion)", openAll = "obliterumOpenBags", backpack = "obliterumOpenBackpack", nobags = "obliterumOpenNoBags", close = "obliterumCloseBags", show = ObliterumForgeFrame},
-	{shortlabel = "Scrapping", label = "Scrapping Machine (BFA)", openAll = "scrappingOpenBags", backpack = "scrappingOpenBackpack", nobags = "scrappingOpenNoBags", close = "scrappingCloseBags", show = ScrappingMachineFrame},
+	{shortlabel = "Void-Stg", label = "Void Storage", openAll = "voidOpenBags", backpack = "voidOpenBackpack", nobags = "voidOpenNoBags", close = "voidCloseBags", show = VoidStorageFrame_LoadUI},
+	{shortlabel = "Obliterum", label = "Obliterum Forge (Legion)", openAll = "obliterumOpenBags", backpack = "obliterumOpenBackpack", nobags = "obliterumOpenNoBags", close = "obliterumCloseBags", show = ObliterumForgeFrame_LoadUI},
+	{shortlabel = "Scrapping", label = "Scrapping Machine (BFA)", openAll = "scrappingOpenBags", backpack = "scrappingOpenBackpack", nobags = "scrappingOpenNoBags", close = "scrappingCloseBags", show = ScrappingMachineFrame_LoadUI},
 };
 
 --------------------------------------------
