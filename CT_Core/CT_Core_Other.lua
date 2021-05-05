@@ -1777,7 +1777,7 @@ do
 		["BANKFRAME_OPENED"]      = {option = "bankOpenBags", open = true, backpack = "bankOpenBackpack", nobags = "bankOpenNoBags", bank = "bankOpenBankBags"},
 		["BANKFRAME_CLOSED"]      = {option = "bankCloseBags"},
 
-		["GUILDBANKFRAME_OPENED"] = GuildBankframe and {option = "gbankOpenBags", open = true, backpack = "gbankOpenBackpack", nobags = "gbankOpenNoBags"},
+		["GUILDBANKFRAME_OPENED"] = GuildBankFrame and {option = "gbankOpenBags", open = true, backpack = "gbankOpenBackpack", nobags = "gbankOpenNoBags"},
 		["GUILDBANKFRAME_CLOSED"] = GuildBankFrame and {option = "gbankCloseBags"},
 
 		["MERCHANT_SHOW"]         = {option = "merchantOpenBags", open = true, backpack = "merchantOpenBackpack", nobags = "merchantOpenNoBags"},
