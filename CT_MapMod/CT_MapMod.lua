@@ -1552,7 +1552,7 @@ function module.configureClassicTaxiFrame()
 		frame.tex:SetTexture("Interface\\TaxiFrame\\UI-Taxi-Icon-Nub")
 		frame.tex:SetAllPoints()
 		frame:SetScript("OnEnter", function()
-			module:displayTooltip(frame, {frame.text or "", "|cffff3333" .. ERR_TAXINOPATHS}, "ANCHOR_RIGHT")
+			module:displayTooltip(frame, {frame.text or "", "|cffff3333" .. TAXI_PATH_UNREACHABLE}, "ANCHOR_RIGHT")
 		end)
 		return frame
 	end
