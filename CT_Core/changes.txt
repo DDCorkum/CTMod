@@ -1,4 +1,4 @@
-CT_Core (9.1.0.1) 2021-05-05
+CT_Core (9.0.5.5) 2021-05-07
 - Fixes to bag automation
 
 CT_Core (9.0.5.3) 2021-04-20

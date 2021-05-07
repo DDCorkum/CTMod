@@ -1,4 +1,4 @@
-CT_MapMod (9.1.0.1) 2021-05-06
+CT_MapMod (9.0.5.5) 2021-05-07
 - Classic and TBC only: added more polish to displaying undiscovered flight paths.
 
 CT_MapMod (9.0.5.3) 2021-04-18
