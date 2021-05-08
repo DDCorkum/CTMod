@@ -319,9 +319,15 @@ module.flightMaps =
 --	val			Table, Required			mapID is the worldmap uiMapID, xOff and yOff are added to the x/y coords, and everything is multiplied by xScale/yScale
 module.classicTaxiMaps = 
 {
-	[1463] = { mapID = 1415, xOff = -0.152, xScale = 1.52, yOff = -0.084, yScale = 1.094 },		-- Classic Eastern Kingdoms
-	[1464] = { mapID = 1414, xOff = -0.164, xScale = 1.5, yOff = -0.01, yScale = 1 },		-- Classic Kalimdor
-	[987] = { mapID = 1945, xOff = -0.146, xScale = 1.48, yOff = 0.071, yScale = 0.92 },		-- Outland
+	-- Eastern Kingdoms: Classic Era vs. Burning Crusade Classic
+	[1463] = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC and { mapID = 1415, xOff = -0.152, xScale = 1.52, yOff = -0.084, yScale = 1.094 }		-- Classic Eastern Kingdoms
+		or { mapID = 1415, xOff = -0.16, xScale = 1.48, yOff = 0.03, yScale = 0.96 },
+	
+	-- Kalimdor: Classic
+	[1464] = { mapID = 1414, xOff = -0.164, xScale = 1.5, yOff = -0.01, yScale = 1 },
+	
+	-- Outland: Burning Crusade Classic
+	[987] = { mapID = 1945, xOff = -0.146, xScale = 1.48, yOff = 0.071, yScale = 0.92 },
 };
 
 
@@ -334,6 +340,7 @@ module.ignoreClassicTaxiNodes =
 	[86] = true,	-- Eastwall Tower, Eastern Plaguelands
 	[87] = true,	-- Crown Guard Tower, Eastern Plaguelands
 	[95] = true,	-- As the Crow Flies quest, Zangermarsh
+	[97] = true,	-- Elekk Path to Kessel quest, Bloodmyst Isle
 	[103] = true,	-- Halaa PvP, Nagrand
 	[104] = true,
 	[105] = true,
@@ -342,6 +349,8 @@ module.ignoreClassicTaxiNodes =
 	[108] = true,
 	[109] = true,
 	[110] = true,
+	[111] = true,	-- Duskwither Teleport end, Eversong
+	[112] = true,	-- Duskwither Teleport start, Eversong
 	[113] = true,	-- Nethrandamus quest, Netherstorm
 	[131] = true,	-- Horde hellfire start, Hellfire Peninsula
 	[132] = true,	-- Horde hellfire end, Hellfire Peninsula
@@ -351,6 +360,8 @@ module.ignoreClassicTaxiNodes =
 	[136] = true,	-- Horde bombing run finish, Hellfire Peninsula
 	[137] = true,	-- Alliance Shatter Point bombing run end, Hellfire Peninsula
 	[138] = true,	-- Alliance Shatter Point bombing run end, Hellfire Peninsula
+	[143] = true,	-- Caverns of Time intro flight start, Tanaris
+	[144] = true,	-- Caverns of Time intro fligth end, Tanaris
 	[145] = true,	-- Stealth Flight quest start, Netherstorm
 	[147] = true,	-- Force Camp quest, Hellfire Peninsula
 	[148] = true,	-- Shatter Point questing8, Hellfire Peninsula
@@ -358,7 +369,9 @@ module.ignoreClassicTaxiNodes =
 	[153] = true,	-- Manaforge Ultris quest end, Netherstorm
 	[157] = true,	-- Vision Guide quest, Blade's Edge Mountaints
 	[169] = true,	-- Netherwing Ledge quest, Shadowmoon Valley
-	
+	[209] = true,	-- Dead Scar Bombing start, Sunwell
+	[211] = true,	-- Ship Bombing end, Sunwell
+	[212] = true,	-- Ship Bombing end, Sunwell
 	
 	
 };
