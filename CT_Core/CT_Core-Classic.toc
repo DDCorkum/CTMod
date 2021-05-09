@@ -1,4 +1,4 @@
-## Interface: 90005
+## Interface: 11307
 ## Version: 9.0.5.5
 ## Title: CT_Core
 ## Notes: General nifty features for CTMod.

@@ -1,10 +1,9 @@
-## Interface: 90005
+## Interface: 11307
 ## Version: 9.0.5.3
 ## Title: CT_Viewport
 ## Notes: Allows you to change the rendered world's size.
 ## DefaultState: Enabled
-## SavedVariablesPerCharacter: CT_Viewport_Saved
-## SavedVariables: CT_ViewportOptions, CT_ViewportBackup
+## SavedVariables: CT_ViewportOptions
 ## Dependencies: CT_Library
 ## X-Part-Of: CT-Library
 

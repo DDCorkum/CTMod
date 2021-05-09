@@ -1547,11 +1547,13 @@ function module.configureClassicTaxiFrame()
 		
 	local function creationFunc(self)
 		local frame = CreateFrame("Frame", nil, TaxiFrame)
-		--frame:SetFrameLevel(1)
 		frame:SetSize(8, 8)
 		frame.tex = frame:CreateTexture(nil, "BACKGROUND", -8)
 		frame.tex:SetTexture("Interface\\TaxiFrame\\UI-Taxi-Icon-Nub")
 		frame.tex:SetAllPoints()
+		frame:SetScript("OnEnter", function()
+			module:displayTooltip(frame, {frame.text or "", "|cffff3333" .. TAXI_PATH_UNREACHABLE}, "ANCHOR_RIGHT")
+		end)
 		return frame
 	end
 	local function resetFunc(self, obj)
@@ -1562,6 +1564,10 @@ function module.configureClassicTaxiFrame()
 	
 	local function CT_MapMod_TaxiFrameClassic_OnShow()
 		if (showUnreachable) then
+			local knownDestinations = {}
+			for i=1, NumTaxiNodes() do
+				knownDestinations[TaxiNodeName(i)] = true
+			end
 			local taxiMap = GetTaxiMapID()
 			if (taxiMap) then
 				local data = module.classicTaxiMaps[taxiMap]
@@ -1569,7 +1575,7 @@ function module.configureClassicTaxiFrame()
 					local nodes = C_TaxiMap.GetTaxiNodesForMap(data.mapID)
 					local wrongFaction = UnitFactionGroup("player") == "Horde" and Enum.FlightPathFaction.Alliance or Enum.FlightPathFaction.Horde
 					for __, node in pairs(nodes) do
-						if (node.faction ~= wrongFaction and not module.ignoreClassicTaxiNodes[node.nodeID]) then
+						if (node.faction ~= wrongFaction and not module.ignoreClassicTaxiNodes[node.nodeID] and not knownDestinations[node.name]) then
 							local pin = flightMarkers:Acquire()
 							local x, y = node.position:GetXY()
 							pin:SetPoint("CENTER", TaxiRouteMap, "TOPLEFT", (x + data.xOff) * TaxiRouteMap:GetWidth() * (data.xScale), - (y + (data.yOff)) * TaxiRouteMap:GetHeight() * (data.yScale))

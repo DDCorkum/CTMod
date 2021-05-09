@@ -739,7 +739,7 @@ do
 	-- blocking to its original state.
 	module:regEvent("PLAYER_LEAVING_WORLD", restoreBlockState);
 	module:regEvent("BANKFRAME_CLOSED", restoreBlockState);
-	if (GuildBankFrame) then
+	if (GuildBankFrame_LoadUI) then
 		module:regEvent("GUILDBANKFRAME_CLOSED", restoreBlockState);
 	end
 
@@ -753,7 +753,7 @@ do
 
 	-- If the guild bank frame has just opened, and the user wants to block while
 	-- at the guild bank, then start blocking.
-	if (GuildBankFrame) then
+	if (GuildBankFrame_LoadUI) then
 		module:regEvent("GUILDBANKFRAME_OPENED", function()
 			if (blockOption) then
 				enableBlockState();
@@ -1777,8 +1777,8 @@ do
 		["BANKFRAME_OPENED"]      = {option = "bankOpenBags", open = true, backpack = "bankOpenBackpack", nobags = "bankOpenNoBags", bank = "bankOpenBankBags"},
 		["BANKFRAME_CLOSED"]      = {option = "bankCloseBags"},
 
-		["GUILDBANKFRAME_OPENED"] = GuildBankframe and {option = "gbankOpenBags", open = true, backpack = "gbankOpenBackpack", nobags = "gbankOpenNoBags"},
-		["GUILDBANKFRAME_CLOSED"] = GuildBankFrame and {option = "gbankCloseBags"},
+		["GUILDBANKFRAME_OPENED"] = GuildBankFrame_LoadUI and {option = "gbankOpenBags", open = true, backpack = "gbankOpenBackpack", nobags = "gbankOpenNoBags"},
+		["GUILDBANKFRAME_CLOSED"] = GuildBankFrame_LoadUI and {option = "gbankCloseBags"},
 
 		["MERCHANT_SHOW"]         = {option = "merchantOpenBags", open = true, backpack = "merchantOpenBackpack", nobags = "merchantOpenNoBags"},
 		["MERCHANT_CLOSED"]       = {option = "merchantCloseBags"},
@@ -1789,14 +1789,14 @@ do
 		["TRADE_SHOW"]            = {option = "tradeOpenBags", open = true, backpack = "tradeOpenBackpack", nobags = "tradeOpenNoBags"},
 		["TRADE_CLOSED"]          = {option = "tradeCloseBags"},
 
-		["VOID_STORAGE_OPEN"]     = VoidStorageFrame and {option = "voidOpenBags", open = true, backpack = "voidOpenBackpack", nobags = "voidOpenNoBags"},
-		["VOID_STORAGE_CLOSE"]    = VoidStorageFrame and {option = "voidCloseBags"},
+		["VOID_STORAGE_OPEN"]     = VoidStorageFrame_LoadUI and {option = "voidOpenBags", open = true, backpack = "voidOpenBackpack", nobags = "voidOpenNoBags"},
+		["VOID_STORAGE_CLOSE"]    = VoidStorageFrame_LoadUI and {option = "voidCloseBags"},
 
-		["OBLITERUM_FORGE_SHOW"]     = ObliterumForgeFrame and {option = "obliterumOpenBags", open = true, backpack = "obliterumOpenBackpack", nobags = "obliterumOpenNoBags"},
-		["OBLITERUM_FORGE_CLOSE"]    = ObliterumForgeFrame and {option = "obliterumCloseBags"},
+		["OBLITERUM_FORGE_SHOW"]     = ObliterumForgeFrame_LoadUI and {option = "obliterumOpenBags", open = true, backpack = "obliterumOpenBackpack", nobags = "obliterumOpenNoBags"},
+		["OBLITERUM_FORGE_CLOSE"]    = ObliterumForgeFrame_LoadUI and {option = "obliterumCloseBags"},
 		
-		["SCRAPPING_MACHINE_SHOW"]     = ScrappingMachineFrame and {option = "scrappingOpenBags", open = true, backpack = "scrappingOpenBackpack", nobags = "scrappingOpenNoBags"},
-		["SCRAPPING_MACHINE_CLOSE"]    = ScrappingMachineFrame and {option = "scrappingCloseBags"},
+		["SCRAPPING_MACHINE_SHOW"]     = ScrappingMachineFrame_LoadUI and {option = "scrappingOpenBags", open = true, backpack = "scrappingOpenBackpack", nobags = "scrappingOpenNoBags"},
+		["SCRAPPING_MACHINE_CLOSE"]    = ScrappingMachineFrame_LoadUI and {option = "scrappingCloseBags"},
 
 	};
 
