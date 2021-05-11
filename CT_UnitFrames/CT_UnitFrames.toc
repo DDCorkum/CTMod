@@ -1,5 +1,5 @@
 ## Interface: 90005
-## Version: 9.0.5.3
+## Version: 9.0.5.6
 ## Title: CT_UnitFrames
 ## Notes: Changes display of hp/mana values and adds a percentage.
 ## DefaultState: Enabled
