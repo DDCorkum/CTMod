@@ -174,7 +174,7 @@ module.frame = function()
 	ysize = 70;
 	options["frame#tl:0:-" .. yoffset .. "#br:tr:0:-".. (yoffset + ysize)] = {
 		"font#tl:5:0#v:GameFontNormalLarge#Layout",
-		"dropdown#t:0:-30#s:190:17#o:layout:1#n:CT_PartyBuffs_LayoutDropdown#Buffs under the mana bar; Debuffs to the side in the top-right#Buffs to the side in the top-right; Debuffs under the mana bar",
+		"dropdown#t:0:-30#s:190:17#o:layout:1#n:CT_PartyBuffs_LayoutDropdown#Buffs underneath, and debuffs in the top-right#Debuffs underneath, and buffs in the top-right#Both buffs and debuffs underneath",
 	};
 	yoffset = yoffset + ysize;
 
@@ -199,7 +199,16 @@ local function updateLayout(value)
 		CT_PartyBuffFrame1Debuff1:SetPoint("TOPLEFT", 0, 0);
 		CT_PartyBuffFrame2Debuff1:SetPoint("TOPLEFT", 0, 0);
 		CT_PartyBuffFrame3Debuff1:SetPoint("TOPLEFT", 0, 0);
-		CT_PartyBuffFrame4Debuff1:SetPoint("TOPLEFT", 0, 0);			
+		CT_PartyBuffFrame4Debuff1:SetPoint("TOPLEFT", 0, 0);
+	elseif (value == 3) then
+		CT_PartyBuffFrame1Buff1:SetPoint("TOPLEFT", 0, 2);
+		CT_PartyBuffFrame2Buff1:SetPoint("TOPLEFT", 0, 2);
+		CT_PartyBuffFrame3Buff1:SetPoint("TOPLEFT", 0, 2);
+		CT_PartyBuffFrame4Buff1:SetPoint("TOPLEFT", 0, 2);
+		CT_PartyBuffFrame1Debuff1:SetPoint("TOPLEFT", 0, -14);
+		CT_PartyBuffFrame2Debuff1:SetPoint("TOPLEFT", 0, -14);
+		CT_PartyBuffFrame3Debuff1:SetPoint("TOPLEFT", 0, -14);
+		CT_PartyBuffFrame4Debuff1:SetPoint("TOPLEFT", 0, -14);
 	else	-- value == 1 or nil, default
 		CT_PartyBuffFrame1Buff1:SetPoint("TOPLEFT", 0, 0);
 		CT_PartyBuffFrame2Buff1:SetPoint("TOPLEFT", 0, 0);
