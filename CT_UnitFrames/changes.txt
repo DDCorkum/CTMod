@@ -1,5 +1,5 @@
-CT_UnitFrames (9.0.5.6) 2021-05-11
-- Added control over the PetFrame health and power bars
+CT_UnitFrames (9.0.5.6) 2021-05-12
+- Added the Pet Frame as a sixth set of options
 
 CT_UnitFrames (9.0.5.3) 2021-04-19
 - Assist frame added to Classic

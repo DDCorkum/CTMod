@@ -1,8 +1,8 @@
 -- UnitFramesOptions
 CT_UFO_RADIO = { "None", "Percent", "Deficit", "Values", "Current" };
-CT_UFO_SELECTION = { "On Health Bar:", "Beside Health Bar:", "On Power Bar:", "Beside Power Bar:", "Pet Health Bar: |cffffff00New!|r", "Pet Power Bar: |cffffff00New!|r " };
+CT_UFO_SELECTION = { "On Health Bar:", "Beside Health Bar:", "On Power Bar:", "Beside Power Bar:" };
 CT_UFO_SELECTION2 = { "Friendly Health Bar:", "Beside Health Bar:", "On Power Bar:", "Beside Power Bar:", "Enemy Health Bar:" };
-CT_UFO_BOX = { "Player Frame", "Party Frames", "Target Frame", "Assist (Target of Target) Frame", "Focus Frame" };
+CT_UFO_BOX = { "Player Frame", "Party Frames", "Target Frame", "Assist (Target of Target) Frame", "Focus Frame", "Pet Frame" };
 CT_UFO_TARGETCLASS = "Show the class";
 CT_UFO_TARGETOFTARGET = "Show target of target";
 CT_UFO_PARTYTEXTSIZE = "Text Size";

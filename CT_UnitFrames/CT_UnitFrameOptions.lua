@@ -23,12 +23,10 @@ tinsert(UISpecialFrames, "CT_UnitFramesOptionsFrame"); -- So we can close it wit
 CT_UnitFramesOptions = {
 	["styles"] = {
 		[1] = { -- Box (Player)
-			{1, 1, 1, 1, 1}, -- On health bar
+			{2, 1, 1, 1, 1}, -- On health bar
 			{1, 1, 1, 1, 1}, -- Right of health bar
 			{1, 1, 1, 1, 1}, -- On mana bar
 			{1, 1, 1, 1, 1}, -- Right of mana bar
-			{1, 1, 1, 1, 1}, -- Pet health bar
-			{1, 1, 1, 1, 1}, -- Pet mana bar
 		},
 		[2] = { -- Box (Party)
 			{1, 1, 1, 1, 1}, -- On health bar
@@ -37,30 +35,36 @@ CT_UnitFramesOptions = {
 			{1, 1, 1, 1, 1}, -- Right of mana bar
 		},
 		[3] = { -- Box (Target)
-			{1, 1, 1, 1, 1}, -- On health bar
+			{2, 1, 1, 1, 1}, -- On health bar
 			{1, 1, 1, 1, 1}, -- Left of health bar
 			{1, 1, 1, 1, 1}, -- On mana bar
 			{1, 1, 1, 1, 1}, -- Left of mana bar
 			{4, 1, 1, 1, 1}, -- Enemy health bar
 		},
 		[4] = { -- Box (Target of Target)
-			{1, 1, 1, 1, 1}, -- On health bar
+			{2, 1, 1, 1, 1}, -- On health bar
 			{1, 1, 1, 1, 1}, -- Left of health bar
 			{1, 1, 1, 1, 1}, -- On mana bar
 			{1, 1, 1, 1, 1}, -- Left of mana bar
 			{4, 1, 1, 1, 1}, -- Enemy health bar
 		},
 		[5] = { -- Box (Focus)
-			{1, 1, 1, 1, 1}, -- On health bar
+			{2, 1, 1, 1, 1}, -- On health bar
 			{1, 1, 1, 1, 1}, -- Left of health bar
 			{1, 1, 1, 1, 1}, -- On mana bar
 			{1, 1, 1, 1, 1}, -- Left of mana bar
 			{4, 1, 1, 1, 1}, -- Enemy health bar
-		}
+		},
+		[6] = { -- Box (Pet)
+			{2, 1, 1, 1, 1}, -- On health bar
+			{1, 1, 1, 1, 1}, -- Right of health bar
+			{1, 1, 1, 1, 1}, -- On mana bar
+			{1, 1, 1, 1, 1}, -- Right of mana bar		
+		},
 	},
 };
 CT_UnitFramesOptions_NumSelections = {
-	6, 4, 5, 5, 5,
+	4, 4, 5, 5, 5, 4
 };
 
 -- OnLoad handlers
@@ -160,6 +164,15 @@ function CT_UnitFrameOptions_OnEvent(self, event, ...)
 				end
 			end
 		end
+		
+		-- Temporary code to convert information that was in a beta version (9.0.5.6a) but has never been in an actual release version
+		if(CT_UnitFramesOptions.styles[1][6]) then
+			CT_UnitFramesOptions.styles[6][1] = CT_UnitFramesOptions.styles[1][5];
+			CT_UnitFramesOptions.styles[6][3] = CT_UnitFramesOptions.styles[1][6];
+			CT_UnitFramesOptions.styles[1][6] = nil;
+			CT_UnitFramesOptions.styles[1][5] = nil;
+		end
+		
 		CT_UnitFramesOptions_Radio_Update();
 	end
 end
@@ -173,7 +186,7 @@ end
 
 -- Function to update the frame
 function CT_UnitFramesOptions_Radio_Update()
-	for box = 1, 5, 1 do
+	for box = 1, #CT_UnitFramesOptions_NumSelections do
 		for selection = 1, CT_UnitFramesOptions_NumSelections[box], 1 do
 			for radio = 1, 5, 1 do
 				_G["CT_UnitFramesOptionsFrameBox" .. box .. "Selection" .. selection .. "Radio" .. radio]:Enable();
@@ -222,7 +235,7 @@ function CT_UnitFramesOptions_Radio_Update()
 		CT_TargetFrameClassFrame:Hide();
 	end
 
-	if (module:getGameVersion() >= 2) then
+	if (FocusFrame) then
 		CT_FocusFrame_ToggleStandardFocus();
 	end
 
@@ -238,12 +251,16 @@ function CT_UnitFramesOptions_Radio_Update()
 	
 	module:ShowAssistFrameBarText();
 	module:AnchorAssistFrameSideText();
-	
-	
-	if (module:getGameVersion() >= 2) then	
+
+	if (FocusFrame) then	
 		module:ShowFocusFrameBarText();
 		module:AnchorFocusFrameSideText();
 	end
+
+	module:ShowPetFrameBarText();
+	module:AnchorPetFrameSideText();
+	
+
 end
 
 -- Color swatch functions
@@ -363,6 +380,7 @@ function CT_UnitFramesOptions_Box_CB_OnClick(self)
 			CT_UnitFramesOptions.shallDisplayAssist = self:GetChecked();
 			if (not InCombatLockdown()) then
 				if ( self:GetChecked() ) then
+					CT_UnitFrames_ResetPosition("CT_AssistFrame_Drag")
 					RegisterUnitWatch(CT_AssistFrame);
 					CT_AssistFrame_Update(CT_AssistFrame);
 				else
@@ -414,6 +432,7 @@ function CT_UnitFramesOptions_Box_CB_OnClick(self)
 			CT_UnitFramesOptions.shallDisplayFocus = self:GetChecked();
 			if (not InCombatLockdown()) then
 				if ( self:GetChecked() ) then
+					CT_UnitFrames_ResetPosition("CT_FocusFrame_Drag")
 					RegisterUnitWatch(CT_FocusFrame);
 					CT_FocusFrame_Update(CT_FocusFrame);
 				else
@@ -431,13 +450,13 @@ end
 
 -- Lock Handler
 -- The [index] must match the ID of the checkbox, and is also used to save the settings.
-local lockTable = { }
-if (module:getGameVersion() >= 2) then
---	lockTable[1] = { drag = "CT_PlayerFrame_Drag", cb = "CT_UnitFramesOptionsFrameBox1LockCB" };
---	lockTable[2] = { drag = "CT_TargetFrame_Drag", cb = "CT_UnitFramesOptionsFrameBox3LockCB" };
-	lockTable[3] = { drag = "CT_AssistFrame_Drag", cb = "CT_UnitFramesOptionsFrameBox4LockCB" };
-	lockTable[4] = { drag = "CT_FocusFrame_Drag",  cb = "CT_UnitFramesOptionsFrameBox5LockCB" };
-end
+local lockTable =
+{ 
+	--[1] = { drag = "CT_PlayerFrame_Drag", cb = "CT_UnitFramesOptionsFrameBox1LockCB" },
+	--[2] = { drag = "CT_TargetFrame_Drag", cb = "CT_UnitFramesOptionsFrameBox3LockCB" },
+	[3] = { drag = "CT_AssistFrame_Drag", cb = "CT_UnitFramesOptionsFrameBox4LockCB" },
+	[4] = FocusFrame and { drag = "CT_FocusFrame_Drag",  cb = "CT_UnitFramesOptionsFrameBox5LockCB" },	-- nil in Classic Era
+}
 
 function CT_UnitFramesOptions_Lock_CB_OnClick(obj, checked, id)
 	if ( not CT_UnitFramesOptions.unlock ) then
@@ -458,48 +477,37 @@ end
 
 module.currBoxFrame = nil;
 
-function CT_UnitFrameOptions_SetOptionsFrame(name)
-	local frame;
-	-- Hide current options box
-	if (module.currBoxFrame) then
-		module.currBoxFrame:Hide();
+function CT_UnitFrameOptionsBoxSelectionButton_OnShow(self)
+	local id = self:GetID()
+	if (FocusFrame) then
+		self:SetPoint("TOPLEFT", (79*id)-64, -45)
+		self:SetSize(75, 21)
+	elseif (id < 5) then
+		self:SetPoint("TOPLEFT", (93*id)-79, -45)
+		self:SetSize(89, 21)
+	elseif (id == 6) then
+		self:SetPoint("TOPLEFT", 386, -45)
+		self:SetSize(89, 21)
 	end
-	if (module:getGameVersion() >= 2) then
-		-- Enable all page buttons
-		CT_UnitFramesOptionsFramePlayerOptions:Enable();
-		CT_UnitFramesOptionsFramePartyOptions:Enable();
-		CT_UnitFramesOptionsFrameTargetOptions:Enable();
-		CT_UnitFramesOptionsFrameAssistOptions:Enable();
-		CT_UnitFramesOptionsFrameFocusOptions:Enable();
-	else
-		CT_UnitFramesOptionsFramePlayerOptions:Enable();
-		CT_UnitFramesOptionsFramePartyOptions:Enable();
-		CT_UnitFramesOptionsFrameTargetOptions:Enable();
-		CT_UnitFramesOptionsFrameAssistOptions:Enable();
-		CT_UnitFramesOptionsFrameFocusOptions:Disable();
-	end
+	self:SetScript("OnShow", nil)
+end
 
-	-- Show chosen options box, and disable the appropriate page button.
-	if (name == "player") then
-		frame = CT_UnitFramesOptionsFrameBox1;
-		CT_UnitFramesOptionsFramePlayerOptions:Disable();
-	elseif (name == "party") then
-		frame = CT_UnitFramesOptionsFrameBox2;
-		CT_UnitFramesOptionsFramePartyOptions:Disable();
-	elseif (name == "target") then
-		frame = CT_UnitFramesOptionsFrameBox3;
-		CT_UnitFramesOptionsFrameTargetOptions:Disable();
-	elseif (name == "assist") then
-		frame = CT_UnitFramesOptionsFrameBox4;
-		CT_UnitFramesOptionsFrameAssistOptions:Disable();
-	elseif (name == "focus") then
-		frame = CT_UnitFramesOptionsFrameBox5;
-		CT_UnitFramesOptionsFrameFocusOptions:Disable();
-	end
-	if (frame) then
-		frame:Show();
-		module.currBoxFrame = frame;
-	end
+function CT_UnitFrameOptions_SetOptionsFrame(btn)
+	local id = btn and btn:GetID() or 1
+	
+	CT_UnitFramesOptionsFramePlayerOptions:SetEnabled(id ~= 1);
+	CT_UnitFramesOptionsFramePartyOptions:SetEnabled(id ~= 2);
+	CT_UnitFramesOptionsFrameTargetOptions:SetEnabled(id ~= 3);
+	CT_UnitFramesOptionsFrameAssistOptions:SetEnabled(id ~= 4);
+	CT_UnitFramesOptionsFrameFocusOptions:SetEnabled(id ~= 5);
+	CT_UnitFramesOptionsFramePetOptions:SetEnabled(id ~= 6);
+	
+	CT_UnitFramesOptionsFrameBox1:SetShown(id == 1);
+	CT_UnitFramesOptionsFrameBox2:SetShown(id == 2);
+	CT_UnitFramesOptionsFrameBox3:SetShown(id == 3);
+	CT_UnitFramesOptionsFrameBox4:SetShown(id == 4);
+	CT_UnitFramesOptionsFrameBox5:SetShown(id == 5);
+	CT_UnitFramesOptionsFrameBox6:SetShown(id == 6);
 end
 
 function CT_UnitFramesOptions_OneColorHealth_CB_OnClick(self, checked)
@@ -507,8 +515,8 @@ function CT_UnitFramesOptions_OneColorHealth_CB_OnClick(self, checked)
 	module:ShowPlayerFrameBarText();
 	module:ShowPartyFrameBarText();
 	module:ShowTargetFrameBarText();
-	if (module:getGameVersion() >= 2) then
-		module:ShowAssistFrameBarText();
+	module:ShowAssistFrameBarText();
+	if (FocusFrame) then
 		module:ShowFocusFrameBarText();
 	end
 end
@@ -518,8 +526,8 @@ function CT_UnitFramesOptions_LargeBreakUp_CB_OnClick(self, checked)
 	module:ShowPlayerFrameBarText();
 	module:ShowPartyFrameBarText();
 	module:ShowTargetFrameBarText();
-	if (module:getGameVersion() >= 2) then
-		module:ShowAssistFrameBarText();
+	module:ShowAssistFrameBarText();
+	if (FocusFrame) then
 		module:ShowFocusFrameBarText();
 	end
 end
@@ -529,8 +537,8 @@ function CT_UnitFramesOptions_LargeAbbreviate_CB_OnClick(self, checked)
 	module:ShowPlayerFrameBarText();
 	module:ShowPartyFrameBarText();
 	module:ShowTargetFrameBarText();
-	if (module:getGameVersion() >= 2) then
-		module:ShowAssistFrameBarText();
+	module:ShowAssistFrameBarText();
+	if (FocusFrame) then	
 		module:ShowFocusFrameBarText();
 	end
 end
@@ -558,40 +566,37 @@ module:setSlashCmd(module.customOpenFunction, "/uf", "/ctuf", "/unitframes");
 -- Mod Initialization
 module.update = function(self, option, value)
 	if ( option == "init" ) then
-		if (module:getGameVersion() >= 2) then
-			CT_AssistFrame.buffsOnTop = CT_UnitFramesOptions.assistBuffsOnTop;
+		CT_AssistFrame.buffsOnTop = CT_UnitFramesOptions.assistBuffsOnTop;
+		if ( CT_UnitFramesOptions.shallDisplayAssist ) then
+			RegisterUnitWatch(CT_AssistFrame);
+			CT_AssistFrame_Update(CT_AssistFrame);
+		else
+			UnregisterUnitWatch(CT_AssistFrame);
+			CT_AssistFrame:Hide();
+		end
+		if ( CT_UnitFramesOptions.shallDisplayTargetofAssist ) then
+			RegisterUnitWatch(CT_TargetofAssistFrame);
+			CT_TargetofAssist_Update(CT_TargetofAssistFrame);
+		else
+			UnregisterUnitWatch(CT_TargetofAssistFrame);
+			CT_TargetofAssistFrame:Hide();
+		end		
+		
+		if (FocusFrame) then
 			CT_FocusFrame.buffsOnTop = CT_UnitFramesOptions.focusBuffsOnTop;
-	
-			if (not InCombatLockdown()) then
-				if ( CT_UnitFramesOptions.shallDisplayAssist ) then
-					RegisterUnitWatch(CT_AssistFrame);
-					CT_AssistFrame_Update(CT_AssistFrame);
-				else
-					UnregisterUnitWatch(CT_AssistFrame);
-					CT_AssistFrame:Hide();
-				end
-				if ( CT_UnitFramesOptions.shallDisplayTargetofAssist ) then
-					RegisterUnitWatch(CT_TargetofAssistFrame);
-					CT_TargetofAssist_Update(CT_TargetofAssistFrame);
-				else
-					UnregisterUnitWatch(CT_TargetofAssistFrame);
-					CT_TargetofAssistFrame:Hide();
-				end
-
-				if ( CT_UnitFramesOptions.shallDisplayFocus ) then
-					RegisterUnitWatch(CT_FocusFrame);
-					CT_FocusFrame_Update(CT_FocusFrame);
-				else
-					UnregisterUnitWatch(CT_FocusFrame);
-					CT_FocusFrame:Hide();
-				end
-				if ( CT_UnitFramesOptions.shallDisplayTargetofFocus ) then
-					RegisterUnitWatch(CT_TargetofFocusFrame);
-					CT_TargetofFocus_Update(CT_TargetofFocusFrame);
-				else
-					UnregisterUnitWatch(CT_TargetofFocusFrame);
-					CT_TargetofFocusFrame:Hide();
-				end
+			if ( CT_UnitFramesOptions.shallDisplayFocus ) then
+				RegisterUnitWatch(CT_FocusFrame);
+				CT_FocusFrame_Update(CT_FocusFrame);
+			else
+				UnregisterUnitWatch(CT_FocusFrame);
+				CT_FocusFrame:Hide();
+			end
+			if ( CT_UnitFramesOptions.shallDisplayTargetofFocus ) then
+				RegisterUnitWatch(CT_TargetofFocusFrame);
+				CT_TargetofFocus_Update(CT_TargetofFocusFrame);
+			else
+				UnregisterUnitWatch(CT_TargetofFocusFrame);
+				CT_TargetofFocusFrame:Hide();
 			end
 		end
 		
@@ -604,7 +609,7 @@ module.update = function(self, option, value)
 			CT_UnitFramesOptions_Lock_CB_OnClick(_G[lockdata.cb], not unlock[i], i);
 		end
 
-		CT_UnitFrameOptions_SetOptionsFrame("player");
+		CT_UnitFrameOptions_SetOptionsFrame();
 		
 		CT_PlayerFrame_PlayerCoords()
 		
