@@ -26,6 +26,19 @@ local function CT_PlayerFrame_ManaTextStatusBar_UpdateTextString(bar)
 	end
 end
 
+function CT_PetFrame_HealthTextStatusBar_UpdateTextString(bar)
+	if (CT_UnitFramesOptions) then
+		CT_UnitFrames_HealthBar_OnValueChanged(bar, tonumber(bar:GetValue()), not CT_UnitFramesOptions.oneColorHealth)
+		module:UpdateStatusBarTextString(bar, CT_UnitFramesOptions.styles[1][5])
+	end
+end
+
+local function CT_PetFrame_ManaTextStatusBar_UpdateTextString(bar)
+	if (CT_UnitFramesOptions) then
+		module:UpdateStatusBarTextString(bar, CT_UnitFramesOptions.styles[1][6])
+	end
+end
+
 module:regEvent("PLAYER_LOGIN", function()
 	PlayerFrameHealthBar:HookScript("OnEnter", CT_PlayerFrame_HealthTextStatusBar_UpdateTextString);
 	PlayerFrameHealthBar:HookScript("OnLeave", CT_PlayerFrame_HealthTextStatusBar_UpdateTextString);
@@ -33,42 +46,25 @@ module:regEvent("PLAYER_LOGIN", function()
 	PlayerFrameManaBar:HookScript("OnEnter", CT_PlayerFrame_ManaTextStatusBar_UpdateTextString);
 	PlayerFrameManaBar:HookScript("OnLeave", CT_PlayerFrame_ManaTextStatusBar_UpdateTextString);
 	PlayerFrameManaBar:HookScript("OnValueChanged", CT_PlayerFrame_ManaTextStatusBar_UpdateTextString);
+	
+	-- See CT_PartyFrame.lua
+	PetFrameHealthBar.ctUsePartyFontSize = true;
+	PetFrameManaBar.ctUsePartyFontSize = true;
+	PetFrameManaBar.ctOffset = -1.5;
+	
+	PetFrameHealthBar:HookScript("OnEnter", CT_PetFrame_HealthTextStatusBar_UpdateTextString);
+	PetFrameHealthBar:HookScript("OnLeave", CT_PetFrame_HealthTextStatusBar_UpdateTextString);
+	PetFrameHealthBar:HookScript("OnValueChanged", CT_PetFrame_HealthTextStatusBar_UpdateTextString);
+	PetFrameManaBar:HookScript("OnEnter", CT_PetFrame_ManaTextStatusBar_UpdateTextString);
+	PetFrameManaBar:HookScript("OnLeave", CT_PetFrame_ManaTextStatusBar_UpdateTextString);
+	PetFrameManaBar:HookScript("OnValueChanged", CT_PetFrame_ManaTextStatusBar_UpdateTextString);
 end);
 
---[[	replaced by "PLAYER_LOGIN" event
-
-	function CT_PlayerFrame_ShowTextStatusBarText(bar)
-		if (bar == PlayerFrameHealthBar or bar == PlayerFrameManaBar) then
-			CT_PlayerFrame_TextStatusBar_UpdateTextString(bar);
-		end
-	end
-
-	function CT_PlayerFrame_HideTextStatusBarText(bar)
-		if (bar == PlayerFrameHealthBar or bar == PlayerFrameManaBar) then
-			CT_PlayerFrame_TextStatusBar_UpdateTextString(bar);
-		end
-	end
-
-	hooksecurefunc("TextStatusBar_UpdateTextString", CT_PlayerFrame_TextStatusBar_UpdateTextString);
-	hooksecurefunc("ShowTextStatusBarText", CT_PlayerFrame_ShowTextStatusBarText);
-	hooksecurefunc("HideTextStatusBarText", CT_PlayerFrame_HideTextStatusBarText);
---]]
-
-function CT_PetFrame_TextStatusBar_UpdateTextString(bar)
-
-	if (bar == PetFrameHealthBar) then
-		if (CT_UnitFramesOptions) then
-			CT_UnitFrames_HealthBar_OnValueChanged(bar, tonumber(bar:GetValue()), not CT_UnitFramesOptions.oneColorHealth)
-		end
-	end
-end
-hooksecurefunc("TextStatusBar_UpdateTextString", CT_PetFrame_TextStatusBar_UpdateTextString);
-
 function module:ShowPlayerFrameBarText()
-	-- UnitFrameHealthBar_Update(PlayerFrameHealthBar, "player");
-	-- UnitFrameManaBar_Update(PlayerFrameManaBar, "player");
 	CT_PlayerFrame_HealthTextStatusBar_UpdateTextString(PlayerFrameHealthBar)
 	CT_PlayerFrame_ManaTextStatusBar_UpdateTextString(PlayerFrameManaBar)
+	CT_PetFrame_HealthTextStatusBar_UpdateTextString(PetFrameHealthBar)
+	CT_PetFrame_ManaTextStatusBar_UpdateTextString(PetFrameManaBar)
 end
 
 function module:AnchorPlayerFrameSideText()

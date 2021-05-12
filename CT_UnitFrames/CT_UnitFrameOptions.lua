@@ -27,6 +27,8 @@ CT_UnitFramesOptions = {
 			{1, 1, 1, 1, 1}, -- Right of health bar
 			{1, 1, 1, 1, 1}, -- On mana bar
 			{1, 1, 1, 1, 1}, -- Right of mana bar
+			{1, 1, 1, 1, 1}, -- Pet health bar
+			{1, 1, 1, 1, 1}, -- Pet mana bar
 		},
 		[2] = { -- Box (Party)
 			{1, 1, 1, 1, 1}, -- On health bar
@@ -58,7 +60,7 @@ CT_UnitFramesOptions = {
 	},
 };
 CT_UnitFramesOptions_NumSelections = {
-	4, 4, 5, 5, 5,
+	6, 4, 5, 5, 5,
 };
 
 -- OnLoad handlers
@@ -152,57 +154,10 @@ function CT_UnitFrameOptions_OnEvent(self, event, ...)
 				CT_UnitFramesOptions["styles"][box] = {};
 			end
 
-			-- Originally there was just "On health bar" (row 1) and "On mana bar" (row 2) settings
-			-- for the target, and target of target boxes (boxes 3 and 4).
-			--
-			-- When "Left of health bar" was added it was inserted between the "On health bar" and
-			-- "On mana bar" rows. People upgrading to this version of CT_UnitFrames did not
-			-- have a third row for boxes 3 and 4.
-			--
-			-- If we detect that the user doesn't have a "Left of Health Bar" (row 3) value for boxes 3 and 4,
-			-- then we will upgrade them by moving their "On mana bar" setting from row 2 to the new location
-			-- at row 3.
-			if (
-				(box == 3 and not CT_UnitFramesOptions["styles"][3][3]) or
-				(box == 4 and not CT_UnitFramesOptions["styles"][4][3])
-			) then
-				fixLeft = true;
-			end
-
-			-- When the "Enemy Health Bar" setting was added, there were 4 rows for the target frame (box 3)
-			-- and the target of target frame (box 4).
-			--
-			-- If we detect that row 5 is missing then we will change its setting to 4 (show value) so that
-			-- people who are upgrading don't wonder why the enemy health is not showing.
-			if (
-				(box == 3 and not CT_UnitFramesOptions["styles"][3][5]) or
-				(box == 4 and not CT_UnitFramesOptions["styles"][4][5])
-			) then
-				fixEnemy = true;
-			end
-
 			for i = 1, CT_UnitFramesOptions_NumSelections[box] do
 				if (not CT_UnitFramesOptions["styles"][box][i]) then
 					CT_UnitFramesOptions["styles"][box][i] = {1, 1, 1, 1, 1};
 				end
-			end
-		end
-		if (fixLeft) then
-			-- Update existing settings to support the "Left of Health/Mana Bar" settings.
-			for box = 3, 4 do
-				for i = 1, 5 do
-					-- Move the old "On mana bar" values from row 2 to row 3.
-					CT_UnitFramesOptions["styles"][box][3][i] = CT_UnitFramesOptions["styles"][box][2][i];
-					-- Default the new "Left of Health Bar" values (row 2) to 1 (show nothing).
-					CT_UnitFramesOptions["styles"][box][2][i] = 1;
-				end
-			end
-		end
-		if (fixEnemy) then
-			-- Upgrade existing settings in box 3 and 4 by assigning a 4 (show value) to
-			-- the "Enemy health bar" setting (on row 5).
-			for box = 3, 4 do
-				CT_UnitFramesOptions["styles"][box][5][1] = 4;
 			end
 		end
 		CT_UnitFramesOptions_Radio_Update();
@@ -232,23 +187,6 @@ function CT_UnitFramesOptions_Radio_Update()
 
 	for boxId, box in pairs(CT_UnitFramesOptions.styles) do
 		for selectionId, selection in pairs(box) do
--- This was the code that prevented the user from selecting the same thing for the bar and the right of the bar.
---[[
-			if ( CT_UnitFramesOptions_NumSelections[boxId] > 2 ) then
-				for radioId = 1, CT_UnitFramesOptions_NumSelections[boxId], 1 do
-					if ( selection[1] > 1 ) then
-						local minBound = 1;
-						if ( selectionId > 2 ) then
-							minBound = 3;
-						end
-						for i = minBound, (minBound+1), 1 do
-							_G["CT_UnitFramesOptionsFrameBox" .. boxId .. "Selection" .. i .. "Radio" .. selection[1] ]:Disable();
-							_G["CT_UnitFramesOptionsFrameBox" .. boxId .. "Selection" .. i .. "Radio" .. selection[1] .. "Name"]:SetTextColor(0.3, 0.3, 0.3, 1.0);
-						end
-					end
-				end
-			end
-]]
 			_G["CT_UnitFramesOptionsFrameBox" .. boxId .. "Selection" .. selectionId .. "Radio" .. selection[1] ]:SetChecked(true);
 			_G["CT_UnitFramesOptionsFrameBox" .. boxId .. "Selection" .. selectionId .. "Radio" .. selection[1] .. "Name"]:SetTextColor(1.0, 1.0, 1.0, 1.0);
 		end
@@ -298,10 +236,11 @@ function CT_UnitFramesOptions_Radio_Update()
 	module:ShowPartyFrameBarText();
 	module:AnchorPartyFrameSideText();
 	
-	if (module:getGameVersion() >= 2) then
-		module:ShowAssistFrameBarText();
-		module:AnchorAssistFrameSideText();
-		
+	module:ShowAssistFrameBarText();
+	module:AnchorAssistFrameSideText();
+	
+	
+	if (module:getGameVersion() >= 2) then	
 		module:ShowFocusFrameBarText();
 		module:AnchorFocusFrameSideText();
 	end

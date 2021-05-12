@@ -49,10 +49,6 @@ end
 
 local function CT_PartyFrame_TextStatusBar_UpdateTextString(bar)
 	if (CT_UnitFramesOptions) then
-		
-		bar.ctUsePartyFontSize = true;
-
-		-- apply changes for the health and mana bars
 		if (bar.type == "health") then	
 			module:UpdateStatusBarTextString(bar, CT_UnitFramesOptions.styles[2][1])
 			CT_UnitFrames_HealthBar_OnValueChanged(bar, tonumber(bar:GetValue()), not CT_UnitFramesOptions.oneColorHealth)
@@ -68,6 +64,7 @@ local function CT_PartyFrame_OnAddonLoaded()
 	local bars = {PartyMemberFrame1HealthBar, PartyMemberFrame1ManaBar, PartyMemberFrame2HealthBar, PartyMemberFrame2ManaBar, PartyMemberFrame3HealthBar, PartyMemberFrame3ManaBar, PartyMemberFrame4HealthBar, PartyMemberFrame4ManaBar};
 	local textRight = {CT_PartyFrame1HealthRight, CT_PartyFrame1ManaRight, CT_PartyFrame2HealthRight, CT_PartyFrame2ManaRight, CT_PartyFrame3HealthRight, CT_PartyFrame3ManaRight, CT_PartyFrame4HealthRight, CT_PartyFrame4ManaRight};
 	for i=1, 8 do
+		bars[i].ctUsePartyFontSize = true;
 		bars[i]:HookScript("OnEnter", CT_PartyFrame_TextStatusBar_UpdateTextString);
 		bars[i]:HookScript("OnLeave", CT_PartyFrame_TextStatusBar_UpdateTextString);
 		bars[i]:HookScript("OnValueChanged", CT_PartyFrame_TextStatusBar_UpdateTextString);

@@ -40,6 +40,7 @@ do
 			CT_UnitFrames_PartyStatusBarText:SetFont("Fonts\\FRIZQT__.TTF", 6 + CT_UnitFramesOptions.partyTextSize, "OUTLINE")
 		end
 	end)
+	
 end
 
 --------------------------------------------
@@ -109,9 +110,9 @@ function module:UpdateStatusBarTextString(textStatusBar, settings, lockShow)
 		textString = intermediateFrame:CreateFontString(nil, "OVERLAY");
 		textString:SetFontObject(textStatusBar.ctUsePartyFontSize and CT_UnitFrames_PartyStatusBarText or CT_UnitFrames_TextStatusBarText);
 		if (UnitFramesImproved) then
-			textString:SetPoint("CENTER", textStatusBar, "BOTTOM", 0, textStatusBar:GetHeight()/2);
+			textString:SetPoint("CENTER", textStatusBar, "BOTTOM", 0, textStatusBar:GetHeight()/2 + (textStatusBar.ctOffset or 0));
 		else
-			textString:SetPoint("CENTER", textStatusBar);
+			textString:SetPoint("CENTER", textStatusBar, 0, textStatusBar.ctOffset or 0);
 		end
 		textStatusBar.ctTextString = textString;
 		

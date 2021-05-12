@@ -1,5 +1,5 @@
 CT_UnitFrames (9.0.5.6) 2021-05-11
-- TOC fix for Classic Era
+- Added control over the PetFrame health and power bars
 
 CT_UnitFrames (9.0.5.3) 2021-04-19
 - Assist frame added to Classic

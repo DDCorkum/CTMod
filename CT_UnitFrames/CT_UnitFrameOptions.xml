@@ -515,6 +515,24 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</Anchor>
 						</Anchors>
 					</Frame>
+					<Frame name="$parentSelection5" id="5" inherits="CT_UnitFramesOptionsFrameSelectionTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="10" y="-85"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentSelection6" id="6" inherits="CT_UnitFramesOptionsFrameSelectionTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="10" y="-105"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
 					<CheckButton name="$parentPlayerTextLeftCB" id="18" hidden="false" inherits="OptionsCheckButtonTemplate">
 						<HitRectInsets>
 							<AbsInset left="0" right="0" top="0" bottom="0"/>
@@ -525,7 +543,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 						<Anchors>
 							<Anchor point="TOPLEFT">
 								<Offset>
-									<AbsDimension x="236" y="-85"/>
+									<AbsDimension x="236" y="-125"/>
 								</Offset>
 							</Anchor>
 						</Anchors>
@@ -559,7 +577,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 						<Anchors>
 							<Anchor point="TOPLEFT">
 								<Offset>
-									<AbsDimension x="25" y="-85"/>
+									<AbsDimension x="25" y="-125"/>
 								</Offset>
 							</Anchor>
 						</Anchors>
@@ -590,12 +608,12 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 						<Anchors>
 							<Anchor point="TOP" relativePoint="TOP">
 								<Offset>
-									<AbsDimension x="0" y="-155"/>
+									<AbsDimension x="0" y="-180"/>
 								</Offset>
 							</Anchor>
 						</Anchors>
 						<Scripts>
-							<OnLoad>
+							<OnLoad inherit="prepend">
 								_G[self:GetName().."Text"]:SetText("");
 								_G[self:GetName().."High"]:SetText("40");
 								_G[self:GetName().."Low"]:SetText("-40");
@@ -692,7 +710,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</Anchor>
 						</Anchors>
 						<Scripts>
-							<OnLoad>
+							<OnLoad inherit="prepend">
 								CT_PartyFrameSlider_OnLoad(self);
 							</OnLoad>
 							<OnShow>
@@ -702,7 +720,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 								CT_UnitFramesOptions.partyTextSize = self:GetValue();
 								_G[self:GetName().."Text"]:SetText(CT_UFO_PARTYTEXTSIZE .. " = "..self:GetValue()+6);
 								CT_UnitFramesOptions_Radio_Update();
-								CT_UnitFrames_PartyStatusBarText:SetFont("Fonts\\ARIALN.TTF", self:GetValue()+6, "OUTLINE");
+								CT_UnitFrames_PartyStatusBarText:SetFont("Fonts\\FRIZQT__.TTF", self:GetValue()+6, "OUTLINE");
 							</OnValueChanged>
 						</Scripts>
 					</Slider>
@@ -718,7 +736,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</Anchor>
 						</Anchors>
 						<Scripts>
-							<OnLoad>
+							<OnLoad inherit="prepend">
 								_G[self:GetName().."Text"]:SetText("");
 								_G[self:GetName().."High"]:SetText("40");
 								_G[self:GetName().."Low"]:SetText("-40");
@@ -917,7 +935,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</Anchor>
 						</Anchors>
 						<Scripts>
-							<OnLoad>
+							<OnLoad inherit="prepend">
 								_G[self:GetName().."Text"]:SetText("");
 								_G[self:GetName().."High"]:SetText("40");
 								_G[self:GetName().."Low"]:SetText("-40");
@@ -1193,7 +1211,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</Anchor>
 						</Anchors>
 						<Scripts>
-							<OnLoad>
+							<OnLoad inherit="prepend">
 								_G[self:GetName().."Text"]:SetText("");
 								_G[self:GetName().."High"]:SetText("40");
 								_G[self:GetName().."Low"]:SetText("-40");
@@ -1521,7 +1539,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</Anchor>
 						</Anchors>
 						<Scripts>
-							<OnLoad>
+							<OnLoad inherit="prepend">
 								_G[self:GetName().."Text"]:SetText("");
 								_G[self:GetName().."High"]:SetText("40");
 								_G[self:GetName().."Low"]:SetText("-40");
