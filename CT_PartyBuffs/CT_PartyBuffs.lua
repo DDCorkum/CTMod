@@ -201,14 +201,14 @@ local function updateLayout(value)
 		CT_PartyBuffFrame3Debuff1:SetPoint("TOPLEFT", 0, 0);
 		CT_PartyBuffFrame4Debuff1:SetPoint("TOPLEFT", 0, 0);
 	elseif (value == 3) then
-		CT_PartyBuffFrame1Buff1:SetPoint("TOPLEFT", 0, 2);
-		CT_PartyBuffFrame2Buff1:SetPoint("TOPLEFT", 0, 2);
-		CT_PartyBuffFrame3Buff1:SetPoint("TOPLEFT", 0, 2);
-		CT_PartyBuffFrame4Buff1:SetPoint("TOPLEFT", 0, 2);
-		CT_PartyBuffFrame1Debuff1:SetPoint("TOPLEFT", 0, -14);
-		CT_PartyBuffFrame2Debuff1:SetPoint("TOPLEFT", 0, -14);
-		CT_PartyBuffFrame3Debuff1:SetPoint("TOPLEFT", 0, -14);
-		CT_PartyBuffFrame4Debuff1:SetPoint("TOPLEFT", 0, -14);
+		CT_PartyBuffFrame1Buff1:SetPoint("TOPLEFT", 0, 0);
+		CT_PartyBuffFrame2Buff1:SetPoint("TOPLEFT", 0, 0);
+		CT_PartyBuffFrame3Buff1:SetPoint("TOPLEFT", 0, 0);
+		CT_PartyBuffFrame4Buff1:SetPoint("TOPLEFT", 0, 0);
+		CT_PartyBuffFrame1Debuff1:SetPoint("TOPLEFT", 0, -18);
+		CT_PartyBuffFrame2Debuff1:SetPoint("TOPLEFT", 0, -18);
+		CT_PartyBuffFrame3Debuff1:SetPoint("TOPLEFT", 0, -18);
+		CT_PartyBuffFrame4Debuff1:SetPoint("TOPLEFT", 0, -18);
 	else	-- value == 1 or nil, default
 		CT_PartyBuffFrame1Buff1:SetPoint("TOPLEFT", 0, 0);
 		CT_PartyBuffFrame2Buff1:SetPoint("TOPLEFT", 0, 0);
