@@ -39,24 +39,24 @@ CT_UnitFramesOptions = {
 			{1, 1, 1, 1, 1}, -- Left of health bar
 			{1, 1, 1, 1, 1}, -- On mana bar
 			{1, 1, 1, 1, 1}, -- Left of mana bar
-			{4, 1, 1, 1, 1}, -- Enemy health bar
+			{2, 1, 1, 1, 1}, -- Enemy health bar
 		},
 		[4] = { -- Box (Target of Target)
 			{2, 1, 1, 1, 1}, -- On health bar
 			{1, 1, 1, 1, 1}, -- Left of health bar
 			{1, 1, 1, 1, 1}, -- On mana bar
 			{1, 1, 1, 1, 1}, -- Left of mana bar
-			{4, 1, 1, 1, 1}, -- Enemy health bar
+			{2, 1, 1, 1, 1}, -- Enemy health bar
 		},
 		[5] = { -- Box (Focus)
 			{2, 1, 1, 1, 1}, -- On health bar
 			{1, 1, 1, 1, 1}, -- Left of health bar
 			{1, 1, 1, 1, 1}, -- On mana bar
 			{1, 1, 1, 1, 1}, -- Left of mana bar
-			{4, 1, 1, 1, 1}, -- Enemy health bar
+			{2, 1, 1, 1, 1}, -- Enemy health bar
 		},
 		[6] = { -- Box (Pet)
-			{2, 1, 1, 1, 1}, -- On health bar
+			{1, 1, 1, 1, 1}, -- On health bar
 			{1, 1, 1, 1, 1}, -- Right of health bar
 			{1, 1, 1, 1, 1}, -- On mana bar
 			{1, 1, 1, 1, 1}, -- Right of mana bar		
