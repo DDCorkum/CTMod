@@ -377,13 +377,13 @@ SlashCmdList["TIMER"] = function(msg)
 		CT_Timer_Reset();
 
 	elseif ( msg == "bg on" ) then
-		module:setOption("hideBG", nil, true);
+		module:setOption("hideBG", nil);
 		if (HideBackgroundCheckButton) then
 			HideBackgroundCheckButton:SetChecked(false);
 		end
 
 	elseif ( msg == "bg off" ) then
-		module:setOption("hideBG", true, true);
+		module:setOption("hideBG", true);
 		if (HideBackgroundCheckButton) then
 			HideBackgroundCheckButton:SetChecked(true);
 		end
@@ -419,7 +419,7 @@ function CT_Timer_SavePosition()
 	end
 
 	local pos = { anchorPoint, anchorTo, relativePoint, xoffset, yoffset };
-	module:setOption("position", pos, true);
+	module:setOption("position", pos);
 end
 
 function CT_Timer_RestorePosition()
@@ -585,7 +585,7 @@ local function optsInit(value)
 	CT_TimerData = module:getOption("timerData");
 	if (not CT_TimerData) then
 		CT_TimerData = {};
-		module:setOption("timerData", CT_TimerData, true);
+		module:setOption("timerData", CT_TimerData);
 	end
 
 	optShowTimer( module:getOption("showTimer") );

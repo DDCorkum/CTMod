@@ -29,7 +29,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 		</Size>
 		<Layers>
 			<Layer level="ARTWORK">
-				<Texture name="$parentIcon" setAllPoints="true"/>
+				<Texture parentKey="Icon" setAllPoints="true"/>
 			</Layer>
 		</Layers>
 		<Scripts>
@@ -48,8 +48,8 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 		</Size>
 		<Layers>
 			<Layer level="ARTWORK">
-				<Texture name="$parentIcon" setAllPoints="true"/>
-				<FontString name="$parentCount" inherits="NumberFontNormalSmall">
+				<Texture parentKey="Icon" setAllPoints="true"/>
+				<FontString parentKey="Count" inherits="NumberFontNormalSmall">
 					<Anchors>
 						<Anchor point="BOTTOMRIGHT">
 							<Offset>
@@ -60,7 +60,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				</FontString>
 			</Layer>
 			<Layer level="OVERLAY">
-				<Texture name="$parentBorder" file="Interface\Buttons\UI-Debuff-Overlays">
+				<Texture parentKey="Border" file="Interface\Buttons\UI-Debuff-Overlays">
 					<Size>
 						<AbsDimension x="19" y="19"/>
 					</Size>
@@ -97,191 +97,31 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 			</Anchor>
 		</Anchors>
 		<Frames>
-			<Button name="$parentBuff1" inherits="CT_PartyBuffButtonTemplate" id="1">
-				<Anchors>
-					<Anchor point="TOPLEFT"/>
-				</Anchors>
-			</Button>
-			<Button name="$parentBuff2" inherits="CT_PartyBuffButtonTemplate" id="2">
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentBuff1" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="2" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-			<Button name="$parentBuff3" inherits="CT_PartyBuffButtonTemplate" id="3">
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentBuff2" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="2" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-			<Button name="$parentBuff4" inherits="CT_PartyBuffButtonTemplate" id="4">
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentBuff3" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="2" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-			<Button name="$parentBuff5" inherits="CT_PartyBuffButtonTemplate" id="5">
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentBuff4" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="2" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-			<Button name="$parentBuff6" inherits="CT_PartyBuffButtonTemplate" id="6">
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentBuff5" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="2" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-			<Button name="$parentBuff7" inherits="CT_PartyBuffButtonTemplate" id="7">
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentBuff6" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="2" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-			<Button name="$parentBuff8" inherits="CT_PartyBuffButtonTemplate" id="8">
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentBuff7" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="2" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-			<Button name="$parentBuff9" inherits="CT_PartyBuffButtonTemplate" id="9">
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentBuff8" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="2" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-			<Button name="$parentBuff10" inherits="CT_PartyBuffButtonTemplate" id="10">
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentBuff9" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="2" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-			<Button name="$parentBuff11" inherits="CT_PartyBuffButtonTemplate" id="11">
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentBuff10" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="2" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-			<Button name="$parentBuff12" inherits="CT_PartyBuffButtonTemplate" id="12">
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentBuff11" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="2" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-			<Button name="$parentBuff13" inherits="CT_PartyBuffButtonTemplate" id="13">
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentBuff12" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="2" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-			<Button name="$parentBuff14" inherits="CT_PartyBuffButtonTemplate" id="14">
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentBuff13" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="2" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-			<Button name="$parentDebuff1" inherits="CT_PartyDebuffButtonTemplate" id="1">
-				<Anchors>
-					<Anchor point="TOPLEFT">
-						<Offset>
-							<AbsDimension x="75" y="38"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-			<Button name="$parentDebuff2" inherits="CT_PartyDebuffButtonTemplate" id="2">
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentDebuff1" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="2" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-			<Button name="$parentDebuff3" inherits="CT_PartyDebuffButtonTemplate" id="3">
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentDebuff2" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="2" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-			<Button name="$parentDebuff4" inherits="CT_PartyDebuffButtonTemplate" id="4">
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentDebuff3" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="2" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-			<Button name="$parentDebuff5" inherits="CT_PartyDebuffButtonTemplate" id="5">
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentDebuff4" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="2" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-			<Button name="$parentDebuff6" inherits="CT_PartyDebuffButtonTemplate" id="6">
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentDebuff5" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="2" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
+			<Button parentKey="Buff1" inherits="CT_PartyBuffButtonTemplate" id="1" />
+			<Button parentKey="Buff2" inherits="CT_PartyBuffButtonTemplate" id="2" />
+			<Button parentKey="Buff3" inherits="CT_PartyBuffButtonTemplate" id="3" />
+			<Button parentKey="Buff4" inherits="CT_PartyBuffButtonTemplate" id="4" />
+			<Button parentKey="Buff5" inherits="CT_PartyBuffButtonTemplate" id="5" />
+			<Button parentKey="Buff6" inherits="CT_PartyBuffButtonTemplate" id="6" />
+			<Button parentKey="Buff7" inherits="CT_PartyBuffButtonTemplate" id="7" />
+			<Button parentKey="Buff8" inherits="CT_PartyBuffButtonTemplate" id="8" />
+			<Button parentKey="Buff9" inherits="CT_PartyBuffButtonTemplate" id="9" />
+			<Button parentKey="Buff10" inherits="CT_PartyBuffButtonTemplate" id="10" />
+			<Button parentKey="Buff11" inherits="CT_PartyBuffButtonTemplate" id="11" />
+			<Button parentKey="Buff12" inherits="CT_PartyBuffButtonTemplate" id="12" />
+			<Button parentKey="Buff13" inherits="CT_PartyBuffButtonTemplate" id="13" />
+			<Button parentKey="Buff14" inherits="CT_PartyBuffButtonTemplate" id="14" />
+			<Button parentKey="Debuff1" inherits="CT_PartyDebuffButtonTemplate" id="1" />
+			<Button parentKey="Debuff2" inherits="CT_PartyDebuffButtonTemplate" id="2" />
+			<Button parentKey="Debuff3" inherits="CT_PartyDebuffButtonTemplate" id="3" />
+			<Button parentKey="Debuff4" inherits="CT_PartyDebuffButtonTemplate" id="4" />
+			<Button parentKey="Debuff5" inherits="CT_PartyDebuffButtonTemplate" id="5" />
+			<Button parentKey="Debuff6" inherits="CT_PartyDebuffButtonTemplate" id="6" />
 		</Frames>
 		<Scripts>
-			<OnUpdate>
-				CT_PartyBuffs_RefreshBuffs(self, elapsed);
-			</OnUpdate>
-			<OnLoad>
-				self.update = 1;
-				CT_PartyBuffs_OnLoad(self);
-			</OnLoad>
+			<OnShow function="CT_PartyMemberFrame_OnShow" />
+			<OnHide function="CT_PartyMemberFrame_OnHide" />
+			<OnLoad function="CT_PartyMemberFrame_OnLoad" />
 		</Scripts>
 	</Button>
 	<Button name="CT_PartyBuffFrame1" hidden="false" inherits="CT_PartyMemberFrameTemplate" parent="PartyMemberFrame1" id="1"/>
@@ -301,92 +141,20 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 			<AbsDimension x="70" y="50"/>
 		</Size>
 		<Frames>
-			<Button name="$parentBuff1" inherits="CT_PartyPetBuffButtonTemplate" id="1">
-				<Anchors>
-					<Anchor point="TOPLEFT"/>
-				</Anchors>
-			</Button>
-			<Button name="$parentBuff2" inherits="CT_PartyPetBuffButtonTemplate" id="2">
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentBuff1" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="2" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-			<Button name="$parentBuff3" inherits="CT_PartyPetBuffButtonTemplate" id="3">
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentBuff2" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="2" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-			<Button name="$parentBuff4" inherits="CT_PartyPetBuffButtonTemplate" id="4">
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentBuff3" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="2" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-			<Button name="$parentBuff5" inherits="CT_PartyPetBuffButtonTemplate" id="5">
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentBuff4" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="2" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-			<Button name="$parentBuff6" inherits="CT_PartyPetBuffButtonTemplate" id="6">
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentBuff5" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="2" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-			<Button name="$parentBuff7" inherits="CT_PartyPetBuffButtonTemplate" id="7">
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentBuff6" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="2" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-			<Button name="$parentBuff8" inherits="CT_PartyPetBuffButtonTemplate" id="8">
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentBuff7" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="2" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-			<Button name="$parentBuff9" inherits="CT_PartyPetBuffButtonTemplate" id="9">
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentBuff8" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="2" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
+			<Button parentKey="Buff1" inherits="CT_PartyPetBuffButtonTemplate" id="1" />
+			<Button parentKey="Buff2" inherits="CT_PartyPetBuffButtonTemplate" id="2" />
+			<Button parentKey="Buff3" inherits="CT_PartyPetBuffButtonTemplate" id="3" />
+			<Button parentKey="Buff4" inherits="CT_PartyPetBuffButtonTemplate" id="4" />
+			<Button parentKey="Buff5" inherits="CT_PartyPetBuffButtonTemplate" id="5" />
+			<Button parentKey="Buff6" inherits="CT_PartyPetBuffButtonTemplate" id="6" />
+			<Button parentKey="Buff7" inherits="CT_PartyPetBuffButtonTemplate" id="7" />
+			<Button parentKey="Buff8" inherits="CT_PartyPetBuffButtonTemplate" id="8" />
+			<Button parentKey="Buff9" inherits="CT_PartyPetBuffButtonTemplate" id="9" />
 		</Frames>
 		<Scripts>
-			<OnUpdate>
-				CT_PartyBuffs_RefreshPetBuffs(self, elapsed);
-			</OnUpdate>
-			<OnLoad>
-				self.update = 0;
-				CT_PartyBuffs_PetFrame_OnLoad(self);
-			</OnLoad>
+			<OnShow function="CT_PartyPetFrame_OnShow" />
+			<OnHide function="CT_PartyPetFrame_OnHide" />
+			<OnLoad function="CT_PartyPetFrame_OnLoad" />
 		</Scripts>
 	</Button>
 </Ui>

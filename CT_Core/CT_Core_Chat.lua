@@ -1146,19 +1146,9 @@ module:setSlashCmd(
 module.chatupdate = function(self, type, value)
 	if ( type == "init" ) then
 		
-		-- Update chat frames with the settings.
+		-- Delay updating chat frames with settings
 		module:regEvent("PLAYER_ENTERING_WORLD",
 			function()
-				-- change the old timestamp options to the newest format before doing anything else
-				if (module:getOption("chatTimestamp")) then
-					local oldFormat = module:getOption("chatTimestampFormat") or 1;
-					local newFormat = (oldFormat == 1 and "[%I:%M] ") or (oldFormat == 2 and "[%I:%M:%S] ") or (oldFormat == 3 and "[%H:%M:%S] ") or "[%H:%M:%S] "
-					CHAT_TIMESTAMP_FORMAT = newFormat;
-					SetCVar("showTimestamps", newFormat);
-				end
-				module:setOption("chatTimestamp", nil, true);
-				module:setOption("chatTimestampFormat", nil, true);
-
 				updateChat();
 				module:unregEvent("PLAYER_ENTERING_WORLD");
 			end

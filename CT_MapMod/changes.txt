@@ -1,3 +1,6 @@
+CT_MapMod (9.0.5.6) 2021-05-13
+- Refactoring to align with changes in CT_Library 9.0.5.6
+
 CT_MapMod (9.0.5.5) 2021-05-07
 - Classic and TBC only: added more polish to displaying undiscovered flight paths.
 

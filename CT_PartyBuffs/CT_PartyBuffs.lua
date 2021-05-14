@@ -29,110 +29,117 @@ CT_NUM_PARTY_BUFFS = 14;
 CT_NUM_PARTY_DEBUFFS = 6;
 CT_NUM_PET_BUFFS = 9;
 
-local numBuffs, numDebuffs, numPetBuffs, buffType, debuffType;
+local numBuffs, numDebuffs, numPetBuffs, buffType, debuffType = 4, 6, 4, 1, 1	-- options
 
-function CT_PartyBuffs_OnLoad(self)
+local ticker			-- calls CT_PartyBuffs_RefreshBuffs every 0.25 sec while either the pet frame or party frames are shown
+local triggers = {}		-- list of party frames requiring an update since the last call
+
+local function CT_PartyBuffs_RefreshBuffs()
+	for frame in pairs(triggers) do
+		if (frame.isPet) then
+			local numShown
+			for i=1, numPetBuffs do
+				local button = frame["Buffs" .. i]
+				local name, icon = UnitBuff(frame.unit, i, buffType == 2 and "RAID" or "")
+				if (name) then
+					button.Icon:SetTexture(icon)
+					button:Show()
+				else
+					numShown = i-1
+					break
+				end
+			end
+			
+			for i=numShown+1, CT_NUM_PET_BUFFS do
+				frame["Buff" .. i]:Hide()
+			end
+		else
+			local numShown
+			for i=1, numBuffs do
+				local button = frame["Buffs" .. i]
+				local name, icon = UnitBuff(frame.unit, i, buffType == 2 and "RAID" or "")
+				if (name) then
+					button.Icon:SetTexture(icon)
+					button:Show()
+				else
+					numShown = i-1
+					break
+				end
+			end
+
+			for i=numShown+1, CT_NUM_PARTY_BUFFS do
+				frame["Buff" .. i]:Hide()
+			end
+
+			for i=1, numDebuffs do
+				local button = frame["Buffs" .. i]
+				local name, icon, count, debuffType = UnitBuff(frame.unit, i, debuffType == 2 and "RAID" or "")
+				if (name) then
+					button.Icon:SetTexture(icon)
+					button.Count:SetText(count)
+					local color = DebuffTypeColor[debuffType or "none"]
+					button.Border:SetVertexColor(color.r, color.g, color.b)
+					button:Show()
+				else
+					numShown = i-1
+				end
+			end
+
+			for i=numShown+1, CT_NUM_PARTY_DEBUFFS do
+				frame["Debuff" .. i]:Hide()
+			end
+		end
+	end
+	wipe(triggers)
+end
+
+local function CT_PartyBuffs_TriggerNextUpdate(self)
+	triggers[self] = true
+end
+
+function CT_PartyMemberFrame_OnLoad(self)
+	self.unit = "party" .. self:GetID()
+	self:SetScript("OnEvent", CT_PartyBuffs_TriggerNextUpdate)
+end
+
+function CT_PartyMemberFrame_OnShow(self)
+	triggers[self] = true
+	CT_PartyBuffs_RefreshBuffs()
+	ticker = ticker or C_Timer.NewTicker(0.25, CT_PartyBuffs_RefreshBuffs) 
+	self:RegisterUnitEvent("UNIT_AURA", self.unit)
+end
+
+function CT_PartyMemberFrame_OnHide(self)
+	triggers[self] = nil
+	if (ticker and not PetFrame:IsVisible() and not PartyMemberFrame1:IsVisible()) then
+		ticker:Cancel()
+		ticker = nil
+	end
+	self:UnregisterEvent("UNIT_AURA")
+end
+
+function CT_PartyPetFrame_OnLoad(self)
+	self.unit = "party" .. self:GetID() .. "pet"
+	self.isPet = true
+	self:SetScript("OnEvent", CT_PartyBuffs_TriggerNextUpdate)
+	
+	CT_PetBuffFrame:SetPoint("TOPLEFT", PetFrame, "TOPLEFT", 48, -42)
 	if (module:getGameVersion() >= 8) then
 		-- this was causing errors in classic; more investigation required
-		PetFrameDebuff1:SetPoint("TOPLEFT", PetFrame, "TOPLEFT", 48, -59);
+		PetFrameDebuff1:SetPoint("TOPLEFT", PetFrame, "TOPLEFT", 48, -59)
 	end
 end
 
-function CT_PartyBuffs_PetFrame_OnLoad(self)
-	CT_PetBuffFrame:SetPoint("TOPLEFT", PetFrame, "TOPLEFT", 48, -42);
-end
+-- the code is exactly the same
+CT_PartyPetFrame_OnShow = CT_PartyMemberFrame_OnShow
+CT_PartyPetFrame_OnHide = CT_PartyMemberFrame_OnHide
+	
 
-function CT_PartyBuffs_RefreshBuffs(self, elapsed)
-	self.update = self.update + elapsed;
-	if ( self.update > 0.5 ) then
-		self.update = 0.5 - self.update;
-		local name = self:GetName();
-			local i;
-			
-		if ( numBuffs == 0 ) then
-			for i = 1, CT_NUM_PARTY_BUFFS, 1 do
-				_G[name .. "Buff" .. i]:Hide();
-			end
-			return;
-		end
-		for i = 1, CT_NUM_PARTY_BUFFS, 1 do
-			if ( i > numBuffs ) then
-				_G[name .. "Buff" .. i]:Hide();
-			else
-				local _, bufftexture = UnitBuff("party" .. self:GetID(), i, (buffType == 2 and "RAID") or "");
-				if ( bufftexture ) then
-					_G[name .. "Buff" .. i .. "Icon"]:SetTexture(bufftexture);
-					_G[name .. "Buff" .. i]:Show();
-				else
-					_G[name .. "Buff" .. i]:Hide();
-				end
-				
-				if ( i <= 4 ) then
-					_G["PartyMemberFrame" .. self:GetID() .. "Debuff" .. i]:Hide();
-				end
-				if ( i <= CT_NUM_PARTY_DEBUFFS ) then
-					if ( i > numDebuffs ) then
-						_G[name .. "Debuff" .. i]:Hide();
-					else
-						local _, debufftexture, debuffApplications, debuffType = UnitDebuff("party" .. self:GetID(), i, (debuffType == 2 and "RAID") or "");
-						if ( debufftexture ) then
-							local color;
-							if ( debuffApplications > 1 ) then
-								_G[name .. "Debuff" .. i .. "Count"]:SetText(debuffApplications);
-							else
-								_G[name .. "Debuff" .. i .. "Count"]:SetText("");
-							end
-							if ( debuffType ) then
-								color = DebuffTypeColor[debuffType];
-							else
-								color = DebuffTypeColor["none"];
-							end
-							_G[name .. "Debuff" .. i .. "Icon"]:SetTexture(debufftexture);
-							_G[name .. "Debuff" .. i]:Show();
-							_G[name .. "Debuff" .. i .. "Border"]:SetVertexColor(color.r, color.g, color.b);
-						else
-							_G[name .. "Debuff" .. i]:Hide();
-						end
-					end
-				end
-			end
+function CT_PartyMemberBuffTooltip_Update(isPet)
+		if ( ( isPet and numPetBuffs > 0 ) or ( not isPet and numBuffs > 0 ) ) then
+			PartyMemberBuffTooltip:Hide();
 		end
 	end
-end
-
-function CT_PartyBuffs_RefreshPetBuffs(self, elapsed)
-	self.update = self.update + elapsed;
-	if ( self.update > 0.5 ) then
-		self.update = 0.5 - self.update
-		local i;
-		if ( numPetBuffs == 0 ) then
-			for i = 1, CT_NUM_PET_BUFFS, 1 do
-				_G[self:GetName() .. "Buff" .. i]:Hide();
-			end
-			return;
-		end
-		local _, _, bufftexture;
-		for i = 1, CT_NUM_PET_BUFFS, 1 do
-			if ( i > numPetBuffs ) then
-				_G[self:GetName() .. "Buff" .. i]:Hide();
-			else
-				_, bufftexture = UnitBuff("pet", i);
-				if ( bufftexture ) then
-					_G[self:GetName() .. "Buff" .. i .. "Icon"]:SetTexture(bufftexture);
-					_G[self:GetName() .. "Buff" .. i]:Show();
-				else
-					_G[self:GetName() .. "Buff" .. i]:Hide();
-				end
-			end
-		end
-	end
-end
-
-function CT_PartyMemberBuffTooltip_Update(pet)
-	if ( ( pet and numPetBuffs > 0 ) or ( not pet and numBuffs > 0 ) ) then
-		PartyMemberBuffTooltip:Hide();
-	end
-end
 
 hooksecurefunc("PartyMemberBuffTooltip_Update", CT_PartyMemberBuffTooltip_Update);
 
@@ -147,7 +154,7 @@ module:setSlashCmd(slashCommand, "/ctpb", "/ctparty", "/ctpartybuffs");
 
 --------------------------------------------
 -- Options Frame Code
-module.frame = function()
+function module:frame()
 	local options = {};
 	local yoffset = 5;
 	local ysize;
@@ -170,15 +177,7 @@ module.frame = function()
 	};
 	yoffset = yoffset + ysize;
 
-	-- Position of the buffs and debuffs
-	ysize = 70;
-	options["frame#tl:0:-" .. yoffset .. "#br:tr:0:-".. (yoffset + ysize)] = {
-		"font#tl:5:0#v:GameFontNormalLarge#Layout",
-		"dropdown#t:0:-30#s:190:17#o:layout:1#n:CT_PartyBuffs_LayoutDropdown#Buffs underneath, and debuffs in the top-right#Debuffs underneath, and buffs in the top-right#Both buffs and debuffs underneath",
-	};
-	yoffset = yoffset + ysize;
-
-	-- Position of the buffs and debuffs
+	-- What to show?
 	ysize = 70;
 	options["frame#tl:0:-" .. yoffset .. "#br:tr:0:-".. (yoffset + ysize)] = {
 		"font#tl:5:0#v:GameFontNormalLarge#What to show?",
@@ -187,59 +186,139 @@ module.frame = function()
 		"dropdown#tl:t:-28:-30#s:95:17#o:buffType:1#n:CT_PartyBuffs_BuffTypeDropdown#All buffs#Buffs I can cast",
 		"dropdown#tl:t:-28:-60#s:95:17#o:debuffType:1#n:CT_PartyBuffs_DebuffTypeDropdown#All Debuffs#Debuffs I can remove",
 	};
+	yoffset = yoffset + ysize;
+
+	-- Position of the buffs and debuffs
+	ysize = 70;
+	options["frame#tl:0:-" .. yoffset .. "#br:tr:0:-".. (yoffset + ysize)] = {
+		"font#tl:5:0#v:GameFontNormalLarge#Layout",
+		"dropdown#t:0:-30#s:190:17#o:layout:1#n:CT_PartyBuffs_LayoutDropdown#Buffs underneath, and debuffs in the top-right#Debuffs underneath, and buffs in the top-right#Both buffs and debuffs underneath",
+	};
+	yoffset = yoffset + ysize;
+	
+	-- Size
+	ysize = 80;
+	options["frame#tl:0:-" .. yoffset .. "#br:tr:0:-".. (yoffset + ysize)] = {
+		"font#tl:5:0#v:GameFontNormalLarge#Size",
+		"slider#tr:t:-20:-45#s:120:17#o:buffSize:0#Buffs:" .. SMALL .. ":" .. LARGE .. "#-1:1:1",
+		"slider#tl:t:20:-45#s:120:17#o:debuffSize:0#Debuffs:" .. SMALL .. ":" .. LARGE .. "#-1:1:1",
+	};
+	yoffset = yoffset + ysize;
+
+
 	return "frame#all", options;
+end
+
+local function initLayout()
+	for i=1, 4 do
+		local frame = _G["CT_PartyBuffFrame"..i]
+		
+		local frame0 = frame.Buff1
+		for j=2, CT_NUM_PARTY_BUFFS do
+			local framei = frame["Buff"..j]
+			framei:SetPoint("LEFT", frame0, "RIGHT", 2, 0)
+			frame0 = framei
+		end
+		
+		frame0 = frame.Debuff1
+		for j=2, CT_NUM_PARTY_DEBUFFS do
+			local framei = frame["Debuff"..j]
+			framei:SetPoint("LEFT", frame0, "RIGHT", 2, 0)
+			frame0 = framei
+		end
+	end
+	
+	-- same thing on a smaller scale for the pet frame
+	local frame = CT_PetBuffFrame
+	frame0 = frame.Buff1
+	frame0:SetPoint("TOPLEFT", 0, 0) -- this is set once only, unlike the party buffs/debuffs that change in updateLayout()
+	for j=2, CT_NUM_PET_BUFFS do
+		local framei = frame["Buff"..j]
+		framei:SetPoint("LEFT", frame0, "RIGHT", 2, 0)
+		frame0 = framei
+	end
 end
 
 local function updateLayout(value)
 	if (value == 2) then
-		CT_PartyBuffFrame1Buff1:SetPoint("TOPLEFT", 75, 38);
-		CT_PartyBuffFrame2Buff1:SetPoint("TOPLEFT", 75, 38);
-		CT_PartyBuffFrame3Buff1:SetPoint("TOPLEFT", 75, 38);
-		CT_PartyBuffFrame4Buff1:SetPoint("TOPLEFT", 75, 38);
-		CT_PartyBuffFrame1Debuff1:SetPoint("TOPLEFT", 0, 0);
-		CT_PartyBuffFrame2Debuff1:SetPoint("TOPLEFT", 0, 0);
-		CT_PartyBuffFrame3Debuff1:SetPoint("TOPLEFT", 0, 0);
-		CT_PartyBuffFrame4Debuff1:SetPoint("TOPLEFT", 0, 0);
+		CT_PartyBuffFrame1.Buff1:SetPoint("TOPLEFT", 75, 38);
+		CT_PartyBuffFrame2.Buff1:SetPoint("TOPLEFT", 75, 38);
+		CT_PartyBuffFrame3.Buff1:SetPoint("TOPLEFT", 75, 38);
+		CT_PartyBuffFrame4.Buff1:SetPoint("TOPLEFT", 75, 38);
+		CT_PartyBuffFrame1.Debuff1:SetPoint("TOPLEFT", 0, 0);
+		CT_PartyBuffFrame2.Debuff1:SetPoint("TOPLEFT", 0, 0);
+		CT_PartyBuffFrame3.Debuff1:SetPoint("TOPLEFT", 0, 0);
+		CT_PartyBuffFrame4.Debuff1:SetPoint("TOPLEFT", 0, 0);
 	elseif (value == 3) then
-		CT_PartyBuffFrame1Buff1:SetPoint("TOPLEFT", 0, 0);
-		CT_PartyBuffFrame2Buff1:SetPoint("TOPLEFT", 0, 0);
-		CT_PartyBuffFrame3Buff1:SetPoint("TOPLEFT", 0, 0);
-		CT_PartyBuffFrame4Buff1:SetPoint("TOPLEFT", 0, 0);
-		CT_PartyBuffFrame1Debuff1:SetPoint("TOPLEFT", 0, -18);
-		CT_PartyBuffFrame2Debuff1:SetPoint("TOPLEFT", 0, -18);
-		CT_PartyBuffFrame3Debuff1:SetPoint("TOPLEFT", 0, -18);
-		CT_PartyBuffFrame4Debuff1:SetPoint("TOPLEFT", 0, -18);
+		CT_PartyBuffFrame1.Buff1:SetPoint("TOPLEFT", 0, 0);
+		CT_PartyBuffFrame2.Buff1:SetPoint("TOPLEFT", 0, 0);
+		CT_PartyBuffFrame3.Buff1:SetPoint("TOPLEFT", 0, 0);
+		CT_PartyBuffFrame4.Buff1:SetPoint("TOPLEFT", 0, 0);
+		CT_PartyBuffFrame1.Debuff1:SetPoint("TOPLEFT", 0, -18);
+		CT_PartyBuffFrame2.Debuff1:SetPoint("TOPLEFT", 0, -18);
+		CT_PartyBuffFrame3.Debuff1:SetPoint("TOPLEFT", 0, -18);
+		CT_PartyBuffFrame4.Debuff1:SetPoint("TOPLEFT", 0, -18);
 	else	-- value == 1 or nil, default
-		CT_PartyBuffFrame1Buff1:SetPoint("TOPLEFT", 0, 0);
-		CT_PartyBuffFrame2Buff1:SetPoint("TOPLEFT", 0, 0);
-		CT_PartyBuffFrame3Buff1:SetPoint("TOPLEFT", 0, 0);
-		CT_PartyBuffFrame4Buff1:SetPoint("TOPLEFT", 0, 0);
-		CT_PartyBuffFrame1Debuff1:SetPoint("TOPLEFT", 75, 38);
-		CT_PartyBuffFrame2Debuff1:SetPoint("TOPLEFT", 75, 38);
-		CT_PartyBuffFrame3Debuff1:SetPoint("TOPLEFT", 75, 38);
-		CT_PartyBuffFrame4Debuff1:SetPoint("TOPLEFT", 75, 38);
+		CT_PartyBuffFrame1.Buff1:SetPoint("TOPLEFT", 0, 0);
+		CT_PartyBuffFrame2.Buff1:SetPoint("TOPLEFT", 0, 0);
+		CT_PartyBuffFrame3.Buff1:SetPoint("TOPLEFT", 0, 0);
+		CT_PartyBuffFrame4.Buff1:SetPoint("TOPLEFT", 0, 0);
+		CT_PartyBuffFrame1.Debuff1:SetPoint("TOPLEFT", 75, 38);
+		CT_PartyBuffFrame2.Debuff1:SetPoint("TOPLEFT", 75, 38);
+		CT_PartyBuffFrame3.Debuff1:SetPoint("TOPLEFT", 75, 38);
+		CT_PartyBuffFrame4.Debuff1:SetPoint("TOPLEFT", 75, 38);
 	end
 end
 
-module.update = function(self, type, value)
+local function setBuffSize(value)
+	if (value) then			-- value is nil if just using default; in which case no actions should be taken.
+		local size = 15 + value
+		for i=1, 4 do
+			local frame = _G["CT_PartyBuffFrame" .. i]
+			for j=1, CT_NUM_PARTY_BUFFS do
+				frame["Buff" .. j]:SetSize(size, size)
+			end
+		end
+		for j=1, CT_NUM_PET_BUFFS do
+			CT_PetBuffFrame["Buff" .. j]:SetSize(size, size)
+		end
+	end
+end
+
+local function setDebuffSize(value)
+	if (value) then			-- value is nil if just using default; in which case no actions should be taken.
+		local size = 15 + value
+		for i=1, 4 do
+			local frame = _G["CT_PartyBuffFrame" .. i]
+			for j=1, CT_NUM_PARTY_DEBUFFS do
+				frame["Debuff" .. j]:SetSize(size, size)
+			end
+		end
+	end
+end
+
+function module:update(type, value)
 	if ( type == "init" ) then
-		numBuffs = self:getOption("numBuffs") or 4;
-		numDebuffs = self:getOption("numDebuffs") or 6;
-		numPetBuffs = self:getOption("numPetBuffs") or 4;
-		buffType = self:getOption("buffType");
-		debuffType = self:getOption("debuffType");
-		updateLayout(self:getOption("layout"));
+		initLayout()
+		updateLayout()
+		for opt, val in self:enumerateOptions() do
+			self:update(opt, val)
+		end
 	elseif ( type == "numBuffs" ) then
-		numBuffs = value;
+		numBuffs = value
 	elseif ( type == "numDebuffs" ) then
-		numDebuffs = value;
+		numDebuffs = value
 	elseif ( type == "numPetBuffs" ) then
-		numPetBuffs = value;
+		numPetBuffs = value
 	elseif ( type == "buffType" ) then
-		buffType = value;
+		buffType = value
 	elseif ( type == "debuffType" ) then
-		debuffType = value;
+		debuffType = value
 	elseif ( type == "layout" ) then
-		updateLayout(value);
+		updateLayout(value)
+	elseif ( type == "buffSize" ) then
+		setBuffSize(value)
+	elseif (type == "debuffSize" ) then
+		setDebuffSize(value)
 	end
 end

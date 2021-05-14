@@ -68,7 +68,7 @@ local function slashCommand(msg)
 				-- Enable or disable the bar.
 				-- If the bar is enabled it will either show or hide based on the
 				-- configured visibility conditions.
-				module:setOption("showGroup" .. groupId, show, true);
+				module:setOption("showGroup" .. groupId, show);
 
 				return;
 			end

@@ -1,3 +1,7 @@
+CT_RaidAssist (9.0.5.6) 2021-05-13
+- Refactoring to align with changes in CT_Library 9.0.5.6
+- Minor changes in anticipation of Burning Crusade Classic
+
 CT_RaidAssist (9.0.5.4) 2021-04-25
 - Minor code cleanup; nothing substantive
 

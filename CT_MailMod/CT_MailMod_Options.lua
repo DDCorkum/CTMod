@@ -164,7 +164,7 @@ module.frame = function()
 			optionsAddScript("onclick",
 				function(self)
 					if (module:getOption("resetLog")) then
-						module:setOption("resetLog", nil, true);
+						module:setOption("resetLog", nil);
 						CT_MailModOptions["mailLog"] = {};
 						module:updateMailLog();
 					end
@@ -204,7 +204,7 @@ module.frame = function()
 		);
 		optionsAddScript("onshow",
 			function(self)
-				module:setOption("resetLog", nil, true);
+				module:setOption("resetLog", nil);
 			end
 		);
 	optionsEndFrame();
@@ -259,16 +259,11 @@ module.update = function(self, optName, value)
 		opt.logColor = getoption("logColor", defaultLogColor);
 		opt.hideLogButton = getoption("hideLogButton", false);
 		module:updateMailLogButton();
-		if (getoption("hideOpenCloseFeature") ~= nil) then
-			-- converting to 8.2.5.5
-			module:setOption("showCheckboxes", not getoption("hideOpenCloseFeature"), true, false);
-			module:setOption("hideOpenCloseFeature", nil, true, false);
-		end
 		opt.showCheckboxes = getoption("showCheckboxes", true);
 		module:updateOpenCloseButtons();
 		module:updateSelectAllCheckbox();
 
-		module:setOption("resetLog", nil, true);
+		module:setOption("resetLog", nil);
 
 		-- Send Mail
 		opt.sendmailAltClickItem = getoption("sendmailAltClickItem", true);
@@ -276,13 +271,13 @@ module.update = function(self, optName, value)
 		module.configureSendToNameAutoComplete();
 		local temp = getoption("sendmailAutoCompleteUse", 5);  -- 5 is a non-sensical value, demonstrating the var was never set
 		if (temp == 5) then
-			module:setOption("sendmailAutoCompleteUse", true, false);
-			module:setOption("sendmailAutoCompleteFriends", true, false);
-			module:setOption("sendmailAutoCompleteGuild", true, false);
-			module:setOption("sendmailAutoCompleteInteracted", true, false);
-			module:setOption("sendmailAutoCompleteGroup", true, false);
-			module:setOption("sendmailAutoCompleteOnline", true, false);
-			module:setOption("sendmailAutoCompleteAccount", true, false);
+			module:setOption("sendmailAutoCompleteUse", true, CT_SKIP_UPDATE_FUNC);
+			module:setOption("sendmailAutoCompleteFriends", true, CT_SKIP_UPDATE_FUNC);
+			module:setOption("sendmailAutoCompleteGuild", true, CT_SKIP_UPDATE_FUNC);
+			module:setOption("sendmailAutoCompleteInteracted", true, CT_SKIP_UPDATE_FUNC);
+			module:setOption("sendmailAutoCompleteGroup", true, CT_SKIP_UPDATE_FUNC);
+			module:setOption("sendmailAutoCompleteOnline", true, CT_SKIP_UPDATE_FUNC);
+			module:setOption("sendmailAutoCompleteAccount", true, CT_SKIP_UPDATE_FUNC);
 		end
 		if (module:getGameVersion() >= 8) then
 			module.protectFocus(module:getOption("sendmailProtectFocus") ~= false);
@@ -348,8 +343,8 @@ module.update = function(self, optName, value)
 				local value = false;
 				opt.openBackpack = value;
 				opt.openNoBags = value;
-				module:setOption("openBackpack", value, true, false);
-				module:setOption("openNoBags", value, true, false);
+				module:setOption("openBackpack", value, CT_SKIP_UPDATE_FUNC);
+				module:setOption("openNoBags", value, CT_SKIP_UPDATE_FUNC);
 				if (optionsFrame) then
 					optionsFrame.openBackpack:SetChecked(value);
 					optionsFrame.openNoBags:SetChecked(value);
@@ -361,8 +356,8 @@ module.update = function(self, optName, value)
 				local value = false;
 				opt.openAllBags = value;
 				opt.openNoBags = value;
-				module:setOption("openAllBags", value, true, false);
-				module:setOption("openNoBags", value, true, false);
+				module:setOption("openAllBags", value, CT_SKIP_UPDATE_FUNC);
+				module:setOption("openNoBags", value, CT_SKIP_UPDATE_FUNC);
 				if (optionsFrame) then
 					optionsFrame.openAllBags:SetChecked(value);
 					optionsFrame.openNoBags:SetChecked(value);
@@ -374,8 +369,8 @@ module.update = function(self, optName, value)
 				local value = false;
 				opt.openAllBags = value;
 				opt.openBackpack = value;
-				module:setOption("openAllBags", value, true, false);
-				module:setOption("openBackpack", value, true, false);
+				module:setOption("openAllBags", value, CT_SKIP_UPDATE_FUNC);
+				module:setOption("openBackpack", value, CT_SKIP_UPDATE_FUNC);
 				if (optionsFrame) then
 					optionsFrame.openAllBags:SetChecked(value);
 					optionsFrame.openBackpack:SetChecked(value);

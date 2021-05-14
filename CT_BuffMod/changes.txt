@@ -1,3 +1,6 @@
+CT_BuffMod (9.0.5.6) 2021-05-13
+- Refactoring to align with changes in CT_Library 9.0.5.6
+
 CT_BuffMod (9.0.5.2) 2020-03-14
 - Fixed: obscure bug in 9.0.5.1 relating to a custom larger font
 

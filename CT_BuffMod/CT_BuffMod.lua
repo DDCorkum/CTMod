@@ -7814,7 +7814,7 @@ function windowListClass:getWindowOptionsList(shouldCreate)
 end
 
 function windowListClass:setWindowOptionsList(windowOptionsList)
-	module:setOption("windowOptionsList", windowOptionsList, true);
+	module:setOption("windowOptionsList", windowOptionsList);
 end
 
 function windowListClass:getWindowOptions(windowId, shouldCreate)
@@ -8177,10 +8177,6 @@ function globalClass:applyGlobalOptions(initFlag)
 	self.expirationWarningTime3 = module:getOption("expirationTime3") or 180;
 
 	-- Flash icons when about to fade
-	if (module:getOption("flashIcons") == false) then		-- this option is depreciated in 8.2.5.2; now the duration flashTime is just set to zero
-		module:setOption("flashIcons", nil, true);
-		module:setOption("flashTime", 0, true);
-	end
 	self.flashTime = module:getOption("flashTime") or constants.DEFAULT_FLASH_TIME;
 end
 
@@ -8573,7 +8569,7 @@ local function options_updateWindowWidgets(windowId)
 	-- Temporarily disable the do not update flag so we can set the option.
 	value = doNotUpdateFlag;
 	doNotUpdateFlag = nil;
-	module:setOption("windowBackgroundColor", { color[1], color[2], color[3], color[4] }, true);
+	module:setOption("windowBackgroundColor", { color[1], color[2], color[3], color[4] });
 	doNotUpdateFlag = value;
 
 	----------
@@ -8731,7 +8727,7 @@ local function options_updateValue(optName, value, windowId)
 	-- currently being edited since the CT_Library code uses :getOption() to get the current value.
 	if (optName ~= "windowBackgroundColor") then
 		-- Clear the general option.
-		module:setOption(optName, nil, true);
+		module:setOption(optName, nil);
 	end
 
 	-- Assign the value to the frame's option table.
@@ -8879,7 +8875,7 @@ local function options_editWindow(windowNum)
 	local windowListObject = globalObject.windowListObject;
 
 	-- Clear the temp option.
-	module:setOption("editWindow", nil, true);
+	module:setOption("editWindow", nil);
 
 	-- Switch to the window.
 	options_setCurrentWindow( windowListObject:windowNumToId(windowNum), true );
@@ -9049,15 +9045,15 @@ module.optionUpdate = function(self, optName, value)
 
 	-- Translate option name, value, etc. if necessary before processing the option.
 	if ( optName == "visShow" ) then
-		self:setOption(optName, nil, true);
+		self:setOption(optName, nil);
 		optName = "visWindow";
 		value = constants.VISIBILITY_SHOW;
 	elseif ( optName == "visBasic" ) then
-		self:setOption(optName, nil, true);
+		self:setOption(optName, nil);
 		optName = "visWindow";
 		value = constants.VISIBILITY_BASIC;
 	elseif ( optName == "visAdvanced" ) then
-		self:setOption(optName, nil, true);
+		self:setOption(optName, nil);
 		optName = "visWindow";
 		value = constants.VISIBILITY_ADVANCED;
 	end
@@ -9256,7 +9252,7 @@ module.frame = function()
 		end
 		local option = self.option;
 		if ( option ) then
-			module:setOption(option, value, true);
+			module:setOption(option, value);
 		end
 	end;
 
@@ -9873,7 +9869,7 @@ CONSOLIDATION REMOVED FROM GAME --]]
 					editBox:HighlightText(0, 0);
 					editBox:ClearFocus();
 					local cond = editBox:GetText();
-					module:setOption("visCondition", cond, true);
+					module:setOption("visCondition", cond);
 					self:Disable();
 					editBox.ctUndo = cond;
 					windowOptionsFrame.visUndo:Disable();
@@ -10379,14 +10375,6 @@ CONSOLIDATION REMOVED FROM GAME--]]
 
 	return "frame#all", optionsGetData();
 end
-
--- Prior to CT_BuffMod 3.302 the options frame was updating the character
--- specific setting for these options, while the updateFunc function
--- was updating the global setting.
--- We want to get rid of the global setting for those options.
-module:setOption("expirationTime1", nil);  -- Remove global setting
-module:setOption("expirationTime2", nil);  -- Remove global setting
-module:setOption("expirationTime3", nil);  -- Remove global setting
 
 -- Function to update an option.
 module.update = function(self, optName, value)

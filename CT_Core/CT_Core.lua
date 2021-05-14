@@ -142,8 +142,8 @@ local function minimapFrameSkeleton()
 			self:SetScript("OnUpdate", nil);
 			
 			local x, y = self:GetCenter();
-			module:setOption("minimapX", x, true);
-			module:setOption("minimapY", y, true);
+			module:setOption("minimapX", x);
+			module:setOption("minimapY", y);
 		end,
 		
 		["onload"] = function(self)
@@ -238,11 +238,11 @@ module.update = function(self, optName, value)
 	if (optName == "init") then
 		-- sets default options for bag automation.  Refer to helper variable for adding further automation
 		for i, bagevent in ipairs(bagAutomationEvents) do
-			if (bagevent.openAll) then module:setOption(bagevent.openAll,module:getOption(bagevent.openAll) ~= false, true); end
-			if (bagevent.backpack) then module:setOption(bagevent.backpack,not not module:getOption(bagevent.backpack), true); end
-			if (bagevent.nobags) then module:setOption(bagevent.nobags,not not module:getOption(bagevent.nobags), true); end
-			if (bagevent.bank) then module:setOption(bagevent.bank,module:getOption(bagevent.bank) ~= false, true); end
-			if (bagevent.close) then module:setOption(bagevent.close,module:getOption(bagevent.close) ~= false, true); end
+			if (bagevent.openAll) then module:setOption(bagevent.openAll,module:getOption(bagevent.openAll) ~= false); end
+			if (bagevent.backpack) then module:setOption(bagevent.backpack,not not module:getOption(bagevent.backpack)); end
+			if (bagevent.nobags) then module:setOption(bagevent.nobags,not not module:getOption(bagevent.nobags)); end
+			if (bagevent.bank) then module:setOption(bagevent.bank,module:getOption(bagevent.bank) ~= false); end
+			if (bagevent.close) then module:setOption(bagevent.close,module:getOption(bagevent.close) ~= false); end
 		end
 	end
 end
@@ -308,7 +308,7 @@ module.frame = function()
 		end
 		local option = self.option;
 		if ( option ) then
-			module:setOption(option, value, true);
+			module:setOption(option, value);
 		end
 	end;
 	local updateFunc2 = function(self, value)
@@ -321,7 +321,7 @@ module.frame = function()
 		end
 		local option = self.option;
 		if ( option ) then
-			module:setOption(option, value, true);
+			module:setOption(option, value);
 		end
 	end;
 	local updateFunc3 = function(self, value)
@@ -334,7 +334,7 @@ module.frame = function()
 		end
 		local option = self.option;
 		if ( option ) then
-			module:setOption(option, value, true);
+			module:setOption(option, value);
 		end
 	end;
 
@@ -413,7 +413,7 @@ module.frame = function()
 				function(self)
 					parent = self:GetParent();
 					if (not self:GetChecked()) then
-						module:setOption("disableBagAutomation",false,true);
+						module:setOption("disableBagAutomation",false);
 						for i, bagevent in ipairs(bagAutomationEvents) do
 							if (bagevent.show) then
 								local labelobj = parent[bagevent.openAll.."Label"];
@@ -427,7 +427,7 @@ module.frame = function()
 							end
 						end
 					else
-						module:setOption("disableBagAutomation",true,true);
+						module:setOption("disableBagAutomation",true);
 						for i, bagevent in ipairs(bagAutomationEvents) do
 							if (bagevent.show) then
 								local labelobj = parent[bagevent.openAll.."Label"];

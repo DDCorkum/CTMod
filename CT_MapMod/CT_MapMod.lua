@@ -1280,8 +1280,8 @@ function module.configureWorldMapFrame()
 					else
 						anchor, xOff = "TOP", btnCenterX - mapCenterX;
 					end
-					module:setOption("CT_MapMod_MapButton_Anchor", anchor, true);
-					module:setOption("CT_MapMod_MapButton_OffX", xOff, true);
+					module:setOption("CT_MapMod_MapButton_Anchor", anchor);
+					module:setOption("CT_MapMod_MapButton_OffX", xOff);
 					self.updatePoint(anchor, xOff);
 				end
 				local function updatePosition()

@@ -103,7 +103,7 @@ end
 		if ( key ) then
 			action = GetBindingByKey(key);
 			if ( action and tostring(buttonId) ~= strmatch(action,"^CLICK CT_BarModActionButton(%d+)") ) then
-				module:setOption("BINDING-" .. buttonId, nil, true);
+				module:setOption("BINDING-" .. buttonId, nil);
 			end
 		end
 	end
@@ -489,7 +489,7 @@ local function bindingsAssign(buttonId, key)
 	-- Get the CT_BarMod button object associated with the specified button id.
 	local obj = actionButtonList[buttonId];
 	if ( obj ) then
-		--module:setOption("BINDING-" .. buttonId, key, true);
+		--module:setOption("BINDING-" .. buttonId, key);
 		-- Bind the key to the action.
 		obj:setBinding(key);
 		SaveBindings(GetCurrentBindingSet());
@@ -504,7 +504,7 @@ local function bindingsDelete(buttonId)
 	-- Get the CT_BarMod button object associated with the specified button id.
 	local obj = actionButtonList[buttonId];
 	if ( obj ) then
-		--module:setOption("BINDING-" .. buttonId, nil, true);
+		--module:setOption("BINDING-" .. buttonId, nil);
 		-- Get the current key binding associated with the button id.
 		local currKey1, currKey2 = module.getBindingKey(buttonId);
 		if (bindingNum == 2) then
@@ -886,7 +886,7 @@ local function flyoutModeStart()
 			if (found > #flyoutDirections) then
 				found = 1;
 			end
-			module:setOption("flyoutDirection" .. self.buttonId, flyoutDirections[found], true);
+			module:setOption("flyoutDirection" .. self.buttonId, flyoutDirections[found]);
 			buttonsUpdateList();
 
 			local obj = actionButtonList[self.buttonId];
@@ -1142,7 +1142,7 @@ local function keyBindingOnLoad(self)
 				local option = dropdown.option;
 				UIDropDownMenu_SetSelectedValue(dropdown, value);
 				if ( option ) then
-					dropdown.object:setOption(option, value, not dropdown.global);
+					dropdown.object:setOption(option, value);
 				end
 				local data = buttonsModes[value];
 				buttonsSetMode(data.mode);

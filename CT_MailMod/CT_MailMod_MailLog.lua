@@ -576,7 +576,7 @@ do
 					if (button == "LeftButton") then
 						self:GetParent():StopMovingOrSizing();
 						resizingMailLog = false;
-						module:setOption("mailLogWidth", self:GetParent():GetWidth(), true);
+						module:setOption("mailLogWidth", self:GetParent():GetWidth());
 						if (self.side == "RIGHT" and txDragRight) then
 							txDragRight:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up");
 						elseif (self.side == "LEFT" and txDragLeft) then
