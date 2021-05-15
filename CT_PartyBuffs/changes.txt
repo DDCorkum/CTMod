@@ -1,6 +1,6 @@
-CT_PartyBuffs (9.0.5.6) 2021-05-14
+CT_PartyBuffs (9.0.5.6) 2021-05-15
 - Added more options to configure the addon
-- Refactoring to align with changes in CT_Library 9.0.5.6
+- Significant refactoring
 
 CT_PartyBuffs (9.0.1.1) 2020-09-25
 - Minor code cleanup; nothing substantive

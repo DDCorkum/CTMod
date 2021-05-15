@@ -5,9 +5,6 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 	<Script file="localization.fr.lua"/>
 	<Script file="CT_PartyBuffs.lua"/>
 	<Button name="CT_PartyBuffButtonTemplate" hidden="true" virtual="true">
-		<Size>
-			<AbsDimension x="15" y="15"/>
-		</Size>
 		<Layers>
 			<Layer level="ARTWORK">
 				<Texture parentKey="Icon" setAllPoints="true"/>
@@ -16,26 +13,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 		<Scripts>
 			<OnEnter>
 				GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-				GameTooltip:SetUnitBuff("party"..self:GetParent():GetID(), self:GetID());
-			</OnEnter>
-			<OnLeave>
-				GameTooltip:Hide();
-			</OnLeave>
-		</Scripts>
-	</Button>
-	<Button name="CT_PartyPetBuffButtonTemplate" hidden="true" virtual="true">
-		<Size>
-			<AbsDimension x="15" y="15"/>
-		</Size>
-		<Layers>
-			<Layer level="ARTWORK">
-				<Texture parentKey="Icon" setAllPoints="true"/>
-			</Layer>
-		</Layers>
-		<Scripts>
-			<OnEnter>
-				GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-				GameTooltip:SetUnitBuff("pet", self:GetID());
+				GameTooltip:SetUnitBuff(self:GetParent().unit, self:GetID());
 			</OnEnter>
 			<OnLeave>
 				GameTooltip:Hide();
@@ -43,9 +21,6 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 		</Scripts>
 	</Button>
 	<Button name="CT_PartyDebuffButtonTemplate" hidden="true" virtual="true">
-		<Size>
-			<AbsDimension x="15" y="15"/>
-		</Size>
 		<Layers>
 			<Layer level="ARTWORK">
 				<Texture parentKey="Icon" setAllPoints="true"/>
@@ -78,14 +53,14 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 		<Scripts>
 			<OnEnter>
 				GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-				GameTooltip:SetUnitDebuff("party"..self:GetParent():GetID(), self:GetID());
+				GameTooltip:SetUnitDebuff(self:GetParent().unit, self:GetID());
 			</OnEnter>
 			<OnLeave>
 				GameTooltip:Hide();
 			</OnLeave>
 		</Scripts>
 	</Button>
-	<Button name="CT_PartyMemberFrameTemplate" hidden="false" virtual="true">
+	<Frame name="CT_PartyMemberFrameTemplate" hidden="false" virtual="true">
 		<Size>
 			<AbsDimension x="70" y="50"/>
 		</Size>
@@ -96,40 +71,18 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				</Offset>
 			</Anchor>
 		</Anchors>
-		<Frames>
-			<Button parentKey="Buff1" inherits="CT_PartyBuffButtonTemplate" id="1" />
-			<Button parentKey="Buff2" inherits="CT_PartyBuffButtonTemplate" id="2" />
-			<Button parentKey="Buff3" inherits="CT_PartyBuffButtonTemplate" id="3" />
-			<Button parentKey="Buff4" inherits="CT_PartyBuffButtonTemplate" id="4" />
-			<Button parentKey="Buff5" inherits="CT_PartyBuffButtonTemplate" id="5" />
-			<Button parentKey="Buff6" inherits="CT_PartyBuffButtonTemplate" id="6" />
-			<Button parentKey="Buff7" inherits="CT_PartyBuffButtonTemplate" id="7" />
-			<Button parentKey="Buff8" inherits="CT_PartyBuffButtonTemplate" id="8" />
-			<Button parentKey="Buff9" inherits="CT_PartyBuffButtonTemplate" id="9" />
-			<Button parentKey="Buff10" inherits="CT_PartyBuffButtonTemplate" id="10" />
-			<Button parentKey="Buff11" inherits="CT_PartyBuffButtonTemplate" id="11" />
-			<Button parentKey="Buff12" inherits="CT_PartyBuffButtonTemplate" id="12" />
-			<Button parentKey="Buff13" inherits="CT_PartyBuffButtonTemplate" id="13" />
-			<Button parentKey="Buff14" inherits="CT_PartyBuffButtonTemplate" id="14" />
-			<Button parentKey="Debuff1" inherits="CT_PartyDebuffButtonTemplate" id="1" />
-			<Button parentKey="Debuff2" inherits="CT_PartyDebuffButtonTemplate" id="2" />
-			<Button parentKey="Debuff3" inherits="CT_PartyDebuffButtonTemplate" id="3" />
-			<Button parentKey="Debuff4" inherits="CT_PartyDebuffButtonTemplate" id="4" />
-			<Button parentKey="Debuff5" inherits="CT_PartyDebuffButtonTemplate" id="5" />
-			<Button parentKey="Debuff6" inherits="CT_PartyDebuffButtonTemplate" id="6" />
-		</Frames>
 		<Scripts>
 			<OnShow function="CT_PartyMemberFrame_OnShow" />
 			<OnHide function="CT_PartyMemberFrame_OnHide" />
 			<OnLoad function="CT_PartyMemberFrame_OnLoad" />
 		</Scripts>
-	</Button>
-	<Button name="CT_PartyBuffFrame1" hidden="false" inherits="CT_PartyMemberFrameTemplate" parent="PartyMemberFrame1" id="1"/>
-	<Button name="CT_PartyBuffFrame2" hidden="false" inherits="CT_PartyMemberFrameTemplate" parent="PartyMemberFrame2" id="2"/>
-	<Button name="CT_PartyBuffFrame3" hidden="false" inherits="CT_PartyMemberFrameTemplate" parent="PartyMemberFrame3" id="3"/>
-	<Button name="CT_PartyBuffFrame4" hidden="false" inherits="CT_PartyMemberFrameTemplate" parent="PartyMemberFrame4" id="4"/>
+	</Frame>
+	<Frame name="CT_PartyBuffFrame1" hidden="false" inherits="CT_PartyMemberFrameTemplate" parent="PartyMemberFrame1" id="1"/>
+	<Frame name="CT_PartyBuffFrame2" hidden="false" inherits="CT_PartyMemberFrameTemplate" parent="PartyMemberFrame2" id="2"/>
+	<Frame name="CT_PartyBuffFrame3" hidden="false" inherits="CT_PartyMemberFrameTemplate" parent="PartyMemberFrame3" id="3"/>
+	<Frame name="CT_PartyBuffFrame4" hidden="false" inherits="CT_PartyMemberFrameTemplate" parent="PartyMemberFrame4" id="4"/>
 
-	<Button name="CT_PetBuffFrame" hidden="false" parent="PlayerFrame">
+	<Frame name="CT_PetBuffFrame" hidden="false" parent="PlayerFrame">
 		<Anchors>
 			<Anchor point="TOPLEFT">
 				<Offset>
@@ -140,21 +93,10 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 		<Size>
 			<AbsDimension x="70" y="50"/>
 		</Size>
-		<Frames>
-			<Button parentKey="Buff1" inherits="CT_PartyPetBuffButtonTemplate" id="1" />
-			<Button parentKey="Buff2" inherits="CT_PartyPetBuffButtonTemplate" id="2" />
-			<Button parentKey="Buff3" inherits="CT_PartyPetBuffButtonTemplate" id="3" />
-			<Button parentKey="Buff4" inherits="CT_PartyPetBuffButtonTemplate" id="4" />
-			<Button parentKey="Buff5" inherits="CT_PartyPetBuffButtonTemplate" id="5" />
-			<Button parentKey="Buff6" inherits="CT_PartyPetBuffButtonTemplate" id="6" />
-			<Button parentKey="Buff7" inherits="CT_PartyPetBuffButtonTemplate" id="7" />
-			<Button parentKey="Buff8" inherits="CT_PartyPetBuffButtonTemplate" id="8" />
-			<Button parentKey="Buff9" inherits="CT_PartyPetBuffButtonTemplate" id="9" />
-		</Frames>
 		<Scripts>
 			<OnShow function="CT_PartyPetFrame_OnShow" />
 			<OnHide function="CT_PartyPetFrame_OnHide" />
 			<OnLoad function="CT_PartyPetFrame_OnLoad" />
 		</Scripts>
-	</Button>
+	</Frame>
 </Ui>
