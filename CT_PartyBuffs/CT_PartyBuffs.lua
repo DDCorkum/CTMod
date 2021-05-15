@@ -11,7 +11,7 @@
 --------------------------------------------
 -- Initialization
 
-local module = { };
+local module = select(2, ...);
 local _G = getfenv(0);
 
 local MODULE_NAME = "CT_PartyBuffs";
@@ -20,8 +20,9 @@ local MODULE_VERSION = strmatch(GetAddOnMetadata(MODULE_NAME, "version"), "^([%d
 module.name = MODULE_NAME;
 module.version = MODULE_VERSION;
 
-_G[MODULE_NAME] = module;
 CT_Library:registerModule(module);
+_G[MODULE_NAME] = module;
+
 
 --------------------------------------------
 -- Buttons
@@ -36,32 +37,34 @@ local debuffPool = CreateFramePool("Button", nil, "CT_PartyDebuffButtonTemplate"
 local partyFrames = {}	-- populated by OnLoad() funcs below
 local petFrame
 
-local numBuffs, numDebuffs, numPetBuffs, layout		-- options used in createAndAnchorButtons()
+local numBuffs, numDebuffs, numPetBuffs, layout		-- options used in createAndAnchorButtons() and its helper, anchorFirstBuffAndDebuff()
 
+-- Helper intended only for use in createAndAnchorButtons(); accepts nil if there are no buttons of a given kind
 local function anchorFirstBuffAndDebuff(buff, debuff)
 	if (buff) then
-		if (layout == 1) then
-			buff:SetPoint("TOPLEFT", 75, 38)
-		else
+		if (layout == 1 or layout == 3) then
 			buff:SetPoint("TOPLEFT", 0, 0)
+		else
+			buff:SetPoint("TOPLEFT", 75, 38)
 		end
 	end
 	if (debuff) then
-		if (layout == 1 or layout == 3 and not buff) then
-			debuff:SetPoint("TOPLEFT", 0, 0)
-		elseif (layout == 2) then
+		if (layout == 1) then
 			debuff:SetPoint("TOPLEFT", 75, 38)
+		elseif (layout == 2 or layout == 3 and not buff) then
+			debuff:SetPoint("TOPLEFT", 0, 0)
 		else
 			debuff:SetPoint("TOPLEFT", 0, -18)
 		end
 	end
 end
 
+-- Acquires/releases buttons and anchors them
 local function createAndAnchorButtons()
 
 	for __, frame in ipairs(partyFrames) do
 		
-		-- Buffs
+		-- Acquire buff buttons, and anchor all but the first
 		local count = #frame.buffs
 		while (count < numBuffs and count < CT_MAX_PARTY_BUFFS) do
 			local btn = buffPool:Acquire()
@@ -70,7 +73,8 @@ local function createAndAnchorButtons()
 				btn:SetPoint("LEFT", frame.buffs[count], "RIGHT", 2, 0)
 			end
 			count = count + 1
-			btn:SetID(count)
+			btn.id = count
+			btn.unit = frame.unit
 			frame.buffs[count] = btn
 		end
 		while (count > numBuffs) do
@@ -78,7 +82,7 @@ local function createAndAnchorButtons()
 			count = count - 1
 		end
 		
-		-- Debuffs
+		-- Acquire debuff buttons, and anchor all but the first
 		count = #frame.debuffs
 		while (count < numDebuffs and count < CT_MAX_PARTY_DEBUFFS) do
 			local btn = debuffPool:Acquire()
@@ -87,7 +91,8 @@ local function createAndAnchorButtons()
 				btn:SetPoint("LEFT", frame.debuffs[count], "RIGHT", 2, 0)
 			end
 			count = count + 1
-			btn:SetID(count)
+			btn.id = count
+			btn.unit = frame.unit
 			frame.debuffs[count] = btn
 		end
 		while (count > numDebuffs) do
@@ -101,7 +106,7 @@ local function createAndAnchorButtons()
 	
 	-- Pet
 	do
-		-- Acquire buff buttons
+		-- Acquire buff buttons, and anchor all but the first
 		local count = #petFrame.buffs
 		while (count < numPetBuffs and count < CT_MAX_PET_BUFFS) do
 			local btn = buffPool:Acquire()
@@ -110,7 +115,8 @@ local function createAndAnchorButtons()
 				btn:SetPoint("LEFT", petFrame.buffs[count], "RIGHT", 2, 0)
 			end
 			count = count + 1
-			btn:SetID(count)
+			btn.id = count
+			btn.unit = "pet"
 			petFrame.buffs[count] = btn
 		end
 		while (count > numPetBuffs) do
@@ -122,7 +128,7 @@ local function createAndAnchorButtons()
 			end
 		end
 		
-		-- Anchor the first buff, and the default Blizzard debuff button if there is one
+		-- Anchor the first buff button and the default Blizzard debuff button
 		anchorFirstBuffAndDebuff(petFrame.buffs[1], PetFrameDebuff1)
 	end
 end
@@ -154,19 +160,28 @@ local function setDebuffSize(size)
 	end
 end
 
+local function setDebuffBorder(show)
+	for btn in debuffPool:EnumerateActive() do
+		btn.Border:SetShown(show)
+	end
+	for __, btn in debuffPool:EnumerateInactive() do
+		btn.Border:SetShown(show)
+	end
+end
+
 
 --------------------------------------------
 -- Aura Manager
 
+local buffFilter, debuffFilter		-- filters used in refreshBuffs() and object handlers 
+
 local ticker				-- calls refreshBuffs() every 0.25 sec while either the pet frame or party frames are shown
 local triggers = {}			-- list of party frames requiring an update since the last call
-
-local buffType, debuffType = 1, 1	-- options used in refreshBuffs()
 
 local function refreshBuffs()
 	for frame in pairs(triggers) do
 		for i, button in ipairs(frame.buffs) do
-			local name, icon = UnitBuff(frame.unit, i, buffType == 2 and "RAID" or "")
+			local name, icon = UnitAura(frame.unit, i, buffFilter)
 			if (name) then
 				button.Icon:SetTexture(icon)
 				button:Show()
@@ -176,7 +191,7 @@ local function refreshBuffs()
 		end
 
 		for i, button in ipairs(frame.debuffs) do
-			local name, icon, count, debuffType = UnitDebuff(frame.unit, i, debuffType == 2 and "RAID" or "")
+			local name, icon, count, debuffType = UnitAura(frame.unit, i, debuffFilter)
 			if (name) then
 				button.Icon:SetTexture(icon)
 				button.Count:SetText(count > 1 and count or "")
@@ -205,6 +220,14 @@ local function refreshAllBuffs()
 		triggers[petFrame] = true
 	end
 	refreshBuffs()
+end
+
+local function setBuffFilter(value)
+	buffFilter = value == 1 and "HELPFUL" or "HELPFUL|RAID"
+end
+
+local function setDebuffFilter(value)
+	debuffFilter = value == 1 and "HARMFUL" or "HARMFUL|RAID"
 end
 
 --------------------------------------------
@@ -249,7 +272,18 @@ end
 -- the code is exactly the same
 CT_PartyPetFrame_OnShow = CT_PartyMemberFrame_OnShow
 CT_PartyPetFrame_OnHide = CT_PartyMemberFrame_OnHide
-	
+
+
+function CT_PartyBuffButton_OnEnter(self)
+	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+	GameTooltip:SetUnitBuff(self.unit, self.id, self.isBuff and buffFilter or debuffFilter)
+end
+
+function CT_PartyDebuffButton_OnEnter(self)
+	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+	GameTooltip:SetUnitBuff(self.unit, self.id, debuffFilter)
+end
+
 
 --------------------------------------------
 -- Hide the default buff tooltip when icons are already present
@@ -297,13 +331,14 @@ function module:frame()
 	yoffset = yoffset + ysize;
 
 	-- What to show?
-	ysize = 70;
+	ysize = 90;
 	options["frame#tl:0:-" .. yoffset .. "#br:tr:0:-".. (yoffset + ysize)] = {
 		"font#tl:5:0#v:GameFontNormalLarge#What to show?",
-		"font#tr:t:-30:-30#v:GameFontNormal#Buffs: #0.9:0.9:0.9:l",
-		"font#tr:t:-30:-60#v:GameFontNormal#Debuffs: #0.9:0.9:0.9:l",
-		"dropdown#tl:t:-28:-30#s:95:17#o:buffType:1#n:CT_PartyBuffs_BuffTypeDropdown#All buffs#Buffs I can cast",
-		"dropdown#tl:t:-28:-60#s:95:17#o:debuffType:1#n:CT_PartyBuffs_DebuffTypeDropdown#All Debuffs#Debuffs I can remove",
+		"font#tr:tl:60:-30#v:GameFontNormal#Buffs: #0.9:0.9:0.9:l",
+		"font#tr:tl:60:-60#v:GameFontNormal#Debuffs: #0.9:0.9:0.9:l",
+		"dropdown#tl:tl:60:-30#s:95:17#o:buffType:1#n:CT_PartyBuffs_BuffTypeDropdown#All buffs#Buffs I can cast",
+		"dropdown#tl:tl:60:-60#s:95:17#o:debuffType:1#n:CT_PartyBuffs_DebuffTypeDropdown#All debuffs#Debuffs I can remove",
+		["checkbutton#tl:tl:210:-60#s:17:17#o:debuffBorder:true#Borders"] = { ["onload"] = function(btn) module:displayTooltip(btn, {"Borders", "Adds a border to indicate a |cFF9600FFcurse|r, |cFF966400disease|r, |cFF3296FFmagic|r, |cFF009600poison|r or |cFFC80000other|r type."}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL) end }
 	};
 	yoffset = yoffset + ysize;
 
@@ -346,7 +381,14 @@ function module:update(type, value)
 		-- Set the size for each frame
 		setBuffSize(module:getOption("buffSize") or 0)
 		setDebuffSize(module:getOption("debuffSize") or 0)
-				
+		
+		-- Hide the filter if the user has turned it off
+		setDebuffBorder(module:getOption("debuffBorder") ~= false)
+		
+		-- Set the filters
+		setBuffFilter(module:getOption("buffType") or 1)
+		setDebuffFilter(module:getOption("debuffType") or 1)
+						
 	elseif ( type == "numBuffs" ) then
 		numBuffs = value
 		createAndAnchorButtons()
@@ -359,14 +401,6 @@ function module:update(type, value)
 		numPetBuffs = value
 		createAndAnchorButtons()
 		refreshAllBuffs()
-	elseif ( type == "buffType" ) then
-		buffType = value
-		createAndAnchorButtons()
-		refreshAllBuffs()
-	elseif ( type == "debuffType" ) then
-		debuffType = value
-		createAndAnchorButtons()
-		refreshAllBuffs()
 	elseif ( type == "layout" ) then
 		layout = value
 		createAndAnchorButtons()
@@ -374,5 +408,14 @@ function module:update(type, value)
 		setBuffSize(value)
 	elseif (type == "debuffSize" ) then
 		setDebuffSize(value)
+	elseif (type == "debuffBorder" ) then
+		setDebuffBorder(value)
+		refreshAllBuffs()
+	elseif ( type == "buffType" ) then
+		setBuffFilter(value)
+		refreshAllBuffs()
+	elseif ( type == "debuffType" ) then
+		setDebuffFilter(value)
+		refreshAllBuffs()
 	end
 end

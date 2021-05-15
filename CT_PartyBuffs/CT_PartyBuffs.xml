@@ -11,19 +11,15 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 			</Layer>
 		</Layers>
 		<Scripts>
-			<OnEnter>
-				GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-				GameTooltip:SetUnitBuff(self:GetParent().unit, self:GetID());
-			</OnEnter>
-			<OnLeave>
-				GameTooltip:Hide();
+			<OnEnter function="CT_PartyBuffButton_OnEnter" />
+			<OnLeave function="CT_PartyBuffButton_OnLeave">
+				GameTooltip:Hide()
 			</OnLeave>
 		</Scripts>
 	</Button>
-	<Button name="CT_PartyDebuffButtonTemplate" hidden="true" virtual="true">
+	<Button name="CT_PartyDebuffButtonTemplate" inherits="CT_PartyBuffButtonTemplate" hidden="true" virtual="true">
 		<Layers>
 			<Layer level="ARTWORK">
-				<Texture parentKey="Icon" setAllPoints="true"/>
 				<FontString parentKey="Count" inherits="NumberFontNormalSmall">
 					<Anchors>
 						<Anchor point="BOTTOMRIGHT">
@@ -51,13 +47,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 			</Layer>
 		</Layers>
 		<Scripts>
-			<OnEnter>
-				GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-				GameTooltip:SetUnitDebuff(self:GetParent().unit, self:GetID());
-			</OnEnter>
-			<OnLeave>
-				GameTooltip:Hide();
-			</OnLeave>
+			<OnEnter function="CT_PartyDebuffButton_OnEnter" />
 		</Scripts>
 	</Button>
 	<Frame name="CT_PartyMemberFrameTemplate" hidden="false" virtual="true">
