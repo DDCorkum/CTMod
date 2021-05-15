@@ -10,7 +10,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 		</Size>
 		<Layers>
 			<Layer level="ARTWORK">
-				<Texture name="$parentIcon" setAllPoints="true"/>
+				<Texture parentKey="Icon" setAllPoints="true"/>
 			</Layer>
 		</Layers>
 		<Scripts>

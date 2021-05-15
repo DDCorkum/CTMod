@@ -37,15 +37,15 @@ local triggers = {}		-- list of party frames requiring an update since the last 
 local function CT_PartyBuffs_RefreshBuffs()
 	for frame in pairs(triggers) do
 		if (frame.isPet) then
-			local numShown
+			local numShown = 0
 			for i=1, numPetBuffs do
-				local button = frame["Buffs" .. i]
+				local button = frame["Buff" .. i]
 				local name, icon = UnitBuff(frame.unit, i, buffType == 2 and "RAID" or "")
 				if (name) then
 					button.Icon:SetTexture(icon)
 					button:Show()
+					numShown = numShown + 1
 				else
-					numShown = i-1
 					break
 				end
 			end
@@ -54,15 +54,15 @@ local function CT_PartyBuffs_RefreshBuffs()
 				frame["Buff" .. i]:Hide()
 			end
 		else
-			local numShown
+			local numShown = 0
 			for i=1, numBuffs do
-				local button = frame["Buffs" .. i]
+				local button = frame["Buff" .. i]
 				local name, icon = UnitBuff(frame.unit, i, buffType == 2 and "RAID" or "")
 				if (name) then
-					button.Icon:SetTexture(icon)
+			 		button.Icon:SetTexture(icon)
 					button:Show()
+					numShown = numShown + 1
 				else
-					numShown = i-1
 					break
 				end
 			end
@@ -71,17 +71,19 @@ local function CT_PartyBuffs_RefreshBuffs()
 				frame["Buff" .. i]:Hide()
 			end
 
+			numShown = 0
 			for i=1, numDebuffs do
-				local button = frame["Buffs" .. i]
-				local name, icon, count, debuffType = UnitBuff(frame.unit, i, debuffType == 2 and "RAID" or "")
+				local button = frame["Debuff" .. i]
+				local name, icon, count, debuffType = UnitDebuff(frame.unit, i, debuffType == 2 and "RAID" or "")
 				if (name) then
 					button.Icon:SetTexture(icon)
 					button.Count:SetText(count)
 					local color = DebuffTypeColor[debuffType or "none"]
 					button.Border:SetVertexColor(color.r, color.g, color.b)
 					button:Show()
+					numShown = numShown + 1
 				else
-					numShown = i-1
+					break
 				end
 			end
 
