@@ -338,7 +338,7 @@ function module:frame()
 		"font#tr:tl:60:-60#v:GameFontNormal#Debuffs: #0.9:0.9:0.9:l",
 		"dropdown#tl:tl:60:-30#s:95:17#o:buffType:1#n:CT_PartyBuffs_BuffTypeDropdown#All buffs#Buffs I can cast",
 		"dropdown#tl:tl:60:-60#s:95:17#o:debuffType:1#n:CT_PartyBuffs_DebuffTypeDropdown#All debuffs#Debuffs I can remove",
-		["checkbutton#tl:tl:210:-60#s:17:17#o:debuffBorder:true#Borders"] = { onshow = function(btn) module:displayTooltip(btn, {"Borders", "Adds a border to indicate a |cFF9600FFcurse|r, |cFF966400disease|r, |cFF3296FFmagic|r, |cFF009600poison|r or |cFFC80000other|r type."}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL) end }
+		["checkbutton#tl:tl:210:-60#s:17:17#o:debuffBorder:true#Borders"] = { onenter = function(btn) module:displayTooltip(btn, {"Borders", "Adds a border to indicate a |cFF9600FFcurse|r, |cFF966400disease|r, |cFF3296FFmagic|r, |cFF009600poison|r or |cFFC80000other|r type.#0.9:0.9:0.9"}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL) end }
 	};
 	yoffset = yoffset + ysize;
 
