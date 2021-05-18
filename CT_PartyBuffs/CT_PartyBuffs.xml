@@ -12,7 +12,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 		</Layers>
 		<Scripts>
 			<OnEnter function="CT_PartyBuffButton_OnEnter" />
-			<OnLeave function="CT_PartyBuffButton_OnLeave">
+			<OnLeave>
 				GameTooltip:Hide()
 			</OnLeave>
 		</Scripts>
