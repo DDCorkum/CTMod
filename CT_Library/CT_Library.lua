@@ -37,7 +37,8 @@ _G[LIBRARY_NAME] = libPublic;
 local modules = {};		-- Contains two references to each installed module: by number and by name.  See lib:iterateModules() and lib:getModule(name)
 local movables, frame, eventTable;
 local timerRepeatingFuncs, timerFuncs = {}, {};
-local numSlashCmds, localizations, tableList, defaultValues;
+local numSlashCmds, localizations, tableList;
+local defaultDisplayValues = {}
 local frameCache;
 
 -- Set the variables used
@@ -915,6 +916,7 @@ local function registerModule(module, position)
 			return a.name < b.name;
 		end
 	end);
+	defaultDisplayValues[module] = {}
 end
 
 -- Integrates the module into the CT Control Panel, and makes the module an extension of CTMod's public interface and protected content by configuring its metatable __index property
@@ -941,40 +943,30 @@ local function getCharKey()
 end
 lib.getCharKey = getCharKey;
 
--- Set an option's value (optionally character specific)
-function lib:setOption(option, value, charSpecific, callUpdate)
+CT_SKIP_UPDATE_FUNC = false	-- convenience constant so the impact of callUpdate is clearer in other modules
+
+-- Set an option's value on the current profile
+function lib:setOption(option, value, callUpdate)
 	-- callUpdate
 	--	false: Do not call the update function.
 	--	true, nil: Call the update function.
 	
 	if (type(option) == "function") then
 		-- some addons overload option so the same object can manipulate different tasks simultaneously
-		option = option();
+		option = option()
 	end
 	if (not option) then
 		-- either option was nil, or option() returned nil
-		return;
+		return
 	end
-	local options = self.options;
-	if ( not options ) then
-		options = { };
-		self.options = options;
-		local optionKey = self.name.."Options";
-		if ( not _G[optionKey] ) then
-			_G[optionKey] = options;
-		end
+	if ( self.options == nil ) then
+		local optionKey = self.name.."Options"
+		self.options = _G[optionKey] or {}
+		_G[optionKey] = self.options
 	end
-	if ( charSpecific ) then
-		local key = getCharKey();
-		local charOptions = options[key];
-		if ( not charOptions ) then
-			charOptions = { };
-			options[key] = charOptions;
-		end
-		charOptions[option] = value;
-	else
-		options[option] = value;
-	end
+	local key = getCharKey();
+	self.options[key] = self.options[key] or {}
+	self.options[key][option] = value;
 	if (callUpdate ~= false) then
 		local updateFunc = self.update;
 		if ( updateFunc ) then
@@ -983,91 +975,45 @@ function lib:setOption(option, value, charSpecific, callUpdate)
 	end
 end
 
--- 04/18/2011
---
--- The problem with the defaultValues table is that it is not
--- populated until an addon's module.frame function is run and the
--- results are parsed. That usually only happens when the user opens
--- the addon's options window. Until then all default values are nil.
--- It has been this way for quite a long time.
---
--- Most (all?) of the existing addons are aware of this and do not
--- rely on the default values in this table. Instead default values
--- are hard coded at various points in the addon, as well as being
--- specified in the widget strings that make up the addon's options
--- frame.
---
--- Note that if CT_Library is ever changed to populate the defaultValues
--- table earlier in an addon's life, this may cause problems with addons
--- that explicitly test an option's value for nil to test if it has ever been
--- modified by the user. If a default value is returned from :getOption()
--- instead of nil, then the addon cannot know if the option was never
--- modified. These sorts of tests would need to be changed first.
-
-if (not defaultValues) then
-	defaultValues = { };
-end
-
--- Reads an option. Prioritizes char-specific options over global copies
-function lib:getOption(option, useDefault)
-	-- useDefault
-	--	false: Do not return default value if option is nil.
-	--	true, nil: Return default value if option is nil.
-	local options = self.options;
+-- Reads an option.
+function lib:getOption(option)
 	if (type(option) == "function") then
-		-- some addons overload option so the same object can manipulate different tasks simultaneously
+		-- some addons overload a frame to have a function
 		option = option();
 	end
-	if (not option) then
-		-- either option was nil, or option() returned nil
-		return;
-	end
-	if ( not options ) then
-		if (useDefault ~= false) then
-			return defaultValues[self.name.."-"..option];
+	if (option and self.options) then
+		local key = getCharKey();
+		if ( self.options[key] ) then
+			return self.options[key][option];
 		end
-		return;
 	end
+end
 
-	local key = getCharKey();
+-- Reads an option, or the 'default' value for display on a frame (NOT INTENDED FOR USE BY ANY MODULES)
+function lib:getDisplayValue(option)
+	local value = self:getOption(option)
+	return value ~= nil and value or defaultDisplayValues[self][option]
+end
 
-	local charOptions = options[key];
-	local val;
-	if ( charOptions ) then
-		val = charOptions[option];
-		if ( val == nil ) then
-			val = options[option];
-			if ( val == nil ) then
-				if (useDefault ~= false) then
-					val = defaultValues[self.name.."-"..option];
-				end
-			end
-		end
-		return val;
+-- Returns all of a toon's options
+
+local function nextOption(t, key)
+	repeat
+		key, val = next(t, key)
+	until (key == nil or key:find("MOVABLE-") == nil)		-- see nextMovable() below
+	return key, val
+end
+
+function lib:enumerateOptions()
+	local key = getCharKey()
+	local options = self.options
+	if (options and options[key]) then
+		return nextOption, options[key]
 	else
-		val = options[option];
-		if ( val == nil ) then
-			if (useDefault ~= false) then
-				val = defaultValues[self.name.."-"..option];
-			end
-		end
-		return val;
+		return next, {}
 	end
 end
 
-function lib:getOptionDefault(option)
-	if ( not option ) then
-		return;
-	end
-	return defaultValues[self.name.."-"..option];
-end
-
-function lib:setOptionDefault(option, value)
-	if ( not option ) then
-		return;
-	end
-	defaultValues[self.name.."-"..option] = value;
-end
 
 -- End Option Handling
 -----------------------------------------------
@@ -1134,7 +1080,7 @@ function lib:stopMovable(id)
 		d, e = d * scale, e * scale;
 
 		pos = { a, b, c, d, e, scale };
-		self:setOption(id, pos, true);
+		self:setOption(id, pos);
 	end
 
 	local rel = pos[2];
@@ -1144,11 +1090,28 @@ function lib:stopMovable(id)
 end
 
 function lib:resetMovable(id)
-	self:setOption("MOVABLE-"..id, nil, true);
+	self:setOption("MOVABLE-"..id, nil);
 end
 
 function lib:UnregisterMovable(id)
 	movables["MOVABLE-"..id] = nil;
+end
+
+local function nextMovable()	-- see nextOption() above
+	repeat
+		key, val = next(t, key)
+	until (key == nil or key:find("MOVABLE-"))
+	return key, val
+end
+
+function lib:enumerateMovables()
+	local key = getCharKey()
+	local options = self.options
+	if (options and options[key]) then
+		return nextMovable, options[key]
+	else
+		return pairs({})
+	end
 end
 
 -- End Movable Handling
@@ -1523,7 +1486,7 @@ local function checkbuttonOnClick(self)
 	local option = self.option;
 
 	if ( option ) then
-		self.object:setOption(option, checked, not self.global);
+		self.object:setOption(option, checked);
 	end
 	if ( checked ) then
 		PlaySound(856);
@@ -1595,7 +1558,7 @@ objectHandlers.checkbutton = function(self, parent, name, virtual, option, text,
 	if ( not virtual or not checkbutton:GetScript("OnClick") ) then
 		checkbutton:SetScript("OnClick", checkbuttonOnClick);
 	end
-	checkbutton:SetChecked(self:getOption(option) or false);
+	checkbutton:SetChecked(self:getDisplayValue(option) or false);
 
 	return checkbutton;
 end
@@ -1717,7 +1680,7 @@ objectHandlers.editbox = function(self, parent, name, virtual, option, font, bdt
 	if (multiline) then
 		frame = lib:createMultiLineEditBox(name,multilinewidth,multilineheight,parent,bdtype, font);
 		if (option) then
-			frame.editBox:SetText(self:getOption(option) or "");
+			frame.editBox:SetText(self:getDisplayValue(option) or "");
 		end
 	else
 		if (tonumber(bdtype) == 1) then
@@ -1752,7 +1715,7 @@ objectHandlers.editbox = function(self, parent, name, virtual, option, font, bdt
 			frame:SetFontObject(font)
 		end
 		if (option) then
-			frame:SetText(self:getOption(option) or "");
+			frame:SetText(self:getDisplayValue(option) or "");
 		end
 	end
 	return frame;
@@ -1841,7 +1804,7 @@ local function dropdownClick(self, arg1, arg2, checked)
 		end
 		
 		if ( option ) then
-			dropdown.object:setOption(option, value, not dropdown.global);
+			dropdown.object:setOption(option, value);
 		end
 	end
 end
@@ -1876,7 +1839,7 @@ objectHandlers.dropdown = function(self, parent, name, virtual, option, ...)
 			UIDropDownMenu_AddButton(dropdownEntry);
 		end
 	end);
-	UIDropDownMenu_SetSelectedValue(frame, self:getOption(option) or 1);
+	UIDropDownMenu_SetSelectedValue(frame, self:getDisplayValue(option) or 1);
 
 	UIDropDownMenu_JustifyText(frame, "LEFT");
 	return frame;
@@ -1909,7 +1872,7 @@ objectHandlers.multidropdown = function(self, parent, name, virtual, option, ...
 			dropdownEntry.text = entries[i];
 			dropdownEntry.value = (i+1)/2;
 			dropdownEntry.isNotRadio = true;
-			dropdownEntry.checked = self:getOption(entries[i+1]);
+			dropdownEntry.checked = self:getDisplayValue(entries[i+1]);
 			dropdownEntry.func = dropdownClick;
 			dropdownEntry.arg1 = entries[i+1];
 			UIDropDownMenu_AddButton(dropdownEntry);
@@ -1933,7 +1896,7 @@ local function updateSliderValue(self, value)
 
 	local option = self.option;
 	if ( option ) then
-		self.object:setOption(option, value, not self.global);
+		self.object:setOption(option, value);
 	end
 end
 
@@ -1951,7 +1914,7 @@ objectHandlers.slider = function(self, parent, name, virtual, option, text, valu
 	slider:SetMinMaxValues(minValue, maxValue);
 	slider:SetValueStep(step);
 
-	slider:SetValue(self:getOption(option) or (maxValue-minValue)/2);
+	slider:SetValue(self:getDisplayValue(option) or (maxValue-minValue)/2);
 	slider:SetScript("OnValueChanged", updateSliderValue);
 
 	updateSliderText(slider);
@@ -1968,12 +1931,12 @@ local function colorSwatchCancel()
 		-- some addons overload 'option' with a custom function to display different windows
 		option = option();
 	end
-	local colors = object:getOption(option);
+	local colors = object:getDisplayValue(option);
 	if (colors) then
 		colors[1], colors[2], colors[3] = r, g, b;
 		colors[4] = a;
 	end
-	object:setOption(option, colors, not self.global);
+	object:setOption(option, colors);
 	self.normalTexture:SetVertexColor(r, g, b);
 end
 
@@ -1985,13 +1948,13 @@ local function colorSwatchColor()
 		-- some addons overload 'option' with a custom function to display different windows
 		option = option();
 	end
-	local colors = object:getOption(option);
+	local colors = object:getDisplayValue(option);
 	if (colors) then
 		colors[1], colors[2], colors[3] = r, g, b;
 	else
 		colors = {r, g, b, 1}
 	end
-	object:setOption(option, colors, not self.global);
+	object:setOption(option, colors);
 	self.normalTexture:SetVertexColor(r, g, b);
 end
 
@@ -2003,9 +1966,9 @@ local function colorSwatchOpacity()
 		-- some addons overload 'option' with a custom function to display different windows
 		option = option();
 	end
-	local colors = object:getOption(option) or {self.r, self.g, self.b};
+	local colors = object:getDisplayValue(option) or {self.r, self.g, self.b};
 	colors[4] = a;
-	object:setOption(option, colors, not self.global);
+	object:setOption(option, colors);
 end
 
 local function colorSwatchShow(self)
@@ -2015,7 +1978,7 @@ local function colorSwatchShow(self)
 		-- some addons overload 'option' with a custom function to display different windows
 		option = option();
 	end
-	local color = object:getOption(option);
+	local color = object:getDisplayValue(option);
 	if ( color ) then
 		r, g, b, a = unpack(color);
 	elseif (self:GetNormalTexture()) then
@@ -2061,7 +2024,7 @@ objectHandlers.colorswatch = function(self, parent, name, virtual, option, alpha
 	bg:SetPoint("TOPLEFT", swatch, 1, -1);
 	bg:SetPoint("BOTTOMRIGHT", swatch, 0, 1);
 
-	local color = self:getOption(option);
+	local color = self:getDisplayValue(option);
 	if ( color ) then
 		normalTexture:SetVertexColor(color[1], color[2], color[3]);
 	end
@@ -2242,7 +2205,7 @@ local function generalObjectHandler(self, specializedHandler, str, parent, initi
 
 	-- Parse the things we want first of all
 	-- Any object handler can have up to 6 special, object-specific attributes
-	local identifier, name, explicitParent, option, defaultValue, global, strata, width,
+	local identifier, name, explicitParent, option, defaultValue, strata, width,
 		height, movable, clamped, hidden, cache, virtual, localInherit;
 	local anch1, anch2, anch3, anch4, specFound;
 	local found;
@@ -2277,9 +2240,6 @@ local function generalObjectHandler(self, specializedHandler, str, parent, initi
 					option = opt;
 					if ( def ) then
 						defaultValue = convertValue(def);
-					end
-					if ( glb ) then
-						global = true;
 					end
 					found = true;
 				end
@@ -2391,7 +2351,7 @@ local function generalObjectHandler(self, specializedHandler, str, parent, initi
 
 	-- Set default value
 	if ( option and defaultValue ) then
-		defaultValues[self.name.."-"..option] = defaultValue;
+		defaultDisplayValues[self][option] = defaultValue;
 	end
 
 	-- Create our frame
@@ -3195,9 +3155,9 @@ local function populateAddonsList(char)
 	
 	-- It is not permissible to import from yourself to yourself
 	local actions = optionsFrame.actions;
-	module:setOption("canImport", nil, true);
-	module:setOption("canDelete", nil, true);
-	module:setOption("canExport", nil, true);
+	module:setOption("canImport", nil);
+	module:setOption("canDelete", nil);
+	module:setOption("canExport", nil);
 	actions.confirmImport:SetChecked(false);
 	actions.confirmDelete:SetChecked(false);
 	actions.confirmExport:SetChecked(false);
@@ -3426,7 +3386,7 @@ local function import()
 			end
 		end
 
-		module:setOption("canImport", nil, true);
+		module:setOption("canImport", nil);
 
 		if ( success ) then
 			C_UI.Reload();
@@ -3458,7 +3418,7 @@ local function delete()
 			end
 		end
 
-		module:setOption("canDelete", nil, true);
+		module:setOption("canDelete", nil);
 
 		if ( success ) then
 			if (fromChar == getCharKey()) then
@@ -3559,7 +3519,7 @@ local function copyFromClipboard()
 			end
 		end
 		importRealm = " Import String";
-		module:setOption("char", "CHAR-Unknown- Import String", true);
+		module:setOption("char", "CHAR-Unknown- Import String");
 		UIDropDownMenu_SetText(CT_LibraryDropdown0, " Import String (1)");
 		UIDropDownMenu_SetText(CT_LibraryDropdown1, "Unknown");
 		closeClipboardPanel();
@@ -3607,9 +3567,9 @@ local function openClipboardPanel(text)
 	actions.confirmImport:SetChecked(false);
 	actions.confirmDelete:SetChecked(false);
 	actions.confirmExport:SetChecked(false);
-	module:setOption("canImport", nil, true);
-	module:setOption("canDelete", nil, true);
-	module:setOption("canExport", nil, true);
+	module:setOption("canImport", nil);
+	module:setOption("canDelete", nil);
+	module:setOption("canExport", nil);
 	if (type(text) == "string") then
 		clipboardPanel.editBox:SetScript("OnTextChanged", nil);
 		clipboardPanel.editBox:SetScript("OnEnterPressed", closeClipboardPanel);
@@ -3652,7 +3612,7 @@ local function export(self)
 			end
 		end
 
-		module:setOption("canExport", nil, true);
+		module:setOption("canExport", nil);
 
 		if ( not success ) then
 			print(L["CT_Library/SettingsImport/NoAddonsSelected"]);
@@ -3675,13 +3635,13 @@ module.update = function(self, type, value)
 	if ( type == "char" and value ) then
 		local name, realm = value:match("^CHAR%-([^-]+)%-(.+)$");
 		if (name and realm) then
-			self:setOption("char", nil, true);
+			self:setOption("char", nil);
 			populateAddonsList(value);
 		else
 			-- Server drop down
 			importRealm = value;
 			hideAddonsList();
-			self:setOption("char", nil, true);
+			self:setOption("char", nil);
 			-- Re initialize character pull down so it only has players from selected server.
 			importSetPlayer = 1;
 			populateCharDropdown();
@@ -3695,8 +3655,8 @@ module.update = function(self, type, value)
 			actions.deleteButton:Enable();
 			actions.confirmImport:SetChecked(false);
 			actions.confirmExport:SetChecked(false);
-			module:setOption("canImport", nil, true);
-			module:setOption("canExport", nil, true);
+			module:setOption("canImport", nil);
+			module:setOption("canExport", nil);
 		else
 			actions.deleteButton:Disable();
 		end
@@ -3707,8 +3667,8 @@ module.update = function(self, type, value)
 			actions.importButton:Enable();
 			actions.confirmDelete:SetChecked(false);
 			actions.confirmExport:SetChecked(false);
-			module:setOption("canDelete", nil, true);
-			module:setOption("canExport", nil, true);
+			module:setOption("canDelete", nil);
+			module:setOption("canExport", nil);
 		else
 			actions.importButton:Disable();
 		end
@@ -3719,8 +3679,8 @@ module.update = function(self, type, value)
 			actions.exportButton:Enable()
 			actions.confirmImport:SetChecked(false);
 			actions.confirmDelete:SetChecked(false);
-			module:setOption("canImport", nil, true);
-			module:setOption("canDelete", nil, true);
+			module:setOption("canImport", nil);
+			module:setOption("canDelete", nil);
 		else
 			actions.exportButton:Disable();
 		end
@@ -3753,9 +3713,9 @@ module.frame = function()
 			populateServerDropdown();
 			populateCharDropdown();
 
-			module:setOption("canImport", nil, true);
-			module:setOption("canDelete", nil, true);
-			module:setOption("canExport", nil, true);
+			module:setOption("canImport", nil);
+			module:setOption("canDelete", nil);
+			module:setOption("canExport", nil);
 		end,
 
 		["checkbutton#tl:24:-170#s:18:18#i:checkAllButton#Select all"] = {

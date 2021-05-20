@@ -56,7 +56,7 @@ module.updateOptionFromOutside = function(optName, value)
 
 	if (optName == "disableDefaultActionBar") then
 		-- Update our option
-		module:setOption(optName, value, true);
+		module:setOption(optName, value);
 	end
 end
 
@@ -1556,7 +1556,7 @@ module.frame = function()
 		optionsBeginFrame(19, 24, "button#tl:80:%y#s:24:%s");
 			optionsAddScript("onclick",
 				function(self)
-					module:setOption("prvsGroup", 1, true);  -- Actual value assigned to option is not important.
+					module:setOption("prvsGroup", 1);  -- Actual value assigned to option is not important.
 				end
 			);
 			optionsAddScript("onload",
@@ -1572,7 +1572,7 @@ module.frame = function()
 		optionsBeginFrame(24, 24, "button#tl:100:%y#s:24:%s");
 			optionsAddScript("onclick",
 				function(self)
-					module:setOption("nextGroup", 1, true);  -- Actual value assigned to option is not important.
+					module:setOption("nextGroup", 1);  -- Actual value assigned to option is not important.
 				end
 			);
 			optionsAddScript("onload",
@@ -1801,7 +1801,7 @@ module.frame = function()
 					editBox:HighlightText(0, 0);
 					editBox:ClearFocus();
 					local cond = editBox:GetText();
-					module:setOption("barCondition", cond, true);
+					module:setOption("barCondition", cond);
 					self:Disable();
 					editBox.ctUndo = cond;
 					groupFrame.visUndo:Disable();
@@ -2035,7 +2035,7 @@ module.frame = function()
 					editBox:HighlightText(0, 0);
 					editBox:ClearFocus();
 					local cond = editBox:GetText();
-					module:setOption("pageCondition", cond, true);
+					module:setOption("pageCondition", cond);
 					self:Disable();
 					editBox.ctUndo = cond;
 					groupFrame.pageUndo:Disable();
@@ -2248,22 +2248,22 @@ module.optionUpdate = function(self, optName, value)
 
 	-- Translate option name, value, etc. if necessary before processing the option.
 	if (optName == "visBasic") then
-		self:setOption(optName, nil, true);
+		self:setOption(optName, nil);
 		optName = "barVisibility";
 		value = 1;
 
 	elseif (optName == "visAdvanced") then
-		self:setOption(optName, nil, true);
+		self:setOption(optName, nil);
 		optName = "barVisibility";
 		value = 2;
 
 	elseif (optName == "pageBasic") then
-		self:setOption(optName, nil, true);
+		self:setOption(optName, nil);
 		optName = "barPaging";
 		value = 1;
 
 	elseif (optName == "pageAdvanced") then
-		self:setOption(optName, nil, true);
+		self:setOption(optName, nil);
 		optName = "barPaging";
 		value = 2;
 
@@ -2272,14 +2272,14 @@ module.optionUpdate = function(self, optName, value)
 	-- Process the options
 	if (optName == "editGroup") then
 		-- Select bar to edit.
-		self:setOption("editGroup", nil, true);
+		self:setOption("editGroup", nil);
 		currentEditGroup = module.GroupNumToId(value);
 		localGroupId = currentEditGroup;
 		updateGroupWidgets(localGroupId);
 
 	elseif (optName == "nextGroup") then
 		-- Select next bar to edit.
-		self:setOption("nextGroup", nil, true);
+		self:setOption("nextGroup", nil);
 		value = module.GroupIdToNum(currentEditGroup);
 		value = value + 1;
 		if (value > module.maxBarNum) then
@@ -2291,7 +2291,7 @@ module.optionUpdate = function(self, optName, value)
 
 	elseif (optName == "prvsGroup") then
 		-- Select previous bar to edit.
-		self:setOption("prvsGroup", nil, true);
+		self:setOption("prvsGroup", nil);
 		value = module.GroupIdToNum(currentEditGroup);
 		value = value - 1;
 		if (value < 1) then
@@ -2350,10 +2350,10 @@ module.optionUpdate = function(self, optName, value)
 			end
 
 			-- Clear the non-group specific option.
-			self:setOption(optName, nil, true);
+			self:setOption(optName, nil);
 
 			-- Assign the value to the group specific option.
-			self:setOption(optName .. localGroupId, value, true);
+			self:setOption(optName .. localGroupId, value);
 
 			return;
 		end
@@ -2408,10 +2408,10 @@ module.optionUpdate = function(self, optName, value)
 		-- to determine the current color for the color swatch.
 
 		-- Clear the non-group specific option.
-		self:setOption(optName, nil, true);
+		self:setOption(optName, nil);
 
 		-- Assign the value to the group specific option.
-		self:setOption(optName .. localGroupId, value, true);
+		self:setOption(optName .. localGroupId, value);
 
 		-- Call the group's update function.
 		if ( group ) then
@@ -2564,7 +2564,7 @@ module.optionUpdate = function(self, optName, value)
 		if (skin and skin.__CTBM__skinID) then
 			id = skin.__CTBM__skinID;
 		end
-		module:setOption("skinID", id, true, false);
+		module:setOption("skinID", id, CT_SKIP_UPDATE_FUNC);
 		-- Assign the skin number to each of the buttons.
 		module:setSkin(value);
 		-- If we're not using Masque, then reskin all groups.
@@ -2618,7 +2618,7 @@ module.optionUpdate = function(self, optName, value)
 			fontStyleNum = fontDefaultStyleNum;
 		end
 		local fontStyleName = fontStyleListSorted[fontStyleNum];
-		module:setOption("cooldownFontStyleName", fontStyleName, true);
+		module:setOption("cooldownFontStyleName", fontStyleName);
 		updateCooldownFont();
 
 	elseif ( optName == "cooldownFontSize" ) then
@@ -2630,7 +2630,7 @@ module.optionUpdate = function(self, optName, value)
 			fontTypeNum = fontDefaultTypeNum;
 		end
 		local fontTypeName = fontTypeListSorted[fontTypeNum];
-		module:setOption("cooldownFontTypeName", fontTypeName, true);
+		module:setOption("cooldownFontTypeName", fontTypeName);
 		updateCooldownFont();
 		
 	elseif (optName == "disableIconIntro" ) then
@@ -2649,7 +2649,7 @@ module.optionUpdate = function(self, optName, value)
 				break;
 			end
 		end
-		module:setOption("skinNumber", skinNumber, true, false);
+		module:setOption("skinNumber", skinNumber, CT_SKIP_UPDATE_FUNC);
 		-- Assign the skin number to each button.
 		module:setSkin(skinNumber);
 		-- Reskin the buttons

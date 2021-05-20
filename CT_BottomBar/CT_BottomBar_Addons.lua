@@ -165,7 +165,7 @@ function addon:rotate()
 	end
 
 	local optName = "orientation" .. self.optionName;
-	module:setOption(optName, newOrientation, true);
+	module:setOption(optName, newOrientation);
 	appliedOptions[optName] = newOrientation;
 
 --	self:rotateFunc(newOrientation);
@@ -209,7 +209,7 @@ function addon:resetPosition()
 		self.orientation = newOrientation;
 
 		local optName = "orientation" .. self.optionName;
-		module:setOption(optName, newOrientation, true);
+		module:setOption(optName, newOrientation);
 		appliedOptions[optName] = newOrientation;
 
 --		self:rotateFunc(newOrientation);
@@ -293,7 +293,7 @@ function addon:init()
 		local movOpt = module:getOption(movName);
 		if (movOpt and (movOpt[2] == "MainMenuBar" or movOpt[2] == "MainMenuBarArtFrame")) then
 			movOpt[2] = "UIParent";
-			module:setOption(movName, movOpt, true);
+			module:setOption(movName, movOpt);
 		end
 
 		-- Register the drag frame as movable (also repositions

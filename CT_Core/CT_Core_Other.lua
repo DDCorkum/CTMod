@@ -811,7 +811,7 @@ tooltipFixedAnchor:SetScript("OnMouseDown",
 			if (anchorSetting > 6) then
 				anchorSetting = 1;
 			end
-			module:setOption("tooltipAnchor", anchorSetting, true);
+			module:setOption("tooltipAnchor", anchorSetting);
 			local direction = "NONE";
 			if anchorSetting == 1 then
 				direction = "TOPLEFT"
@@ -1871,7 +1871,7 @@ end
 
 local function uncheckBagOption(optName)
 	local value = false;
-	module:setOption(optName, value, true, false);
+	module:setOption(optName, value, CT_SKIP_UPDATE_FUNC);
 	if (type(module.frame) == "table") then
 		local cb = module.frame.section1[optName];
 		cb:SetChecked(value);
@@ -2331,8 +2331,8 @@ do
 		local height = self.parent:GetHeight();
 		local width = self.parent:GetWidth();
 
-		module:setOption("watchWidth", width, true);
-		module:setOption("watchHeight", height, true);
+		module:setOption("watchWidth", width);
+		module:setOption("watchHeight", height);
 
 		resizedWidth = width;
 		resizedHeight = height;
@@ -3054,20 +3054,6 @@ local modFunctions = {
 
 module.modupdate = function(self, type, value)
 	if ( type == "init" ) then
-		
-		-- tooltipAnchor can no longer be 9 as of 8.2.0.1
-		if ((module:getOption("tooltipAnchor") or 5) > 6) then
-			module:setOption("tooltipAnchor", 5, true, false);  -- removed several options
-		end
-		
-		-- these settings are removed as of 8.2.0.1
-		module:setOption("tooltipRelocationAnchor", nil, true, false);
-		module:setOption("tooltipFrameAnchor", nil, true, false);
-		module:setOption("tooltipMouseAnchor", nil, true, false);
-		module:setOption("tooltipFrameDisableFade", nil, true, false);
-		module:setOption("tooltipMouseDisableFade", nil, true, false);
-		
-		
 		-- load all the various settings
 		for key, value in pairs(modFunctions) do
 			value(self:getOption(key), key);

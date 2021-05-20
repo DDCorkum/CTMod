@@ -313,7 +313,7 @@ local function configureActionBar()
 			disableMainBar = true;
 
 			-- Enable the CT_BarMod main action bar
-			CT_BarMod:setOption("showGroup" .. CT_BarMod.actionBarId, 1, true);
+			CT_BarMod:setOption("showGroup" .. CT_BarMod.actionBarId, 1);
 
 			-- Reset position of CT_BarMod main action bar.
 			resetMainBarPos = true;
@@ -337,7 +337,7 @@ local function configureActionBar()
 			if (CT_BarMod.isFirstRun and CT_BarMod:isFirstRun()) then
 
 				-- Enable the CT_BarMod main action bar
-				CT_BarMod:setOption("showGroup" .. CT_BarMod.actionBarId, 1, true);
+				CT_BarMod:setOption("showGroup" .. CT_BarMod.actionBarId, 1);
 
 				-- Reset position of CT_BarMod main action bar.
 				resetMainBarPos = true;
@@ -398,7 +398,7 @@ local function configureActionBar()
 			);
 
 			-- Set a flag to keep us from using the old data more than once.
-			module:setOption("oldActionBarConvertedFlag", true, true);
+			module:setOption("oldActionBarConvertedFlag", true);
 
 			-- If this is the first run for CT_BarMod...
 			if (CT_BarMod.isFirstRun and CT_BarMod:isFirstRun()) then
@@ -407,7 +407,7 @@ local function configureActionBar()
 
 				-- Disable the CT_BarMod action bars with group ids 1 through 5 (bars 2 through 6).
 				for groupId = 1, 5 do
-					CT_BarMod:setOption("showGroup" .. groupId, false, true);
+					CT_BarMod:setOption("showGroup" .. groupId, false);
 				end
 			end
 
@@ -770,7 +770,7 @@ module.update = function(self, optName, value)
 
 	-- Update the "disable the default action bar" option.
 	-- This will also update CT_BarMod's version of this option.
-	module:setOption("disableDefaultActionBar", module.actionBarDisabled, true);
+	module:setOption("disableDefaultActionBar", module.actionBarDisabled);
 end
 
 --------------------------------------------

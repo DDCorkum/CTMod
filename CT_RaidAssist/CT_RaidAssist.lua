@@ -106,78 +106,74 @@ local strsplit = strsplit;
 --------------------------------------------
 -- Pseudo-Object-Oriented Design
 
-local StaticCTRAReadyCheck;		-- Adds features to help you share your ready check status with raid members
-local StaticCTRAFrames;			-- Wrapper over all raid-frame portions of the addon
-local StaticClickCastBroker;		-- Brokers what spells a CTRAPlayerFrame object should cast when right-clicked; owned by CTRAFrames
-local NewCTRAWindow;			-- Set of player frames sharing a common appearance and anchor point; owned by CTRAFrames
-local NewCTRAPlayerFrame;		-- A single, interactive player frame that is contained in a window; owned by CTRAWindow
-local NewCTRATargetFrame;		-- A single, interactive target frame that is contained in a window; owned by CTRAWindow
+local StaticCTRAReadyCheck		-- Adds features to help you share your ready check status with raid members
+local StaticCTRAFrames			-- Wrapper over all raid-frame portions of the addon
+local StaticClickCastBroker		-- Brokers what spells a CTRAPlayerFrame object should cast when right-clicked; owned by CTRAFrames
+local NewCTRAWindow			-- Set of player frames sharing a common appearance and anchor point; owned by CTRAFrames
+local NewCTRAPlayerFrame		-- A single, interactive player frame that is contained in a window; owned by CTRAWindow
+local NewCTRATargetFrame		-- A single, interactive target frame that is contained in a window; owned by CTRAWindow
 
 
 --------------------------------------------
 -- Initialization
 
-local MODULE_TOC_NAME, module = ...;
-local _G = getfenv(0);
+local MODULE_TOC_NAME, module = ...
+local _G = getfenv(0)
 
-local MODULE_TOC_VERSION = strmatch(GetAddOnMetadata(MODULE_TOC_NAME, "version"), "^([%d.]+)");
+local MODULE_TOC_VERSION = strmatch(GetAddOnMetadata(MODULE_TOC_NAME, "version"), "^([%d.]+)")
 
-module.name = "CT_RaidAssist";
-module.version = MODULE_TOC_VERSION;
+module.name = "CT_RaidAssist"
+module.version = MODULE_TOC_VERSION
 
-_G[module.name] = module;
-CT_Library:registerModule(module);
+_G[module.name] = module
+CT_Library:registerModule(module)
 
-module.text = module.text or { };	-- see localization.lua
+module.text = module.text or { }	-- see localization.lua
 local L = module.text
 
 -- triggered by module.update("init")
 function module:init()	
-	module.CTRAReadyCheck = StaticCTRAReadyCheck();
-	module.CTRAFrames = StaticCTRAFrames();
-	module.ClickCastBroker = StaticClickCastBroker();
+	module.CTRAReadyCheck = StaticCTRAReadyCheck()
+	module.CTRAFrames = StaticCTRAFrames()
+	module.ClickCastBroker = StaticClickCastBroker()
 	
-	-- convert from 8.3.0.11 and earlier to 8.3.7.1
-	if (not module:getOption("CTRA_LastConversion") or module:getOption("CTRA_LastConversion") < 8.307) then
-		module:setOption("CTRA_LastConversion", 8.307, true)
-		for i=1, 10 do
-			local v, h = module:getOption("CTRAWindow" .. i .. "_VerticalSpacing"), module:getOption("CTRAWindow" .. i .. "_HorizontalSpacing")
-			module:setOption("CTRAWindow" .. i .. "_VerticalSpacing", v and v+3, true);
-			module:setOption("CTRAWindow" .. i .. "_HorizontalSpacing", h and h+3, true);
-		end
-	end
+	-- placeholder for converting settings from older versions of the addon
+	--[[if (not module:getOption("CTRA_LastConversion") or module:getOption("CTRA_LastConversion") < 8.307) then
+		module:setOption("CTRA_LastConversion", 8.307)
+		
+	end--]]
 end
 
 -- triggered by CT_Library whenever a setting changes, and upon initialization, to call functions associated with tailoring various functionality as required
 function module:update(option, value)
 	if (option == "init") then
-		module:init();
+		module:init()
 	else
-		StaticCTRAReadyCheck():Update(option, value);
-		StaticCTRAFrames():Update(option, value);
+		StaticCTRAReadyCheck():Update(option, value)
+		StaticCTRAFrames():Update(option, value)
 	end
 end
 
 --produces the options frames
 function module:frame()
 	-- see CT_Library
-	local optionsFrameList = module:framesInit();
+	local optionsFrameList = module:framesInit()
 		
 	-- Ready Check Monitor
-	StaticCTRAReadyCheck():Frame(optionsFrameList);
+	StaticCTRAReadyCheck():Frame(optionsFrameList)
 
 	-- Custom Raid Frames
-	StaticCTRAFrames():Frame(optionsFrameList);
+	StaticCTRAFrames():Frame(optionsFrameList)
 
 	-- see CT_Library
-	return "frame#all", module:framesGetData(optionsFrameList);
+	return "frame#all", module:framesGetData(optionsFrameList)
 end
 
 local function slashCommand()
 	module:showModuleOptions(module.name)
 end
 
-module:setSlashCmd(slashCommand, "/ctra", "/ctraid", "/ctraidassist");
+module:setSlashCmd(slashCommand, "/ctra", "/ctraid", "/ctraidassist")
  
 
 --------------------------------------------
@@ -864,7 +860,7 @@ function StaticCTRAFrames()
 					optionsAddScript("onclick", 
 						function()
 							selectedWindow = (module:getOption("CTRAFrames_NumEnabledWindows") or 1) + 1;
-							module:setOption("CTRAFrames_NumEnabledWindows", selectedWindow, true);
+							module:setOption("CTRAFrames_NumEnabledWindows", selectedWindow);
 							if (not windows[selectedWindow]) then
 								windows[selectedWindow] = NewCTRAWindow(self)
 							end
@@ -886,7 +882,7 @@ function StaticCTRAFrames()
 						function()
 							local windowToClone = selectedWindow;
 							selectedWindow = (module:getOption("CTRAFrames_NumEnabledWindows") or 1) + 1;
-							module:setOption("CTRAFrames_NumEnabledWindows", selectedWindow, true);
+							module:setOption("CTRAFrames_NumEnabledWindows", selectedWindow);
 							if (not windows[selectedWindow]) then
 								windows[selectedWindow] = NewCTRAWindow(self);
 							end
@@ -919,7 +915,7 @@ function StaticCTRAFrames()
 							--delete the window, and push this frame to the end of the table
 							local windowToDelete = windows[selectedWindow];
 							windowToDelete:Disable(true); -- now the window is disabled, and its settings are also DELETED because the flag was set to true
-							module:setOption("CTRAFrames_NumEnabledWindows", (module:getOption("CTRAFrames_NumEnabledWindows") or 1) - 1, true); -- now we are tracking one fewer window being enabled
+							module:setOption("CTRAFrames_NumEnabledWindows", (module:getOption("CTRAFrames_NumEnabledWindows") or 1) - 1); -- now we are tracking one fewer window being enabled
 							tinsert(windows,tremove(windows,selectedWindow)); -- pushes this frame to the end of the table, beyond numEnabledWindows
 							
 							-- inform remaining windows of their new positions, and copy saved variable data from their previous positions
@@ -980,7 +976,7 @@ function StaticCTRAFrames()
 					optionsEndFrame();
 				end
 				optionsAddObject(220, 20, "font#tl:100:%y#s:0:%s#" .. L["CT_RaidAssist/Options/Window/Groups/RoleHeader"] .. textColor1 .. ":l");
-				for __, val in ipairs((module:getGameVersion() >= 8 and {"Myself", "Tanks", "Heals", "Melee", "Range", "Pets"}) or {"Myself", "Pets"}) do
+				for __, val in ipairs((module:getGameVersion() >= 5 and {"Myself", "Tanks", "Heals", "Melee", "Range", "Pets"}) or {"Myself", "Pets"}) do
 					optionsBeginFrame( -5,  25, "checkbutton#tl:100:%y#n:CTRAWindow_Show" .. val .. "CheckButton#" .. val);
 						optionsAddScript("onload",
 							function(button)
@@ -990,12 +986,12 @@ function StaticCTRAFrames()
 						);
 					optionsEndFrame();
 				end
-				if(module:getGameVersion() == 1) then
+				if(module:getGameVersion() < 5) then
 					optionsAddObject(-5, 115, "font#tl:100:%y#Sort by tank, \nheals, and dps \nunavailable \nin Classic" .. textColor2 .. ":l");
 				end
 				optionsAddObject(200, 20, "font#tl:190:%y#s:0:%s#" .. L["CT_RaidAssist/Options/Window/Groups/ClassHeader"] .. textColor1 .. ":l");
 				for __, class in ipairs(
-					(module:getGameVersion() >= 8 and 
+					(module:getGameVersion() >= 7 and 
 						{
 							{"DeathKnights", LOCALIZED_CLASS_NAMES_MALE.DEATHKNIGHT},
 							{"DemonHunters", LOCALIZED_CLASS_NAMES_MALE.DEMONHUNTER},
@@ -1024,7 +1020,7 @@ function StaticCTRAFrames()
 							{"Warriors", LOCALIZED_CLASS_NAMES_MALE.WARRIOR},
 						}
 				) do
-					optionsBeginFrame( -5, (module:getGameVersion() >= 8 and 15) or 20, "checkbutton#tl:190:%y#n:CTRAWindow_Show" .. class[1] .. "CheckButton#" .. class[2] .. "#l:90");
+					optionsBeginFrame( -5, (module:getGameVersion() >= 7 and 15) or 20, "checkbutton#tl:190:%y#n:CTRAWindow_Show" .. class[1] .. "CheckButton#" .. class[2] .. "#l:90");
 						optionsAddScript("onload",
 							function(button)
 								button.option = function() return "CTRAWindow" .. selectedWindow .. "_Show" .. class[1]; end
@@ -1109,7 +1105,7 @@ function StaticCTRAFrames()
 								"EnablePowerBar",
 							}
 							for __, property in ipairs(presetClassic) do
-								module:setOption("CTRAWindow" .. selectedWindow .. "_" .. property, nil, true);		--the default is to look like classic, so just nil them out
+								module:setOption("CTRAWindow" .. selectedWindow .. "_" .. property, nil);		--the default is to look like classic, so just nil them out
 								self:Update("CTRAWindow" .. selectedWindow .. "_" .. property, windows[selectedWindow]:GetProperty(property));	-- forces the window's update function to actually trigger with the default
 							end
 							windows[selectedWindow]:Focus();
@@ -1134,7 +1130,7 @@ function StaticCTRAFrames()
 								["EnablePowerBar"] = false,
 							}							
 							for key, val in pairs(presetHybrid) do
-								module:setOption("CTRAWindow" .. selectedWindow .. "_" .. key, val, true);
+								module:setOption("CTRAWindow" .. selectedWindow .. "_" .. key, val);
 							end
 							windows[selectedWindow]:Focus();
 						end
@@ -1158,7 +1154,7 @@ function StaticCTRAFrames()
 								["EnablePowerBar"] = false,
 							}						
 							for key, val in pairs(presetModern) do
-								module:setOption("CTRAWindow" .. selectedWindow .. "_" .. key, val, true);
+								module:setOption("CTRAWindow" .. selectedWindow .. "_" .. key, val);
 							end
 							windows[selectedWindow]:Focus();
 						end
@@ -1609,7 +1605,7 @@ function NewCTRAWindow(owningCTRAFrames)	-- local at the top of this file
 		-- STEP 1:
 		if (copyFromWindow and type(copyFromWindow) == "number") then
 			for key, __ in pairs(defaultOptions) do
-				module:setOption("CTRAWindow" .. asWindow .. "_" .. key,module:getOption("CTRAWindow" .. copyFromWindow .. "_" .. key),true, false);
+				module:setOption("CTRAWindow" .. asWindow .. "_" .. key,module:getOption("CTRAWindow" .. copyFromWindow .. "_" .. key), CT_SKIP_UPDATE_FUNC);
 			end
 		end
 		
@@ -1705,7 +1701,7 @@ function NewCTRAWindow(owningCTRAFrames)	-- local at the top of this file
 		-- STEP 1:
 		if (deletePermanently and windowID) then
 			for key, __ in pairs(defaultOptions) do
-				module:setOption("CTRAWindow" .. windowID .. "_" .. key,nil,true,false);
+				module:setOption("CTRAWindow" .. windowID .. "_" .. key, nil, CT_SKIP_UPDATE_FUNC);
 			end
 			module:resetMovable("CTRAWindow" .. windowID);
 		end
@@ -2154,7 +2150,7 @@ function StaticClickCastBroker()
 		local function addToTable(table, id, localizedName, defaultModifier, defaultButton)
 			local option = module:getOption("CTRAFrames_ClickCast_" .. id)
 			if (resetFlag and option) then
-				module:setOption("CTRA_Frames_ClickCast_" .. id, nil, true);
+				module:setOption("CTRA_Frames_ClickCast_" .. id, nil);
 				option = nil;
 			end
 			if (not option) then

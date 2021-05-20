@@ -1,5 +1,5 @@
 ## Interface: 11307
-## Version: 9.0.5.3
+## Version: 9.0.5.6
 ## Title: CT_UnitFrames
 ## Notes: Changes display of hp/mana values and adds a percentage.
 ## DefaultState: Enabled
@@ -11,6 +11,7 @@ CT_UnitFrames.lua
 CT_PlayerFrame.xml
 CT_TargetFrame.xml
 CT_AssistFrame.xml
-CT_FocusFrame.xml
+#CT_FocusFrame.xml	# Not available in 1.13.7
 CT_PartyFrame.xml
+CT_PetFrame.xml
 CT_UnitFrameOptions.xml

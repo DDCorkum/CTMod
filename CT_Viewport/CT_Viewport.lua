@@ -266,7 +266,7 @@ function module.ApplyViewport(left, right, top, bottom, r, g, b)
 	savedViewport[5] = r;
 	savedViewport[6] = g;
 	savedViewport[7] = b;
-	module:setOption("savedViewport", savedViewport, true);
+	module:setOption("savedViewport", savedViewport);
 
 	local update = true;
 	if (WorldFrame:IsProtected() and InCombatLockdown()) then
@@ -515,7 +515,7 @@ end
 function module:update(option, value)
 	if (option == "init") then
 		
-		savedViewport = module:getOption("savedViewport") or {0,0,0,0,0,0,0};
+		savedViewport = module:getOption("savedViewport") or {0,0,0,0,0,0,0}
 		
 		-- Temporary code to transition from 9.0.2.4 to 9.0.5.x
 		if (CT_Viewport_Saved) then
@@ -523,18 +523,17 @@ function module:update(option, value)
 			CT_ViewportBackup = CT_ViewportBackup or {}
 
 			local oldSetOption = module.setOption
-			function module:setOption(option, value, charOnly)
-				oldSetOption(self, option, value, charOnly);
-				if (charOnly) then
-					CT_ViewportBackup[module:getCharKey()] = CT_ViewportBackup[module:getCharKey()] or {}
-					CT_ViewportBackup[module:getCharKey()][option] = value
-				end
+			function module:setOption(option, value, ...)
+				oldSetOption(self, option, value, ...)
+				local key = module:getCharKey()
+				CT_ViewportBackup[key] = CT_ViewportBackup[key] or {}
+				CT_ViewportBackup[key][option] = value
 			end
 			
 			if (#CT_Viewport_Saved > 0) then
 				-- avoid deleting other toons' data when migrating saved variable types
 				for charKey, val in pairs(CT_ViewportBackup) do	
-					module.options[charKey] = val;
+					module.options[charKey] = val
 				end
 
 				-- convert from an olds note format
@@ -547,18 +546,18 @@ function module:update(option, value)
 		module:setOption("savedViewport", savedViewport, true)
 	
 		-- The former on-load and VARIABLES_LOADED until 9.0.0.1
-		local dummyFrame = CreateFrame("Frame");
-		frameClearAllPoints = dummyFrame.ClearAllPoints;
-		frameSetAllPoints = dummyFrame.SetAllPoints;
-		frameSetPoint = dummyFrame.SetPoint;
+		local dummyFrame = CreateFrame("Frame")
+		frameClearAllPoints = dummyFrame.ClearAllPoints
+		frameSetAllPoints = dummyFrame.SetAllPoints
+		frameSetPoint = dummyFrame.SetPoint
 
-		hooksecurefunc(WorldFrame, "ClearAllPoints", module.ApplySavedViewport);
-		hooksecurefunc(WorldFrame, "SetAllPoints", module.ApplySavedViewport);
-		hooksecurefunc(WorldFrame, "SetPoint", module.ApplySavedViewport);
+		hooksecurefunc(WorldFrame, "ClearAllPoints", module.ApplySavedViewport)
+		hooksecurefunc(WorldFrame, "SetAllPoints", module.ApplySavedViewport)
+		hooksecurefunc(WorldFrame, "SetPoint", module.ApplySavedViewport)
 
 		-- Beginning in Battle for Azeroth, some raid encounters have cinematics during combat.  Examples: Jaina freezing the sea, or N'Zoth special area on mythic mode
-		CinematicFrame:SetScript("OnShow", nil);
-		CinematicFrame:SetScript("OnHide", nil);
+		CinematicFrame:SetScript("OnShow", nil)
+		CinematicFrame:SetScript("OnHide", nil)
 
 		-- The game reloads the UI when switching between different aspect ratios.
 		-- The game does not reload the UI when switching between resolutions with the same aspect ratio.
@@ -570,16 +569,16 @@ function module:update(option, value)
 		-- Handle screen resolution changes.
 		hooksecurefunc("SetScreenResolution",
 			function(width, height, ...)
-				module.Init(width, height);
-				module.ApplySavedViewport();
-				module.hasAppliedViewport = nil;
+				module.Init(width, height)
+				module.ApplySavedViewport()
+				module.hasAppliedViewport = nil
 			end
 		);
 
 
-		module.Init(nil, nil);
+		module.Init(nil, nil)
 		
-		module.ApplySavedViewport();
+		module.ApplySavedViewport()
 	end
 end
 

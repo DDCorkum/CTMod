@@ -92,7 +92,7 @@ module.updateOptionFromOutside = function(optName, value)
 
 	if (optName == "disableDefaultActionBar") then
 		-- Update our option
-		module:setOption(optName, value, true);
+		module:setOption(optName, value);
 	end
 end
 
@@ -552,7 +552,7 @@ function module:updateOption(optName, value)
 					-- both be enabled or disabled at the same time.
 					-- The rep bar should be disabled before the exp bar.
 					if (optName == "enableExperience Bar") then
-						module:setOption("enableReputation Bar", value0, true);
+						module:setOption("enableReputation Bar", value0);
 					end
 
 					if (applyUnprotectedOption(optName, value)) then
@@ -569,7 +569,7 @@ function module:updateOption(optName, value)
 					-- both be enabled or disabled at the same time.
 					-- The rep bar should be disabled before the exp bar.
 					if (optName == "enableExperience Bar") then
-						module:setOption("enableReputation Bar", value0, true);
+						module:setOption("enableReputation Bar", value0);
 					end
 
 					if (applyProtectedOption(optName, value)) then

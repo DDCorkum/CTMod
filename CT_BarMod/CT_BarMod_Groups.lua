@@ -124,7 +124,7 @@ local function groupFrame_OnMouseUp(self, button)
 		else
 			orientation = "DOWN";
 		end
-		module:setOption("orientation" .. self.object.groupId, orientation, true);
+		module:setOption("orientation" .. self.object.groupId, orientation);
 	end
 end
 
@@ -267,27 +267,27 @@ module.updateActionBar = function(pos, orientation, scale, opacity, spacing, hid
 
 	optName = "orientation";
 	value = orientation;
-	module:setOption(optName .. groupId, value, true);
+	module:setOption(optName .. groupId, value);
 	obj:update(optName, value);
 
 	optName = "barScale";
 	value = scale;
-	module:setOption(optName .. groupId, value, true);
+	module:setOption(optName .. groupId, value);
 	obj:update(optName, value);
 
 	optName = "barOpacity";
 	value = opacity;
-	module:setOption(optName .. groupId, value, true);
+	module:setOption(optName .. groupId, value);
 	obj:update(optName, value);
 
 	optName = "barSpacing";
 	value = spacing;
-	module:setOption(optName .. groupId, value, true);
+	module:setOption(optName .. groupId, value);
 	obj:update(optName, value);
 
 	optName = "showGroup";
 	value = not hide;
-	module:setOption(optName .. groupId, value, true);
+	module:setOption(optName .. groupId, value);
 end
 
 module.resetActionBarPosition = function()
@@ -623,7 +623,7 @@ function group:new(groupId)
 		-- then initially hide this group so that it does not appear in the middle
 		-- of the user's screen. They can toggle it on via the CT_BarMod options.
 		if (groupId >= 6) then
-			module:setOption("showGroup" .. groupId, false, true);
+			module:setOption("showGroup" .. groupId, false);
 		end
 	end
 
@@ -649,7 +649,7 @@ function group:new(groupId)
 				hide = false;
 			end
 		end
-		module:setOption("barHideInVehicle" .. groupId, hide, true);
+		module:setOption("barHideInVehicle" .. groupId, hide);
 	end
 	if (module:getOption("barHideInOverride" .. groupId) == nil) then
 		-- Hide when there is an override bar.
@@ -657,7 +657,7 @@ function group:new(groupId)
 		-- This option was added in 5.0001. We'll initialize this to the
 		-- same value as the player's "Hide when in vehicle" option.
 		local hide = module:getOption("barHideInVehicle" .. groupId) ~= false;
-		module:setOption("barHideInOverride" .. groupId, hide, true);
+		module:setOption("barHideInOverride" .. groupId, hide);
 	end
 
 	if (module:getOption("stdPositions") == nil) then
@@ -670,12 +670,12 @@ function group:new(groupId)
 				-- Default to using the standard bar positions.
 				newPositions = true;
 			end
-			module:setOption("stdPositions", newPositions, true);
+			module:setOption("stdPositions", newPositions);
 		else
 			-- Existing character's first time for this option.
 			-- Default to the original CT_BarMod positions value (false) since
 			-- those would be the bar positions that they have been using.
-			module:setOption("stdPositions", false, true);
+			module:setOption("stdPositions", false);
 		end
 		firstTime = true;
 	end
@@ -900,7 +900,7 @@ function group:position(orientation, stdPositions)
 	end
 	frame:ClearAllPoints();
 	frame:SetPoint(pos[1], UIParent, pos[2], pos[3], yoffset);
-	module:setOption("orientation" .. groupId, orientation or pos[5] or "ACROSS", true);
+	module:setOption("orientation" .. groupId, orientation or pos[5] or "ACROSS");
 end
 
 function group:resetPosition()

@@ -32,6 +32,8 @@ do
 	CT_UnitFrames_TextStatusBarText:CopyFontObject(TextStatusBarText)
 	CreateFont("CT_UnitFrames_PartyStatusBarText")
 	CT_UnitFrames_PartyStatusBarText:SetFont("Fonts\\FRIZQT__.TTF", 9, "OUTLINE")
+	CreateFont("CT_UnitFrames_PetStatusBarText")
+	CT_UnitFrames_PetStatusBarText:SetFont("Fonts\\FRIZQT__.TTF", 9, "OUTLINE")
 	module:regEvent("PLAYER_LOGIN", function()
 		if (CT_UnitFramesOptions.makeFontLikeRetail) then
 			CT_UnitFrames_TextStatusBarText:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
@@ -39,7 +41,11 @@ do
 		if (CT_UnitFramesOptions.partyTextSize) then
 			CT_UnitFrames_PartyStatusBarText:SetFont("Fonts\\FRIZQT__.TTF", 6 + CT_UnitFramesOptions.partyTextSize, "OUTLINE")
 		end
+		if (CT_UnitFramesOptions.petTextSize) then
+			CT_UnitFrames_PetStatusBarText:SetFont("Fonts\\FRIZQT__.TTF", 6 + CT_UnitFramesOptions.petTextSize, "OUTLINE")
+		end
 	end)
+	
 end
 
 --------------------------------------------
@@ -107,11 +113,11 @@ function module:UpdateStatusBarTextString(textStatusBar, settings, lockShow)
 		intermediateFrame = CreateFrame("Frame", nil, intermediateFrame);	-- +3 frameLevel
 		intermediateFrame:SetAllPoints();
 		textString = intermediateFrame:CreateFontString(nil, "OVERLAY");
-		textString:SetFontObject(textStatusBar.ctUsePartyFontSize and CT_UnitFrames_PartyStatusBarText or CT_UnitFrames_TextStatusBarText);
+		textString:SetFontObject(textStatusBar.ctFont or CT_UnitFrames_TextStatusBarText);
 		if (UnitFramesImproved) then
-			textString:SetPoint("CENTER", textStatusBar, "BOTTOM", 0, textStatusBar:GetHeight()/2);
+			textString:SetPoint("CENTER", textStatusBar, "BOTTOM", 0, textStatusBar:GetHeight()/2 + (textStatusBar.ctOffset or 0));
 		else
-			textString:SetPoint("CENTER", textStatusBar);
+			textString:SetPoint("CENTER", textStatusBar, 0, textStatusBar.ctOffset or 0);
 		end
 		textStatusBar.ctTextString = textString;
 		
