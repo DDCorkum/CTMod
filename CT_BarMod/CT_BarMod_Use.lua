@@ -76,7 +76,7 @@ local GetActionCooldown = GetActionCooldown;
 -- GetActionCount, overridden for WoW Classic 1.13.3 (CTMod 8.2.5.8) using GetItemCount and some tooltip scanning
 local OldGetActionCount, GetActionCount, GetItemCount, ReagentScannerTooltip = GetActionCount, GetActionCount, GetItemCount, CreateFrame("GameTooltip", "CT_BarMod_ReagentScanner", nil, "GameTooltipTemplate");
 reagentScannerCache = {};
-if (module:getGameVersion() <= 2) then
+if (module:getGameVersion() == 1) then
 	ReagentScannerTooltip:SetOwner(UIParent, "ANCHOR_NONE");
 	
 	local function scanSpellTooltip(spell)
