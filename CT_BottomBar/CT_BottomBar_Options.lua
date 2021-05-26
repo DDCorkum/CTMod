@@ -1115,15 +1115,7 @@ function module:optionsInitApplied()
 	appliedOptions.petbattleHideFrame = nil;  -- no support for hiding pet battle UI
 
 	-- Hide enabled bars when in a vehicle.
-	old = tonumber(module:getOption("vehicleHideOther"));  -- old option used prior to 4.007
-	new = module:getOption("vehicleHideEnabledBars");  -- new option starting with 4.007
-	if (new == nil and old ~= nil) then
-		-- Convert pre 4.007 option (1 to 3 == hide other bars when in vehicle, 4 == don't hide other bars)
-		value = (old ~= 4);
-	else
-		value = (new ~= false);
-	end
-	appliedOptions.vehicleHideEnabledBars = value;
+	appliedOptions.vehicleHideEnabledBars = module:getOption("vehicleHideEnabledBars") ~= false;
 	appliedOptions.overrideHideEnabledBars = appliedOptions.vehicleHideEnabledBars; -- using same value as vehicle option
 	appliedOptions.petbattleHideEnabledBars = module:getOption("petbattleHideEnabledBars") ~= false;
 end
