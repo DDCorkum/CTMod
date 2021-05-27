@@ -276,12 +276,12 @@ CT_PartyPetFrame_OnHide = CT_PartyMemberFrame_OnHide
 
 function CT_PartyBuffButton_OnEnter(self)
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-	GameTooltip:SetUnitBuff(self.unit, self.id, self.isBuff and buffFilter or debuffFilter)
+	GameTooltip:SetUnitAura(self.unit, self.id, buffFilter)
 end
 
 function CT_PartyDebuffButton_OnEnter(self)
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-	GameTooltip:SetUnitBuff(self.unit, self.id, debuffFilter)
+	GameTooltip:SetUnitAura(self.unit, self.id, debuffFilter)
 end
 
 
