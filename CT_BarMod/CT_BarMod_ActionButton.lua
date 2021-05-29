@@ -190,7 +190,7 @@ local function getActionButton(buttonId)
 	local button, parent;
 	button = tremove(actionButtonObjectPool);
 	if (not button) then
-		button = CreateFrame("CheckButton", "CT_BarModActionButton" .. buttonId, nil, "SecureActionButtonTemplate");
+		button = CreateFrame("CheckButton", "CT_BarModActionButton" .. buttonId, nil, "SecureActionButtonTemplate,SecureHandlerBaseTemplate");
 		button:SetHeight(36);
 		button:SetWidth(36);
 		button:SetPoint("TOPLEFT", 0, 0);
@@ -403,10 +403,38 @@ end
 function actionButton:setClickDirection(onKeyDown, alsoOnMouseDown)
 	if (onKeyDown and alsoOnMouseDown) then
 		self.button:RegisterForClicks("AnyDown");
+		if (self.onClickWrapped) then
+			self.button:UnwrapScript(self.button, "OnClick")
+			self.onClickWrapped = nil
+		end		
+	elseif (onKeyDown) then
+		self.button:RegisterForClicks("AnyUp", "Button31Down")
+		if (not self.onClickWrapped) then
+			self.onClickWrapped = true
+			self.button:WrapScript(
+				self.button, 
+				"OnClick", 
+				--pre-body
+				[=[
+					--self, button, down
+					if (down) then
+						self:SetAttribute("type31", "action")
+					else
+						self:SetAttribute("type31", "")
+					end
+				]=]
+			)
+		end
+		self.onClickWrapped = true
 	else
 		self.button:RegisterForClicks("AnyUp");
+		if (self.onClickWrapped) then
+			self.button:UnwrapScript(self.button, "OnClick")
+			self.onClickWrapped = nil
+		end
 	end		
 end
+
 
 -- Change a button's scale
 function actionButton:setScale(scale)
@@ -467,7 +495,7 @@ function actionButton:setBinding(binding, delete)
 		if (delete) then
 			SetBinding(binding, nil);
 		else
-			SetBindingClick(binding, self.name);
+			SetBindingClick(binding, self.name, "Button31");
 		end
 	end
 	self:updateBinding();

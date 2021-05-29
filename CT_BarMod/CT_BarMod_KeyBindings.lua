@@ -66,7 +66,7 @@ do
 	for bar = 1, module.maxBarNum do
 		_G["BINDING_HEADER_CT_BarMod_Bar" .. bar] = "CT_BarMod Bar" .. bar;
 		for button = 1, 12 do
-			_G["BINDING_NAME_CLICK CT_BarModActionButton" .. count .. ":LeftButton"] = "Bar " .. bar .. " Button " .. button;
+			_G["BINDING_NAME_CLICK CT_BarModActionButton" .. count .. ":Button31"] = "Bar " .. bar .. " Button " .. button;
 			count = count + 1;
 		end
 	end
@@ -83,7 +83,7 @@ module.getBindingKey = function(buttonId)
 	if (hasCachedBindingKeys[buttonId]) then
 		return cachedBindingKey1[buttonId], cachedBindingKey2[buttonId]
 	else
-		local key1, key2 = GetBindingKey("CLICK CT_BarModActionButton" .. buttonId .. ":LeftButton");
+		local key1, key2 = GetBindingKey("CLICK CT_BarModActionButton" .. buttonId .. ":Button31");
 		hasCachedBindingKeys[buttonId], cachedBindingKey1[buttonId], cachedBindingKey2[buttonId] = true, key1, key2
 		return key1, key2
 	end
@@ -1199,6 +1199,33 @@ end
 local function keyBindingUpdate(option, value)
 	wipeBindingCache();
 end
+
+
+---------------------------------------------
+-- Converting from 9.0.5.7 to 9.0.5.8
+
+module:regEvent("PLAYER_LOGIN", function()
+	if (module:getOption("keyBindingsConvertedToButton31") ~= true) then
+		module:setOption("keyBindingsConvertedToButton31", true)
+		local needSave = false
+		for i=1, 144 do
+			local key1, key2 = GetBindingKey("CLICK CT_BarModActionButton" .. i .. ":LeftButton")
+			if key1 then
+				SetBinding(key1, "CLICK CT_BarModActionButton" .. i .. ":Button31")
+				needSave = true
+			end
+			if key2 then
+				SetBinding(key2, "CLICK CT_BarModActionButton" .. i .. ":Button31")
+				needSave = true
+			end
+		end
+		if (needSave) then
+			SaveBindings(GetCurrentBindingSet())
+			wipeBindingCache()
+		end
+	end
+end)
+
 
 --------------------------------------------
 -- Public functions

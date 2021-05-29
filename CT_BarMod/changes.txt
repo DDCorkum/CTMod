@@ -1,3 +1,6 @@
+CT_BarMod (9.0.5.8) 2021-05-28
+- Action bars 7-10 now mimick console variable ActionButtonUseKeyDown
+
 CT_BarMod (9.0.5.7) 2021-05-25
 - No longer overloading GetActionCount() in Burning Crusade Classic
 

@@ -1328,9 +1328,9 @@ function useButton:getBinding()
 	if (not text) then
 		-- Get the key assigned directly to this (our) button.
 		local key1, key2 = module.getBindingKey(id);
-		if (key1 and checkBindingAction(key1, id, (self.actionName and (self.actionName .. self.buttonNum)) or "CLICK CT_BarModActionButton" .. id .. ":LeftButton")) then			--checkBindingAction detects potential interference from other addons using SetOverrideBinding()
+		if (key1 and checkBindingAction(key1, id, (self.actionName and (self.actionName .. self.buttonNum)) or "CLICK CT_BarModActionButton" .. id .. ":Button31")) then			--checkBindingAction detects potential interference from other addons using SetOverrideBinding()
 			text = key1;
-		elseif (key2 and checkBindingAction(key2, id, (self.actionName and (self.actionName .. self.buttonNum)) or "CLICK CT_BarModActionButton" .. id .. ":LeftButton")) then
+		elseif (key2 and checkBindingAction(key2, id, (self.actionName and (self.actionName .. self.buttonNum)) or "CLICK CT_BarModActionButton" .. id .. ":Button31")) then
 			text = key2;
 		else
 			return;
