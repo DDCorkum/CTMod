@@ -18,9 +18,9 @@
 ------------------------------------------------
 
 --------------------------------------------
--- Performance Optimization and Retail vs. Classic differences
+-- Classic Compatibility
 
--- FrameXML api
+-- Class Colors
 local GetClassColor = GetClassColor;
 do
 	-- classic compatibility
@@ -48,59 +48,24 @@ do
 		end
 	end
 end
-local CompactRaidFrameManager_SetSetting = CompactRaidFrameManager_SetSetting;
-local GetInstanceInfo = GetInstanceInfo;
-local GetInspectSpecialization = GetInspectSpecialization or function() return nil; end		-- doesn't exist in classic
-local GetSpecialization = GetSpecialization or function() return nil; end 			-- doesn't exist in classic
-local GetSpecializationInfo = GetSpecializationInfo or function() return nil; end 		-- doesn't exist in classic
-local GetSpecializationRoleByID = GetSpecializationRoleByID or function() return nil; end 	-- doesn't exist in classic
-local GetReadyCheckStatus = GetReadyCheckStatus;
-local InCombatLockdown = InCombatLockdown;
-local IncomingSummonStatus = (C_IncomingSummon and C_IncomingSummon.IncomingSummonStatus) or function() return 0; end	-- doesn't exist in classic, and 0 means no incoming summons
-local RegisterStateDriver = RegisterStateDriver;
-local SetPortraitTexture = SetPortraitTexture;
-local UnitAura = UnitAura;
-local UnitBuff = UnitBuff;
-local UnitDebuff = UnitDebuff;
-local UnitClass = UnitClass;
-local UnitExists = UnitExists;
-local UnitGetTotalAbsorbs = UnitGetTotalAbsorbs or function() return 0; end -- doesn't exist in classic
-local UnitGetIncomingHeals = UnitGetIncomingHeals or function() return 0; end -- doesn't exist in classic
-local UpdateIncomingHealsFunc;
+
+-- Incoming heals and absorbs
+local UnitGetTotalAbsorbs = UnitGetTotalAbsorbs or function() return 0; end	
+local UnitGetIncomingHeals = UnitGetIncomingHeals
 do
-	local libHealComm;
-	local playerGUID = UnitGUID("player");
-	function UpdateIncomingHealsFunc()
-		if (libHealComm) then
-			return;
-		end
-		libHealComm = LibStub:GetLibrary("LibHealComm-4.0", true);
-		if (libHealComm) then
-			UnitGetIncomingHeals = function(unit, selfOnly)
-				return libHealComm:GetHealAmount(UnitGUID(unit), libHealComm.ALL_DATA, nil, selfOnly and playerGUID) or 0;
-			end
-		end
+	local libHealComm = LibStub:GetLibrary("LibHealComm-4.0", true)
+	UnitGetIncomingHeals = UnitGetIncomingHeals or function(unit, selfOnly)
+		return libHealComm and libHealComm:GetHealAmount(UnitGUID(unit), libHealComm.ALL_DATA, nil, selfOnly and UnitGUID("player")) or 0
 	end
 end
-local UnitIsWarModePhased = UnitIsWarModePhased;
-local UnitInPhase = UnitInPhase;
-local UnitPhaseReason = UnitPhaseReason	or function(unit) return UnitIsWarModePhased and UnitIsWarModePhased(unit) and 2 or not UnitInPhase(unit) and 0 or nil;	end	-- compatibility with Classic, BFA and Shadowlands
-local UnitInRange = UnitInRange;
-local UnitIsDeadOrGhost = UnitIsDeadOrGhost;
-local UnitIsUnit = UnitIsUnit;
-local UnitHealth = UnitHealth;
-local UnitHealthMax = UnitHealthMax;
-local UnitGroupRolesAssigned = UnitGroupRolesAssigned or function() return nil; end -- doesn't exist in classic
-local UnitName = UnitName;
-local UnitPower = UnitPower;
-local UnitPowerMax = UnitPowerMax;
-local UnregisterStateDriver = UnregisterStateDriver;
 
--- lua functions
-local max = max;
-local min = min;
-local select = select;
-local strsplit = strsplit;
+-- Role icons
+local UnitGroupRolesAssigned = UnitGroupRolesAssigned or function() return nil; end -- doesn't exist in classic
+local UnitPhaseReason = UnitPhaseReason	or function(unit) return UnitIsWarModePhased and UnitIsWarModePhased(unit) and 2 or not UnitInPhase(unit) and 0 or nil;	end	-- compatibility with Classic, BFA and Shadowlands
+local GetInspectSpecialization = GetInspectSpecialization or function() return nil; end
+local GetSpecialization = GetSpecialization or function() return nil; end
+local GetSpecializationInfo = GetSpecializationInfo or function() return nil; end
+local GetSpecializationRoleByID = GetSpecializationRoleByID or function() return nil; end
 
 
 --------------------------------------------
@@ -589,15 +554,6 @@ function StaticCTRAFrames()
 					else
 						showDefaultFrames();
 					end
-				elseif (key == "CTRAFrames_ShareClassicHealPrediction") then
-					if (val) then
-						if (module:getGameVersion() == 1) then
-							module:InstallLibHealComm_CallbackHandler();
-							module:InstallLibHealComm_ChatThrottle();
-							module:InstallLibHealComm();
-							UpdateIncomingHealsFunc();
-						end
-					end
 				elseif (
 					key == "CTRAFrames_ClickCast_UseCliqueAddon"
 					or key == "CTRAFrames_ClickCast_ToggleMenu"
@@ -679,11 +635,6 @@ function StaticCTRAFrames()
 		optionsBeginFrame( -15,  20, "checkbutton#tl:10:%y#n:CTRAFrames_HideBlizzardDefaultFramesCheckButton#o:CTRAFrames_HideBlizzardDefaultFrames:true#" .. L["CT_RaidAssist/Options/Frames/HideBlizzardDefaultCheckButton"] .. "#l:268");
 			optionsAddTooltip({L["CT_RaidAssist/Options/Frames/HideBlizzardDefaultCheckButton"],L["CT_RaidAssist/Options/Frames/HideBlizzardDefaultTooltip"] .. textColor1});
 		optionsEndFrame();
-		if (module:getGameVersion() == 1) then
-			optionsBeginFrame(-5, 20, "checkbutton#tl:10:%y#n:CTRA_ShareClassicHealPredictionCheckButton#o:CTRAFrames_ShareClassicHealPrediction:true#" .. L["CT_RaidAssist/Options/Frames/ShareClassicHealPredictionCheckButton"] .. "#l:268");
-				optionsAddTooltip({L["CT_RaidAssist/Options/Frames/ShareClassicHealPredictionCheckButton"],L["CT_RaidAssist/Options/Frames/ShareClassicHealPredictionTip"] .. textColor1});
-			optionsEndFrame();
-		end
 
 		-- Everything below this line will pseudo-disable when the frames are disabled
 		optionsBeginFrame(-5, 0, "frame#tl:0:%y#br:tr:0:%b#n:");
@@ -1354,14 +1305,6 @@ function StaticCTRAFrames()
 		module:regEvent("GROUP_ROSTER_UPDATE", doUpdate);	-- the frames might enable only during raids, groups, or always!
 		module:regEvent("UNIT_PET", doUpdate);			-- in case the user wishes to display pets as members of the raid
 		module:regEvent("PLAYER_REGEN_ENABLED", doUpdate);	-- in case the player's membership in a group/raid changed during combat
-		if (module:getGameVersion() == 1) then
-			if (module:getOption("CTRAFrames_ShareClassicHealPrediction") ~= false) then
-				module:InstallLibHealComm_CallbackHandler();
-				module:InstallLibHealComm_ChatThrottle();
-				module:InstallLibHealComm();
-			end
-			UpdateIncomingHealsFunc();
-		end
 		return obj;
 	end
 end
@@ -2449,7 +2392,6 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 	local shownYOff;		-- the y coordinate this frame is currently showingw
 	local isPet;			-- flag that, when true, indicates this unit is actually a player's pet instead of a normal player
 	local optionsWaiting = { };	-- a list of options that need to be triggered once combat ends
-	local healCommRegistered;	-- a flag on Classic to avoid registering multiple times.
 	local absorbSetting;		-- a flag to control the behaviour of the total-absorb bar
 	local incomingSetting;		-- a flag to control the behaviour of the incoming-heal bar (aka prediction bar)
 	
@@ -3673,7 +3615,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 							updateRaidStatusIndicators();
 						elseif (
 							event == "INCOMING_SUMMON_CHANGED"
-							or event == "ACCEPT_SUMMON"
+							or event == "CONFIRM_SUMMON"
 							or event == "CANCEL_SUMMON"
 							or event == "READY_CHECK_CONFIRM"
 							or event == "READY_CHECK_FINISHED"
@@ -3718,15 +3660,15 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 				listenerFrame:RegisterUnitEvent("UNIT_PHASE", shownUnit);			-- updateRoleTexture();
 				--listenerFrame:RegisterUnitEvent("PARTY_MEMBER_ENABLE");				-- updateRoleTexture();
 				--listenerFrame:RegisterUnitEvent("PARTY_MEMBER_DISABLE");			-- updateRoleTexture();
-				if (module:getGameVersion() >= 8) then
+				if (module:getGameVersion() >= 5) then
 					listenerFrame:RegisterUnitEvent("INCOMING_SUMMON_CHANGED", shownUnit);		-- updateRaidStatusIndicators();
 					listenerFrame:RegisterUnitEvent("UNIT_ABSORB_AMOUNT_CHANGED", shownUnit);	-- updateHealthBar; updateBackdrop();
 					listenerFrame:RegisterUnitEvent("UNIT_HEAL_PREDICTION", shownUnit);		-- updateHealthBar; updateBackdrop();
-				elseif (module:getGameVersion() == 1 and not healCommRegistered) then
+				elseif (obj.UpdateIncomingHeals == nil) then
+					-- do this once only
 					local healComm = LibStub("LibHealComm-4.0", true);
 					if (healComm) then
 						obj.UpdateIncomingHeals = updateHealthBar;
-						healCommRegistered = true;
 						healComm.RegisterCallback(obj, "HealComm_HealStarted", "UpdateIncomingHeals");
 						healComm.RegisterCallback(obj, "HealComm_HealUpdated", "UpdateIncomingHeals");
 						healComm.RegisterCallback(obj, "HealComm_HealDelayed", "UpdateIncomingHeals");

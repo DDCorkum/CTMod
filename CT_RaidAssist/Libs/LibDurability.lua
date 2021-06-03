@@ -1,37 +1,3 @@
-------------------------------------------------
---            CT_RaidAssist (CTRA)            --
---                                            --
--- Provides features to assist raiders incl.  --
--- customizable raid frames.  CTRA was the    --
--- original raid frame in Vanilla (pre 1.11)  --
--- but has since been re-written completely   --
--- to integrate with the more modern UI.      --
---                                            --
--- This file *conditionally* adds a library,  --
--- allowing users of CT_RaidAssist the option --
--- to share durability info with raid peers.  --
---					      --
--- LibDurability is credited to funkehdude    --
--- under CC BY-NC-SA 3.0 which allows one to  --
--- share and adapt for non-commerical with    --
--- attribution and requiring CC BY-NC-SA 3.0  --
--- or similar for the derivitative work.      --
---                                            --
--- The work is only modified at the top and   --
--- bottom, for the conditional loading logic. --
--- These additions were by Dahk Celes (DDC).  --
-------------------------------------------------
-
-local module = select(2, ...);
-
-function module:InstallLibDurability()
-	if (module:getOption("CTRA_ShareDurability") == false) then return; end
-
-------------------------------------------------------------------------------------
--- Everything below this line is LibDurability r23 unmodified, until the very end --
-------------------------------------------------------------------------------------
-
-
 local LD = LibStub:NewLibrary("LibDurability", 2)
 if not LD then return end -- No upgrade needed
 
@@ -149,11 +115,4 @@ function LD:Unregister(addon)
 		error("LibDurability: You must pass your own addon name or object to :Unregister.")
 	end
 	callbackMap[addon] = nil
-end
-
-
-------------------------------------------------------------------------------------
--- Everything above this line is LibDurability r23 unmodified, until the very top --
-------------------------------------------------------------------------------------
-
 end

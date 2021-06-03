@@ -1,5 +1,5 @@
 ## Interface: 11307
-## Version: 9.0.5.4
+## Version: 9.0.5.8
 ## Title: CT_RaidAssist
 ## Author: TS & Cide (Original), Dargen (MT Addon), DDC (Redesign)
 ## Notes: Monitor raid HP and click cast buffs, debuff removals, resurrections
@@ -9,10 +9,10 @@
 ## SavedVariables: CT_RaidAssistOptions
 ## X-Part-Of: CT-Library
 
-# Durability tracking on both retail and classic, modified to include the opt-out feature
+# Durability tracking on both retail and classic
 Libs/LibDurability.lua
 
-# Incoming heals/absorbs tracking on Classic only, modified to include the opt-out feature
+# Incoming heals/absorbs tracking on Classic only
 Libs/LibHealComm-4.0/CallbackHandler-1.0.lua
 Libs/LibHealComm-4.0/ChatThrottleLib.lua
 Libs/LibHealComm-4.0/LibHealComm-4.0.lua
