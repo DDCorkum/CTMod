@@ -67,6 +67,9 @@ local GetSpecialization = GetSpecialization or function() return nil; end
 local GetSpecializationInfo = GetSpecializationInfo or function() return nil; end
 local GetSpecializationRoleByID = GetSpecializationRoleByID or function() return nil; end
 
+-- Status messages
+local IncomingSummonStatus = (C_IncomingSummon and C_IncomingSummon.IncomingSummonStatus) or function() return 0; end
+
 
 --------------------------------------------
 -- Pseudo-Object-Oriented Design
@@ -343,18 +346,12 @@ function StaticCTRAReadyCheck()
 			extendReadyChecks = value;
 		elseif (option == "CTRA_MonitorDurability") then
 			monitorDurability = value;
-		elseif (option == "CTRA_ShareDurability") then
-			if (value) then
-				module:InstallLibDurability()
-			end
 		end
 	end
 	
 	function obj:Frame(optionsFrameList)
 		-- helper functions to shorten the code a bit
-		local optionsAddFrame = function(offset, size, details, data) module:framesAddFrame(optionsFrameList, offset, size, details, data); end
 		local optionsAddObject = function(offset, size, details) module:framesAddObject(optionsFrameList, offset, size, details); end
-		local optionsAddScript = function(name, func) module:framesAddScript(optionsFrameList, name, func); end
 		local optionsAddTooltip = function(text) module:framesAddScript(optionsFrameList, "onenter", function(obj) module:displayTooltip(obj, text, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL); end); end
 		local optionsBeginFrame = function(offset, size, details, data) module:framesBeginFrame(optionsFrameList, offset, size, details, data); end
 		local optionsEndFrame = function() module:framesEndFrame(optionsFrameList); end
@@ -385,7 +382,6 @@ function StaticCTRAReadyCheck()
 	-- PUBLIC CONSTRUCTOR
 	do
 		configureAfterReadyCheckFrame();
-		module:InstallLibDurability(); -- see Libs/LibDurability.lua
 		configureDurabilityMonitor();
 		return obj;
 	end
@@ -585,7 +581,6 @@ function StaticCTRAFrames()
 	
 	function obj:Frame(optionsFrameList)
 		-- helper functions to shorten the code a bit
-		local optionsAddFrame = function(offset, size, details, data) module:framesAddFrame(optionsFrameList, offset, size, details, data); end
 		local optionsAddObject = function(offset, size, details) module:framesAddObject(optionsFrameList, offset, size, details); end
 		local optionsAddScript = function(name, func) module:framesAddScript(optionsFrameList, name, func); end
 		local optionsAddTooltip = function(text, anchor) module:framesAddScript(optionsFrameList, "onenter", function(obj) module:displayTooltip(obj, text, anchor or "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL); end); end
@@ -2413,7 +2408,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 	local auraBoss1, auraBoss2, auraBoss3, auraBoss4;
 	local aura1, aura2, aura3, aura4, aura5;
 	local statusTexture, statusFontString, statusNoticeBackground, statusAlarmBackground;
-	local durabilityAverage, durabilityTime;
+	local durabilityAverage, durabilityBroken, durabilityTime;
 	local DEFAULT_DEBUFF_COLOR = {r = 1, g = 0, b = 0};
 	
 	-- PRIVATE FUNCTIONS
@@ -3063,7 +3058,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 		local numShown = 0;
 		wipe(auraBossShown);
 		local frame = auraBoss1;
-		local encounter = true or module:isInEncounter() or select(3, GetInstanceInfo()) == 8;	-- raid fights, or mythic plus dungeons
+		local encounter = module:isInEncounter() or select(3, GetInstanceInfo()) == 8;	-- raid fights, or mythic plus dungeons
 		if(encounter and shownUnit and UnitExists(shownUnit) and owner:GetProperty("ShowBossAuras")) then		
 			for auraIndex = 1, 40 do
 				local name, icon, count, debuffType, duration, expirationTime, __, __, __, spellId = UnitBuff(shownUnit, auraIndex);
@@ -3183,7 +3178,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 		end
 
 		local function constructAuraBoss()
-			frame = CreateFrame("Frame", nil, visualFrame);
+			local frame = CreateFrame("Frame", nil, visualFrame);
 			frame:SetSize(16,16);
 			frame.texture = frame:CreateTexture(nil, "OVERLAY", nil, 2)
 			frame.texture:SetAllPoints();

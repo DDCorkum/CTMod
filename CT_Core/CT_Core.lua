@@ -103,7 +103,7 @@ local function minimapFrameSkeleton()
 							if (UIDROPDOWNMENU_MENU_LEVEL == 1) then
 								for i, mod in module:iterateModules() do
 									if (i>2) then
-										info = {};
+										local info = {};
 										info.text = mod.name;
 
 
@@ -411,7 +411,7 @@ module.frame = function()
 			);
 			optionsAddScript("onclick",
 				function(self)
-					parent = self:GetParent();
+					local parent = self:GetParent();
 					if (not self:GetChecked()) then
 						module:setOption("disableBagAutomation",false);
 						for i, bagevent in ipairs(bagAutomationEvents) do
