@@ -2985,7 +2985,10 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 		-- This is a hack because certain status changes seemed during development to not consistently
 		-- push an event notification to the handler.  Originally introduced at 2 seconds, but now
 		-- slowing to 10 seconds in 8.3.0.9 as an experiment to see if this can be fully removed.
-		C_Timer.NewTicker(10, updateRaidStatusIndicators);
+		--
+		--  Update: In 9.0.5.8 a typo was found which could have been the root cause of the problem.
+		--  Now extending this ticker to 15 seconds as a continued experiment to see if it can be removed.
+		C_Timer.NewTicker(15, updateRaidStatusIndicators);
 		
 		-- initial configuration
 		configureRaidStatusIndicators();

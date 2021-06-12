@@ -1325,6 +1325,9 @@ module.frame = function()
 		optionsAddFrame( -20,   17, "slider#t:0:%y#s:175:%s#o:cooldownFontSize:" .. fontDefaultSize .. "#Size = <value>#10:30:1");
 		
 		optionsAddObject(-10,   26, "checkbutton#tl:20:%y#o:displayRecharge:true#Display recharge sweep");
+		
+		optionsAddObject(-10,   14, "font#t:0:%y#v:ChatFontNormal#Flare when cooldown finishes, if longer than:");
+		optionsAddObject(-20,   17, "slider#t:0:%y#s:175:%s#o:minimumCooldownToBling:0#<value> seconds:0 sec:30 sec#0:30:0.5");
 	optionsEndFrame();
 
 	----------
@@ -2630,6 +2633,9 @@ module.optionUpdate = function(self, optName, value)
 		module:setOption("cooldownFontTypeName", fontTypeName);
 		updateCooldownFont();
 		
+	elseif (optName == "minimumCooldownToBling") then
+		module.minimumCooldownToBling = value;
+		
 	elseif (optName == "disableIconIntro" ) then
 		module.suppressActionBarController(value)
 		
@@ -2658,6 +2664,8 @@ module.optionUpdate = function(self, optName, value)
 			module:reskinAllGroups();
 		end
 
+		module.minimumCooldownToBling = module:getOption("minimumCooldownToBling") or 0
+		
 		module:setAttributes();
 		module.setActionBindings();
 		module:hideExtraBars();

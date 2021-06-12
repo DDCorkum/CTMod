@@ -1,4 +1,4 @@
-CT_RaidAssist (9.0.5.8) 2021-06-02
+CT_RaidAssist (9.0.5.8) 2021-06-12
 - LibDurability and LibHealComm-4.0 now always included when applicable; removing the opt-out feature for simplicity
 - Fix to event handling when accepting/confirming a summon
 

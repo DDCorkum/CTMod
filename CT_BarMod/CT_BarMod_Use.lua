@@ -677,7 +677,6 @@ function useButton:update()
 	self:updateBinding();
 	self:updateRange();
 	self:updateTexture();
-	self:updateOpacity();
 --	self:updateState();  -- updateFlash() calls updateState().
 	self:updateFlash();
 	self:updateUnitAttributes();
@@ -1006,87 +1005,54 @@ function useButton:updateUsable()
 	end
 end
 
--- Update opacity
-local fadedButtons = {};
-local fadedCount = 0;
-
-local function fadeUpdater()
---[[	for button, value in pairs(fadedButtons) do
-		button:updateOpacity();
-	end
---]]
-end
-
-function useButton:updateOpacity()
---[[	local start, duration, enable = GetActionCooldown(self.actionId);
-	if ( start > 0 and duration > 0 and enable > 0 ) then
-		if (not fadedButtons[self]) then
-			fadedButtons[self] = true;
-			fadedCount = fadedCount + 1;
-			if (fadedCount == 1) then
-				module:unschedule(fadeUpdater, true);
-				module:schedule(0.3, true, fadeUpdater);
-			end
-		end
-		self.button:SetAlpha(0.1);
-	else
-		if (fadedButtons[self]) then
-			fadedButtons[self] = nil;
-			fadedCount = fadedCount - 1;
-			if (fadedCount == 0) then
-				module:unschedule(fadeUpdater, true);
-			end
-		end
-
-		self.button:SetAlpha(self.alphaCurrent or 1);
-	end
---]]
-end
-
 -- Update Cooldown
 function useButton:updateCooldown()
-	local actionCooldown, controlCooldown;
-	local cooldown = self.button.cooldown;
-	local recharge = self.button.recharge;
+	if (self.hasAction) then
 	
-	-- Action cooldown
-	local start, duration, enable = GetActionCooldown(self.actionId);
-	if ( start > 0 and enable > 0 ) then
-		cooldown:SetCooldown(start, duration);
-		actionCooldown = true;
-		if ( displayCount ) then
-			startCooldown(cooldown, start, duration);
+		local actionCooldown, controlCooldown;
+		local cooldown = self.button.cooldown;
+		local recharge = self.button.recharge;
+		
+		-- Action cooldown
+		local start, duration, enable = GetActionCooldown(self.actionId);
+		if ( start > 0 and enable > 0 ) then
+			cooldown:SetCooldown(start, duration);
+			actionCooldown = true;
+			if ( displayCount ) then
+				startCooldown(cooldown, start, duration);
+			else
+				stopCooldown(cooldown);
+			end
 		else
 			stopCooldown(cooldown);
+			actionCooldown = false;
 		end
-	else
-		stopCooldown(cooldown);
-		actionCooldown = false;
-	end
+
+		-- Loss of control cooldown
+		local start, duration = GetActionLossOfControlCooldown(self.actionId);
+		--cooldown:SetLossOfControlCooldown(start, duration);
+		if (start > 0 and duration > 0) then
+			controlCooldown = true;
+		else
+			controlCooldown = false;
+		end
+
+		-- Hide/show the cooldown
+		if (actionCooldown or controlCooldown) then
+			cooldown:Show();
+		else
+			cooldown:Hide();
+		end
+
+		-- Recharge animation
+		local current, maxCharges, start, duration, modRate = GetActionCharges(self.actionId);
+		if (displayRecharge and current > 0 and current < maxCharges) then
+			recharge:SetCooldown(start, duration, modRate);
+			recharge:Show();
+		else
+			recharge:Hide();
+		end
 	
-	-- Loss of control cooldown
-	local start, duration = GetActionLossOfControlCooldown(self.actionId);
-	--cooldown:SetLossOfControlCooldown(start, duration);
-	if (start > 0 and duration > 0) then
-		controlCooldown = true;
-	else
-		controlCooldown = false;
-	end
-	
-	-- Hide/show the cooldown
-	if (actionCooldown or controlCooldown) then
-		cooldown:Show();
-	else
-		cooldown:Hide();
-	end
-	
-	-- Recharge animation
-	local current, maxCharges, start, duration, modRate = GetActionCharges(self.actionId);
-	if (displayRecharge and current > 0 and current < maxCharges) then
-		recharge:SetCooldown(start, duration, modRate);
-		recharge:Show();
-	else
-		recharge:Hide();
 	end
 end
 
@@ -1110,20 +1076,20 @@ end
 -- Update Binding
 function useButton:updateBinding()
 	local hotkey = self.button.hotkey
-	if (not self.hasAction) then
-		hotkey:SetText("");
-		return;
-	end
-	local text;
-	if ( displayBindings ) then		
-		text = self:getBinding();
-	end
-	if (text) then
-		hotkey:SetText(text);
-		hotkey.showRangeIndicator = nil;
-	elseif (self.hasRange and IsActionInRange(self.actionId) ~= nil and displayRangeDot) then
-		-- this ability has a range limitation applicable to the current target
-		hotkey:SetText(rangeIndicator);
+	if (self.hasAction) then
+		local text;
+		if ( displayBindings ) then		
+			text = self:getBinding();
+		end
+		if (text) then
+			hotkey:SetText(text);
+			hotkey.showRangeIndicator = nil;
+		elseif (self.hasRange and IsActionInRange(self.actionId) ~= nil and displayRangeDot) then
+			-- this ability has a range limitation applicable to the current target
+			hotkey:SetText(rangeIndicator);
+		else
+			hotkey:SetText("");
+		end
 	else
 		hotkey:SetText("");
 	end
@@ -1164,10 +1130,7 @@ end
 function useButton:updateCount()
 	local actionId = self.actionId;
 	local text = self.button.count;
-	local hasAction = HasAction(actionId);
-	if ( not hasAction ) then
-		text:SetText("");
-	else
+	if ( self.hasAction ) then
 		local count = GetActionCount(actionId)
 		if (
 			self.isConsumable
@@ -1183,6 +1146,8 @@ function useButton:updateCount()
 				text:SetText("");
 			end
 		end
+	else
+		text:SetText("");
 	end
 end
 
@@ -1689,13 +1654,12 @@ local function eventHandler_UpdateCooldown()
 	actionButtonList:updateUsable();
 	actionButtonList:updateCount();
 	actionButtonList:updateCooldown();
-	actionButtonList:updateOpacity();
+	
 end
 
 local function eventHandler_UpdateUsable()
 	actionButtonList:updateUsable();
 	actionButtonList:updateCooldown();
-	actionButtonList:updateOpacity();
 end
 
 local function eventHandler_UpdateBindings()
