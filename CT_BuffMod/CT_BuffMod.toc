@@ -1,4 +1,4 @@
-## Interface: 90005
+## Interface: 90100
 ## Version: 9.0.5.6
 ## Title: CT_BuffMod
 ## Notes: Customizable buff display.

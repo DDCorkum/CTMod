@@ -1,4 +1,4 @@
-CT_BarMod (9.0.5.8) 2021-06-12
+CT_BarMod (9.1.0.1) 2021-06-12
 - Action bars 7-10 now mimick console variable ActionButtonUseKeyDown
 - Minor tweaks to improve efficiency
 
