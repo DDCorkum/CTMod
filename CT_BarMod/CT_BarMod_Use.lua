@@ -75,7 +75,7 @@ local GetActionCooldown = GetActionCooldown;
 
 -- GetActionCount, overridden for WoW Classic 1.13.3 (CTMod 8.2.5.8) using GetItemCount and some tooltip scanning
 local OldGetActionCount, GetActionCount, GetItemCount, ReagentScannerTooltip = GetActionCount, GetActionCount, GetItemCount, CreateFrame("GameTooltip", "CT_BarMod_ReagentScanner", nil, "GameTooltipTemplate");
-reagentScannerCache = {};
+local reagentScannerCache = {};
 if (module:getGameVersion() == 1) then
 	ReagentScannerTooltip:SetOwner(UIParent, "ANCHOR_NONE");
 	
@@ -85,9 +85,8 @@ if (module:getGameVersion() == 1) then
 		for i=1, ReagentScannerTooltip:NumLines() do
 			local text = _G["CT_BarMod_ReagentScannerTextLeft" .. i]:GetText();
 			if (text and string.find(text, SPELL_REAGENTS)) then	
-				reagent = string.gsub(text, SPELL_REAGENTS, "");		-- strip out the localized header
-				reagent = string.gsub(reagent, "|cffff2020", "");		-- strip out the red colour if there is none of the reagent
-				reagent = string.gsub(reagent, "|r", "");			-- strip out the red colour if there is none of the reagent
+				local reagent = string.gsub(text, SPELL_REAGENTS, "");		-- strip out the localized header
+				reagent = string.gsub(reagent, "|cffff2020(.*)|r", "$1");	-- strip out the red colour when there is insufficent quantity of the reagent
 				reagentScannerCache[spell] = reagent;	-- add to the cache!
 				return reagent;
 			end
