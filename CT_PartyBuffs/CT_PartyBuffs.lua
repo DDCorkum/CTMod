@@ -373,8 +373,6 @@ function module:update(type, value)
 		numBuffs = module:getOption("numBuffs") or 4
 		numDebuffs = module:getOption("numDebuffs") or 6
 		numPetBuffs = module:getOption("numPetBuffs") or 4
-		buffType = module:getOption("buffType") or 1
-		debufftype = module:getOption("debuffType") or 1
 		layout = module:getOption("layout") or 1
 		createAndAnchorButtons()
 		
