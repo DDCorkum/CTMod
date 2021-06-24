@@ -1015,6 +1015,8 @@ do
 end
 
 -- Scroll wheel
+
+--[[	The default UI now provides this function.
 do
 	local wheelHook;
 
@@ -1042,6 +1044,7 @@ do
 		end
 	end);
 end
+--]]
 
 -- Right click the Prev/Next page buttons
 do
