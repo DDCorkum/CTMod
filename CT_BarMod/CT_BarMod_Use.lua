@@ -35,6 +35,7 @@ local bar6Bindings = true;
 local hideGlow = false;
 local useNonEmptyNormal = false;
 local backdropShow = false;
+local minimumCooldownToBling = 0;
 
 local normalTexture1 = "Interface\\Buttons\\UI-Quickslot";  -- square texture that has a filled in center
 local normalTexture2 = "Interface\\Buttons\\UI-Quickslot2"; -- square texture that has an empty center
@@ -964,22 +965,28 @@ function useButton:updateUsable()
 		local texture, name, enabled = GetPossessInfo(POSSESS_CANCEL_SLOT or 2);
 		if (enabled) then
 			button.icon:SetVertexColor(1, 1, 1);
+			button.blingcontainer:Show();
 		else
 			button.icon:SetVertexColor(0.4, 0.4, 0.4);
+			button.blingcontainer:Hide();
 		end
 
 	elseif ( self.actionMode == "leave" ) then
 		if (CanExitVehicle()) then
 			button.icon:SetVertexColor(1, 1, 1);
+			button.blingcontainer:Show();
 		else
 			button.icon:SetVertexColor(0.4, 0.4, 0.4);
+			button.blingcontainer:Hide();
 		end
 
 	elseif ( colorLack and self.outOfRange ) then
 		if ( colorLack == 2 ) then
 			button.icon:SetVertexColor(0.5, 0.5, 0.5);
+			button.blingcontainer:Show();
 		else
 			button.icon:SetVertexColor(0.8, 0.4, 0.4);
+			button.blingcontainer:Show();
 		end
 		
 	elseif (
@@ -992,15 +999,19 @@ function useButton:updateUsable()
 		)
 	) then
 		button.icon:SetVertexColor(1, 1, 1);
+		button.blingcontainer:Show();
 		
 	elseif ( notEnoughMana ) then
 		button.icon:SetVertexColor(0.5, 0.5, 1);
+		button.blingcontainer:Hide();
 
 	elseif ( self.actionType == "companion" and not InCombatLockdown()) then
 		button.icon:SetVertexColor(1, 1, 1);
+		button.blingcontainer:Show();
 	
 	else
 		button.icon:SetVertexColor(0.4, 0.4, 0.4);
+		button.blingcontainer:Hide();
 	end
 end
 
@@ -1010,6 +1021,7 @@ function useButton:updateCooldown()
 	
 		local actionCooldown, controlCooldown;
 		local cooldown = self.button.cooldown;
+		local bling = self.button.bling;
 		local recharge = self.button.recharge;
 		
 		-- Action cooldown
@@ -1022,6 +1034,7 @@ function useButton:updateCooldown()
 			else
 				stopCooldown(cooldown);
 			end
+			bling:SetShown(duration >= minimumCooldownToBling)
 		else
 			stopCooldown(cooldown);
 			actionCooldown = false;
@@ -1032,6 +1045,7 @@ function useButton:updateCooldown()
 		--cooldown:SetLossOfControlCooldown(start, duration);
 		if (start > 0 and duration > 0) then
 			controlCooldown = true;
+			bling:SetShown(duration >= minimumCooldownToBling)
 		else
 			controlCooldown = false;
 		end
@@ -2337,6 +2351,9 @@ module.useUpdate = function(self, optName, value)
 
 	elseif ( optName == "defbarHideTooltip" ) then
 		defbarHideTooltip = value;
+		
+	elseif ( optName == "minimumCooldownToBling" ) then
+		minimumCooldownToBling = value;
 
 	elseif ( optName == "init" ) then
 		colorLack = self:getOption("colorLack") or 1;
@@ -2375,6 +2392,8 @@ module.useUpdate = function(self, optName, value)
 		defbarShowActionText = module:getOption("defbarShowActionText") ~= false;
 		defbarSetUnitAttributes = module:getOption("defbarSetUnitAttributes") ~= false;
 		defbarHideTooltip = module:getOption("defbarHideTooltip") ~= false;
+		
+		minimumCooldownToBling = module:getOption("minimumCooldownToBling") or 0
 
 		if (hideGrid) then
 			actionButtonList:hideGrid();

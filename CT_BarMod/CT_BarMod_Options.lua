@@ -2632,10 +2632,7 @@ module.optionUpdate = function(self, optName, value)
 		local fontTypeName = fontTypeListSorted[fontTypeNum];
 		module:setOption("cooldownFontTypeName", fontTypeName);
 		updateCooldownFont();
-		
-	elseif (optName == "minimumCooldownToBling") then
-		module.minimumCooldownToBling = value;
-		
+				
 	elseif (optName == "disableIconIntro" ) then
 		module.suppressActionBarController(value)
 		
@@ -2663,8 +2660,6 @@ module.optionUpdate = function(self, optName, value)
 			-- Reskin the CT_BarMod groups
 			module:reskinAllGroups();
 		end
-
-		module.minimumCooldownToBling = module:getOption("minimumCooldownToBling") or 0
 		
 		module:setAttributes();
 		module.setActionBindings();

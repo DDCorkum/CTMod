@@ -1,5 +1,6 @@
-CT_BarMod (9.1.0.1) 2021-06-23
+CT_BarMod (9.1.0.1) 2021-06-25
 - Action bars 7-10 now mimick console variable ActionButtonUseKeyDown
+- Cooldown 'bling' respects bar opacity, ignores unusable abilities, and can be set to ignore the GCD
 - Minor tweaks to improve efficiency
 
 CT_BarMod (9.0.5.7) 2021-05-25

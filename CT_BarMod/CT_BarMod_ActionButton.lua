@@ -56,8 +56,6 @@ module.maxBarNum = 12;  -- Maximum number of bars allowed
 module.controlBarId = 11;  -- id number of the Control Bar
 module.actionBarId = 12;  -- id number of the Action Bar
 
-module.minimumCooldownToBling = 0	-- minimum time a cooldown must last before the bling effect is shown at the end of it.
-
 -------------------------------------------
 -- Helpers
 
@@ -215,54 +213,60 @@ local function getActionButton(buttonId)
 
 		button.cooldown = CreateFrame("Cooldown", nil, parent, "CooldownFrameTemplate");
 		button.cooldown:SetDrawEdge(false);
-		button.cooldown:SetDrawBling(false);	-- replaced with a manual bling that respects alpha
+		button.cooldown:SetDrawBling(false);
+		
+		button.blingcontainer = CreateFrame("Frame", nil, button)
+		button.blingcontainer:SetAllPoints()
+		button.blingcontainer:SetClipsChildren(true)
+		
+		local bling = button.blingcontainer:CreateTexture("OVERLAY")
+		bling:SetTexture("Interface\\Cooldown\\star4")
+		bling:SetAllPoints()
+		bling:SetVertexColor(0.3, 0.6, 1, 0)
+		bling:SetBlendMode("ADD")
+		button.bling = bling
+		bling.ag = bling:CreateAnimationGroup()
+		bling.r = bling.ag:CreateAnimation("Rotation")
+		bling.r:SetDegrees(-45)
+		bling.r:SetDuration(1.0)
+		bling.a1 = bling.ag:CreateAnimation("Alpha")
+		bling.a1:SetDuration(0.5)
+		bling.a1:SetFromAlpha(0.0)
+		bling.a1:SetToAlpha(0.6)
+		bling.a2 = bling.ag:CreateAnimation("Alpha")
+		bling.a2:SetDuration(0.5)
+		bling.a2:SetStartDelay(0.5)
+		bling.a2:SetFromAlpha(0.6)
+		bling.a2:SetToAlpha(0.0)
+		bling.s1 = bling.ag:CreateAnimation("Scale")
+		bling.s1:SetFromScale(1.0, 1.0)
+		bling.s1:SetToScale(1.8, 1.8)
+		bling.s1:SetDuration(0.4)
+		bling.s2 = bling.ag:CreateAnimation("Scale")
+		bling.s2:SetFromScale(1.0, 1.0)
+		bling.s2:SetToScale(0.75, 0.75)
+		bling.s2:SetDuration(0.4)
+		bling.s2:SetStartDelay(0.4)
+		bling.s3 = bling.ag:CreateAnimation("Scale")
+		bling.s3:SetFromScale(1.0, 1.0)
+		bling.s3:SetToScale(1.2, 1.2)
+		bling.s3:SetDuration(0.2)
+		bling.s3:SetStartDelay(0.8)
+		
+		button.cooldown:HookScript("OnCooldownDone", function(self) 
+			bling.ag:Restart()
+			bling.ag:Play()
+		end)
+		
+		hooksecurefunc(button.cooldown, "SetCooldown", function(self, start, duration)
+			bling.ag:Stop()
+		end)
 		
 		button.recharge = CreateFrame("Cooldown", nil, parent, "CooldownFrameTemplate");
 		button.recharge:SetDrawSwipe(false);
 		button.recharge:SetDrawBling(false);
 		button.recharge:SetHideCountdownNumbers(true);
 		
-		-- Recreates the bling animation at the end of the cooldown.  This is here because normally cooldown widgets include the bloom implicitly (ie, its done in C rather than Lua).
-		button.bling = parent:CreateTexture("OVERLAY")
-		button.bling:SetTexture("interface\\cooldown\\star4.blp")
-		button.bling:SetAlpha(0)
-		button.bling:SetAllPoints()
-		button.bling:SetBlendMode("ADD")
-		local ag = button.bling:CreateAnimationGroup()
-		ag.r = ag:CreateAnimation("Rotation")
-		ag.r:SetDegrees(-45)
-		ag.r:SetDuration(1)
-		ag.a1, ag.a2 = ag:CreateAnimation("Alpha"), ag:CreateAnimation("Alpha")
-		ag.a1:SetFromAlpha(0)
-		ag.a1:SetToAlpha(1)
-		ag.a1:SetDuration(0.3)
-		ag.a2:SetFromAlpha(1)
-		ag.a2:SetToAlpha(0)
-		ag.a2:SetDuration(0.6)
-		ag.a2:SetStartDelay(0.3)
-		ag.s = ag:CreateAnimation("Scale")
-		ag.s:SetFromScale(1,1)
-		ag.s:SetToScale(1.2,1.2)
-		ag.s:SetDuration(1)
-		do
-			local originalStart, fullDuration = 0, 0
-			button.cooldown:HookScript("OnHide", function(self) 
-				if (fullDuration > module.minimumCooldownToBling) then
-					ag:Restart()
-					ag:Play()
-				end
-			end)
-			hooksecurefunc(button.cooldown, "SetCooldown", function(self, start, duration)
-				if (start < originalStart + fullDuration) then
-					fullDuration = duration + start - originalStart
-				else
-					originalStart = start
-					fullDuration = duration
-				end
-				ag:Stop()
-			end)
-		end
-
 		button.FlyoutArrow = parent:CreateTexture(nil, "ARTWORK", "ActionBarFlyoutButton-ArrowUp");
 		button.FlyoutArrow:SetDrawLayer("ARTWORK", 2);
 
