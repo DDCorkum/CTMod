@@ -265,6 +265,8 @@ function public:InsertOre(mapID, x, y, ore, descript, name)
 			ore = ore:sub(9); 				-- "Reiches Thoriumvorkommen" to "Thoriumvorkommen"
 		elseif (ore:sub(1,8) == "Kleines " and ore:len() > 8) then
 			ore = ore:sub(9); 				-- "Kleines Thoriumvorkommen" to "Thoriumvorkommen"
+		elseif (ore:sub(1,7) == "Reiche " and ore:len() > 7) then
+			ore = ore:sub(8); 				-- "Reiche Adamantitablagerung" to "Adamantitablagerung"
 		end
 		-- composite nouns
 		if (ore:sub(-9) == "vorkommen" and ore:len() > 9) then
