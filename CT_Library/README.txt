@@ -10,6 +10,8 @@ The CTMod team has included the following individuals over time:
 - Resike (since 2014)
 - Dahk Celes / DDCorkum (since 2017)
 
+CTMod is currently distributed through GitHub, CurseForge, WoWInterface and Wago.
+
 
 
 ------------------------------
@@ -36,26 +38,29 @@ CT_RaidAssist embeds the following addon libraries:
 - LibDurability by funkehdude (CC BY-NC-SA 3.0)
 - LibHealComm by Shadowed, Azilroka and xbeebs (license unknown), which includes CallbackHandler by nevcairiel (BSD license) and ChatThrottleLib by Mikk (license unknown)
 
-These libraries permit the modern implementation of CT_RaidAssist to
-be compatible with non-CT addons for raid management tasks like
-checking durability and predicting incoming heals in WoW Classic.
+These libraries permit CT_RaidAssist to share info with other raid addons
+for common tasks like durability and predicting incoming heals in WoW Classic.
 
 Using a common library allows users more freedom to choose any
 compatible addon, so they do not feel pressured to use any
 particular one (CT or otherwise) to participate in a raiding guild.
 
-To further give users control over their privacy, CT_RaidAssist also
-adds a single conditional statement at the top of certain embedded 
-lua files to toggle whether or not the library should be installed.
-This conditional only interrupts CT_RaidAssist from installing the
-embedded library; it does not stop any other addon from installing it.
-
-This small change is intended to balance user privacy rights, and the CTMod
-team appologizes if this has inadvertently violated the spirit of any license.
+Former versions of CT_RaidAssist included an opt-out feature so users could refrain from
+installing these data-sharing libraries.  However, this has been removed since it is
+not known that any user actually made use of this opt-out feature.
 
 
 
-D.D. Corkum
-aka. Dahk Celes
+------------------------------
+-- Acknowledgements
+
+The team also acknowledges the following contributions:
+- Dargen (the former "Main Tank" module in CTRA)
+- Dynaletik (much of the German localization)
+- 萌丶汉丶纸 (much of the Chinese localization)
+
+
+
+Dahk Celes (D.D. Corkum)
 CTMod Team
-25 Oct 2020 (Updated 5 April 2021)
+25 Oct 2020 (Updated 2 June 2021)

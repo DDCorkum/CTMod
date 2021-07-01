@@ -790,7 +790,7 @@ module.frame = function()
 				optionsBeginFrame(  17,  24, "button#tl:22:%y#s:24:%s");
 					optionsAddScript("onclick",
 						function(self, button)
-							size = module:getOption("repBarWidth") or 1024;
+							local size = module:getOption("repBarWidth") or 1024;
 							if (button == "RightButton") then
 								size = size - 5;
 							else
@@ -813,7 +813,7 @@ module.frame = function()
 				optionsBeginFrame(  25,  24, "button#tl:275:%y#s:24:%s");
 					optionsAddScript("onclick",
 						function(self)
-							size = module:getOption("repBarWidth") or 1024;
+							local size = module:getOption("repBarWidth") or 1024;
 							if (button == "RightButton") then
 								size = size + 5;
 							else

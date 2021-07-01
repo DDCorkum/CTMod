@@ -1,3 +1,6 @@
+CT_BottomBar (9.1.0.1) 2021-06-23
+- Minor cleanup; nothing substantive.
+
 CT_BottomBar (9.0.5.7) 2021-05-25
 - Fixed: error on new characters without a profile.
 

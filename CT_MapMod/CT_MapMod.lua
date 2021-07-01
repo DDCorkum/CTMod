@@ -273,6 +273,8 @@ function public:InsertOre(mapID, x, y, ore, descript, name)
 			ore = ore:sub(1, -6); 				-- "Monelitflöz" to Monelit"	NOTE: the ö counts as TWO bytes
 		elseif (ore:sub(-4) == "ader" and ore:len() > 4) then
 			ore = ore:sub(1, -5); 				-- "Zinnader" to "Zinn"
+		elseif (ore:sub(-10) == "ablagerung" and ore:len() > 10) then
+			ore = ore:sub(1, -11); 				-- "Mithrilablagerung" to "Mithril"
 		end
 	elseif (GetLocale() == "esES" or GetLocale() == "esMX") then
 		-- following adjective

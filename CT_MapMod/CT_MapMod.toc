@@ -1,5 +1,5 @@
-## Interface: 90005
-## Version: 9.0.5.6
+## Interface: 90100
+## Version: 9.1.0.1
 ## Title: CT_MapMod
 ## Notes: Pins the World Map with points of interest and herb/ore nodes
 ## DefaultState: Enabled

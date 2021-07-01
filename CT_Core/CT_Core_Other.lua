@@ -399,6 +399,8 @@ elseif (module:getGameVersion() == 2) then
 
 		local questIndex, questLogTitle, questTitleTag, questNumGroupMates, questNormalText, questHighlight, questCheck;
 		local questLogTitleText, level, questTag, isHeader, isCollapsed, isComplete, color;
+-- CT_CORE MODIFICATION STARTS HERE
+		local frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isBounty, isStory, isHidden, isScaling;
 		local numPartyMembers, partyMembersOnQuest, tempWidth, textWidth;
 		for i=1, QUESTS_DISPLAYED, 1 do
 			questIndex = i + FauxScrollFrame_GetOffset(QuestLogListScrollFrame);
@@ -410,7 +412,7 @@ elseif (module:getGameVersion() == 2) then
 			questHighlight = _G["QuestLogTitle"..i.."Highlight"];
 			if ( questIndex <= numEntries ) then
 				questLogTitleText, level, questTag, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isBounty, isStory, isHidden, isScaling = GetQuestLogTitle(questIndex);
--- CT_CORE MODIFICATION STARTS HERE
+
 				if (displayLevels and questLogTitleText and level and level > 0) then
 					if (questTag) then
 						questLogTitleText = "[" .. level .. "+] " .. questLogTitleText;

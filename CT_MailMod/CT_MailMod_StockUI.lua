@@ -632,6 +632,40 @@ do
 	module:regCustomEvent("INCOMING_STOP", customEvents_MailCheckboxes);
 end
 
+
+-- Overriding Blizzard's open all button
+do
+	local oldOnClick = OpenAllMail:GetScript("OnClick")
+	OpenAllMail:SetScript("OnClick", function(self)
+		-- STEP 1: Give the user the same impression that processing has begun as if it were Blizzard's routine button click.
+		-- STEP 2: Perform a custom CT_MailMod open-all for anything the addon is capable of opening.
+		-- STEP 3: Return control to Blizzard to do whatever it wishes with the rest
+		
+		-- STEP 1:
+		self:Reset()
+		self:Disable()
+		self:SetText(OPEN_ALL_MAIL_BUTTON_OPENING);
+		
+		-- STEP 2:
+		if (module.isProcessing) then
+			module:cancelProcessing()
+		end
+		CTMailModOpenSelected:Disable()
+		CTMailModReturnSelected:Disable()
+		module:inboxSelectAll()
+		if (module:inboxGetNumSelected() > 0) then
+			module:closeOpenMail()
+			module:retrieveSelected()
+		end
+		CTMailModOpenSelected:Enable()
+		CTMailModReturnSelected:Enable()
+		
+		-- STEP 3:
+		return oldOnClick(self)
+	end)
+end
+
+
 -- Quick action (expiry) buttons
 local quickAction = { };
 do
@@ -1015,6 +1049,8 @@ do
 end
 
 -- Scroll wheel
+
+--[[	The default UI now provides this function.
 do
 	local wheelHook;
 
@@ -1042,6 +1078,7 @@ do
 		end
 	end);
 end
+--]]
 
 -- Right click the Prev/Next page buttons
 do

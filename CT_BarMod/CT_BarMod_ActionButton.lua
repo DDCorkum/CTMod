@@ -190,7 +190,7 @@ local function getActionButton(buttonId)
 	local button, parent;
 	button = tremove(actionButtonObjectPool);
 	if (not button) then
-		button = CreateFrame("CheckButton", "CT_BarModActionButton" .. buttonId, nil, "SecureActionButtonTemplate");
+		button = CreateFrame("CheckButton", "CT_BarModActionButton" .. buttonId, nil, "SecureActionButtonTemplate,SecureHandlerBaseTemplate");
 		button:SetHeight(36);
 		button:SetWidth(36);
 		button:SetPoint("TOPLEFT", 0, 0);
@@ -213,11 +213,60 @@ local function getActionButton(buttonId)
 
 		button.cooldown = CreateFrame("Cooldown", nil, parent, "CooldownFrameTemplate");
 		button.cooldown:SetDrawEdge(false);
+		button.cooldown:SetDrawBling(false);
+		
+		button.blingcontainer = CreateFrame("Frame", nil, button)
+		button.blingcontainer:SetAllPoints()
+		button.blingcontainer:SetClipsChildren(true)
+		
+		local bling = button.blingcontainer:CreateTexture("OVERLAY")
+		bling:SetTexture("Interface\\Cooldown\\star4")
+		bling:SetAllPoints()
+		bling:SetVertexColor(0.3, 0.6, 1, 0)
+		bling:SetBlendMode("ADD")
+		button.bling = bling
+		bling.ag = bling:CreateAnimationGroup()
+		bling.r = bling.ag:CreateAnimation("Rotation")
+		bling.r:SetDegrees(-45)
+		bling.r:SetDuration(1.0)
+		bling.a1 = bling.ag:CreateAnimation("Alpha")
+		bling.a1:SetDuration(0.5)
+		bling.a1:SetFromAlpha(0.0)
+		bling.a1:SetToAlpha(0.6)
+		bling.a2 = bling.ag:CreateAnimation("Alpha")
+		bling.a2:SetDuration(0.5)
+		bling.a2:SetStartDelay(0.5)
+		bling.a2:SetFromAlpha(0.6)
+		bling.a2:SetToAlpha(0.0)
+		bling.s1 = bling.ag:CreateAnimation("Scale")
+		bling.s1:SetFromScale(1.0, 1.0)
+		bling.s1:SetToScale(1.8, 1.8)
+		bling.s1:SetDuration(0.4)
+		bling.s2 = bling.ag:CreateAnimation("Scale")
+		bling.s2:SetFromScale(1.0, 1.0)
+		bling.s2:SetToScale(0.75, 0.75)
+		bling.s2:SetDuration(0.4)
+		bling.s2:SetStartDelay(0.4)
+		bling.s3 = bling.ag:CreateAnimation("Scale")
+		bling.s3:SetFromScale(1.0, 1.0)
+		bling.s3:SetToScale(1.2, 1.2)
+		bling.s3:SetDuration(0.2)
+		bling.s3:SetStartDelay(0.8)
+		
+		button.cooldown:HookScript("OnCooldownDone", function(self) 
+			bling.ag:Restart()
+			bling.ag:Play()
+		end)
+		
+		hooksecurefunc(button.cooldown, "SetCooldown", function(self, start, duration)
+			bling.ag:Stop()
+		end)
 		
 		button.recharge = CreateFrame("Cooldown", nil, parent, "CooldownFrameTemplate");
 		button.recharge:SetDrawSwipe(false);
+		button.recharge:SetDrawBling(false);
 		button.recharge:SetHideCountdownNumbers(true);
-
+		
 		button.FlyoutArrow = parent:CreateTexture(nil, "ARTWORK", "ActionBarFlyoutButton-ArrowUp");
 		button.FlyoutArrow:SetDrawLayer("ARTWORK", 2);
 
@@ -403,10 +452,38 @@ end
 function actionButton:setClickDirection(onKeyDown, alsoOnMouseDown)
 	if (onKeyDown and alsoOnMouseDown) then
 		self.button:RegisterForClicks("AnyDown");
+		if (self.onClickWrapped) then
+			self.button:UnwrapScript(self.button, "OnClick")
+			self.onClickWrapped = nil
+		end		
+	elseif (onKeyDown) then
+		self.button:RegisterForClicks("AnyUp", "Button31Down")
+		if (not self.onClickWrapped) then
+			self.onClickWrapped = true
+			self.button:WrapScript(
+				self.button, 
+				"OnClick", 
+				--pre-body
+				[=[
+					--self, button, down
+					if (down) then
+						self:SetAttribute("type31", "action")
+					else
+						self:SetAttribute("type31", "")
+					end
+				]=]
+			)
+		end
+		self.onClickWrapped = true
 	else
 		self.button:RegisterForClicks("AnyUp");
+		if (self.onClickWrapped) then
+			self.button:UnwrapScript(self.button, "OnClick")
+			self.onClickWrapped = nil
+		end
 	end		
 end
+
 
 -- Change a button's scale
 function actionButton:setScale(scale)
@@ -467,7 +544,7 @@ function actionButton:setBinding(binding, delete)
 		if (delete) then
 			SetBinding(binding, nil);
 		else
-			SetBindingClick(binding, self.name);
+			SetBindingClick(binding, self.name, "Button31");
 		end
 	end
 	self:updateBinding();
@@ -488,9 +565,9 @@ function actionButton:postclick() end
 local lastMethod;
 module.actionButtonList = actionButtonList;
 
-local function doMethod(...)
+local function doMethod(__, ...)
 	for buttonId, object in pairs(actionButtonList) do
-		object[lastMethod](object, select(2, ...));
+		object[lastMethod](object, ...);
 	end
 end
 setmetatable(actionButtonList, { __index =

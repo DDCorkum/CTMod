@@ -1100,9 +1100,9 @@ module.frame = function()
 				timeElapsed = 0;
 				if (GetCVar("ActionButtonUseKeyDown") == "1") then
 					if (module:getOption("onMouseDown")) then
-						CT_BarMod_ToggleKeyFontString:SetText("Currently responds to |cFFFFFF99mouse down|r & |cFFFFFF99 key down|n|cFF999999(applies to all bars equally)");
+						CT_BarMod_ToggleKeyFontString:SetText("Currently responds to |cFFFFFF99mouse down|r & |cFFFFFF99 key down");
 					else
-						CT_BarMod_ToggleKeyFontString:SetText("Currently responds to |cFFFFFF99mouse up|r & |cFFFFFF99 key down|n|cFF999999(applies to bars 3-6 and the action bar)");
+						CT_BarMod_ToggleKeyFontString:SetText("Currently responds to |cFFFFFF99mouse up|r & |cFFFFFF99 key down");
 					end
 				else
 					CT_BarMod_ToggleKeyFontString:SetText("Currently responds to |cFFFFFF99mouse up|r & |cFFFFFF99 key up");
@@ -1114,13 +1114,13 @@ module.frame = function()
 					"Toggles console variable 'ActionButtonUseKeyDown' between 0 and 1", 
 					" ", 
 					"|cFFFFFF99Action on Key Release Up:", 
-					"- Same as typing /console ActionButtonUseKeyDown |cFFFFFFFF0", 
-					"- |cFFFFFFFFAll|r buttons will respond to |cFFFFFFFFmouse-up|r and |cFFFFFFFFkey-up", 
+					"- Same as typing |cFFFFFFFF/console ActionButtonUseKeyDown 0|r", 
+					"- All buttons will respond to |cFFFFFFFFmouse-up|r and |cFFFFFFFFkey-up|r", 
 					" ", 
 					"|cFFFFFF99Action on Key Press Down:", 
-					"- Same as typing /console ActionButtonUseKeyDown |cFFFFFFFF1", 
-					"- Bars 2-6 and the action bar will respond to |cFFFFFFFFpressing the key down", 
-					"- Unlocks further options for mouse clicking and bars 7-10",
+					"- Same as typing |cFFFFFFFF/console ActionButtonUseKeyDown 1|r", 
+					"- All buttons will respond to |cFFFFFFFFkey-down|r", 
+					"- Unlocks more options for mouse |cFFFFFFFFup or down|r and", 
 					" ", 
 					"|cFF666666Console variables persist even if you get rid of addons",
 					"|cFF666666but can be reset by typing /console cvar_reset"
@@ -1134,9 +1134,6 @@ module.frame = function()
 					"Also respond to mouse-down",
 					"- Actions trigger when you press a mouse button, instead of release",
 					"- Caution!  It even triggers when you are dragging a button to a new slot",
-					"- Also allows the extra action bars (7-10) to respond to key-down",
-					" ",
-					"|cFF666666Why does this affect bars 7-10?  It's a Blizzard-imposed restriction"
 				}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
 			end);
 			optionsAddScript("onshow", function(checkbutton)
@@ -1328,6 +1325,9 @@ module.frame = function()
 		optionsAddFrame( -20,   17, "slider#t:0:%y#s:175:%s#o:cooldownFontSize:" .. fontDefaultSize .. "#Size = <value>#10:30:1");
 		
 		optionsAddObject(-10,   26, "checkbutton#tl:20:%y#o:displayRecharge:true#Display recharge sweep");
+		
+		optionsAddObject(-10,   14, "font#t:0:%y#v:ChatFontNormal#Flare when cooldown finishes, if longer than:");
+		optionsAddObject(-20,   17, "slider#t:0:%y#s:175:%s#o:minimumCooldownToBling:0#<value> seconds:0 sec:30 sec#0:30:0.5");
 	optionsEndFrame();
 
 	----------
@@ -2632,7 +2632,7 @@ module.optionUpdate = function(self, optName, value)
 		local fontTypeName = fontTypeListSorted[fontTypeNum];
 		module:setOption("cooldownFontTypeName", fontTypeName);
 		updateCooldownFont();
-		
+				
 	elseif (optName == "disableIconIntro" ) then
 		module.suppressActionBarController(value)
 		
@@ -2660,7 +2660,7 @@ module.optionUpdate = function(self, optName, value)
 			-- Reskin the CT_BarMod groups
 			module:reskinAllGroups();
 		end
-
+		
 		module:setAttributes();
 		module.setActionBindings();
 		module:hideExtraBars();

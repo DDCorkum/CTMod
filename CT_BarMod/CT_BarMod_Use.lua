@@ -35,6 +35,7 @@ local bar6Bindings = true;
 local hideGlow = false;
 local useNonEmptyNormal = false;
 local backdropShow = false;
+local minimumCooldownToBling = 0;
 
 local normalTexture1 = "Interface\\Buttons\\UI-Quickslot";  -- square texture that has a filled in center
 local normalTexture2 = "Interface\\Buttons\\UI-Quickslot2"; -- square texture that has an empty center
@@ -75,7 +76,7 @@ local GetActionCooldown = GetActionCooldown;
 
 -- GetActionCount, overridden for WoW Classic 1.13.3 (CTMod 8.2.5.8) using GetItemCount and some tooltip scanning
 local OldGetActionCount, GetActionCount, GetItemCount, ReagentScannerTooltip = GetActionCount, GetActionCount, GetItemCount, CreateFrame("GameTooltip", "CT_BarMod_ReagentScanner", nil, "GameTooltipTemplate");
-reagentScannerCache = {};
+local reagentScannerCache = {};
 if (module:getGameVersion() == 1) then
 	ReagentScannerTooltip:SetOwner(UIParent, "ANCHOR_NONE");
 	
@@ -85,9 +86,8 @@ if (module:getGameVersion() == 1) then
 		for i=1, ReagentScannerTooltip:NumLines() do
 			local text = _G["CT_BarMod_ReagentScannerTextLeft" .. i]:GetText();
 			if (text and string.find(text, SPELL_REAGENTS)) then	
-				reagent = string.gsub(text, SPELL_REAGENTS, "");		-- strip out the localized header
-				reagent = string.gsub(reagent, "|cffff2020", "");		-- strip out the red colour if there is none of the reagent
-				reagent = string.gsub(reagent, "|r", "");			-- strip out the red colour if there is none of the reagent
+				local reagent = string.gsub(text, SPELL_REAGENTS, "");		-- strip out the localized header
+				reagent = string.gsub(reagent, "|cffff2020(.*)|r", "$1");	-- strip out the red colour when there is insufficent quantity of the reagent
 				reagentScannerCache[spell] = reagent;	-- add to the cache!
 				return reagent;
 			end
@@ -677,7 +677,6 @@ function useButton:update()
 	self:updateBinding();
 	self:updateRange();
 	self:updateTexture();
-	self:updateOpacity();
 --	self:updateState();  -- updateFlash() calls updateState().
 	self:updateFlash();
 	self:updateUnitAttributes();
@@ -966,22 +965,28 @@ function useButton:updateUsable()
 		local texture, name, enabled = GetPossessInfo(POSSESS_CANCEL_SLOT or 2);
 		if (enabled) then
 			button.icon:SetVertexColor(1, 1, 1);
+			button.blingcontainer:Show();
 		else
 			button.icon:SetVertexColor(0.4, 0.4, 0.4);
+			button.blingcontainer:Hide();
 		end
 
 	elseif ( self.actionMode == "leave" ) then
 		if (CanExitVehicle()) then
 			button.icon:SetVertexColor(1, 1, 1);
+			button.blingcontainer:Show();
 		else
 			button.icon:SetVertexColor(0.4, 0.4, 0.4);
+			button.blingcontainer:Hide();
 		end
 
 	elseif ( colorLack and self.outOfRange ) then
 		if ( colorLack == 2 ) then
 			button.icon:SetVertexColor(0.5, 0.5, 0.5);
+			button.blingcontainer:Show();
 		else
 			button.icon:SetVertexColor(0.8, 0.4, 0.4);
+			button.blingcontainer:Show();
 		end
 		
 	elseif (
@@ -994,99 +999,73 @@ function useButton:updateUsable()
 		)
 	) then
 		button.icon:SetVertexColor(1, 1, 1);
+		button.blingcontainer:Show();
 		
 	elseif ( notEnoughMana ) then
 		button.icon:SetVertexColor(0.5, 0.5, 1);
+		button.blingcontainer:Hide();
 
 	elseif ( self.actionType == "companion" and not InCombatLockdown()) then
 		button.icon:SetVertexColor(1, 1, 1);
+		button.blingcontainer:Show();
 	
 	else
 		button.icon:SetVertexColor(0.4, 0.4, 0.4);
+		button.blingcontainer:Hide();
 	end
-end
-
--- Update opacity
-local fadedButtons = {};
-local fadedCount = 0;
-
-local function fadeUpdater()
---[[	for button, value in pairs(fadedButtons) do
-		button:updateOpacity();
-	end
---]]
-end
-
-function useButton:updateOpacity()
---[[	local start, duration, enable = GetActionCooldown(self.actionId);
-	if ( start > 0 and duration > 0 and enable > 0 ) then
-		if (not fadedButtons[self]) then
-			fadedButtons[self] = true;
-			fadedCount = fadedCount + 1;
-			if (fadedCount == 1) then
-				module:unschedule(fadeUpdater, true);
-				module:schedule(0.3, true, fadeUpdater);
-			end
-		end
-		self.button:SetAlpha(0.1);
-	else
-		if (fadedButtons[self]) then
-			fadedButtons[self] = nil;
-			fadedCount = fadedCount - 1;
-			if (fadedCount == 0) then
-				module:unschedule(fadeUpdater, true);
-			end
-		end
-
-		self.button:SetAlpha(self.alphaCurrent or 1);
-	end
---]]
 end
 
 -- Update Cooldown
 function useButton:updateCooldown()
-	local actionCooldown, controlCooldown;
-	local cooldown = self.button.cooldown;
-	local recharge = self.button.recharge;
+	if (self.hasAction) then
 	
-	-- Action cooldown
-	local start, duration, enable = GetActionCooldown(self.actionId);
-	if ( start > 0 and enable > 0 ) then
-		cooldown:SetCooldown(start, duration);
-		actionCooldown = true;
-		if ( displayCount ) then
-			startCooldown(cooldown, start, duration);
+		local actionCooldown, controlCooldown;
+		local cooldown = self.button.cooldown;
+		local bling = self.button.bling;
+		local recharge = self.button.recharge;
+		
+		-- Action cooldown
+		local start, duration, enable = GetActionCooldown(self.actionId);
+		if ( start > 0 and enable > 0 ) then
+			cooldown:SetCooldown(start, duration);
+			actionCooldown = true;
+			if ( displayCount ) then
+				startCooldown(cooldown, start, duration);
+			else
+				stopCooldown(cooldown);
+			end
+			bling:SetShown(duration >= minimumCooldownToBling)
 		else
 			stopCooldown(cooldown);
+			actionCooldown = false;
 		end
-	else
-		stopCooldown(cooldown);
-		actionCooldown = false;
-	end
+
+		-- Loss of control cooldown
+		local start, duration = GetActionLossOfControlCooldown(self.actionId);
+		--cooldown:SetLossOfControlCooldown(start, duration);
+		if (start > 0 and duration > 0) then
+			controlCooldown = true;
+			bling:SetShown(duration >= minimumCooldownToBling)
+		else
+			controlCooldown = false;
+		end
+
+		-- Hide/show the cooldown
+		if (actionCooldown or controlCooldown) then
+			cooldown:Show();
+		else
+			cooldown:Hide();
+		end
+
+		-- Recharge animation
+		local current, maxCharges, start, duration, modRate = GetActionCharges(self.actionId);
+		if (displayRecharge and current > 0 and current < maxCharges) then
+			recharge:SetCooldown(start, duration, modRate);
+			recharge:Show();
+		else
+			recharge:Hide();
+		end
 	
-	-- Loss of control cooldown
-	local start, duration = GetActionLossOfControlCooldown(self.actionId);
-	--cooldown:SetLossOfControlCooldown(start, duration);
-	if (start > 0 and duration > 0) then
-		controlCooldown = true;
-	else
-		controlCooldown = false;
-	end
-	
-	-- Hide/show the cooldown
-	if (actionCooldown or controlCooldown) then
-		cooldown:Show();
-	else
-		cooldown:Hide();
-	end
-	
-	-- Recharge animation
-	local current, maxCharges, start, duration, modRate = GetActionCharges(self.actionId);
-	if (displayRecharge and current > 0 and current < maxCharges) then
-		recharge:SetCooldown(start, duration, modRate);
-		recharge:Show();
-	else
-		recharge:Hide();
 	end
 end
 
@@ -1110,20 +1089,20 @@ end
 -- Update Binding
 function useButton:updateBinding()
 	local hotkey = self.button.hotkey
-	if (not self.hasAction) then
-		hotkey:SetText("");
-		return;
-	end
-	local text;
-	if ( displayBindings ) then		
-		text = self:getBinding();
-	end
-	if (text) then
-		hotkey:SetText(text);
-		hotkey.showRangeIndicator = nil;
-	elseif (self.hasRange and IsActionInRange(self.actionId) ~= nil and displayRangeDot) then
-		-- this ability has a range limitation applicable to the current target
-		hotkey:SetText(rangeIndicator);
+	if (self.hasAction) then
+		local text;
+		if ( displayBindings ) then		
+			text = self:getBinding();
+		end
+		if (text) then
+			hotkey:SetText(text);
+			hotkey.showRangeIndicator = nil;
+		elseif (self.hasRange and IsActionInRange(self.actionId) ~= nil and displayRangeDot) then
+			-- this ability has a range limitation applicable to the current target
+			hotkey:SetText(rangeIndicator);
+		else
+			hotkey:SetText("");
+		end
 	else
 		hotkey:SetText("");
 	end
@@ -1164,10 +1143,7 @@ end
 function useButton:updateCount()
 	local actionId = self.actionId;
 	local text = self.button.count;
-	local hasAction = HasAction(actionId);
-	if ( not hasAction ) then
-		text:SetText("");
-	else
+	if ( self.hasAction ) then
 		local count = GetActionCount(actionId)
 		if (
 			self.isConsumable
@@ -1183,6 +1159,8 @@ function useButton:updateCount()
 				text:SetText("");
 			end
 		end
+	else
+		text:SetText("");
 	end
 end
 
@@ -1328,9 +1306,9 @@ function useButton:getBinding()
 	if (not text) then
 		-- Get the key assigned directly to this (our) button.
 		local key1, key2 = module.getBindingKey(id);
-		if (key1 and checkBindingAction(key1, id, (self.actionName and (self.actionName .. self.buttonNum)) or "CLICK CT_BarModActionButton" .. id .. ":LeftButton")) then			--checkBindingAction detects potential interference from other addons using SetOverrideBinding()
+		if (key1 and checkBindingAction(key1, id, (self.actionName and (self.actionName .. self.buttonNum)) or "CLICK CT_BarModActionButton" .. id .. ":Button31")) then			--checkBindingAction detects potential interference from other addons using SetOverrideBinding()
 			text = key1;
-		elseif (key2 and checkBindingAction(key2, id, (self.actionName and (self.actionName .. self.buttonNum)) or "CLICK CT_BarModActionButton" .. id .. ":LeftButton")) then
+		elseif (key2 and checkBindingAction(key2, id, (self.actionName and (self.actionName .. self.buttonNum)) or "CLICK CT_BarModActionButton" .. id .. ":Button31")) then
 			text = key2;
 		else
 			return;
@@ -1689,13 +1667,12 @@ local function eventHandler_UpdateCooldown()
 	actionButtonList:updateUsable();
 	actionButtonList:updateCount();
 	actionButtonList:updateCooldown();
-	actionButtonList:updateOpacity();
+	
 end
 
 local function eventHandler_UpdateUsable()
 	actionButtonList:updateUsable();
 	actionButtonList:updateCooldown();
-	actionButtonList:updateOpacity();
 end
 
 local function eventHandler_UpdateBindings()
@@ -2374,6 +2351,9 @@ module.useUpdate = function(self, optName, value)
 
 	elseif ( optName == "defbarHideTooltip" ) then
 		defbarHideTooltip = value;
+		
+	elseif ( optName == "minimumCooldownToBling" ) then
+		minimumCooldownToBling = value;
 
 	elseif ( optName == "init" ) then
 		colorLack = self:getOption("colorLack") or 1;
@@ -2412,6 +2392,8 @@ module.useUpdate = function(self, optName, value)
 		defbarShowActionText = module:getOption("defbarShowActionText") ~= false;
 		defbarSetUnitAttributes = module:getOption("defbarSetUnitAttributes") ~= false;
 		defbarHideTooltip = module:getOption("defbarHideTooltip") ~= false;
+		
+		minimumCooldownToBling = module:getOption("minimumCooldownToBling") or 0
 
 		if (hideGrid) then
 			actionButtonList:hideGrid();

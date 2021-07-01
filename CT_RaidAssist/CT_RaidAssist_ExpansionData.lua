@@ -17,7 +17,7 @@
 -- Rebuilt by Dahk Celes (ddc) in 2019        --
 ------------------------------------------------
 
-local MODULE_NAME, module = ...;
+local __, module = ...;
 
 -- Expansion Configuration Data
 -- These tables should be updated every expansion or major patch to reflect new content
@@ -210,7 +210,7 @@ module.CTRA_Configuration_BossAuras =
 	[25991] = 2,		-- Temple of Ahn'Qiraj - Viscidus: Poison Bolt Volley
 	[26050] = 5,		-- Temple of Ahn'Qiraj - Princess Huhuran: Acid Spit
 	[26476] = 5,		-- Temple of Ahn'Qiraj - C'Thun: Digestive Acid
-	[25991] = 0,		-- Naxxramas - Grand Widow Faerlina: Poison Bolt Volley
+	[28796] = 0,		-- Naxxramas - Grand Widow Faerlina: Poison Bolt Volley
 	[28622] = 0,		-- Naxxramas - Maexxna: Web Wrap
 	[28776] = 0,		-- Naxxramas - Maexxna: Necrotic Poison
 	[28213] = 0,		-- Naxxramas - Noth the Plaguebringer: Curse of the Plaguebringer
