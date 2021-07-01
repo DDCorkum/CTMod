@@ -175,11 +175,18 @@ end
 
 -- The "Open Selected" and "Return Selected" buttons
 do
+
+	local pressedOpenAll = false;	-- indicates the user pressed OpenAllMail, Blizzard's button that is overloaded below
+
 	module:getFrame( {
 		["button#n:CTMailModOpenSelected#s:68:25#l:tl:143:-39.5#v:UIPanelButtonTemplate#" .. module.text["CT_MailMod/Inbox/OpenSelectedButton"]] = {
 			["onclick"] = function(self, arg1)
 				if ( arg1 == "LeftButton" ) then
 					if (module.isProcessing) then
+						if (pressedOpenAll) then
+							OpenAllMail:SetText(OPEN_ALL_MAIL_BUTTON)
+							pressedOpenAll = false
+						end
 						module:cancelProcessing();
 					else
 						if (module:inboxGetNumSelected() == 0) then
@@ -211,15 +218,11 @@ do
 		["button#n:CTMailModReturnSelected#s:68:25#l:tl:212:-39.5#v:UIPanelButtonTemplate#" .. module.text["CT_MailMod/Inbox/ReturnSelectedButton"]] = {
 			["onclick"] = function(self, arg1)
 				if ( arg1 == "LeftButton" ) then
-					if (module.isProcessing) then
-						module:cancelProcessing();
+					if (module:inboxGetNumSelected() == 0) then
+						DEFAULT_CHAT_FRAME:AddMessage(module.text["CT_MailMod/NOTHING_SELECTED"]);
 					else
-						if (module:inboxGetNumSelected() == 0) then
-							DEFAULT_CHAT_FRAME:AddMessage(module.text["CT_MailMod/NOTHING_SELECTED"]);
-						else
-							module:closeOpenMail();
-							module:returnSelected();
-						end
+						module:closeOpenMail();
+						module:returnSelected();
 					end
 				end
 			end,
@@ -242,6 +245,35 @@ do
 		},
 	}, InboxFrame);
 
+
+	-- Override Blizzard's OpenAllMail button.
+
+	module:regCustomEvent("INCOMING_START", function()
+		OpenAllMail:Disable()
+	end)
+
+	module:regCustomEvent("INCOMING_STOP", function()
+		if (pressedOpenAll) then
+			pressedOpenAll = false;
+			OpenAllMailMixin.OnClick(OpenAllMail)
+		else
+			OpenAllMail:Enable()
+		end
+
+	end)
+
+	OpenAllMail:SetScript("OnClick", function(self)		
+		module:inboxSelectAll()
+		if (module:inboxGetNumSelected() > 0) then
+			pressedOpenAll = true
+			OpenAllMail:SetText(OPEN_ALL_MAIL_BUTTON_OPENING)
+			CTMailModOpenSelected:Click("LeftButton")
+		else
+			return false
+		end
+
+	end)
+
 	function module:updateOpenCloseButtons()
 		if (module.opt.showCheckboxes) then
 			CTMailModOpenSelected:Show();
@@ -256,19 +288,18 @@ do
 		if (event == "INCOMING_START") then
 			CTMailModOpenSelected:SetText(module.text["CT_MailMod/STOP_SELECTED"]);
 			CTMailModOpenSelected:Enable();
-			CTMailModReturnSelected:SetText(module.text["CT_MailMod/STOP_SELECTED"]);
-			CTMailModReturnSelected:Enable();
+			CTMailModReturnSelected:Hide();
 
 		elseif (event == "INCOMING_STOP") then
 			-- Restore everything
 			CTMailModOpenSelected:SetText(module.text["CT_MailMod/Inbox/OpenSelectedButton"]);
 			CTMailModOpenSelected:Enable();
-			CTMailModReturnSelected:SetText(module.text["CT_MailMod/Inbox/ReturnSelectedButton"]);
-			CTMailModReturnSelected:Enable();
+			CTMailModReturnSelected:Show();
 		end
 	end
 	module:regCustomEvent("INCOMING_START", customEvents_OpenReturn);
 	module:regCustomEvent("INCOMING_STOP", customEvents_OpenReturn);
+
 end
 
 -- Select All checkbox, mail selection checkboxes, and mail numbers.
@@ -632,40 +663,10 @@ do
 	module:regCustomEvent("INCOMING_STOP", customEvents_MailCheckboxes);
 end
 
+<<<<<<< Updated upstream
+=======
 
--- Overriding Blizzard's open all button
-do
-	local oldOnClick = OpenAllMail:GetScript("OnClick")
-	OpenAllMail:SetScript("OnClick", function(self)
-		-- STEP 1: Give the user the same impression that processing has begun as if it were Blizzard's routine button click.
-		-- STEP 2: Perform a custom CT_MailMod open-all for anything the addon is capable of opening.
-		-- STEP 3: Return control to Blizzard to do whatever it wishes with the rest
-		
-		-- STEP 1:
-		self:Reset()
-		self:Disable()
-		self:SetText(OPEN_ALL_MAIL_BUTTON_OPENING);
-		
-		-- STEP 2:
-		if (module.isProcessing) then
-			module:cancelProcessing()
-		end
-		CTMailModOpenSelected:Disable()
-		CTMailModReturnSelected:Disable()
-		module:inboxSelectAll()
-		if (module:inboxGetNumSelected() > 0) then
-			module:closeOpenMail()
-			module:retrieveSelected()
-		end
-		CTMailModOpenSelected:Enable()
-		CTMailModReturnSelected:Enable()
-		
-		-- STEP 3:
-		return oldOnClick(self)
-	end)
-end
-
-
+>>>>>>> Stashed changes
 -- Quick action (expiry) buttons
 local quickAction = { };
 do
@@ -1049,8 +1050,6 @@ do
 end
 
 -- Scroll wheel
-
---[[	The default UI now provides this function.
 do
 	local wheelHook;
 
@@ -1078,7 +1077,6 @@ do
 		end
 	end);
 end
---]]
 
 -- Right click the Prev/Next page buttons
 do
