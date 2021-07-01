@@ -663,10 +663,7 @@ do
 	module:regCustomEvent("INCOMING_STOP", customEvents_MailCheckboxes);
 end
 
-<<<<<<< Updated upstream
-=======
 
->>>>>>> Stashed changes
 -- Quick action (expiry) buttons
 local quickAction = { };
 do
@@ -1049,34 +1046,6 @@ do
 	module:regCustomEvent("INCOMING_STOP", customEvents_MailIconButtons);
 end
 
--- Scroll wheel
-do
-	local wheelHook;
-
-	local function inboxOnMouseWheel(self, direction, ...)
-		if (not module.opt.inboxMouseWheel) then
-			return;
-		end
-		if (direction == 1) then
-			if (InboxFrame.pageNum > 1) then
-				InboxPrevPage();
-			end
-		else
-			local lastPage = ceil(GetInboxNumItems() / INBOXITEMS_TO_DISPLAY);
-			if (InboxFrame.pageNum < lastPage) then
-				InboxNextPage();
-			end
-		end
-	end
-
-	module:regEvent("MAIL_SHOW", function()
-		if (not wheelHook) then
-			wheelHook = true;
-			MailFrame:EnableMouseWheel(true);
-			MailFrame:HookScript("OnMouseWheel", inboxOnMouseWheel);
-		end
-	end);
-end
 
 -- Right click the Prev/Next page buttons
 do

@@ -83,7 +83,6 @@ module.frame = function()
 
 		-- Inbox Options
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_MailMod/Options/Inbox/Heading"]);
-		-- optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:inboxMouseWheel:true#" .. L["CT_MailMod/Options/Inbox/MouseWheelCheckButton"] .. "#l:268"); -- the default UI now provides this option
 		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:inboxShowLong:true#" .. L["CT_MailMod/Options/Inbox/ShowLongCheckButton"] .. "#l:268");
 		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:inboxShowExpiry:true#" .. L["CT_MailMod/Options/Inbox/ShowExpiryCheckButton"] .. "#l:268");
 		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:inboxShowInbox:true#" .. L["CT_MailMod/Options/Inbox/ShowInboxCheckButton"] .. "#l:268");
@@ -235,7 +234,6 @@ module.update = function(self, optName, value)
 		opt.showMoneyChange = getoption("showMoneyChange", false);
 
 		-- Inbox
-		-- opt.inboxMouseWheel = getoption("inboxMouseWheel", true); -- the default UI now provides this option
 		opt.inboxShowNumbers = getoption("inboxShowNumbers", true);
 		opt.inboxShowLong = getoption("inboxShowLong", true);
 		opt.inboxShowExpiry = getoption("inboxShowExpiry", true);
