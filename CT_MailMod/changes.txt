@@ -1,4 +1,7 @@
-CT_MailMod (9.1.0.1) 2021-06-23
+CT_MailMod (9.1.0.2) 2021-06-30
+- Better implementation of the OpenAllButton override.
+
+CT_MailMod (9.1.0.1) 2021-06-29
 - Removing the mouse scroll-wheel feature, as this is now part of the default UI since WoW 6.1.0
 - Overriding the OpenAllButton to do CT_MailMod parsing first, so the mail log is updated.
 

@@ -259,12 +259,14 @@ function public:InsertOre(mapID, x, y, ore, descript, name)
 		elseif (ore:sub(1,9) == "Veine de " and ore:len() > 10) then 
 			ore = ore:sub(10,10):upper() .. ore:sub(11);	-- "Veine de gangreschiste" to "Gangreschiste"
 		end
-	elseif (GetLocale() == "deDE") then
+	elseif (GetLocale() == "deDE") then		-- credit: Dynaletik
 		-- adjectives
 		if (ore:sub(1,8) == "Reiches " and ore:len() > 8) then
 			ore = ore:sub(9); 				-- "Reiches Thoriumvorkommen" to "Thoriumvorkommen"
 		elseif (ore:sub(1,8) == "Kleines " and ore:len() > 8) then
 			ore = ore:sub(9); 				-- "Kleines Thoriumvorkommen" to "Thoriumvorkommen"
+		elseif (ore:sub(1,7) == "Reiche " and ore:len() > 7) then
+			ore = ore:sub(8); 				-- "Reiche Adamantitablagerung" to "Adamantitablagerung"
 		end
 		-- composite nouns
 		if (ore:sub(-9) == "vorkommen" and ore:len() > 9) then

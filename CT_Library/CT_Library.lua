@@ -1118,6 +1118,25 @@ end
 -----------------------------------------------
 
 -----------------------------------------------
+-- Secure Hooks	
+
+-- Executes func() right away if _G[frame] exists, or after _G[trigger] happens for the first time.
+function lib:hookWhenFirstLoaded(frame, trigger, func)
+	if (_G[frame]) then
+		func(self, _G[frame])
+	else
+		hooksecurefunc(trigger, function()
+			func(self, _G[frame])
+			func = nop
+		end)
+	end
+end
+
+-- End Secure Hooks
+-----------------------------------------------
+
+
+-----------------------------------------------
 -- Frame Misc
 
 function lib:createMultiLineEditBox(name, width, height, parent, bdtype, font)

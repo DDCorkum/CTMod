@@ -1,3 +1,6 @@
+CT_Library (9.1.0.2) 2021-07-01
+- Added lib:hookWhenFirstLoaded() to simplify the common task of hooking a frame once and only once after it is loaded on demand
+
 CT_Library (9.0.5.5) 2021-05-02
 - Adopting the CT_Module-Classic.toc and CT_Module-BCC.toc format so that a single package will work in all three game editions
 
