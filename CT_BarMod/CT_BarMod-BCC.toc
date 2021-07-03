@@ -1,5 +1,5 @@
 ## Interface: 20501
-## Version: 9.1.0.1
+## Version: 9.1.0.3
 ## Title: CT_BarMod
 ## Notes: Intuitive yet powerful action bar addon.
 ## DefaultState: Enabled
