@@ -51,7 +51,7 @@ end
 
 -- Slash command to display the frame
 SlashCmdList["VIEWPORT"] = function(msg)
-	module:showModuleOptions(module.name);
+	module:showModuleOptions();
 	local iStart, iEnd, left, right, top, bottom = string.find(msg, "^(%d+%.?%d?) (%d+%.?%d?) (%d+%.?%d?) (%d+%.?%d?)$");
 	if ( left and right and top and bottom ) then
 		local screenRes = module.screenRes;

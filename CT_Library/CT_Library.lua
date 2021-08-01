@@ -1482,8 +1482,93 @@ local objectHandlers = { };
 
 -- Frame
 objectHandlers.frame = function(self, parent, name, virtual, option)
-	local frame = CreateFrame("Frame", name, parent, virtual);
-	return frame;
+	local frame = CreateFrame("Frame", name, parent, virtual)
+	return frame
+end
+
+-- Collapsible Frame
+do
+	local function collapse(self)
+		local parent = self:GetParent()
+		local top, bottom = self:GetTop(), self:GetBottom()
+		if (parent and top and bottom and self.movedSiblings == nil) then
+			local height = max(top-bottom-20, 0)
+			if (self.button) then
+				self.button:SetNormalAtlas("UI-QuestTrackerButton-Expand-Section")
+				self.button:SetPushedAtlas("UI-QuestTrackerButton-Expand-Section-Pressed")
+				self.button.text:Show()
+			end
+			self.movedSiblings = {}
+			if (parent) then
+				for i=1, parent:GetNumChildren() do
+					local sibling = select(i, parent:GetChildren())
+					if (sibling:GetTop() < top and sibling ~= self) then
+						sibling:AdjustPointsOffset(0, height)
+						tinsert(self.movedSiblings, sibling)
+					end
+				end
+				for i=1, parent:GetNumRegions() do
+					local sibling = select(i, parent:GetRegions())
+					if (sibling:GetTop() < top) then
+						sibling:AdjustPointsOffset(0, height)
+						tinsert(self.movedSiblings, sibling)
+					end
+				end
+			end
+			self:Hide()
+		end
+	end
+
+	local function expand(self)
+		if (self.movedSiblings) then
+			self:Show()
+			local parent = self:GetParent()
+			local top, bottom = self:GetTop(), self:GetBottom()
+			local height = max(top-bottom-20, 0)
+			if (self.button) then
+				self.button:SetNormalAtlas("UI-QuestTrackerButton-Collapse-Section")
+				self.button:SetPushedAtlas("UI-QuestTrackerButton-Collapse-Section-Pressed")
+				self.button.text:Hide()
+			end
+			for __, sibling in ipairs(self.movedSiblings) do
+				sibling:AdjustPointsOffset(0, -height)
+			end
+			self.movedSiblings = nil
+
+		end
+	end
+	
+	local function toggle(self)
+		if (self.frame:IsShown()) then
+			self.frame:Collapse()
+		else
+			self.frame:Expand()
+		end
+	end
+
+	objectHandlers.collapsible = function(self, parent, name, virtual, option, header)
+		local frame = CreateFrame("Frame", name, parent, virtual)
+		frame.Collapse = collapse
+		frame.Expand = expand
+		if (header) then
+			local title, align = header:match("(.*):([lr])")
+			title = title or header
+			local button = CreateFrame("Button", name and name .. "Minimize", parent)
+			button:SetPoint(align ~= "r" and "TOPLEFT" or "TOPRIGHT", frame)
+			button:SetSize(15,15)
+			button:SetNormalAtlas("UI-QuestTrackerButton-Collapse-Section")
+			button:SetPushedAtlas("UI-QuestTrackerButton-Collapse-Section-Pressed")
+			button:SetHighlightAtlas("UI-QuestTrackerButton-Highlight")
+			button:SetScript("OnClick", toggle)
+			frame.button = button
+			button.frame = frame
+			button.text = button:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+			button.text:SetText(title)
+			button.text:SetPoint(align ~= "r" and "LEFT" or "RIGHT", button, align ~= "r" and "RIGHT" or "LEFT", 2, 0)
+			button.text:Hide()
+		end
+		return frame
+	end
 end
 
 -- Button
@@ -2644,6 +2729,7 @@ function lib:framesGetYOffset(framesList)
 	return frame.yoffset;
 end
 
+
 -- End Frame Creation
 -----------------------------------------------
 
@@ -3048,9 +3134,9 @@ end
 
 -- Show the CTMod control panel options for the specified addon name.
 -- if useCustomFunction is true then an attempt will be made to open a module's custom options function instead
-function libPublic:showModuleOptions(modname, useCustomFunction)
+function libPublic:showModuleOptions(useCustomFunction)
 	self:showControlPanel(true);
-	if (not lib:isControlPanelShown()) then	-- this might happen if the panel is forced off during combat
+	if (not lib:IsControlPanelShown()) then	-- this might happen if the panel is forced off during combat
 		return;
 	end
 	local listing = CTCONTROLPANEL.listing;
@@ -3062,33 +3148,33 @@ function libPublic:showModuleOptions(modname, useCustomFunction)
 	-- Otherwise, identifies the "button" that a user would normally click to open the module's options
 	-- Then shows the control panel and simulates a click on that button
 	
-	for i, v in ipairs(modules) do
-		if (useCustomFunction and v.customOpenFunction) then
-			self:showControlPanel(false);
-			v.customOpenFunction()
-			return;
-		end
-		if (v.frame) then
-			num = num + 1;
-			if (v.name == modname) then
-				button = listing[tostring(num)];
-				break;
+	if (useCustomFunction and self.customOpenFunction) then
+		self:showControlPanel(false)
+		self:customOpenFunction()
+	else
+		for i, v in ipairs(modules) do
+			if (v.frame) then
+				num = num + 1;
+				if (self == v) then
+					button = listing[tostring(num)];
+					break;
+				end
 			end
 		end
-	end
-	
-	if (button) then
-		-- Click the addon's button to open the options
-		button:Click();
+
+		if (button) then
+			-- Click the addon's button to open the options
+			button:Click();
+		end
 	end
 end
 
-function libPublic:isControlPanelShown()
-	if (controlPanelFrame and controlPanelFrame:IsVisible()) then
-		return true;
-	else
-		return false;
-	end
+function libPublic:IsControlPanelShown()
+	return controlPanelFrame and controlPanelFrame:IsVisible()
+end
+
+function libPublic:IsModuleOptionTabSelected()
+	return controlPanelFrame and controlPanelFrame.IsVisible() and selectedModule == self
 end
 
 -- We don't want multiple copies of the control panel slash commands

@@ -397,7 +397,7 @@ SlashCmdList["TIMER"] = function(msg)
 		CT_Timer_Start(tonumber(mins)*60+tonumber(sec));
 
 	elseif ( msg == "options" ) then
-		module:showModuleOptions(module.name);
+		module:showModuleOptions();
 	else
 
 		SlashCmdList["TIMER"]("");
@@ -624,7 +624,7 @@ module.update = function(self, optName, value)
 end
 
 local function slashCommand(msg)
-	module:showModuleOptions(module.name);
+	module:showModuleOptions();
 end
 
 module:setSlashCmd(slashCommand, "/cttimer");

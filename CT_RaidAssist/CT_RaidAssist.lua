@@ -138,7 +138,7 @@ function module:frame()
 end
 
 local function slashCommand()
-	module:showModuleOptions(module.name)
+	module:showModuleOptions()
 end
 
 module:setSlashCmd(slashCommand, "/ctra", "/ctraid", "/ctraidassist")
@@ -1616,7 +1616,7 @@ function NewCTRAWindow(owningCTRAFrames)	-- local at the top of this file
 		self:Update();
 		
 		-- STEP 7:
-		if (module:isControlPanelShown()) then
+		if (module:IsControlPanelShown()) then
 			self:ShowAnchor();
 		else
 			self:HideAnchor();

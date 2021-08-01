@@ -1187,7 +1187,7 @@ function module.configureWorldMapFrame()
 								info.text = L["CT_MapMod/Map/DropDown/Options"];
 								info.hasArrow = false;
 								info.func = function()
-									module:showModuleOptions(MODULE_NAME);
+									module:showModuleOptions();
 									if (WorldMapFrame:GetFrameStrata() == "FULLSCREEN") then
 										-- so the options are visible on classic
 										CTCONTROLPANEL:SetFrameStrata("FULLSCREEN_DIALOG");
@@ -1742,7 +1742,7 @@ end
 
 -- Slash command
 local function slashCommand(msg)
-	module:showModuleOptions(module.name);
+	module:showModuleOptions();
 end
 
 module:setSlashCmd(slashCommand, "/ctmapmod", "/ctmap", "/mapmod", "/ctcarte", "/ctkarte");

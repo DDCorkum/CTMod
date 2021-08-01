@@ -394,7 +394,7 @@ function module:externalDropDown_Initialize(level, addButtonFunc)		-- addButtonF
 	info.text = "Open options";
 	info.notCheckable = 1;
 	info.func = function()
-		module:showModuleOptions(module.name);
+		module:showModuleOptions();
 	end
 	addButtonFunc(info, level);
 	

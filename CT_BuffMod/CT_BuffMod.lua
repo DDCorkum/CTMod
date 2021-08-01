@@ -170,7 +170,6 @@ local needEnchantRescan;
 local normalEnchantRescan = 2;
 local sortSeqChanged;
 
-local optionsFrame;
 local globalFrame;
 local globalObject;
 --local frame_Show; -- it doesn't appear this is ever used
@@ -784,12 +783,12 @@ end
 
 local function isControlPanelShown()
 	-- Returns true if the CTMod control panel is showing.
-	return CTCONTROLPANEL and CTCONTROLPANEL:IsShown();
+	return module:IsControlPanelShown()
 end
 
 local function isOptionsFrameShown()
 	-- Returns true if the CT_BuffMod options window is showing.
-	return optionsFrame and optionsFrame:IsShown();
+	return module:IsModuleOptionTabSelected()
 end
 
 local function buildCondition(text)
@@ -8883,7 +8882,7 @@ end
 
 function module:options_editWindow(windowId)
 	if (not isOptionsFrameShown()) then
-		module:showModuleOptions(module.name);
+		module:showModuleOptions();
 	end
 
 	ctprint(format(L["CT_BuffMod/Options/WindowControls/WindowSelectedMessage"],windowId));
@@ -10355,11 +10354,6 @@ CONSOLIDATION REMOVED FROM GAME--]]
 		optionsAddObject( -7, 2*15, "font#t:0:%y#s:0:%s#l#r#" .. L["CT_BuffMod/Options/Reset/Line 1"] .. "#" .. textColor2);
 	optionsEndFrame();
 
-	optionsAddScript("onload",
-		function(self)
-			optionsFrame = self;
-		end
-	);
 	optionsAddScript("onshow",
 		function(self)
 			globalObject.windowListObject:altFrameEnableMouse(true);
@@ -10504,7 +10498,7 @@ frame_Hide = globalFrame.Hide;
 -- Slash command.
 
 local function slashCommand()
-	module:showModuleOptions(module.name);
+	module:showModuleOptions();
 end
 
 module:setSlashCmd(slashCommand, "/ctbuff", "/ctbuffmod", "/ctaura");
