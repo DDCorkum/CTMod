@@ -364,22 +364,23 @@ module.frame = function()
 
 -- Alternate Power Bar
 	if (module:getGameVersion() >= 8) then
-		optionsAddBookmark("Alternate Power Bar", "AlternatePowerBarHeading");
-		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Alternate Power Bar#i:AlternatePowerBarHeading");
+		optionsAddBookmark("Alternate Power Bar", "AlternatePowerBarHeading")
+		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Alternate Power Bar#i:AlternatePowerBarHeading")
 		optionsAddObject( -2, 5*14, "font#t:0:%y#s:0:%s#l:13:0#r#The game sometimes uses this bar to show the status of a quest, or your status in a fight, etc. The bar can vary in size, and its default position is centered near the bottom of the screen.#" .. textColor2 .. ":l");
-		optionsAddObject( -2, 3*14, "font#t:0:%y#s:0:%s#l:13:0#r#When the bar is unlocked, use left-click to move it, and right-click to reset its position.#" .. textColor2 .. ":l");
-		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:powerbaraltEnabled#Use a custom position for the bar");
-		optionsAddObject(  0,   26, "checkbutton#tl:40:%y#o:powerbaraltMovable#Unlock the bar");
-		optionsAddObject( -2,   15, "font#tl:70:%y#v:ChatFontNormal#Move key:");
-		optionsAddObject( 14,   20, "dropdown#tl:145:%y#s:100:%s#n:CTCoreDropdownPowerBarAlt#o:powerbaraltModifier:1#None#Alt#Ctrl#Shift");
-		optionsAddObject(  0,   26, "checkbutton#tl:40:%y#o:powerbaraltShowAnchor#Show anchor if bar hidden and unlocked");
-		optionsBeginFrame( -10,   30, "button#t:0:%y#s:180:%s#n:CT_Core_ResetPowerBarAlt_Button#v:GameMenuButtonTemplate#Reset anchor position");
-			optionsAddScript("onclick",
-				function(self)
-					module.powerbaralt_resetPosition();
-				end
-			);
-		optionsEndFrame();
+		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:powerbaraltEnabled#Use a custom position for the bar")
+		optionsBeginFrame(0, 0, "collapsible#tl:0:%y#br:tr:0:%b#o:powerbaraltEnabled#i:powerbaraltCollapsible")
+			optionsAddObject(  0,   26, "checkbutton#tl:40:%y#o:powerbaraltMovable#Unlock the bar")
+			optionsAddObject( -2,   15, "font#tl:70:%y#v:ChatFontNormal#Move key:")
+			optionsAddObject( 14,   20, "dropdown#tl:145:%y#s:100:%s#n:CTCoreDropdownPowerBarAlt#o:powerbaraltModifier:1#None#Alt#Ctrl#Shift")
+			optionsAddObject(  0,   26, "checkbutton#tl:40:%y#o:powerbaraltShowAnchor#Show anchor if bar hidden and unlocked")
+			optionsBeginFrame( -10,   30, "button#t:0:%y#s:180:%s#n:CT_Core_ResetPowerBarAlt_Button#v:GameMenuButtonTemplate#Reset anchor position")
+				optionsAddScript("onclick",
+					function(self)
+						module.powerbaralt_resetPosition()
+					end
+				);
+			optionsEndFrame()
+		optionsEndFrame()
 	else
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Alternate Power Bar");
 		optionsAddObject( -2, 5*14, "font#t:0:%y#s:0:%s#l:13:0#r#The alternate power bar settings are disabled in WoW Classic#" .. textColor2 .. ":l");
@@ -538,6 +539,9 @@ module.frame = function()
 				);
 			end
 		);
+		optionsAddScript("onenter", function(slider)
+			optionsAddTooltip({"Camera Max Distance", "Due to a bug in the default UI, reloading without CTMod may reset this value to no more than 2.0"})
+		end)
 	optionsEndFrame();
 
 

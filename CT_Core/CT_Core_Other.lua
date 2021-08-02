@@ -2907,6 +2907,10 @@ if (PlayerPowerBarAlt) then
 			UIParent_ManageFramePositions();
 		end
 	end
+	
+	local function powerbaralt_onEnter(self)
+		module:displayPredefinedTooltip(self, "DRAG")
+	end
 
 	local function powerbaralt_createAnchorFrame()
 		local movable = "PowerBarAltAnchor";
@@ -2934,9 +2938,10 @@ if (PlayerPowerBarAlt) then
 		tex:SetTexture("Interface\\Tooltips\\UI-Tooltip-Background");
 		tex:SetVertexColor(0.7, 0.7, 0.7, 0.8);
 
-		self:SetScript("OnMouseDown", powerbaralt_onMouseDown);
-		self:SetScript("OnMouseUp", powerbaralt_onMouseUp);
-		self:SetScript("OnEvent", powerbaralt_onEvent);
+		self:SetScript("OnMouseDown", powerbaralt_onMouseDown)
+		self:SetScript("OnMouseUp", powerbaralt_onMouseUp)
+		self:SetScript("OnEvent", powerbaralt_onEvent)
+		self:SetScript("OnEnter", powerbaralt_onEnter)
 
 		module:registerMovable(movable, self, true);
 		self.movable = movable;

@@ -1594,6 +1594,8 @@ do
 			if (option:sub(1,1) == "~") then
 				frame.invertAutoCollapse = true
 				option = option:sub(2)
+			else
+				frame.invertAutoCollapse = false
 			end
 			self:registerOnOptionSetCallback(option, autoCollapse, frame)
 			C_Timer.After(0, function()
@@ -2477,10 +2479,6 @@ local function generalObjectHandler(self, specializedHandler, str, parent, initi
 	-- Check override name
 	if (overrideName or name) then
 		name = overrideName or name;
-	elseif (identifier and parent and parent ~= UIParent) then
-		name = (parent:GetName() or "") .. identifier;
-	else
-		name = identifier or option;
 	end
 	
 	-- Ensure at least one valid anchor
@@ -3115,7 +3113,7 @@ local function maximizeControlPanel()
 	CTControlPanelMinimizeButton:SetDisabledTexture("Interface\\Buttons\\UI-Panel-SmallerButton-Up");
 	CTControlPanelMinimizeButton:SetPushedTexture("Interface\\Buttons\\UI-Panel-SmallerButton-Down");
 	CT_LibraryOptionsScrollFrameScrollBar:Show();
-	CTCONTROLPANELlisting:Show();
+	CTCONTROLPANEL.listing:Show();
 	CT_LibraryOptionsScrollFrame:SetScale(1);
 	CT_LibraryOptionsScrollFrame:SetAlpha(1);
 end
@@ -3128,7 +3126,7 @@ local function minimizeControlPanel()
 	CTControlPanelMinimizeButton:SetDisabledTexture("Interface\\Buttons\\UI-Panel-BiggerButton-Up");
 	CTControlPanelMinimizeButton:SetPushedTexture("Interface\\Buttons\\UI-Panel-BiggerButton-Down");
 	CT_LibraryOptionsScrollFrameScrollBar:Hide();
-	CTCONTROLPANELlisting:Hide();
+	CTCONTROLPANEL.listing:Hide();
 	CT_LibraryOptionsScrollFrame:SetScale(0.00001);
 	CT_LibraryOptionsScrollFrame:SetAlpha(0);
 end
