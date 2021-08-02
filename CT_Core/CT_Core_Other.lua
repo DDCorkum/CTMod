@@ -1526,9 +1526,10 @@ end
 --------------------------------------------
 -- Movable casting bar
 
+local movableCastingBar, movableCastingBarHelper, enableMovableCastingBar, unlockMovableCastingBar
 
 -- start by creating a helper that can be moved around
-local movableCastingBarHelper = CreateFrame("StatusBar", nil, UIParent, "CastingBarFrameTemplate");
+ movableCastingBarHelper = CreateFrame("StatusBar", nil, UIParent, "CastingBarFrameTemplate");
 movableCastingBarHelper:SetWidth(195);
 movableCastingBarHelper:SetHeight(13);
 movableCastingBarHelper:SetPoint("CENTER", UIParent, "CENTER", 0, 0);
@@ -1538,11 +1539,8 @@ movableCastingBarHelper:SetScript("OnUpdate", nil);
 movableCastingBarHelper:SetScript("OnShow", nil);
 
 local function castingbar_ToggleHelper(showHelper)
-	if (showHelper) then
-		movableCastingBarHelper:Show();
-	else
-		movableCastingBarHelper:Hide();
-	end
+	unlockMovableCastingBar = showHelper
+	movableCastingBarHelper:SetShown(enableMovableCastingBar and unlockMovableCastingBar)
 end
 
 castingbar_ToggleHelper(module:getOption("castingbarMovable"));
@@ -1582,6 +1580,8 @@ local function castingbar_Update(enable)
 		CastingBarFrame_OnLoad(movableCastingBar,nil,true,false);
 		CastingBarFrame_OnLoad(CastingBarFrame,"player",true,false);
 	end
+	enableMovableCastingBar = enable
+	movableCastingBarHelper:SetShown(enableMovableCastingBar and unlockMovableCastingBar)
 end
 
 movableCastingBar:RegisterEvent("ADDON_LOADED")

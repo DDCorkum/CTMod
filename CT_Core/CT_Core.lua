@@ -268,7 +268,7 @@ local function optionsAddScript(name, func)
 	module:framesAddScript(optionsFrameList, name, func);
 end
 local function optionsAddTooltip(text)
-	module:framesAddScript(optionsFrameList, "onenter", function(obj) module:displayTooltip(obj, text, "CT_ABOVEBELOW", 0, 0, CT_CONTROLPANEL) end)
+	module:framesAddScript(optionsFrameList, "onenter", function(obj) module:displayTooltip(obj, text, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL) end)
 end
 local function optionsBeginFrame(offset, size, details, data)
 	module:framesBeginFrame(optionsFrameList, offset, size, details, data);
@@ -396,18 +396,7 @@ module.frame = function()
 	optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Bag automation options#i:BagAutomationHeading");
 	optionsAddObject( -8, 2*13, "font#t:0:%y#s:0:%s#l:13:0#r#Disable bag automation if you have other bag management addons#" .. textColor2 .. ":l");	
 	optionsBeginFrame( -3, 15, "checkbutton#tl:60:%y#o:disableBagAutomation#i:disableBagAutomation#|cFFFF6666Disable bag automation");
-		optionsAddScript("onenter",
-			function(self)
-				GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 120, -5);
-				GameTooltip:SetText("|rDisables|cFFCCCCCC all bag automation by CT_Core for compatibility with other addons.");
-				GameTooltip:Show();
-			end
-		);
-		optionsAddScript("onleave",
-			function(self)
-				GameTooltip:Hide();
-			end
-		);
+		optionsAddTooltip({"Disable bag automation#1:0.5:0.5","Prevents conflicts with other bag management addons#0.9:0.9:0.9"})
 	optionsEndFrame();
 	optionsBeginFrame(0, 0, "collapsible#tl:0:%y#br:tr:0:%b#i:bagAutomationCollapsible#o:~disableBagAutomation")
 		-- refer to local variable bagAutomationEvents
@@ -547,10 +536,12 @@ module.frame = function()
 
 -- Casting Bar options
 	optionsAddBookmark("Casting Bar", "CastingBarHeading");
-	optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Casting Bar#i:CastingBarHeading");
-	optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:castingTimers#Display casting bar timers");
-	optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:castingbarEnabled#Use custom casting bar position");
-	optionsAddObject(  6,   26, "checkbutton#tl:40:%y#o:castingbarMovable#Unlock the casting bar");
+	optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Casting Bar#i:CastingBarHeading")
+	optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:castingTimers#Display casting bar timers")
+	optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:castingbarEnabled#Use custom casting bar position")
+	optionsBeginFrame(   0,    0, "collapsible#tl:0:%y#br:tr:0:%b#o:castingbarEnabled")
+		optionsAddObject(  6,   26, "checkbutton#tl:40:%y#o:castingbarMovable#Unlock the casting bar")
+	optionsEndFrame()
 
 -- Chat options
 	optionsAddBookmark("Chat Features", "ChatHeading");
@@ -565,12 +556,27 @@ module.frame = function()
 
 	optionsAddObject(-15, 1*13, "font#tl:15:%y#Chat Timestamps");
 	optionsAddObject(-15, 2*13, "font#tl:15:%y#r#Change how timestamps appear in chat windows, overriding the default game setting#" .. textColor2 .. ":l");
+	local currentTimestampButton;
 	local function addTimestampButton(yOff, ySize, xOff, xSize, label, format)
 		optionsBeginFrame(yOff, ySize, "button#v:GameMenuButtonTemplate#tl:" .. xOff .. ":%y#s:" .. xSize .. ":%s#" .. label)
-			optionsAddScript("onclick", function()
-				CHAT_TIMESTAMP_FORMAT = format;
-				SetCVar("showTimestamps", format);
-			end);
+			optionsAddScript("onclick", function(self)
+				CHAT_TIMESTAMP_FORMAT = format
+				SetCVar("showTimestamps", format)
+				if (currentTimestampButton) then
+					currentTimestampButton:GetFontString():SetTextColor(1,1,1)
+					currentTimestampButton = self
+					self:GetFontString():SetTextColor(1,1,0.5)
+				end
+			end)
+			optionsAddScript("onshow", function(self)
+				if (CHAT_TIMESTAMP_FORMAT == format) then
+					self:GetFontString():SetTextColor(1,1,0.5)
+					currentTimestampButton = self
+				else
+					self:GetFontString():SetTextColor(1,1,1)
+				end
+			end)
+			optionsAddTooltip({"Chat Timestamps", "/console showTimestamps " .. (format or "") .. "#0.9:0.9:0.9", "/run CHAT_TIMESTAMP_FORMAT = " .. (format and ("\"" .. format .. "\"") or "nil") .. "#0.9:0.9:0.9"})
 		optionsEndFrame();	
 	end
 	addTimestampButton(-5, 22,  120, 80, "None", nil);

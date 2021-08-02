@@ -1502,17 +1502,15 @@ end
 -- Collapsible Frame
 do
 	local function collapse(self)
-		local parent = self:GetParent()
-		local top, bottom = self:GetTop(), self:GetBottom()
-		if (parent and top and bottom and self.movedSiblings == nil) then
-			local height = max(top-bottom-20, 0)
+		if (#self.movedSiblings == 0) then
+			local top, bottom, parent = self:GetTop(), self:GetBottom(), self:GetParent()
+			local height = max(self.button and top-bottom-20 or top-bottom, 0)
 			if (self.button) then
 				self.button:SetNormalAtlas("UI-QuestTrackerButton-Expand-Section")
 				self.button:SetPushedAtlas("UI-QuestTrackerButton-Expand-Section-Pressed")
 				self.button.text:Show()
 			end
-			self.movedSiblings = {}
-			if (parent) then
+			while (parent) do
 				for i=1, parent:GetNumChildren() do
 					local sibling = select(i, parent:GetChildren())
 					if (sibling:GetTop() < top and sibling ~= self) then
@@ -1527,17 +1525,29 @@ do
 						tinsert(self.movedSiblings, sibling)
 					end
 				end
+				if (parent.collapsiblePassthrough) then
+					local point, relativeTo, relativePoint, ofsx, ofsy = parent:GetPoint(2)
+					parent:SetPoint(point, relativeTo, relativePoint, ofsx, ofsy + height)
+					tinsert(self.shrunkParents, parent)
+					parent = parent:GetParent()
+				elseif (parent.collapsibleChildrenMayShrink) then
+					local point, relativeTo, relativePoint, ofsx, ofsy = parent:GetPoint(2)
+					parent:SetPoint(point, relativeTo, relativePoint, ofsx, ofsy + height)
+					tinsert(self.shrunkParents, parent)					
+					parent = nil
+				else
+					parent = nil
+				end
 			end
 			self:Hide()
 		end
 	end
 
 	local function expand(self)
-		if (self.movedSiblings) then
+		if (#self.movedSiblings > 0) then
 			self:Show()
-			local parent = self:GetParent()
 			local top, bottom = self:GetTop(), self:GetBottom()
-			local height = max(top-bottom-20, 0)
+			local height = max(self.button and top-bottom-20 or top-bottom, 0)
 			if (self.button) then
 				self.button:SetNormalAtlas("UI-QuestTrackerButton-Collapse-Section")
 				self.button:SetPushedAtlas("UI-QuestTrackerButton-Collapse-Section-Pressed")
@@ -1546,8 +1556,12 @@ do
 			for __, sibling in ipairs(self.movedSiblings) do
 				sibling:AdjustPointsOffset(0, -height)
 			end
-			self.movedSiblings = nil
-
+			wipe(self.movedSiblings)
+			for __, parent in ipairs(self.shrunkParents) do
+				local point, relativeTo, relativePoint, ofsx, ofsy = parent:GetPoint(2)	
+				parent:SetPoint(point, relativeTo, relativePoint, ofsx, ofsy - height)
+			end
+			wipe(self.shrunkParents)
 		end
 	end
 		
@@ -1569,6 +1583,8 @@ do
 
 	objectHandlers.collapsible = function(self, parent, name, virtual, option, header)
 		local frame = CreateFrame("Frame", name, parent, virtual)
+		frame.movedSiblings = {}
+		frame.shrunkParents = {}
 		frame.Collapse = collapse
 		frame.Expand = expand
 		if (header) then
@@ -3209,7 +3225,7 @@ function libPublic:IsControlPanelShown()
 end
 
 function libPublic:IsModuleOptionTabSelected()
-	return controlPanelFrame and controlPanelFrame.IsVisible() and selectedModule == self
+	return controlPanelFrame and controlPanelFrame:IsVisible() and selectedModule == self
 end
 
 -- We don't want multiple copies of the control panel slash commands
