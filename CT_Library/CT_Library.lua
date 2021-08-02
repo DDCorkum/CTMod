@@ -948,8 +948,8 @@ CT_SKIP_UPDATE_FUNC = false	-- convenience constant so the impact of callUpdate 
 -- Set an option's value on the current profile
 function lib:setOption(option, value, callUpdate)
 	-- callUpdate
-	--	false: Do not call the update function.
-	--	true, nil: Call the update function.
+	--	false: Do not call the update and callback functions.
+	--	true, nil: Call the update and callback functions.
 	
 	if (type(option) == "function") then
 		-- some addons overload option so the same object can manipulate different tasks simultaneously
@@ -971,6 +971,11 @@ function lib:setOption(option, value, callUpdate)
 		local updateFunc = self.update;
 		if ( updateFunc ) then
 			updateFunc(self, option, value);
+		end
+		if (self.onOptionSetCallbacks and self.onOptionSetCallbacks[option]) then
+			for func, owner in pairs(self.onOptionSetCallbacks[option]) do
+				func(owner, option, value)
+			end
 		end
 	end
 end
@@ -1012,6 +1017,14 @@ function lib:enumerateOptions()
 	else
 		return next, {}
 	end
+end
+
+-- function lib:registerOnOptionSetCallback(option, func [, owner])
+-- Registers a callback function, func(owner, option, value), to fire when an option is set using lib:setOption(); however, the callback is suppressed when the third argument of setOption() is explicitly false
+function lib:registerOnOptionSetCallback(option, func, owner)
+	self.onOptionSetCallbacks = self.onOptionSetCallbacks or {}
+	self.onOptionSetCallbacks[option] = self.onOptionSetCallbacks[option] or {}
+	self.onOptionSetCallbacks[option][func] = owner or self
 end
 
 
@@ -1537,12 +1550,20 @@ do
 
 		end
 	end
-	
+		
 	local function toggle(self)
 		if (self.frame:IsShown()) then
 			self.frame:Collapse()
 		else
 			self.frame:Expand()
+		end
+	end
+	
+	local function autoCollapse(frame, __, value)	-- frame, option, value
+		if (frame.invertAutoCollapse ~= not not value) then
+			frame:Expand()
+		else
+			frame:Collapse()
 		end
 	end
 
@@ -1566,6 +1587,18 @@ do
 			button.text:SetText(title)
 			button.text:SetPoint(align ~= "r" and "LEFT" or "RIGHT", button, align ~= "r" and "RIGHT" or "LEFT", 2, 0)
 			button.text:Hide()
+		end
+		
+		-- Collapse immediately after loading when the option is false; or when its true if prefixed with "~"
+		if (option) then
+			if (option:sub(1,1) == "~") then
+				frame.invertAutoCollapse = true
+				option = option:sub(2)
+			end
+			self:registerOnOptionSetCallback(option, autoCollapse, frame)
+			C_Timer.After(0, function()
+				autoCollapse(frame, option, self:getDisplayValue(option))
+			end)
 		end
 		return frame
 	end
@@ -2525,6 +2558,10 @@ local function getFrame(self, value, origParent, initialValue, overrideName)
 					if ( lower == "onload" ) then
 						parent.execOnLoad = true;
 					end
+				end
+			elseif (lower == "ctOnOptionSet" ) then
+				if ( parent and parent.option and type(value) == "function") then
+					self:registerOptionCallback(parent.option, value)
 				end
 			else
 				local parent = parent;

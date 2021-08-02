@@ -407,20 +407,8 @@ module.frame = function()
 				GameTooltip:Hide();
 			end
 		);
-		optionsAddScript("onclick",
-			function(self)
-				local parent = self:GetParent()
-				if (not self:GetChecked()) then
-					module:setOption("disableBagAutomation",false)
-					parent["bagAutomationCollapsible"]:Expand()
-				else
-					module:setOption("disableBagAutomation",true)
-					parent["bagAutomationCollapsible"]:Collapse()
-				end
-			end
-		)
 	optionsEndFrame();
-	optionsBeginFrame(0, 0, "collapsible#tl:0:%y#br:tr:0:%b#i:bagAutomationCollapsible")
+	optionsBeginFrame(0, 0, "collapsible#tl:0:%y#br:tr:0:%b#i:bagAutomationCollapsible#o:~disableBagAutomation")
 		-- refer to local variable bagAutomationEvents
 		for i, bagevent in ipairs(bagAutomationEvents) do
 			if (bagevent.show) then
@@ -504,11 +492,6 @@ module.frame = function()
 				end
 			end
 		end
-		optionsAddScript("onload", function(self)
-			if (module:getOption("disableBagAutomation")) then
-				C_Timer.After(0,function() self:Collapse() end)	-- small delay to ensure everything is loaded first
-			end
-		end)
 	optionsEndFrame()
 	optionsAddObject( -18, 1*13, "font#tl:25:%y#s:0:%s#l:13:0#r#Also see CT_MailMod for bag settings#" .. textColor2 .. ":l");	
 
@@ -979,7 +962,6 @@ function module:externalDropDown_Initialize(level, addButtonFunc)		-- customAddB
 				local yOff = select(5, obj:GetPoint(1))
 				if (yOff) then
 					CT_LibraryOptionsScrollFrameScrollBar:SetValue(-yOff);
-					print(yOff)
 				end
 			end
 		end

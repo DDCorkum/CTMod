@@ -1,3 +1,7 @@
+CT_Library (9.1.0.3) 2021-08-01
+- Added vertically-collapsible frames to make options menus in the CT control panel more dynamic
+- Removed the first argument from showModuleOptions() because it wasn't really useful
+
 CT_Library (9.1.0.2) 2021-07-01
 - Added lib:hookWhenFirstLoaded() to simplify the common task of hooking a frame once and only once after it is loaded on demand
 

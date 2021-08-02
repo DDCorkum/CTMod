@@ -1875,7 +1875,7 @@ local function uncheckBagOption(optName)
 	local value = false;
 	module:setOption(optName, value, CT_SKIP_UPDATE_FUNC);
 	if (type(module.frame) == "table") then
-		local cb = module.frame.section1[optName];
+		local cb = module.frame.bagAutomationCollapsible[optName];
 		cb:SetChecked(value);
 	end
 end
