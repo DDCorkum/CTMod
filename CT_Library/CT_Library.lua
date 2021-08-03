@@ -2879,13 +2879,17 @@ function lib:framesInitTemplate()
 end
 
 function lib:framesRegisterTemplate(framesList, name)
-	frameTemplates[name] = self:framesGetData(framesList)
+	local frame = framesList[#framesList]
+	frameTemplates[name] = {size = -frame.yoffset, data = self:framesGetData(framesList)}
 end
 
 function lib:framesAddFromTemplate(framesList, offset, size, details, template)
 	local data = {}
-	for k, v in pairs(frameTemplates[template]) do
+	for k, v in pairs(frameTemplates[template].data) do
 		data[k] = v
+	end
+	if (size == 0) then
+		size = frameTemplates[template].size
 	end
 	self:framesBeginFrame(framesList, offset, size, details, data)
 	self:framesEndFrame(framesList)
