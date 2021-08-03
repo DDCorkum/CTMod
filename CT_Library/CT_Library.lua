@@ -259,9 +259,37 @@ do
 				tooltip:SetText(text);
 			end
 		elseif (type(text) == "table") then
-			for i, row in ipairs(text) do
+			-- first row may only be a simple title and optional color
+			do
+				local row = text[1]
+				splitrow = {strsplit("#", row)}
+				local titleR, titleG, titleB
+				local alpha, title
+				for j=1, #splitrow do
+					local pieces = {strsplit(":",splitrow[j])}
+					local isAllNums = true
+					for k, piece in ipairs(pieces) do
+						if (not tonumber(piece) or tonumber(piece) < 0 or tonumber (piece) > 10) then
+							isAllNums = false
+						end
+					end
+					if (not titleR and #pieces >= 3 and isallNums) then
+						titleR, titleG, titleB, alpha = pieces[1], pieces[2], pieces[3], pieces[4]
+					elseif (not title) then
+						title = splitrow[j]
+					end
+					if (title) then
+						GameTooltip:AddLine(title, titleR, titleG, titleB, alpha)
+					end
+				end
+			end
+			
+			-- subsequent rows could be single or double line and may have wrap
+			for i=2, #text do
+				local row = text[i]
 				local splitrow = {strsplit("#", row)}
-				local leftR,leftG,leftB,rightR,rightG,rightB,alpha,wrap,leftText,rightText;
+				local leftR,leftG,leftB,rightR,rightG,rightB
+				local alpha,wrap,leftText,rightText;
 				for j=1, #splitrow do
 					local pieces = {strsplit(":", splitrow[j])}
 					local isAllNums = true;
@@ -295,9 +323,9 @@ do
 					customSize = size;
 				end
 				if (rightText) then
-					GameTooltip:AddDoubleLine(leftText, rightText, leftR, leftG, leftB, rightR, rightG, rightB);
+					GameTooltip:AddDoubleLine(leftText, rightText, leftR or 0.9, leftG or 0.9, leftB or 0.9, rightR or 0.9, rightG or 0.9, rightB or 0.9);
 				elseif (leftText) then
-					GameTooltip:AddLine(leftText, leftR, leftG, leftB, alpha, wrap);
+					GameTooltip:AddLine(leftText, leftR or 0.9, leftG or 0.9, leftB or 0.9, alpha, wrap);
 				end
 				customSize = nil;
 			end
@@ -632,16 +660,6 @@ local function loadAddon(event, addon)
 			-- Initialize options
 			module.options = _G[addon.."Options"];
 			
-			-- Delete leftovers from settings import
-			if ( module.options ) then
-				-- previously-used export strings
-				module.options["CHAR-Unknown- Import String"] = nil;
-				
-				-- backup data is only intended to be available after a single /reload
-				module.options["CHAR-Unknown- Temporary Backup"] = module.options["CHAR-Unknown- Interim Backup"]
-				module.options["CHAR-Unknown- Interim Backup"] = nil;
-			end
-
 			-- Run any update function we might have
 			if ( module.update ) then
 				module:update("init");
@@ -934,99 +952,169 @@ end
 -----------------------------------------------
 -- Option Handling
 
-local charKey;
-local function getCharKey()
-	if ( not charKey ) then
-		charKey = "CHAR-"..(UnitName("player") or "Unknown").."-"..(GetRealmName() or "Unknown");
-	end
-	return charKey;
-end
-lib.getCharKey = getCharKey;
-
-CT_SKIP_UPDATE_FUNC = false	-- convenience constant so the impact of callUpdate is clearer in other modules
-
--- Set an option's value on the current profile
-function lib:setOption(option, value, callUpdate)
-	-- callUpdate
-	--	false: Do not call the update and callback functions.
-	--	true, nil: Call the update and callback functions.
-	
-	if (type(option) == "function") then
-		-- some addons overload option so the same object can manipulate different tasks simultaneously
-		option = option()
-	end
-	if (not option) then
-		-- either option was nil, or option() returned nil
-		return
-	end
-	if ( self.options == nil ) then
-		local optionKey = self.name.."Options"
-		self.options = _G[optionKey] or {}
-		_G[optionKey] = self.options
-	end
-	local key = getCharKey();
-	self.options[key] = self.options[key] or {}
-	self.options[key][option] = value;
-	if (callUpdate ~= false) then
-		local updateFunc = self.update;
-		if ( updateFunc ) then
-			updateFunc(self, option, value);
+do
+	local charKey;
+	local function getCharKey()
+		if ( not charKey ) then
+			charKey = "CHAR-"..(UnitName("player") or "Unknown").."-"..(GetRealmName() or "Unknown");
 		end
-		if (self.onOptionSetCallbacks and self.onOptionSetCallbacks[option]) then
-			for func, owner in pairs(self.onOptionSetCallbacks[option]) do
-				func(owner, option, value)
+		return charKey;
+	end
+	lib.getCharKey = getCharKey;
+
+	CT_SKIP_UPDATE_FUNC = false	-- convenience constant so the impact of callUpdate is clearer in other modules
+
+	-- Set an option's value on the current profile
+	function lib:setOption(option, value, callUpdate)
+		-- callUpdate
+		--	false: Do not call the update and callback functions.
+		--	true, nil: Call the update and callback functions.
+
+		if (type(option) == "function") then
+			-- some addons overload option so the same object can manipulate different tasks simultaneously
+			option = option()
+		end
+		if (not option) then
+			-- either option was nil, or option() returned nil
+			return
+		end
+		if ( self.options == nil ) then
+			local optionKey = self.name.."Options"
+			self.options = _G[optionKey] or {}
+			_G[optionKey] = self.options
+		end
+		local key = getCharKey();
+		self.options[key] = self.options[key] or {}
+		self.options[key][option] = value;
+		if (callUpdate ~= false) then
+			local updateFunc = self.update;
+			if ( updateFunc ) then
+				updateFunc(self, option, value);
+			end
+			if (self.setOptionCallbacks and self.setOptionCallbacks[option]) then
+				for func, owner in pairs(self.setOptionCallbacks[option]) do
+					func(owner, option, value)
+				end
 			end
 		end
 	end
-end
 
--- Reads an option.
-function lib:getOption(option)
-	if (type(option) == "function") then
-		-- some addons overload a frame to have a function
-		option = option();
-	end
-	if (option and self.options) then
-		local key = getCharKey();
-		if ( self.options[key] ) then
-			return self.options[key][option];
+	-- Reads an option.
+	function lib:getOption(option)
+		if (type(option) == "function") then
+			-- some addons overload a frame to have a function
+			option = option();
+		end
+		if (option and self.options) then
+			local key = getCharKey();
+			if ( self.options[key] ) then
+				return self.options[key][option];
+			end
 		end
 	end
-end
 
--- Reads an option, or the 'default' value for display on a frame (NOT INTENDED FOR USE BY ANY MODULES)
-function lib:getDisplayValue(option)
-	local value = self:getOption(option)
-	return value ~= nil and value or defaultDisplayValues[self][option]
-end
-
--- Returns all of a toon's options
-
-local function nextOption(t, key)
-	repeat
-		key, val = next(t, key)
-	until (key == nil or key:find("MOVABLE-") == nil)		-- see nextMovable() below
-	return key, val
-end
-
-function lib:enumerateOptions()
-	local key = getCharKey()
-	local options = self.options
-	if (options and options[key]) then
-		return nextOption, options[key]
-	else
-		return next, {}
+	-- Reads an option, or the 'default' value for display on a frame (NOT INTENDED FOR USE BY ANY MODULES)
+	function lib:getDisplayValue(option)
+		local value = self:getOption(option)
+		return value ~= nil and value or defaultDisplayValues[self][option]
 	end
-end
 
--- function lib:registerOnOptionSetCallback(option, func [, owner])
--- Registers a callback function, func(owner, option, value), to fire when an option is set using lib:setOption(); however, the callback is suppressed when the third argument of setOption() is explicitly false
-function lib:registerOnOptionSetCallback(option, func, owner)
-	self.onOptionSetCallbacks = self.onOptionSetCallbacks or {}
-	self.onOptionSetCallbacks[option] = self.onOptionSetCallbacks[option] or {}
-	self.onOptionSetCallbacks[option][func] = owner or self
-end
+	local function nextOption(t, key)
+		repeat
+			key, val = next(t, key)
+		until (key == nil or key:find("MOVABLE-") == nil)		-- see nextMovable() below
+		return key, val
+	end
 
+	-- function lib:enumerateOptions()
+	-- Iterates through each option except movables; see lib:nextMovable()
+	function lib:enumerateOptions()
+		local key = getCharKey()
+		local options = self.options
+		if (options and options[key]) then
+			return nextOption, options[key]
+		else
+			return next, {}
+		end
+	end
+
+	-- function lib:registerSetOptionCallback(option, func [, owner])
+	-- Registers a callback, func(owner, option, value), to fire during lib:setOption() unless supressed args to setOption()
+	function lib:registerSetOptionCallback(option, func, owner)
+		self.setOptionCallbacks = self.setOptionCallbacks or {}
+		self.setOptionCallbacks[option] = self.setOptionCallbacks[option] or {}
+		self.setOptionCallbacks[option][func] = owner or self
+	end
+
+
+	local optionsToReset
+	
+	StaticPopupDialogs["CT_RESETOPTIONS"] = {
+		text = "Do you want to reset %s options?",
+		button1 = ACCEPT,
+		button2 = CANCEL,
+		OnAccept = function()
+			optionsToReset["CHAR-Unknown- Interim Backup"] = optionsToReset[getCharKey()]
+			optionsToReset[getCharKey()] = {}
+			C_UI.Reload()
+		end,
+		timeout = 15,
+		whileDead = true,
+		hideOnEscape = true,
+	}
+	
+	StaticPopupDialogs["CT_RESETOPTIONS_ALL"] = {
+		text = "Do you want to reset %s for all characters?",
+		showAlert = true,
+		button1 = ACCEPT,
+		button2 = CANCEL,
+		OnAccept = function()
+			wipe(optionsToReset)
+			C_UI.Reload()
+		end,
+		timeout = 15,
+		whileDead = true,
+		hideOnEscape = true,
+	}
+
+	-- lib:resetOptions(resetAll)
+	-- Asks the user for confirmation before wiping the options table and reloading the UI
+	-- 		resetAll		boolean		Wipe out the entire option table, not just the charKey child
+	function lib:resetOptions(resetAll)
+		if (self.options) then
+			optionsToReset = self.options
+			StaticPopup_Show(resetAll and "CT_RESETOPTIONS_ALL" or "CT_RESETOPTIONS", self.name)
+		end
+	end
+
+	local historyToReset, shouldReloadUI
+	
+	StaticPopupDialogs["CT_RESETHISTORY"] = {
+		text = "Do you want to delete this history?",
+		button1 = DELETE,
+		button2 = CANCEL,
+		OnAccept = function()
+			wipe(historyToReset)
+			if (shouldReloadUI ~= false) then
+				C_UI.Reload()
+			end
+		end,
+		timeout = 15,
+		whileDead = true,
+		hideOnEscape = true,
+	}
+	
+	-- lib:resetHistory(history [, reloadUI])
+	-- Asks the user for confirmation before wiping history and calling postFunc
+	-- 		history		table		Object to wipe when the user clicks ACCEPT
+	-- 		reloadUI	boolean?	Reloads the UI unless explicitly false
+	function lib:resetHistory(history, reloadUI)
+		optionsToReset = history
+		shouldReloadUI = reloadUI ~= false
+		StaticPopup_Show("CT_RESETHISTORY")
+	end
+
+end
 
 -- End Option Handling
 -----------------------------------------------
@@ -1117,6 +1205,8 @@ local function nextMovable()	-- see nextOption() above
 	return key, val
 end
 
+-- function lib:enumerateOptions()
+-- Iterates through the saved settings for each movable; see lib:enumerateOptions()
 function lib:enumerateMovables()
 	local key = getCharKey()
 	local options = self.options
@@ -1613,7 +1703,7 @@ do
 			else
 				frame.invertAutoCollapse = false
 			end
-			self:registerOnOptionSetCallback(option, autoCollapse, frame)
+			self:registerSetOptionCallback(option, autoCollapse, frame)
 			C_Timer.After(0, function()
 				autoCollapse(frame, option, self:getDisplayValue(option))
 			end)
@@ -1975,7 +2065,8 @@ objectHandlers.dropdown = function(self, parent, name, virtual, option, ...)
 	-- Handle specializ
 	
 	-- Make the slider smaller
-	local left, right, mid, btn = _G[name.."Left"], _G[name.."Middle"], _G[name.."Right"], _G[name.."Button"];
+	local left, right, mid, btn = frame.Left, frame.Middle, frame.Right, frame.Button
+	--local left, right, mid, btn = _G[name.."Left"], _G[name.."Middle"], _G[name.."Right"], _G[name.."Button"];
 	local setHeight = left.SetHeight;
 
 	btn:SetPoint("TOPRIGHT", right, "TOPRIGHT", 12, -12);
@@ -2073,6 +2164,7 @@ objectHandlers.slider = function(self, parent, name, virtual, option, text, valu
 	slider:SetScript("OnValueChanged", updateSliderValue);
 
 	updateSliderText(slider);
+		
 	return slider;
 end
 
@@ -2780,6 +2872,41 @@ function lib:framesGetYOffset(framesList)
 	return frame.yoffset;
 end
 
+local frameTemplates = {}
+
+function lib:framesInitTemplate()
+	return self:framesInit()
+end
+
+function lib:framesRegisterTemplate(framesList, name)
+	frameTemplates[name] = self:framesGetData(framesList)
+end
+
+function lib:framesAddFromTemplate(framesList, offset, size, details, template)
+	local data = {}
+	for k, v in pairs(frameTemplates[template]) do
+		data[k] = v
+	end
+	self:framesBeginFrame(framesList, offset, size, details, data)
+	self:framesEndFrame(framesList)
+end
+
+
+do
+	-- Reset button at the bottom of every options panel
+	local resetTemplate = lib:framesInitTemplate()
+	lib:framesAddObject(resetTemplate, 0, 17, "font#tl:5%y#v:GameFontNormalLarge#Reset Options")
+	lib:framesAddObject(resetTemplate, -5, 26, "checkbutton#tl:10:%y#i:resetAll#Reset options for all of your characters")
+	lib:framesBeginFrame(resetTemplate, 0, 30, "button#t:0:%y#s:120:%s#v:UIPanelButtonTemplate#Reset options")
+		lib:framesAddScript(resetTemplate, "onclick", function(btn)
+				local mod = lib:getControlPanelSelectedModule()
+				mod:resetOptions(btn:GetParent().resetAll:GetChecked())
+		end)
+	lib:framesEndFrame(resetTemplate)
+	lib:framesAddObject(resetTemplate, 0, 3*13, "font#t:0:%y#s:0:%s#l#r#Resets options to default and reloads the UI.#0.9:0.9:0.9")
+	lib:framesRegisterTemplate(resetTemplate, "ResetTemplate")
+end
+
 
 -- End Frame Creation
 -----------------------------------------------
@@ -3224,8 +3351,12 @@ function libPublic:IsControlPanelShown()
 	return controlPanelFrame and controlPanelFrame:IsVisible()
 end
 
-function libPublic:IsModuleOptionTabSelected()
-	return controlPanelFrame and controlPanelFrame:IsVisible() and selectedModule == self
+function lib:isModuleOptionTabSelected()
+	return controlPanelFrame and controlPanelFrame:IsVisible() and modules[selectedModule] == self
+end
+
+function lib:getControlPanelSelectedModule()
+	return modules[selectedModule]
 end
 
 -- We don't want multiple copies of the control panel slash commands
@@ -3317,7 +3448,7 @@ local function populateAddonsList(char)
 	actions.confirmImport:SetChecked(false);
 	actions.confirmDelete:SetChecked(false);
 	actions.confirmExport:SetChecked(false);
-	if (char == getCharKey()) then
+	if (char == module.getCharKey()) then
 		actions.confirmImport:Hide();
 		actions.importNote:Hide();
 		actions.importButton:Hide();
@@ -3373,7 +3504,7 @@ local function populateCharDropdownInit()
 	for key, value in ipairs(players) do
 		name, realm = value:match("^CHAR%-([^-]+)%-(.+)$");
 		if ( name and realm ) then
-			if (value == getCharKey()) then
+			if (value == module.getCharKey()) then
 				importDropdownEntry.text = "|cffffff00" .. name;
 			else
 				importDropdownEntry.text = name;
@@ -3525,7 +3656,7 @@ local function import()
 		if (not module:getOption("canImport")) then
 			return;
 		end
-		local charKey = getCharKey();
+		local charKey = module.getCharKey();
 		local options, success;
 		local fromOptions;
 
@@ -3565,7 +3696,7 @@ local function delete()
 			if ( options and addon ~= module ) then
 				fromOptions = options[fromChar];
 				if ( fromOptions and addonIsChecked(addon.name) and module:getOption("canDelete") ) then
-					if (fromChar == getCharKey()) then
+					if (fromChar == module.getCharKey()) then
 						options["CHAR-Unknown- Interim Backup"] = fromOptions;
 					end
 					options[fromChar] = nil;
@@ -3577,7 +3708,7 @@ local function delete()
 		module:setOption("canDelete", nil);
 
 		if ( success ) then
-			if (fromChar == getCharKey()) then
+			if (fromChar == module.getCharKey()) then
 				C_UI.Reload();
 			end
 			local count;
@@ -3787,7 +3918,48 @@ local function export(self)
 	end
 end
 
-module.update = function(self, type, value)
+
+-- Recovery from backup
+local numBackupsFound = 0
+module:regEvent("ADDON_LOADED", function(__, name)
+	if (name == LIBRARY_NAME) then
+		StaticPopupDialogs["CT_RECOVEROPTIONS"] =
+		{
+			text = "Did you recently change %s settings?|nA temporary backup is available until you relog.",
+			button2 = OKAY,
+			button3 = SETTINGS,
+			timeout = 60,
+			OnAlt = function() module:showModuleOptions() end,
+			hideOnEscape = true,
+			enterClicksFirstButton = true,
+			whileDead = true,
+		}
+	else
+		local addon = module:getModule(name)
+		if (addon) then
+			local options = addon.options or _G[addon.name .. "Options"]
+			if ( options ) then
+				-- previously-used export strings
+				options["CHAR-Unknown- Import String"] = nil;
+
+				-- backup data is only intended to be available after a single /reload
+				options["CHAR-Unknown- Temporary Backup"] = options["CHAR-Unknown- Interim Backup"]
+				options["CHAR-Unknown- Interim Backup"] = nil;
+
+				-- trigger a static popup alerting the user that backup data is available
+				if (options["CHAR-Unknown- Temporary Backup"]) then
+					numBackupsFound = numBackupsFound + 1
+					--StaticPopup_Hide("CT_RECOVEROPTIONS")
+					StaticPopup_Show("CT_RECOVEROPTIONS", numBackupsFound == 1 and name or "CTMod")
+				end
+			end
+		end
+	end
+end)
+
+
+
+function module:update(type, value)		-- also see the general-purpose ADDON_LOADED hook for fetching data from a backup
 	if ( type == "char" and value ) then
 		local name, realm = value:match("^CHAR%-([^-]+)%-(.+)$");
 		if (name and realm) then

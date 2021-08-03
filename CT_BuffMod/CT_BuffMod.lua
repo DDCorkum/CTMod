@@ -788,7 +788,7 @@ end
 
 local function isOptionsFrameShown()
 	-- Returns true if the CT_BuffMod options window is showing.
-	return module:IsModuleOptionTabSelected()
+	return module:isModuleOptionTabSelected()
 end
 
 local function buildCondition(text)
@@ -9218,27 +9218,14 @@ local optionsFrameList;
 local function optionsInit()
 	optionsFrameList = module:framesInit();
 end
-local function optionsGetData()
-	return module:framesGetData(optionsFrameList);
-end
-local function optionsAddFrame(offset, size, details, data)
-	module:framesAddFrame(optionsFrameList, offset, size, details, data);
-end
-local function optionsAddObject(offset, size, details)
-	module:framesAddObject(optionsFrameList, offset, size, details);
-end
-local function optionsAddScript(name, func)
-	module:framesAddScript(optionsFrameList, name, func);
-end
-local optionsAddTooltip = function(text)
-	module:framesAddScript(optionsFrameList, "onenter", function(obj) module:displayTooltip(obj, text, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL); end);
-end
-local function optionsBeginFrame(offset, size, details, data)
-	module:framesBeginFrame(optionsFrameList, offset, size, details, data);
-end
-local function optionsEndFrame()
-	module:framesEndFrame(optionsFrameList);
-end
+local function optionsGetData() return module:framesGetData(optionsFrameList); end
+local function optionsAddFrame(offset, size, details, data)	module:framesAddFrame(optionsFrameList, offset, size, details, data); end
+local function optionsAddObject(offset, size, details) 	module:framesAddObject(optionsFrameList, offset, size, details); end
+local function optionsAddScript(name, func) 	module:framesAddScript(optionsFrameList, name, func); end
+local optionsAddTooltip = function(text) 	module:framesAddScript(optionsFrameList, "onenter", function(obj) module:displayTooltip(obj, text, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL); end); end
+local function optionsBeginFrame(offset, size, details, data) 	module:framesBeginFrame(optionsFrameList, offset, size, details, data); end
+local function optionsEndFrame() 	module:framesEndFrame(optionsFrameList); end
+local function optionsAddFromTemplate (offset, size, details, template) module:framesAddFromTemplate(optionsFrameList, offset, size, details, template) end
 
 module.frame = function()
 	local updateFunc = function(self, value)
@@ -10221,25 +10208,7 @@ CONSOLIDATION REMOVED FROM GAME--]]
 
 	
 	-- Reset Options
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
-		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_BuffMod/Options/Reset/Heading"]);
-		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:resetAll#" .. L["CT_BuffMod/Options/Reset/ResetAllCheckbox"]);
-		optionsBeginFrame(  -5,   30, "button#t:0:%y#s:120:%s#v:UIPanelButtonTemplate#" .. L["CT_BuffMod/Options/Reset/ResetButton"]);
-			optionsAddScript("onclick", function(self)
-				if (module:getOption("resetAll")) then
-					CT_BuffModOptions = {};
-				else
-					if (not CT_BuffModOptions or not type(CT_BuffModOptions) == "table") then
-						CT_BuffModOptions = {};
-					else
-						CT_BuffModOptions[module:getCharKey()] = nil;
-					end
-				end
-				ConsoleExec("RELOADUI");
-			end);
-		optionsEndFrame();
-		optionsAddObject( -7, 2*15, "font#t:0:%y#s:0:%s#l#r#" .. L["CT_BuffMod/Options/Reset/Line 1"] .. "#" .. textColor2);
-	optionsEndFrame();
+	optionsAddFromTemplate(-20, 0, "frame#tl:0:%y#br:tr:0:%b#i:ResetFrame", "ResetTemplate")
 
 	optionsAddScript("onshow",
 		function(self)

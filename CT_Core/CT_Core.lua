@@ -276,9 +276,14 @@ end
 local function optionsEndFrame()
 	module:framesEndFrame(optionsFrameList);
 end
+local function optionsAddFromTemplate(offset, size, details, template)
+	module:framesAddFromTemplate(optionsFrameList, offset, size, details, template)
+end
+
 local function optionsAddBookmark(title, frameName)
 	tinsert(bookmarks, {["title"] = title, ["obj"] = frameName});
 end
+
 
 local function humanizeTime(timeValue)
 	-- (single letter for hour/minute/second, and shows 2 values): 1h 35m / 35m 30s
@@ -528,9 +533,7 @@ module.frame = function()
 				);
 			end
 		);
-		optionsAddScript("onenter", function(slider)
-			optionsAddTooltip({"Camera Max Distance", "Due to a bug in the default UI, reloading without CTMod may reset this value to no more than 2.0"})
-		end)
+		optionsAddTooltip({"Camera Max Distance", "Due to a bug in the default UI, reloading without addons will reset this value to no more than |cFFFFFFFF2.0|r"})
 	optionsEndFrame();
 
 
@@ -576,7 +579,7 @@ module.frame = function()
 					self:GetFontString():SetTextColor(1,1,1)
 				end
 			end)
-			optionsAddTooltip({"Chat Timestamps", "/console showTimestamps " .. (format or "") .. "#0.9:0.9:0.9", "/run CHAT_TIMESTAMP_FORMAT = " .. (format and ("\"" .. format .. "\"") or "nil") .. "#0.9:0.9:0.9"})
+			optionsAddTooltip({"Chat Timestamps", "/console showTimestamps |cffffff99" .. (format and format:gsub(" ", "|cff666633_|r") or "") .. "|r", "/run CHAT_TIMESTAMP_FORMAT = " .. (format and ("\"|cffffff99" .. format:gsub(" ", "|cff666633_|r") .. "|r\"") or "|cffffff99nil|r")})
 		optionsEndFrame();	
 	end
 	addTimestampButton(-5, 22,  120, 80, "None", nil);
@@ -917,28 +920,8 @@ module.frame = function()
 	optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:blockBankTrades#Block trades while using bank or guild bank");
 
 	-- Reset Options
-	optionsAddBookmark("Reset All", "ResetHeading");
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b#i:ResetHeading");
-		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Reset Options");
-		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:resetAll#Reset options for all of your characters");
-		optionsBeginFrame(   0,   30, "button#t:0:%y#s:120:%s#v:UIPanelButtonTemplate#Reset options");
-			optionsAddScript("onclick",
-				function(self)
-					if (module:getOption("resetAll")) then
-						CT_CoreOptions = {};
-					else
-						if (not CT_CoreOptions or not type(CT_CoreOptions) == "table") then
-							CT_CoreOptions = {};
-						else
-							CT_CoreOptions[module:getCharKey()] = nil;
-						end
-					end
-					ConsoleExec("RELOADUI");
-				end
-			);
-		optionsEndFrame();
-		optionsAddObject(  0, 3*13, "font#t:0:%y#s:0:%s#l#r#Note: This will reset the options to default and then reload your UI.#" .. textColor2);
-	optionsEndFrame();
+	optionsAddBookmark("Reset All", "ResetFrame");
+	optionsAddFromTemplate(-20, 0, "frame#tl:0:%y#br:tr:0:%b#i:ResetFrame", "ResetTemplate")
 
 	return "frame#all", optionsGetData();
 end

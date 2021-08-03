@@ -488,9 +488,9 @@ end
 local function optionsBeginFrame(offset, size, details, data)
 	module:framesBeginFrame(optionsFrameList, offset, size, details, data);
 end
-local function optionsEndFrame()
-	module:framesEndFrame(optionsFrameList);
-end
+local function optionsEndFrame() module:framesEndFrame(optionsFrameList); end
+
+local function optionsAddFromTemplate (offset, size, details, template) module:framesAddFromTemplate(optionsFrameList, offset, size, details, template) end
 
 module.frame = function()
 	local textColor1 = "0.9:0.9:0.9";
@@ -527,25 +527,7 @@ module.frame = function()
 		optionsAddObject( -5, 2*13, "font#t:0:%y#s:0:%s#l#r#This will place the window at\nthe center of the screen.#" .. textColor2);
 	optionsEndFrame();
 
-	optionsBeginFrame(-25, 0, "frame#tl:0:%y#br:tr:0:%b");
-		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Reset Options");
-		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:resetAll#Reset options for all of your characters");
-		optionsBeginFrame(  -5,   30, "button#t:0:%y#s:120:%s#v:UIPanelButtonTemplate#Reset options");
-			optionsAddScript("onclick", function(self)
-				if (module:getOption("resetAll")) then
-					CT_TimerOptions = {};
-				else
-					if (not CT_TimerOptions or not type(CT_TimerOptions) == "table") then
-						CT_TimerOptions = {};
-					else
-						CT_TimerOptions[module:getCharKey()] = nil;
-					end
-				end
-				ConsoleExec("RELOADUI");
-			end);
-		optionsEndFrame();
-		optionsAddObject( -7, 2*15, "font#t:0:%y#s:0:%s#l#r#Note: Resetting the options to their default values will reload your UI.#" .. textColor2);
-	optionsEndFrame();
+	optionsAddFromTemplate(-20, 0, "frame#tl:0:%y#br:tr:0:%b#i:ResetFrame", "ResetTemplate")
 
 	-- Slash command details
 	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
