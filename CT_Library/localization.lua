@@ -36,7 +36,7 @@ setmetatable(L, metatable);
 L["CT_Library/ControlPanelCannotOpen"] = "Cannot open the CT options while in combat"
 L["CT_Library/Frames/ResetOptionsTemplate/Button"] = "Reset Options"
 L["CT_Library/Frames/ResetOptionsTemplate/Heading"] = "Reset Options"
-L["CT_Library/Frames/ResetOptionsTemplate/Line1"] = "Resets options to defaults and then reload the UI."
+L["CT_Library/Frames/ResetOptionsTemplate/Line1"] = "Resets options to defaults and reloads the UI."
 L["CT_Library/Frames/ResetOptionsTemplate/ResetAllCheckbox"] = "Reset options for all of your characters"
 L["CT_Library/Introduction"] = [=[Thank you for using CTMod!
 

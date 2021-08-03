@@ -2893,7 +2893,8 @@ end
 
 
 lib:regEvent("PLAYER_LOGIN", function()
-	-- Reset button at the bottom of every options panel
+
+	-- ResetOptionsTemplate
 	local resetTemplate = lib:framesInitTemplate()
 	lib:framesAddObject(resetTemplate, 0, 17, "font#tl:5%y#v:GameFontNormalLarge#" .. L["CT_Library/Frames/ResetOptionsTemplate/Heading"])
 	lib:framesBeginFrame(resetTemplate, -5, 26, "checkbutton#tl:10:%y#i:resetAll#" .. L["CT_Library/Frames/ResetOptionsTemplate/ResetAllCheckbox"])
@@ -2910,13 +2911,14 @@ lib:regEvent("PLAYER_LOGIN", function()
 			local mod = lib:getControlPanelSelectedModule()
 			mod:resetOptions(btn:GetParent().resetAll:GetChecked())
 		end)
-		lib:frameAddScript(resetTemplate, "onenter", function(btn)
+		lib:framesAddScript(resetTemplate, "onenter", function(btn)
 			lib:displayTooltip(btn, {L["CT_Library/Frames/ResetOptionsTemplate/Heading"], L["CT_Library/Frames/ResetOptionsTemplate/Line1"]}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL)
 		end)
 	lib:framesEndFrame(resetTemplate)
-	--lib:framesAddObject(resetTemplate, 0, 3*13, "font#t:0:%y#s:0:%s#l#r#0.9:0.9:0.9#" .. L["CT_Library/Frames/ResetOptionsTemplate/Line1"])
+	lib:framesAddObject(resetTemplate, 0, 3*13, "font#t:0:%y#s:0:%s#l#r#" .. L["CT_Library/Frames/ResetOptionsTemplate/Line1"] .. "#0.9:0.9:0.9")
 	lib:framesRegisterTemplate(resetTemplate, "ResetTemplate")
-end
+	
+end)
 
 
 -- End Frame Creation
