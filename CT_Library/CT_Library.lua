@@ -2892,18 +2892,29 @@ function lib:framesAddFromTemplate(framesList, offset, size, details, template)
 end
 
 
-do
+lib:regEvent("PLAYER_LOGIN", function()
 	-- Reset button at the bottom of every options panel
 	local resetTemplate = lib:framesInitTemplate()
-	lib:framesAddObject(resetTemplate, 0, 17, "font#tl:5%y#v:GameFontNormalLarge#Reset Options")
-	lib:framesAddObject(resetTemplate, -5, 26, "checkbutton#tl:10:%y#i:resetAll#Reset options for all of your characters")
-	lib:framesBeginFrame(resetTemplate, 0, 30, "button#t:0:%y#s:120:%s#v:UIPanelButtonTemplate#Reset options")
+	lib:framesAddObject(resetTemplate, 0, 17, "font#tl:5%y#v:GameFontNormalLarge#" .. L["CT_Library/Frames/ResetOptionsTemplate/Heading"])
+	lib:framesBeginFrame(resetTemplate, -5, 26, "checkbutton#tl:10:%y#i:resetAll#" .. L["CT_Library/Frames/ResetOptionsTemplate/ResetAllCheckbox"])
 		lib:framesAddScript(resetTemplate, "onclick", function(btn)
-				local mod = lib:getControlPanelSelectedModule()
-				mod:resetOptions(btn:GetParent().resetAll:GetChecked())
+			if (btn:GetChecked()) then
+				btn.text:SetTextColor(1, 0.5, 0.5)
+			else
+				btn.text:SetTextColor(1, 1, 1)
+			end
 		end)
 	lib:framesEndFrame(resetTemplate)
-	lib:framesAddObject(resetTemplate, 0, 3*13, "font#t:0:%y#s:0:%s#l#r#Resets options to default and reloads the UI.#0.9:0.9:0.9")
+	lib:framesBeginFrame(resetTemplate, 0, 30, "button#t:0:%y#s:120:%s#v:UIPanelButtonTemplate#" .. L["CT_Library/Frames/ResetOptionsTemplate/Button"])
+		lib:framesAddScript(resetTemplate, "onclick", function(btn)
+			local mod = lib:getControlPanelSelectedModule()
+			mod:resetOptions(btn:GetParent().resetAll:GetChecked())
+		end)
+		lib:frameAddScript(resetTemplate, "onenter", function(btn)
+			lib:displayTooltip(btn, {L["CT_Library/Frames/ResetOptionsTemplate/Heading"], L["CT_Library/Frames/ResetOptionsTemplate/Line1"]}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL)
+		end)
+	lib:framesEndFrame(resetTemplate)
+	--lib:framesAddObject(resetTemplate, 0, 3*13, "font#t:0:%y#s:0:%s#l#r#0.9:0.9:0.9#" .. L["CT_Library/Frames/ResetOptionsTemplate/Line1"])
 	lib:framesRegisterTemplate(resetTemplate, "ResetTemplate")
 end
 
