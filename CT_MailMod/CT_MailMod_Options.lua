@@ -11,10 +11,9 @@
 -- the CTMod Team. Thank you.                 --
 ------------------------------------------------
 
-local _G = getfenv(0);
-local module = _G["CT_MailMod"];
+local _G = getfenv(0)
+local module = select(2, ...)
 
-module.text = module.text or { };	-- see localization.lua
 local L = module.text;
 
 --------------------------------------------
@@ -158,15 +157,10 @@ module.frame = function()
 		optionsAddObject(-25,   17, "slider#t:0:%y#o:logWindowScale:1#s:175:%s#" .. L["CT_MailMod/Options/MailLog/ScaleSliderLabel"] .. "#0.20:2:0.01");
 
 		optionsAddObject(-20, 1*13, "font#t:0:%y#l:13:0#r#" .. L["CT_MailMod/Options/MailLog/Delete/Heading"] .. "#" .. textColor3 .. ":l");
-		optionsAddObject(-10,   26, "checkbutton#tl:10:%y#o:resetLog#i:resetLog#" .. L["CT_MailMod/Options/MailLog/Delete/ConfirmationCheckButton"] .. "#l:268");
 		optionsBeginFrame(  -5,   30, "button#t:0:%y#s:120:%s#v:UIPanelButtonTemplate#i:deleteLogButton#" .. L["CT_MailMod/Options/MailLog/Delete/Button"]);
 			optionsAddScript("onclick",
-				function(self)
-					if (module:getOption("resetLog")) then
-						module:setOption("resetLog", nil);
-						CT_MailModOptions["mailLog"] = {};
-						module:updateMailLog();
-					end
+				function()
+					module:resetHistory(CT_MailModOptions.mailLog, false)
 				end
 			);
 		optionsEndFrame();
@@ -194,16 +188,9 @@ module.frame = function()
 			optionsAddObject( -7, 2*15, "font#t:0:%y#l#r#" .. L["CT_MailMod/Options/Reset/Line 1"] .. "#" .. textColor2);
 		optionsEndFrame();
 
-
-
 		optionsAddScript("onload",
 			function (self)
 				optionsFrame = self;
-			end
-		);
-		optionsAddScript("onshow",
-			function(self)
-				module:setOption("resetLog", nil);
 			end
 		);
 	optionsEndFrame();
@@ -226,6 +213,17 @@ module.opt = {};
 module.update = function(self, optName, value)
 	local opt = module.opt;
 	if (optName == "init") then
+	
+		-- Temporary
+		local charLog = module:getOption("mailLog")
+			CT_MailModOptions.mailLog = CT_MailModOptions.mailLog or {}	
+			if (charLog) then
+			for __, v in ipairs(charLog) do
+				tinsert(CT_MailModOptions.mailLog, v)
+			end
+			module:setOption("mailLog", nil)
+		end
+		
 		-- General
 		opt.openBackpack = getoption("openBackpack", false);
 		opt.openAllBags = getoption("openAllBags", false);
@@ -260,8 +258,6 @@ module.update = function(self, optName, value)
 		opt.showCheckboxes = getoption("showCheckboxes", true);
 		module:updateOpenCloseButtons();
 		module:updateSelectAllCheckbox();
-
-		module:setOption("resetLog", nil);
 
 		-- Send Mail
 		opt.sendmailAltClickItem = getoption("sendmailAltClickItem", true);
@@ -307,18 +303,7 @@ module.update = function(self, optName, value)
 			module:updateOpenCloseButtons();  -- hide the open/close buttons
 			module:updateSelectAllCheckbox(); -- hide the select all checkbox
 			module:inboxUpdateSelection();    -- hide any currently open checkboxes
-
-		elseif (optName == "resetLog") then
-			if (optionsFrame) then
-				if (value) then
-					optionsFrame.resetLog:SetChecked(true);
-					optionsFrame.deleteLogButton:Enable();
-				else
-					optionsFrame.resetLog:SetChecked(false);
-					optionsFrame.deleteLogButton:Disable();
-				end
-			end
-
+			
 		elseif (optName == "blockTrades") then
 			module.configureBlockTradesMail(value);
 

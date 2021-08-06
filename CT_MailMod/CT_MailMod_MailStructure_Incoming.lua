@@ -12,7 +12,7 @@
 ------------------------------------------------
 
 local _G = getfenv(0);
-local module = _G["CT_MailMod"];
+local module = select(2, ...)
 
 --------------------------------------------
 -- Incoming Mail Structure
@@ -239,7 +239,7 @@ function incMail:retrieveSelectedMail(cancelProcessing)
 		self.mailCount = inboxNumItems;
 		module:gotoInboxMailPage(self.id);
 
-		GetInboxText(self.id);  -- Flag message as read.
+		self.body = GetInboxText(self.id);  -- Flag message as read.
 
 		self.logPending = false;
 		self.logFunc = module.logIncoming;
@@ -249,23 +249,24 @@ function incMail:retrieveSelectedMail(cancelProcessing)
 
 		if (self:canMassOpen()) then
 			self.logSuccess = true;
-			self.logMessage = "CT_MailMod/MAIL_OPEN_OK";
+			self.logMessage = module.text["CT_MailMod/MAIL_OPEN_OK"];
 			module:printLogMessage(self.logSuccess, self, self.logMessage);
 			self.logPrint = false;
 		else
-			local message;
 			if (self.codAmount > 0) then
 				-- Don't open COD messages.
-				message = "CT_MailMod/MAIL_OPEN_IS_COD";
+				self.body = "|cffff0000" .. COD .. "|r " .. self.body
+				message = module.text["CT_MailMod/MAIL_OPEN_IS_COD"]
 			elseif (self.isGM) then
 				-- Don't open GM messages.
-				message = "CT_MailMod/MAIL_OPEN_IS_GM";
+				self.body = "|cff00c0ffGM: |r" .. self.body
+				message = module.text["CT_MailMod/MAIL_OPEN_IS_GM"]
 			elseif (self.money == 0 and self.numItems == 0) then
 				-- Don't open messages with no money or items.
-				message = "CT_MailMod/MAIL_OPEN_NO_ITEMS_MONEY";
+				message = module.text["CT_MailMod/MAIL_OPEN_NO_ITEMS_MONEY"]
 			else
 				-- Cannot open this message.
-				message = "CT_MailMod/MAIL_OPEN_CANNOT_OPEN";
+				message = module.text["CT_MailMod/MAIL_OPEN_CANNOT_OPEN"]
 			end
 			module:logIncoming(false, self, message);
 			return 3;

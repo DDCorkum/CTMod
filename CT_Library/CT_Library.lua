@@ -2874,55 +2874,35 @@ end
 
 local frameTemplates = {}
 
-function lib:framesInitTemplate()
-	return self:framesInit()
-end
-
-function lib:framesRegisterTemplate(framesList, name)
-	local frame = framesList[#framesList]
-	frameTemplates[name] = {size = -frame.yoffset, data = self:framesGetData(framesList)}
-end
-
-function lib:framesAddFromTemplate(framesList, offset, size, details, template)
-	local data = {}
-	for k, v in pairs(frameTemplates[template].data) do
-		data[k] = v
-	end
-	if (size == 0) then
-		size = frameTemplates[template].size
-	end
-	self:framesBeginFrame(framesList, offset, size, details, data)
+function lib:framesAddFromTemplate(framesList, offset, size, details, template, ...)
+	local children = self:framesInit()
+	frameTemplates[template](self, children, ...)
+	local child = children[#children]
+	self:framesBeginFrame(framesList, offset, size ~= 0 and size or -child.yoffset, details, child.data)
 	self:framesEndFrame(framesList)
 end
 
-
-lib:regEvent("PLAYER_LOGIN", function()
-
-	-- ResetOptionsTemplate
-	local resetTemplate = lib:framesInitTemplate()
-	lib:framesAddObject(resetTemplate, 0, 17, "font#tl:5%y#v:GameFontNormalLarge#" .. L["CT_Library/Frames/ResetOptionsTemplate/Heading"])
-	lib:framesBeginFrame(resetTemplate, -5, 26, "checkbutton#tl:10:%y#i:resetAll#" .. L["CT_Library/Frames/ResetOptionsTemplate/ResetAllCheckbox"])
-		lib:framesAddScript(resetTemplate, "onclick", function(btn)
+function frameTemplates.ResetTemplate(self, framesList)
+	self:framesAddObject(framesList, 0, 17, "font#tl:5%y#v:GameFontNormalLarge#" .. L["CT_Library/Frames/ResetOptionsTemplate/Heading"])
+	self:framesBeginFrame(framesList, -5, 26, "checkbutton#tl:10:%y#i:resetAll#" .. L["CT_Library/Frames/ResetOptionsTemplate/ResetAllCheckbox"])
+		self:framesAddScript(framesList, "onclick", function(btn)
 			if (btn:GetChecked()) then
 				btn.text:SetTextColor(1, 0.5, 0.5)
 			else
 				btn.text:SetTextColor(1, 1, 1)
 			end
 		end)
-	lib:framesEndFrame(resetTemplate)
-	lib:framesBeginFrame(resetTemplate, 0, 30, "button#t:0:%y#s:120:%s#v:UIPanelButtonTemplate#" .. L["CT_Library/Frames/ResetOptionsTemplate/Button"])
-		lib:framesAddScript(resetTemplate, "onclick", function(btn)
-			local mod = lib:getControlPanelSelectedModule()
-			mod:resetOptions(btn:GetParent().resetAll:GetChecked())
+	self:framesEndFrame(framesList)
+	self:framesBeginFrame(framesList, 0, 30, "button#t:0:%y#s:120:%s#v:UIPanelButtonTemplate#" .. L["CT_Library/Frames/ResetOptionsTemplate/Button"])
+		self:framesAddScript(framesList, "onclick", function(btn)
+			self:resetOptions(btn:GetParent().resetAll:GetChecked())
 		end)
-		lib:framesAddScript(resetTemplate, "onenter", function(btn)
-			lib:displayTooltip(btn, {L["CT_Library/Frames/ResetOptionsTemplate/Heading"], L["CT_Library/Frames/ResetOptionsTemplate/Line1"]}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL)
+		self:framesAddScript(framesList, "onenter", function(btn)
+			self:displayTooltip(btn, {L["CT_Library/Frames/ResetOptionsTemplate/Heading"], L["CT_Library/Frames/ResetOptionsTemplate/Line1"]}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL)
 		end)
-	lib:framesEndFrame(resetTemplate)
-	lib:framesAddObject(resetTemplate, 0, 3*13, "font#t:0:%y#s:0:%s#l#r#" .. L["CT_Library/Frames/ResetOptionsTemplate/Line1"] .. "#0.9:0.9:0.9")
-	lib:framesRegisterTemplate(resetTemplate, "ResetTemplate")
-	
-end)
+	self:framesEndFrame(framesList)
+	self:framesAddObject(framesList, 0, 3*13, "font#t:0:%y#s:0:%s#l#r#" .. L["CT_Library/Frames/ResetOptionsTemplate/Line1"] .. "#0.9:0.9:0.9")
+end
 
 
 -- End Frame Creation

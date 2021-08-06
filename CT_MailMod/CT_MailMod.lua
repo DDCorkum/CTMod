@@ -14,7 +14,7 @@
 --------------------------------------------
 -- Initialization
 
-local module = { };
+local module = select(2, ...)
 local _G = getfenv(0);
 
 local MODULE_NAME = "CT_MailMod";
@@ -23,8 +23,8 @@ local MODULE_VERSION = strmatch(GetAddOnMetadata(MODULE_NAME, "version"), "^([%d
 module.name = MODULE_NAME;
 module.version = MODULE_VERSION;
 
-_G[MODULE_NAME] = module;
 CT_Library:registerModule(module);
+_G[MODULE_NAME] = module;
 
 -- Max attachment slots
 --
