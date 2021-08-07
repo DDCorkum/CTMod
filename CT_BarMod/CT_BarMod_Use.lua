@@ -2368,7 +2368,13 @@ module.useUpdate = function(self, optName, value)
 		displayBindings = self:getOption("displayBindings") ~= false;
 		displayRangeDot = self:getOption("displayRangeDot") ~= false;
 		displayActionText = self:getOption("displayActionText") ~= false;
-		displayCount = self:getOption("displayCount") ~= false;
+		module:regEvent("PLAYER_LOGIN", function()
+			if (OmniCC) then
+				displayCount = self:getOption("displayCount")
+			else
+				displayCount = self:getOption("displayCount") ~= false
+			end
+		end)
 		displayRecharge = self:getOption("displayRecharge") ~= false;
 		hideGlow = self:getOption("hideGlow");
 		buttonLock = self:getOption("buttonLock");
