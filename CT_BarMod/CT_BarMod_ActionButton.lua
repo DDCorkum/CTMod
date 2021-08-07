@@ -253,13 +253,17 @@ local function getActionButton(buttonId)
 		bling.s3:SetDuration(0.2)
 		bling.s3:SetStartDelay(0.8)
 		
-		button.cooldown:HookScript("OnCooldownDone", function(self) 
-			bling.ag:Restart()
-			bling.ag:Play()
-		end)
+		module:regEvent("PLAYER_LOGIN", function()
+			-- Delay these hooks for compatibility with OmniCC.
 		
-		hooksecurefunc(button.cooldown, "SetCooldown", function(self, start, duration)
-			bling.ag:Stop()
+			button.cooldown:HookScript("OnCooldownDone", function(self) 
+				bling.ag:Restart()
+				bling.ag:Play()
+			end)
+
+			hooksecurefunc(button.cooldown, "SetCooldown", function(self, start, duration)
+				bling.ag:Stop()
+			end)
 		end)
 		
 		button.recharge = CreateFrame("Cooldown", nil, parent, "CooldownFrameTemplate");

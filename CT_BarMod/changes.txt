@@ -1,5 +1,6 @@
 CT_BarMod (9.1.0.3) 2021-07-02
 - Keybindings will trigger the macro conditional [button:1] instead of [button:31]
+- Restoring compatibility with OmniCC
 
 CT_BarMod (9.1.0.1) 2021-06-25
 - Action bars 7-10 now mimick console variable ActionButtonUseKeyDown
