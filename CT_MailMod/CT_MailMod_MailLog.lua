@@ -324,13 +324,14 @@ local function writeLogEntry(self, type, success, mail, message)
 			log[previous] = entry  -- Update the existing entry
 		elseif (mail.wasRead and previous > 0) then
 				local found
-				local now = time()
-				for i=previous, 1, -1 do
+				local monthago = time()-2678400
+				for i=previous, max(1,previous-50), -1 do		-- starting with the most recent message, and moving backwards, but going back no further than 50 messages (arbitrary)
 					local __, olderType, __, olderReceiver, olderSender, olderSubject, __, olderTimestamp, olderExpires = decodeLogEntry(log[i])
-					if (olderExpires == nil or olderExpires < now) then
+					if (olderTimestamp < monthago) then  -- stop if reaching messages sent over 31 days ago
 						break
 					elseif(
-						abs(checkMailTime + mail.daysleft*86400 - olderExpires) < 2
+						olderExpires
+						and abs(checkMailTime + mail.daysleft*86400 - olderExpires) < 2
 						and mail.subject == olderSubject
 						and (
 							mail.receiver == olderReceiver and mail.sender == olderSender and type == olderType
