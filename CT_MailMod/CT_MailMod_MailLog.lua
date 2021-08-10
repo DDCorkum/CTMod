@@ -324,9 +324,12 @@ local function writeLogEntry(self, type, success, mail, message)
 			log[previous] = entry  -- Update the existing entry
 		elseif (mail.wasRead and previous > 0) then
 				local found
-				for i=previous, max(previous-20, 1), -1 do
+				local now = time()
+				for i=previous, 1, -1 do
 					local __, olderType, __, olderReceiver, olderSender, olderSubject, __, olderTimestamp, olderExpires = decodeLogEntry(log[i])
-					if (
+					if (olderExpires == nil or olderExpires < now) then
+						break
+					elseif(
 						abs(checkMailTime + mail.daysleft*86400 - olderExpires) < 2
 						and mail.subject == olderSubject
 						and (
