@@ -470,26 +470,13 @@ end
 -- Options frame
 
 local optionsFrameList;
-local function optionsInit()
-	optionsFrameList = module:framesInit();
-end
-local function optionsGetData()
-	return module:framesGetData(optionsFrameList);
-end
-local function optionsAddFrame(offset, size, details, data)
-	module:framesAddFrame(optionsFrameList, offset, size, details, data);
-end
-local function optionsAddObject(offset, size, details)
-	module:framesAddObject(optionsFrameList, offset, size, details);
-end
-local function optionsAddScript(name, func)
-	module:framesAddScript(optionsFrameList, name, func);
-end
-local function optionsBeginFrame(offset, size, details, data)
-	module:framesBeginFrame(optionsFrameList, offset, size, details, data);
-end
+local function optionsInit() optionsFrameList = module:framesInit(); end
+local function optionsGetData()	return module:framesGetData(optionsFrameList); end
+local function optionsAddFrame(offset, size, details, data)	module:framesAddFrame(optionsFrameList, offset, size, details, data); end
+local function optionsAddObject(offset, size, details) module:framesAddObject(optionsFrameList, offset, size, details); end
+local function optionsAddScript(name, func)	module:framesAddScript(optionsFrameList, name, func); end
+local function optionsBeginFrame(offset, size, details, data) module:framesBeginFrame(optionsFrameList, offset, size, details, data); end
 local function optionsEndFrame() module:framesEndFrame(optionsFrameList); end
-
 local function optionsAddFromTemplate (offset, size, details, template) module:framesAddFromTemplate(optionsFrameList, offset, size, details, template) end
 
 module.frame = function()
