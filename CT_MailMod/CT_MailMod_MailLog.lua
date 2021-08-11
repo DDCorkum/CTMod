@@ -47,6 +47,9 @@ local checkMailTime
 hooksecurefunc("CheckInbox", function()
 	checkMailTime = time()
 end)
+SendMailMailButton:HookScript("PreClick", function()
+	checkMailTime = time()
+end)
 
 local function encodeLogEntry(success, type, mail, message)
 	-- Encode a log entry
@@ -125,27 +128,31 @@ end
 
 local function decodeLogEntry(logMsg)
 	-- Decode a log entry
-	local receiver, sender, subject, money, timestamp, expires, numItems, items, message, body;
+	local receiver, sender, subject, money, timestamp, expires, numItems, items, message, body
 
-	local success, type, msg = logMsg:match("^(%d)#([^#]*)#(.*)$");
+	local success, type, msg = logMsg:match("^(%d)#([^#]*)#(.*)$")
 	if ( success == "1" or success == "4") then
 		-- Success
-		receiver, sender, money, timestamp, expires, numItems, message = msg:match("^([^#]*)#([^#]*)#([^#]*)#(%d*)%-?(%d-)#([^#]*)#(.*)$");
+		receiver, sender, money, timestamp, expires, numItems, message = msg:match("^([^#]*)#([^#]*)#([^#]*)#(%d*)%-?(%d-)#([^#]*)#(.*)$")
 		if (success == "1") then
-			subject, items = message:match("^(.-)#("..("[^#]+#"):rep(tonumber(numItems)-1).."[^#]+)$");
+			subject, items = message:match("^(.-)#("..("[^#]+#"):rep(tonumber(numItems)-1).."[^#]+)$")
 			body = ""
-		else
-			body, subject, items = message:match("^(.-)#(.-)#("..("[^#]+#"):rep(tonumber(numItems)-1).."[^#]+)$");
-			body = body:gsub("\26","#")
-		end
-		if ( not items ) then
-			subject = message;
-			items = "";
+			if ( not items ) then
+				subject = message
+				items = ""
+			end
+		else -- if success == "4" then
+			body, subject, items = message:match("^([^#]+)#(.+)#("..("[^#]+#"):rep(tonumber(numItems)-1).."[^#]+)$")
+			if (not items) then
+				items = ""
+				body, subject = message:match("^([^#]+)#(.+)$")
+				body = body and body:gsub("\26","#") or ""
+			end
 		end
 		if (items == "") then
-			return true, type, nil, receiver, sender, subject, tonumber(money), tonumber(timestamp), tonumber(expires), body;
+			return true, type, nil, receiver, sender, subject, tonumber(money), tonumber(timestamp), tonumber(expires), body
 		else
-			return true, type, nil, receiver, sender, subject, tonumber(money), tonumber(timestamp), tonumber(expires), body, ("#"):split(items);
+			return true, type, nil, receiver, sender, subject, tonumber(money), tonumber(timestamp), tonumber(expires), body, ("#"):split(items)
 		end
 
 	elseif (success == "2") then
@@ -322,21 +329,20 @@ local function writeLogEntry(self, type, success, mail, message)
 		local previous = #log
 		if (mail and mail.serial and mail.serial == logSerial and previous > 0) then
 			log[previous] = entry  -- Update the existing entry
-		elseif (mail.wasRead and previous > 0) then
+		elseif (type == "incoming" and previous > 0) then
 				local found
 				local monthago = time()-2678400
 				for i=previous, max(1,previous-50), -1 do		-- starting with the most recent message, and moving backwards, but going back no further than 50 messages (arbitrary)
 					local __, olderType, __, olderReceiver, olderSender, olderSubject, __, olderTimestamp, olderExpires = decodeLogEntry(log[i])
 					if (olderTimestamp < monthago) then  -- stop if reaching messages sent over 31 days ago
+						found = false
 						break
 					elseif(
 						olderExpires
 						and abs(checkMailTime + mail.daysleft*86400 - olderExpires) < 2
 						and mail.subject == olderSubject
-						and (
-							mail.receiver == olderReceiver and mail.sender == olderSender and type == olderType
-							or mail.receiver == olderSender and mail.sender == olderReceiver and type == "incoming" and olderSender == "outgoing"
-						)
+						and mail.receiver == olderReceiver 
+						and mail.sender == olderSender
 					) then
 						found = true
 						break
