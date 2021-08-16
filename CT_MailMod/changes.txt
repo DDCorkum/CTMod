@@ -1,4 +1,4 @@
-CT_MailMod (9.1.0.3) 2021-08-07
+CT_MailMod (9.1.0.3) 2021-08-16
 - Restoring the account-wide log
 - Avoiding logging the same message twice
 - Estimating when mail was actually sent, versus the timestamp when openned

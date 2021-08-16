@@ -160,7 +160,7 @@ module.frame = function()
 		optionsBeginFrame(  -5,   30, "button#t:0:%y#s:120:%s#v:UIPanelButtonTemplate#i:deleteLogButton#" .. L["CT_MailMod/Options/MailLog/Delete/Button"]);
 			optionsAddScript("onclick",
 				function()
-					module:resetHistory(CT_MailModOptions.mailLog, false)
+					module:resetHistory(CT_MailModOptions.mailLog, module.updateMailLog)
 				end
 			);
 		optionsEndFrame();

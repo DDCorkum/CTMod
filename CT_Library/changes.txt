@@ -1,4 +1,4 @@
-CT_Library (9.1.0.3) 2021-08-03
+CT_Library (9.1.0.3) 2021-08-16
 - Added vertically-collapsible frames to make options menus in the CT control panel more dynamic
 - Removed the first argument from showModuleOptions() because it wasn't really useful
 - Adding frame templates to standardize repetitive elements in the control panel

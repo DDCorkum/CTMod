@@ -1087,7 +1087,7 @@ do
 		end
 	end
 
-	local historyToReset, shouldReloadUI
+	local historyToReset, callbackAfterReset
 	
 	StaticPopupDialogs["CT_RESETHISTORY"] = {
 		text = "Do you want to delete this history?",
@@ -1095,9 +1095,7 @@ do
 		button2 = CANCEL,
 		OnAccept = function()
 			wipe(historyToReset)
-			if (shouldReloadUI ~= false) then
-				C_UI.Reload()
-			end
+			callbackAfterReset()
 		end,
 		timeout = 15,
 		whileDead = true,
@@ -1107,10 +1105,10 @@ do
 	-- lib:resetHistory(history [, reloadUI])
 	-- Asks the user for confirmation before wiping history and calling postFunc
 	-- 		history		table		Object to wipe when the user clicks ACCEPT
-	-- 		reloadUI	boolean?	Reloads the UI unless explicitly false
-	function lib:resetHistory(history, reloadUI)
-		optionsToReset = history
-		shouldReloadUI = reloadUI ~= false
+	-- 		callback	function?	Callback function; defaults to C_UI.Reload() but may be replaced with noop
+	function lib:resetHistory(history, callback)
+		historyToReset = history
+		callbackAfterReset = callback or C_UI.Reload
 		StaticPopup_Show("CT_RESETHISTORY")
 	end
 
