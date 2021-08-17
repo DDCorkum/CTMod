@@ -1,5 +1,5 @@
 CT_Viewport (9.1.0.3) 2021-08-09
-- Refactoring to align with changes in CT_Library
+- Added optional background color
 
 CT_Viewport (9.0.5.6) 2021-05-13
 - Refactoring to align with changes in CT_Library 9.0.5.6
