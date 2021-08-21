@@ -259,34 +259,7 @@ do
 				tooltip:SetText(text);
 			end
 		elseif (type(text) == "table") then
-			-- first row may only be a simple title and optional color
-			do
-				local row = text[1]
-				splitrow = {strsplit("#", row)}
-				local titleR, titleG, titleB
-				local alpha, title
-				for j=1, #splitrow do
-					local pieces = {strsplit(":",splitrow[j])}
-					local isAllNums = true
-					for k, piece in ipairs(pieces) do
-						if (not tonumber(piece) or tonumber(piece) < 0 or tonumber (piece) > 10) then
-							isAllNums = false
-						end
-					end
-					if (not titleR and #pieces >= 3 and isallNums) then
-						titleR, titleG, titleB, alpha = pieces[1], pieces[2], pieces[3], pieces[4]
-					elseif (not title) then
-						title = splitrow[j]
-					end
-					if (title) then
-						GameTooltip:AddLine(title, titleR, titleG, titleB, alpha)
-					end
-				end
-			end
-			
-			-- subsequent rows could be single or double line and may have wrap
-			for i=2, #text do
-				local row = text[i]
+			for i, row in ipairs(text) do
 				local splitrow = {strsplit("#", row)}
 				local leftR,leftG,leftB,rightR,rightG,rightB
 				local alpha,wrap,leftText,rightText;
