@@ -74,7 +74,7 @@ local function slashCommand(msg)
 			end
 		end
 	end
-	module:showModuleOptions(module.name);
+	module:showModuleOptions();
 end
 
 module:setSlashCmd(slashCommand, "/ctbar", "/ctbm", "/ctbarmod");

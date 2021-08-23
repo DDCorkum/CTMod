@@ -1,3 +1,6 @@
+CT_Core (9.1.0.3) 2021-08-01
+- Control panel improvements
+
 CT_Core (9.1.0.1) 2021-06-03
 - Minor code cleanup; nothing substantive
 

@@ -1091,7 +1091,7 @@ do
 		if button == "RightButton" then
 			module.toggleMailLog();
 		else
-			module:showModuleOptions(module.name);
+			module:showModuleOptions();
 		end
 	end);
 	frame:SetScript("OnEnter", function(self, ...)

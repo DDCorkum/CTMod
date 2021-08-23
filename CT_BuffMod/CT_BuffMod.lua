@@ -170,7 +170,6 @@ local needEnchantRescan;
 local normalEnchantRescan = 2;
 local sortSeqChanged;
 
-local optionsFrame;
 local globalFrame;
 local globalObject;
 --local frame_Show; -- it doesn't appear this is ever used
@@ -784,12 +783,12 @@ end
 
 local function isControlPanelShown()
 	-- Returns true if the CTMod control panel is showing.
-	return CTCONTROLPANEL and CTCONTROLPANEL:IsShown();
+	return module:IsControlPanelShown()
 end
 
 local function isOptionsFrameShown()
 	-- Returns true if the CT_BuffMod options window is showing.
-	return optionsFrame and optionsFrame:IsShown();
+	return module:isModuleOptionTabSelected()
 end
 
 local function buildCondition(text)
@@ -8647,21 +8646,21 @@ local function options_updateWindowWidgets(windowId)
 	----------
 	-- Style 1
 	----------
-	frame.buffSize1:SetValue( frameOptions.buffSize1 or constants.BUFF_SIZE_DEFAULT );
-	frame.colorCodeIcons1:SetChecked( not not frameOptions.colorCodeIcons1 );
-	frame.normalIconBorder1:SetChecked( not not frameOptions.normalIconBorder1 );
-	frame.detailWidth1:SetValue( frameOptions.detailWidth1 or constants.DEFAULT_DETAIL_WIDTH );
+	frame.style1Collapsible.buffSize1:SetValue( frameOptions.buffSize1 or constants.BUFF_SIZE_DEFAULT );
+	frame.style1Collapsible.colorCodeIcons1:SetChecked( not not frameOptions.colorCodeIcons1 );
+	frame.style1Collapsible.normalIconBorder1:SetChecked( not not frameOptions.normalIconBorder1 );
+	frame.style1Collapsible.detailWidth1:SetValue( frameOptions.detailWidth1 or constants.DEFAULT_DETAIL_WIDTH );
 
 	dropdown = CT_BuffModDropdown_rightAlign1;
 	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
 	UIDropDownMenu_SetSelectedValue( dropdown, tonumber(frameOptions.rightAlign1) or constants.RIGHT_ALIGN_DEFAULT );
 
-	frame.colorBuffs1:SetChecked( frameOptions.colorBuffs1 ~= false );
-	frame.colorCodeBackground1:SetChecked( not not frameOptions.colorCodeBackground1 );
+	frame.style1Collapsible.colorBuffs1:SetChecked( frameOptions.colorBuffs1 ~= false );
+	frame.style1Collapsible.colorCodeBackground1:SetChecked( not not frameOptions.colorCodeBackground1 );
 
-	frame.showNames1:SetChecked( frameOptions.showNames1 ~= false );
+	frame.style1Collapsible.showNames1:SetChecked( frameOptions.showNames1 ~= false );
 
-	frame.colorCodeDebuffs1:SetChecked( not not frameOptions.colorCodeDebuffs1 );
+	frame.style1Collapsible.colorCodeDebuffs1:SetChecked( not not frameOptions.colorCodeDebuffs1 );
 
 	dropdown = CT_BuffModDropdown_nameJustifyWithTime1;
 	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
@@ -8671,7 +8670,7 @@ local function options_updateWindowWidgets(windowId)
 	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
 	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.nameJustifyNoTime1 or constants.JUSTIFY_DEFAULT );
 
-	frame.showTimers1:SetChecked( frameOptions.showTimers1 ~= false );
+	frame.style1Collapsible.showTimers1:SetChecked( frameOptions.showTimers1 ~= false );
 
 	dropdown = CT_BuffModDropdown_durationFormat1;
 	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
@@ -8685,20 +8684,20 @@ local function options_updateWindowWidgets(windowId)
 	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
 	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.timeJustifyNoName1 or constants.JUSTIFY_DEFAULT );
 
-	frame.showBuffTimer1:SetChecked( frameOptions.showBuffTimer1 ~= false );
-	frame.showTimerBackground1:SetChecked( frameOptions.showTimerBackground1 ~= false );
+	frame.style1Collapsible.showBuffTimer1:SetChecked( frameOptions.showBuffTimer1 ~= false );
+	frame.style1Collapsible.showTimerBackground1:SetChecked( frameOptions.showTimerBackground1 ~= false );
 
-	frame.spacingOnLeft1:SetValue( frameOptions.spacingOnLeft1 or 0 );
-	frame.spacingOnRight1:SetValue( frameOptions.spacingOnRight1 or 0 );
+	frame.style1Collapsible.spacingOnLeft1:SetValue( frameOptions.spacingOnLeft1 or 0 );
+	frame.style1Collapsible.spacingOnRight1:SetValue( frameOptions.spacingOnRight1 or 0 );
 
 	----------
 	-- Style 2
 	----------
-	frame.buffSize2:SetValue( frameOptions.buffSize2 or constants.BUFF_SIZE_DEFAULT );
-	frame.colorCodeIcons2:SetChecked( not not frameOptions.colorCodeIcons2 );
-	frame.normalIconBorder2:SetChecked( not not frameOptions.normalIconBorder2 );
+	frame.style2Collapsible.buffSize2:SetValue( frameOptions.buffSize2 or constants.BUFF_SIZE_DEFAULT );
+	frame.style2Collapsible.colorCodeIcons2:SetChecked( not not frameOptions.colorCodeIcons2 );
+	frame.style2Collapsible.normalIconBorder2:SetChecked( not not frameOptions.normalIconBorder2 );
 
-	frame.showTimers2:SetChecked( frameOptions.showTimers2 ~= false );
+	frame.style2Collapsible.showTimers2:SetChecked( frameOptions.showTimers2 ~= false );
 
 	dropdown = CT_BuffModDropdown_durationFormat2;
 	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
@@ -8708,7 +8707,7 @@ local function options_updateWindowWidgets(windowId)
 	UIDropDownMenu_Initialize( dropdown, dropdown.initialize );
 	UIDropDownMenu_SetSelectedValue( dropdown, frameOptions.dataSide2 or constants.DATA_SIDE_BOTTOM );
 
-	frame.spacingFromIcon2:SetValue( frameOptions.spacingFromIcon2 or 0 );
+	frame.style2Collapsible.spacingFromIcon2:SetValue( frameOptions.spacingFromIcon2 or 0 );
 
 	doNotUpdateFlag = nil;
 end
@@ -8883,7 +8882,7 @@ end
 
 function module:options_editWindow(windowId)
 	if (not isOptionsFrameShown()) then
-		module:showModuleOptions(module.name);
+		module:showModuleOptions();
 	end
 
 	ctprint(format(L["CT_BuffMod/Options/WindowControls/WindowSelectedMessage"],windowId));
@@ -9219,27 +9218,14 @@ local optionsFrameList;
 local function optionsInit()
 	optionsFrameList = module:framesInit();
 end
-local function optionsGetData()
-	return module:framesGetData(optionsFrameList);
-end
-local function optionsAddFrame(offset, size, details, data)
-	module:framesAddFrame(optionsFrameList, offset, size, details, data);
-end
-local function optionsAddObject(offset, size, details)
-	module:framesAddObject(optionsFrameList, offset, size, details);
-end
-local function optionsAddScript(name, func)
-	module:framesAddScript(optionsFrameList, name, func);
-end
-local optionsAddTooltip = function(text)
-	module:framesAddScript(optionsFrameList, "onenter", function(obj) module:displayTooltip(obj, text, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL); end);
-end
-local function optionsBeginFrame(offset, size, details, data)
-	module:framesBeginFrame(optionsFrameList, offset, size, details, data);
-end
-local function optionsEndFrame()
-	module:framesEndFrame(optionsFrameList);
-end
+local function optionsGetData() return module:framesGetData(optionsFrameList); end
+local function optionsAddFrame(offset, size, details, data)	module:framesAddFrame(optionsFrameList, offset, size, details, data); end
+local function optionsAddObject(offset, size, details) 	module:framesAddObject(optionsFrameList, offset, size, details); end
+local function optionsAddScript(name, func) 	module:framesAddScript(optionsFrameList, name, func); end
+local optionsAddTooltip = function(text) 	module:framesAddScript(optionsFrameList, "onenter", function(obj) module:displayTooltip(obj, text, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL); end); end
+local function optionsBeginFrame(offset, size, details, data) 	module:framesBeginFrame(optionsFrameList, offset, size, details, data); end
+local function optionsEndFrame() 	module:framesEndFrame(optionsFrameList); end
+local function optionsAddFromTemplate (offset, size, details, template) module:framesAddFromTemplate(optionsFrameList, offset, size, details, template) end
 
 module.frame = function()
 	local updateFunc = function(self, value)
@@ -9346,56 +9332,17 @@ CONSOLIDATION REMOVED FROM GAME --]]
 	optionsEndFrame();
 
 	-- Expiration options
-	optionsBeginFrame(-15, 0, "frame#tl:0:%y#br:tr:0:%b");
-		optionsAddObject( -0,   13, "font#tl:15:%y#v:GameFontNormal#" .. L["CT_BuffMod/Options/General/Expiration/Heading"]);
 
-		optionsAddObject(-22,   7, "font#l:tl:30:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/General/Expiration/FlashSliderLabel"]);
-		optionsBeginFrame(15,   17, "slider#tl:175:%y#tr:-5:%y#i:flashTime#o:flashTime:" .. constants.DEFAULT_FLASH_TIME .. "#<value> seconds:" .. L["CT_BuffMod/TimeFormat/Off"] .. ":" .. format(L["CT_BuffMod/TimeFormat/Minutes Smaller"],1) .. "#0:60:1");
-			optionsAddScript("onvaluechanged", updateFunc);
-			optionsAddScript("onload", updateFunc);
-		optionsEndFrame();
+	optionsAddObject( -15,   13, "font#tl:15:%y#v:GameFontNormal#" .. L["CT_BuffMod/Options/General/Expiration/Heading"]);
 
-		local delayAttempted;
-		local function enableExpirationChildren()
-			if (
-				enableExpiration
-				and expirationCastOnly 
-				and expirationSound 
-				and expirationDurationHeading 
-				and expirationWarningTimeHeading 
-				and expirationTime1Label 
-				and CT_BuffMod_ExpirationTime1Slider
-				and expirationTime2Label 
-				and CT_BuffMod_ExpirationTime2Slider
-				and expirationTime3Label 
-				and CT_BuffMod_ExpirationTime3Slider
-			) then
-				expirationCastOnly:SetEnabled(enableExpiration:GetChecked());
-				expirationCastOnly:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
-				expirationSound:SetEnabled(enableExpiration:GetChecked());
-				expirationSound:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
-				expirationDurationHeading:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
-				expirationWarningTimeHeading:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
-				expirationTime1Label:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
-				CT_BuffMod_ExpirationTime1Slider:SetEnabled(enableExpiration:GetChecked());
-				CT_BuffMod_ExpirationTime1Slider:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
-				expirationTime2Label:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
-				CT_BuffMod_ExpirationTime2Slider:SetEnabled(enableExpiration:GetChecked());
-				CT_BuffMod_ExpirationTime2Slider:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
-				expirationTime3Label:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
-				CT_BuffMod_ExpirationTime3Slider:SetEnabled(enableExpiration:GetChecked());
-				CT_BuffMod_ExpirationTime3Slider:SetAlpha((enableExpiration:GetChecked() and 1) or 0.5)
-			elseif (not delayAttempted) then
-				-- one of the frames wasn't created yet?  Try again in five seconds (but attempt this delay once only)
-				-- [this is a very ugly hack to resolve a possible race condition when the frames are being built]
-				delayAttempted = true;
-				C_Timer.After(5, enableExpirationChildren)
-			end
-		end
+	optionsAddObject(-22,   7, "font#l:tl:30:%y#v:ChatFontNormal#" .. L["CT_BuffMod/Options/General/Expiration/FlashSliderLabel"]);
+	optionsBeginFrame(15,   17, "slider#tl:175:%y#tr:-5:%y#i:flashTime#o:flashTime:" .. constants.DEFAULT_FLASH_TIME .. "#<value> seconds:" .. L["CT_BuffMod/TimeFormat/Off"] .. ":" .. format(L["CT_BuffMod/TimeFormat/Minutes Smaller"],1) .. "#0:60:1");
+		optionsAddScript("onvaluechanged", updateFunc);
+		optionsAddScript("onload", updateFunc);
+	optionsEndFrame();
 
-		optionsBeginFrame(-18,   26, "checkbutton#tl:30:%y#o:enableExpiration:true#" .. L["CT_BuffMod/Options/General/Expiration/ChatMessageCheckbox"]);
-			optionsAddScript("onload", function() enableExpiration:HookScript("OnClick", enableExpirationChildren) end);
-		optionsEndFrame();
+	optionsAddObject(-18,   26, "checkbutton#tl:30:%y#o:enableExpiration:true#" .. L["CT_BuffMod/Options/General/Expiration/ChatMessageCheckbox"])
+	optionsBeginFrame( 0,    0, "collapsible#tl:0:%y#br:tr:0:%b#i:expirationCollapsible#o:enableExpiration:true")
 		optionsAddObject(  5,   26, "checkbutton#tl:48:%y#o:expirationCastOnly#" .. L["CT_BuffMod/Options/General/Expiration/PlayerBuffsOnlyCheckbox"]);
 		optionsAddObject(  5,   26, "checkbutton#tl:48:%y#o:expirationSound:true#" .. L["CT_BuffMod/Options/General/Expiration/PlaySoundCheckbox"]);
 
@@ -9420,10 +9367,14 @@ CONSOLIDATION REMOVED FROM GAME --]]
 			optionsAddScript("onload", updateFunc);
 			optionsAddScript("onshow", enableExpirationChildren);
 		optionsEndFrame();
-	optionsEndFrame();
+	optionsEndFrame()
+	
 
 	-- Adding and Removing Windows
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b#i:frameOptions");
+	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b#i:frameOptions#n:foo");
+		optionsAddScript("onload", function(self)
+			self.collapsibleChildrenMayShrink = true
+		end)
 		optionsAddObject(-10,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_BuffMod/Options/WindowControls/Heading"]);
 
 		optionsBeginFrame( -10,   30, "button#tl:15:%y#s:80:%s#v:UIPanelButtonTemplate#" .. L["CT_BuffMod/Options/WindowControls/AddButton"]);
@@ -9589,12 +9540,12 @@ CONSOLIDATION REMOVED FROM GAME --]]
 			optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#i:label#" .. L["CT_BuffMod/Options/Window/Grouping/GroupByPriorityLabel"]);
 			optionsAddObject( 15,   20, "dropdown#tl:140:%y#s:130:%s#n:CT_BuffModDropdown_groupByPriority#i:dropdown#o:groupByPriority:" .. constants.GROUP_BY_FILTER_OWN_ZERO .. groupByStrings[1] .. groupByStrings[2] .. groupByStrings[3] .. groupByStrings[4] .. groupByStrings[5] .. groupByStrings[6]);
 			optionsAddScript("onleave", function(frame)
-				frameOptionsplayerUnsecure.text:SetTextColor(1,1,1);
+				frame:GetParent().playerUnsecure.text:SetTextColor(1,1,1);
 			end);
 			optionsAddScript("onenter", function(frame)
 				if (frame.label:GetAlpha() < 1) then
 					module:displayTooltip(frame, {L["CT_BuffMod/Options/Window/Grouping/GroupByPriorityLabel"], L["CT_BuffMod/Options/Window/Grouping/MethodUnavailableTip"] .. "#" .. textColor2}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
-					frameOptionsplayerUnsecure.text:SetTextColor(1, 1, 0);
+					frame:GetParent().playerUnsecure.text:SetTextColor(1, 1, 0);
 				else
 					module:displayTooltip(frame, {L["CT_BuffMod/Options/Window/Grouping/GroupByPriorityLabel"], L["CT_BuffMod/Options/Window/Grouping/GroupByPriorityTip"] .. "#" .. textColor2}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
 				end
@@ -9615,12 +9566,12 @@ CONSOLIDATION REMOVED FROM GAME --]]
 			optionsAddObject(-10,   14, "font#tl:35:%y#v:ChatFontNormal#i:label#" .. L["CT_BuffMod/Options/Window/Grouping/NonExpiringBuffsLabel"]);
 			optionsAddObject( 15,   20, "dropdown#tl:140:%y#s:130:%s#n:CT_BuffModDropdown_separateZero#i:dropdown#o:separateZero:" .. constants.SEPARATE_ZERO_WITH .. L["CT_BuffMod/Options/Window/Grouping/NonExpiringBuffsDropdown"]);
 			optionsAddScript("onleave", function(frame)
-				frameOptionsplayerUnsecure.text:SetTextColor(1,1,1);
+				frame:GetParent().playerUnsecure.text:SetTextColor(1,1,1);
 			end);
 			optionsAddScript("onenter", function(frame)
 				if (frame.label:GetAlpha() < 1) then
 					module:displayTooltip(frame, {L["CT_BuffMod/Options/Window/Grouping/NonExpiringBuffsLabel"], L["CT_BuffMod/Options/Window/Grouping/MethodUnavailableTip"] .. "#" .. textColor2}, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL);
-					frameOptionsplayerUnsecure.text:SetTextColor(1, 1, 0);
+					frame:GetParent().playerUnsecure.text:SetTextColor(1, 1, 0);
 				end
 			end);
 		optionsEndFrame();
@@ -10052,263 +10003,184 @@ CONSOLIDATION REMOVED FROM GAME--]]
 		-- Button style
 		optionsAddObject(-20,   14, "font#tl:28:%y#v:ChatFontNormal#Use style:");
 		optionsBeginFrame( 15,   20, "dropdown#tl:80:%y#s:170:%s#n:CT_BuffModDropdown_buttonStyle#i:buttonStyle#o:buttonStyle:1#" .. L["CT_BuffMod/Options/Window/Button/Style1/Heading"] .. "#" .. L["CT_BuffMod/Options/Window/Button/Style2/Heading"]);
-			local elapsedbuttonstyle = 0;
-			optionsAddScript("onupdate",
-				function(self, elapsed)
-					elapsedbuttonstyle = elapsedbuttonstyle + elapsed;
-					if elapsedbuttonstyle < 0.5 then return; end
-					elapsedbuttonstyle = 0;
-					if (UIDropDownMenu_GetSelectedID(CT_BuffModDropdown_buttonStyle) == 1) then
-						-- maximize Style 1 options, minimize Style 2 options
-						CT_BuffMod_Style1Label:Show();
-						CT_BuffMod_Style1SizeLabel:Show();
-						frameOptionsbuffSize1:Show();
-						CT_BuffMod_Style1PositionLabel:Show();
-						CT_BuffModDropdown_rightAlign1:Show();
-						frameOptionscolorCodeIcons1:Show();
-						frameOptionsnormalIconBorder1:Show();
-						frameOptionsdetailWidth1:Show();
-						frameOptionscolorBuffs1:Show();
-						frameOptionscolorCodeBackground1:Show();
-						frameOptionsshowNames1:Show();
-						frameOptionscolorCodeDebuffs1:Show();
-						CT_BuffMod_Style1JustifyLabel1:Show();
-						CT_BuffModDropdown_nameJustifyWithTime1:Show();
-						CT_BuffMod_Style1JustifyLabel2:Show();
-						CT_BuffModDropdown_nameJustifyNoTime1:Show();
-						frameOptionsshowTimers1:Show();
-						CT_BuffMod_Style1FormatLabel:Show();
-						CT_BuffModDropdown_durationFormat1:Show();
-						CT_BuffMod_showDaysFormat1:Show();
-						CT_BuffMod_Style1LocationLabel:Show();
-						CT_BuffModDropdown_durationLocation1:Show();
-						CT_BuffMod_Style1JustifyLabel3:Show();
-						CT_BuffModDropdown_timeJustifyNoName1:Show();
-						frameOptionsshowBuffTimer1:Show();
-						frameOptionsshowTimerBackground1:Show();
-						CT_BuffMod_Style1OffsetLabel1:Show();
-						frameOptionsspacingOnLeft1:Show();
-						CT_BuffMod_Style1OffsetLabel2:Show();
-						frameOptionsspacingOnRight1:Show();
-						CT_BuffMod_Style2Label:Hide();
-						CT_BuffMod_Style2SizeLabel:Hide();
-						frameOptionsbuffSize2:Hide();
-						frameOptionscolorCodeIcons2:Hide();
-						frameOptionsnormalIconBorder2:Hide();
-						frameOptionsshowTimers2:Hide();
-						CT_BuffMod_Style2FormatLabel:Hide();
-						CT_BuffModDropdown_durationFormat2:Hide();
-						CT_BuffMod_showDaysFormat2:Hide();
-						CT_BuffMod_Style2LocationLabel:Hide();
-						CT_BuffModDropdown_dataSide2:Hide();
-						CT_BuffMod_Style2OffsetLabel:Hide();
-						frameOptionsspacingFromIcon2:Hide();
-						CT_BuffMod_Style2ContinueLabel:Hide();
-						
-						
+			optionsAddScript("onshow", function(self)
+				self.ticker = self.ticker or C_Timer.NewTicker(0.5, function()
+					if (UIDropDownMenu_GetSelectedID(self) == 1) then
+						self.parent.style1Collapsible:Expand()
+						self.parent.style2Collapsible:Collapse()
 					else
-						-- minimize Style 1 options, maximize Style 2 options
-						CT_BuffMod_Style1Label:Hide();
-						CT_BuffMod_Style1SizeLabel:Hide();
-						frameOptionsbuffSize1:Hide();
-						CT_BuffMod_Style1PositionLabel:Hide();
-						CT_BuffModDropdown_rightAlign1:Hide();
-						frameOptionscolorCodeIcons1:Hide();
-						frameOptionsnormalIconBorder1:Hide();
-						frameOptionsdetailWidth1:Hide();
-						frameOptionscolorBuffs1:Hide();
-						frameOptionscolorCodeBackground1:Hide();
-						frameOptionsshowNames1:Hide();
-						frameOptionscolorCodeDebuffs1:Hide();
-						CT_BuffMod_Style1JustifyLabel1:Hide();
-						CT_BuffModDropdown_nameJustifyWithTime1:Hide();
-						CT_BuffMod_Style1JustifyLabel2:Hide();
-						CT_BuffModDropdown_nameJustifyNoTime1:Hide();
-						frameOptionsshowTimers1:Hide();
-						CT_BuffMod_Style1FormatLabel:Hide();
-						CT_BuffModDropdown_durationFormat1:Hide();
-						CT_BuffMod_showDaysFormat1:Hide();
-						CT_BuffMod_Style1LocationLabel:Hide();
-						CT_BuffModDropdown_durationLocation1:Hide();
-						CT_BuffMod_Style1JustifyLabel3:Hide();
-						CT_BuffModDropdown_timeJustifyNoName1:Hide();
-						frameOptionsshowBuffTimer1:Hide();
-						frameOptionsshowTimerBackground1:Hide();
-						CT_BuffMod_Style1OffsetLabel1:Hide();
-						frameOptionsspacingOnLeft1:Hide();
-						CT_BuffMod_Style1OffsetLabel2:Hide();
-						frameOptionsspacingOnRight1:Hide();
-						CT_BuffMod_Style2Label:Show();
-						CT_BuffMod_Style2SizeLabel:Show();
-						frameOptionsbuffSize2:Show();
-						frameOptionscolorCodeIcons2:Show();
-						frameOptionsnormalIconBorder2:Show();
-						frameOptionsshowTimers2:Show();
-						CT_BuffMod_Style2FormatLabel:Show();
-						CT_BuffModDropdown_durationFormat2:Show();
-						CT_BuffMod_showDaysFormat2:Show();
-						CT_BuffMod_Style2LocationLabel:Show();
-						CT_BuffModDropdown_dataSide2:Show();
-						CT_BuffMod_Style2OffsetLabel:Show();
-						frameOptionsspacingFromIcon2:Show();
-						CT_BuffMod_Style2ContinueLabel:Show();
+						self.parent.style1Collapsible:Collapse()
+						self.parent.style2Collapsible:Expand()
 					end
+				end)
+			end)
+			optionsAddScript("onhide", function(self)
+				if (self.ticker) then
+					self.ticker:Cancel()
+					self.ticker = nil
 				end
-			);
-		optionsEndFrame();
-
-
+			end)
+		optionsEndFrame()
+		
 		-- Style 1
-		optionsAddObject(-20, 1*13, "font#tl:22:%y#n:CT_BuffMod_Style1Label#" .. L["CT_BuffMod/Options/Window/Button/Style1/Heading"]);
+		optionsBeginFrame( 0,    0, "collapsible#tl:0:%y#br:tr:0:%b#i:style1Collapsible")
 
+			optionsAddObject(-20, 1*13, "font#tl:22:%y#n:CT_BuffMod_Style1Label#" .. L["CT_BuffMod/Options/Window/Button/Style1/Heading"]);
+
+
+			-- Size of the icon
+			optionsAddObject(-20,   14, "font#tl:35:%y#v:ChatFontNormal#n:CT_BuffMod_Style1SizeLabel#" .. L["CT_BuffMod/Options/Window/Button/General/IconSizeSliderLabel"]);
+			optionsAddObject( 15,   17, "slider#tl:165:%y#s:120:%s#i:buffSize1#o:buffSize1:" .. constants.BUFF_SIZE_DEFAULT .. "#<value>#" .. constants.BUFF_SIZE_MINIMUM ..":" .. constants.BUFF_SIZE_MAXIMUM .. ":1");
+
+			-- Icon position
+			optionsAddObject(-20,   15, "font#tl:35:%y#n:CT_BuffMod_Style1PositionLabel#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Button/Style1/IconPositionLabel"]);
+			optionsAddObject( 15,   20, "dropdown#tl:140:%y#s:120:%s#n:CT_BuffModDropdown_rightAlign1#i:rightAlign1#o:rightAlign1:" .. constants.RIGHT_ALIGN_DEFAULT .. L["CT_BuffMod/Options/Window/Button/Style1/IconPositionDropdown"]);
+
+			-- Icon Borders, including debuff colour codes
+			optionsBeginFrame( -5,   26, "checkbutton#tl:30:%y#i:colorCodeIcons1#o:colorCodeIcons1#" .. L["CT_BuffMod/Options/Window/Button/General/DebuffBorderColorCheckbox"]);
+				optionsAddScript("onenter",
+					function(button)
+						module:displayTooltip(button, {L["CT_BuffMod/Options/Window/Button/General/DebuffBorderColorCheckbox"],L["CT_BuffMod/Options/Window/Button/General/DebuffColorTooltip"]}, "ANCHOR_TOPLEFT");
+					end
+				);
+			optionsEndFrame();
+			optionsBeginFrame( -5,   26, "checkbutton#tl:30:%y#i:normalIconBorder1#o:normalIconBorder1#" .. L["CT_BuffMod/Options/Window/Button/General/NormalIconBorderCheckbox"]);
+				optionsAddScript("onenter",
+					function(button)
+						module:displayTooltip(button, {L["CT_BuffMod/Options/Window/Button/General/NormalIconBorderCheckbox"],L["CT_BuffMod/Options/Window/Button/General/NormalIconBorderTip"]}, "ANCHOR_TOPLEFT");
+					end
+				);
+			optionsEndFrame();
+
+			-- Detail frame width
+			optionsAddObject(-20,   17, "slider#tl:40:%y#s:250:%s#i:detailWidth1#o:detailWidth1:" .. constants.DEFAULT_DETAIL_WIDTH .. "#Bar width = <value>#0:400:1");
+
+			-- Color the background of the bar
+			-- 	Color code debuff backgrounds
+			optionsAddObject(-15,   26, "checkbutton#tl:30:%y#i:colorBuffs1#o:colorBuffs1:true#" .. L["CT_BuffMod/Options/Window/Button/Style1/BarBackgroundCheckbox"]);
+			optionsBeginFrame(  6,   26, "checkbutton#tl:44:%y#i:colorCodeBackground1#o:colorCodeBackground1#" .. L["CT_BuffMod/Options/Window/Button/Style1/DebuffBarBackgroundCheckbox"]);
+				optionsAddScript("onenter",
+					function(button)
+						module:displayTooltip(button, {L["CT_BuffMod/Options/Window/Button/Style1/DebuffBarBackgroundCheckbox"],L["CT_BuffMod/Options/Window/Button/General/DebuffColorTooltip"]}, "ANCHOR_TOPLEFT");
+					end
+				);
+			optionsEndFrame();
+
+
+			-- Show name
+			--	Color code debuff names
+			--	Justify (beside time)
+			-- 	Justify (when alone)
+			optionsAddObject( -5,   26, "checkbutton#tl:30:%y#i:showNames1#o:showNames1:true#" .. L["CT_BuffMod/Options/Window/Button/Style1/ShowNameCheckbox"]);
+			optionsBeginFrame(  6,   26, "checkbutton#tl:44:%y#i:colorCodeDebuffs1#o:colorCodeDebuffs1#" .. L["CT_BuffMod/Options/Window/Button/Style1/DebuffNameCheckbox"]);
+				optionsAddScript("onenter",
+					function(button)
+						module:displayTooltip(button, {L["CT_BuffMod/Options/Window/Button/Style1/DebuffNameCheckbox"],L["CT_BuffMod/Options/Window/Button/General/DebuffColorTooltip"]}, "ANCHOR_TOPLEFT");
+					end
+				);
+			optionsEndFrame();
+			optionsAddObject( -3,   15, "font#tl:48:%y#v:ChatFontNormal#n:CT_BuffMod_Style1JustifyLabel1#" .. L["CT_BuffMod/Options/Window/Button/Style1/JustifyNotAloneLabel"]);
+			optionsAddObject( 15,   20, "dropdown#tl:180:%y#s:80:%s#n:CT_BuffModDropdown_nameJustifyWithTime1#i:nameJustifyWithTime1#o:nameJustifyWithTime1:" .. constants.JUSTIFY_DEFAULT .. L["CT_BuffMod/Options/Window/Button/Style1/JustifyDropdown"]);
+
+			optionsAddObject( -5,   15, "font#tl:48:%y#v:ChatFontNormal#n:CT_BuffMod_Style1JustifyLabel2#" .. L["CT_BuffMod/Options/Window/Button/Style1/JustifyAloneLabel"]);
+			optionsAddObject( 15,   20, "dropdown#tl:180:%y#s:80:%s#n:CT_BuffModDropdown_nameJustifyNoTime1#i:nameJustifyNoTime1#o:nameJustifyNoTime1:" .. constants.JUSTIFY_DEFAULT .. L["CT_BuffMod/Options/Window/Button/Style1/JustifyDropdown"]);
+
+			-- Show time remaining text
+			--	Format
+			--	Location
+			--	Justify (when alone)
+			optionsAddObject( -5,   26, "checkbutton#tl:30:%y#i:showTimers1#o:showTimers1:true#" .. L["CT_BuffMod/Options/Window/Button/General/TimeRemainingCheckbox"]);
+
+			optionsAddObject( -3,   15, "font#tl:48:%y#v:ChatFontNormal#n:CT_BuffMod_Style1FormatLabel#Format:");
+			optionsAddObject( 15,   20, "dropdown#tl:115:%y#s:145:%s#n:CT_BuffModDropdown_durationFormat1#i:durationFormat1#o:durationFormat1:1#" .. L["CT_BuffMod/Options/Window/Time Remaining/Duration Format Dropdown"]);
+
+			optionsAddObject(  6,   26, "checkbutton#tl:44:%y#n:CT_BuffMod_showDaysFormat1#o:showDays1:true#" .. L["CT_BuffMod/Options/Window/Button/General/ShowDaysCheckbox"]);
+
+			optionsAddObject( -5,   15, "font#tl:48:%y#v:ChatFontNormal#n:CT_BuffMod_Style1LocationLabel#" .. L["CT_BuffMod/Options/Window/Button/General/TimeLocationLabel"]);
+			optionsAddObject( 15,   20, "dropdown#tl:115:%y#s:145:%s#n:CT_BuffModDropdown_durationLocation1#i:durationLocation1#o:durationLocation1:" .. constants.DURATION_LOCATION_DEFAULT .. "#Default#Left of the name#Right of the name#Above the name#Below the name");
+
+			optionsAddObject( -5,   15, "font#tl:48:%y#v:ChatFontNormal#n:CT_BuffMod_Style1JustifyLabel3#" .. L["CT_BuffMod/Options/Window/Button/Style1/JustifyAloneLabel"]);
+			optionsAddObject( 15,   20, "dropdown#tl:180:%y#s:80:%s#n:CT_BuffModDropdown_timeJustifyNoName1#i:timeJustifyNoName1#o:timeJustifyNoName1:" .. constants.JUSTIFY_DEFAULT .. L["CT_BuffMod/Options/Window/Button/Style1/JustifyDropdown"]);
+
+			-- Show time remaining bar
+			-- 	Show the bar's background
+			optionsAddObject( -5,   26, "checkbutton#tl:30:%y#i:showBuffTimer1#o:showBuffTimer1:true#" .. L["CT_BuffMod/Options/Window/Button/Style1/TimeRemainingBarCheckbox"]);
+			optionsAddObject(  6,   26, "checkbutton#tl:44:%y#i:showTimerBackground1#o:showTimerBackground1:true#" .. L["CT_BuffMod/Options/Window/Button/Style1/TimeRemainingBarBackgroundCheckbox"]);
+
+			-- Spacing between left side of detail frame and text
+			optionsAddObject(-15,   14, "font#tl:48:%y#v:ChatFontNormal#n:CT_BuffMod_Style1OffsetLabel1#" .. L["CT_BuffMod/Options/Window/Button/Style1/LeftOffsetLabel"]);
+			optionsAddObject( 15,   17, "slider#tl:190:%y#s:100:%s#i:spacingOnLeft1#o:spacingOnLeft1:0#<value>#0:50:1");
+
+			-- Spacing between right side of detail frame and text
+			optionsAddObject(-20,   14, "font#tl:48:%y#v:ChatFontNormal#n:CT_BuffMod_Style1OffsetLabel2#" .. L["CT_BuffMod/Options/Window/Button/Style1/RightOffsetLabel"]);
+			optionsAddObject( 15,   17, "slider#tl:190:%y#s:100:%s#i:spacingOnRight1#o:spacingOnRight1:0#<value>#0:50:1");
 		
-		-- Size of the icon
-		optionsAddObject(-20,   14, "font#tl:35:%y#v:ChatFontNormal#n:CT_BuffMod_Style1SizeLabel#" .. L["CT_BuffMod/Options/Window/Button/General/IconSizeSliderLabel"]);
-		optionsAddObject( 15,   17, "slider#tl:165:%y#s:120:%s#i:buffSize1#o:buffSize1:" .. constants.BUFF_SIZE_DEFAULT .. "#<value>#" .. constants.BUFF_SIZE_MINIMUM ..":" .. constants.BUFF_SIZE_MAXIMUM .. ":1");
-
-		-- Icon position
-		optionsAddObject(-20,   15, "font#tl:35:%y#n:CT_BuffMod_Style1PositionLabel#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Button/Style1/IconPositionLabel"]);
-		optionsAddObject( 15,   20, "dropdown#tl:140:%y#s:120:%s#n:CT_BuffModDropdown_rightAlign1#i:rightAlign1#o:rightAlign1:" .. constants.RIGHT_ALIGN_DEFAULT .. L["CT_BuffMod/Options/Window/Button/Style1/IconPositionDropdown"]);
-
-		-- Icon Borders, including debuff colour codes
-		optionsBeginFrame( -5,   26, "checkbutton#tl:30:%y#i:colorCodeIcons1#o:colorCodeIcons1#" .. L["CT_BuffMod/Options/Window/Button/General/DebuffBorderColorCheckbox"]);
-			optionsAddScript("onenter",
-				function(button)
-					module:displayTooltip(button, {L["CT_BuffMod/Options/Window/Button/General/DebuffBorderColorCheckbox"],L["CT_BuffMod/Options/Window/Button/General/DebuffColorTooltip"]}, "ANCHOR_TOPLEFT");
-				end
-			);
-		optionsEndFrame();
-		optionsBeginFrame( -5,   26, "checkbutton#tl:30:%y#i:normalIconBorder1#o:normalIconBorder1#" .. L["CT_BuffMod/Options/Window/Button/General/NormalIconBorderCheckbox"]);
-			optionsAddScript("onenter",
-				function(button)
-					module:displayTooltip(button, {L["CT_BuffMod/Options/Window/Button/General/NormalIconBorderCheckbox"],L["CT_BuffMod/Options/Window/Button/General/NormalIconBorderTip"]}, "ANCHOR_TOPLEFT");
-				end
-			);
-		optionsEndFrame();
-
-		-- Detail frame width
-		optionsAddObject(-20,   17, "slider#tl:40:%y#s:250:%s#i:detailWidth1#o:detailWidth1:" .. constants.DEFAULT_DETAIL_WIDTH .. "#Bar width = <value>#0:400:1");
-
-		-- Color the background of the bar
-		-- 	Color code debuff backgrounds
-		optionsAddObject(-15,   26, "checkbutton#tl:30:%y#i:colorBuffs1#o:colorBuffs1:true#" .. L["CT_BuffMod/Options/Window/Button/Style1/BarBackgroundCheckbox"]);
-		optionsBeginFrame(  6,   26, "checkbutton#tl:44:%y#i:colorCodeBackground1#o:colorCodeBackground1#" .. L["CT_BuffMod/Options/Window/Button/Style1/DebuffBarBackgroundCheckbox"]);
-			optionsAddScript("onenter",
-				function(button)
-					module:displayTooltip(button, {L["CT_BuffMod/Options/Window/Button/Style1/DebuffBarBackgroundCheckbox"],L["CT_BuffMod/Options/Window/Button/General/DebuffColorTooltip"]}, "ANCHOR_TOPLEFT");
-				end
-			);
-		optionsEndFrame();
-
-
-		-- Show name
-		--	Color code debuff names
-		--	Justify (beside time)
-		-- 	Justify (when alone)
-		optionsAddObject( -5,   26, "checkbutton#tl:30:%y#i:showNames1#o:showNames1:true#" .. L["CT_BuffMod/Options/Window/Button/Style1/ShowNameCheckbox"]);
-		optionsBeginFrame(  6,   26, "checkbutton#tl:44:%y#i:colorCodeDebuffs1#o:colorCodeDebuffs1#" .. L["CT_BuffMod/Options/Window/Button/Style1/DebuffNameCheckbox"]);
-			optionsAddScript("onenter",
-				function(button)
-					module:displayTooltip(button, {L["CT_BuffMod/Options/Window/Button/Style1/DebuffNameCheckbox"],L["CT_BuffMod/Options/Window/Button/General/DebuffColorTooltip"]}, "ANCHOR_TOPLEFT");
-				end
-			);
-		optionsEndFrame();
-		optionsAddObject( -3,   15, "font#tl:48:%y#v:ChatFontNormal#n:CT_BuffMod_Style1JustifyLabel1#" .. L["CT_BuffMod/Options/Window/Button/Style1/JustifyNotAloneLabel"]);
-		optionsAddObject( 15,   20, "dropdown#tl:180:%y#s:80:%s#n:CT_BuffModDropdown_nameJustifyWithTime1#i:nameJustifyWithTime1#o:nameJustifyWithTime1:" .. constants.JUSTIFY_DEFAULT .. L["CT_BuffMod/Options/Window/Button/Style1/JustifyDropdown"]);
-
-		optionsAddObject( -5,   15, "font#tl:48:%y#v:ChatFontNormal#n:CT_BuffMod_Style1JustifyLabel2#" .. L["CT_BuffMod/Options/Window/Button/Style1/JustifyAloneLabel"]);
-		optionsAddObject( 15,   20, "dropdown#tl:180:%y#s:80:%s#n:CT_BuffModDropdown_nameJustifyNoTime1#i:nameJustifyNoTime1#o:nameJustifyNoTime1:" .. constants.JUSTIFY_DEFAULT .. L["CT_BuffMod/Options/Window/Button/Style1/JustifyDropdown"]);
-
-		-- Show time remaining text
-		--	Format
-		--	Location
-		--	Justify (when alone)
-		optionsAddObject( -5,   26, "checkbutton#tl:30:%y#i:showTimers1#o:showTimers1:true#" .. L["CT_BuffMod/Options/Window/Button/General/TimeRemainingCheckbox"]);
-
-		optionsAddObject( -3,   15, "font#tl:48:%y#v:ChatFontNormal#n:CT_BuffMod_Style1FormatLabel#Format:");
-		optionsAddObject( 15,   20, "dropdown#tl:115:%y#s:145:%s#n:CT_BuffModDropdown_durationFormat1#i:durationFormat1#o:durationFormat1:1#" .. L["CT_BuffMod/Options/Window/Time Remaining/Duration Format Dropdown"]);
-		
-		optionsAddObject(  6,   26, "checkbutton#tl:44:%y#n:CT_BuffMod_showDaysFormat1#o:showDays1:true#" .. L["CT_BuffMod/Options/Window/Button/General/ShowDaysCheckbox"]);
-		
-		optionsAddObject( -5,   15, "font#tl:48:%y#v:ChatFontNormal#n:CT_BuffMod_Style1LocationLabel#" .. L["CT_BuffMod/Options/Window/Button/General/TimeLocationLabel"]);
-		optionsAddObject( 15,   20, "dropdown#tl:115:%y#s:145:%s#n:CT_BuffModDropdown_durationLocation1#i:durationLocation1#o:durationLocation1:" .. constants.DURATION_LOCATION_DEFAULT .. "#Default#Left of the name#Right of the name#Above the name#Below the name");
-
-		optionsAddObject( -5,   15, "font#tl:48:%y#v:ChatFontNormal#n:CT_BuffMod_Style1JustifyLabel3#" .. L["CT_BuffMod/Options/Window/Button/Style1/JustifyAloneLabel"]);
-		optionsAddObject( 15,   20, "dropdown#tl:180:%y#s:80:%s#n:CT_BuffModDropdown_timeJustifyNoName1#i:timeJustifyNoName1#o:timeJustifyNoName1:" .. constants.JUSTIFY_DEFAULT .. L["CT_BuffMod/Options/Window/Button/Style1/JustifyDropdown"]);
-
-		-- Show time remaining bar
-		-- 	Show the bar's background
-		optionsAddObject( -5,   26, "checkbutton#tl:30:%y#i:showBuffTimer1#o:showBuffTimer1:true#" .. L["CT_BuffMod/Options/Window/Button/Style1/TimeRemainingBarCheckbox"]);
-		optionsAddObject(  6,   26, "checkbutton#tl:44:%y#i:showTimerBackground1#o:showTimerBackground1:true#" .. L["CT_BuffMod/Options/Window/Button/Style1/TimeRemainingBarBackgroundCheckbox"]);
-
-		-- Spacing between left side of detail frame and text
-		optionsAddObject(-15,   14, "font#tl:48:%y#v:ChatFontNormal#n:CT_BuffMod_Style1OffsetLabel1#" .. L["CT_BuffMod/Options/Window/Button/Style1/LeftOffsetLabel"]);
-		optionsAddObject( 15,   17, "slider#tl:190:%y#s:100:%s#i:spacingOnLeft1#o:spacingOnLeft1:0#<value>#0:50:1");
-
-		-- Spacing between right side of detail frame and text
-		optionsAddObject(-20,   14, "font#tl:48:%y#v:ChatFontNormal#n:CT_BuffMod_Style1OffsetLabel2#" .. L["CT_BuffMod/Options/Window/Button/Style1/RightOffsetLabel"]);
-		optionsAddObject( 15,   17, "slider#tl:190:%y#s:100:%s#i:spacingOnRight1#o:spacingOnRight1:0#<value>#0:50:1");
-
+			optionsAddScript("onload", function(self)
+				self.collapsiblePassthrough = true;
+			end)
+		optionsEndFrame()
 
 		-- Style 2
-		optionsAddObject(517, 1*13, "font#tl:22:%y#n:CT_BuffMod_Style2Label#" .. L["CT_BuffMod/Options/Window/Button/Style2/Heading"]);
-
-		-- Icon size
-		optionsAddObject(-20,   14, "font#tl:35:%y#n:CT_BuffMod_Style2SizeLabel#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Button/General/IconSizeSliderLabel"]);
-		optionsAddObject( 15,   17, "slider#tl:165:%y#s:120:%s#i:buffSize2#o:buffSize2:" .. constants.BUFF_SIZE_DEFAULT .. "#<value>#" .. constants.BUFF_SIZE_MINIMUM ..":" .. constants.BUFF_SIZE_MAXIMUM .. ":1");
-
-		-- Icon Borders, including debuff colour codes
-		optionsBeginFrame(-15,   26, "checkbutton#tl:30:%y#i:colorCodeIcons2#o:colorCodeIcons2#" .. L["CT_BuffMod/Options/Window/Button/General/DebuffBorderColorCheckbox"]);
-			optionsAddScript("onenter",
-				function(button)
-					module:displayTooltip(button, {L["CT_BuffMod/Options/Window/Button/General/DebuffBorderColorCheckbox"],L["CT_BuffMod/Options/Window/Button/General/DebuffColorTooltip"]}, "ANCHOR_TOPLEFT");
-				end
-			);
-		optionsEndFrame();
-		optionsBeginFrame( -6,   26, "checkbutton#tl:30:%y#i:normalIconBorder2#o:normalIconBorder2#" .. L["CT_BuffMod/Options/Window/Button/General/NormalIconBorderCheckbox"]);
-			optionsAddScript("onenter",
-				function(button)
-					module:displayTooltip(button, {L["CT_BuffMod/Options/Window/Button/General/NormalIconBorderCheckbox"],L["CT_BuffMod/Options/Window/Button/General/NormalIconBorderTip"]}, "ANCHOR_TOPLEFT");
-				end
-			);
-		optionsEndFrame();
 		
-		-- Show time remaining text
-		--	Format
-		--	Location
-		optionsAddObject( -6,   26, "checkbutton#tl:30:%y#i:showTimers2#o:showTimers2:true#" .. L["CT_BuffMod/Options/Window/Button/General/TimeRemainingCheckbox"]);
-
-		optionsAddObject( -2,   15, "font#tl:70:%y#n:CT_BuffMod_Style2FormatLabel#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Button/General/TimeFormatLabel"]);
-		optionsAddObject( 12,   20, "dropdown#tl:115:%y#s:145:%s#n:CT_BuffModDropdown_durationFormat2#i:durationFormat2#o:durationFormat2:1#" .. L["CT_BuffMod/Options/Window/Time Remaining/Duration Format Dropdown"]);
+		optionsBeginFrame( -10,    0, "collapsible#tl:0:%y#br:tr:0:%b#i:style2Collapsible")
 		
-		optionsAddObject(  6,   26, "checkbutton#tl:44:%y#n:CT_BuffMod_showDaysFormat2#o:showDays2:true#" .. L["CT_BuffMod/Options/Window/Button/General/ShowDaysCheckbox"]);
-		
-		optionsAddObject( -6,   15, "font#tl:48:%y#n:CT_BuffMod_Style2LocationLabel#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Button/General/TimeLocationLabel"]);
-		optionsAddObject( 12,   20, "dropdown#tl:115:%y#s:145:%s#n:CT_BuffModDropdown_dataSide2#i:dataSide2#o:dataSide2:" .. constants.DATA_SIDE_BOTTOM .. L["CT_BuffMod/Options/Window/Button/Style2/TimeLocationDropdown"]);
+			optionsAddObject(-20, 1*13, "font#tl:22:%y#n:CT_BuffMod_Style2Label#" .. L["CT_BuffMod/Options/Window/Button/Style2/Heading"]);
 
-		-- Spacing between icon and text
-		optionsAddObject(-17,   14, "font#tl:48:%y#n:CT_BuffMod_Style2OffsetLabel#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Button/Style2/OffsetLabel"]);
-		optionsBeginFrame(15,   17, "slider#tl:190:%y#s:100:%s#i:spacingFromIcon2#o:spacingFromIcon2:0#<value>#0:50:1");
-			optionsAddScript("onupdate",
-				function(self)
-					if (UIDropDownMenu_GetSelectedID(CT_BuffModDropdown_dataSide2) == constants.DATA_SIDE_CENTER) then
-						self:Disable();
-						frameOptionsspacingFromIcon2Low:SetTextColor(.5,.5,.5)
-						frameOptionsspacingFromIcon2Text:SetTextColor(.5,.5,.5)
-						frameOptionsspacingFromIcon2High:SetTextColor(.5,.5,.5)
-					else
-						self:Enable();
-						frameOptionsspacingFromIcon2Low:SetTextColor(1,1,1);
-						frameOptionsspacingFromIcon2Text:SetTextColor(1,1,1)
-						frameOptionsspacingFromIcon2High:SetTextColor(1,1,1)
+			-- Icon size
+			optionsAddObject(-20,   14, "font#tl:35:%y#n:CT_BuffMod_Style2SizeLabel#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Button/General/IconSizeSliderLabel"]);
+			optionsAddObject( 15,   17, "slider#tl:165:%y#s:120:%s#i:buffSize2#o:buffSize2:" .. constants.BUFF_SIZE_DEFAULT .. "#<value>#" .. constants.BUFF_SIZE_MINIMUM ..":" .. constants.BUFF_SIZE_MAXIMUM .. ":1");
+
+			-- Icon Borders, including debuff colour codes
+			optionsBeginFrame(-15,   26, "checkbutton#tl:30:%y#i:colorCodeIcons2#o:colorCodeIcons2#" .. L["CT_BuffMod/Options/Window/Button/General/DebuffBorderColorCheckbox"]);
+				optionsAddScript("onenter",
+					function(button)
+						module:displayTooltip(button, {L["CT_BuffMod/Options/Window/Button/General/DebuffBorderColorCheckbox"],L["CT_BuffMod/Options/Window/Button/General/DebuffColorTooltip"]}, "ANCHOR_TOPLEFT");
 					end
-				end
-			);
-		optionsEndFrame();
+				);
+			optionsEndFrame();
+			optionsBeginFrame( -6,   26, "checkbutton#tl:30:%y#i:normalIconBorder2#o:normalIconBorder2#" .. L["CT_BuffMod/Options/Window/Button/General/NormalIconBorderCheckbox"]);
+				optionsAddScript("onenter",
+					function(button)
+						module:displayTooltip(button, {L["CT_BuffMod/Options/Window/Button/General/NormalIconBorderCheckbox"],L["CT_BuffMod/Options/Window/Button/General/NormalIconBorderTip"]}, "ANCHOR_TOPLEFT");
+					end
+				);
+			optionsEndFrame();
+
+			-- Show time remaining text
+			--	Format
+			--	Location
+			optionsAddObject( -6,   26, "checkbutton#tl:30:%y#i:showTimers2#o:showTimers2:true#" .. L["CT_BuffMod/Options/Window/Button/General/TimeRemainingCheckbox"]);
+
+			optionsAddObject( -2,   15, "font#tl:70:%y#n:CT_BuffMod_Style2FormatLabel#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Button/General/TimeFormatLabel"]);
+			optionsAddObject( 12,   20, "dropdown#tl:115:%y#s:145:%s#n:CT_BuffModDropdown_durationFormat2#i:durationFormat2#o:durationFormat2:1#" .. L["CT_BuffMod/Options/Window/Time Remaining/Duration Format Dropdown"]);
+
+			optionsAddObject(  6,   26, "checkbutton#tl:44:%y#n:CT_BuffMod_showDaysFormat2#o:showDays2:true#" .. L["CT_BuffMod/Options/Window/Button/General/ShowDaysCheckbox"]);
+
+			optionsAddObject( -6,   15, "font#tl:48:%y#n:CT_BuffMod_Style2LocationLabel#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Button/General/TimeLocationLabel"]);
+			optionsAddObject( 12,   20, "dropdown#tl:115:%y#s:145:%s#n:CT_BuffModDropdown_dataSide2#i:dataSide2#o:dataSide2:" .. constants.DATA_SIDE_BOTTOM .. L["CT_BuffMod/Options/Window/Button/Style2/TimeLocationDropdown"]);
+
+			-- Spacing between icon and text
+			optionsAddObject(-17,   14, "font#tl:48:%y#n:CT_BuffMod_Style2OffsetLabel#v:ChatFontNormal#" .. L["CT_BuffMod/Options/Window/Button/Style2/OffsetLabel"]);
+			optionsBeginFrame(15,   17, "slider#tl:190:%y#s:100:%s#i:spacingFromIcon2#o:spacingFromIcon2:0#<value>#0:50:1");
+				optionsAddScript("onupdate",
+					function(self)
+						if (UIDropDownMenu_GetSelectedID(CT_BuffModDropdown_dataSide2) == constants.DATA_SIDE_CENTER) then
+							self:Disable();
+							self.Low:SetTextColor(.5,.5,.5)
+							self.Text:SetTextColor(.5,.5,.5)
+							self.High:SetTextColor(.5,.5,.5)
+						else
+							self:Enable();
+							self.Low:SetTextColor(1,1,1);
+							self.Text:SetTextColor(1,1,1)
+							self.High:SetTextColor(1,1,1)
+						end
+					end
+				);
+			optionsEndFrame();
 		
-		optionsAddObject( -80, 2*14, "font#t:0:%y#s:0:%s#l:13:0#n:CT_BuffMod_Style2ContinueLabel#r#Continue scrolling for further options#" .. textColor2 .. ":l");
-
-
+		optionsEndFrame()
+		
 		----------
 		-- Scripts
 		----------
@@ -10318,6 +10190,7 @@ CONSOLIDATION REMOVED FROM GAME--]]
 				module:setRadioButtonTextures(self.visShow);
 				module:setRadioButtonTextures(self.visBasic);
 				module:setRadioButtonTextures(self.visAdvanced);
+				self.collapsiblePassthrough = true;
 			end
 		);
 		optionsAddScript("onshow",
@@ -10335,31 +10208,8 @@ CONSOLIDATION REMOVED FROM GAME--]]
 
 	
 	-- Reset Options
-	optionsBeginFrame(-200	, 0, "frame#tl:0:%y#br:tr:0:%b");
-		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_BuffMod/Options/Reset/Heading"]);
-		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:resetAll#" .. L["CT_BuffMod/Options/Reset/ResetAllCheckbox"]);
-		optionsBeginFrame(  -5,   30, "button#t:0:%y#s:120:%s#v:UIPanelButtonTemplate#" .. L["CT_BuffMod/Options/Reset/ResetButton"]);
-			optionsAddScript("onclick", function(self)
-				if (module:getOption("resetAll")) then
-					CT_BuffModOptions = {};
-				else
-					if (not CT_BuffModOptions or not type(CT_BuffModOptions) == "table") then
-						CT_BuffModOptions = {};
-					else
-						CT_BuffModOptions[module:getCharKey()] = nil;
-					end
-				end
-				ConsoleExec("RELOADUI");
-			end);
-		optionsEndFrame();
-		optionsAddObject( -7, 2*15, "font#t:0:%y#s:0:%s#l#r#" .. L["CT_BuffMod/Options/Reset/Line 1"] .. "#" .. textColor2);
-	optionsEndFrame();
+	optionsAddFromTemplate(-20, 0, "frame#tl:0:%y#br:tr:0:%b#i:ResetFrame", "ResetTemplate")
 
-	optionsAddScript("onload",
-		function(self)
-			optionsFrame = self;
-		end
-	);
 	optionsAddScript("onshow",
 		function(self)
 			globalObject.windowListObject:altFrameEnableMouse(true);
@@ -10504,7 +10354,7 @@ frame_Hide = globalFrame.Hide;
 -- Slash command.
 
 local function slashCommand()
-	module:showModuleOptions(module.name);
+	module:showModuleOptions();
 end
 
 module:setSlashCmd(slashCommand, "/ctbuff", "/ctbuffmod", "/ctaura");

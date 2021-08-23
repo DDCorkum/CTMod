@@ -43,6 +43,14 @@ local module = _G["CT_MailMod"];
 --   As of CT_MailMod 3.210, new log entries are recorded in the log with
 --   a timestamp equal to the time that the log entry was created.
 
+local checkMailTime
+hooksecurefunc("CheckInbox", function()
+	checkMailTime = time()
+end)
+SendMailMailButton:HookScript("PreClick", function()
+	checkMailTime = time()
+end)
+
 local function encodeLogEntry(success, type, mail, message)
 	-- Encode a log entry
 	local entry;
@@ -61,10 +69,20 @@ local function encodeLogEntry(success, type, mail, message)
 			sender = mail.sender;
 		end
 	end
+	
+	local timestamp, expires
+	local maxDuration = mail.codAmount > 0 and 259200 or 2678400
+	if (type == "outgoing") then
+		timestamp = time()
+		expires = timestamp + maxDuration
+	else
+		expires = checkMailTime + math.floor(mail.daysleft*86400+0.5)
+		timestamp = expires - maxDuration
+	end
 
 	if ( success and mail ) then
 		-- Format:
-		--   success, type, receiver, sender, money, timestamp, num items (N)
+		--   success, type, receiver, sender, money, timestamp, expires, num items (N)
 		--   subject, item_1 string, item_2, string, ..., item_N string
 		--
 		local numItems = 0;
@@ -82,21 +100,26 @@ local function encodeLogEntry(success, type, mail, message)
 			end
 		end
 		money = money or 0;
-		entry = ("1#%s#%s#%s#%s#%d#%d#%s"):format(type, receiver, sender, money, time(), numItems, mail.subject) .. items;
+		if (mail.body and mail.body ~= "") then
+			-- added in CT_MailMod 
+			entry = ("4#%s#%s#%s#%s#%d-%d#%d#%s#%s"):format(type, receiver, sender, money, timestamp, expires, numItems, mail.body:gsub("#","\26"), mail.subject) .. items;
+		else
+			entry = ("1#%s#%s#%s#%s#%d-%d#%d#%s"):format(type, receiver, sender, money, timestamp, expires, numItems, mail.subject) .. items;
+		end
 
 	elseif ( not success and message ) then
 		if (not mail) then
 			-- Old type "0" format: (no longer added to the log as of CT_MailMod 3.210)
 			--   success, type, message
-			-- entry = ("0#%s#%s"):format(type, module.text[message]);
+			-- entry = ("0#%s#%s"):format(type, message);
 
 			-- Type "3" format: (added as of CT_MailMod 3.210)
 			--   success, type, timestamp, message
-			entry = ("3#%s#%d#%s"):format(type, time(), module.text[message]);
+			entry = ("3#%s#%d#%s"):format(type, timestamp, message);
 		else
 			-- Format:
-			--   success, type, receiver, sender, subject, timestamp, message
-			entry = ("2#%s#%s#%s#%s#%d#%s"):format(type, receiver, sender, mail.subject, time(), module.text[message]);
+			--   success, type, receiver, sender, subject, timestamp, expires, message
+			entry = ("2#%s#%s#%s#%s#%d-%d#%s"):format(type, receiver, sender, mail.subject, timestamp, expires, message);
 		end
 	end
 
@@ -105,41 +128,51 @@ end
 
 local function decodeLogEntry(logMsg)
 	-- Decode a log entry
-	local receiver, sender, subject, money, timestamp, numItems, items, message;
+	local receiver, sender, subject, money, timestamp, expires, numItems, items, message, body
 
-	local success, type, msg = logMsg:match("^(%d)#([^#]*)#(.*)$");
-	if ( success == "1" ) then
+	local success, type, msg = logMsg:match("^(%d)#([^#]*)#(.*)$")
+	if ( success == "1" or success == "4") then
 		-- Success
-		receiver, sender, money, timestamp, numItems, message = msg:match("^([^#]*)#([^#]*)#([^#]*)#([^#]*)#([^#]*)#(.*)$");
-		subject, items = message:match("^(.-)#("..("[^#]+#"):rep(tonumber(numItems)-1).."[^#]+)$");
-		if ( not items ) then
-			subject = message;
-			items = "";
+		receiver, sender, money, timestamp, expires, numItems, message = msg:match("^([^#]*)#([^#]*)#([^#]*)#(%d*)%-?(%d-)#([^#]*)#(.*)$")
+		if (success == "1") then
+			subject, items = message:match("^(.-)#("..("[^#]+#"):rep(tonumber(numItems)-1).."[^#]+)$")
+			body = ""
+			if ( not items ) then
+				subject = message
+				items = ""
+			end
+		else -- if success == "4" then
+			body, subject, items = message:match("^([^#]+)#(.+)#("..("[^#]+#"):rep(tonumber(numItems)-1).."[^#]+)$")
+			if (not items) then
+				items = ""
+				body, subject = message:match("^([^#]+)#(.+)$")
+				body = body and body:gsub("\26","#") or ""
+			end
 		end
 		if (items == "") then
-			return true, type, nil, receiver, sender, subject, tonumber(money), tonumber(timestamp);
+			return true, type, nil, receiver, sender, subject, tonumber(money), tonumber(timestamp), tonumber(expires), body
 		else
-			return true, type, nil, receiver, sender, subject, tonumber(money), tonumber(timestamp), ("#"):split(items);
+			return true, type, nil, receiver, sender, subject, tonumber(money), tonumber(timestamp), tonumber(expires), body, ("#"):split(items)
 		end
 
 	elseif (success == "2") then
 		-- New as of CT_MailMod 3.210
 		-- Failure
-		receiver, sender, subject, timestamp, message = msg:match("^([^#]*)#([^#]*)#([^#]*)#([^#]*)#(.*)$");
-		return false, type, message, receiver, sender, subject, 0, tonumber(timestamp);
+		receiver, sender, subject, timestamp, expires, message = msg:match("^([^#]*)#([^#]*)#([^#]*)#(%d*)%-?(%d-)#(.*)$");
+		return false, type, message, receiver, sender, subject, 0, tonumber(timestamp), tonumber(expires), "";
 
 	elseif (success == "3") then
 		-- New as of CT_MailMod 3.210
 		-- Failure
-		timestamp, message = msg:match("^([^#]*)#(.*)$");
-		return false, type, message, nil, nil, nil, 0, tonumber(timestamp);
+		timestamp, expires, message = msg:match("^(%d*)%-?(%d-)#(.*)$");
+		return false, type, message, nil, nil, nil, 0, tonumber(timestamp), tonumber(expires);
 
 	else
 		-- Type "0" record.
 		-- As of CT_MailMod 3.210 these are no longer being added to the mail log (type "3" is now being added instead).
 		-- This code is here to handle existing log entries, or future unknown record types.
 		-- Failure
-		return false, type, msg, nil, nil, nil, 0, 0;
+		return false, type, msg, nil, nil, nil, 0, 0, 0, "";
 	end
 end
 
@@ -147,9 +180,9 @@ end
 
 local function getLogTable()
 	-- Obtain a reference to the mail log table.
-	local log = module:getOption("mailLog") or { };
-	module:setOption("mailLog", log);
-	return log;
+	local log = CT_MailModOptions.mailLog or {}
+	CT_MailModOptions.mailLog = log
+	return log
 end
 
 --------------------------------------------
@@ -197,12 +230,12 @@ do
 			local entry = log[filterProgress];
 
 			success, action, message, receiver,
-				sender, subject, money, timestamp,
+				sender, subject, money, timestamp, expires, body,
 				items[1], items[2], items[3], items[4],
 				items[5], items[6], items[7], items[8],
 				items[9], items[10], items[11], items[12],
 				items[13], items[14], items[15], items[16] = decodeLogEntry(entry);
-
+			
 			action =
 				action == "returned" and module.text["CT_MailMod/MailLog/Return"]
 				or action == "deleted" and module.text["CT_MailMod/MailLog/Delete"]
@@ -292,11 +325,34 @@ local function writeLogEntry(self, type, success, mail, message)
 
 		-- If this mail object is the same as the one associated with the most
 		-- recent log entry then update that log entry, otherwise add a new log entry.
-		local log = getLogTable();
-		if (mail and mail.serial and mail.serial == logSerial and #log > 0) then
-			log[#log] = entry;  -- Update the existing entry
+		local log = getLogTable()
+		local previous = #log
+		if (mail and mail.serial and mail.serial == logSerial and previous > 0) then
+			log[previous] = entry  -- Update the existing entry
+		elseif (type == "incoming" and previous > 0) then
+				local found
+				local monthago = time()-2678400
+				for i=previous, max(1,previous-50), -1 do		-- starting with the most recent message, and moving backwards, but going back no further than 50 messages (arbitrary)
+					local __, olderType, __, olderReceiver, olderSender, olderSubject, __, olderTimestamp, olderExpires = decodeLogEntry(log[i])
+					if (olderTimestamp < monthago) then  -- stop if reaching messages sent over 31 days ago
+						found = false
+						break
+					elseif(
+						olderExpires
+						and abs(checkMailTime + mail.daysleft*86400 - olderExpires) < 2
+						and mail.subject == olderSubject
+						and mail.receiver == olderReceiver 
+						and mail.sender == olderSender
+					) then
+						found = true
+						break
+					end
+				end
+				if (not found) then
+					tinsert(log, entry)
+				end
 		else
-			tinsert(log, entry);  -- Add new entry
+			tinsert(log, entry)  -- Add new entry
 		end
 
 		if (mail) then
@@ -414,6 +470,8 @@ do
 	local updateMailLog;
 	local resizeMailLog;
 	local resizingMailLog;
+	local numRows = 24
+	local logHeight = 82 + numRows*22
 	local defaultLogWidth = 800;
 	local function mailLogFrameSkeleton()
 		local scrollChild = {
@@ -422,10 +480,9 @@ do
 			"font#l:5:0#i:icontext#v:GameFontNormal##1:1:1:l:48",
 			"font#s:100:20#l:55:0#i:receiver#v:GameFontNormal##1:1:1:l",
 			"font#s:100:20#l:155:0#i:sender#v:GameFontNormal##1:1:1:l",
-			"font#s:60:20#l:255:0#i:date#v:GameFontNormal##1:1:1:c",
+			"font#s:60:20#t:tl:285:0#i:date#v:GameFontNormal##1:1:1:l",
 			"font#s:150:20#l:315:0#i:subject#v:ChatFontNormal##1:1:1:l",
-			"font#tl:55:0#br:-5:0#i:message#v:GameFontNormal##1:0:0:l",
-			"font#tl:475:0#br:-5:0#i:comment#v:GameFontNormal##1:0:0:l",
+			"font#r:-10:0#t#b#i:comment#v:GameFontNormal##1:1:1:l",
 			-- Having a moneyframe "here", but creating it dynamically later
 			-- Having several icons "here", but creating them dynamically later
 			["onenter"] = function(self)
@@ -435,21 +492,22 @@ do
 					self.sender:GetText() and "|cffcccccc" .. module.text["CT_MailMod/MailLog/Receiver"] .. " -|r " .. self.receiver:GetText() .. "#1:1:1", 
 					self.receiver:GetText() and "|cffcccccc" .. module.text["CT_MailMod/MailLog/Sender"] .. " -|r " .. self.sender:GetText() .. "#1:1:1", 
 					self.timestamp and "|cffcccccc" .. module.text["CT_MailMod/MailLog/Date"] .. " -|r " .. date("%Y-%m-%d %H:%M:%S", self.timestamp) .. "#1:1:1", 
-					self.subject:GetText() and "|cffcccccc" .. module.text["CT_MailMod/MailLog/Subject"] .. " -|r " .. gsub(self.subject:GetText(),"#","~") .. "#1:1:1"
+					self.subject:GetText() and "|cffcccccc" .. module.text["CT_MailMod/MailLog/Subject"] .. " -|r " .. gsub(self.subject:GetText(),"#","~") .. "#1:1:1",
+					self.tooltip1,
+					self.tooltip2,
 				}, "CT_ABOVEBELOW", 0, 0, CT_MailMod_MailLog);
 			end
 		}
 
-		return "frame#n:CT_MailMod_MailLog#s:" .. defaultLogWidth .. ":584", {
+		return "frame#n:CT_MailMod_MailLog#s:" .. defaultLogWidth .. ":" .. logHeight, {
 			"backdrop#tooltip#0:0:0:0.75",
 			"font#t:0:-10#v:GameFontNormalHuge#" .. module.text["CT_MailMod/MAIL_LOG"] .. "#1:1:1",
 
-			"font#l:tl:60:-55#i:receiverHeading#v:GameFontNormalLarge#" .. module.text["CT_MailMod/MailLog/Receiver"] .. "#1:1:1:c:100",
-			"font#l:tl:160:-55#i:senderHeading#v:GameFontNormalLarge#" .. module.text["CT_MailMod/MailLog/Sender"] .. "#1:1:1:c:100",
-			"font#l:tl:265:-55#i:dateHeading#v:GameFontNormalLarge#" .. module.text["CT_MailMod/MailLog/Date"] .. "#1:1:1:c:55",
-			"font#l:tl:320:-55#i:subjectHeading#v:GameFontNormalLarge#" .. module.text["CT_MailMod/MailLog/Subject"] .. "#1:1:1:c:150",
-			"font#l:tl:475:-55#i:moneyHeading#v:GameFontNormalLarge#" .. module.text["CT_MailMod/MailLog/Money"] .. "#1:1:1:c:78:",
-			"font#l:tl:553:-55#i:itemsHeading#v:GameFontNormalLarge#" .. module.text["CT_MailMod/MailLog/Items"] .. "#1:1:1:c:100",
+			"font#tl:tl:60:-47#i:receiverHeading#v:GameFontNormalLarge#" .. module.text["CT_MailMod/MailLog/Receiver"] .. "#1:1:1:c:100",
+			"font#tl:tl:160:-47#i:senderHeading#v:GameFontNormalLarge#" .. module.text["CT_MailMod/MailLog/Sender"] .. "#1:1:1:c:100",
+			"font#t:tl:285:-47#i:dateHeading#v:GameFontNormalLarge#" .. module.text["CT_MailMod/MailLog/Date"] .. "#1:1:1:c:55",
+			"font#tl:tl:320:-47#i:subjectHeading#v:GameFontNormalLarge#" .. module.text["CT_MailMod/MailLog/Subject"] .. "#1:1:1:c:150",
+			"font#tl:tl:475:-47#i:contentsHeading#v:GameFontNormalLarge#Contents#1:1:1:c:150",
 
 			--"font#tl:20:-40#v:GameFontNormalLarge#Filter:#1:1:1",
 			--"dropdown#n:CT_MAILMOD_MAILLOGDROPDOWN1#tl:80:-43#All Mail#Incoming Mail#Outgoing Mail",
@@ -490,30 +548,33 @@ do
 
 			["frame#tl:5:-72#br:-5:5#i:scrollChildren"] = {
 				["frame#s:0:20#tl:0:0#r#i:1"] = scrollChild,
-				["frame#s:0:21#tl:0:-21#r#i:2"] = scrollChild,
-				["frame#s:0:21#tl:0:-42#r#i:3"] = scrollChild,
-				["frame#s:0:21#tl:0:-63#r#i:4"] = scrollChild,
-				["frame#s:0:21#tl:0:-84#r#i:5"] = scrollChild,
-				["frame#s:0:21#tl:0:-105#r#i:6"] = scrollChild,
-				["frame#s:0:21#tl:0:-126#r#i:7"] = scrollChild,
-				["frame#s:0:21#tl:0:-147#r#i:8"] = scrollChild,
-				["frame#s:0:21#tl:0:-168#r#i:9"] = scrollChild,
-				["frame#s:0:21#tl:0:-189#r#i:10"] = scrollChild,
-				["frame#s:0:21#tl:0:-210#r#i:11"] = scrollChild,
-				["frame#s:0:21#tl:0:-231#r#i:12"] = scrollChild,
-				["frame#s:0:21#tl:0:-252#r#i:13"] = scrollChild,
-				["frame#s:0:21#tl:0:-273#r#i:14"] = scrollChild,
-				["frame#s:0:21#tl:0:-294#r#i:15"] = scrollChild,
-				["frame#s:0:21#tl:0:-315#r#i:16"] = scrollChild,
-				["frame#s:0:21#tl:0:-336#r#i:17"] = scrollChild,
-				["frame#s:0:21#tl:0:-357#r#i:18"] = scrollChild,
-				["frame#s:0:21#tl:0:-378#r#i:19"] = scrollChild,
-				["frame#s:0:21#tl:0:-399#r#i:20"] = scrollChild,
-				["frame#s:0:21#tl:0:-420#r#i:21"] = scrollChild,
-				["frame#s:0:21#tl:0:-441#r#i:22"] = scrollChild,
-				["frame#s:0:21#tl:0:-462#r#i:23"] = scrollChild,
-				["frame#s:0:21#tl:0:-483#r#i:24"] = scrollChild,
-				["onload"] = function(self) self:SetAlpha(0.7); end,
+				["frame#s:0:21#tl:0:-22#r#i:2"] = scrollChild,
+				["frame#s:0:21#tl:0:-44#r#i:3"] = scrollChild,
+				["frame#s:0:21#tl:0:-66#r#i:4"] = scrollChild,
+				["frame#s:0:21#tl:0:-88#r#i:5"] = scrollChild,
+				["frame#s:0:21#tl:0:-110#r#i:6"] = scrollChild,
+				["frame#s:0:21#tl:0:-132#r#i:7"] = scrollChild,
+				["frame#s:0:21#tl:0:-154#r#i:8"] = scrollChild,
+				["frame#s:0:21#tl:0:-176#r#i:9"] = scrollChild,
+				["frame#s:0:21#tl:0:-198#r#i:10"] = scrollChild,
+				["frame#s:0:21#tl:0:-220#r#i:11"] = scrollChild,
+				["frame#s:0:21#tl:0:-242#r#i:12"] = scrollChild,
+				["frame#s:0:21#tl:0:-264#r#i:13"] = scrollChild,
+				["frame#s:0:21#tl:0:-286#r#i:14"] = scrollChild,
+				["frame#s:0:21#tl:0:-308#r#i:15"] = scrollChild,
+				["frame#s:0:21#tl:0:-330#r#i:16"] = scrollChild,
+				["frame#s:0:21#tl:0:-352#r#i:17"] = scrollChild,
+				["frame#s:0:21#tl:0:-374#r#i:18"] = scrollChild,
+				["frame#s:0:21#tl:0:-396#r#i:19"] = scrollChild,
+				["frame#s:0:21#tl:0:-418#r#i:20"] = scrollChild,
+				["frame#s:0:21#tl:0:-440#r#i:21"] = scrollChild,
+				["frame#s:0:21#tl:0:-462#r#i:22"] = scrollChild,
+				["frame#s:0:21#tl:0:-484#r#i:23"] = scrollChild,
+				["frame#s:0:21#tl:0:-506#r#i:24"] = scrollChild,
+				["onload"] = function(self) 
+					self:SetAlpha(0.7);
+					self:SetClipsChildren(true)
+				end,
 			},
 
 			["onload"] = function(self)
@@ -586,8 +647,8 @@ do
 				end;
 
 				self:SetResizable(true);
-				self:SetMaxResize(UIParent:GetWidth(), 500);
-				self:SetMinResize(defaultLogWidth - 100, 500);
+				self:SetMaxResize(UIParent:GetWidth(), logHeight);
+				self:SetMinResize(defaultLogWidth - 100, logHeight);
 
 				local rightFrame = CreateFrame("Frame", "CT_MailMod_MailLog_RightResizeFrame", self);
 				rightFrame.side = "RIGHT";
@@ -695,13 +756,12 @@ do
 			createMoneyFrame = function(parent, id) -- Local
 				local frameName = "CT_MailMod_MailLogMoneyFrame"..id;
 				local frame = CreateFrame("Frame", frameName, parent, "SmallMoneyFrameTemplate");
+				frame:SetPoint("LEFT", parent.subject, "RIGHT", 0, 0)
 
 				_G[frameName.."GoldButton"]:EnableMouse(false);
 				_G[frameName.."SilverButton"]:EnableMouse(false);
 				_G[frameName.."CopperButton"]:EnableMouse(false);
 
-				local diff = mailLogFrame:GetWidth() - defaultLogWidth;
-				frame:SetPoint("LEFT", parent, "LEFT", 470 + diff, 0);
 				frame.moneyType = "STATIC";
 				frame.hasPickup = 0;
 				frame.info = moneyTypeInfo
@@ -723,11 +783,14 @@ do
 			end
 
 			createItemFrame = function(parent, id) -- Local
-				local diff = mailLogFrame:GetWidth() - defaultLogWidth;
 				local button = CreateFrame("Button", nil, parent);
 				button:SetWidth(16);
 				button:SetHeight(16);
-				button:SetPoint("LEFT", parent, "LEFT", 530 + diff + id * 18, 0);
+				if (id > 1) then
+					button:SetPoint("LEFT", parent.items[id-1], "RIGHT", 2, 0)
+				else
+					button:SetPoint("LEFT", parent.subject, "RIGHT", 0, 0)
+				end
 				button:SetScript("OnEnter", itemOnEnter);
 				button:SetScript("OnLeave", itemOnLeave);
 				button.countFontString = button:CreateFontString(nil, "OVERLAY", "NumberFontNormalSmall");
@@ -747,51 +810,46 @@ do
 			return name;
 		end
 
-		updateMailEntry = function(frame, i, success, type, message, receiver, sender, subject, money, timestamp, ...) -- Local
+		updateMailEntry = function(frame, i, success, type, message, receiver, sender, subject, money, timestamp, expires, body, ...) -- Local
 			local moneyFrame = frame.moneyFrame;
 			local items = select('#', ...);
 
 			frame.timestamp = timestamp;
+			frame.expires = expires
+
+			body = body or ""
+			frame.tooltip1 = message or body
+			frame.tooltip2 = message and body
 
 			if ( success ) then
 				-- Success
 
-				receiver = formatPlayer(receiver);
-				sender = formatPlayer(sender);
-
-				frame.receiver:SetText(receiver);
-				frame.sender:SetText(sender);
-				frame.date:SetText(
-					((timestamp > time() - 30000000) and date("%b %d", timestamp))
-					or date("%y%m%d", timestamp)
-				);
-				frame.subject:SetText(subject);
-				frame.message:SetText("");
-				frame.comment:SetText("");
+				receiver = formatPlayer(receiver)
+				sender = formatPlayer(sender)
+				frame.receiver:SetText(receiver)
+				frame.sender:SetText(sender)
+				frame.date:SetText(date("%y %m %d", timestamp))
+				frame.subject:SetText(subject)
+				frame.comment:SetText(body:gsub("\n", " "))
 			else
 				-- Failure
 				money = 0;
 
-				local diff = mailLogFrame:GetWidth() - defaultLogWidth;
-				frame.comment:ClearAllPoints();
-				frame.comment:SetPoint("TOPLEFT", frame, "TOPLEFT", 470 + diff, 0);
-				frame.comment:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -5, 0);
-
 				if (receiver) then
-					receiver = formatPlayer(receiver);
-					sender = formatPlayer(sender);
+					receiver = formatPlayer(receiver)
+					sender = formatPlayer(sender)
 
-					frame.receiver:SetText(receiver);
-					frame.sender:SetText(sender);
-					frame.subject:SetText(subject);
-					frame.message:SetText("");
-					frame.comment:SetText(message);
+					frame.receiver:SetText(receiver)
+					frame.sender:SetText(sender)
+					frame.date:SetText(date("%y %m %d", timestamp))
+					frame.subject:SetText(subject)
+					frame.comment:SetText(body:gsub("\n", " "))
 				else
-					frame.receiver:SetText("");
-					frame.sender:SetText("");
-					frame.subject:SetText("");
-					frame.message:SetText(message);
-					frame.comment:SetText("");
+					frame.receiver:SetText("")
+					frame.sender:SetText("")
+					frame.date:SetText(date("%y %m %d", timestamp))
+					frame.subject:SetText("")
+					frame.comment:SetText(message)
 				end
 			end
 
@@ -862,37 +920,45 @@ do
 					item:Hide();
 				end
 			end
+					
+			
+			if (frame.moneyFrame and frame.moneyFrame:IsShown()) then
+				if (frame.items[1] and frame.items[1]:IsShown()) then
+					frame.items[1]:SetPoint("LEFT", frame.subject, "RIGHT", 55, 0)
+					local i, x = 2, 78
+					while (frame.items[i] and frame.items[i]:IsShown()) do
+						x = x + 18
+						i = i + 1
+					end
+					frame.comment:SetPoint("LEFT", frame.subject, "RIGHT", x, 0)
+				else
+					frame.comment:SetPoint("LEFT", frame.subject, "RIGHT", 55, 0)
+				end
+			elseif (frame.items[1] and frame.items[1]:IsShown()) then
+				frame.items[1]:SetPoint("LEFT", frame.subject, "RIGHT", 0, 0)
+				local i, x = 2, 23
+				while (frame.items[i] and frame.items[i]:IsShown()) do
+					x = x + 18
+					i = i + 1
+				end
+				frame.comment:SetPoint("LEFT", frame.subject, "RIGHT", x, 0)
+			else
+				frame.comment:SetPoint("LEFT", frame.subject, "RIGHT", 0, 0)
+			end
 		end
 	end
 
 	resizeMailLog = function(logFrame)
 		local tostring = tostring;
 		local diff = logFrame:GetWidth() - defaultLogWidth;
-		local subjectWidth = 155 + diff;			-- was 200 until CTMod 8.2.5.7 and the addition of a date column
+		local subjectWidth = 200 + diff*0.6;
 		local children = logFrame.scrollChildren;
 
-		logFrame.moneyHeading:ClearAllPoints();
-		logFrame.moneyHeading:SetPoint("TOPLEFT", logFrame, "TOPLEFT", 475 + diff, -47);
+		logFrame.contentsHeading:SetPoint("TOPLEFT", logFrame, "TOPLEFT", 520 + diff*0.6, -47)
 
-		logFrame.itemsHeading:ClearAllPoints();
-		logFrame.itemsHeading:SetPoint("TOPLEFT", logFrame, "TOPLEFT", 553 + diff, -47);
-
-		for i = 1, 21 do
+		for i = 1, numRows do
 			local frame = children[tostring(i)];
 			frame.subject:SetWidth(subjectWidth);
-			if (frame.moneyFrame) then
-				frame.moneyFrame:ClearAllPoints();
-				frame.moneyFrame:SetPoint("LEFT", frame, "LEFT", 470 + diff, 0);
-			end
-			if (frame.items) then
-				for id, item in ipairs(frame.items) do
-					item:ClearAllPoints();
-					item:SetPoint("LEFT", frame, "LEFT", (530 + diff) + id * 18, 0);
-				end
-			end
-			frame.comment:ClearAllPoints();
-			frame.comment:SetPoint("TOPLEFT", frame, "TOPLEFT", 470 + diff, 0);
-			frame.comment:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -5, 0);
 		end
 	end
 
@@ -907,12 +973,12 @@ do
 		if (filteredLog) then
 
 			-- STEP 2:
-			FauxScrollFrame_Update(CT_MailMod_MailLog_ScrollFrame, #filteredLog, 24, 20);
+			FauxScrollFrame_Update(CT_MailMod_MailLog_ScrollFrame, #filteredLog, numRows, 20);
 			local offset = FauxScrollFrame_GetOffset(CT_MailMod_MailLog_ScrollFrame);
 
 			-- STEP 3:
 			local children, frame = mailLogFrame.scrollChildren;
-			for i = 1, 24, 1 do
+			for i = 1, numRows, 1 do
 				frame = children[tostring(i)];
 				if (filteredLog[#filteredLog+1-offset-i]) then  -- reversed, so that newer items are at the top
 					updateMailEntry(frame, i, decodeLogEntry(filteredLog[#filteredLog+1-offset-i]));

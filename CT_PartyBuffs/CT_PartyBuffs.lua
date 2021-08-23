@@ -298,7 +298,7 @@ end)
 -- Slash command.
 
 local function slashCommand(msg)
-	module:showModuleOptions(module.name);
+	module:showModuleOptions();
 end
 
 module:setSlashCmd(slashCommand, "/ctpb", "/ctparty", "/ctpartybuffs");

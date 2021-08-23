@@ -118,7 +118,7 @@ For this example plugin, we show the standard Titan buttons plus options to dete
 					if (module.customOpenFunction) then
 						module:customOpenFunction(...);
 					else
-						CT:showModuleOptions(module.name);
+						module:showModuleOptions();
 					end
 				end;
 			end		

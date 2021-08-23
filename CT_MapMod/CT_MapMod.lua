@@ -1187,7 +1187,7 @@ function module.configureWorldMapFrame()
 								info.text = L["CT_MapMod/Map/DropDown/Options"];
 								info.hasArrow = false;
 								info.func = function()
-									module:showModuleOptions(MODULE_NAME);
+									module:showModuleOptions();
 									if (WorldMapFrame:GetFrameStrata() == "FULLSCREEN") then
 										-- so the options are visible on classic
 										CTCONTROLPANEL:SetFrameStrata("FULLSCREEN_DIALOG");
@@ -1742,7 +1742,7 @@ end
 
 -- Slash command
 local function slashCommand(msg)
-	module:showModuleOptions(module.name);
+	module:showModuleOptions();
 end
 
 module:setSlashCmd(slashCommand, "/ctmapmod", "/ctmap", "/mapmod", "/ctcarte", "/ctkarte");
@@ -1755,12 +1755,13 @@ module.frame = function()
 	local optionsFrameList = module:framesInit()
 	
 	-- helper funcs
-	local optionsAddFrame = function(offset, size, details, data) module:framesAddFrame(optionsFrameList, offset, size, details, data); end
-	local optionsAddObject = function(offset, size, details) module:framesAddObject(optionsFrameList, offset, size, details); end
-	local optionsAddScript = function(name, func) module:framesAddScript(optionsFrameList, name, func); end
-	local optionsAddTooltip = function(text) module:framesAddScript(optionsFrameList, "onenter", function(obj) module:displayTooltip(obj, text, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL); end); end
-	local optionsBeginFrame = function(offset, size, details, data) module:framesBeginFrame(optionsFrameList, offset, size, details, data); end
-	local optionsEndFrame = function() module:framesEndFrame(optionsFrameList); end
+	local function optionsAddFrame (offset, size, details, data) module:framesAddFrame(optionsFrameList, offset, size, details, data) end
+	local function optionsAddObject (offset, size, details) module:framesAddObject(optionsFrameList, offset, size, details) end
+	local function optionsAddScript (name, func) module:framesAddScript(optionsFrameList, name, func) end
+	local function optionsAddTooltip (text) module:framesAddScript(optionsFrameList, "onenter", function(obj) module:displayTooltip(obj, text, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL) end) end
+	local function optionsBeginFrame (offset, size, details, data) module:framesBeginFrame(optionsFrameList, offset, size, details, data) end
+	local function optionsEndFrame () module:framesEndFrame(optionsFrameList) end
+	local function optionsAddFromTemplate (offset, size, details, template) module:framesAddFromTemplate(optionsFrameList, offset, size, details, template) end
 
 	local textColor0 = "#1.0:1.0:1.0";
 	local textColor1 = "#0.9:0.9:0.9";
@@ -1852,27 +1853,7 @@ module.frame = function()
 		end
 		
 		-- Reset Options
-		optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
-			optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#" .. L["CT_MapMod/Options/Reset/Heading"]); -- Reset Options
-			optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:CT_MapMod_resetAll#" .. L["CT_MapMod/Options/Reset/ResetAllCheckbox"]); -- Reset options for all of your characters
-			optionsBeginFrame(   0,   30, "button#t:0:%y#s:120:%s#v:UIPanelButtonTemplate#" .. L["CT_MapMod/Options/Reset/ResetButton"]);  -- Reset options
-				optionsAddScript("onclick",
-					function()
-						if (module:getOption("CT_MapMod_resetAll")) then
-							CT_MapModOptions = {};
-						else
-							if (type(CT_MapModOptions) ~= "table") then
-								CT_MapModOptions = {};
-							else
-								CT_MapModOptions[module:getCharKey()] = nil;
-							end
-						end
-						ConsoleExec("RELOADUI");
-					end
-				);
-			optionsEndFrame();
-		optionsEndFrame();
-		optionsAddObject(  0, 3*13, "font#t:0:%y#s:0:%s#l#r#" .. L["CT_MapMod/Options/Reset/Line 1"] .. textColor2); --Note: This will reset the options to default and then reload your UI.
+		optionsAddFromTemplate(-20, 0, "frame#tl:0:%y#br:tr:0:%b#i:ResetFrame", "ResetTemplate")
 		
 	optionsEndFrame();
 

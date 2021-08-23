@@ -51,7 +51,7 @@ end
 
 -- Slash command to display the frame
 SlashCmdList["VIEWPORT"] = function(msg)
-	module:showModuleOptions(module.name);
+	module:showModuleOptions();
 	local iStart, iEnd, left, right, top, bottom = string.find(msg, "^(%d+%.?%d?) (%d+%.?%d?) (%d+%.?%d?) (%d+%.?%d?)$");
 	if ( left and right and top and bottom ) then
 		local screenRes = module.screenRes;
@@ -209,7 +209,7 @@ function module.GetCurrentResolution(...)
 end
 
 -- Apply the viewport settings
-function module.ApplyViewport(left, right, top, bottom, r, g, b)
+function module.ApplyViewport(left, right, top, bottom)
 	local screenRes = module.screenRes;
 
 	-- UIParent values change when the UI scale is changed by the user,
@@ -255,18 +255,11 @@ function module.ApplyViewport(left, right, top, bottom, r, g, b)
 		left, right, top, bottom = 0, 0, 0, 0;
 	end
 
-	r = ( r or 0 );
-	g = ( g or 0 );
-	b = ( b or 0 );
-
-	savedViewport[1] = floor(left*2+0.1)*.5;
-	savedViewport[2] = floor(right*2+0.1)*.5;
-	savedViewport[3] = floor(top*2+0.1)*.5;
-	savedViewport[4] = floor(bottom*2+0.1)*.5;
-	savedViewport[5] = r;
-	savedViewport[6] = g;
-	savedViewport[7] = b;
-	module:setOption("savedViewport", savedViewport);
+	savedViewport[1] = floor(left*2+0.1)*.5
+	savedViewport[2] = floor(right*2+0.1)*.5
+	savedViewport[3] = floor(top*2+0.1)*.5
+	savedViewport[4] = floor(bottom*2+0.1)*.5
+	module:setOption("savedViewport", savedViewport, false)
 
 	local update = true;
 	if (WorldFrame:IsProtected() and InCombatLockdown()) then
@@ -275,35 +268,38 @@ function module.ApplyViewport(left, right, top, bottom, r, g, b)
 	if (update) then
 		frameClearAllPoints(WorldFrame);
 
-		local xoffset;
-		local yoffset;
+		local ULx;
+		local ULy;
+		local LRx
+		local LRy
 
 		if (screenRes[1] == 0) then
-			xoffset = 0;
+			ULx = 0;
 		else
-			xoffset = (left / screenRes[1]) * (parentWidth * parentScale);
+			ULx = (left / screenRes[1]) * (parentWidth * parentScale);
 		end
 		if (screenRes[2] == 0) then
-			yoffset = 0;
+			ULy = 0;
 		else
-			yoffset = (top / screenRes[2]) * (parentHeight * parentScale);
+			ULy = (top / screenRes[2]) * (parentHeight * parentScale);
 		end
-		frameSetPoint(WorldFrame, "TOPLEFT", xoffset, -yoffset);
+		frameSetPoint(WorldFrame, "TOPLEFT", ULx, -ULy);
 
 		if (screenRes[1] == 0) then
-			xoffset = 0;
+			LRx = 0;
 		else
-			xoffset = (right / screenRes[1]) * (parentWidth * parentScale);
+			LRx = (right / screenRes[1]) * (parentWidth * parentScale);
 		end
 		if (screenRes[2] == 0) then
-			yoffset = 0;
+			LRy = 0;
 		else
-			yoffset = (bottom / screenRes[2]) * (parentHeight * parentScale);
+			LRy = (bottom / screenRes[2]) * (parentHeight * parentScale);
 		end
-		frameSetPoint(WorldFrame, "BOTTOMRIGHT", -xoffset, yoffset);
+		frameSetPoint(WorldFrame, "BOTTOMRIGHT", -LRx, LRy);
+		
+		module.updateGradientPoints(ULx, ULy, LRx, LRy)
+
 	end
-
-	--CT_ViewportOverlay:SetVertexColor(r, g, b, 1);
 end
 
 function module.ApplySavedViewport()
@@ -329,10 +325,7 @@ function module.ApplySavedViewport()
 		savedViewport[1],
 		savedViewport[2],
 		savedViewport[3],
-		savedViewport[4],
-		savedViewport[5],
-		savedViewport[6],
-		savedViewport[7]
+		savedViewport[4]
 	);
 end
 
@@ -380,7 +373,7 @@ do
 end
 
 -- Apply saved settings to the inner viewport
-function module.ApplyInnerViewport(left, right, top, bottom, r, g, b)
+function module.ApplyInnerViewport(left, right, top, bottom)
 	local screenRes = module.screenRes;
 	local iframe = CT_ViewportInnerFrame;
 
@@ -512,10 +505,77 @@ function module.Init(width, height)
 	end
 end
 
+-----------------------
+-- Gradient textures
+
+do
+	local frame = CreateFrame("Frame")
+	frame:SetFrameStrata("BACKGROUND")
+	frame:SetFrameLevel(0)
+	frame:SetAllPoints()
+	frame:Hide()
+	
+	local left = frame:CreateTexture(nil, "BACKGROUND", -7)
+	left:SetPoint("RIGHT", WorldFrame, "LEFT")
+	left:SetPoint("BOTTOM", WorldFrame)
+	left:SetPoint("TOP", WorldFrame)
+	
+	local right = frame:CreateTexture(nil, "BACKGROUND", -7)
+	right:SetPoint("LEFT", WorldFrame, "RIGHT")
+	right:SetPoint("BOTTOM", WorldFrame)
+	right:SetPoint("TOP", WorldFrame)
+	
+	local bottom  = frame:CreateTexture(nil, "BACKGROUND", -7)
+	bottom:SetPoint("LEFT", left)
+	bottom:SetPoint("RIGHT", right)
+	bottom:SetPoint("TOP", WorldFrame, "BOTTOM")	
+	
+	local top  = frame:CreateTexture(nil, "BACKGROUND", -7)
+	top:SetPoint("LEFT", left)
+	top:SetPoint("RIGHT", right)
+	top:SetPoint("BOTTOM", WorldFrame, "TOP")
+	
+	function module.updateGradientPoints(ULx, ULy, LRx, LRy)		--called by ApplyViewport() when out of combat
+		if (ULx > 0 or ULy > 0 or LRx > 0 or LRy > 0) then
+			left:SetPoint("LEFT", WorldFrame, -ULx, 0)
+			right:SetPoint("RIGHT", WorldFrame, LRx, 0)
+			bottom:SetPoint("BOTTOM", WorldFrame, 0, -LRy)
+			top:SetPoint("TOP", WorldFrame, 0, ULy)
+			frame:Show()
+		else
+			frame:Hide()
+		end
+	end
+	
+	function module.setGradientColor(color)		--called by ApplyViewport() when it happens
+		local r, g, b, a
+		if (color) then
+			r, g, b, a = color[1] or 0, color[2] or 0, color[3] or 0, color[4] or 1
+		else
+			r, g, b, a = 0, 0, 0, 1
+		end
+
+		left:SetColorTexture(r, g, b, a)
+		right:SetColorTexture(r, g, b, a)
+		bottom:SetColorTexture(r, g, b, a)
+		top:SetColorTexture(r, g, b, a)
+	end
+
+end
+
+
+-----------------------
+-- Apply Settings
+
 function module:update(option, value)
 	if (option == "init") then
 		
-		savedViewport = module:getOption("savedViewport") or {0,0,0,0,0,0,0}
+		savedViewport = module:getOption("savedViewport") or {0,0,0,0}
+		
+		-- Temporary code to transition from 9.1.0.2 to 9.1.0.3
+		savedViewport[5] = nil
+		savedViewport[6] = nil
+		savedViewport[7] = nil
 		
 		-- Temporary code to transition from 9.0.2.4 to 9.0.5.x
 		if (CT_Viewport_Saved) then
@@ -537,13 +597,13 @@ function module:update(option, value)
 				end
 
 				-- convert from an olds note format
-				savedViewport[1], savedViewport[2], savedViewport[3], savedViewport[4], savedViewport[5], savedViewport[6], savedViewport[7]
-					= CT_Viewport_Saved[1], CT_Viewport_Saved[2], CT_Viewport_Saved[3], CT_Viewport_Saved[4], CT_Viewport_Saved[5], CT_Viewport_Saved[6], CT_Viewport_Saved[7]
+				savedViewport[1], savedViewport[2], savedViewport[3], savedViewport[4]
+					= CT_Viewport_Saved[1], CT_Viewport_Saved[2], CT_Viewport_Saved[3], CT_Viewport_Saved[4]
 				wipe(CT_Viewport_Saved)
 			end
 		end
 
-		module:setOption("savedViewport", savedViewport, true)
+		module:setOption("savedViewport", savedViewport, false)
 	
 		-- The former on-load and VARIABLES_LOADED until 9.0.0.1
 		local dummyFrame = CreateFrame("Frame")
@@ -576,9 +636,15 @@ function module:update(option, value)
 		);
 
 
+		module.setGradientColor(module:getOption("color"))
+
 		module.Init(nil, nil)
-		
+	
 		module.ApplySavedViewport()
+		
+	elseif (option == "color") then
+		module.setGradientColor(value)
+		
 	end
 end
 
@@ -1156,6 +1222,9 @@ function module.frame()
 		optionsAddTooltip({L["CT_Viewport/Options/Alerts/SuppressLoadingMessageCheckButton"],L["CT_Viewport/Options/Alerts/SuppressLoadingMessageTip"] .. textColor1});
 	optionsEndFrame();
 	
+	-- Gradient color
+	optionsAddObject(-25, 17, "font#tl:5:%y#v:GameFontNormalLarge#" .. COLOR)
+	optionsAddObject(-5, 10, "colorswatch#tl:10:%y#s:16:16#o:color:0,0,0,1#true")	
 	
 	-- see CT_Library
 	return "frame#all", module:framesGetData(optionsFrameList);

@@ -1526,9 +1526,10 @@ end
 --------------------------------------------
 -- Movable casting bar
 
+local movableCastingBar, movableCastingBarHelper, enableMovableCastingBar, unlockMovableCastingBar
 
 -- start by creating a helper that can be moved around
-local movableCastingBarHelper = CreateFrame("StatusBar", nil, UIParent, "CastingBarFrameTemplate");
+ movableCastingBarHelper = CreateFrame("StatusBar", nil, UIParent, "CastingBarFrameTemplate");
 movableCastingBarHelper:SetWidth(195);
 movableCastingBarHelper:SetHeight(13);
 movableCastingBarHelper:SetPoint("CENTER", UIParent, "CENTER", 0, 0);
@@ -1538,11 +1539,8 @@ movableCastingBarHelper:SetScript("OnUpdate", nil);
 movableCastingBarHelper:SetScript("OnShow", nil);
 
 local function castingbar_ToggleHelper(showHelper)
-	if (showHelper) then
-		movableCastingBarHelper:Show();
-	else
-		movableCastingBarHelper:Hide();
-	end
+	unlockMovableCastingBar = showHelper
+	movableCastingBarHelper:SetShown(enableMovableCastingBar and unlockMovableCastingBar)
 end
 
 castingbar_ToggleHelper(module:getOption("castingbarMovable"));
@@ -1582,6 +1580,8 @@ local function castingbar_Update(enable)
 		CastingBarFrame_OnLoad(movableCastingBar,nil,true,false);
 		CastingBarFrame_OnLoad(CastingBarFrame,"player",true,false);
 	end
+	enableMovableCastingBar = enable
+	movableCastingBarHelper:SetShown(enableMovableCastingBar and unlockMovableCastingBar)
 end
 
 movableCastingBar:RegisterEvent("ADDON_LOADED")
@@ -1875,7 +1875,7 @@ local function uncheckBagOption(optName)
 	local value = false;
 	module:setOption(optName, value, CT_SKIP_UPDATE_FUNC);
 	if (type(module.frame) == "table") then
-		local cb = module.frame.section1[optName];
+		local cb = module.frame.bagAutomationCollapsible[optName];
 		cb:SetChecked(value);
 	end
 end
@@ -2907,6 +2907,10 @@ if (PlayerPowerBarAlt) then
 			UIParent_ManageFramePositions();
 		end
 	end
+	
+	local function powerbaralt_onEnter(self)
+		module:displayPredefinedTooltip(self, "DRAG")
+	end
 
 	local function powerbaralt_createAnchorFrame()
 		local movable = "PowerBarAltAnchor";
@@ -2934,9 +2938,10 @@ if (PlayerPowerBarAlt) then
 		tex:SetTexture("Interface\\Tooltips\\UI-Tooltip-Background");
 		tex:SetVertexColor(0.7, 0.7, 0.7, 0.8);
 
-		self:SetScript("OnMouseDown", powerbaralt_onMouseDown);
-		self:SetScript("OnMouseUp", powerbaralt_onMouseUp);
-		self:SetScript("OnEvent", powerbaralt_onEvent);
+		self:SetScript("OnMouseDown", powerbaralt_onMouseDown)
+		self:SetScript("OnMouseUp", powerbaralt_onMouseUp)
+		self:SetScript("OnEvent", powerbaralt_onEvent)
+		self:SetScript("OnEnter", powerbaralt_onEnter)
 
 		module:registerMovable(movable, self, true);
 		self.movable = movable;

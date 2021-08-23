@@ -123,7 +123,7 @@ function module:update(option, value)
 end
 
 --produces the options frames
-function module:frame()
+function module.frame()
 	-- see CT_Library
 	local optionsFrameList = module:framesInit()
 		
@@ -132,13 +132,16 @@ function module:frame()
 
 	-- Custom Raid Frames
 	StaticCTRAFrames():Frame(optionsFrameList)
+	
+	-- Reset Options
+	module:framesAddFromTemplate(optionsFrameList, -20, 0, "frame#tl:0:%y#br:tr:0:%b#i:ResetFrame", "ResetTemplate")
 
 	-- see CT_Library
 	return "frame#all", module:framesGetData(optionsFrameList)
 end
 
 local function slashCommand()
-	module:showModuleOptions(module.name)
+	module:showModuleOptions()
 end
 
 module:setSlashCmd(slashCommand, "/ctra", "/ctraid", "/ctraidassist")
@@ -1616,7 +1619,7 @@ function NewCTRAWindow(owningCTRAFrames)	-- local at the top of this file
 		self:Update();
 		
 		-- STEP 7:
-		if (module:isControlPanelShown()) then
+		if (module:IsControlPanelShown()) then
 			self:ShowAnchor();
 		else
 			self:HideAnchor();

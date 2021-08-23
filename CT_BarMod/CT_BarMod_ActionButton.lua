@@ -253,13 +253,17 @@ local function getActionButton(buttonId)
 		bling.s3:SetDuration(0.2)
 		bling.s3:SetStartDelay(0.8)
 		
-		button.cooldown:HookScript("OnCooldownDone", function(self) 
-			bling.ag:Restart()
-			bling.ag:Play()
-		end)
+		module:regEvent("PLAYER_LOGIN", function()
+			-- Delay these hooks for compatibility with OmniCC.
 		
-		hooksecurefunc(button.cooldown, "SetCooldown", function(self, start, duration)
-			bling.ag:Stop()
+			button.cooldown:HookScript("OnCooldownDone", function(self) 
+				bling.ag:Restart()
+				bling.ag:Play()
+			end)
+
+			hooksecurefunc(button.cooldown, "SetCooldown", function(self, start, duration)
+				bling.ag:Stop()
+			end)
 		end)
 		
 		button.recharge = CreateFrame("Cooldown", nil, parent, "CooldownFrameTemplate");
@@ -449,38 +453,53 @@ end
 -- Set if action is triggered on click up or click down.
 -- This affects the mouse for ALL bars, and also the keybind for extra bars (7-10).
 -- Keybinds for bars 2-6 and the action bar are handled elsewhere in a way that is integrated with console variable "ActionButtonUseKeyDown"
+--
+-- Update: Keybinds trigger Button31, but are now converted to LeftButton during execution so the macro conditional [button:1] will trigger.
 function actionButton:setClickDirection(onKeyDown, alsoOnMouseDown)
+	self.button:SetAttribute("type31", "")
+	if (self.onClickDirectionPreviouslySet) then
+		self.button:UnwrapScript(self.button, "OnClick")
+	end
+	self.onClickDirectionPreviouslySet = true
 	if (onKeyDown and alsoOnMouseDown) then
 		self.button:RegisterForClicks("AnyDown");
-		if (self.onClickWrapped) then
-			self.button:UnwrapScript(self.button, "OnClick")
-			self.onClickWrapped = nil
-		end		
+		self.button:WrapScript(
+			self.button,
+			"OnClick",
+			--pre-body
+			[=[
+				-- self, button, down
+				if (button == "Button31") then
+					return "LeftButton"
+				end
+			]=]
+		)
 	elseif (onKeyDown) then
 		self.button:RegisterForClicks("AnyUp", "Button31Down")
-		if (not self.onClickWrapped) then
-			self.onClickWrapped = true
-			self.button:WrapScript(
-				self.button, 
-				"OnClick", 
-				--pre-body
-				[=[
-					--self, button, down
-					if (down) then
-						self:SetAttribute("type31", "action")
-					else
-						self:SetAttribute("type31", "")
-					end
-				]=]
-			)
-		end
-		self.onClickWrapped = true
+		self.button:WrapScript(
+			self.button, 
+			"OnClick", 
+			--pre-body
+			[=[
+				--self, button, down
+				if (button == "Button31" and down) then
+					return "LeftButton"
+				end
+			]=]
+		)
 	else
-		self.button:RegisterForClicks("AnyUp");
-		if (self.onClickWrapped) then
-			self.button:UnwrapScript(self.button, "OnClick")
-			self.onClickWrapped = nil
-		end
+		self.button:RegisterForClicks("AnyUp")
+		self.button:WrapScript(
+			self.button,
+			"OnClick",
+			--pre-body
+			[=[
+				-- self, button, down
+				if (button == "Button31") then
+					return "LeftButton"
+				end
+			]=]
+		)
 	end		
 end
 
