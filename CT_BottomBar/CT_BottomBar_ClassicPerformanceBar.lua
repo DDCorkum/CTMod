@@ -77,7 +77,7 @@ local function addon_Init(self)
 	
 	self.frame:SetClampRectInsets(5,5,35,15);
 	
-	local frame2 = CT_BottomBar_ClassicPerformanceBar_Framebutton;
+	local frame2 = self.frame.button;
 	frame2:HookScript("OnMouseUp", function()
 		updatePosition(self)
 	end);
