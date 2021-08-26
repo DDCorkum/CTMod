@@ -14,4 +14,3 @@ Libs\Ace3\AceSerializer-3.0.lua
 CT_Library.lua
 localization.lua
 CT_Library_TitanPlugin.lua
-
