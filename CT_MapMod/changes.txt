@@ -1,3 +1,6 @@
+CT_MapMod (9.1.0.5) 2021-09-01
+- Small change for BCC 2.5.2
+
 CT_MapMod (9.1.0.3) 2021-08-09
 - Control panel improvements
 

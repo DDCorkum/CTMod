@@ -1198,12 +1198,15 @@ end
 function lib:hookWhenFirstLoaded(frame, trigger, func)
 	if (_G[frame]) then
 		func(self, _G[frame])
-	else
+		return true;
+	elseif (type("trigger") == "string" and _G[trigger]) then
 		hooksecurefunc(trigger, function()
 			func(self, _G[frame])
 			func = nop
 		end)
+		return true;
 	end
+	return false;
 end
 
 -- End Secure Hooks

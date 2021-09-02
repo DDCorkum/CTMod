@@ -514,7 +514,7 @@
 						CT_FocusHealthCheck(self, value);
 					</OnValueChanged>
 					<OnSizeChanged>
-						if (UnitGetIncomingHeals) then
+						if (UnitFrameHealPredictionBars_Update) then
 							-- Retail
 							UnitFrameHealPredictionBars_UpdateSize(self:GetParent());
 						end
