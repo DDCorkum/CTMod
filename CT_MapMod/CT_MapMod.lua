@@ -67,12 +67,10 @@ function module:Initialize()				-- called via module.update("init") from CT_Libr
 	module:configureWorldMapFrame()
 	
 	-- FlightMapFrame (loaded asynchrously when first visiting a flight master)
-	hooksecurefunc("FlightMap_LoadUI", function()
-		if (module.flightMapDataProvider == nil) then
-			module.flightMapDataProvider = module:NewDataProvider()
-			FlightMapFrame:AddDataProvider(module.flightMapDataProvider)
-			module:configureFlightMapFrame()
-		end
+	module:hookWhenFirstLoaded("FlightMapFrame", "FlightMap_LoadUI", function()
+		module.flightMapDataProvider = module:NewDataProvider()
+		FlightMapFrame:AddDataProvider(module.flightMapDataProvider)
+		module:configureFlightMapFrame()
 	end)
 	
 	-- TaxiFrame (WoD alternative to FlightMapFrame)

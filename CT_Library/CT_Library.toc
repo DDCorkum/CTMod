@@ -1,5 +1,5 @@
 ## Interface: 90100
-## Version: 9.1.0.3
+## Version: 9.1.0.5
 ## Title: CT_Library |cFFCC6600CTMod|r
 ## Notes: Library features for CTMod. 
 ## DefaultState: Enabled
@@ -14,3 +14,4 @@ Libs\Ace3\AceSerializer-3.0.lua
 CT_Library.lua
 localization.lua
 CT_Library_TitanPlugin.lua
+

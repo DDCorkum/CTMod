@@ -1,4 +1,4 @@
-## Interface: 20501
+## Interface: 20502
 ## Version: 9.0.5.3
 ## Title: CT_ExpenseHistory
 ## Notes: Detailed log of character expenses.
