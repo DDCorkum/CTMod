@@ -1060,7 +1060,6 @@ do
 			frame:SetPoint("TOP", map, "BOTTOM", 0, -10);
 			frame:SetClampedToScreen(true);
 			frame:SetClampRectInsets(-20, 20, 20, -20);
-			frame:SetFrameStrata(WorldMapFrame:GetFrameStrata() == "FULLSCREEN" and "FULLSCREEN_DIALOG" or "DIALOG");
 			frame:Show();
 			updateFields();
 		end
@@ -1088,9 +1087,6 @@ function module.configureWorldMapFrame()
 		["button#n:CT_MapMod_WhereAmIButton#s:100:20#v:UIPanelButtonTemplate#" .. L["CT_MapMod/Map/Where am I?"]] = {
 			["onload"] = function (self)
 				module.mapResetButton = self;
-				if (WorldMapFrame:GetFrameStrata() == "FULLSCREEN") then
-					self:SetFrameStrata("FULLSCREEN_DIALOG");
-				end
 				local function updatePosition(value)
 					self:ClearAllPoints();
 					if (value == 1) then
@@ -1301,16 +1297,10 @@ function module.configureWorldMapFrame()
 				self:RegisterForDrag("LeftButton","RightButton");
 				self:SetClampedToScreen(true);
 				self:SetMovable(true);
-				if (WorldMapFrame:GetFrameStrata() == "FULLSCREEN") then
-					self:SetFrameStrata("FULLSCREEN_DIALOG");
-				end
 			end,
 		},
 		["frame#n:CT_MapMod_pxy#s:80:16#b:b:-100:0"] = { 
 			["onload"] = function(self)
-				if (WorldMapFrame:GetFrameStrata() == "FULLSCREEN") then
-					self:SetFrameStrata("FULLSCREEN_DIALOG");
-				end
 				module.pxy = self
 				local text = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
 				text:SetAllPoints();
@@ -1358,9 +1348,6 @@ function module.configureWorldMapFrame()
 		},
 		["frame#n:CT_MapMod_cxy#s:80:16#b:b:100:0"] =  { 
 			["onload"] = function(self)
-				if (WorldMapFrame:GetFrameStrata() == "FULLSCREEN") then
-					self:SetFrameStrata("FULLSCREEN_DIALOG");
-				end
 				module.cxy = self
 				local text = self:CreateFontString(nil,"ARTWORK","ChatFontNormal");
 				text:SetAllPoints();
@@ -1401,7 +1388,7 @@ function module.configureWorldMapFrame()
 				end
 			end,
 		},
-	}, WorldMapFrame.BorderFrame);
+	}, WorldMapFrame.ScrollContainer);
 	
 	-- Adding notes to the map by clicking on it
 	WorldMapFrame:AddCanvasClickHandler(function(canvas, button)
