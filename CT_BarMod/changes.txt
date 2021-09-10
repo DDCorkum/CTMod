@@ -1,3 +1,6 @@
+CT_BarMod (9.1.0.6) 2021-09-09
+- Fixed a bug when configuring bar fading.
+
 CT_BarMod (9.1.0.3) 2021-07-02
 - Keybindings will trigger the macro conditional [button:1] instead of [button:31]
 - Restoring compatibility with OmniCC

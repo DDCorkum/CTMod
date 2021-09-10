@@ -98,8 +98,8 @@ function CT_AssistFrame_OnLoad(self)
 		nil, -- threatFrame,
 		nil, -- "player",
 		nil, -- _G[thisName.."NumericalThreat"],
-		UnitGetIncomingHeals and _G[thisName.."MyHealPredictionBar"] or _G[thisName.."MyHealPredictionBar"]:Hide() and nil,		-- classic compatibility
-		UnitGetIncomingHeals and _G[thisName.."OtherHealPredictionBar"] or _G[thisName.."OtherHealPredictionBar"]:Hide() and nil,
+		module:getGameVersion() > 1 and UnitGetIncomingHeals and _G[thisName.."MyHealPredictionBar"] or _G[thisName.."MyHealPredictionBar"]:Hide() and nil,		-- classic compatibility
+		module:getGameVersion() > 1 and UnitGetIncomingHeals and _G[thisName.."OtherHealPredictionBar"] or _G[thisName.."OtherHealPredictionBar"]:Hide() and nil,
 		UnitGetTotalHealAbsorbs and _G[thisName.."TotalAbsorbBar"] or _G[thisName.."TotalAbsorbBar"]:Hide() and nil,
 		UnitGetTotalHealAbsorbs and _G[thisName.."TotalAbsorbBarOverlay"] or _G[thisName.."TotalAbsorbBarOverlay"]:Hide() and nil,
 		UnitGetTotalHealAbsorbs and _G[thisName.."TextureFrameOverAbsorbGlow"] or _G[thisName.."TextureFrameOverAbsorbGlow"]:Hide() and nil,
