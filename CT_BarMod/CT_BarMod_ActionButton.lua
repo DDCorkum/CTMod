@@ -219,7 +219,7 @@ local function getActionButton(buttonId)
 		button.blingcontainer:SetAllPoints()
 		button.blingcontainer:SetClipsChildren(true)
 		
-		local bling = button.blingcontainer:CreateTexture("OVERLAY")
+		local bling = button.blingcontainer:CreateTexture(nil, "OVERLAY")
 		bling:SetTexture("Interface\\Cooldown\\star4")
 		bling:SetAllPoints()
 		bling:SetVertexColor(0.3, 0.6, 1, 0)

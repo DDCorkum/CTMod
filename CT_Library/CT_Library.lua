@@ -252,55 +252,51 @@ do
 
 		-- generate the tooltip content
 		if (type(text) == "string") then
-			local p1, p2 = strsplit(":", text);
+			local p1, p2 = strsplit(":", text)
 			if (p1 and p2 and validLinkTypes[p1] and tonumber(p2)) then
-				tooltip:SetHyperlink(text);
+				tooltip:SetHyperlink(text)
 			else
-				tooltip:SetText(text);
+				tooltip:SetText(text)
 			end
 		elseif (type(text) == "table") then
 			for i, row in ipairs(text) do
 				local splitrow = {strsplit("#", row)}
 				local leftR,leftG,leftB,rightR,rightG,rightB
-				local alpha,wrap,leftText,rightText;
+				local alpha,wrap,leftText,rightText
 				for j=1, #splitrow do
 					local pieces = {strsplit(":", splitrow[j])}
-					local isAllNums = true;
+					local isAllNums = true
 					for k, piece in ipairs(pieces) do
 						if (not tonumber(piece) or tonumber(piece) < 0 or tonumber(piece) > 1) then
-							isAllNums = false;
+							isAllNums = false
 						end
 					end						
 					if (not leftR and #pieces >= 3 and isAllNums) then
-						leftR = pieces[1];
-						leftG = pieces[2];
-						leftB = pieces[3];
+						leftR = pieces[1]
+						leftG = pieces[2]
+						leftB = pieces[3]
 						if (pieces[6]) then
-							rightR = pieces[4];
-							rightG = pieces[5];
-							rightB = pieces[6];
+							rightR = pieces[4]
+							rightG = pieces[5]
+							rightB = pieces[6]
 						elseif (pieces[4]) then
-							alpha = pieces[4];
+							alpha = pieces[4]
 						end
 					elseif (not wrap and #pieces == 1 and pieces[1] == "w") then
-						wrap = true;
+						wrap = true
 					elseif (not size and #pieces == 2 and pieces[1] == "s") then
-						lineHeight[i] = tonumber(pieces[2]);
+						lineHeight[i] = tonumber(pieces[2])
 					elseif (not leftText) then
-						leftText = splitrow[j];
+						leftText = splitrow[j]
 					elseif (not rightText) then
-						rightText = splitrow[j];
+						rightText = splitrow[j]
 					end
 				end
-				if (size) then
-					customSize = size;
-				end
 				if (rightText) then
-					GameTooltip:AddDoubleLine(leftText, rightText, leftR or 0.9, leftG or 0.9, leftB or 0.9, rightR or 0.9, rightG or 0.9, rightB or 0.9);
+					GameTooltip:AddDoubleLine(leftText, rightText, leftR or 0.9, leftG or 0.9, leftB or 0.9, rightR or 0.9, rightG or 0.9, rightB or 0.9)
 				elseif (leftText) then
-					GameTooltip:AddLine(leftText, leftR or 0.9, leftG or 0.9, leftB or 0.9, alpha, wrap);
+					GameTooltip:AddLine(leftText, leftR or 0.9, leftG or 0.9, leftB or 0.9, alpha, wrap)
 				end
-				customSize = nil;
 			end
 		end
 
@@ -753,23 +749,17 @@ end
 
 -- Check if an encounter is in progress, and return its ID (might not work after a /reload until the next encounter begins)
 do
-
-	local inEncounter = nil,
+	local inEncounter = nil
 	lib:regEvent("ENCOUNTER_START", function(id)
-		inEncounter = id;
+		inEncounter = id
 	end);
 	lib:regEvent("ENCOUNTER_END", function()
-		inEncounter = nil;
+		inEncounter = nil
 	end);
 	
 	function lib:isInEncounter()
-		return inEncounter;
+		return inEncounter
 	end
-
-end
-
-function lib:unload()
-	self:clearTable(self);
 end
 
 -- End Generic Functions
@@ -993,6 +983,7 @@ do
 	end
 
 	local function nextOption(t, key)
+		local val
 		repeat
 			key, val = next(t, key)
 		until (key == nil or key:find("MOVABLE-") == nil)		-- see nextMovable() below
@@ -1169,7 +1160,8 @@ function lib:UnregisterMovable(id)
 	movables["MOVABLE-"..id] = nil;
 end
 
-local function nextMovable()	-- see nextOption() above
+local function nextMovable(t, key)	-- see nextOption() above
+	local val
 	repeat
 		key, val = next(t, key)
 	until (key == nil or key:find("MOVABLE-"))
@@ -3347,23 +3339,23 @@ lib:updateSlashCmd(displayControlPanel, "/ct", "/ctmod");
 -- Settings Import (1)
 
 -- Initialization
-local module = { };
-module.name = "Settings Import"; -- this is changed to a localized string during the button's onLoad
-module.version = "";
+local module = { }
+module.name = "Settings Import" -- this is changed to a localized string during the button's onLoad
+module.version = ""
 -- Register as module 1 only, since this will code will get executed once per different
 -- version of CT_Library. We don't want multiple copies showing up in the
 -- control panel.
-registerModule(module, 1);
+registerModule(module, 1)
 
-module:regEvent("PLAYER_LOGIN", function() module.displayName = "|cFFFFFFCC" .. L["CT_Library/SettingsImport/Heading"]; end);
+module:regEvent("PLAYER_LOGIN", function() module.displayName = "|cFFFFFFCC" .. L["CT_Library/SettingsImport/Heading"]; end)
 
-local optionsFrame, addonsFrame, checkAllButton, fromChar;
+local optionsFrame, addonsFrame, checkAllButton, fromChar, clipboardPanel
 
 -- Dropdown Handling
-local importDropdownEntry, importFlaggedCharacters;
-local importRealm, importSetPlayer;
-local importRealm2;
-local importPlayerCount;
+local importDropdownEntry, importFlaggedCharacters
+local importRealm, importSetPlayer
+local importRealm2
+local importPlayerCount
 
 local function populateAddonsList(char)
 	local importButton, num, obj, options;
@@ -3822,9 +3814,9 @@ local function openClipboardPanel(text)
 		
 	end
 	clipboardPanel:Show();
-	actions.confirmImport:SetChecked(false);
-	actions.confirmDelete:SetChecked(false);
-	actions.confirmExport:SetChecked(false);
+	optionsFrame.actions.confirmImport:SetChecked(false);
+	optionsFrame.actions.confirmDelete:SetChecked(false);
+	optionsFrame.actions.confirmExport:SetChecked(false);
 	module:setOption("canImport", nil);
 	module:setOption("canDelete", nil);
 	module:setOption("canExport", nil);
@@ -4110,37 +4102,35 @@ registerModule(module, 2);
 
 module:regEvent("PLAYER_LOGIN", function() module.displayName = "|cFFFFFFCC" .. L["CT_Library/Help/Heading"]; end);
 
-local helpFrameList;
-local function helpInit()
-	optionsFrameList = module:framesInit();
-end
-local function helpGetData()
-	return module:framesGetData(optionsFrameList);
-end
-local function helpAddFrame(offset, size, details, data)
-	module:framesAddFrame(optionsFrameList, offset, size, details, data);
-end
-local function helpAddObject(offset, size, details)
-	module:framesAddObject(optionsFrameList, offset, size, details);
-end
-local function helpAddScript(name, func)
-	module:framesAddScript(optionsFrameList, name, func);
-end
-local function helpBeginFrame(offset, size, details, data)
-	module:framesBeginFrame(optionsFrameList, offset, size, details, data);
-end
-local function helpEndFrame()
-	module:framesEndFrame(optionsFrameList);
-end
 
 module.frame = function()
+
+	local optionsFrameList = module:framesInit()
+	
+	local function helpGetData()
+		return module:framesGetData(optionsFrameList);
+	end
+	local function helpAddFrame(offset, size, details, data)
+		module:framesAddFrame(optionsFrameList, offset, size, details, data);
+	end
+	local function helpAddObject(offset, size, details)
+		module:framesAddObject(optionsFrameList, offset, size, details);
+	end
+	local function helpAddScript(name, func)
+		module:framesAddScript(optionsFrameList, name, func);
+	end
+	local function helpBeginFrame(offset, size, details, data)
+		module:framesBeginFrame(optionsFrameList, offset, size, details, data);
+	end
+	local function helpEndFrame()
+		module:framesEndFrame(optionsFrameList);
+	end
+
 	local textColor0 = "1.0:1.0:1.0";
 	local textColor1 = "0.9:0.9:0.9";
 	local textColor2 = "0.7:0.7:0.7";
 	local textColor3 = "1.0:0.4:0.4";
-	
-	helpInit();
-	
+		
 	-- About CTMod
 	helpBeginFrame(-5, 0, "frame#tl:0:%y#r");
 		
