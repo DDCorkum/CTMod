@@ -54,7 +54,6 @@ end
 
 -- Incoming heals and absorbs
 local UnitGetTotalAbsorbs = UnitGetTotalAbsorbs or n0p
-local UnitGetIncomingHeals = UnitGetIncomingHeals or n0p
 
 -- Role icons
 local UnitGroupRolesAssigned = UnitGroupRolesAssigned or nop -- doesn't exist in classic
