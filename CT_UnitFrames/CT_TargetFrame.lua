@@ -193,6 +193,11 @@ module:regEvent("PLAYER_LOGIN", function()
 	TargetFrameManaBar:HookScript("OnEnter", CT_TargetFrame_ManaTextStatusBar_UpdateTextString);
 	TargetFrameManaBar:HookScript("OnLeave", CT_TargetFrame_ManaTextStatusBar_UpdateTextString);
 	TargetFrameManaBar:HookScript("OnValueChanged", CT_TargetFrame_ManaTextStatusBar_UpdateTextString);
+	
+	-- incoming heals on classic
+	if (UnitGetTotalAbsorbs == nil) then
+		module:addClassicIncomingHeals(TargetFrame)
+	end
 end);
 
 --[[	replaced by PLAYER_LOGIN event

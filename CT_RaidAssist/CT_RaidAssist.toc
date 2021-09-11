@@ -1,5 +1,5 @@
 ## Interface: 90100
-## Version: 9.1.0.3
+## Version: 9.1.0.6
 ## Title: CT_RaidAssist
 ## Author: TS & Cide (Original), Dargen (MT Addon), DDC (Redesign)
 ## Notes: Monitor raid HP and click cast buffs, debuff removals, resurrections
@@ -11,11 +11,6 @@
 
 # Durability tracking on both retail and classic
 Libs/LibDurability.lua
-
-# Incoming heals/absorbs tracking in classic
-# Classic Only # Libs/LibHealComm-4.0/CallbackHandler-1.0.lua
-# Classic Only # Libs/LibHealComm-4.0/ChatThrottleLib.lua
-# Classic Only # Libs/LibHealComm-4.0/LibHealComm-4.0.lua
 
 # CTRA (for both retail and classic)
 CT_RaidAssist.lua

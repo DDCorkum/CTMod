@@ -5,8 +5,8 @@ CTMod remains "all rights reserved"; specifically,
 it is requested to contact the team before modifying or redistributing.
 
 The CTMod team has included the following individuals over time:
-- Cide (original team member)
-- TS (original team member)
+- Cide (original author)
+- TS (original author)
 - Resike (since 2014)
 - Dahk Celes / DDCorkum (since 2017)
 
@@ -34,21 +34,14 @@ any help to find these original files from the library authors.
 ------------------------------
 -- CT_RaidAssist
 
-CT_RaidAssist embeds the following addon libraries:
+CTRA installs common libraries to allow users more freedom to choose any compatible addon, 
+avoiding any pressure to install a particular one (CT or otherwise) to participate in a raiding guild.
+
+CT_RaidAssist currently embeds the following addon library:
 - LibDurability by funkehdude (CC BY-NC-SA 3.0)
-- LibHealComm by Shadowed, Azilroka and xbeebs (license unknown), which includes CallbackHandler by nevcairiel (BSD license) and ChatThrottleLib by Mikk (license unknown)
 
-These libraries permit CT_RaidAssist to share info with other raid addons
-for common tasks like durability and predicting incoming heals in WoW Classic.
-
-Using a common library allows users more freedom to choose any
-compatible addon, so they do not feel pressured to use any
-particular one (CT or otherwise) to participate in a raiding guild.
-
-Former versions of CT_RaidAssist included an opt-out feature so users could refrain from
-installing these data-sharing libraries.  However, this has been removed since it is
-not known that any user actually made use of this opt-out feature.
-
+CT_RaidAssit formerly embeded the following addon library:
+- LibHealComm by Shadowed, Azilroka and xbeebs (license unknown), including CallbackHandler by nevcairiel (BSD license) and ChatThrottleLib by Mikk (license unknown)
 
 
 ------------------------------
@@ -62,5 +55,5 @@ The team also acknowledges the following contributions:
 
 
 Dahk Celes (D.D. Corkum)
-CTMod Team
-25 Oct 2020 (Updated 2 June 2021)
+on behalf of the CTMod Team
+25 Oct 2020 (updated 11 Sep 2021)

@@ -207,7 +207,7 @@ function CT_UnitFramesOptions_Radio_Update()
 
 	CT_UnitFramesOptionsFrameBox1PlayerTextLeftCB:SetChecked(CT_UnitFramesOptions.playerTextLeft);
 	CT_UnitFramesOptionsFrameBox1PlayerCoordsRightCB:SetChecked(CT_UnitFramesOptions.playerCoordsRight);
-	CT_UnitFramesOptionsFrameBox2PartyClassColorCB:SetChecked(CT_UnitFramesOptions.partyClassColor);
+	CT_UnitFramesOptionsFrameBox2PartyClassColorCB:SetChecked(CT_UnitFramesOptions.partyClassColor ~= false);
 	CT_UnitFramesOptionsFrameBox3ClassFrameCB:SetChecked(CT_UnitFramesOptions.displayTargetClass);
 	CT_UnitFramesOptionsFrameBox3TargetTextRightCB:SetChecked(CT_UnitFramesOptions.targetTextRight);
 	CT_UnitFramesOptionsFrameBox3ShowToTCB:SetChecked(GetCVar("showTargetOfTarget") == "1");

@@ -38,6 +38,11 @@ module:regEvent("PLAYER_LOGIN", function()
 	PetFrameManaBar:HookScript("OnEnter", CT_PetFrame_ManaTextStatusBar_UpdateTextString)
 	PetFrameManaBar:HookScript("OnLeave", CT_PetFrame_ManaTextStatusBar_UpdateTextString)
 	PetFrameManaBar:HookScript("OnValueChanged", CT_PetFrame_ManaTextStatusBar_UpdateTextString)
+	
+	-- incoming heals on classic
+	if (UnitGetTotalAbsorbs == nil) then
+		module:addClassicIncomingHeals(PetFrame)
+	end
 end)
 
 function module:ShowPetFrameBarText()
