@@ -225,7 +225,7 @@ function CT_FocusFrame_OnEvent(self, event, arg1, ...)
 
 	if (arg1 == "focus") then
 		UnitFrame_OnEvent(self, event, "focus")
-	elseif (arg1 and UnitIsUnit(arg1, "focus")) then
+	elseif (type(arg1) == "string" and UnitIsUnit(arg1, "focus")) then
 		-- happens when you focus yourself, or when your focus targets themself
 		UnitFrame_OnEvent(self, event, "focus")
 		if (event == "UNIT_HEALTH" or event == "UNIT_MAXHEALTH") then

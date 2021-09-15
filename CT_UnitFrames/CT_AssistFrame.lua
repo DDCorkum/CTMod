@@ -237,7 +237,7 @@ function CT_AssistFrame_OnEvent(self, event, arg1, ...)
 
 	if (arg1 == "targettarget") then
 		UnitFrame_OnEvent(self, event, "targettarget")
-	elseif (arg1 and UnitIsUnit(arg1, "targettarget")) then
+	elseif (type(arg1) == "string" and UnitIsUnit(arg1, "targettarget")) then
 		-- happens when you target yourself, or when your target targets themself
 		UnitFrame_OnEvent(self, event, "targettarget")
 		if (event == "UNIT_HEALTH" or event == "UNIT_MAXHEALTH") then
