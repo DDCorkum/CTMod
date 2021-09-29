@@ -33,6 +33,11 @@ module:regEvent("PLAYER_LOGIN", function()
 	PlayerFrameManaBar:HookScript("OnEnter", CT_PlayerFrame_ManaTextStatusBar_UpdateTextString)
 	PlayerFrameManaBar:HookScript("OnLeave", CT_PlayerFrame_ManaTextStatusBar_UpdateTextString)
 	PlayerFrameManaBar:HookScript("OnValueChanged", CT_PlayerFrame_ManaTextStatusBar_UpdateTextString)
+	
+	-- incoming heals on classic
+	if (UnitGetTotalAbsorbs == nil) then
+		module:addClassicIncomingHeals(self)
+	end
 end)
 
 function module:ShowPlayerFrameBarText()
