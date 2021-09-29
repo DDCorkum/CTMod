@@ -36,7 +36,7 @@ module:regEvent("PLAYER_LOGIN", function()
 	
 	-- incoming heals on classic
 	if (UnitGetTotalAbsorbs == nil) then
-		module:addClassicIncomingHeals(self)
+		module:addClassicIncomingHeals(PlayerFrame)
 	end
 end)
 
