@@ -1770,7 +1770,7 @@ end
 
 do
 	local function setBlizzardButtonAttributes(button)
-		action = ActionButton_GetPagedID(button)
+		local action = ActionButton_GetPagedID(button)
 		button.hasAction = HasAction(action);
 		button.hasRange = ActionHasRange(action);
 		button.isConsumable = IsConsumableAction(action);

@@ -97,8 +97,8 @@ function CT_FocusFrame_OnLoad(self)
 		threatFrame,
 		"player",
 		_G[thisName.."NumericalThreat"],
-		UnitGetIncomingHeals and _G[thisName.."MyHealPredictionBar"] or _G[thisName.."MyHealPredictionBar"]:Hide() and nil,		-- classic compatibility
-		UnitGetIncomingHeals and _G[thisName.."OtherHealPredictionBar"] or _G[thisName.."OtherHealPredictionBar"]:Hide() and nil,
+		UnitGetTotalAbsorbs and _G[thisName.."MyHealPredictionBar"] or _G[thisName.."MyHealPredictionBar"]:Hide() and nil,		-- classic compatibility
+		UnitGetTotalAbsorbs and _G[thisName.."OtherHealPredictionBar"] or _G[thisName.."OtherHealPredictionBar"]:Hide() and nil,
 		UnitGetTotalHealAbsorbs and _G[thisName.."TotalAbsorbBar"] or _G[thisName.."TotalAbsorbBar"]:Hide() and nil,
 		UnitGetTotalHealAbsorbs and _G[thisName.."TotalAbsorbBarOverlay"] or _G[thisName.."TotalAbsorbBarOverlay"]:Hide() and nil,
 		UnitGetTotalHealAbsorbs and _G[thisName.."TextureFrameOverAbsorbGlow"] or _G[thisName.."TextureFrameOverAbsorbGlow"]:Hide() and nil,
@@ -108,12 +108,18 @@ function CT_FocusFrame_OnLoad(self)
 		UnitGetTotalHealAbsorbs and _G[thisName.."HealAbsorbBarRightShadow"] or _G[thisName.."HealAbsorbBarRightShadow"]:Hide() and nil
 	);
 
+	-- incoming heals on classic
+	if (UnitGetTotalAbsorbs == nil) then
+		module:addClassicIncomingHeals(self)
+	end
+
 	self.noTextPrefix = true;
 	CT_FocusFrame_Update(self);
 
 	self:RegisterEvent("PLAYER_ENTERING_WORLD");
 	self:RegisterEvent("PLAYER_FOCUS_CHANGED");
 	self:RegisterUnitEvent("UNIT_HEALTH", unit1);
+	self:RegisterUnitEvent("UNIT_MAXHEALTH", unit1)
 	if ( self.showLevel ) then
 		self:RegisterUnitEvent("UNIT_LEVEL", unit1);
 	end
@@ -214,11 +220,19 @@ function CT_FocusFrame_Update(self)
 	end
 end
 
-function CT_FocusFrame_OnEvent(self, event, ...)
+function CT_FocusFrame_OnEvent(self, event, arg1, ...)
 	-- self == The main unit frame
-	UnitFrame_OnEvent(self, event, ...);
 
-	local arg1 = ...;
+	if (arg1 == "focus") then
+		UnitFrame_OnEvent(self, event, "focus")
+	elseif (type(arg1) == "string" and UnitIsUnit(arg1, "focus")) then
+		-- happens when you focus yourself, or when your focus targets themself
+		UnitFrame_OnEvent(self, event, "focus")
+		if (event == "UNIT_HEALTH" or event == "UNIT_MAXHEALTH") then
+			UnitFrameHealthBar_OnEvent(self.healthbar, event, "focus")
+		end
+	end	
+
 	if ( event == "PLAYER_ENTERING_WORLD" ) then
 		if (CT_UnitFramesOptions.shallDisplayFocus) then
 			RegisterUnitWatch(self);

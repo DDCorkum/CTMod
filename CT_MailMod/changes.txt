@@ -1,3 +1,6 @@
+CT_MailMod (9.1.0.6) 2021-09-09
+- Resolving an error that appears during a fresh install
+
 CT_MailMod (9.1.0.3) 2021-08-16
 - Restoring the account-wide log
 - Avoiding logging the same message twice

@@ -98,16 +98,21 @@ function CT_AssistFrame_OnLoad(self)
 		nil, -- threatFrame,
 		nil, -- "player",
 		nil, -- _G[thisName.."NumericalThreat"],
-		UnitGetIncomingHeals and _G[thisName.."MyHealPredictionBar"] or _G[thisName.."MyHealPredictionBar"]:Hide() and nil,		-- classic compatibility
-		UnitGetIncomingHeals and _G[thisName.."OtherHealPredictionBar"] or _G[thisName.."OtherHealPredictionBar"]:Hide() and nil,
-		UnitGetTotalHealAbsorbs and _G[thisName.."TotalAbsorbBar"] or _G[thisName.."TotalAbsorbBar"]:Hide() and nil,
-		UnitGetTotalHealAbsorbs and _G[thisName.."TotalAbsorbBarOverlay"] or _G[thisName.."TotalAbsorbBarOverlay"]:Hide() and nil,
-		UnitGetTotalHealAbsorbs and _G[thisName.."TextureFrameOverAbsorbGlow"] or _G[thisName.."TextureFrameOverAbsorbGlow"]:Hide() and nil,
+		UnitGetTotalAbsorbs and _G[thisName.."MyHealPredictionBar"] or _G[thisName.."MyHealPredictionBar"]:Hide() and nil,		-- classic compatibility
+		UnitGetTotalAbsorbs and _G[thisName.."OtherHealPredictionBar"] or _G[thisName.."OtherHealPredictionBar"]:Hide() and nil,
+		UnitGetTotalAbsorbs and _G[thisName.."TotalAbsorbBar"] or _G[thisName.."TotalAbsorbBar"]:Hide() and nil,
+		UnitGetTotalAbsorbs and _G[thisName.."TotalAbsorbBarOverlay"] or _G[thisName.."TotalAbsorbBarOverlay"]:Hide() and nil,
+		UnitGetTotalAbsorbs and _G[thisName.."TextureFrameOverAbsorbGlow"] or _G[thisName.."TextureFrameOverAbsorbGlow"]:Hide() and nil,
 		UnitGetTotalHealAbsorbs and _G[thisName.."TextureFrameOverHealAbsorbGlow"] or _G[thisName.."TextureFrameOverHealAbsorbGlow"]:Hide() and nil,
 		UnitGetTotalHealAbsorbs and _G[thisName.."HealAbsorbBar"] or _G[thisName.."HealAbsorbBar"]:Hide() and nil,
 		UnitGetTotalHealAbsorbs and _G[thisName.."HealAbsorbBarLeftShadow"] or _G[thisName.."HealAbsorbBarLeftShadow"]:Hide() and nil,
 		UnitGetTotalHealAbsorbs and _G[thisName.."HealAbsorbBarRightShadow"] or _G[thisName.."HealAbsorbBarRightShadow"]:Hide() and nil
 	);
+
+	-- incoming heals on classic
+	if (UnitGetTotalAbsorbs == nil) then
+		module:addClassicIncomingHeals(self)
+	end
 
 	self.noTextPrefix = true;
 	CT_AssistFrame_Update(self);
@@ -115,6 +120,7 @@ function CT_AssistFrame_OnLoad(self)
 	self:RegisterEvent("PLAYER_ENTERING_WORLD");
 	self:RegisterEvent("PLAYER_TARGET_CHANGED");
 	self:RegisterUnitEvent("UNIT_HEALTH", unit1);
+	self:RegisterUnitEvent("UNIT_MAXHEALTH", unit1)
 	if ( self.showLevel ) then
 		self:RegisterUnitEvent("UNIT_LEVEL", unit1);
 	end
@@ -226,13 +232,18 @@ function CT_AssistFrame_Update(self)
 	end
 end
 
-function CT_AssistFrame_OnEvent(self, event, ...)
+function CT_AssistFrame_OnEvent(self, event, arg1, ...)
 	-- self == The main unit frame
-	local arg1 = ...;
 
-	if (arg1 == "player" or arg1 == "targettarget") then	-- in case you are targeting yourself
-		UnitFrame_OnEvent(self, event, "targettarget");
-	end
+	if (arg1 == "targettarget") then
+		UnitFrame_OnEvent(self, event, "targettarget")
+	elseif (type(arg1) == "string" and UnitIsUnit(arg1, "targettarget")) then
+		-- happens when you target yourself, or when your target targets themself
+		UnitFrame_OnEvent(self, event, "targettarget")
+		if (event == "UNIT_HEALTH" or event == "UNIT_MAXHEALTH") then
+			UnitFrameHealthBar_OnEvent(self.healthbar, event, "targettarget")
+		end
+	end	
 	
 	if ( event == "PLAYER_ENTERING_WORLD" ) then
 		if (CT_UnitFramesOptions.shallDisplayAssist) then

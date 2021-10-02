@@ -730,6 +730,9 @@ module.update = function(self, optName, value)
 		if (VehicleSeatIndicator) then
 			module:loadAddon("Vehicle Bar");
 		end
+		if (ZoneAbilityFrame) then
+			module:loadAddon("Zone Ability Bar");
+		end
 
 		-- Status Tracking (Exp/Rep) Bars
 		module:insertAddonTitle(L["CT_BottomBar/Options/AddonList/StatusTrackingBarsSubheading"])

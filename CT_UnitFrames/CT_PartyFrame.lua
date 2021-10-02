@@ -105,7 +105,7 @@ end
 local function UpdatePartyFrameClassColors()
 	local GetClassColor = GetClassColor or C_ClassColor.GetClassColor
 	for i=1, 4 do
-		if (CT_UnitFramesOptions.partyClassColor and UnitExists("party" .. i)) then
+		if (CT_UnitFramesOptions.partyClassColor ~= false and UnitExists("party" .. i)) then
 			local r, g, b = GetClassColor(select(2,UnitClass("party" .. i)))
 			_G["PartyMemberFrame" .. i .. "Name"]:SetTextColor(r or 1, g or 0.82, b or 0)
 		else
@@ -118,3 +118,13 @@ end
 module.UpdatePartyFrameClassColors = UpdatePartyFrameClassColors
 module:regEvent("GROUP_ROSTER_UPDATE", UpdatePartyFrameClassColors)
 module:regEvent("PLAYER_LOGIN", UpdatePartyFrameClassColors)
+
+module:regEvent("PLAYER_LOGIN", function()
+	-- incoming heals on classic
+	if (UnitGetTotalAbsorbs == nil) then
+		module:addClassicIncomingHeals(PartyMemberFrame1)
+		module:addClassicIncomingHeals(PartyMemberFrame2)
+		module:addClassicIncomingHeals(PartyMemberFrame3)
+		module:addClassicIncomingHeals(PartyMemberFrame4)
+	end
+end)

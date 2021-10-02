@@ -1,3 +1,6 @@
+CT_MapMod (9.1.0.6) 2021-09-06
+- Resolving a class-only addon conflict with Leatrix Maps BCC.
+
 CT_MapMod (9.1.0.5) 2021-09-01
 - Small change for BCC 2.5.2
 

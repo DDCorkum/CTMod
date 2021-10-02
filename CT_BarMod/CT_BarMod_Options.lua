@@ -1627,11 +1627,11 @@ module.frame = function()
 			optionsAddScript("onload", function(obj)
 				obj:HookScript("OnClick", function()
 					if (obj:GetChecked()) then
-						barFaded:SetAlpha(1);
-						barFadedCombat:SetAlpha(1);
+						obj:GetParent().barFaded:SetAlpha(1);
+						obj:GetParent().barFadedCombat:SetAlpha(1);
 					else
-						barFaded:SetAlpha(0.5);
-						barFadedCombat:SetAlpha(0.5);
+						obj:GetParent().barFaded:SetAlpha(0.5);
+						obj:GetParent().barFadedCombat:SetAlpha(0.5);
 					end
 				end);
 			end);

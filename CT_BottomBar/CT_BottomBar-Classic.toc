@@ -1,5 +1,5 @@
-## Interface: 11307
-## Version: 9.1.0.3
+## Interface: 11400
+## Version: 9.1.0.6
 ## Title: CT_BottomBar
 ## Notes: Breaks up the main menu bar into movable pieces.
 ## DefaultState: Enabled
@@ -30,4 +30,5 @@ CT_BottomBar_Rep.lua
 CT_BottomBar_ClassicPerformanceBar.lua
 CT_BottomBar_ClassicKeyRingButton.lua
 CT_BottomBar_StanceBar.lua
+CT_BottomBar_ZoneAbility.lua
 localization.lua

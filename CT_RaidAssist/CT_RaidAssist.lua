@@ -20,6 +20,9 @@
 --------------------------------------------
 -- Classic Compatibility
 
+local function nop() end
+local function n0p() return 0 end
+
 -- Class Colors
 local GetClassColor = GetClassColor;
 do
@@ -50,25 +53,18 @@ do
 end
 
 -- Incoming heals and absorbs
-local UnitGetTotalAbsorbs = UnitGetTotalAbsorbs or function() return 0; end	
-local UnitGetIncomingHeals = UnitGetIncomingHeals
-do
-	local libHealComm = LibStub:GetLibrary("LibHealComm-4.0", true)
-	UnitGetIncomingHeals = UnitGetIncomingHeals or function(unit, selfOnly)
-		return libHealComm and libHealComm:GetHealAmount(UnitGUID(unit), libHealComm.ALL_DATA, nil, selfOnly and UnitGUID("player")) or 0
-	end
-end
+local UnitGetTotalAbsorbs = UnitGetTotalAbsorbs or n0p
 
 -- Role icons
-local UnitGroupRolesAssigned = UnitGroupRolesAssigned or function() return nil; end -- doesn't exist in classic
-local UnitPhaseReason = UnitPhaseReason	or function(unit) return UnitIsWarModePhased and UnitIsWarModePhased(unit) and 2 or not UnitInPhase(unit) and 0 or nil;	end	-- compatibility with Classic, BFA and Shadowlands
-local GetInspectSpecialization = GetInspectSpecialization or function() return nil; end
-local GetSpecialization = GetSpecialization or function() return nil; end
-local GetSpecializationInfo = GetSpecializationInfo or function() return nil; end
-local GetSpecializationRoleByID = GetSpecializationRoleByID or function() return nil; end
+local UnitGroupRolesAssigned = UnitGroupRolesAssigned or nop -- doesn't exist in classic
+local UnitPhaseReason = UnitPhaseReason	or function(unit) return UnitIsWarModePhased and UnitIsWarModePhased(unit) and 2 or not UnitInPhase(unit) and 0 or nil end	-- compatibility with Classic, BFA and Shadowlands
+local GetInspectSpecialization = GetInspectSpecialization or nop
+local GetSpecialization = GetSpecialization or nop
+local GetSpecializationInfo = GetSpecializationInfo or nop
+local GetSpecializationRoleByID = GetSpecializationRoleByID or nop
 
 -- Status messages
-local IncomingSummonStatus = (C_IncomingSummon and C_IncomingSummon.IncomingSummonStatus) or function() return 0; end
+local IncomingSummonStatus = (C_IncomingSummon and C_IncomingSummon.IncomingSummonStatus) or n0p
 
 
 --------------------------------------------
@@ -162,19 +158,19 @@ function StaticCTRAReadyCheck()
 	
 	local invSlots =
 	{
-		-- name, 		anchorPt, 	relTo, 			relPtm		xOff, 	yOff, 		width, 	height, 		leftTexCoord,	rightTexCoord,	topTexCoord,	bottomTexCoord
-		{INVSLOT_HEAD,		"TOP",		"",			"TOP",		0,	-10,		18,	22,			0.0,		0.140625,	0.0,		0.171875},
-		{INVSLOT_SHOULDER,	"TOP",		INVSLOT_HEAD,		"BOTTOM",	0,	16,		48,	22,			0.140625,	0.515625,	0.0,		0.171875},
-		{INVSLOT_CHEST,		"TOP",		INVSLOT_SHOULDER,	"TOP",		0,	-7,		20,	22,			0.515625,	0.6640625,	0.0,		0.171875},
-		{INVSLOT_WRIST,		"TOP",		INVSLOT_SHOULDER,	"BOTTOM",	0,	7,		44,	22,			0.6640625,	1.0,		0.0,		0.171875},
-		{INVSLOT_HAND,		"TOP",		INVSLOT_WRIST,		"BOTTOM",	0,	15,		42,	18,			0.0,		0.328125,	0.171875,	0.3046875},
-		{INVSLOT_WAIST,		"TOP",		INVSLOT_CHEST,		"BOTTOM",	0,	6,		16,	5,			0.328125,	0.46875,	0.171875,	0.203125},
-		{INVSLOT_LEGS,		"TOP",		INVSLOT_WAIST,		"BOTTOM",	0,	2,		29,	20,			0.46875,	0.6875,		0.171875,	0.3203125},
-		{INVSLOT_FEET,		"TOP",		INVSLOT_LEGS,		"BOTTOM",	0,	8,		41,	32,			0.6875,		1.0,		0.171875,	0.4140625},
-		{INVSLOT_MAINHAND,	"RIGHT",	INVSLOT_WRIST,		"LEFT",		0,	-6,		20,	45,			0.0,		0.140625,	0.3203125,	0.6640625},
-		{INVSLOT_OFFHAND,	"LEFT",		INVSLOT_WRIST,		"RIGHT",	0,	10,		25,	31,			0.1875,		0.375,		0.3203125,	0.5546875},
-		--{"OffWeapon",		"LEFT",		INVSLOT_WRIST,		"RIGHT",	0,	-6,		20,	45,			0.0,		0.140625,	0.3203125,	0.6640625},
-		{INVSLOT_RANGED,	"TOP",		INVSLOT_OFFHAND,	"BOTTOM",	0,	5,		28,	38,			0.1875,		0.3984375,	0.5546875,	0.84375},
+		-- {name, 			point,		relTo,				relPoint, xOff, yOff,		width, height,	leftTexCoord, rightTexCoord, topTexCoord, bottomTexCoord},
+		{INVSLOT_HEAD,		"TOP",		"",					"TOP",		0,	-10,		18,	22,			0.0,		0.140625,	0.0,		0.171875},
+		{INVSLOT_SHOULDER,	"TOP",		INVSLOT_HEAD,		"BOTTOM",	0,	16,			48,	22,			0.140625,	0.515625,	0.0,		0.171875},
+		{INVSLOT_CHEST,		"TOP",		INVSLOT_SHOULDER,	"TOP",		0,	-7,			20,	22,			0.515625,	0.6640625,	0.0,		0.171875},
+		{INVSLOT_WRIST,		"TOP",		INVSLOT_SHOULDER,	"BOTTOM",	0,	7,			44,	22,			0.6640625,	1.0,		0.0,		0.171875},
+		{INVSLOT_HAND,		"TOP",		INVSLOT_WRIST,		"BOTTOM",	0,	15,			42,	18,			0.0,		0.328125,	0.171875,	0.3046875},
+		{INVSLOT_WAIST,		"TOP",		INVSLOT_CHEST,		"BOTTOM",	0,	6,			16,	5,			0.328125,	0.46875,	0.171875,	0.203125},
+		{INVSLOT_LEGS,		"TOP",		INVSLOT_WAIST,		"BOTTOM",	0,	2,			29,	20,			0.46875,	0.6875,		0.171875,	0.3203125},
+		{INVSLOT_FEET,		"TOP",		INVSLOT_LEGS,		"BOTTOM",	0,	8,			41,	32,			0.6875,		1.0,		0.171875,	0.4140625},
+		{INVSLOT_MAINHAND,	"RIGHT",	INVSLOT_WRIST,		"LEFT",		0,	-6,			20,	45,			0.0,		0.140625,	0.3203125,	0.6640625},
+		{INVSLOT_OFFHAND,	"LEFT",		INVSLOT_WRIST,		"RIGHT",	0,	10,			25,	31,			0.1875,		0.375,		0.3203125,	0.5546875},
+		--{"OffWeapon",		"LEFT",		INVSLOT_WRIST,		"RIGHT",	0,	-6,			20,	45,			0.0,		0.140625,	0.3203125,	0.6640625},
+		{INVSLOT_RANGED,	"TOP",		INVSLOT_OFFHAND,	"BOTTOM",	0,	5,			28,	38,			0.1875,		0.3984375,	0.5546875,	0.84375},
 	}
 
 	-- PRIVATE METHODS
@@ -1134,7 +1130,7 @@ function StaticCTRAFrames()
 					optionsWindowizeObject("TargetPower");
 					optionsAddTooltip({L["CT_RaidAssist/Options/Window/Appearance/TargetPowerCheckButton"],L["CT_RaidAssist/Options/Window/Appearance/TargetPowerTooltip"] .. textColor1});
 				optionsEndFrame();
-				if (module:getGameVersion() >= 8) then
+				if (UnitGetTotalAbsorbs ~= n0p) then
 					optionsAddObject(-21,   20, "font#l:tl:13:%y#r:tl:158:%y#" .. L["CT_RaidAssist/Options/Window/Appearance/ShowTotalAbsorbsLabel"] .. textColor1 .. ":l:290");
 					optionsBeginFrame(26,   20, "dropdown#tl:140:%y#s:110:%s#n:CTRAWindow_ShowTotalAbsorbsDropDown" .. L["CT_RaidAssist/Options/Window/Appearance/ShowTotalAbsorbsDropDown"]);
 						optionsWindowizeObject("ShowTotalAbsorbs");
@@ -3642,40 +3638,30 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 				visualFrame:Show();
 				RegisterStateDriver(visualFrame, "visibility", "[@" .. shownUnit .. ", exists] show; hide");
 				listenerFrame:UnregisterAllEvents();  -- probably not required, but doing it to be absolute
-				listenerFrame:RegisterUnitEvent("UNIT_NAME_UPDATE", shownUnit);			-- updateName();
-				listenerFrame:RegisterUnitEvent("UNIT_HEALTH", shownUnit);			-- updateHealthBar(); updateBackdrop();
-				listenerFrame:RegisterUnitEvent("UNIT_MAXHEALTH", shownUnit);			-- updateHealthBar(); updateBackdrop();
-				listenerFrame:RegisterUnitEvent("UNIT_POWER_UPDATE", shownUnit);		-- updatePowerBar();
-				listenerFrame:RegisterUnitEvent("UNIT_DISPLAYPOWER", shownUnit);		-- configurePowerBar();
-				listenerFrame:RegisterUnitEvent("UNIT_AURA", shownUnit);			-- updateAuras();   also toggles secureButtonDebuffFirst:IsShown() if appropriate
-				listenerFrame:RegisterEvent("PLAYER_REGEN_ENABLED");				-- updateAuras();   also toggles secureButtonDebuffFirst:IsShown() if appropriate
-				listenerFrame:RegisterEvent("PLAYER_REGEN_DISABLED");				-- updateAuras();   also toggles secureButtonDebuffFirst:IsShown() if appropriate
-				listenerFrame:RegisterEvent("READY_CHECK");					-- updateRaidStatusIndicators();
-				listenerFrame:RegisterUnitEvent("READY_CHECK_CONFIRM", shownUnit);		-- updateRaidStatusIndicators();
-				listenerFrame:RegisterEvent("READY_CHECK_FINISHED");				-- updateRaidStatusIndicators();
-				listenerFrame:RegisterUnitEvent("PLAYER_FLAGS_CHANGED", shownUnit);		-- updateRaidStatusIndicators();
-				listenerFrame:RegisterUnitEvent("UNIT_CONNECTION", shownUnit);			-- updateRaidStatusIndicators();
-				listenerFrame:RegisterEvent("CANCEL_SUMMON");					-- updateRaidStatusIndicators();
-				listenerFrame:RegisterEvent("CONFIRM_SUMMON");					-- updateRaidStatusIndicators();
-				listenerFrame:RegisterEvent("RAID_TARGET_UPDATE");				-- updateRoleTexture();
-				listenerFrame:RegisterUnitEvent("UNIT_PHASE", shownUnit);			-- updateRoleTexture();
-				--listenerFrame:RegisterUnitEvent("PARTY_MEMBER_ENABLE");				-- updateRoleTexture();
-				--listenerFrame:RegisterUnitEvent("PARTY_MEMBER_DISABLE");			-- updateRoleTexture();
-				if (module:getGameVersion() >= 5) then
-					listenerFrame:RegisterUnitEvent("INCOMING_SUMMON_CHANGED", shownUnit);		-- updateRaidStatusIndicators();
-					listenerFrame:RegisterUnitEvent("UNIT_ABSORB_AMOUNT_CHANGED", shownUnit);	-- updateHealthBar; updateBackdrop();
-					listenerFrame:RegisterUnitEvent("UNIT_HEAL_PREDICTION", shownUnit);		-- updateHealthBar; updateBackdrop();
-				elseif (obj.UpdateIncomingHeals == nil) then
-					-- do this once only
-					local healComm = LibStub("LibHealComm-4.0", true);
-					if (healComm) then
-						obj.UpdateIncomingHeals = updateHealthBar;
-						healComm.RegisterCallback(obj, "HealComm_HealStarted", "UpdateIncomingHeals");
-						healComm.RegisterCallback(obj, "HealComm_HealUpdated", "UpdateIncomingHeals");
-						healComm.RegisterCallback(obj, "HealComm_HealDelayed", "UpdateIncomingHeals");
-						healComm.RegisterCallback(obj, "HealComm_HealStopped", "UpdateIncomingHeals");
-					end
-				end				
+				listenerFrame:RegisterUnitEvent("UNIT_NAME_UPDATE", shownUnit)
+				listenerFrame:RegisterUnitEvent("UNIT_HEALTH", shownUnit)
+				listenerFrame:RegisterUnitEvent("UNIT_MAXHEALTH", shownUnit)
+				listenerFrame:RegisterUnitEvent("UNIT_POWER_UPDATE", shownUnit)
+				listenerFrame:RegisterUnitEvent("UNIT_DISPLAYPOWER", shownUnit)
+				listenerFrame:RegisterUnitEvent("UNIT_AURA", shownUnit)
+				listenerFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
+				listenerFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
+				listenerFrame:RegisterEvent("READY_CHECK")
+				listenerFrame:RegisterUnitEvent("READY_CHECK_CONFIRM", shownUnit)
+				listenerFrame:RegisterEvent("READY_CHECK_FINISHED")
+				listenerFrame:RegisterUnitEvent("PLAYER_FLAGS_CHANGED", shownUnit)
+				listenerFrame:RegisterUnitEvent("UNIT_CONNECTION", shownUnit)
+				listenerFrame:RegisterEvent("CANCEL_SUMMON")
+				listenerFrame:RegisterEvent("CONFIRM_SUMMON")
+				listenerFrame:RegisterEvent("RAID_TARGET_UPDATE")
+				listenerFrame:RegisterUnitEvent("UNIT_PHASE", shownUnit)
+				--listenerFrame:RegisterUnitEvent("PARTY_MEMBER_ENABLE")
+				--listenerFrame:RegisterUnitEvent("PARTY_MEMBER_DISABLE")
+				listenerFrame:RegisterUnitEvent("UNIT_HEAL_PREDICTION", shownUnit)
+				if (UnitGetTotalAbsorbs ~= n0p) then
+					listenerFrame:RegisterUnitEvent("INCOMING_SUMMON_CHANGED", shownUnit)
+					listenerFrame:RegisterUnitEvent("UNIT_ABSORB_AMOUNT_CHANGED", shownUnit)
+				end			
 			else
 				UnregisterStateDriver(visualFrame, "visibility");
 				visualFrame:Hide();

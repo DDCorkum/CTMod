@@ -216,12 +216,14 @@ module.update = function(self, optName, value)
 	
 		-- Temporary
 		local charLog = module:getOption("mailLog")
+		if (CT_MailModOptions) then
 			CT_MailModOptions.mailLog = CT_MailModOptions.mailLog or {}	
 			if (charLog) then
-			for __, v in ipairs(charLog) do
-				tinsert(CT_MailModOptions.mailLog, v)
+				for __, v in ipairs(charLog) do
+					tinsert(CT_MailModOptions.mailLog, v)
+				end
+				module:setOption("mailLog", nil)
 			end
-			module:setOption("mailLog", nil)
 		end
 		
 		-- General

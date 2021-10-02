@@ -295,3 +295,27 @@ function CT_UnitFrames_HealthBar_OnValueChanged(self, value, smooth)
 		self:SetStatusBarColor(r, g, b);
 	end
 end
+
+function module:addClassicIncomingHeals(frame)
+	if (UnitGetTotalAbsorbs or frame.myHealPredictionBar) then
+		-- This should only fire on classic
+		return
+	end
+	local myHealPredictionBar = frame.healthbar:CreateTexture(nil, "ARTWORK", "MyHealPredictionBarTemplate")
+	myHealPredictionBar:Hide()
+	local otherHealPredictionBar = frame.healthbar:CreateTexture(nil, "ARTWORK", "OtherHealPredictionBarTemplate")
+	otherHealPredictionBar:Hide()
+	frame:RegisterUnitEvent("UNIT_HEAL_PREDICTION", frame.unit)
+	local healthtexture = frame.healthbar:GetStatusBarTexture()
+	frame:HookScript("OnEvent", function(__, event)
+		if (event == "UNIT_HEAL_PREDICTION") then
+			local health, maxHealth = frame.healthbar:GetValue(), select(2,frame.healthbar:GetMinMaxValues())
+			if (maxHealth > 0) then
+				local myHeals = C_CVar.GetCVar("predictedHealth") == "1" and (min(UnitGetIncomingHeals(frame.unit, "player") or 0, maxHealth - health)) or 0
+				local otherHeals = C_CVar.GetCVar("predictedHealth") == "1" and (min(UnitGetIncomingHeals(frame.unit) or 0, maxHealth - health) - myHeals) or 0
+				UnitFrameUtil_UpdateFillBar(frame, healthtexture, myHealPredictionBar, myHeals, 0)
+				UnitFrameUtil_UpdateFillBar(frame, myHeals > 0 and myHealPredictionBar or healthtexture, otherHealPredictionBar, otherHeals, 0)
+			end
+		end
+	end)
+end
