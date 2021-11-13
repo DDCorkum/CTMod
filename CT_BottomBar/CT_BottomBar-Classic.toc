@@ -1,4 +1,4 @@
-## Interface: 11400
+## Interface: 11401
 ## Version: 9.1.0.6
 ## Title: CT_BottomBar
 ## Notes: Breaks up the main menu bar into movable pieces.

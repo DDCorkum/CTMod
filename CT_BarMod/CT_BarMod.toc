@@ -1,4 +1,4 @@
-## Interface: 90100
+## Interface: 90105
 ## Version: 9.1.0.6
 ## Title: CT_BarMod
 ## Notes: Intuitive yet powerful action bar addon.

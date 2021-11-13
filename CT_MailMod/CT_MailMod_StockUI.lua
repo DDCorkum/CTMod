@@ -187,31 +187,65 @@ do
 							OpenAllMail:SetText(OPEN_ALL_MAIL_BUTTON)
 							pressedOpenAll = false
 						end
-						module:cancelProcessing();
+						module:cancelProcessing()
 					else
 						if (module:inboxGetNumSelected() == 0) then
-							DEFAULT_CHAT_FRAME:AddMessage(module.text["CT_MailMod/NOTHING_SELECTED"]);
+							DEFAULT_CHAT_FRAME:AddMessage(module.text["CT_MailMod/NOTHING_SELECTED"])
 						else
-							module:closeOpenMail();
-							module:retrieveSelected();
+							if (IsShiftKeyDown()) then
+								-- Only open mail from the auction house
+								local hasAHMessages = false
+								local patterns =
+								{
+									AUCTION_EXPIRED_MAIL_SUBJECT:sub(1,-4),			-- removes " %s" or "%s."
+									--AUCTION_INVOICE_MAIL_SUBJECT:sub(1,-4),
+									AUCTION_OUTBID_MAIL_SUBJECT:sub(1,-4),
+									AUCTION_REMOVED_MAIL_SUBJECT:sub(1,-4),
+									AUCTION_SOLD_MAIL_SUBJECT:sub(1,-4),
+									AUCTION_WON_MAIL_SUBJECT:sub(1,-4),
+								}
+								for i = 1, GetInboxNumItems() do
+									--if (GetInboxInvoiceInfo(i)) then
+									if (module.selectedMail[i]) then
+										local subject = select(4,GetInboxHeaderInfo(i))
+										if (
+											subject:find(patterns[1]) 
+											or subject:find(patterns[2])
+											or subject:find(patterns[3])
+											or subject:find(patterns[4])
+											or subject:find(patterns[5])
+										) then
+											hasAHMessages = true
+										else							
+											module.selectedMail[i] = false
+											module.selectAllMail = false
+										end
+									end
+								end
+								module:inboxUpdateSelection()
+								if (hasAHMessages) then
+									module:closeOpenMail()
+									module:retrieveSelected()
+								else
+									DEFAULT_CHAT_FRAME:AddMessage(module.text["CT_MailMod/NOTHING_FROM_AH"])
+								end
+							else
+								module:closeOpenMail()
+								module:retrieveSelected()
+							end
 						end
 					end
 				end
 			end,
 			["onenter"] = function(self)
-				GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", 30, -60);
-				GameTooltip:SetText(module.text["CT_MailMod/Inbox/OpenSelectedTip"]);
-				GameTooltip:Show();
-			end,
-			["onleave"] = function(self)
-				GameTooltip:Hide();
+				module:displayTooltip(self, {module.text["CT_MailMod/Inbox/OpenSelectedTip"], "|n|c0080A0FF" .. SHIFT_KEY .. "|r - " .. module.text["CT_MailMod/Inbox/OpenSelectedTip2"] .. "#0.9:0.9:0.9"}, "ANCHOR_TOPLEFT", 30, -60)
 			end,
 			["onload"] = function(self)
 				module:registerConflictResolution("ClassicGuildBank", 1, function()			
 					-- move our frame down a bit and make it smaller, so there is more room for them
-					self:SetPoint("LEFT", InboxFrame, "TOPLEFT", 155, -49.5);
-					self:SetSize(65, 19);
-					self:SetNormalFontObject("GameFontNormalSmall");
+					self:SetPoint("LEFT", InboxFrame, "TOPLEFT", 155, -49.5)
+					self:SetSize(65, 19)
+					self:SetNormalFontObject("GameFontNormalSmall")
 				end);
 			end
 		},

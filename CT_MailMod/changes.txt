@@ -1,3 +1,6 @@
+CT_MailMod (9.1.5.1) 2021-11-02
+- Shift-click to only open mail from the auction house.
+
 CT_MailMod (9.1.0.6) 2021-09-09
 - Resolving an error that appears during a fresh install
 

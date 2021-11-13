@@ -1,4 +1,4 @@
-## Interface: 11400
+## Interface: 11401
 ## Version: 9.0.5.3
 ## Title: CT_ExpenseHistory
 ## Notes: Detailed log of character expenses.
