@@ -1,3 +1,6 @@
+CT_BottomBar (9.1.5.2) 2021-12-17
+- LFG micro button in TBC and Season of Mastery
+
 CT_BottomBar (9.1.0.6) 2021-09-28
 - Adding ZoneAbilityFrame
 

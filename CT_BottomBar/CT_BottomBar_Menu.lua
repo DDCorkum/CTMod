@@ -452,77 +452,56 @@ local function addon_PostInit(self)
 end
 
 local function addon_Register()
-	if (module:getGameVersion() >= 8) then
-		module:registerAddon(
-			"Menu Bar",  -- option name
-			"MenuBar",  -- used in frame names
-			module.text["CT_BottomBar/Options/MenuBar"],  -- shown in options window & tooltips
-			module.text["CT_BottomBar/Options/MenuBar"],  -- title for horizontal orientation
-			"Menu",  -- title for vertical orientation
-			{ "BOTTOMLEFT", ctRelativeFrame, "BOTTOM", 36, 28 },
-			{ -- settings
-				orientation = "ACROSS",
-				usedOnVehicleUI = true,
-				usedOnOverrideUI = true,
-				usedOnPetBattleUI = true,
-				OnDelayedUpdate = addon_OnDelayedUpdate,
-			},
-			addon_Init,
-			addon_PostInit,
-			nil,  -- no config function
-			addon_Update,
-			addon_UpdateOrientation,
-			nil,  -- no enable function
-			addon_Disable,
-			"helperFrame", -- 1
-			CharacterMicroButton, -- 2
-			SpellbookMicroButton, -- 3
-			TalentMicroButton, -- 4
-			AchievementMicroButton, -- 5
-			QuestLogMicroButton, -- 6
-			GuildMicroButton, -- 7	
-			LFDMicroButton, -- 8
-			CollectionsMicroButton, -- 9
-			EJMicroButton, -- 10
-			StoreMicroButton, -- 11
-			MainMenuMicroButton -- 12
-			--PVPMicroButton, -- old 8
-			--HelpMicroButton -- old 14
-		);
-	else
-		-- Classic
-		module:registerAddon(
-			"Menu Bar",  -- option name
-			"MenuBar",  -- used in frame names
-			module.text["CT_BottomBar/Options/MenuBar"],  -- shown in options window & tooltips
-			module.text["CT_BottomBar/Options/MenuBar"],  -- title for horizontal orientation
-			"Menu",  -- title for vertical orientation
-			{ "BOTTOMLEFT", ctRelativeFrame, "BOTTOM", 40, 4 },
-			{ -- settings
-				orientation = "ACROSS",
-				usedOnVehicleUI = true,
-				usedOnOverrideUI = true,
-				usedOnPetBattleUI = true,
-				OnDelayedUpdate = addon_OnDelayedUpdate,
-			},
-			addon_Init,
-			addon_PostInit,
-			nil,  -- no config function
-			addon_Update,
-			addon_UpdateOrientation,
-			nil,  -- no enable function
-			addon_Disable,
-			"helperFrame", -- 1
-			CharacterMicroButton, -- 2
-			SpellbookMicroButton, -- 3
-			TalentMicroButton, -- 4	
-			QuestLogMicroButton, -- 5
-			SocialsMicroButton, -- 6
-			WorldMapMicroButton, -- 7
-			MainMenuMicroButton, -- 8
-			HelpMicroButton -- 9
-		);
+
+	local allButtons =
+	{
+		CharacterMicroButton,
+		SpellbookMicroButton,
+		TalentMicroButton,
+		AchievementMicroButton,
+		QuestLogMicroButton,
+		GuildMicroButton or SocialsMicroButton,
+		WOW_PROJECT_ID == WOW_PROJECT_CLASSIC and (C_Seasons.HasActiveSeason() and LFGMicroButton or WorldMapMicroButton) or LFGMicroButton or LFDMicroButton,
+		CollectionsMicroButton,
+		EJMicroButton,
+		StoreMicroButton,
+		MainMenuMicroButton,		-- Retail has both, but the latter is not useful when the former is available
+		WOW_PROJECT_ID ~= WOW_PROJECT_MAINLINE and HelpMicroButton or nil,
+		--PVPMicroButton,		
+	}
+	
+	local realButtons = {}	-- classic vs retail
+	
+	for i=1, 12 do
+		if allButtons[i] then
+			tinsert(realButtons, allButtons[i])
+		end
 	end
+
+	module:registerAddon(
+		"Menu Bar",  -- option name
+		"MenuBar",  -- used in frame names
+		module.text["CT_BottomBar/Options/MenuBar"],  -- shown in options window & tooltips
+		module.text["CT_BottomBar/Options/MenuBar"],  -- title for horizontal orientation
+		"Menu",  -- title for vertical orientation
+		module:getGameVersion() >= 8 and { "BOTTOMLEFT", ctRelativeFrame, "BOTTOM", 36, 28 } or { "BOTTOMLEFT", ctRelativeFrame, "BOTTOM", 40, 4 },
+		{ -- settings
+			orientation = "ACROSS",
+			usedOnVehicleUI = true,
+			usedOnOverrideUI = true,
+			usedOnPetBattleUI = true,
+			OnDelayedUpdate = addon_OnDelayedUpdate,
+		},
+		addon_Init,
+		addon_PostInit,
+		nil,  -- no config function
+		addon_Update,
+		addon_UpdateOrientation,
+		nil,  -- no enable function
+		addon_Disable,
+		"helperFrame", -- 1
+		unpack(realButtons)
+	)
 end
 
 module.loadedAddons["Menu Bar"] = addon_Register;
