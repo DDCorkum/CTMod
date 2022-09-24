@@ -467,12 +467,12 @@ local function addon_Register()
 		StoreMicroButton,
 		MainMenuMicroButton,		-- Retail has both, but the latter is not useful when the former is available
 		WOW_PROJECT_ID ~= WOW_PROJECT_MAINLINE and HelpMicroButton or nil,
-		--PVPMicroButton,		
+		PVPMicroButton,		
 	}
 	
 	local realButtons = {}	-- classic vs retail
 	
-	for i=1, 12 do
+	for i=1, 13 do
 		if allButtons[i] then
 			tinsert(realButtons, allButtons[i])
 		end

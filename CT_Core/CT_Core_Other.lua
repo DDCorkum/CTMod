@@ -11,7 +11,7 @@
 local _G = getfenv(0);
 local module = _G.CT_Core;
 local NUM_CHAT_WINDOWS = NUM_CHAT_WINDOWS;
-local WatchFrame = ObjectiveTrackerFrame or QuestWatchFrame;  -- QuestWatchFrame in WoW Classic
+local WatchFrame = ObjectiveTrackerFrame or QuestWatchFrame or WatchFrame;  -- QuestWatchFrame in WoW Classic
 --------------------------------------------
 -- Quest Levels
 
@@ -681,7 +681,7 @@ elseif (module:getGameVersion() == 2) then
 	
 
 
-else  -- if module:getGameVersion() >= 9
+elseif module:getGameVersion() >= 9 then
 	
 	local dummySetText = CreateFrame("Frame"):CreateFontString(nil, "ARTWORK").SetText;	-- prevents an infinite loop by the hook below
 	QuestScrollFrame.titleFramePool.creationFunc = function(self)
@@ -2388,7 +2388,7 @@ do
 					CT_Core_MinimizeWatchFrameButton:Hide();	-- hides the custom minimize button on classic only
 				end
 				-- Restore Blizzard's WatchFrame
-				if (module:getGameVersion() >= 8) then
+				if (module:getGameVersion() >= 3) then
 					WatchFrame:SetWidth(getBlizzardExpandedWidth());
 				else
 					QuestWatch_Update();
