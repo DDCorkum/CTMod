@@ -33,34 +33,6 @@ end
 
 if (module:getGameVersion() == 1) then
 
-	
-	--[[
-		-- THIS WAS A SIMPLE METHOD USED FROM 8.2.0.5 THROUGH 8.2.5.3
-		-- IT OVERLOADED THE GLOBAL API GetQuestLogTitle
-		-- BUT DOING SO CAN NEGATIVELY AFFECT OTHER ADDONS
-		
-		local old_GetQuestLogTitle = GetQuestLogTitle;
-		GetQuestLogTitle = function(index)
-			local args = {old_GetQuestLogTitle(questIndex)};
-			if (displayLevels and not args[4] and args[2] and args[2] > 0) then
-				if (args[3]) then
-					args[1] = "[" .. args[2] .. "+] " .. args[1];
-				else
-					args[1] = "[" .. args[2] .. "] " .. args[1];
-				end
-			end
-			return unpack(args);
-		end	
-		GetQuestLogTitle = new_GetQuestLogTitle;
-		
-	--]]
-
-	
-	
-	-- THIS IS IS A HARDER APPROACH STARTING IN 8.2.5.4
-	-- IT OVERLOADS QuestLog_Update(self) ON LINE 111 AND QuestWatch_Update() ON LINE 616 OF QuestLogFrame.lua
-	-- DOING SO LIMITS THE SCOPE TO THE DISPLAY OF QUESTS IN THE QUEST TRACKER, FOR BETTER COMPATIBILITY TO OTHER ADDONS
-
 	QuestLog_Update = function(self)
 		local numEntries, numQuests = GetNumQuestLogEntries();
 		if ( numEntries == 0 ) then
@@ -98,7 +70,7 @@ if (module:getGameVersion() == 1) then
 			questNormalText = _G["QuestLogTitle"..i.."NormalText"];
 			questHighlight = _G["QuestLogTitle"..i.."Highlight"];
 			if ( questIndex <= numEntries ) then
--- CT_CORE MODIFICATION STARTS HERE
+-- CT_CORE CLASSIC ERA QUEST LOG MODIFICATION STARTS HERE
 				local questLogTitleText, level, questTag, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isBounty, isStory, isHidden, isScaling = GetQuestLogTitle(questIndex);
 				if (displayLevels and questLogTitleText and level and level > 0) then
 					if (questTag) then
@@ -107,7 +79,7 @@ if (module:getGameVersion() == 1) then
 						questLogTitleText = "[" .. level .. "] " .. questLogTitleText;
 					end
 				end
--- CT_CORE MODIFICATION ENDS HERE
+-- CT_CORE CLASSIC ERA QUEST LOG MODIFICATION ENDS HERE
 				if ( isHeader ) then
 					if ( questLogTitleText ) then
 						questLogTitle:SetText(questLogTitleText);
@@ -291,7 +263,7 @@ if (module:getGameVersion() == 1) then
 				if ( numObjectives > 0 ) then
 					-- Set title
 					watchText = _G["QuestWatchLine"..watchTextIndex];
--- CT_CORE MODIFICATION STARTS HERE
+-- CT_CORE CLASSIC ERA OBJECTIVES TRACKER MODIFICATION STARTS HERE
 					-- watchText:SetText(GetQuestLogTitle(questIndex));
 					local questLogTitleText, level, questTag = GetQuestLogTitle(questIndex);
 					if (displayLevels and questLogTitleText and level and level > 0) then
@@ -302,7 +274,7 @@ if (module:getGameVersion() == 1) then
 						end
 					end
 					watchText:SetText(questLogTitleText);
--- CT_CORE MODIFICATION ENDS HERE
+-- CT_CORE CLASSIC ERA OBJECTIVES TRACKER MODIFICATION ENDS HERE
 					tempWidth = watchText:GetWidth();
 					-- Set the anchor of the title line a little lower
 					if ( watchTextIndex > 1 ) then
@@ -399,7 +371,7 @@ elseif (module:getGameVersion() == 2) then
 
 		local questIndex, questLogTitle, questTitleTag, questNumGroupMates, questNormalText, questHighlight, questCheck;
 		local questLogTitleText, level, questTag, isHeader, isCollapsed, isComplete, color;
--- CT_CORE MODIFICATION STARTS HERE
+-- CT_CORE TBC CLASSIC QUEST LOG MODIFICATION STARTS HERE
 		local frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isBounty, isStory, isHidden, isScaling;
 		local numPartyMembers, partyMembersOnQuest, tempWidth, textWidth;
 		for i=1, QUESTS_DISPLAYED, 1 do
@@ -420,7 +392,7 @@ elseif (module:getGameVersion() == 2) then
 						questLogTitleText = "[" .. level .. "] " .. questLogTitleText;
 					end
 				end
--- CT_CORE MODIFICATION ENDS HERE
+-- CT_CORE TBC CLASSIC QUEST LOG MODIFICATION ENDS HERE
 				if ( isHeader ) then
 					if ( questLogTitleText ) then
 						questLogTitle:SetText(questLogTitleText);
@@ -600,7 +572,7 @@ elseif (module:getGameVersion() == 2) then
 				if ( numObjectives > 0 ) then
 					-- Set title
 					watchText = _G["QuestWatchLine"..watchTextIndex];
--- CT_CORE MODIFICATION STARTS HERE
+-- CT_CORE TBC CLASSIC OBJECTIVES TRACKER MODIFICATION STARTS HERE
 					-- watchText:SetText(GetQuestLogTitle(questIndex));
 					local questLogTitleText, level, questTag = GetQuestLogTitle(questIndex);
 					if (displayLevels and questLogTitleText and level and level > 0) then
@@ -611,7 +583,7 @@ elseif (module:getGameVersion() == 2) then
 						end
 					end
 					watchText:SetText(questLogTitleText);
--- CT_CORE MODIFICATION ENDS HERE
+-- CT_CORE TBC CLASSIC OBJECTIVES TRACKER MODIFICATION ENDS HERE
 					tempWidth = watchText:GetWidth();
 					-- Set the anchor of the title line a little lower
 					if ( watchTextIndex > 1 ) then
@@ -679,9 +651,23 @@ elseif (module:getGameVersion() == 2) then
 		UIParent_ManageFramePositions();
 	end); -- end post-hook of QuestWatch_Update()
 	
+elseif module:getGameVersion() == 3 then
 
+	local dummySetText = CreateFrame("Button").SetText
+	for __, btn in pairs(QuestLogListScrollFrame.buttons) do
+		hooksecurefunc(btn, "SetText", function(self, text)
+			if text:sub(1,1) ~= "[" then
+				__, level = GetQuestLogTitle(self:GetID())
+				if displayLevels and level and level > 0 then
+					dummySetText(self, "[" .. level .. "]" .. text:sub(2))
+				end
+			else
+				dummySetText(self, text)
+			end
+		end)
+	end
 
-elseif module:getGameVersion() >= 9 then
+else -- if module:getGameVersion() >= 9 then
 	
 	local dummySetText = CreateFrame("Frame"):CreateFontString(nil, "ARTWORK").SetText;	-- prevents an infinite loop by the hook below
 	QuestScrollFrame.titleFramePool.creationFunc = function(self)

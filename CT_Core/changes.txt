@@ -1,5 +1,5 @@
-CT_Core (9.1.5.2) 2022-09-24
-- Temporarily fixes for Classic Wrath of the Lich King (todo: restoring levels in the quest log)
+CT_Core (9.1.5.2) 2022-09-25
+- Updates for Classic WotLK
 
 CT_Core (9.1.0.3) 2021-08-01
 - Control panel improvements
