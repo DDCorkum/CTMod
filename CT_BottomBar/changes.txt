@@ -1,4 +1,4 @@
-CT_BottomBar (9.1.5.2) 2022-09-24
+CT_BottomBar (9.2.0.1) 2022-09-25
 - LFG micro button in Wrath and Season of Mastery
 - PvP micro button in Wrath
 
