@@ -717,7 +717,7 @@ module.update = function(self, optName, value)
 			-- WoD onwards
 			module:loadAddon("Possess Bar");	
 		end
-		if (module:getGameVersion() <= 2) then
+		if (module:getGameVersion() <= 7) then
 			-- Classic
 			module:loadAddon("Stance Bar")
 		else

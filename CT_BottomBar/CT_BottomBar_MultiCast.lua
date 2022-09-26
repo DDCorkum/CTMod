@@ -214,4 +214,4 @@ local function addon_Register()
 	);
 end
 
---module.loadedAddons["MultiCastBar"] = addon_Register;
+module.loadedAddons["MultiCastBar"] = addon_Register;

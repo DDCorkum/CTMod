@@ -1322,7 +1322,7 @@ function auraClass:checkExpiration()
 
 				-- Play a sound
 				if (globalObject.expirationSound) then
-					if (module:getGameVersion() >= 8) then
+					if (module:getGameVersion() >= 3) then
 						PlaySoundFile(569634); -- "Sound\\Spells\\misdirection_impact_head.wav"
 					else
 						PlaySound(3081); -- "TellMessage"

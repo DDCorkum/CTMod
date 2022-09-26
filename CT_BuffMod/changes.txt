@@ -1,3 +1,6 @@
+CT_BuffMod (9.2.0.1) 2022-09-26
+- Audio expiration warning in Classic WotLK
+
 CT_BuffMod (9.1.0.3) 2021-08-09
 - Control panel improvements
 

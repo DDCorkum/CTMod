@@ -1900,7 +1900,7 @@ function module:buildPageBasicCondition(groupId)
 	local bar;
 	local condition = "";
 
-	if (module:getGameVersion() >= 8) then
+	if (module:getGameVersion() >= 3) then
 		if (groupId == module.actionBarId) then
 			condition = condition .. "[vehicleui]" .. GetVehicleBarIndex() .. "; ";
 			condition = condition .. "[overridebar]" .. GetOverrideBarIndex() .. "; ";

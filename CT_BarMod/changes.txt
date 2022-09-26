@@ -1,3 +1,6 @@
+CT_BarMod (9.2.0.1) 2021-09-26
+- Udpates for Classic WotLK
+
 CT_BarMod (9.1.0.6) 2021-09-09
 - Fixed a bug when configuring bar fading
 

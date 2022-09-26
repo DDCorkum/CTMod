@@ -1,6 +1,7 @@
-CT_BottomBar (9.2.0.1) 2022-09-25
-- LFG micro button in Wrath and Season of Mastery
-- PvP micro button in Wrath
+CT_BottomBar (9.2.0.1) 2022-09-26
+- LFG micro button in WotLK and SoM
+- PvP micro button in WotLK
+- Tentative fix for Shaman Totem Bar in WotLK
 
 CT_BottomBar (9.1.0.6) 2021-09-28
 - Adding ZoneAbilityFrame

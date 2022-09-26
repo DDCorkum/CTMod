@@ -335,6 +335,7 @@ module.classicTaxiMaps =
 -- 	key			Number, Required		TaxiNodeID
 module.ignoreClassicTaxiNodes = 
 {
+	[36] = true,	-- Generic, World Target 001
 	[84] = true,	-- Plaguewood Tower, Eastern Plaguelands
 	[85] = true,	-- Northpass Tower, Eastern Plaguelands
 	[86] = true,	-- Eastwall Tower, Eastern Plaguelands
@@ -368,11 +369,25 @@ module.ignoreClassicTaxiNodes =
 	[152] = true,	-- Manaforge Ultris quest start, Netherstorm
 	[153] = true,	-- Manaforge Ultris quest end, Netherstorm
 	[157] = true,	-- Vision Guide quest, Blade's Edge Mountaints
+	[168] = true,	-- Filming
 	[169] = true,	-- Netherwing Ledge quest, Shadowmoon Valley
+	[180] = true,	-- Quest - Dustwallow - Alcaz Survey Start
+	[181] = true,	-- Quest - Dustwallow - Alcaz Survey End
 	[209] = true,	-- Dead Scar Bombing start, Sunwell
 	[211] = true,	-- Ship Bombing end, Sunwell
 	[212] = true,	-- Ship Bombing end, Sunwell
-	
+	[285] = true,	-- Quest: Wintergarde -> Stars' Rest (Start)
+	[287] = true,	-- Quest: Valgarde -> Westguard Keep Start
+	[292] = true,	-- Flavor - Stormwind Harbor - Start
+	[316] = true,	-- Ebon Hold - Acherus -> Death's Breach Start
+	[318] = true,	-- Ebon Hold - Death's Breach -> Acherus Start
+	[392] = true,	-- CC Prologue - GT - Quest - Vent Horizon - Start
+	[393] = true,	-- CC Prologue - GT - Quest - Vent Horizon - End
+	[394] = true,	-- CC Prologue - ET - Battle Flight - Start
+	[404] = true,	-- Durotar - ET - CC Prologue Spy Frog Start
+	[405] = true,	-- Durotar - ET - CC Prologue Spy Frog End
+	[438] = true,	-- Durotar - ET - CC Prologue Troll Taxi Bat Start
+	[439] = true,	-- Durotar - ET - CC Prologue Troll Recruit End
 	
 };
 
