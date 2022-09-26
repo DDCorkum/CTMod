@@ -654,7 +654,7 @@ module.frame = function()
 						color = textColor0;
 					end
 					optionsAddObject( -5,   14, "font#tl:" .. left .. ":%y#" .. obj.addonName .. "#" .. color .. ":l:150");
-					optionsAddObject( 21,   26, "checkbutton#tl:150:%y" .. "#i:enable" .. obj.optionName .. "#o:enable" .. obj.optionName .. ":true#" .. L["CT_BottomBar/Options/MovableBars/Activate"]);
+					optionsAddObject( 21,   26, "checkbutton#tl:150:%y" .. "#i:enable" .. obj.optionName .. "#o:enable" .. obj.optionName .. ":" .. (module:getOption("enable" .. obj.optionName) ~= false and "true" or "false") .. "#" .. L["CT_BottomBar/Options/MovableBars/Activate"]);
 					optionsAddObject( 26,   26, "checkbutton#tl:230:%y" .. "#i:" .. obj.optionName .. "#o:" .. obj.optionName .. ((obj:isDefaultHidden() and ":true") or "") .. "#" .. L["CT_BottomBar/Options/MovableBars/Hide"]);
 				end
 			end

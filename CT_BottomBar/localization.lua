@@ -49,11 +49,13 @@ L["CT_BottomBar/Options/General/Heading"] = "Important General Options"
 L["CT_BottomBar/Options/MenuBar"] = "Menu Bar"
 L["CT_BottomBar/Options/MovableBars/Activate"] = "Activate"
 L["CT_BottomBar/Options/MovableBars/Hide"] = "Hide"
+L["CT_BottomBar/Options/MultiCastBar"] = "Totem Bar"
 L["CT_BottomBar/Options/PetBar"] = "Pet Bar"
 L["CT_BottomBar/Options/RepBar"] = "Reputation Bar"
 L["CT_BottomBar/Options/StanceBar"] = "Stance Bar"
 L["CT_BottomBar/Options/StatusBar"] = "Status Bar (XP & Rep)"
 L["CT_BottomBar/Options/TalkingHead"] = "Quest Dialogue"
+L["CT_BottomBar/Options/ZoneAbilityBar"] = "Zone Bar"
 
 
 -----------------------------------------------
@@ -62,6 +64,10 @@ L["CT_BottomBar/Options/TalkingHead"] = "Quest Dialogue"
 if (GetLocale() == "frFR") then
 
 L["CT_BottomBar/Options/ActionBarPage"] = "Les flèches haut/bas"
+L["CT_BottomBar/Options/AddonList/CommonBarsSubheading"] = "Les barres d'action habituelles"
+L["CT_BottomBar/Options/AddonList/InformationalBarsSubheading"] = "Les barres de renseignements"
+L["CT_BottomBar/Options/AddonList/SpecialBarsSubheading"] = "Les barres d'action spéciales"
+L["CT_BottomBar/Options/AddonList/StatusTrackingBarsSubheading"] = "Les barres de complétion"
 L["CT_BottomBar/Options/BagsBar"] = "Les sacs"
 L["CT_BottomBar/Options/ClassBar"] = "La classe"
 L["CT_BottomBar/Options/ClassicKeyRingButton"] = "Le trousseau de clés"
@@ -111,5 +117,40 @@ L["CT_BottomBar/Options/RepBar"] = "Rufleiste"
 L["CT_BottomBar/Options/StanceBar"] = "Haltungsleiste"
 L["CT_BottomBar/Options/StatusBar"] = "Statusleiste (EP & Ruf)"
 L["CT_BottomBar/Options/TalkingHead"] = "Questdialoge"
+
+
+-----------------------------------------------
+-- zhCN (credit: 萌丶汉丶纸)
+
+elseif GetLocale() == "zhCN" then
+
+L["CT_BottomBar/Options/ActionBarPage"] = "箭头上/下翻页"
+L["CT_BottomBar/Options/AddonList/CommonBarsSubheading"] = "普通按钮栏"
+L["CT_BottomBar/Options/AddonList/InformationalBarsSubheading"] = "信息显示栏"
+L["CT_BottomBar/Options/AddonList/SpecialBarsSubheading"] = "特殊按钮栏"
+L["CT_BottomBar/Options/AddonList/StatusTrackingBarsSubheading"] = "状态追踪栏"
+L["CT_BottomBar/Options/BagsBar"] = "背包栏"
+L["CT_BottomBar/Options/ClassBar"] = "职业栏"
+L["CT_BottomBar/Options/ClassicKeyRingButton"] = "钥匙环按钮"
+L["CT_BottomBar/Options/ClassicPerformanceBar"] = "性能栏"
+L["CT_BottomBar/Options/ExpBar"] = "经验栏"
+L["CT_BottomBar/Options/FlightBar"] = "停止飞行按钮"
+L["CT_BottomBar/Options/FPSBar"] = "FPS指示"
+L["CT_BottomBar/Options/General/BackgroundTextures/Heading"] = "背景材质"
+L["CT_BottomBar/Options/General/BackgroundTextures/HideActionBarCheckButton"] = "隐藏动作栏材质"
+L["CT_BottomBar/Options/General/BackgroundTextures/HideGryphonsCheckButton"] = "隐藏银龙/狮鹫"
+L["CT_BottomBar/Options/General/BackgroundTextures/HideMenuAndBagsCheckButton"] = "隐藏菜单和背包材质"
+L["CT_BottomBar/Options/General/BackgroundTextures/Line1"] = "控制默认UI栏位置后面的灰色背景"
+L["CT_BottomBar/Options/General/BackgroundTextures/ShowLionsCheckButton"] = "显示狮鹫替代银龙"
+L["CT_BottomBar/Options/General/Heading"] = "重要的常规选项"
+L["CT_BottomBar/Options/MenuBar"] = "菜单栏"
+L["CT_BottomBar/Options/MovableBars/Activate"] = "激活"
+L["CT_BottomBar/Options/MovableBars/Hide"] = "隐藏"
+L["CT_BottomBar/Options/PetBar"] = "宠物栏"
+L["CT_BottomBar/Options/RepBar"] = "声望栏"
+L["CT_BottomBar/Options/StanceBar"] = "姿态栏"
+L["CT_BottomBar/Options/StatusBar"] = "状态栏 (经验 & 声望)"
+L["CT_BottomBar/Options/TalkingHead"] = "任务对话"
+
 
 end
