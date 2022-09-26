@@ -936,7 +936,7 @@ function StaticCTRAFrames()
 				end
 				optionsAddObject(200, 20, "font#tl:190:%y#s:0:%s#" .. L["CT_RaidAssist/Options/Window/Groups/ClassHeader"] .. textColor1 .. ":l");
 				for __, class in ipairs(
-					(module:getGameVersion() >= 7 and 
+					module:getGameVersion() >= 7 and 
 						{
 							{"DeathKnights", LOCALIZED_CLASS_NAMES_MALE.DEATHKNIGHT},
 							{"DemonHunters", LOCALIZED_CLASS_NAMES_MALE.DEMONHUNTER},
@@ -951,8 +951,20 @@ function StaticCTRAFrames()
 							{"Warlocks", LOCALIZED_CLASS_NAMES_MALE.WARLOCK},
 							{"Warriors", LOCALIZED_CLASS_NAMES_MALE.WARRIOR},
 						}
-					)
-					or
+					or module:getGameVersion() >= 3 and
+						{
+							{"DeathKnights", LOCALIZED_CLASS_NAMES_MALE.DEATHKNIGHT},
+							{"Druids", LOCALIZED_CLASS_NAMES_MALE.DRUID},
+							{"Hunters", LOCALIZED_CLASS_NAMES_MALE.HUNTER},
+							{"Mages", LOCALIZED_CLASS_NAMES_MALE.MAGE},
+							{"Paladins", LOCALIZED_CLASS_NAMES_MALE.PALADIN},
+							{"Priests", LOCALIZED_CLASS_NAMES_MALE.PRIEST},
+							{"Rogues", LOCALIZED_CLASS_NAMES_MALE.ROGUE},
+							{"Shamans", LOCALIZED_CLASS_NAMES_MALE.SHAMAN},
+							{"Warlocks", LOCALIZED_CLASS_NAMES_MALE.WARLOCK},
+							{"Warriors", LOCALIZED_CLASS_NAMES_MALE.WARRIOR},
+						}
+					or 
 						{
 							{"Druids", LOCALIZED_CLASS_NAMES_MALE.DRUID},
 							{"Hunters", LOCALIZED_CLASS_NAMES_MALE.HUNTER},
@@ -2350,7 +2362,7 @@ function StaticClickCastBroker()
 	do
 		module:regEvent("PLAYER_LOGIN", obj.Refresh);
 		module:regEvent("LEARNED_SPELL_IN_TAB", updateSpells);
-		if (module:getGameVersion() >= 8) then
+		if (module:getGameVersion() >= 3) then
 			module:regEvent("ACTIVE_TALENT_GROUP_CHANGED", updateSpells);
 		end
 		return obj;
@@ -4264,9 +4276,11 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 				listenerFrame:RegisterUnitEvent("UNIT_DISPLAYPOWER", shownUnit);
 				listenerFrame:RegisterUnitEvent("UNIT_NAME_UPDATE", shownUnit);
 				listenerFrame:RegisterUnitEvent("UNIT_TARGET", strsub(shownUnit, 1, -7));
-				if (module:getGameVersion() >= 8) then
-					listenerFrame:RegisterUnitEvent("UNIT_ABSORB_AMOUNT_CHANGED", shownUnit);
+				if (module:getGameVersion() >= 2) then
 					listenerFrame:RegisterUnitEvent("UNIT_HEAL_PREDICTION", shownUnit);
+				end
+				if (module:getGameVersion() >= 5) then
+					listenerFrame:RegisterUnitEvent("UNIT_ABSORB_AMOUNT_CHANGED", shownUnit);
 				end
 			else
 				UnregisterStateDriver(visualFrame, "visibility");

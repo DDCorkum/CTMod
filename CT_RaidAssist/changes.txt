@@ -1,3 +1,6 @@
+CT_RaidAssist (9.2.0.1) 2022-09-26
+- Updates for Classic WotLK
+
 CT_RaidAssist (9.1.0.6) 2021-09-11
 - Removing LibHealComm-4.0 now that 2.5.2 and 1.14.0 includes a limited form of UnitGetIncomingHeals()
 
