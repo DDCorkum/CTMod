@@ -32,6 +32,14 @@ local function moveBar()
 		MultiCastActionPage2:AdjustPointsOffset((x-x2)/scale, (y-y2)/scale)
 		MultiCastActionPage3:AdjustPointsOffset((x-x2)/scale, (y-y2)/scale)
 		MultiCastSlotButton1:AdjustPointsOffset((x-x2)/scale, (y-y2)/scale)
+		
+		local x3,y3 = MultiCastSummonSpellButton:GetScaledRect()
+		MultiCastSummonSpellButton:AdjustPointsOffset((x-30-x3)/scale, (y-y3)/scale)
+		
+		MultiCastRecallSpellButton:ClearPointByName("BOTTOMLEFT")
+		
+		--local x4,y4 = MultiCastRecallSpellButton:GetScaledRect()
+		--MultiCastRecallSpellButton:AdjustPointsOffset((x+30-x4)/scale, (y-y4)/scale)
 	end	
 end
 
@@ -41,8 +49,8 @@ local function addon_Update(self)
 	-- self == actionbar arrows bar object
 	
 	self.helperFrame:ClearAllPoints();
-	self.helperFrame:SetPoint("TOPLEFT", self.frame, -10, 20);
-	self.helperFrame:SetPoint("BOTTOMRIGHT", self.frame, 75, 0);
+	self.helperFrame:SetPoint("TOPLEFT", self.frame, -30, 30);
+	self.helperFrame:SetPoint("BOTTOMRIGHT", self.frame, 150, 0);
 
 	moveBar()
 
@@ -78,9 +86,30 @@ local function addon_Init(self)
 	
 	hooksecurefunc(MultiCastActionBarFrame, "SetPoint", moveBar)
 	hooksecurefunc(MultiCastActionBarFrame, "Show", moveBar)
+	hooksecurefunc(MultiCastSlotButton1, "SetPoint", moveBar)
 	module:regEvent("PLAYER_REGEN_ENABLED", moveBar)
 	hooksecurefunc(self.frame,"StopMovingOrSizing", moveBar)
 
+	
+	-- modification to this function so it stops moving things in response to events.
+	local oldMultiCastSummonSpellButton_Update = MultiCastSummonSpellButton_Update
+	local oldMultiCastRecallSpellButton_Update = MultiCastSummonSpellButton_Update
+	module:regEvent("PLAYER_REGEN_ENABLED", function()
+		if isEnabled then
+			MultiCastSummonSpellButton_Update = oldMultiCastSummonSpellButton_Update
+			MultiCastSummonSpellButton_Update(MultiCastSummonSpellButton)
+			MultiCastRecallSpellButton_Update = oldMultiCastRecallSpellButton_Update
+			MultiCastRecallSpellButton_Update(MultiCastRecallSpellButton)
+		end
+	end)
+	module:regEvent("PLAYER_REGEN_DISABLED", function()
+		if isEnabled then
+			MultiCastSummonSpellButton_Update = nop
+			MultiCastRecallSpellButton_Update = nop
+		end
+	end)
+
+	
 	return true;
 end
 
