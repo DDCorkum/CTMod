@@ -93,7 +93,7 @@ local function addon_Init(self)
 	
 	-- modification to this function so it stops moving things in response to events.
 	local oldMultiCastSummonSpellButton_Update = MultiCastSummonSpellButton_Update
-	local oldMultiCastRecallSpellButton_Update = MultiCastSummonSpellButton_Update
+	local oldMultiCastRecallSpellButton_Update = MultiCastRecallSpellButton_Update
 	module:regEvent("PLAYER_REGEN_ENABLED", function()
 		if isEnabled then
 			MultiCastSummonSpellButton_Update = oldMultiCastSummonSpellButton_Update

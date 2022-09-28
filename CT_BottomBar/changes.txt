@@ -1,4 +1,4 @@
-CT_BottomBar (9.2.0.1) 2022-09-27
+CT_BottomBar (9.2.0.1) 2022-09-28
 - LFG micro button in WotLK and SoM
 - PvP micro button in WotLK
 - Shaman Totem Bar in WotLK
