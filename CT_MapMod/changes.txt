@@ -1,3 +1,6 @@
+CT_MapMod (9.2.0.1) 2022-09-26
+- Partial update for Classic WotLK
+
 CT_MapMod (9.1.0.6) 2021-09-06
 - Resolving a class-only addon conflict with Leatrix Maps BCC.
 

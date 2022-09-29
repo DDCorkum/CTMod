@@ -1,5 +1,5 @@
-## Interface: 11401
-## Version: 9.1.0.3
+## Interface: 11403
+## Version: 9.2.0.1
 ## Title: CT_BuffMod
 ## Notes: Customizable buff display.
 ## DefaultState: Enabled

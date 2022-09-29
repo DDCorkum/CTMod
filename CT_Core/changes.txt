@@ -1,3 +1,6 @@
+CT_Core (9.2.0.1) 2022-09-25
+- Updates for Classic WotLK
+
 CT_Core (9.1.0.3) 2021-08-01
 - Control panel improvements
 

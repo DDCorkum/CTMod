@@ -902,7 +902,7 @@ local function CT_BarMod__ActionButton_UpdateOverlayGlow(self)
 end
 
 function useButton:updateOverlayGlow()
-	if (module:getGameVersion() >= 8) then
+	if (module:getGameVersion() >= 4) then
 		CT_BarMod__ActionButton_UpdateOverlayGlow(self.button);
 	end
 end
@@ -2154,18 +2154,22 @@ module.useEnable = function(self)
 	self:regEvent("PLAYER_REGEN_DISABLED", combatFlagger);
 	self:regEvent("SPELL_UPDATE_CHARGES", eventHandler_UpdateCount);
 	self:regEvent("LOSS_OF_CONTROL_UPDATE", eventHandler_UpdateCooldown);
-	if (module:getGameVersion() >= 8) then
+	if module:getGameVersion() >= 3 then
 		self:regEvent("UNIT_ENTERING_VEHICLE", eventHandler_UpdateStateVehicle);
 		self:regEvent("UNIT_ENTERED_VEHICLE", eventHandler_UpdateStateVehicle);
 		self:regEvent("UNIT_EXITED_VEHICLE", eventHandler_UpdateStateVehicle);
-		self:regEvent("ARCHAEOLOGY_CLOSED", eventHandler_UpdateState);
 		self:regEvent("UPDATE_VEHICLE_ACTIONBAR", eventHandler_UpdateAll);
 		self:regEvent("UPDATE_OVERRIDE_ACTIONBAR", eventHandler_UpdateAll);
 		self:regEvent("UPDATE_POSSESS_BAR", eventHandler_UpdateAll);
 		self:regEvent("UPDATE_MULTI_CAST_ACTIONBAR", eventHandler_UpdateAll);
 		self:regEvent("COMPANION_UPDATE", eventHandler_UpdateStateCompanion);
+	end
+	if module:getGameVersion() >= 4 then
+		self:regEvent("ARCHAEOLOGY_CLOSED", eventHandler_UpdateState);
 		self:regEvent("SPELL_ACTIVATION_OVERLAY_GLOW_SHOW", eventHandler_ShowOverlayGlow);
 		self:regEvent("SPELL_ACTIVATION_OVERLAY_GLOW_HIDE", eventHandler_HideOverlayGlow);
+	end
+	if module:getGameVersion() >= 5 then
 		self:regEvent("UPDATE_SUMMONPETS_ACTION", eventHandler_updateSummonPets);
 	end
 	self:schedule(0.25, true, rangeUpdater); -- originally 0.5 sec, but setting at 0.25 sec to more closely match the Blizzard default bars
@@ -2196,20 +2200,24 @@ module.useDisable = function(self)
 	self:unregEvent("PLAYER_REGEN_ENABLED", combatFlagger);
 	self:unregEvent("PLAYER_REGEN_DISABLED", combatFlagger);
 	self:unregEvent("SPELL_UPDATE_CHARGES", eventHandler_UpdateCount);
-	self:unregEvent("UPDATE_SUMMONPETS_ACTION", eventHandler_updateSummonPets);
-	if (module:getGameVersion() >= 8) then
+	self:unregEvent("LOSS_OF_CONTROL_UPDATE", eventHandler_UpdateCooldown);
+	if module:getGameVersion() >= 3 then
 		self:unregEvent("UNIT_ENTERING_VEHICLE", eventHandler_UpdateStateVehicle);
 		self:unregEvent("UNIT_ENTERED_VEHICLE", eventHandler_UpdateStateVehicle);
 		self:unregEvent("UNIT_EXITED_VEHICLE", eventHandler_UpdateStateVehicle);
-		self:unregEvent("ARCHAEOLOGY_CLOSED", eventHandler_UpdateState);
 		self:unregEvent("UPDATE_VEHICLE_ACTIONBAR", eventHandler_UpdateAll);
 		self:unregEvent("UPDATE_OVERRIDE_ACTIONBAR", eventHandler_UpdateAll);
 		self:unregEvent("UPDATE_POSSESS_BAR", eventHandler_UpdateAll);
 		self:unregEvent("UPDATE_MULTI_CAST_ACTIONBAR", eventHandler_UpdateAll);
-		self:unregEvent("COMPANION_UPDATE", eventHandler_UpdateStateCompanion);
+		self:unregEvent("COMPANION_UPDATE", eventHandler_UpdateStateCompanion);		
+	end
+	if module:getGameVersion() >= 4 then
+		self:unregEvent("ARCHAEOLOGY_CLOSED", eventHandler_UpdateState);
 		self:unregEvent("SPELL_ACTIVATION_OVERLAY_GLOW_SHOW", eventHandler_ShowOverlayGlow);
 		self:unregEvent("SPELL_ACTIVATION_OVERLAY_GLOW_HIDE", eventHandler_HideOverlayGlow);
-		self:unregEvent("LOSS_OF_CONTROL_UPDATE", eventHandler_UpdateCooldown);
+	end
+	if module:getGameVersion() >= 5 then		
+		self:unregEvent("UPDATE_SUMMONPETS_ACTION", eventHandler_updateSummonPets);
 	end
 	self:unschedule(rangeUpdater, true);
 	self:unschedule(bindingUpdater, true);
