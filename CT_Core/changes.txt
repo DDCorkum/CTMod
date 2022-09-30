@@ -1,3 +1,6 @@
+CT_Core (9.2.0.2) 2022-09-30
+- Updates for WoW Dragonflight
+
 CT_Core (9.2.0.1) 2022-09-25
 - Updates for Classic WotLK
 
