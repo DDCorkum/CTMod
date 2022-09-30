@@ -188,26 +188,6 @@ function module.UpdateInnerFrameBounds()
 	return ivalues;
 end
 
--- Get current resolution in x and y
-function module.GetCurrentResolution(...)
-	local currRes = nil;
-	
-	if (GetCurrentResolution() > 0) then
-		-- a standard resolution, found on the dropdown list
-		currRes = select(GetCurrentResolution(), ...);
-	else
-		-- a custom resolution in windowed mode
-		currRes = GetCVar("gxWindowedResolution");
-	end	
-	if ( currRes ) then
-		local useless, useless, x, y = string.find(currRes, "(%d+)x(%d+)");
-		if ( x and y ) then
-			return tonumber(x), tonumber(y);
-		end
-	end
-	return nil;
-end
-
 -- Apply the viewport settings
 function module.ApplyViewport(left, right, top, bottom)
 	local screenRes = module.screenRes;
@@ -475,33 +455,29 @@ function module.ChangeViewportSide(editBox)
 	end
 end
 
-function module.Init(width, height)
-	local x, y;
-	if (width and height) then
-		x = width;
-		y = height;
-	else
-		x, y = module.GetCurrentResolution(GetScreenResolutions());
-	end
-	if ( x and y ) then
---[[		if (y == 0) then
-			modifier = 0;
-		else
-			modifier = x / y;
+function module.Init()
+	if C_VideoOptions and C_VideoOptions.GetCurrentGameWindowSize then
+		-- WoW 10.x
+		local size = C_VideoOptions.GetCurrentGameWindowSize()
+		if size.x and size.y and size.x > 0 and size.y > 0 then
+			module.screenRes = { size.x, size.y }
+			module.awaitingValues = true
 		end
-		if ( modifier ~= (4 / 3) ) then
-			local newViewportHeight = ivalues[6] / modifier;  -- ivalues[6] / modifier;
-			if (CT_ViewportInnerFrame) then
-				CT_ViewportInnerFrame:SetHeight(newViewportHeight);
-				--CT_ViewportBorderFrame:SetHeight(newViewportHeight + 8);
-			else
-				module.pendingViewportHeight = newViewportHeight;
+	else
+		-- prior to WoW 10.x
+		local currRes = GetCurrentResolution()
+		if currRes then
+			currRes = select(currRes, GetScreenResolutions())
+		else
+			currRes = GetCVar("gxWindowedResolution")
+		end
+		if currRes then
+			local __, __, x, y = string.find(currRes, "(%d+)x(%d+)")
+			if x and y then
+				module.screenRes = {tonumber(x), tonumber(y)}
+				module.awaitingValues = true
 			end
 		end
---]]
-		module.screenRes = { x, y };
-		--CT_Viewport:SetHeight(210 + CT_ViewportBorderFrame:GetHeight());
-		module.awaitingValues = true;
 	end
 end
 
@@ -515,22 +491,22 @@ do
 	frame:SetAllPoints()
 	frame:Hide()
 	
-	local left = frame:CreateTexture(nil, "BACKGROUND", -7)
+	local left = frame:CreateTexture(nil, "BACKGROUND", nil, -7)
 	left:SetPoint("RIGHT", WorldFrame, "LEFT")
 	left:SetPoint("BOTTOM", WorldFrame)
 	left:SetPoint("TOP", WorldFrame)
 	
-	local right = frame:CreateTexture(nil, "BACKGROUND", -7)
+	local right = frame:CreateTexture(nil, "BACKGROUND", nil, -7)
 	right:SetPoint("LEFT", WorldFrame, "RIGHT")
 	right:SetPoint("BOTTOM", WorldFrame)
 	right:SetPoint("TOP", WorldFrame)
 	
-	local bottom  = frame:CreateTexture(nil, "BACKGROUND", -7)
+	local bottom  = frame:CreateTexture(nil, "BACKGROUND", nil, -7)
 	bottom:SetPoint("LEFT", left)
 	bottom:SetPoint("RIGHT", right)
 	bottom:SetPoint("TOP", WorldFrame, "BOTTOM")	
 	
-	local top  = frame:CreateTexture(nil, "BACKGROUND", -7)
+	local top  = frame:CreateTexture(nil, "BACKGROUND", nil, -7)
 	top:SetPoint("LEFT", left)
 	top:SetPoint("RIGHT", right)
 	top:SetPoint("BOTTOM", WorldFrame, "TOP")
@@ -626,19 +602,28 @@ function module:update(option, value)
 		-- The game does not reload the UI when changing the UI scale slider. We'll catch this indirectly
 		-- via the OnShow script when the viewport window is re-opened.
 
-		-- Handle screen resolution changes.
-		hooksecurefunc("SetScreenResolution",
-			function(width, height, ...)
-				module.Init(width, height)
+		-- Handle screen resolution changes.		
+		if Settings and Settings.SetOnValueChangedCallback then
+			-- WoW 10.x
+			Settings.SetOnValueChangedCallback("PROXY_DISPLAY_MODE", function()
+				module.Init()
 				module.ApplySavedViewport()
 				module.hasAppliedViewport = nil
-			end
-		);
+			end)
+		else
+			-- prior to WoW 10.x
+			hooksecurefunc("SetScreenResolution", function(width, height)
+				module.screenRes = {width, height}
+				module.awaitingValues = true
+				module.ApplySavedViewport()
+				module.hasAppliedViewport = nil
+			end)
+		end
 
 
 		module.setGradientColor(module:getOption("color"))
 
-		module.Init(nil, nil)
+		module.Init()
 	
 		module.ApplySavedViewport()
 		
@@ -995,8 +980,18 @@ function module.frame()
 	local function attachBorderAndInner()
 		CT_ViewportInnerFrame:ClearAllPoints();
 		CT_ViewportInnerFrame:SetPoint("TOPLEFT", CT_ViewportBorderFrame, "TOPLEFT", 4, -4);
-		CT_ViewportInnerFrame:SetMaxResize(CT_ViewportBorderFrame:GetWidth()-4, CT_ViewportBorderFrame:GetHeight()-4);
-		CT_ViewportInnerFrame:SetMinResize((CT_ViewportBorderFrame:GetWidth()-4)/2, (CT_ViewportBorderFrame:GetHeight()-4)/2)
+		if CT_ViewportInnerFrame.SetMaxResize then
+			CT_ViewportInnerFrame:SetMaxResize(CT_ViewportBorderFrame:GetWidth()-4, CT_ViewportBorderFrame:GetHeight()-4);
+			CT_ViewportInnerFrame:SetMinResize((CT_ViewportBorderFrame:GetWidth()-4)/2, (CT_ViewportBorderFrame:GetHeight()-4)/2)
+		else
+			CT_ViewportInnerFrame:SetResizeBounds(
+				(CT_ViewportBorderFrame:GetWidth()-4)/2,
+				(CT_ViewportBorderFrame:GetHeight()-4)/2,
+				CT_ViewportBorderFrame:GetWidth()-4,
+				CT_ViewportBorderFrame:GetHeight()-4
+			)
+				
+		end
 		CT_ViewportInnerFrame:SetResizable(true);
 		module.UpdateInnerFrameBounds();
 		module.ApplyInnerViewport(
