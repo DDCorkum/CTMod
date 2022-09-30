@@ -747,6 +747,42 @@ function CT_EH_AddExpense(cost, item)
 	end
 end
 
+
+--------------------------------------------
+-- CT_ExpenseHistoryFrame
+
+function CT_ExpenseHistoryFrame_OnLoad(self)
+		
+		local tab1 = CreateFrame("Button", "CT_ExpenseHistoryFrameTab1", self, module:getGameVersion() >= 10 and "CharacterFrameTabTemplate" or "CharacterFrameTabButtonTemplate", 1)
+		tab1:SetText(L["CT_ExpenseHistory/Summary/Heading"])
+		tab1:SetPoint("CENTER", self, "BOTTOMLEFT", 60, -8)
+		tab1:SetSize(115, 32)
+		tab1:SetFrameLevel(2)
+		tab1:SetScript("OnClick", CT_EH_Tab_OnClick)
+			
+		local tab2 = CreateFrame("Button", "CT_ExpenseHistoryFrameTab2", self, module:getGameVersion() >= 10 and "CharacterFrameTabTemplate" or "CharacterFrameTabButtonTemplate", 2)
+		tab2:SetText(L["CT_ExpenseHistory/Log/Heading"])
+		tab2:SetPoint("LEFT", tab1, "RIGHT", -16, 0)
+		tab2:SetSize(115, 32)
+		tab2:SetFrameLevel(2)
+		tab2:SetScript("OnClick", CT_EH_Tab_OnClick)
+
+		self:RegisterEvent("PLAYER_LOGIN");
+		self.elapsed = 0;
+		PanelTemplates_SetNumTabs(self, 2);
+		PanelTemplates_SetTab(self, 1);
+		Mixin(self, BackdropTemplateMixin or { });
+		self:SetBackdrop({
+			bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+			edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+			tile = true,
+			tileSize = 32,
+			edgeSize = 32,
+			insets = { left = 11, right = 12, top = 12, bottom = 11 },
+		});
+end
+
+
 --------------------------------------------
 -- Options Frame Code
 
