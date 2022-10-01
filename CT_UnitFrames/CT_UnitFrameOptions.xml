@@ -7,6 +7,42 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 			<OnShow function="CT_UnitFrameOptionsBoxSelectionButton_OnShow" />
 		</Scripts>
 	</Button>
+	<CheckButton name="CT_UnitFramesOptionsCheckButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="26" y="26" />
+		</Size>
+		<HitRectInsets>
+			<AbsInset left="0" right="-100" top="0" bottom="0"/>
+		</HitRectInsets>
+		<Scripts>
+			<OnClick>
+				if ( self:GetChecked() ) then
+					PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+				else
+					PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF);
+				end
+				BlizzardOptionsPanel_CheckButton_OnClick(self);
+			</OnClick>
+			<OnEnter>
+				if ( self.tooltipText ) then
+					GetAppropriateTooltip():SetOwner(self, self.tooltipOwnerPoint or "ANCHOR_RIGHT");
+					GetAppropriateTooltip():SetText(self.tooltipText, nil, nil, nil, nil, true);
+				end
+				if ( self.tooltipRequirement ) then
+					GetAppropriateTooltip():AddLine(self.tooltipRequirement, 1.0, 1.0, 1.0, true);
+					GetAppropriateTooltip():Show();
+				end
+			</OnEnter>
+			<OnLeave>
+				GetAppropriateTooltip():Hide();
+			</OnLeave>
+		</Scripts>
+		<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+		<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+	 	<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+		<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+		<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>		
+	</CheckButton>
 	<CheckButton name="CT_UnitFramesOptionsRadioButtonTemplate" virtual="true">
 		<Size>
 			<AbsDimension x="20" y="20"/>
@@ -257,7 +293,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				<PushedTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Down"/>
 				<HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" alphaMode="ADD"/>
 			</Button>
-			<CheckButton name="$parentOneColorHealthCB" hidden="false" inherits="OptionsCheckButtonTemplate">
+			<CheckButton name="$parentOneColorHealthCB" hidden="false" inherits="CT_UnitFramesOptionsCheckButtonTemplate">
 				<HitRectInsets>
 					<AbsInset left="0" right="0" top="0" bottom="0"/>
 				</HitRectInsets>
@@ -291,7 +327,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 					</Layer>
 				</Layers>
 			</CheckButton>
-			<CheckButton name="$parentLargeBreakUpCB" hidden="false" inherits="OptionsCheckButtonTemplate">
+			<CheckButton name="$parentLargeBreakUpCB" hidden="false" inherits="CT_UnitFramesOptionsCheckButtonTemplate">
 				<HitRectInsets>
 					<AbsInset left="0" right="0" top="0" bottom="0"/>
 				</HitRectInsets>
@@ -325,7 +361,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 					</Layer>
 				</Layers>
 			</CheckButton>
-			<CheckButton name="$parentLargeAbbreviateCB" hidden="false" inherits="OptionsCheckButtonTemplate">
+			<CheckButton name="$parentLargeAbbreviateCB" hidden="false" inherits="CT_UnitFramesOptionsCheckButtonTemplate">
 				<HitRectInsets>
 					<AbsInset left="0" right="0" top="0" bottom="0"/>
 				</HitRectInsets>
@@ -359,7 +395,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 					</Layer>
 				</Layers>
 			</CheckButton>
-			<CheckButton name="$parentMakeFontLikeRetailCB" hidden="false" inherits="OptionsCheckButtonTemplate">
+			<CheckButton name="$parentMakeFontLikeRetailCB" hidden="false" inherits="CT_UnitFramesOptionsCheckButtonTemplate">
 				<HitRectInsets>
 					<AbsInset left="0" right="0" top="0" bottom="0"/>
 				</HitRectInsets>
@@ -442,7 +478,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</Anchor>
 						</Anchors>
 					</Frame>
-					<CheckButton name="$parentPlayerTextLeftCB" id="18" hidden="false" inherits="OptionsCheckButtonTemplate">
+					<CheckButton name="$parentPlayerTextLeftCB" id="18" hidden="false" inherits="CT_UnitFramesOptionsCheckButtonTemplate">
 						<HitRectInsets>
 							<AbsInset left="0" right="0" top="0" bottom="0"/>
 						</HitRectInsets>
@@ -476,7 +512,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</Layer>
 						</Layers>
 					</CheckButton>
-					<CheckButton name="$parentPlayerCoordsRightCB" id="63" hidden="false" inherits="OptionsCheckButtonTemplate">
+					<CheckButton name="$parentPlayerCoordsRightCB" id="63" hidden="false" inherits="CT_UnitFramesOptionsCheckButtonTemplate">
 						<HitRectInsets>
 							<AbsInset left="0" right="0" top="0" bottom="0"/>
 						</HitRectInsets>
@@ -563,7 +599,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</Anchor>
 						</Anchors>
 					</Frame>
-					<CheckButton name="$parentPartyClassColorCB" id="65" hidden="false" inherits="OptionsCheckButtonTemplate">
+					<CheckButton name="$parentPartyClassColorCB" id="65" hidden="false" inherits="CT_UnitFramesOptionsCheckButtonTemplate">
 						<HitRectInsets>
 							<AbsInset left="0" right="0" top="0" bottom="0"/>
 						</HitRectInsets>
@@ -702,7 +738,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</Anchor>
 						</Anchors>
 					</Frame>
-					<CheckButton name="$parentClassFrameCB" id="12" hidden="false" inherits="OptionsCheckButtonTemplate">
+					<CheckButton name="$parentClassFrameCB" id="12" hidden="false" inherits="CT_UnitFramesOptionsCheckButtonTemplate">
 						<HitRectInsets>
 							<AbsInset left="0" right="0" top="0" bottom="0"/>
 						</HitRectInsets>
@@ -736,7 +772,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</Layer>
 						</Layers>
 					</CheckButton>
-					<CheckButton name="$parentTargetTextRightCB" id="18" hidden="false" inherits="OptionsCheckButtonTemplate">
+					<CheckButton name="$parentTargetTextRightCB" id="18" hidden="false" inherits="CT_UnitFramesOptionsCheckButtonTemplate">
 						<HitRectInsets>
 							<AbsInset left="0" right="0" top="0" bottom="0"/>
 						</HitRectInsets>
@@ -770,7 +806,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</Layer>
 						</Layers>
 					</CheckButton>
-					<CheckButton name="$parentShowToTCB" id="64" hidden="false" inherits="OptionsCheckButtonTemplate">
+					<CheckButton name="$parentShowToTCB" id="64" hidden="false" inherits="CT_UnitFramesOptionsCheckButtonTemplate">
 						<HitRectInsets>
 							<AbsInset left="0" right="0" top="0" bottom="0"/>
 						</HitRectInsets>
@@ -874,7 +910,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</Anchor>
 						</Anchors>
 					</Frame>
-					<CheckButton name="$parentDisplayCB" id="14" hidden="false" inherits="OptionsCheckButtonTemplate">
+					<CheckButton name="$parentDisplayCB" id="14" hidden="false" inherits="CT_UnitFramesOptionsCheckButtonTemplate">
 						<HitRectInsets>
 							<AbsInset left="0" right="0" top="0" bottom="0"/>
 						</HitRectInsets>
@@ -908,7 +944,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</Layer>
 						</Layers>
 					</CheckButton>
-					<CheckButton name="$parentLockCB" id="3" hidden="false" inherits="OptionsCheckButtonTemplate">
+					<CheckButton name="$parentLockCB" id="3" hidden="false" inherits="CT_UnitFramesOptionsCheckButtonTemplate">
 						<HitRectInsets>
 							<AbsInset left="0" right="0" top="0" bottom="0"/>
 						</HitRectInsets>
@@ -942,7 +978,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</Layer>
 						</Layers>
 					</CheckButton>
-					<CheckButton name="$parentTargetofAssistCB" id="15" hidden="false" inherits="OptionsCheckButtonTemplate">
+					<CheckButton name="$parentTargetofAssistCB" id="15" hidden="false" inherits="CT_UnitFramesOptionsCheckButtonTemplate">
 						<HitRectInsets>
 							<AbsInset left="0" right="0" top="0" bottom="0"/>
 						</HitRectInsets>
@@ -976,7 +1012,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</Layer>
 						</Layers>
 					</CheckButton>
-					<CheckButton name="$parentAssistCastbarCB" id="16" hidden="false" inherits="OptionsCheckButtonTemplate">
+					<CheckButton name="$parentAssistCastbarCB" id="16" hidden="false" inherits="CT_UnitFramesOptionsCheckButtonTemplate">
 						<HitRectInsets>
 							<AbsInset left="0" right="0" top="0" bottom="0"/>
 						</HitRectInsets>
@@ -1010,7 +1046,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</Layer>
 						</Layers>
 					</CheckButton>
-					<CheckButton name="$parentAssistTextRightCB" id="18" hidden="false" inherits="OptionsCheckButtonTemplate">
+					<CheckButton name="$parentAssistTextRightCB" id="18" hidden="false" inherits="CT_UnitFramesOptionsCheckButtonTemplate">
 						<HitRectInsets>
 							<AbsInset left="0" right="0" top="0" bottom="0"/>
 						</HitRectInsets>
@@ -1044,7 +1080,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</Layer>
 						</Layers>
 					</CheckButton>
-					<CheckButton name="$parentAssistBuffsOnTopCB" id="19" hidden="false" inherits="OptionsCheckButtonTemplate">
+					<CheckButton name="$parentAssistBuffsOnTopCB" id="19" hidden="false" inherits="CT_UnitFramesOptionsCheckButtonTemplate">
 						<HitRectInsets>
 							<AbsInset left="0" right="0" top="0" bottom="0"/>
 						</HitRectInsets>
@@ -1158,7 +1194,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</Anchor>
 						</Anchors>
 					</Frame>
-					<CheckButton name="$parentDisplayCB" id="14" hidden="false" inherits="OptionsCheckButtonTemplate">
+					<CheckButton name="$parentDisplayCB" id="14" hidden="false" inherits="CT_UnitFramesOptionsCheckButtonTemplate">
 						<HitRectInsets>
 							<AbsInset left="0" right="0" top="0" bottom="0"/>
 						</HitRectInsets>
@@ -1192,7 +1228,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</Layer>
 						</Layers>
 					</CheckButton>
-					<CheckButton name="$parentLockCB" id="4" hidden="false" inherits="OptionsCheckButtonTemplate">
+					<CheckButton name="$parentLockCB" id="4" hidden="false" inherits="CT_UnitFramesOptionsCheckButtonTemplate">
 						<HitRectInsets>
 							<AbsInset left="0" right="0" top="0" bottom="0"/>
 						</HitRectInsets>
@@ -1226,7 +1262,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</Layer>
 						</Layers>
 					</CheckButton>
-					<CheckButton name="$parentHideStdFocusCB" id="17" hidden="false" inherits="OptionsCheckButtonTemplate">
+					<CheckButton name="$parentHideStdFocusCB" id="17" hidden="false" inherits="CT_UnitFramesOptionsCheckButtonTemplate">
 						<HitRectInsets>
 							<AbsInset left="0" right="0" top="0" bottom="0"/>
 						</HitRectInsets>
@@ -1260,7 +1296,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</Layer>
 						</Layers>
 					</CheckButton>
-					<CheckButton name="$parentTargetofFocusCB" id="15" hidden="false" inherits="OptionsCheckButtonTemplate">
+					<CheckButton name="$parentTargetofFocusCB" id="15" hidden="false" inherits="CT_UnitFramesOptionsCheckButtonTemplate">
 						<HitRectInsets>
 							<AbsInset left="0" right="0" top="0" bottom="0"/>
 						</HitRectInsets>
@@ -1294,7 +1330,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</Layer>
 						</Layers>
 					</CheckButton>
-					<CheckButton name="$parentFocusCastbarCB" id="16" hidden="false" inherits="OptionsCheckButtonTemplate">
+					<CheckButton name="$parentFocusCastbarCB" id="16" hidden="false" inherits="CT_UnitFramesOptionsCheckButtonTemplate">
 						<HitRectInsets>
 							<AbsInset left="0" right="0" top="0" bottom="0"/>
 						</HitRectInsets>
@@ -1328,7 +1364,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</Layer>
 						</Layers>
 					</CheckButton>
-					<CheckButton name="$parentFocusTextRightCB" id="18" hidden="false" inherits="OptionsCheckButtonTemplate">
+					<CheckButton name="$parentFocusTextRightCB" id="18" hidden="false" inherits="CT_UnitFramesOptionsCheckButtonTemplate">
 						<HitRectInsets>
 							<AbsInset left="0" right="0" top="0" bottom="0"/>
 						</HitRectInsets>
@@ -1362,7 +1398,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 							</Layer>
 						</Layers>
 					</CheckButton>
-					<CheckButton name="$parentFocusBuffsOnTopCB" id="19" hidden="false" inherits="OptionsCheckButtonTemplate">
+					<CheckButton name="$parentFocusBuffsOnTopCB" id="19" hidden="false" inherits="CT_UnitFramesOptionsCheckButtonTemplate">
 						<HitRectInsets>
 							<AbsInset left="0" right="0" top="0" bottom="0"/>
 						</HitRectInsets>

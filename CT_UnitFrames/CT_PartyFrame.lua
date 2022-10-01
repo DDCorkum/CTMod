@@ -37,10 +37,10 @@ local function CT_PartyFrame_AnchorSideText_Single(id)
 
 		local ancP, relTo, relP, xoff, yoff = textRight:GetPoint(1)
 		xoff = -6 + (CT_UnitFramesOptions.partyTextSpacing or 9)
-		if (notPresentIcon:IsVisible()) then
+		if (notPresentIcon and notPresentIcon:IsVisible()) then
 			xoff = xoff + 28
 		end
-
+		
 		-- <Anchor point="LEFT" relativePoint="RIGHT">
 		textRight:ClearAllPoints()
 		textRight:SetPoint(ancP, relTo, relP, xoff, yoff)
@@ -61,25 +61,62 @@ local function CT_PartyFrame_TextStatusBar_UpdateTextString(bar)
 end
 
 local function CT_PartyFrame_OnAddonLoaded()
-	local bars = {PartyMemberFrame1HealthBar, PartyMemberFrame1ManaBar, PartyMemberFrame2HealthBar, PartyMemberFrame2ManaBar, PartyMemberFrame3HealthBar, PartyMemberFrame3ManaBar, PartyMemberFrame4HealthBar, PartyMemberFrame4ManaBar}
-	local textRight = {CT_PartyFrame1HealthRight, CT_PartyFrame1ManaRight, CT_PartyFrame2HealthRight, CT_PartyFrame2ManaRight, CT_PartyFrame3HealthRight, CT_PartyFrame3ManaRight, CT_PartyFrame4HealthRight, CT_PartyFrame4ManaRight}
-	for i=1, 8 do
-		bars[i].ctFont = CT_UnitFrames_PartyStatusBarText
-		bars[i]:HookScript("OnEnter", CT_PartyFrame_TextStatusBar_UpdateTextString)
-		bars[i]:HookScript("OnLeave", CT_PartyFrame_TextStatusBar_UpdateTextString)
-		bars[i]:HookScript("OnValueChanged", CT_PartyFrame_TextStatusBar_UpdateTextString)
-		bars[i].textRight = textRight[i]
-		bars[i].type = i%2 == 1 and "health" or "mana"
+
+	if PartyFrameMixin then
+		-- WoW 10.x
+		for frame in PartyFrame.PartyMemberFramePool:EnumerateActive() do		-- this will break if Blizzard ever decides to defer or shuffle the four party subframes
+			local id = frame.layoutIndex
+			local newFrame = CreateFrame("Button", "CT_PartyFrame"..id, frame, "CT_PartyFrameTemplate", id)
+			newFrame:SetPoint("CENTER", frame.HealthBar)
+		
+			frame.HealthBar.textRight = _G["CT_PartyFrame"..id.."HealthRight"]
+			frame.HealthBar.ctFont = CT_UnitFrames_PartyStatusBarText
+			frame.HealthBar:HookScript("OnEnter", CT_PartyFrame_TextStatusBar_UpdateTextString)
+			frame.HealthBar:HookScript("OnLeave", CT_PartyFrame_TextStatusBar_UpdateTextString)
+			frame.HealthBar:HookScript("OnValueChanged", CT_PartyFrame_TextStatusBar_UpdateTextString)
+			frame.HealthBar.type = "health"
+			
+			frame.ManaBar.textRight = _G["CT_PartyFrame"..id.."ManaRight"]
+			frame.ManaBar.ctFont = CT_UnitFrames_PartyStatusBarText
+			frame.ManaBar:HookScript("OnEnter", CT_PartyFrame_TextStatusBar_UpdateTextString)
+			frame.ManaBar:HookScript("OnLeave", CT_PartyFrame_TextStatusBar_UpdateTextString)
+			frame.ManaBar:HookScript("OnValueChanged", CT_PartyFrame_TextStatusBar_UpdateTextString)
+			frame.ManaBar.type = "mana"
+		end
+	else
+		-- prior to WoW 10.x
+		CreateFrame("Button", "CT_PartyFrame1", PartyMemberFrame1, "CT_PartyFrameTemplate", 1)
+		CreateFrame("Button", "CT_PartyFrame2", PartyMemberFrame2, "CT_PartyFrameTemplate", 2)
+		CreateFrame("Button", "CT_PartyFrame3", PartyMemberFrame3, "CT_PartyFrameTemplate", 3)
+		CreateFrame("Button", "CT_PartyFrame4", PartyMemberFrame4, "CT_PartyFrameTemplate", 4)
+		
+		CT_PartyFrame1:SetPoint("CENTER", "PartyMemberFrame1HealthBar")
+		CT_PartyFrame2:SetPoint("CENTER", "PartyMemberFrame2HealthBar")
+		CT_PartyFrame3:SetPoint("CENTER", "PartyMemberFrame3HealthBar")
+		CT_PartyFrame4:SetPoint("CENTER", "PartyMemberFrame4HealthBar")
+		
+		local bars = {PartyMemberFrame1HealthBar , PartyMemberFrame1ManaBar, PartyMemberFrame2HealthBar, PartyMemberFrame2ManaBar, PartyMemberFrame3HealthBar, PartyMemberFrame3ManaBar, PartyMemberFrame4HealthBar, PartyMemberFrame4ManaBar}
+		local textRight = {CT_PartyFrame1HealthRight, CT_PartyFrame1ManaRight, CT_PartyFrame2HealthRight, CT_PartyFrame2ManaRight, CT_PartyFrame3HealthRight, CT_PartyFrame3ManaRight, CT_PartyFrame4HealthRight, CT_PartyFrame4ManaRight}
+		for i=1, 8 do
+			bars[i].ctFont = CT_UnitFrames_PartyStatusBarText
+			bars[i]:HookScript("OnEnter", CT_PartyFrame_TextStatusBar_UpdateTextString)
+			bars[i]:HookScript("OnLeave", CT_PartyFrame_TextStatusBar_UpdateTextString)
+			bars[i]:HookScript("OnValueChanged", CT_PartyFrame_TextStatusBar_UpdateTextString)
+			bars[i].textRight = textRight[i]
+			bars[i].type = i%2 == 1 and "health" or "mana"
+		end
 	end
 	module:unregEvent("ADDON_LOADED", CT_PartyFrame_OnAddonLoaded)
 end
 
 module:regEvent("ADDON_LOADED", CT_PartyFrame_OnAddonLoaded)
 
-hooksecurefunc("PartyMemberFrame_UpdateNotPresentIcon", function(self)
-	local id = self:GetID() or 1
-	CT_PartyFrame_AnchorSideText_Single(id)
-end)
+if PartyMemberFrame_UpdateNotPresentIcon then
+	hooksecurefunc("PartyMemberFrame_UpdateNotPresentIcon", function(self)
+		local id = self:GetID() or 1
+		CT_PartyFrame_AnchorSideText_Single(id)
+	end)
+end
 
 
 function module:AnchorPartyFrameSideText()
@@ -89,29 +126,50 @@ function module:AnchorPartyFrameSideText()
 end
 
 function module:ShowPartyFrameBarText()
-	CT_PartyFrame_TextStatusBar_UpdateTextString(PartyMemberFrame1HealthBar)
-	CT_PartyFrame_TextStatusBar_UpdateTextString(PartyMemberFrame1ManaBar)
-
-	CT_PartyFrame_TextStatusBar_UpdateTextString(PartyMemberFrame2HealthBar)
-	CT_PartyFrame_TextStatusBar_UpdateTextString(PartyMemberFrame2ManaBar)
+	if PartyFrameMixin then
+		-- WoW 10.x
+		for frame in PartyFrame.PartyMemberFramePool:EnumerateActive() do
+			CT_PartyFrame_TextStatusBar_UpdateTextString(frame.HealthBar)
+			CT_PartyFrame_TextStatusBar_UpdateTextString(frame.ManaBar)
+		end
+	else
+		-- prior to WoW 10.x
+		CT_PartyFrame_TextStatusBar_UpdateTextString(PartyMemberFrame1HealthBar)
+		CT_PartyFrame_TextStatusBar_UpdateTextString(PartyMemberFrame1ManaBar)
 	
-	CT_PartyFrame_TextStatusBar_UpdateTextString(PartyMemberFrame3HealthBar)
-	CT_PartyFrame_TextStatusBar_UpdateTextString(PartyMemberFrame3ManaBar)
-
-	CT_PartyFrame_TextStatusBar_UpdateTextString(PartyMemberFrame4HealthBar)
-	CT_PartyFrame_TextStatusBar_UpdateTextString(PartyMemberFrame4ManaBar)
+		CT_PartyFrame_TextStatusBar_UpdateTextString(PartyMemberFrame2HealthBar)
+		CT_PartyFrame_TextStatusBar_UpdateTextString(PartyMemberFrame2ManaBar)
+		
+		CT_PartyFrame_TextStatusBar_UpdateTextString(PartyMemberFrame3HealthBar)
+		CT_PartyFrame_TextStatusBar_UpdateTextString(PartyMemberFrame3ManaBar)
+	
+		CT_PartyFrame_TextStatusBar_UpdateTextString(PartyMemberFrame4HealthBar)
+		CT_PartyFrame_TextStatusBar_UpdateTextString(PartyMemberFrame4ManaBar)
+	end
 end
 
 local function UpdatePartyFrameClassColors()
 	local GetClassColor = GetClassColor or C_ClassColor.GetClassColor
-	for i=1, 4 do
-		if (CT_UnitFramesOptions.partyClassColor ~= false and UnitExists("party" .. i)) then
-			local r, g, b = GetClassColor(select(2,UnitClass("party" .. i)))
-			_G["PartyMemberFrame" .. i .. "Name"]:SetTextColor(r or 1, g or 0.82, b or 0)
-		else
-			_G["PartyMemberFrame" .. i .. "Name"]:SetTextColor(1,0.82,0)
+	if PartyFrameMixin then
+		-- WoW 10.x
+		for frame in PartyFrame.PartyMemberFramePool:EnumerateActive() do
+			if (CT_UnitFramesOptions.partyClassColor ~= false and UnitExists(frame.unit)) then
+				local r, g, b = GetClassColor(select(2,UnitClass(frame.unit)))
+				frame.Name:SetTextColor(r or 1, g or 0.82, b or 0)
+			else
+				frame.Name:SetTextColor(1,0.82,0)
+			end
 		end
-		
+	else
+		-- prior to WoW 10.x
+		for i=1, 4 do
+			if (CT_UnitFramesOptions.partyClassColor ~= false and UnitExists("party" .. i)) then
+				local r, g, b = GetClassColor(select(2,UnitClass("party" .. i)))
+				_G["PartyMemberFrame" .. i .. "Name"]:SetTextColor(r or 1, g or 0.82, b or 0)
+			else
+				_G["PartyMemberFrame" .. i .. "Name"]:SetTextColor(1,0.82,0)
+			end
+		end		
 	end
 end
 

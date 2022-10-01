@@ -922,8 +922,14 @@ local function setChatFrameNoResizeLimits(chatFrame, hasNoLimits)
 		end
 	end
 
-	chatFrame:SetMinResize(minWidth, minHeight);
-	chatFrame:SetMaxResize(maxWidth, maxHeight);
+	if chatFrame.SetResizeBounds then
+		-- WoW 10.x
+		chatFrame:SetResizeBounds(minWidth,minHeight,maxWidth,maxHeight)
+	else
+		-- prior to WoW 10.x
+		chatFrame:SetMinResize(minWidth, minHeight)
+		chatFrame:SetMaxResize(maxWidth, maxHeight)
+	end
 
 	width = chatFrame:GetWidth();
 	height = chatFrame:GetHeight();

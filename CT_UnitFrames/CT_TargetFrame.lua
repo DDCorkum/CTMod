@@ -11,6 +11,10 @@
 
 local module = select(2, ...);
 
+-- before/after WoW 10.x
+local healthBar = TargetFrameHealthBar or TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar
+local manaBar = TargetFrameHealthBar or TargetFrame.TargetFrameContent.TargetFrameContentMain.ManaBar
+
 local inworld;
 function CT_TargetFrameOnEvent(self, event, arg1, ...)
 
@@ -22,9 +26,6 @@ function CT_TargetFrameOnEvent(self, event, arg1, ...)
 			end
 			CT_TargetFrame_SetClassPosition(true);
 
-			TargetFrameHealthBar:SetScript("OnLeave", function() GameTooltip:Hide(); end);
-			TargetFrameManaBar:SetScript("OnLeave", function() GameTooltip:Hide(); end);
-
 			if ( GetCVarBool("predictedPower") ) then
 				local statusbar = TargetFrameManaBar;
 				statusbar:SetScript("OnUpdate", UnitFrameManaBar_OnUpdate);
@@ -34,17 +35,20 @@ function CT_TargetFrameOnEvent(self, event, arg1, ...)
 	end
 end
 
-local function CT_TargetFrame_ResetUserPlacedPosition()
-	if (not InCombatLockdown()) then
-		-- Reposition 15 to the right of where Blizzard puts it (250) to allow
-		-- enough room between the player and target frames so that
-		-- both can show "100%" beside their health/mana bars if needed.
-                -- See also: CT_PlayerFrame.xml
-		TargetFrame:ClearAllPoints();
-		TargetFrame:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 265, -4);
+if TargetFrame_ResetUserPlacedPosition then
+	-- prior to WoW 10.x, if the user reset the target frame's position then it was necessary to shift it slightly to the right.  (see PlayerFrame.xml)
+	
+	local function shiftTargetFrame()
+		TargetFrame.ClearAllPoints()
+		TargetFrame:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 265, -4)
 	end
+	
+	local function onResetUserPlacedPosition()
+		module:afterCombat(shiftTargetFrame)
+	end
+	
+	hooksecurefunc("TargetFrame_ResetUserPlacedPosition", onResetUserPlacedPosition)
 end
-hooksecurefunc("TargetFrame_ResetUserPlacedPosition", CT_TargetFrame_ResetUserPlacedPosition);
 
 
 -- Adapting code by github user shoestare, this function now performs two tasks:
@@ -187,12 +191,16 @@ local function CT_TargetFrame_ManaTextStatusBar_UpdateTextString(bar)
 end
 
 module:regEvent("PLAYER_LOGIN", function()
-	TargetFrameHealthBar:HookScript("OnEnter", CT_TargetFrame_HealthTextStatusBar_UpdateTextString);
-	TargetFrameHealthBar:HookScript("OnLeave", CT_TargetFrame_HealthTextStatusBar_UpdateTextString);
-	TargetFrameHealthBar:HookScript("OnValueChanged", CT_TargetFrame_HealthTextStatusBar_UpdateTextString);
-	TargetFrameManaBar:HookScript("OnEnter", CT_TargetFrame_ManaTextStatusBar_UpdateTextString);
-	TargetFrameManaBar:HookScript("OnLeave", CT_TargetFrame_ManaTextStatusBar_UpdateTextString);
-	TargetFrameManaBar:HookScript("OnValueChanged", CT_TargetFrame_ManaTextStatusBar_UpdateTextString);
+	
+	healthBar:HookScript("OnEnter", CT_TargetFrame_HealthTextStatusBar_UpdateTextString);
+	healthBar:HookScript("OnLeave", CT_TargetFrame_HealthTextStatusBar_UpdateTextString);
+	healthBar:HookScript("OnValueChanged", CT_TargetFrame_HealthTextStatusBar_UpdateTextString);
+	--healthBar:SetScript("OnLeave", function() GameTooltip:Hide(); end);
+	
+	manaBar:HookScript("OnEnter", CT_TargetFrame_ManaTextStatusBar_UpdateTextString);
+	manaBar:HookScript("OnLeave", CT_TargetFrame_ManaTextStatusBar_UpdateTextString);
+	manaBar:HookScript("OnValueChanged", CT_TargetFrame_ManaTextStatusBar_UpdateTextString);
+	--manaBar:SetScript("OnLeave", function() GameTooltip:Hide(); end);
 	
 	-- incoming heals on classic
 	if (UnitGetTotalAbsorbs == nil) then
@@ -242,8 +250,8 @@ function module:AnchorTargetFrameSideText()
 end
 
 function module:ShowTargetFrameBarText()
-	UnitFrameHealthBar_Update(TargetFrameHealthBar, "target");
-	UnitFrameManaBar_Update(TargetFrameManaBar, "target");
-	CT_TargetFrame_HealthTextStatusBar_UpdateTextString(TargetFrameHealthBar);
-	CT_TargetFrame_ManaTextStatusBar_UpdateTextString(TargetFrameManaBar);
+	UnitFrameHealthBar_Update(healthBar, "target");
+	UnitFrameManaBar_Update(manaBar, "target");
+	CT_TargetFrame_HealthTextStatusBar_UpdateTextString(healthBar);
+	CT_TargetFrame_ManaTextStatusBar_UpdateTextString(manaBar);
 end

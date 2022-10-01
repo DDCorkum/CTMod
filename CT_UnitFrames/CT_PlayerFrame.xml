@@ -39,9 +39,15 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 		</Layers>
 		<Scripts>
 			<OnLoad>
-				self:SetParent(PlayerFrameTexture:GetParent());
-				TargetFrame:ClearAllPoints();
-				TargetFrame:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 265, -4);
+				if PlayerFrame.PlayerFrameContent then
+					-- WoW 10.x
+					self:SetParent(PlayerFrame.PlayerFrameContent.PlayerFrameContentMain)
+				else
+					-- prior to WoW 10.x
+					self:SetParent(PlayerFrameTexture:GetParent())
+					TargetFrame:ClearAllPoints()
+					TargetFrame:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 265, -4)
+				end
 			</OnLoad>
 		</Scripts>
 	</Frame>

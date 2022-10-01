@@ -1181,7 +1181,8 @@ function CT_Assist_Spellbar_OnLoad(self)
 		self:RegisterEvent("VARIABLES_LOADED");
 	end
 
-	CastingBarFrame_OnLoad(self, unit1, false, true);
+	local configFunc = CastingBarFrame_OnLoad or CastingBarMixin.OnLoad
+	configFunc(self, unit1, false, true);
 
 	local barIcon = self.Icon;
 	barIcon:Show();
@@ -1251,13 +1252,14 @@ function CT_Assist_Spellbar_OnEvent(self, event, ...)
 		-- The position depends on the classification of the target
 		CT_Assist_Spellbar_AdjustPosition(self);
 	end
+	local onEventHandler = CastingBarFrame_OnEvent or CastingBarMixin.OnEvent  -- WoW 10.x
 	if ( self.unit == unit1 and strsub(event, 1, 15) == "UNIT_SPELLCAST_" and UnitIsUnit(arg1, self.unit) ) then
 		-- arg1 may be a different code than the main unit frame's unit, even though they are the same unit.
 		-- If this is the main unit frame, and this is a unit spellcast event, and the arg1 is equivalent to the main unit frame's unit...
 		-- Pass "targettarget" (self.unit) instead of arg1 to fool the CastingBarFrame_OnEvent() function into showing the casting bar for our assist frame.
-		CastingBarFrame_OnEvent(self, event, self.unit, select(2, ...));
+		onEventHandler(self, event, self.unit, select(2, ...));
 	else
-		CastingBarFrame_OnEvent(self, event, arg1, select(2, ...));
+		onEventHandler(self, event, arg1, select(2, ...));
 	end
 end
 
