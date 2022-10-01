@@ -10,4 +10,3 @@
 CT_BuffMod.xml
 CT_BuffMod.lua
 localization.lua
-Bindings.xml

@@ -1,5 +1,6 @@
 CT_BuffMod (9.2.0.2) 2022-09-30
 - Updates for WoW Dragonflight
+- Correcting Bindings.xml and toc files
 
 CT_BuffMod (9.2.0.1) 2022-09-26
 - Audio expiration warning in Classic WotLK

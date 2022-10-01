@@ -11,4 +11,3 @@ CT_Core.lua
 CT_Core_Chat.lua
 CT_Core_Other.lua
 localization.lua
-Bindings.xml

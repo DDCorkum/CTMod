@@ -520,7 +520,7 @@
 						end
 					</OnSizeChanged>
 				</Scripts>
-				<BarTexture urgency="5" file="Interface\TargetingFrame\UI-StatusBar"/>
+				<BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
 			</StatusBar>
 			<StatusBar name="$parentManaBar" inherits="TextStatusBar" useParentLevel="true">
 				<Size>
@@ -542,7 +542,7 @@
 						CT_FocusFrame_TextStatusBar_OnLoad(self)
 					</OnLoad>
 				</Scripts>
-				<BarTexture urgency="5" file="Interface\TargetingFrame\UI-StatusBar"/>
+				<BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
 				<BarColor r="0" g="0" b="1.0"/>
 			</StatusBar>
 			<StatusBar name="$parentSpellBar" inherits="SmallCastingBarFrameTemplate" hidden="true">

@@ -1,5 +1,6 @@
-CT_Core (9.2.0.2) 2022-10-01
+CT_Core (9.2.0.2) 2022-10-02
 - Updates for WoW Dragonflight
+- Correcting Bindings.xml and toc files
 
 CT_Core (9.2.0.1) 2022-09-25
 - Updates for Classic WotLK
