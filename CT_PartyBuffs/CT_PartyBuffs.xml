@@ -50,43 +50,4 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 			<OnEnter function="CT_PartyDebuffButton_OnEnter" />
 		</Scripts>
 	</Button>
-	<Frame name="CT_PartyMemberFrameTemplate" hidden="false" virtual="true">
-		<Size>
-			<AbsDimension x="70" y="50"/>
-		</Size>
-		<Anchors>
-			<Anchor point="TOPLEFT">
-				<Offset>
-					<AbsDimension x="48" y="-32"/>
-				</Offset>
-			</Anchor>
-		</Anchors>
-		<Scripts>
-			<OnShow function="CT_PartyMemberFrame_OnShow" />
-			<OnHide function="CT_PartyMemberFrame_OnHide" />
-			<OnLoad function="CT_PartyMemberFrame_OnLoad" />
-		</Scripts>
-	</Frame>
-	<Frame name="CT_PartyBuffFrame1" hidden="false" inherits="CT_PartyMemberFrameTemplate" parent="PartyMemberFrame1" id="1"/>
-	<Frame name="CT_PartyBuffFrame2" hidden="false" inherits="CT_PartyMemberFrameTemplate" parent="PartyMemberFrame2" id="2"/>
-	<Frame name="CT_PartyBuffFrame3" hidden="false" inherits="CT_PartyMemberFrameTemplate" parent="PartyMemberFrame3" id="3"/>
-	<Frame name="CT_PartyBuffFrame4" hidden="false" inherits="CT_PartyMemberFrameTemplate" parent="PartyMemberFrame4" id="4"/>
-
-	<Frame name="CT_PetBuffFrame" hidden="false" parent="PlayerFrame">
-		<Anchors>
-			<Anchor point="TOPLEFT">
-				<Offset>
-					<AbsDimension x="128" y="-102"/>
-				</Offset>
-			</Anchor>
-		</Anchors>
-		<Size>
-			<AbsDimension x="70" y="50"/>
-		</Size>
-		<Scripts>
-			<OnShow function="CT_PartyPetFrame_OnShow" />
-			<OnHide function="CT_PartyPetFrame_OnHide" />
-			<OnLoad function="CT_PartyPetFrame_OnLoad" />
-		</Scripts>
-	</Frame>
 </Ui>
