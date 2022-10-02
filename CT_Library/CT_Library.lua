@@ -1109,13 +1109,13 @@ end
 
 function lib:registerMovable(id, frame, clamped)
 	if ( not movables ) then
-		movables = { };
+		movables = { }
 	end
 
-	id = "MOVABLE-"..id;
-	movables[id] = frame;
-	frame:SetMovable(true);
-	frame:SetClampedToScreen(clamped);
+	id = "MOVABLE-"..id
+	movables[id] = frame
+	frame:SetMovable(true)
+	frame:SetClampedToScreen(clamped or false)	-- WoW 10.x PTR doesn't accept nil as a substitute for false
 
 	-- See if we have a saved position already...
 	local option = self:getOption(id);

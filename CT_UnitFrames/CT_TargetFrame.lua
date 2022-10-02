@@ -103,7 +103,12 @@ end
 
 function CT_TargetofTargetHealthCheck ()
 	if ( not UnitIsPlayer("targettarget") ) then
-		TargetFrameToTPortrait:SetVertexColor(1.0, 1.0, 1.0, 1.0);
+		if TargetFrameToT.Portrait then
+			-- WoW 10.x
+			TargetFrameToT.Portrait:SetVertexColor(1.0, 1.0, 1.0, 1.0)
+		else
+			TargetFrameToTPortrait:SetVertexColor(1.0, 1.0, 1.0, 1.0)
+		end
 	end
 end
 hooksecurefunc("TargetofTargetHealthCheck", CT_TargetofTargetHealthCheck);
