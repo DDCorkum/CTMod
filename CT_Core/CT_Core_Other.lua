@@ -3016,6 +3016,51 @@ if (PlayerPowerBarAlt) then
 	end
 end
 
+
+--------------------------------------------
+-- Camera Max Distance (classic only)
+
+
+if InterfaceOptionsCameraPanelMaxDistanceSlider then
+	
+	-- bugfix so the CVar doesn't get reduced to 2.0 when the Interface Options initialize
+	local slider = InterfaceOptionsCameraPanelMaxDistanceSlider
+	if slider then
+		oldFunc = slider.SetMinMaxValues
+		function slider:SetMinMaxValues(minVal, maxVal)
+			oldFunc(slider, minVal, max(maxVal, 2.6)) 
+		end
+	end
+
+	-- restoring max distance after playing with addons disabled
+	local function fixCameraOnAddonLoaded()
+		local ctCameraDistance = module:getOption("cameraDistanceMaxZoomFactor")
+		local cvarCameraDistance = tonumber(GetCVar("cameraDistanceMaxZoomFactor"))
+		if ctCameraDistance and cvarCameraDistance and ctCameraDistance > cvarCameraDistance then
+			module:regEvent("PLAYER_LOGIN", function()
+				SetCVar("cameraDistanceMaxZoomFactor", ctCameraDistance)
+			end)
+		elseif cvarCameraDistance and cvarCameraDistance > 2.0 then
+			module:setOption("cameraDistanceMaxZoomFactor", cvarCameraDistance)
+		end
+		module:unregEvent("ADDON_LOADED", fixCameraOnAddonLoaded)
+	end
+	module:regEvent("ADDON_LOADED", fixCameraOnAddonLoaded)
+
+	-- ensuring this doesn't override behaviour of the original frame
+	InterfaceOptionsCameraPanelMaxDistanceSlider:HookScript("OnLeave", function()
+		local cvarCameraDistance = tonumber(GetCVar("cameraDistanceMaxZoomFactor"))
+		if cvarCameraDistance > 2.0 then
+			module:setOption("cameraDistanceMaxZoomFactor", cvarCameraDistance)
+		else
+			module:setOption("cameraDistanceMaxZoomFactor", nil)
+		end
+	end)
+
+	-- the rest of the code is inside the options panel, because it just uses a CVar
+
+end
+
 --------------------------------------------
 -- General Initializer
 
