@@ -838,6 +838,12 @@ module.chatStickyTypes = {
 	{default = 1, chatType = "YELL", label = "Yell"},
 };
 
+for i = #module.chatStickyTypes, 1, -1 do
+	if not ChatTypeInfo[module.chatStickyTypes[i].chatType] then
+		tremove(module.chatStickyTypes, i)
+	end
+end
+
 local function setChatStickyFlag(chatType, stickyMode)
 	-- stickyMode: 0 or 1
 	if (not ChatTypeInfo[chatType]) then

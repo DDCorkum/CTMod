@@ -693,10 +693,10 @@ module.frame = function()
 		local num = #(module.chatStickyTypes);
 		for i = 1, num, 2 do
 			local stickyInfo = module.chatStickyTypes[i];
-			optionsAddObject(cbOffset,   26, "checkbutton#tl:25:%y#o:chatSticky" .. stickyInfo.chatType .. ":" .. stickyInfo.default .. "#" .. stickyInfo.label);
+			optionsAddObject(cbOffset,   26, "checkbutton#tl:25:%y#o:chatSticky" .. stickyInfo.chatType .. ":" .. (ChatTypeInfo[stickyInfo.chatType].sticky == 1 and "true" or "false") .. "#" .. stickyInfo.label);
 			if (i ~= num) then
 				stickyInfo = module.chatStickyTypes[i+1];
-				optionsAddObject(26,   26, "checkbutton#tl:155:%y#o:chatSticky" .. stickyInfo.chatType .. ":" .. stickyInfo.default .. "#" .. stickyInfo.label);
+				optionsAddObject(26,   26, "checkbutton#tl:155:%y#o:chatSticky" .. stickyInfo.chatType .. ":" .. (ChatTypeInfo[stickyInfo.chatType].sticky == 1 and "true" or "false") .. "#" .. stickyInfo.label);
 			end
 			cbOffset = 6;
 		end
