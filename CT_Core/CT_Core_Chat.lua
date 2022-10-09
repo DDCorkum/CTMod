@@ -838,6 +838,12 @@ module.chatStickyTypes = {
 	{default = 1, chatType = "YELL", label = "Yell"},
 };
 
+for i = #module.chatStickyTypes, 1, -1 do
+	if not ChatTypeInfo[module.chatStickyTypes[i].chatType] then
+		tremove(module.chatStickyTypes, i)
+	end
+end
+
 local function setChatStickyFlag(chatType, stickyMode)
 	-- stickyMode: 0 or 1
 	if (not ChatTypeInfo[chatType]) then
@@ -922,8 +928,14 @@ local function setChatFrameNoResizeLimits(chatFrame, hasNoLimits)
 		end
 	end
 
-	chatFrame:SetMinResize(minWidth, minHeight);
-	chatFrame:SetMaxResize(maxWidth, maxHeight);
+	if chatFrame.SetResizeBounds then
+		-- WoW 10.x
+		chatFrame:SetResizeBounds(minWidth,minHeight,maxWidth,maxHeight)
+	else
+		-- prior to WoW 10.x
+		chatFrame:SetMinResize(minWidth, minHeight)
+		chatFrame:SetMaxResize(maxWidth, maxHeight)
+	end
 
 	width = chatFrame:GetWidth();
 	height = chatFrame:GetHeight();

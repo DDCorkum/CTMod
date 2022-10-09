@@ -1,5 +1,5 @@
 ## Interface: 11403
-## Version: 9.0.5.3
+## Version: 9.2.0.2
 ## Title: CT_ExpenseHistory
 ## Notes: Detailed log of character expenses.
 ## DefaultState: Enabled

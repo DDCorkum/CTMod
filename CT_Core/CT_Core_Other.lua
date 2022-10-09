@@ -1180,7 +1180,7 @@ end
 -- Casting Bar Timer
 
 local displayTimers;
-local castingBarFrames = { "CastingBarFrame", "TargetFrameSpellBar", "FocusFrameSpellBar", "CT_CastingBarFrame" };
+local castingBarFrames = { "CastingBarFrame", "PlayerCastingBarFrame", "TargetFrameSpellBar", "FocusFrameSpellBar", "CT_CastingBarFrame" };
 
 local function castingtimer_createFS(castBarFrame)
 	local countDownText = castBarFrame:CreateFontString(nil, "ARTWORK", "GameFontHighlight");
@@ -1277,12 +1277,12 @@ end
 
 local function castingtimer_PlayerFrame_DetachCastBar()
 	-- hooksecurefunc of PlayerFrame_DetachCastBar in PlayerFrame.lua.
-	castingtimer_configure(CastingBarFrame);
+	castingtimer_configure(CastingBarFrame or PlayerCastingBarFrame);
 end
 
 local function castingtimer_PlayerFrame_AttachCastBar()
 	-- hooksecurefunc of PlayerFrame_AttachCastBar in PlayerFrame.lua.
-	castingtimer_configure(CastingBarFrame);
+	castingtimer_configure(CastingBarFrame or PlayerCastingBarFrame);
 end
 
 hooksecurefunc("PlayerFrame_DetachCastBar", castingtimer_PlayerFrame_DetachCastBar);
@@ -1470,7 +1470,17 @@ local function CT_Core_ContainerFrameItemButton_OnModifiedClick(self, button)
 	CT_Core_AddToTrade(self, button);
 end
 
-hooksecurefunc("ContainerFrameItemButton_OnModifiedClick", CT_Core_ContainerFrameItemButton_OnModifiedClick);
+if ContainerFrameItemButton_OnModifiedClick then
+	-- prior to WoW 10.x
+	hooksecurefunc("ContainerFrameItemButton_OnModifiedClick", CT_Core_ContainerFrameItemButton_OnModifiedClick)
+else
+	-- WoW 10.x
+	hooksecurefunc("ContainerFrameItemButton_OnClick", function(...)
+		if IsModifierKeyDown() then
+			CT_Core_ContainerFrameItemButton_OnModifiedClick()
+		end
+	end)
+end
 
 CT_Core_ContainerFrameItemButton_OnModifiedClick_Register(CT_Core_AddToAuctions);
 
@@ -1480,20 +1490,26 @@ CT_Core_ContainerFrameItemButton_OnModifiedClick_Register(CT_Core_AddToAuctions)
 local function hide_gryphons(val)
 	if (CT_BottomBar) then return; end
 	if (val) then
-		if (module:getGameVersion() >= 8) then
-			MainMenuBarArtFrame.LeftEndCap:Hide();
-			MainMenuBarArtFrame.RightEndCap:Hide();
+		if MainMenuBar.EndCaps then
+			MainMenuBar.EndCaps.LeftEndCap:Hide()
+			MainMenuBar.EndCaps.RightEndCap:Hide()
+		elseif module:getGameVersion() >= 8 then
+			MainMenuBarArtFrame.LeftEndCap:Hide()
+			MainMenuBarArtFrame.RightEndCap:Hide()
 		else
-			MainMenuBarLeftEndCap:Hide();
-			MainMenuBarRightEndCap:Hide();
+			MainMenuBarLeftEndCap:Hide()
+			MainMenuBarRightEndCap:Hide()
 		end
 	else
-		if (module:getGameVersion() >= 8) then
-			MainMenuBarArtFrame.LeftEndCap:Show();
-			MainMenuBarArtFrame.RightEndCap:Show();
+		if MainMenuBar.EndCaps then
+			MainMenuBar.EndCaps.LeftEndCap:Show()
+			MainMenuBar.EndCaps.RightEndCap:Show()
+		elseif module:getGameVersion() >= 8 then
+			MainMenuBarArtFrame.LeftEndCap:Show()
+			MainMenuBarArtFrame.RightEndCap:Show()
 		else
-			MainMenuBarLeftEndCap:Show();
-			MainMenuBarRightEndCap:Show();
+			MainMenuBarLeftEndCap:Show()
+			MainMenuBarRightEndCap:Show()
 		end
 	end
 end
@@ -1559,12 +1575,25 @@ local function castingbar_Update(enable)
 		return;
 	end
 	if (enable and not frameIsAttached) then
-		CastingBarFrame_OnLoad(movableCastingBar,"player",true,false);
-		CastingBarFrame_OnLoad(CastingBarFrame,nil,true,false);
+		if CastingBarFrame_OnLoad then
+			-- prior to WoW 10.x
+			CastingBarFrame_OnLoad(movableCastingBar, "player", true, false)
+			CastingBarFrame_OnLoad(CastingBarFrame, nil, true, false)
+		else
+			-- WoW 10.x
+			PlayerCastingBarFrame.OnLoad(movableCastingBar, "player", true, false)
+			PlayerCastingBarFrame.showCastbar = false --:OnLoad(nil, true, false)
+		end
 	else
-	
-		CastingBarFrame_OnLoad(movableCastingBar,nil,true,false);
-		CastingBarFrame_OnLoad(CastingBarFrame,"player",true,false);
+		if CastingBarFrame_OnLoad then
+			-- prior to WoW 10.x
+			CastingBarFrame_OnLoad(movableCastingBar, nil, true, false)
+			CastingBarFrame_OnLoad(CastingBarFrame, "player", true, false)
+		else
+			-- WoW 10.x
+			movableCastingBar.showCastbar = false
+			PlayerCastingBarFrame.showCastbar = true   --:OnLoad("player", true, false)
+		end
 	end
 	enableMovableCastingBar = enable
 	movableCastingBarHelper:SetShown(enableMovableCastingBar and unlockMovableCastingBar)
@@ -1780,11 +1809,11 @@ do
 		["VOID_STORAGE_OPEN"]     = VoidStorageFrame_LoadUI and {option = "voidOpenBags", open = true, backpack = "voidOpenBackpack", nobags = "voidOpenNoBags"},
 		["VOID_STORAGE_CLOSE"]    = VoidStorageFrame_LoadUI and {option = "voidCloseBags"},
 
-		["OBLITERUM_FORGE_SHOW"]     = ObliterumForgeFrame_LoadUI and {option = "obliterumOpenBags", open = true, backpack = "obliterumOpenBackpack", nobags = "obliterumOpenNoBags"},
-		["OBLITERUM_FORGE_CLOSE"]    = ObliterumForgeFrame_LoadUI and {option = "obliterumCloseBags"},
+		--["OBLITERUM_FORGE_SHOW"]     = ObliterumForgeFrame_LoadUI and {option = "obliterumOpenBags", open = true, backpack = "obliterumOpenBackpack", nobags = "obliterumOpenNoBags"},
+		--["OBLITERUM_FORGE_CLOSE"]    = ObliterumForgeFrame_LoadUI and {option = "obliterumCloseBags"},
 		
-		["SCRAPPING_MACHINE_SHOW"]     = ScrappingMachineFrame_LoadUI and {option = "scrappingOpenBags", open = true, backpack = "scrappingOpenBackpack", nobags = "scrappingOpenNoBags"},
-		["SCRAPPING_MACHINE_CLOSE"]    = ScrappingMachineFrame_LoadUI and {option = "scrappingCloseBags"},
+		--["SCRAPPING_MACHINE_SHOW"]     = ScrappingMachineFrame_LoadUI and {option = "scrappingOpenBags", open = true, backpack = "scrappingOpenBackpack", nobags = "scrappingOpenNoBags"},
+		--["SCRAPPING_MACHINE_CLOSE"]    = ScrappingMachineFrame_LoadUI and {option = "scrappingCloseBags"},
 
 	};
 
@@ -2987,6 +3016,51 @@ if (PlayerPowerBarAlt) then
 	end
 end
 
+
+--------------------------------------------
+-- Camera Max Distance (classic only)
+
+
+if InterfaceOptionsCameraPanelMaxDistanceSlider then
+	
+	-- bugfix so the CVar doesn't get reduced to 2.0 when the Interface Options initialize
+	local slider = InterfaceOptionsCameraPanelMaxDistanceSlider
+	if slider then
+		oldFunc = slider.SetMinMaxValues
+		function slider:SetMinMaxValues(minVal, maxVal)
+			oldFunc(slider, minVal, max(maxVal, 2.6)) 
+		end
+	end
+
+	-- restoring max distance after playing with addons disabled
+	local function fixCameraOnAddonLoaded()
+		local ctCameraDistance = module:getOption("cameraDistanceMaxZoomFactor")
+		local cvarCameraDistance = tonumber(GetCVar("cameraDistanceMaxZoomFactor"))
+		if ctCameraDistance and cvarCameraDistance and ctCameraDistance > cvarCameraDistance then
+			module:regEvent("PLAYER_LOGIN", function()
+				SetCVar("cameraDistanceMaxZoomFactor", ctCameraDistance)
+			end)
+		elseif cvarCameraDistance and cvarCameraDistance > 2.0 then
+			module:setOption("cameraDistanceMaxZoomFactor", cvarCameraDistance)
+		end
+		module:unregEvent("ADDON_LOADED", fixCameraOnAddonLoaded)
+	end
+	module:regEvent("ADDON_LOADED", fixCameraOnAddonLoaded)
+
+	-- ensuring this doesn't override behaviour of the original frame
+	InterfaceOptionsCameraPanelMaxDistanceSlider:HookScript("OnLeave", function()
+		local cvarCameraDistance = tonumber(GetCVar("cameraDistanceMaxZoomFactor"))
+		if cvarCameraDistance > 2.0 then
+			module:setOption("cameraDistanceMaxZoomFactor", cvarCameraDistance)
+		else
+			module:setOption("cameraDistanceMaxZoomFactor", nil)
+		end
+	end)
+
+	-- the rest of the code is inside the options panel, because it just uses a CVar
+
+end
+
 --------------------------------------------
 -- General Initializer
 
@@ -2999,7 +3073,7 @@ local modFunctions = {
 	["tickModLock"] = setTickLocked,
 	["tooltipAnchorUnlock"] = tooltip_toggleAnchor,
 	["tooltipRelocation"] = tooltip_toggleAnchor,
-	["hideWorldMap"] = toggleWorldMap,
+	["hideWorldMap"] = MiniMapWorldMapButton and toggleWorldMap,	-- removed in WoW 10.x
 	["blockDuels"] = configureDuelBlockOption,
 	["watchframeEnabled"] = module.watchframeEnabled,
 	["watchframeLocked"] = module.watchframeLocked,

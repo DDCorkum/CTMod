@@ -762,6 +762,29 @@ do
 	end
 end
 
+
+local queueDuringCombat = {}
+local errorFreeAfterCombat = true
+
+function lib:afterCombat(func, ...)
+	if InCombatLockdown() then
+		tinsert(queueDuringCombat, {func, ...})
+	else
+		func(...)
+	end
+end
+
+lib:regEvent("PLAYER_REGEN_ENABLED", function()
+	for __, funcAndArgs in ipairs(queueDuringCombat) do
+		local retOK, msg = pcall(unpack(funcAndArgs))
+		if not retOK and msg and errorFreeAfterCombat then
+			print("CTMod caught an error when combat ended.")
+			print(msg)
+			errorFreeAfterCombat = false
+		end
+	end
+end)
+
 -- End Generic Functions
 -----------------------------------------------
 
@@ -1086,13 +1109,13 @@ end
 
 function lib:registerMovable(id, frame, clamped)
 	if ( not movables ) then
-		movables = { };
+		movables = { }
 	end
 
-	id = "MOVABLE-"..id;
-	movables[id] = frame;
-	frame:SetMovable(true);
-	frame:SetClampedToScreen(clamped);
+	id = "MOVABLE-"..id
+	movables[id] = frame
+	frame:SetMovable(true)
+	frame:SetClampedToScreen(clamped or false)	-- WoW 10.x PTR doesn't accept nil as a substitute for false
 
 	-- See if we have a saved position already...
 	local option = self:getOption(id);

@@ -527,10 +527,17 @@ module.frame = function()
 				end
 				slider:SetScript("OnValueChanged",
 					function()
-						SetCVar("cameraDistanceMaxZoomFactor", slider:GetValue());
-						_G[slider:GetName() .. "Text"]:SetText("Current: " .. round(slider:GetValue(),1));
+						local value = slider:GetValue()
+						SetCVar("cameraDistanceMaxZoomFactor", value);
+						_G[slider:GetName() .. "Text"]:SetText("Current: " .. round(value,1));
+						if value > 2.0 then
+							module:setOption("cameraDistanceMaxZoomFactor", value)
+						else
+							module:setOption("cameraDistanceMaxZoomFactor", nil)
+						end
 					end
 				);
+				
 			end
 		);
 		optionsAddTooltip({"Camera Max Distance", "Due to a bug in the default UI, reloading without addons will reset this value to no more than |cFFFFFFFF2.0|r"})
@@ -686,10 +693,10 @@ module.frame = function()
 		local num = #(module.chatStickyTypes);
 		for i = 1, num, 2 do
 			local stickyInfo = module.chatStickyTypes[i];
-			optionsAddObject(cbOffset,   26, "checkbutton#tl:25:%y#o:chatSticky" .. stickyInfo.chatType .. ":" .. stickyInfo.default .. "#" .. stickyInfo.label);
+			optionsAddObject(cbOffset,   26, "checkbutton#tl:25:%y#o:chatSticky" .. stickyInfo.chatType .. ":" .. (ChatTypeInfo[stickyInfo.chatType].sticky == 1 and "true" or "false") .. "#" .. stickyInfo.label);
 			if (i ~= num) then
 				stickyInfo = module.chatStickyTypes[i+1];
-				optionsAddObject(26,   26, "checkbutton#tl:155:%y#o:chatSticky" .. stickyInfo.chatType .. ":" .. stickyInfo.default .. "#" .. stickyInfo.label);
+				optionsAddObject(26,   26, "checkbutton#tl:155:%y#o:chatSticky" .. stickyInfo.chatType .. ":" .. (ChatTypeInfo[stickyInfo.chatType].sticky == 1 and "true" or "false") .. "#" .. stickyInfo.label);
 			end
 			cbOffset = 6;
 		end

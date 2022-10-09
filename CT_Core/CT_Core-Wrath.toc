@@ -1,5 +1,5 @@
 ## Interface: 30400
-## Version: 9.2.0.1
+## Version: 9.2.0.2
 ## Title: CT_Core
 ## Notes: General nifty features for CTMod.
 ## DefaultState: Enabled
@@ -11,4 +11,3 @@ CT_Core.lua
 CT_Core_Chat.lua
 CT_Core_Other.lua
 localization.lua
-Bindings.xml

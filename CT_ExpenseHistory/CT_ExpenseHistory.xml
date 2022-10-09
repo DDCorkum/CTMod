@@ -34,19 +34,6 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 		<HighlightFont style="GameFontHighlight"/>
 		<DisabledFont style="GameFontHighlight"/>
 	</Button>
-	<Button name="CT_ExpenseHistoryFrameTabTemplate" inherits="CharacterFrameTabButtonTemplate" virtual="true">
-		<Size>
-		    <AbsDimension x="115" y="32"/>
-		</Size>
-		<Scripts>
-			<OnLoad>
-				self:SetFrameLevel(2);
-			</OnLoad>
-			<OnClick>
-				CT_EH_Tab_OnClick(self);
-			</OnClick>
-		</Scripts>
-	</Button>
 	<Frame name="CT_ExpenseHistoryLogLineTemplate" virtual="true" hidden="true">
 		<Size>
 			<AbsDimension x="375" y="20"/>
@@ -961,41 +948,10 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 					</Frame>
 				</Frames>
 			</Frame>
-			<Button name="$parentTab1" inherits="CT_ExpenseHistoryFrameTabTemplate" id="1" ><Scripts><OnLoad>self:SetText(CT_ExpenseHistory.text["CT_ExpenseHistory/Summary/Heading"]);</OnLoad></Scripts>
-                <Anchors>
-                    <Anchor point="CENTER" relativePoint="BOTTOMLEFT">
-                        <Offset>
-                            <AbsDimension x="60" y="-8"/>
-                        </Offset>
-                    </Anchor>
-                </Anchors>
-			</Button>
-			<Button name="$parentTab2" inherits="CT_ExpenseHistoryFrameTabTemplate" id="2" ><Scripts><OnLoad>self:SetText(CT_ExpenseHistory.text["CT_ExpenseHistory/Log/Heading"]);</OnLoad></Scripts>
-                <Anchors>
-                   <Anchor point="LEFT" relativeTo="$parentTab1" relativePoint="RIGHT">
-                        <Offset>
-                            <AbsDimension x="-16" y="0"/>
-                        </Offset>
-                    </Anchor>
-                </Anchors>
-			</Button>
+			<!--  CT_ExpenseHistoryFrameTab1 and CT_ExpenseHistoryFrameTab2 in OnLoad script for compatibility with changing template names in WoW 10.x -->
 		</Frames>
 		<Scripts>
-			<OnLoad>
-				self:RegisterEvent("PLAYER_LOGIN");
-				self.elapsed = 0;
-				PanelTemplates_SetNumTabs(self, 2);
-				PanelTemplates_SetTab(self, 1);
-				Mixin(self, BackdropTemplateMixin or { });
-				self:SetBackdrop({
-					bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
-					edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
-					tile = true,
-					tileSize = 32,
-					edgeSize = 32,
-					insets = { left = 11, right = 12, top = 12, bottom = 11 },
-				});
-			</OnLoad>
+			<OnLoad function="CT_ExpenseHistoryFrame_OnLoad" />
 			<OnEvent>
 				CT_EH_OnEvent(event);
 			</OnEvent>

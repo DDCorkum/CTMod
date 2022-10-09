@@ -230,49 +230,9 @@ local function setDebuffFilter(value)
 	debuffFilter = value == 1 and "HARMFUL" or "HARMFUL|RAID"
 end
 
+
 --------------------------------------------
--- Handlers
-
-function CT_PartyMemberFrame_OnLoad(self)
-	local id = self:GetID();
-	partyFrames[id] = self
-	self.unit = "party" .. self:GetID()
-	self:SetScript("OnEvent", triggerNextUpdate)
-	self.buffs = {}
-	self.debuffs = {}
-end
-
-function CT_PartyMemberFrame_OnShow(self)
-	triggerNextUpdate(self)
-	refreshBuffs()
-	ticker = ticker or C_Timer.NewTicker(0.25, refreshBuffs) 
-	self:RegisterUnitEvent("UNIT_AURA", self.unit)
-end
-
-function CT_PartyMemberFrame_OnHide(self)
-	triggers[self] = nil
-	if (ticker and not PetFrame:IsVisible() and not PartyMemberFrame1:IsVisible()) then
-		ticker:Cancel()
-		ticker = nil
-	end
-	self:UnregisterEvent("UNIT_AURA")
-end
-
-function CT_PartyPetFrame_OnLoad(self)
-	petFrame = self
-	self.unit = "party" .. self:GetID() .. "pet"
-	self.isPet = true
-	self:SetScript("OnEvent", CT_PartyBuffs_TriggerNextUpdate)
-	self.buffs = {}
-	self.debuffs = {} -- The addon doesn't create pet debuff icons; however, this empty table is necessary for refreshBuffs()
-	
-	CT_PetBuffFrame:SetPoint("TOPLEFT", PetFrame, "TOPLEFT", 48, -42)
-end
-
--- the code is exactly the same
-CT_PartyPetFrame_OnShow = CT_PartyMemberFrame_OnShow
-CT_PartyPetFrame_OnHide = CT_PartyMemberFrame_OnHide
-
+-- Handlers for XML frames
 
 function CT_PartyBuffButton_OnEnter(self)
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
@@ -284,11 +244,70 @@ function CT_PartyDebuffButton_OnEnter(self)
 	GameTooltip:SetUnitAura(self.unit, self.id, debuffFilter)
 end
 
+--------------------------------------------
+-- Frames
 
+do
+	local function partyMemberFrame_OnShow(self)
+		triggerNextUpdate(self)
+		refreshBuffs()
+		ticker = ticker or C_Timer.NewTicker(0.25, refreshBuffs) 
+	end
+
+	local function partyMemberFrame_OnHide(self)
+		triggers[self] = nil
+		if (ticker and not CT_PetBuffFrame:IsVisible() and not CT_PartyBuffFrame1:IsVisible()) then
+			ticker:Cancel()
+			ticker = nil
+		end
+	end
+
+	local function createPartyMemberFrame(id)
+		local frame = CreateFrame("Frame", "CT_PartyBuffFrame"..id, _G["PartyMemberFrame"..id] or PartyFrame, nil, id)
+		frame:SetPoint("TOPLEFT", 48, PartyMemberFrame1 and -32 or -53*(id-1)-32)
+		frame:SetSize(70, 50)
+		frame:SetScript("OnShow", partyMemberFrame_OnShow)
+		frame:SetScript("OnHide", partyMemberFrame_OnHide)
+		frame:SetScript("OnEvent", triggerNextUpdate)
+		
+		frame.buffs = {}
+		frame.debuffs = {}
+		
+		partyFrames[id] = frame
+		
+		frame.unit = "party" .. id
+		frame:RegisterUnitEvent("UNIT_AURA", frame.unit)
+		
+		RegisterUnitWatch(frame)	-- useful starting in WoW 10.x because it is now parented by PartyFrame that never disappears
+	end
+
+	createPartyMemberFrame(1)
+	createPartyMemberFrame(2)
+	createPartyMemberFrame(3)
+	createPartyMemberFrame(4)
+	
+	-- pet frame
+	local frame = CreateFrame("Frame", "CT_PetBuffFrame", PetFrame)
+	frame:SetPoint("TOPLEFT", 48, -42)
+	frame:SetSize(70,50)
+	frame:SetScript("OnShow", partyMemberFrame_OnShow)
+	frame:SetScript("OnHide", partyMemberFrame_OnHide)
+	frame:SetScript("OnEvent", triggerNextUpdate)
+
+	frame.buffs = {}
+	frame.debuffs = {}
+
+	petFrame = frame
+
+	frame.unit = "pet"
+	frame:RegisterUnitEvent("UNIT_AURA", frame.unit)
+	frame.isPet = true
+	
+	RegisterUnitWatch(frame)	-- not strictly necessary; included to match the party frame
+end
 --------------------------------------------
 -- Hide the default buff tooltip when icons are already present
-
-hooksecurefunc("PartyMemberBuffTooltip_Update", function(self)
+PartyMemberBuffTooltip:HookScript("OnShow", function(self)
 	if ( ( self.unit == "pet" and numPetBuffs > 0 ) or ( self.unit ~= "pet" and numBuffs > 0 ) ) then
 		PartyMemberBuffTooltip:Hide();
 	end

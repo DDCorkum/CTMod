@@ -2992,7 +2992,7 @@ end
 function CT_BuffMod_AuraButton_OnShow(self)
 	if (not self.ctinit) then
 		self.ctinit = true;
-		self:RegisterForClicks("LeftButton", "RightButtonUp");
+		self:RegisterForClicks("RightButtonDown", "LeftButtonDown");
 		auraButton_Update(self);
 	end
 end
@@ -8186,29 +8186,31 @@ local enchantsOption;
 function globalClass:hideBlizzardEnchantsFrame(value)
 	-- Configure the option.
 	local frame = TemporaryEnchantFrame;
-	enchantsOption = value;  -- save option's value for use in the OnShow hook.
-	if (value) then
-		frame_Hide(frame);
-		hidEnchants = true;
-	else
-		-- Only show the frame if we have previously hidden it,
-		-- that way we don't affect anything if the user leaves the option disabled.
-		if (hidEnchants) then
-			frame:Show();
+	if frame then
+		enchantsOption = value;  -- save option's value for use in the OnShow hook.
+		if (value) then
+			frame_Hide(frame);
+			hidEnchants = true;
+		else
+			-- Only show the frame if we have previously hidden it,
+			-- that way we don't affect anything if the user leaves the option disabled.
+			if (hidEnchants) then
+				frame:Show();
 			hidEnchants = nil;
+			end
 		end
 	end
 end
 
-TemporaryEnchantFrame:HookScript("OnShow",
-	function(self)
+if TemporaryEnchantFrame then
+	TemporaryEnchantFrame:HookScript("OnShow", function(self)
 		-- If player has chosen to hide the frame.
 		if (enchantsOption) then
 			-- Override Show() by hiding the frame.
-			frame_Hide(self);
+				frame_Hide(self)
 		end
-	end
-);
+	end)
+end
 
 -- Blizzard shows the BuffFrame frame once and then never shows/hides it again.
 local hidBuffs;
@@ -10301,11 +10303,13 @@ local function globalFrame_Init(self)
 			module.auraAlpha = module.auraAlpha - 0.05;
 			if (module.auraAlpha <= 0) then
 				flashDirection = false;
+				module.auraAlpha = 0
 			end
 		else
 			module.auraAlpha = module.auraAlpha + 0.05;
 			if (module.auraAlpha >= 1) then
 				flashDirection = true;
+				module.auraAlpha = 1
 			end
 		end
 		C_Timer.After(0.05, synchronizeFlashing);

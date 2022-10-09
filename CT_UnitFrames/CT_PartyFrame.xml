@@ -2,9 +2,6 @@
 C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 	<Script file="CT_PartyFrame.lua"/>
 	<Button name="CT_PartyFrameTemplate" virtual="true">
-		<Anchors>
-			<Anchor point="CENTER" relativeTo="$parentHealthBar"/>
-		</Anchors>
 		<Size>
 			<AbsDimension x="86" y="19"/>
 		</Size>
@@ -49,10 +46,6 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 			</Frame>
 		</Frames>
 	</Button>
-	<Button name="CT_PartyFrame1" inherits="CT_PartyFrameTemplate" parent="PartyMemberFrame1" toplevel="true" id="1"/>
-	<Button name="CT_PartyFrame2" inherits="CT_PartyFrameTemplate" parent="PartyMemberFrame2" toplevel="true" id="2"/>
-	<Button name="CT_PartyFrame3" inherits="CT_PartyFrameTemplate" parent="PartyMemberFrame3" toplevel="true" id="3"/>
-	<Button name="CT_PartyFrame4" inherits="CT_PartyFrameTemplate" parent="PartyMemberFrame4" toplevel="true" id="4"/>
 
 	<Frame name="CT_PartyFrameGlobalFrame" parent="UIParent" hidden="false">
 		<Scripts>
