@@ -3188,6 +3188,14 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 			frame.cooldown:SetAllPoints();
 			frame.cooldown:SetDrawEdge(false);
 			frame.cooldown:SetReverse(true);
+			
+			-- Interrupt the WoW 10.x implementation of cooldown timers
+			local cooldownTimer = frame.cooldown:GetRegions()
+			if cooldownTimer then
+				cooldownTimer:Hide()
+				cooldownTimer:SetScript("OnShow", cooldownTimer.Hide)
+			end
+			
 			return frame;
 		end
 
