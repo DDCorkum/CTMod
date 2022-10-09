@@ -343,7 +343,7 @@ do
 
 	-- The Select All checkbox
 	module:getFrame( {
-		["checkbutton#n:CTMailModSelectAll#s:24:24#l:tl:59:-38#v:OptionsCheckButtonTemplate##1:0.82:0"] = {
+		["checkbutton#n:CTMailModSelectAll#s:24:24#l:tl:59:-38#v:InterfaceOptionsCheckButtonTemplate##1:0.82:0"] = {
 			["onclick"] = function(self, arg1)
 				if (self:GetChecked()) then
 					module:inboxSelectAll();

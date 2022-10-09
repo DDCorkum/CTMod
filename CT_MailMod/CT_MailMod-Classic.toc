@@ -9,7 +9,6 @@
 
 CT_MailMod.lua
 localization.lua
-Bindings.xml
 
 CT_MailMod_Utility.lua
 CT_MailMod_MailLog.lua
