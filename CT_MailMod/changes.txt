@@ -1,3 +1,6 @@
+CT_MailMod (9.2.0.3) 2022-10-13
+- Updates for WoW Dragonflight
+
 CT_MailMod (9.1.5.1) 2021-11-02
 - Shift-click to only open mail from the auction house.
 

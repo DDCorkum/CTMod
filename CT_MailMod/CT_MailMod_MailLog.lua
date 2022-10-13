@@ -646,9 +646,14 @@ do
 					end
 				end;
 
-				self:SetResizable(true);
-				self:SetMaxResize(UIParent:GetWidth(), logHeight);
-				self:SetMinResize(defaultLogWidth - 100, logHeight);
+				self:SetResizable(true)
+				if self.SetResizeBounds then
+					-- WoW 10.x
+					self:SetResizeBounds(defaultLogWidth - 100, logHeight, UIParent:GetWidth(), logHeight)
+				else
+					self:SetMaxResize(UIParent:GetWidth(), logHeight)
+					self:SetMinResize(defaultLogWidth - 100, logHeight)
+				end
 
 				local rightFrame = CreateFrame("Frame", "CT_MailMod_MailLog_RightResizeFrame", self);
 				rightFrame.side = "RIGHT";
