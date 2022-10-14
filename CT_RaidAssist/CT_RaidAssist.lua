@@ -3191,9 +3191,8 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 			
 			-- Interrupt the WoW 10.x implementation of cooldown timers
 			local cooldownTimer = frame.cooldown:GetRegions()
-			if cooldownTimer then
-				cooldownTimer:Hide()
-				cooldownTimer:SetScript("OnShow", cooldownTimer.Hide)
+			if cooldownTimer and cooldownTimer:IsObjectType("FontString") then
+				cooldownTimer:ClearAllPoints()
 			end
 			
 			return frame;

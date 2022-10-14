@@ -276,9 +276,10 @@ do
 		partyFrames[id] = frame
 		
 		frame.unit = "party" .. id
+		frame:SetAttribute("unit", "party" .. id)
 		frame:RegisterUnitEvent("UNIT_AURA", frame.unit)
 		
-		RegisterUnitWatch(frame)	-- useful starting in WoW 10.x because it is now parented by PartyFrame that never disappears
+		RegisterUnitWatch(frame, false)	-- useful starting in WoW 10.x because it is now parented by PartyFrame that never disappears
 	end
 
 	createPartyMemberFrame(1)
