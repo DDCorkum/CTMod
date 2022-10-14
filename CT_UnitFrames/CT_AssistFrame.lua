@@ -87,8 +87,8 @@ function CT_AssistFrame_OnLoad(self)
 		portraitFrame = _G[thisName.."Portrait"];
 	end
 
-	local args =
-		module:getGameVersion() >= 10 and {
+	if module:getGameVersion() >= 10 then
+		UnitFrame_Initialize(self,
 			unit1,
 			_G[thisName.."TextureFrameName"],
 			"Target", -- WoW 10.x frameType
@@ -108,9 +108,10 @@ function CT_AssistFrame_OnLoad(self)
 			_G[thisName.."TextureFrameOverHealAbsorbGlow"],
 			_G[thisName.."HealAbsorbBar"],
 			_G[thisName.."HealAbsorbBarLeftShadow"],
-			_G[thisName.."HealAbsorbBarRightShadow"],	
-		}
-		or {
+			_G[thisName.."HealAbsorbBarRightShadow"]	
+		)
+	else
+		UnitFrame_Initialize(self,
 			unit1,
 			_G[thisName.."TextureFrameName"],
 			-- in WoW 10.x, this is where the frameType goes
@@ -130,10 +131,9 @@ function CT_AssistFrame_OnLoad(self)
 			UnitGetTotalHealAbsorbs and _G[thisName.."TextureFrameOverHealAbsorbGlow"] or _G[thisName.."TextureFrameOverHealAbsorbGlow"]:Hide() and nil,
 			UnitGetTotalHealAbsorbs and _G[thisName.."HealAbsorbBar"] or _G[thisName.."HealAbsorbBar"]:Hide() and nil,
 			UnitGetTotalHealAbsorbs and _G[thisName.."HealAbsorbBarLeftShadow"] or _G[thisName.."HealAbsorbBarLeftShadow"]:Hide() and nil,
-			UnitGetTotalHealAbsorbs and _G[thisName.."HealAbsorbBarRightShadow"] or _G[thisName.."HealAbsorbBarRightShadow"]:Hide() and nil,
-		}
-		
-	UnitFrame_Initialize(self, unpack(args));
+			UnitGetTotalHealAbsorbs and _G[thisName.."HealAbsorbBarRightShadow"] or _G[thisName.."HealAbsorbBarRightShadow"]:Hide() and nil
+		)
+	end
 
 	-- incoming heals on classic
 	if (UnitGetTotalAbsorbs == nil) then

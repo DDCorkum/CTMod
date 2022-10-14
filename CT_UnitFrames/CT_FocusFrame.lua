@@ -608,6 +608,7 @@ function CT_FocusFrame_UpdateAuras(self)
 			else
 				frame = CreateFrame("Button", frameName, self, "CT_FocusBuffFrameTemplate");
 				frame.unit = self.unit;
+				frame.Cooldown:GetRegions():ClearAllPoints()	-- Hack.  Prevents any font string from appearing to show the cooldown duration while action bar cooldowns are displayed.
 			end
 		end
 		if ( icon and ( not self.maxBuffs or i <= self.maxBuffs ) ) then
