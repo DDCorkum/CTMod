@@ -763,30 +763,35 @@ module.frame = function()
 	optionsAddBookmark("Quests", "QuestsHeading");
 	optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Quests#i:QuestsHeading");
 
+	
 	-- Movable Objectives Tracker
 	optionsAddObject(-20, 1*13, "font#tl:15:%y#Movable Objectives Tracker#i:MovableObjectivesHeading");
-	optionsAddObject( -5,   26, "checkbutton#tl:10:%y#i:watchframeEnabled#o:watchframeEnabled#Enable these options");
-	optionsAddObject(  4,   26, "checkbutton#tl:40:%y#i:watchframeLocked#o:watchframeLocked:true#Lock the game's Objectives window");
-	optionsAddObject(  6,   26, "checkbutton#tl:40:%y#i:watchframeShowTooltip#o:watchframeShowTooltip:true#Show drag and resize tooltips");
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		optionsAddObject(  6,   26, "checkbutton#tl:40:%y#i:watchframeAddMinimizeButton#o:watchframeAddMinimizeButton:true#Add a minimize button (like retail)");
+	if EditModeManagerFrame then
+		optionsAddObject( -10, 13, "font#t:0:%y#Now movable with the default UI#0.6:0.6:0.6")
+	else
+		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#i:watchframeEnabled#o:watchframeEnabled#Enable these options");
+		optionsAddObject(  4,   26, "checkbutton#tl:40:%y#i:watchframeLocked#o:watchframeLocked:true#Lock the game's Objectives window");
+		optionsAddObject(  6,   26, "checkbutton#tl:40:%y#i:watchframeShowTooltip#o:watchframeShowTooltip:true#Show drag and resize tooltips");
+		if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+			optionsAddObject(  6,   26, "checkbutton#tl:40:%y#i:watchframeAddMinimizeButton#o:watchframeAddMinimizeButton:true#Add a minimize button (like retail)");
+		end
+		optionsAddObject(  6,   26, "checkbutton#tl:40:%y#i:watchframeClamped#o:watchframeClamped:true#Keep the window on screen");
+		optionsAddObject(  6,   26, "checkbutton#tl:40:%y#i:watchframeShowBorder#o:watchframeShowBorder#Show the border");
+		optionsAddObject(  0,   16, "colorswatch#tl:45:%y#s:16:%s#o:watchframeBackground:0,0,0,0#true");
+		optionsAddObject( 14,   14, "font#tl:69:%y#v:ChatFontNormal#Background color and opacity");
+		optionsBeginFrame( -10,   30, "button#t:0:%y#s:180:%s#n:CT_Core_ResetObjectivesPosition_Button#v:GameMenuButtonTemplate#Reset window position");
+			optionsAddScript("onclick",
+				function(self)
+					module.resetWatchFramePosition();
+				end
+			);
+		optionsEndFrame();
+		optionsAddFrame( -14,   17, "slider#tl:75:%y#n:CTCoreWatchFrameScaleSlider#o:CTCore_WatchFrameScale:100#Font Size = <value>%:90%:110%#90:110:5");
+		optionsAddObject( -10,  26, "checkbutton#tl:40:%y#i:watchframeChangeWidth#o:watchframeChangeWidth#Can change width of window");
+
+		optionsAddObject(  5, 5*13, "font#t:0:%y#s:0:%s#l:70:0#r#Note: To use a wider objectives window without enabling this option, you can enable the 'Wider objectives tracker' option in the game's Interface options.#" .. textColor2 .. ":l");
 	end
-	optionsAddObject(  6,   26, "checkbutton#tl:40:%y#i:watchframeClamped#o:watchframeClamped:true#Keep the window on screen");
-	optionsAddObject(  6,   26, "checkbutton#tl:40:%y#i:watchframeShowBorder#o:watchframeShowBorder#Show the border");
-	optionsAddObject(  0,   16, "colorswatch#tl:45:%y#s:16:%s#o:watchframeBackground:0,0,0,0#true");
-	optionsAddObject( 14,   14, "font#tl:69:%y#v:ChatFontNormal#Background color and opacity");
-	optionsBeginFrame( -10,   30, "button#t:0:%y#s:180:%s#n:CT_Core_ResetObjectivesPosition_Button#v:GameMenuButtonTemplate#Reset window position");
-		optionsAddScript("onclick",
-			function(self)
-				module.resetWatchFramePosition();
-			end
-		);
-	optionsEndFrame();
-	optionsAddFrame( -14,   17, "slider#tl:75:%y#n:CTCoreWatchFrameScaleSlider#o:CTCore_WatchFrameScale:100#Font Size = <value>%:90%:110%#90:110:5");
-	optionsAddObject( -10,  26, "checkbutton#tl:40:%y#i:watchframeChangeWidth#o:watchframeChangeWidth#Can change width of window");
-
-	optionsAddObject(  5, 5*13, "font#t:0:%y#s:0:%s#l:70:0#r#Note: To use a wider objectives window without enabling this option, you can enable the 'Wider objectives tracker' option in the game's Interface options.#" .. textColor2 .. ":l");
-
+	
 	--Quest Log
 	optionsAddObject(-20, 1*13, "font#tl:15:%y#Quest Log");
 	optionsBeginFrame(-5,   26, "checkbutton#tl:10:%y#o:questLevels:" .. (module:getGameVersion() < 7 and "true" or "false") .. "#Display quest levels in the Quest Log#i:QuestLogHeading");

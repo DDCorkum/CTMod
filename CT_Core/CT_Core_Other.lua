@@ -2040,7 +2040,10 @@ end
 --------------------------------------------
 -- Objectives window
 
-do
+if not EditModeManagerFrame then
+
+	-- prior to WoW 10.x
+
 	local initDone;
 	local watchFrame;
 	local playerLoggedIn;
@@ -2410,7 +2413,7 @@ do
 				else
 					QuestWatch_Update();
 				end
-				frameSetParent(WatchFrame, "UIParent");
+				frameSetParent(WatchFrame, UIParent);
 				WatchFrame:ClearAllPoints();
 				WatchFrame:SetPoint("TOPRIGHT", MiniMapCluster, "BOTTOMRIGHT", ((MultiBarRight:IsShown() and -52) and MultiBarLeft:IsShown() and -95) or 0);	-- this is probably not even required because of UIParent_ManageFramePositions()
 				WatchFrame:SetClampedToScreen(true);
