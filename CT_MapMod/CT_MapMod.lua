@@ -155,6 +155,26 @@ function public:InsertHerb(mapID, x, y, herb, descript, name)
 	if (type(name) ~= "string") then
 		name = nil;
 	end
+	
+	-- convert special node names to the standard variant (localization dependent)
+	if GetLocale() == "enUS" or GetLocale() == "enGB" then
+		-- Drangonflight prefixes
+		if herb:sub(1, 8) == "Decayed " then
+			herb = herb:sub(9)
+		elseif herb:sub(1, 11) == "Self-Grown " then
+			herb = herb:sub(12)
+		elseif herb:sub(1, 10) == "Windswept " then
+			herb = herb:sub(11)
+		elseif herb:sub(1, 7) == "Frigid " then
+			herb = herb:sub(8)
+		elseif herb:sub(1, 5) == "Lush " then
+			herb = herb:sub(6)
+		elseif herb:sub(1, 14) == "Titan-Touched " then
+			herb = herb:sub(15)
+		end
+	end
+	
+	-- now process the standardized names
 	for __, expansion in pairs(module.pinTypes["Herb"]) do
 		for __, kind in ipairs(expansion) do
 			if (L["CT_MapMod/Herb/" .. kind] == herb or kind == herb) then
@@ -452,18 +472,18 @@ function CT_MapMod_DataProviderMixin:RefreshAllData(fromOnShow)
 		-- Retail
 		local prof1, prof2 = GetProfessions();
 		if (prof1) then 
-			local __, icon = GetProfessionInfo(prof1)
-			if (icon == 136246) then 
+			local tradeSkill = select(7, GetProfessionInfo(prof1))
+			if (tradeSkill == 182) then 
 				module.isHerbalist = true;
-			elseif (icon == 134708) then 
+			elseif (tradeSkill == 186) then 
 				module.isMiner = true; 
 			end
 		end
 		if (prof2) then 
-			local __, icon = GetProfessionInfo(prof2)
-			if (icon == 136246) then 
+			local tradeSkill = select(7, GetProfessionInfo(prof2))
+			if (tradeSkill == 182) then 
 				module.isHerbalist = true;
-			elseif (icon == 134708) then 
+			elseif (tradeSkill == 186) then 
 				module.isMiner = true;
 			end
 		end

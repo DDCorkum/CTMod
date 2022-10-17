@@ -1,3 +1,6 @@
+CT_MapMod (9.2.0.4) 2022-10-17
+- Dragonflight herbalism
+
 CT_MapMod (9.2.0.1) 2022-09-26
 - Partial update for Classic WotLK
 
