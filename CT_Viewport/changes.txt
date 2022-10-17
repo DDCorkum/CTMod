@@ -1,3 +1,6 @@
+CT_Viewport (9.2.0.3) 2022-10-14
+- Fix to bug introduced in 9.2.0.2 affecting non-default resolutions
+
 CT_Viewport (9.2.0.2) 2022-09-30
 - Updates for WoW Dragonflight
 

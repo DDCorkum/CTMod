@@ -41,11 +41,13 @@ do
 	end
 
 	local function CT_MailMod_ContainerFrameItemButton_OnModifiedClick(self, button)
-		CT_MailMod_AddToSendMail(self, button);
+		if IsModifierKeyDown() then
+			CT_MailMod_AddToSendMail(self, button)
+		end
 	end
 
 	if (not CT_Core_ContainerFrameItemButton_OnModifiedClick) then
-		hooksecurefunc("ContainerFrameItemButton_OnModifiedClick", CT_MailMod_ContainerFrameItemButton_OnModifiedClick);
+		hooksecurefunc("ContainerFrameItemButton_OnClick", CT_MailMod_ContainerFrameItemButton_OnModifiedClick);
 	else
 		CT_Core_ContainerFrameItemButton_OnModifiedClick_Register(CT_MailMod_AddToSendMail);
 	end

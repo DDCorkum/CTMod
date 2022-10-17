@@ -396,9 +396,16 @@ module.frame = function()
 	optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Auction House#i:AuctionHouseHeading");
 	optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:auctionAltClickItem#Alt left-click to add an item to the Auctions tab");
 
--- Bag automation
-	optionsAddBookmark("Bag Automation", "BagAutomationHeading");
-	optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Bag automation options#i:BagAutomationHeading");
+-- Bags and Menu Bar
+	if module:getGameVersion() >= 10 then
+		optionsAddBookmark("Bags and Menu Bars", "BagsAndMicroMenuHeading")
+		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Bag and Menu Bars#i:BagsAndMicroMenuHeading");
+		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:enableCustomBagMenuBars#Move bag and menu bars");
+		optionsAddObject( -5,   26, "checkbutton#tl:30:%y#o:showCustomBagMenuAnchors#Show dragging anchors");
+		optionsAddObject(-15,   17, "font#tl:5:%y#v:GameFontNormal#Auction House#i:Bag Automation");
+	else
+		optionsAddObject(-15,   17, "font#tl:5:%y#v:GameFontNormalLarge#Auction House#i:Bag Automation");
+	end
 	optionsAddObject( -8, 2*13, "font#t:0:%y#s:0:%s#l:13:0#r#Disable bag automation if you have other bag management addons#" .. textColor2 .. ":l");	
 	optionsBeginFrame( -3, 15, "checkbutton#tl:60:%y#o:disableBagAutomation#i:disableBagAutomation#|cFFFF6666Disable bag automation");
 		optionsAddTooltip({"Disable bag automation#1:0.5:0.5","Prevents conflicts with other bag management addons#0.9:0.9:0.9"})
@@ -756,30 +763,35 @@ module.frame = function()
 	optionsAddBookmark("Quests", "QuestsHeading");
 	optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Quests#i:QuestsHeading");
 
+	
 	-- Movable Objectives Tracker
 	optionsAddObject(-20, 1*13, "font#tl:15:%y#Movable Objectives Tracker#i:MovableObjectivesHeading");
-	optionsAddObject( -5,   26, "checkbutton#tl:10:%y#i:watchframeEnabled#o:watchframeEnabled#Enable these options");
-	optionsAddObject(  4,   26, "checkbutton#tl:40:%y#i:watchframeLocked#o:watchframeLocked:true#Lock the game's Objectives window");
-	optionsAddObject(  6,   26, "checkbutton#tl:40:%y#i:watchframeShowTooltip#o:watchframeShowTooltip:true#Show drag and resize tooltips");
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
-		optionsAddObject(  6,   26, "checkbutton#tl:40:%y#i:watchframeAddMinimizeButton#o:watchframeAddMinimizeButton:true#Add a minimize button (like retail)");
+	if EditModeManagerFrame then
+		optionsAddObject( -10, 13, "font#t:0:%y#Now movable with the default UI#0.6:0.6:0.6")
+	else
+		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#i:watchframeEnabled#o:watchframeEnabled#Enable these options");
+		optionsAddObject(  4,   26, "checkbutton#tl:40:%y#i:watchframeLocked#o:watchframeLocked:true#Lock the game's Objectives window");
+		optionsAddObject(  6,   26, "checkbutton#tl:40:%y#i:watchframeShowTooltip#o:watchframeShowTooltip:true#Show drag and resize tooltips");
+		if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+			optionsAddObject(  6,   26, "checkbutton#tl:40:%y#i:watchframeAddMinimizeButton#o:watchframeAddMinimizeButton:true#Add a minimize button (like retail)");
+		end
+		optionsAddObject(  6,   26, "checkbutton#tl:40:%y#i:watchframeClamped#o:watchframeClamped:true#Keep the window on screen");
+		optionsAddObject(  6,   26, "checkbutton#tl:40:%y#i:watchframeShowBorder#o:watchframeShowBorder#Show the border");
+		optionsAddObject(  0,   16, "colorswatch#tl:45:%y#s:16:%s#o:watchframeBackground:0,0,0,0#true");
+		optionsAddObject( 14,   14, "font#tl:69:%y#v:ChatFontNormal#Background color and opacity");
+		optionsBeginFrame( -10,   30, "button#t:0:%y#s:180:%s#n:CT_Core_ResetObjectivesPosition_Button#v:GameMenuButtonTemplate#Reset window position");
+			optionsAddScript("onclick",
+				function(self)
+					module.resetWatchFramePosition();
+				end
+			);
+		optionsEndFrame();
+		optionsAddFrame( -14,   17, "slider#tl:75:%y#n:CTCoreWatchFrameScaleSlider#o:CTCore_WatchFrameScale:100#Font Size = <value>%:90%:110%#90:110:5");
+		optionsAddObject( -10,  26, "checkbutton#tl:40:%y#i:watchframeChangeWidth#o:watchframeChangeWidth#Can change width of window");
+
+		optionsAddObject(  5, 5*13, "font#t:0:%y#s:0:%s#l:70:0#r#Note: To use a wider objectives window without enabling this option, you can enable the 'Wider objectives tracker' option in the game's Interface options.#" .. textColor2 .. ":l");
 	end
-	optionsAddObject(  6,   26, "checkbutton#tl:40:%y#i:watchframeClamped#o:watchframeClamped:true#Keep the window on screen");
-	optionsAddObject(  6,   26, "checkbutton#tl:40:%y#i:watchframeShowBorder#o:watchframeShowBorder#Show the border");
-	optionsAddObject(  0,   16, "colorswatch#tl:45:%y#s:16:%s#o:watchframeBackground:0,0,0,0#true");
-	optionsAddObject( 14,   14, "font#tl:69:%y#v:ChatFontNormal#Background color and opacity");
-	optionsBeginFrame( -10,   30, "button#t:0:%y#s:180:%s#n:CT_Core_ResetObjectivesPosition_Button#v:GameMenuButtonTemplate#Reset window position");
-		optionsAddScript("onclick",
-			function(self)
-				module.resetWatchFramePosition();
-			end
-		);
-	optionsEndFrame();
-	optionsAddFrame( -14,   17, "slider#tl:75:%y#n:CTCoreWatchFrameScaleSlider#o:CTCore_WatchFrameScale:100#Font Size = <value>%:90%:110%#90:110:5");
-	optionsAddObject( -10,  26, "checkbutton#tl:40:%y#i:watchframeChangeWidth#o:watchframeChangeWidth#Can change width of window");
-
-	optionsAddObject(  5, 5*13, "font#t:0:%y#s:0:%s#l:70:0#r#Note: To use a wider objectives window without enabling this option, you can enable the 'Wider objectives tracker' option in the game's Interface options.#" .. textColor2 .. ":l");
-
+	
 	--Quest Log
 	optionsAddObject(-20, 1*13, "font#tl:15:%y#Quest Log");
 	optionsBeginFrame(-5,   26, "checkbutton#tl:10:%y#o:questLevels:" .. (module:getGameVersion() < 7 and "true" or "false") .. "#Display quest levels in the Quest Log#i:QuestLogHeading");

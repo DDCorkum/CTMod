@@ -1,3 +1,6 @@
+CT_UnitFrames (9.2.0.3) 2021-10-09
+- Updates for Dragonflight
+
 CT_UnitFrames (9.1.0.6) 2021-09-09
 - Removing an error in 1.14.0 triggered by Blizzard's partial implementation of UnitGetIncomingHeals()
 

@@ -155,7 +155,7 @@
 			</Layer>
 		</Layers>
 		<Frames>
-			<Cooldown name="$parentCooldown" inherits="CooldownFrameTemplate" reverse="true" drawEdge="true">
+			<Cooldown name="$parentCooldown" parentKey="Cooldown" inherits="CooldownFrameTemplate" reverse="true" drawEdge="true">
 				<Anchors>
 					<Anchor point="CENTER">
 						<Offset>

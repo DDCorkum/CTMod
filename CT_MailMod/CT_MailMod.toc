@@ -1,5 +1,5 @@
 ## Interface: 90207
-## Version: 9.1.5.1
+## Version: 9.2.0.3
 ## Title: CT_MailMod
 ## Notes: Heavily improves the in-game mail functionality.
 ## DefaultState: Enabled
@@ -9,7 +9,6 @@
 
 CT_MailMod.lua
 localization.lua
-Bindings.xml
 
 CT_MailMod_Utility.lua
 CT_MailMod_MailLog.lua

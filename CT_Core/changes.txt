@@ -1,3 +1,7 @@
+CT_Core (9.2.0.3) 2022-10-13
+- Removing the movable objectives tracker from Dragonflight
+- Adding movable backpack and micro-menu in Dragonflight only (in lieu of CT_BottomBar)
+
 CT_Core (9.2.0.2) 2022-10-08
 - Updates for WoW Dragonflight
 - Correcting Bindings.xml and toc files

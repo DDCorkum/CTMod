@@ -101,17 +101,21 @@ function CT_SetTargetClass()
 	CT_TargetFrameClassFrame:SetBackdropColor(r, g, b, 0.5);
 end
 
-function CT_TargetofTargetHealthCheck ()
-	if ( not UnitIsPlayer("targettarget") ) then
-		if TargetFrameToT.Portrait then
-			-- WoW 10.x
-			TargetFrameToT.Portrait:SetVertexColor(1.0, 1.0, 1.0, 1.0)
-		else
+if TargetofTargetHealthCheck then
+	-- prior to WoW 10.x
+	hooksecurefunc("TargetofTargetHealthCheck", function()
+		if ( not UnitIsPlayer("targettarget") ) then
 			TargetFrameToTPortrait:SetVertexColor(1.0, 1.0, 1.0, 1.0)
 		end
-	end
+	end)
+else
+	-- WoW 10.x
+	hooksecurefunc(TargetFrameToT, "HealthCheck", function()
+		if ( not UnitIsPlayer("targettarget") ) then
+			TargetFrameToT.Portrait:SetVertexColor(1.0, 1.0, 1.0, 1.0)	
+		end
+	end)
 end
-hooksecurefunc("TargetofTargetHealthCheck", CT_TargetofTargetHealthCheck);
 
 function CT_TargetFrame_UpdateThreatIndicator(indicator, numericIndicator, unit)
 	if (numericIndicator and numericIndicator == TargetFrameNumericalThreat) then

@@ -1,3 +1,6 @@
+CT_RaidAssist (9.2.0.3) 2022-10-14
+- Removing cooldown text when action bar numbers are shown
+
 CT_RaidAssist (9.2.0.1) 2022-09-26
 - Updates for Classic WotLK
 

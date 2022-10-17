@@ -22,7 +22,7 @@ module.name = MODULE_NAME;
 module.version = MODULE_VERSION;
 
 CT_Library:registerModule(module);
-_G[MODULE_NAME] = module.publicInterface;
+_G[MODULE_NAME] = module --.publicInterface;
 local public = _G[MODULE_NAME]
 
 -- See localization.lua
@@ -466,7 +466,7 @@ function module.Init()
 	else
 		-- prior to WoW 10.x
 		local currRes = GetCurrentResolution()
-		if currRes then
+		if currRes > 0 then
 			currRes = select(currRes, GetScreenResolutions())
 		else
 			currRes = GetCVar("gxWindowedResolution")
@@ -612,9 +612,8 @@ function module:update(option, value)
 			end)
 		else
 			-- prior to WoW 10.x
-			hooksecurefunc("SetScreenResolution", function(width, height)
-				module.screenRes = {width, height}
-				module.awaitingValues = true
+			hooksecurefunc("SetScreenResolution", function(res)
+				module.Init()
 				module.ApplySavedViewport()
 				module.hasAppliedViewport = nil
 			end)

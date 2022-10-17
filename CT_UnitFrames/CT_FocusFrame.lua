@@ -85,28 +85,54 @@ function CT_FocusFrame_OnLoad(self)
 	if ( self.showPortrait ) then
 		portraitFrame = _G[thisName.."Portrait"];
 	end
-
-	UnitFrame_Initialize(self,
-		unit1,
-		_G[thisName.."TextureFrameName"],
-		portraitFrame,
-		_G[thisName.."HealthBar"],
-		_G[thisName.."TextureFrameHealthBarText"],
-		_G[thisName.."ManaBar"],
-		_G[thisName.."TextureFrameManaBarText"],
-		threatFrame,
-		"player",
-		_G[thisName.."NumericalThreat"],
-		UnitGetTotalAbsorbs and _G[thisName.."MyHealPredictionBar"] or _G[thisName.."MyHealPredictionBar"]:Hide() and nil,		-- classic compatibility
-		UnitGetTotalAbsorbs and _G[thisName.."OtherHealPredictionBar"] or _G[thisName.."OtherHealPredictionBar"]:Hide() and nil,
-		UnitGetTotalHealAbsorbs and _G[thisName.."TotalAbsorbBar"] or _G[thisName.."TotalAbsorbBar"]:Hide() and nil,
-		UnitGetTotalHealAbsorbs and _G[thisName.."TotalAbsorbBarOverlay"] or _G[thisName.."TotalAbsorbBarOverlay"]:Hide() and nil,
-		UnitGetTotalHealAbsorbs and _G[thisName.."TextureFrameOverAbsorbGlow"] or _G[thisName.."TextureFrameOverAbsorbGlow"]:Hide() and nil,
-		UnitGetTotalHealAbsorbs and _G[thisName.."TextureFrameOverHealAbsorbGlow"] or _G[thisName.."TextureFrameOverHealAbsorbGlow"]:Hide() and nil,
-		UnitGetTotalHealAbsorbs and _G[thisName.."HealAbsorbBar"] or _G[thisName.."HealAbsorbBar"]:Hide() and nil,
-		UnitGetTotalHealAbsorbs and _G[thisName.."HealAbsorbBarLeftShadow"] or _G[thisName.."HealAbsorbBarLeftShadow"]:Hide() and nil,
-		UnitGetTotalHealAbsorbs and _G[thisName.."HealAbsorbBarRightShadow"] or _G[thisName.."HealAbsorbBarRightShadow"]:Hide() and nil
-	);
+	
+	local args =
+		module:getGameVersion() >= 10 and {
+			unit1,
+			_G[thisName.."TextureFrameName"],
+			"Target", -- WoW 10.x frameType
+			portraitFrame,
+			_G[thisName.."HealthBar"],
+			_G[thisName.."TextureFrameHealthBarText"],
+			_G[thisName.."ManaBar"],
+			_G[thisName.."TextureFrameManaBarText"],
+			threatFrame,
+			"player",
+			_G[thisName.."NumericalThreat"],
+			_G[thisName.."MyHealPredictionBar"],
+			_G[thisName.."OtherHealPredictionBar"],
+			_G[thisName.."TotalAbsorbBar"],
+			_G[thisName.."TotalAbsorbBarOverlay"],
+			_G[thisName.."TextureFrameOverAbsorbGlow"],
+			_G[thisName.."TextureFrameOverHealAbsorbGlow"],
+			_G[thisName.."HealAbsorbBar"],
+			_G[thisName.."HealAbsorbBarLeftShadow"],
+			_G[thisName.."HealAbsorbBarRightShadow"],	
+		}
+		or {
+			unit1,
+			_G[thisName.."TextureFrameName"],
+			-- in WoW 10.x, this is where the frameType goes
+			portraitFrame,
+			_G[thisName.."HealthBar"],
+			_G[thisName.."TextureFrameHealthBarText"],
+			_G[thisName.."ManaBar"],
+			_G[thisName.."TextureFrameManaBarText"],
+			threatFrame,
+			"player",
+			_G[thisName.."NumericalThreat"],
+			UnitGetTotalAbsorbs and _G[thisName.."MyHealPredictionBar"] or _G[thisName.."MyHealPredictionBar"]:Hide() and nil,		-- classic compatibility
+			UnitGetTotalAbsorbs and _G[thisName.."OtherHealPredictionBar"] or _G[thisName.."OtherHealPredictionBar"]:Hide() and nil,
+			UnitGetTotalAbsorbs and _G[thisName.."TotalAbsorbBar"] or _G[thisName.."TotalAbsorbBar"]:Hide() and nil,
+			UnitGetTotalAbsorbs and _G[thisName.."TotalAbsorbBarOverlay"] or _G[thisName.."TotalAbsorbBarOverlay"]:Hide() and nil,
+			UnitGetTotalAbsorbs and _G[thisName.."TextureFrameOverAbsorbGlow"] or _G[thisName.."TextureFrameOverAbsorbGlow"]:Hide() and nil,
+			UnitGetTotalHealAbsorbs and _G[thisName.."TextureFrameOverHealAbsorbGlow"] or _G[thisName.."TextureFrameOverHealAbsorbGlow"]:Hide() and nil,
+			UnitGetTotalHealAbsorbs and _G[thisName.."HealAbsorbBar"] or _G[thisName.."HealAbsorbBar"]:Hide() and nil,
+			UnitGetTotalHealAbsorbs and _G[thisName.."HealAbsorbBarLeftShadow"] or _G[thisName.."HealAbsorbBarLeftShadow"]:Hide() and nil,
+			UnitGetTotalHealAbsorbs and _G[thisName.."HealAbsorbBarRightShadow"] or _G[thisName.."HealAbsorbBarRightShadow"]:Hide() and nil,
+		}
+		
+	UnitFrame_Initialize(self, unpack(args));
 
 	-- incoming heals on classic
 	if (UnitGetTotalAbsorbs == nil) then
@@ -582,6 +608,7 @@ function CT_FocusFrame_UpdateAuras(self)
 			else
 				frame = CreateFrame("Button", frameName, self, "CT_FocusBuffFrameTemplate");
 				frame.unit = self.unit;
+				frame.Cooldown:GetRegions():ClearAllPoints()	-- Hack.  Prevents any font string from appearing to show the cooldown duration while action bar cooldowns are displayed.
 			end
 		end
 		if ( icon and ( not self.maxBuffs or i <= self.maxBuffs ) ) then
@@ -1053,15 +1080,28 @@ function CT_TargetofFocus_OnLoad(self)
 	local thisName = self:GetName();
 	local frame = self;
 
-	UnitFrame_Initialize(frame,
-		unit2,
-		_G[thisName.."TextureFrameName"],
-		_G[thisName.."Portrait"],
-		_G[thisName.."HealthBar"],
-		_G[thisName.."TextureFrameHealthBarText"],
-		_G[thisName.."ManaBar"],
-		_G[thisName.."TextureFrameManaBarText"]
-	);
+	if module:getGameVersion() >= 10 then
+		UnitFrame_Initialize(frame,
+			unit2,
+			_G[thisName.."TextureFrameName"],
+			"TargetOfTarget",
+			_G[thisName.."Portrait"],
+			_G[thisName.."HealthBar"],
+			_G[thisName.."TextureFrameHealthBarText"],
+			_G[thisName.."ManaBar"],
+			_G[thisName.."TextureFrameManaBarText"]
+		)
+	else
+		UnitFrame_Initialize(frame,
+			unit2,
+			_G[thisName.."TextureFrameName"],
+			_G[thisName.."Portrait"],
+			_G[thisName.."HealthBar"],
+			_G[thisName.."TextureFrameHealthBarText"],
+			_G[thisName.."ManaBar"],
+			_G[thisName.."TextureFrameManaBarText"]
+		)
+	end
 	SetTextStatusBarTextZeroText(frame.healthbar, DEAD);
 	frame:RegisterUnitEvent("UNIT_AURA", unit2);
 	frame.deadText = _G[thisName.."TextureFrameDeadText"];
