@@ -1,5 +1,5 @@
 ## Interface: 90207
-## Version: 9.2.0.2
+## Version: 9.2.0.3
 ## Title: CT_ExpenseHistory
 ## Notes: Detailed log of character expenses.
 ## DefaultState: Enabled
