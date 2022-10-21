@@ -1,5 +1,5 @@
 ## Interface: 30400
-## Version: 9.2.0.3
+## Version: 9.2.0.4
 ## Title: CT_Core
 ## Notes: General nifty features for CTMod.
 ## DefaultState: Enabled

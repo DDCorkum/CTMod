@@ -984,8 +984,7 @@ do
 		end
 	end
 
-	-- this is a "dummy" tooltip that doesn't ever get displayed.  It is just to make hidden use of the :SetInboxItem(...) function of GameTooltip.
-	local BattlePetProcessingTooltip = CreateFrame("GameTooltip", nil);
+	local battlePetTooltip -- dummy tooltip frame for its return values prior to WoW 10.x
 
 	-- Extra lines for mail icon button tooltip
 	local function CT_MailMod_InboxFrameItem_OnEnter(self, ...)
@@ -1004,26 +1003,29 @@ do
 				local name, itemID, itemTexture, count, quality, canUse = GetInboxItem(mailIndex, i);
 				if (name) then
 					local itemLink = GetInboxItemLink(mailIndex, i);
-					local __, speciesID, level, breedQuality, maxHealth, power, speed, petname = BattlePetProcessingTooltip:SetInboxItem(mailIndex, i);
-					if (itemLink and speciesID and speciesID > 0) then
-						if (breedQuality == 1) then
-							itemLink = "|cffffffff";
-						elseif (breedQuality == 2) then
-							itemLink = "|cff1eff00";
-						elseif (breedQuality == 3) then
-							itemLink = "|cff0070dd";
-						elseif (breedQuality == 4) then
-							itemLink = "|cffa335ee";
-						else
-							itemLink = "|cff9d9d9d";
+					local petSpecies, petQuality, petLevel, petName
+					if C_TooltipInfo then
+						-- WoW 10.x
+						local data = C_TooltipInfo.GetInboxItem(mailIndex, i)
+						if data then
+							TooltipUtil.SurfaceArgs(data)
+							petSpecies, petQuality, petLevel, petName = data.battlePetSpeciesID, data.battlePetBreedQuality, data.battlePetLevel, data.battlePetName
 						end
-						if (level > 1) then
-							itemLink = itemLink .. "|Hitem:" .. speciesID .. ":0:0:0:0:0:0:0:0:0|h[" .. petname .. "]|h (level " .. level .. ")|r";
-						else
-							itemLink = itemLink .. "|Hitem:" .. speciesID .. ":0:0:0:0:0:0:0:0:0|h[" .. petname .. "]|h|r";
+					else
+						battlePetTooltip = battlePetTooltip or CreateFrame("GameTooltip")	-- deliberately does not inherit any templates, prior to WoW 10.x
+						__, petSpecies, petLevel, petQuality, __, __, __, petName = battlePetTooltip:SetInboxItem(mailIndex, i)
+					end
+					if petSpecies then
+						itemLink = ("%s|Hitem:%d:0:0:0:0:0:0:0:0:0|h[%s]|h|r"):format(
+							petQuality == 1 and "|cffffffff" or petQuality == 2 and "|cff1eff00" or petQuality == 3 and "|cff0070dd" or petQuality == 4 and "|cffa335ee" or "|cff9d9d9d",
+							petSpecies,
+							petName
+						)
+						if petLevel and petLevel > 1 then
+							itemLink = ("%s (%s)"):format(itemLink, BATTLE_PET_CAGE_TOOLTIP_LEVEL:format(petLevel))
 						end
-					elseif (not itemLink) then
-						itemLink = "[" .. name .. "]";
+					else
+						itemLink = itemLink or ("["..name.."]")
 					end
 					
 					if (count == 1) then
