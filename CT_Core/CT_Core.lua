@@ -397,14 +397,15 @@ module.frame = function()
 	optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:auctionAltClickItem#Alt left-click to add an item to the Auctions tab");
 
 -- Bags and Menu Bar
-	if module:getGameVersion() >= 10 then
-		optionsAddBookmark("Bags and Menu Bars", "BagsAndMicroMenuHeading")
+	if module:getGameVersion() >= 10 and not CT_BottomBar then
+		optionsAddBookmark("Bags and Menu Bars", "BagsAndMicroMenuHeading")	
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Bag and Menu Bars#i:BagsAndMicroMenuHeading");
 		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:enableCustomBagMenuBars#Move bag and menu bars");
 		optionsAddObject( -5,   26, "checkbutton#tl:30:%y#o:showCustomBagMenuAnchors#Show dragging anchors");
 		optionsAddObject(-15,   17, "font#tl:5:%y#v:GameFontNormal#Auction House#i:Bag Automation");
 	else
-		optionsAddObject(-15,   17, "font#tl:5:%y#v:GameFontNormalLarge#Auction House#i:Bag Automation");
+		optionsAddBookmark("Bag Automation", "BagsAndMicroMenuHeading")
+		optionsAddObject(-15,   17, "font#tl:5:%y#v:GameFontNormalLarge#Bag Automation#i:BagsAndMicroMenuHeading");
 	end
 	optionsAddObject( -8, 2*13, "font#t:0:%y#s:0:%s#l:13:0#r#Disable bag automation if you have other bag management addons#" .. textColor2 .. ":l");	
 	optionsBeginFrame( -3, 15, "checkbutton#tl:60:%y#o:disableBagAutomation#i:disableBagAutomation#|cFFFF6666Disable bag automation");

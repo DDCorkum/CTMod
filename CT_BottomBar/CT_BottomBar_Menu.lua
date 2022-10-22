@@ -423,7 +423,9 @@ local function addon_Init(self)
 	ctAddon = self;
 	module.ctMenuBar = self;
 
-	self.frame:SetFrameLevel(MainMenuBarArtFrame:GetFrameLevel() + 1);
+	if MainMenuBartArtFrame then
+		self.frame:SetFrameLevel(MainMenuBarArtFrame:GetFrameLevel() + 1)
+	end
 
 	local frame = CreateFrame("Frame", "CT_BottomBar_" .. self.frameName .. "_GuideFrame");
 	self.helperFrame = frame;

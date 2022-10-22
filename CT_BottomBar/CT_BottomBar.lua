@@ -7,7 +7,7 @@
 --                                            --
 -- Please do not modify or otherwise          --
 -- redistribute this without the consent of   --
--- the CTMod Team. Thank you.                 --
+-- the CTMod Team. Thank you.                 -- 
 --                                            --
 -- Original credits to Cide and TS (Vanilla)  --
 -- Maintained by Resike from 2014 to 2017     --
@@ -442,7 +442,9 @@ local function configureThings()
 	end
 
 	-- Configure MainMenuBar related items (gryphons, artwork).
-	module:mainmenuConfigure();
+	if module:getGameVersion() <= 9 then
+		module:mainmenuConfigure();
+	end
 end
 
 --------------------------------------------
@@ -534,7 +536,7 @@ local function CT_BottomBar_EventFunc(self, event, arg1, arg2, arg3, ...)
 --		module:updateSpecialVisibility();
 		module:updateAllVisibility();
 
-	elseif (event == "PLAYER_LOGIN") then
+	elseif (event == "PLAYER_LOGIN" and module:getGameVersion() <= 9) then
 		-- Restore CT_BottomBar's gryphons setting.
 		-- This will override CT_Core's setting.
 		module:restoreGryphons();
@@ -593,31 +595,34 @@ local function hook_UIParent_ManageFramePositions()
 	-- 	<OnShow function="UIParent_ManageFramePositions"/>
 	-- 	<OnHide function="UIParent_ManageFramePositions"/>
 
-	-- From StanceBar.xml
-	StanceBarFrame:HookScript("OnShow", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
-	StanceBarFrame:HookScript("OnHide", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
-
-	-- From DurabilityFrame.xml
-	DurabilityFrame:HookScript("OnShow", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
-	DurabilityFrame:HookScript("OnHide", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
-
-	-- From PetActionBarFrame.xml
-	PetActionBarFrame:HookScript("OnShow", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
-	PetActionBarFrame:HookScript("OnHide", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
-
-	
-	if (PossessBarFrame) then
-	
-		-- From PossessActionBarFrame.xml
-		PossessBarFrame:HookScript("OnShow", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
-		PossessBarFrame:HookScript("OnHide", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
+	if StanceBarFrame then
+		-- From StanceBar.xml
+		StanceBarFrame:HookScript("OnShow", CT_BottomBar_Hooked_UIParent_ManageFramePositions)
+		StanceBarFrame:HookScript("OnHide", CT_BottomBar_Hooked_UIParent_ManageFramePositions)
 	end
 	
-	if (MultiCastActionBarFrame) then
-		-- From MultiCastActionBarFrame.xml
-		MultiCastActionBarFrame:HookScript("OnShow", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
-		MultiCastActionBarFrame:HookScript("OnHide", CT_BottomBar_Hooked_UIParent_ManageFramePositions);
+	if DurabilityFrame then
+		-- From DurabilityFrame.xml
+		DurabilityFrame:HookScript("OnShow", CT_BottomBar_Hooked_UIParent_ManageFramePositions)
+		DurabilityFrame:HookScript("OnHide", CT_BottomBar_Hooked_UIParent_ManageFramePositions)
+	end
 	
+	-- From PetActionBarFrame.xml
+	if PetActionBarFrame then
+		PetActionBarFrame:HookScript("OnShow", CT_BottomBar_Hooked_UIParent_ManageFramePositions)
+		PetActionBarFrame:HookScript("OnHide", CT_BottomBar_Hooked_UIParent_ManageFramePositions)
+	end
+	
+	if PossessBarFrame then	
+		-- From PossessActionBarFrame.xml
+		PossessBarFrame:HookScript("OnShow", CT_BottomBar_Hooked_UIParent_ManageFramePositions)
+		PossessBarFrame:HookScript("OnHide", CT_BottomBar_Hooked_UIParent_ManageFramePositions)
+	end
+	
+	if MultiCastActionBarFrame then
+		-- From MultiCastActionBarFrame.xml
+		MultiCastActionBarFrame:HookScript("OnShow", CT_BottomBar_Hooked_UIParent_ManageFramePositions)
+		MultiCastActionBarFrame:HookScript("OnHide", CT_BottomBar_Hooked_UIParent_ManageFramePositions)
 	end
 	
 
@@ -659,25 +664,6 @@ module.update = function(self, optName, value)
 	module.frame_SetAlpha = frame_SetAlpha;
 	module.frame_EnableMouse = frame_EnableMouse;
 
-	-- Create a secure frame
-	local secureFrame = CreateFrame("Frame", "CT_BottomBar_SecureFrame", nil, "SecureFrameTemplate,SecureHandlerAttributeTemplate");
-	initSecureFrame();
-
-	-- Fix CT_BarMod bar positioning issue when CT_BarMod loads before CT_BottomBar.
-	fix_CT_BarMod_BarPositions()
-
-	-- Configure/disable the default main action bar.
-	configureActionBar();
-
-	-- Initialize some bars bar
-	if (module:getGameVersion() >= 3) then
-		module:initOverrideActionBar();
-	end
-	module:initMainMenuBar();
-
-	-- Make sure Blizzard managed frames are in position.
-	UIParent_ManageFramePositions();
-
 	-- Create the options tables.
 	module.appliedOptions = {};
 	module.pendingOptions = {};
@@ -685,11 +671,35 @@ module.update = function(self, optName, value)
 	appliedOptions = module.appliedOptions;
 	pendingOptions = module.pendingOptions;
 
-	-- Initialize some other lua files.
-	if (module:getGameVersion()  >= 3) then	
-		module:overrideInit();
+
+	-- Create a secure frame
+	local secureFrame = CreateFrame("Frame", "CT_BottomBar_SecureFrame", nil, "SecureFrameTemplate,SecureHandlerAttributeTemplate");
+	initSecureFrame();
+
+	if module:getGameVersion() <= 9 then
+	
+		-- Fix CT_BarMod bar positioning issue when CT_BarMod loads before CT_BottomBar.
+		fix_CT_BarMod_BarPositions()
+	
+		-- Configure/disable the default main action bar.
+		configureActionBar();
+	
+		-- Initialize some bars bar
+		if (module:getGameVersion() >= 3) then
+			module:initOverrideActionBar();
+		end
+		module:initMainMenuBar();
+		
+		-- Make sure Blizzard managed frames are in position.
+		UIParent_ManageFramePositions();
+
+		-- Initialize some other lua files.
+		if (module:getGameVersion()  >= 3) then	
+			module:overrideInit();
+		end
+		module:mainmenuInit();
 	end
-	module:mainmenuInit();
+
 	module:optionsInit();
 	module:addonsInit();
 
@@ -784,3 +794,13 @@ local function slashCommand(msg)
 end
 
 module:setSlashCmd(slashCommand, "/ctbb", "/ctbottom", "/ctbottombar");
+
+
+--------------------------------------------
+-- Placeholder funcs
+
+module.hasPetBattleUI = nop
+module.hasVehicleUI = nop
+module.hasOverrideUI = nop
+module.hideOverrideActionBar = nop
+module.showOverrideActionBar = nop

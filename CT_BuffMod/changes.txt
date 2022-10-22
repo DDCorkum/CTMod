@@ -1,5 +1,5 @@
 CT_BuffMod (9.2.0.4) 2022-10-22
-- Workaround for Blizzard blocking actions on button-down clicks
+- Workaround for secure actions blocked on key press
 
 CT_BuffMod (9.2.0.2) 2022-09-30
 - Updates for WoW Dragonflight

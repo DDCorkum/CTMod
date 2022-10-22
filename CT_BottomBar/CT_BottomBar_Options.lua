@@ -690,65 +690,67 @@ module.frame = function()
 		optionsAddObject(  -15,    1, "texture#tl:5:%y#br:tr:0:%b#1:1:1");
 		
 	optionsEndFrame();
-
-	-- General Options
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
-		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Important General Options");
-		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormal#" .. L["CT_BottomBar/Options/General/BackgroundTextures/Heading"]);
-		optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_BottomBar/Options/General/BackgroundTextures/Line1"] .. "#" .. textColor2 .. ":l");
-		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#i:showLions#o:showLions#" .. L["CT_BottomBar/Options/General/BackgroundTextures/ShowLionsCheckButton"]);
-		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#i:hideGryphons#o:hideGryphons:true#" .. L["CT_BottomBar/Options/General/BackgroundTextures/HideGryphonsCheckButton"]);
-		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#i:hideTexturesBackground#o:hideTexturesBackground:true#" .. L["CT_BottomBar/Options/General/BackgroundTextures/HideActionBarCheckButton"]);
-		--optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#Warning: don't hide the bag/menu background if you unchecked 'Activate' up above#" .. textColor2 .. ":l");
-		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#i:hideMenuAndBagsBackground#o:hideMenuAndBagsBackground:true#" .. L["CT_BottomBar/Options/General/BackgroundTextures/HideMenuAndBagsCheckButton"]);
-		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormal#How to move bars");
-		optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#You can move a bar off the screen if you want... but consider just hiding it instead#" .. textColor2 .. ":l");
-		optionsAddObject(  -5,   26, "checkbutton#tl:20:%y#o:clampFrames:true#Cannot drag bars completely off screen");
-		if (CT_BarMod) then
-			optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#The numbered bars are part of CT_BarMod.\nCheck this to move them at the same time.#" .. textColor2 .. ":l");
-			optionsAddObject( -5,   26, "checkbutton#tl:20:%y#i:showCTBarMod#o:showCTBarMod#Move CT_BarMod bars at the same time");
-		end
-		optionsAddObject(  -15,    1, "texture#tl:5:%y#br:tr:0:%b#1:1:1");
-	optionsEndFrame();
 	
-	-- Bar-Specific Options
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
-		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Bar-Specific Options");
-	optionsEndFrame();
-	
-	-- Override Frame
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
-		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormal#Override/Vehicle Frame");
-		optionsAddObject( -5, 4*14, "font#t:0:%y#s:0:%s#l:20:0#r#This is a large frame used for vehicle and override bars. If you hide the frame you will need to use an alternate bar that can show vehicle and override buttons.#" .. textColor2 .. ":l");
-		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:vehicleHideFrame#Hide the override/vehicle frame.");
-		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:vehicleHideEnabledBars:true#Hide the activated CT_BottomBar bars.");
-	optionsEndFrame();
-
-	-- Pet Battle Frame
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
-		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormal#Pet Battle Frame");
-		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:petbattleHideEnabledBars:true#Hide the activated CT_BottomBar bars.");
-	optionsEndFrame();
-
-	-- Action bar options
-	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b#i:actionbar");
-		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormal#Action Bar");
-
-		optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:20:0#r#CT_BottomBar does not include support for manipulating the default main action bar.#" .. textColor2 .. ":l");
-		optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:20:0#r#The main action bar can either be used in its default state or it can be disabled.#" .. textColor2 .. ":l");
-		optionsAddObject( -5, 3*14, "font#t:0:%y#s:0:%s#l:20:0#r#If you disable the bar, you may want to use CT_BarMod version 4.004 (or greater) which includes an alternate main action bar.#" .. textColor2 .. ":l");
-		optionsAddObject( -2, 3*14, "font#t:0:%y#s:0:%s#l:20:0#r#NOTE: Disabling or enabling the default main action bar will have no effect until addons are reloaded.#" .. textColor3 .. ":l");
-
-		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#i:disableDefaultActionBar#o:disableDefaultActionBar:true#Disable the default main action bar.");
-
-		optionsBeginFrame(  -8,   30, "button#t:0:%y#s:180:%s#n:CT_BottomBar_DisableActionBar_Button#v:GameMenuButtonTemplate#Reload addons");
-			optionsAddScript("onclick",
-				function(self)
-					ConsoleExec("RELOADUI");
-				end
-			);
+	if module:getGameVersion() <= 9 then
+		-- General Options
+		optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
+			optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Important General Options");
+			optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormal#" .. L["CT_BottomBar/Options/General/BackgroundTextures/Heading"]);
+			optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_BottomBar/Options/General/BackgroundTextures/Line1"] .. "#" .. textColor2 .. ":l");
+			optionsAddObject( -5,   26, "checkbutton#tl:20:%y#i:showLions#o:showLions#" .. L["CT_BottomBar/Options/General/BackgroundTextures/ShowLionsCheckButton"]);
+			optionsAddObject(  6,   26, "checkbutton#tl:20:%y#i:hideGryphons#o:hideGryphons:true#" .. L["CT_BottomBar/Options/General/BackgroundTextures/HideGryphonsCheckButton"]);
+			optionsAddObject(  6,   26, "checkbutton#tl:20:%y#i:hideTexturesBackground#o:hideTexturesBackground:true#" .. L["CT_BottomBar/Options/General/BackgroundTextures/HideActionBarCheckButton"]);
+			--optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#Warning: don't hide the bag/menu background if you unchecked 'Activate' up above#" .. textColor2 .. ":l");
+			optionsAddObject(  6,   26, "checkbutton#tl:20:%y#i:hideMenuAndBagsBackground#o:hideMenuAndBagsBackground:true#" .. L["CT_BottomBar/Options/General/BackgroundTextures/HideMenuAndBagsCheckButton"]);
+			optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormal#How to move bars");
+			optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#You can move a bar off the screen if you want... but consider just hiding it instead#" .. textColor2 .. ":l");
+			optionsAddObject(  -5,   26, "checkbutton#tl:20:%y#o:clampFrames:true#Cannot drag bars completely off screen");
+			if (CT_BarMod) then
+				optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#The numbered bars are part of CT_BarMod.\nCheck this to move them at the same time.#" .. textColor2 .. ":l");
+				optionsAddObject( -5,   26, "checkbutton#tl:20:%y#i:showCTBarMod#o:showCTBarMod#Move CT_BarMod bars at the same time");
+			end
+			optionsAddObject(  -15,    1, "texture#tl:5:%y#br:tr:0:%b#1:1:1");
 		optionsEndFrame();
-	optionsEndFrame();
+
+		-- Bar-Specific Options
+		optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
+			optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Bar-Specific Options");
+		optionsEndFrame();
+
+		-- Override Frame
+		optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
+			optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormal#Override/Vehicle Frame");
+			optionsAddObject( -5, 4*14, "font#t:0:%y#s:0:%s#l:20:0#r#This is a large frame used for vehicle and override bars. If you hide the frame you will need to use an alternate bar that can show vehicle and override buttons.#" .. textColor2 .. ":l");
+			optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:vehicleHideFrame#Hide the override/vehicle frame.");
+			optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:vehicleHideEnabledBars:true#Hide the activated CT_BottomBar bars.");
+		optionsEndFrame();
+
+		-- Pet Battle Frame
+		optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
+			optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormal#Pet Battle Frame");
+			optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:petbattleHideEnabledBars:true#Hide the activated CT_BottomBar bars.");
+		optionsEndFrame();
+
+		-- Action bar options
+		optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b#i:actionbar");
+			optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormal#Action Bar");
+
+			optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:20:0#r#CT_BottomBar does not include support for manipulating the default main action bar.#" .. textColor2 .. ":l");
+			optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:20:0#r#The main action bar can either be used in its default state or it can be disabled.#" .. textColor2 .. ":l");
+			optionsAddObject( -5, 3*14, "font#t:0:%y#s:0:%s#l:20:0#r#If you disable the bar, you may want to use CT_BarMod version 4.004 (or greater) which includes an alternate main action bar.#" .. textColor2 .. ":l");
+			optionsAddObject( -2, 3*14, "font#t:0:%y#s:0:%s#l:20:0#r#NOTE: Disabling or enabling the default main action bar will have no effect until addons are reloaded.#" .. textColor3 .. ":l");
+
+			optionsAddObject( -5,   26, "checkbutton#tl:20:%y#i:disableDefaultActionBar#o:disableDefaultActionBar:true#Disable the default main action bar.");
+
+			optionsBeginFrame(  -8,   30, "button#t:0:%y#s:180:%s#n:CT_BottomBar_DisableActionBar_Button#v:GameMenuButtonTemplate#Reload addons");
+				optionsAddScript("onclick",
+					function(self)
+						ConsoleExec("RELOADUI");
+					end
+				);
+			optionsEndFrame();
+		optionsEndFrame();
+	end
 
 	-- Bags Bar
 	if (module.ctBagsBar) then
@@ -757,7 +759,9 @@ module.frame = function()
 
 			optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:20:0#r#These options will have no effect if the Bags Bar is not activated.#" .. textColor3 .. ":l");
 
-			optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:bagsBarHideBags#Hide all buttons except for the backpack");
+			if not BagBarExpandToggle then
+				optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:bagsBarHideBags#Hide all buttons except for the backpack");
+			end
 
 			optionsAddFrame( -25,   17, "slider#tl:30:%y#s:250:%s#i:spacing#n:bagsBarSpacing#o:bagsBarSpacing:2#Button Spacing = <value>#0:25:1");
 		optionsEndFrame();

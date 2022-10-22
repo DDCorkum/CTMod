@@ -3128,11 +3128,18 @@ ctMicroMenuBar:SetScript("OnDragStop", function()
 end)
 
 local function enableCustomBagMenuBars(enable)
-	ctBagBar.enabled = enable
-	MainMenuBarBackpackButton:SetPoint("TOPRIGHT", enable and ctBagBar or MicroButtonAndBagsBar, -4, 2)
-	CharacterMicroButton:SetPoint("BOTTOMLEFT", enable and ctMicroMenuBar or MicroButtonAndBagsBar, 7, 2)
-	ctBagBar:SetShown(enable and ctBagBar.shown)
-	ctMicroMenuBar:SetShown(enable and ctBagBar.shown)
+	if ctBagBar.enabled and not enable then
+		-- take no action if it was never enabled
+		ctBagBar.enabled = false
+		MainMenuBarBackpackButton:SetPoint("TOPRIGHT", MicroButtonAndBagsBar, -4, 2)
+		CharacterMicroButton:SetPoint("BOTTOMLEFT", MicroButtonAndBagsBar, 7, 2)
+	elseif enable then
+		ctBagBar.enabled = true
+		ctBagBar:SetShown(ctBagBar.shown)
+		ctMicroMenuBar:SetShown(ctBagBar.shown)
+		MainMenuBarBackpackButton:SetPoint("TOPRIGHT", ctBagBar, -4, 2)
+		CharacterMicroButton:SetPoint("BOTTOMLEFT", ctMicroMenuBar, 7, 2)
+	end
 end
 
 local function showCustomBagMenuAnchors(show)
@@ -3141,7 +3148,7 @@ local function showCustomBagMenuAnchors(show)
 	ctMicroMenuBar:SetShown(show and ctBagBar.enabled)
 end	
 
-if module:getGameVersion() < 10 then
+if module:getGameVersion() < 10 or CT_BottomBar then
 	enableCustomBagMenuBars = nil
 	showCustomBagMenuAnchors = nil
 end

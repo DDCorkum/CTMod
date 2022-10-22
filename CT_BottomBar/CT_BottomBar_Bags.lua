@@ -37,13 +37,15 @@ local function addon_UpdateOrientation(self, orientation)
 	else
 		spacing = spacing or appliedOptions.bagsBarSpacing or 4;
 	end
-
+	
+	local width = 0
 	for i = 2, #frames do
 		obj = frames[i];
 		obj:ClearAllPoints();
 		obj:SetParent(self.frame);
+		width = width + obj:GetWidth()
 	end
-	if (appliedOptions.bagsBarHideBags) then
+	if (appliedOptions.bagsBarHideBags and not BagBarExpandToggle) then
 		local backpack = frames[#frames];
 		for i = 2, #frames - 1 do
 			obj = frames[i];
@@ -53,19 +55,21 @@ local function addon_UpdateOrientation(self, orientation)
 		backpack:SetPoint("BOTTOMLEFT", self.frame, 0, 0);
 		backpack:Show();
 	else
-		for i = 2, #frames do
+		frames[#frames]:SetPoint("TOPRIGHT", self.frame, width + spacing*(#frames-2), 0)
+		for i=#frames-1, 2, -1 do
 			obj = frames[i];
-			if (i == 2) then
-				-- Left most bag (CharacterBag3Slot)
-				obj:SetPoint("BOTTOMLEFT", self.frame, 0, 0);
-			else
-				if ( orientation == "ACROSS" ) then
-					obj:SetPoint("LEFT", frames[i-1], "RIGHT", spacing, 0);
+			if ( orientation == "ACROSS" ) then
+				if BagBarExpandToggle and i == #frames-1 then
+					obj:SetPoint("RIGHT", frames[i+1], "LEFT", -(spacing + BagBarExpandToggle:GetWidth()), 0)
 				else
-					obj:SetPoint("TOP", frames[i-1], "BOTTOM", 0, -spacing);
+					obj:SetPoint("RIGHT", frames[i+1], "LEFT", -spacing, 0)
 				end
+			else
+				obj:SetPoint("BOTTOM", frames[i+1], "TOP", 0, spacing)
 			end
-			obj:Show();
+			if not BagBarExpandToggle then
+				obj:Show()
+			end
 		end
 	end
 end
@@ -81,7 +85,7 @@ local function addon_Update(self)
 		obj1 = MainMenuBarBackpackButton;  -- Left most bag
 		obj2 = MainMenuBarBackpackButton;  -- Right most bag
 	else
-		obj1 = CharacterBag3Slot;  -- Left most bag
+		obj1 = CharacterReagentBag0Slot or CharacterBag3Slot;  -- Left most bag
 		obj2 = MainMenuBarBackpackButton;  -- Right most bag
 	end
 
@@ -101,13 +105,44 @@ local function addon_Init(self)
 
 	module.ctBagsBar = self;
 
-	self.frame:SetFrameLevel(MainMenuBarArtFrame:GetFrameLevel() + 1);
+	if MainMenuBarArtFrame then
+		-- before WoW 10.x
+		self.frame:SetFrameLevel(MainMenuBarArtFrame:GetFrameLevel() + 1)
+	end
 
 	local frame = CreateFrame("Frame", "CT_BottomBar_" .. self.frameName .. "_GuideFrame");
 	self.helperFrame = frame;
-
+	
+	if CharacterReagentBag0Slot then
+		local oldFunc = CharacterReagentBag0Slot.SetBarExpanded
+		function CharacterReagentBag0Slot.SetBarExpanded(slot, isExpanded)
+			if self.isDisabled then
+				oldFunc(slot, isExpanded)
+			else
+				slot:SetShown(isExpanded)
+			end
+		end
+	end
+	
+	if BagBarExpandToggle then
+		MainMenuBarBackpackButton:HookScript("OnShow", function()
+			BagBarExpandToggle:Show()
+		end)
+		
+		MainMenuBarBackpackButton:HookScript("OnHide", function()
+			BagBarExpandToggle:Hide()
+		end)
+	end
+	
 	return true;
 end
+
+local addon_Disable = BagBarExpandToggle and function(self)
+	BagBarExpandToggle:Click()
+	BagBarExpandToggle:Click()
+end
+
+local addon_Enable = addon_Disable
 
 local function addon_Register()
 	local x, y;
@@ -117,7 +152,13 @@ local function addon_Register()
 	else
 		x = 300;
 		y = 2;
-	end		
+	end	
+	
+	local frames = {CharacterBag3Slot, CharacterBag2Slot, CharacterBag1Slot, CharacterBag0Slot, MainMenuBarBackpackButton}
+	if CharacterReagentBag0Slot then
+		tinsert(frames, 1, CharacterReagentBag0Slot)
+	end
+	
 	module:registerAddon(
 		"Bags Bar",  -- option name
 		"BagsBar",  -- used in frame names
@@ -134,14 +175,10 @@ local function addon_Register()
 		nil,  -- no config function
 		addon_Update,
 		addon_UpdateOrientation,
-		nil,  -- no enable func
-		nil,  -- no disable func
+		addon_Enable,
+		addon_Disable,
 		"helperFrame",
-		CharacterBag3Slot,
-		CharacterBag2Slot,
-		CharacterBag1Slot,
-		CharacterBag0Slot,
-		MainMenuBarBackpackButton
+		unpack(frames)
 	);
 end
 
