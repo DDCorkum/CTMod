@@ -17,4 +17,3 @@ CT_BarMod_Skins.lua
 CT_BarMod_Use.lua
 CT_BarMod_Shift.lua
 CT_BarMod_Options.lua
-Bindings.xml

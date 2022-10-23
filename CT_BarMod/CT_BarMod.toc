@@ -1,5 +1,5 @@
 ## Interface: 90207
-## Version: 9.2.0.1
+## Version: 9.2.0.4
 ## Title: CT_BarMod
 ## Notes: Intuitive yet powerful action bar addon.
 ## DefaultState: Enabled
@@ -17,4 +17,3 @@ CT_BarMod_Skins.lua
 CT_BarMod_Use.lua
 CT_BarMod_Shift.lua
 CT_BarMod_Options.lua
-Bindings.xml
