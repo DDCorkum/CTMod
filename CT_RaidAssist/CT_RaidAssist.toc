@@ -1,4 +1,4 @@
-## Interface: 90207
+## Interface: 100000
 ## Version: 9.2.0.3
 ## Title: CT_RaidAssist
 ## Author: TS & Cide (Original), Dargen (MT Addon), DDC (Redesign)
