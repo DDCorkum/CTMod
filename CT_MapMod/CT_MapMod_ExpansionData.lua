@@ -60,11 +60,12 @@ module.pinTypes =
 		},
 		["Recent Expansions"] =
 		{
-			-- WoD, Legion, BFA, SL
+			-- WoD, Legion, BFA, SL, DF
 			"Fireweed", "Gorgrond Flytrap", "Frostweed", "Nagrand Arrowbloom", "Starflower", "Talador Orchid", "Withered Herb",
 			"Aethril", "Astral Glory", "Dreamleaf", "Fel-Encrusted Herb", "Fjarnskaggl", "Foxflower", "Starlight Rose",
 			"Akunda's Bite", "Anchor Weed", "Riverbud", "Sea Stalks", "Siren's Sting", "Star Moss", "Winter's Kiss", "Zin'anthid",
 			"Death Blossom", "Marrowroot", "Rising Glory", "Vigil's Torch", "Widowbloom", "Nightshade",
+			"Hochenblume", "Saxifrage", "Bubble Poppy", "Writhebark",
 		},
 	},
 	["Ore"] =
@@ -151,6 +152,10 @@ module.pinIcons =
 	["Wild Steelbloom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_WildSteelbloom",
 	["Wintersbite"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Wintersbite",
 	["Dreaming Glory"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_DreamingGlory",
+	["Hochenblume"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Hochenblume",
+	["Saxifrage"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",
+	["Bubble Poppy"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",
+	["Writhebark"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",
 	
 	-- Burning Crusade
 	["Felweed"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Felweed",

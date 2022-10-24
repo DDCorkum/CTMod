@@ -3267,6 +3267,10 @@ local function displayControlPanel()
 		controlPanelFrame.height = maxHeight;	-- tracking variables used by resizer()
 		controlPanelFrame.width = minWidth;
 		controlPanelFrame.alpha = 0;
+		
+		if lib:getGameVersion() >= 10 then
+			print("Warning: it may be necessary to /reload after using the CTMod control panel, due to bugs in the new Dragonflight user interface.")
+		end
 	end
 	maximizeControlPanel();
 	controlPanelFrame:Show();

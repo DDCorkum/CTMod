@@ -1363,10 +1363,14 @@ local function CT_Core_AddToAuctions(self, button)
 					AuctionFrameTab_OnClick(AuctionFrameTab3, 3);
 				end
 				-- Pickup and place item in the auction sell button.
-				local bag, item = self:GetParent():GetID(), self:GetID();
-				PickupContainerItem(bag, item);
-				ClickAuctionSellItemButton(AuctionsItemButton, "LeftButton");
-				AuctionsFrameAuctions_ValidateAuction();
+				local bag, item = self:GetParent():GetID(), self:GetID()
+				if C_Container.PickupContainerItem then
+					C_Container.PickupContainerItem(bag, item)
+				else
+					PickupContainerItem(bag, item)
+				end
+				ClickAuctionSellItemButton(AuctionsItemButton, "LeftButton")
+				AuctionsFrameAuctions_ValidateAuction()
 				return true;
 			end
 		end
@@ -1395,10 +1399,14 @@ do
 		end
 
 		addItemToTrade = function(bag, item)
-			local slot = TradeFrame_GetAvailableSlot();
+			local slot = TradeFrame_GetAvailableSlot()
 			if (slot) then
-				PickupContainerItem(bag, item);
-				ClickTradeButton(slot);
+				if C_Container.PickupContainerItem then
+					C_Container.PickupContainerItem(bag, item)
+				else
+					PickupContainerItem(bag, item)
+				end
+				ClickTradeButton(slot)
 			end
 		end
 
@@ -3120,11 +3128,18 @@ ctMicroMenuBar:SetScript("OnDragStop", function()
 end)
 
 local function enableCustomBagMenuBars(enable)
-	ctBagBar.enabled = enable
-	MainMenuBarBackpackButton:SetPoint("TOPRIGHT", enable and ctBagBar or MicroButtonAndBagsBar, -4, 2)
-	CharacterMicroButton:SetPoint("BOTTOMLEFT", enable and ctMicroMenuBar or MicroButtonAndBagsBar, 7, 2)
-	ctBagBar:SetShown(enable and ctBagBar.shown)
-	ctMicroMenuBar:SetShown(enable and ctBagBar.shown)
+	if ctBagBar.enabled and not enable then
+		-- take no action if it was never enabled
+		ctBagBar.enabled = false
+		MainMenuBarBackpackButton:SetPoint("TOPRIGHT", MicroButtonAndBagsBar, -4, 2)
+		CharacterMicroButton:SetPoint("BOTTOMLEFT", MicroButtonAndBagsBar, 7, 2)
+	elseif enable then
+		ctBagBar.enabled = true
+		ctBagBar:SetShown(ctBagBar.shown)
+		ctMicroMenuBar:SetShown(ctBagBar.shown)
+		MainMenuBarBackpackButton:SetPoint("TOPRIGHT", ctBagBar, -4, 2)
+		CharacterMicroButton:SetPoint("BOTTOMLEFT", ctMicroMenuBar, 7, 2)
+	end
 end
 
 local function showCustomBagMenuAnchors(show)
@@ -3133,7 +3148,7 @@ local function showCustomBagMenuAnchors(show)
 	ctMicroMenuBar:SetShown(show and ctBagBar.enabled)
 end	
 
-if module:getGameVersion() < 10 then
+if module:getGameVersion() < 10 or CT_BottomBar then
 	enableCustomBagMenuBars = nil
 	showCustomBagMenuAnchors = nil
 end

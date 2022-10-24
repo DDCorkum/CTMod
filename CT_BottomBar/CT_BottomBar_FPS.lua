@@ -38,18 +38,19 @@ local function addon_Enable(self)
 		FramerateText:Hide();
 		self.fontstring:Show();
 	end
-	ToggleFramerate = function(benchmark)
+	function ToggleFramerate(benchmark)
 		FramerateText.benchmark = benchmark;
 		if self.fontstring:IsShown() then
 			self.fontstring:Hide();
 		else
 			self.fontstring:Show();
 		end
-		WorldFrame.fpsTime = 0;
+		(FramerateFrame or WorldFrame).fpsTime = 0
 	end
 	
 end
 
+local oldToggleFramerate = ToggleFramerate
 local function addon_Disable(self)
 	if (self.fontstring:IsShown()) then
 		FramerateLabel:Show();
@@ -57,17 +58,7 @@ local function addon_Disable(self)
 		self.fontstring:Hide();
 	end	
 	-- the original code from WorldFrame.lua
-	ToggleFramerate = function(benchmark)
-		FramerateText.benchmark = benchmark;
-		if ( FramerateText:IsShown() ) then
-			FramerateLabel:Hide();
-			FramerateText:Hide();
-		else
-			FramerateLabel:Show();
-			FramerateText:Show();
-		end
-		WorldFrame.fpsTime = 0;
-	end;
+	ToggleFramerate = oldToggleFramerate
 end
 
 
@@ -79,7 +70,7 @@ local function addon_Init(self)
 
 	module.ctFramerateBar = self;
 
-	self.frame:SetFrameLevel(MainMenuBarArtFrame:GetFrameLevel() + 1);
+	self.frame:SetFrameLevel((MainMenuBarArtFrame or MainMenuBar or self.frame):GetFrameLevel() + 1);
 	self.frame:SetHeight(30);
 	self.frame:SetWidth(90);
 

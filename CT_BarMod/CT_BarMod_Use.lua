@@ -16,6 +16,10 @@
 
 local module = select(2, ...);
 
+if module:getGameVersion() >= 10 then
+	return
+end
+
 -- Options
 local displayBindings = true;
 local displayRangeDot = true;

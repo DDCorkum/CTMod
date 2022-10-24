@@ -1,4 +1,8 @@
-CT_UnitFrames (9.2.0.3) 2021-10-09
+CT_UnitFrames (9.2.0.4) 2022-10-21
+- Further updates for Dragonflight
+- Bugfix for target health bar text in live servers
+
+CT_UnitFrames (9.2.0.3) 2022-10-09
 - Updates for Dragonflight
 
 CT_UnitFrames (9.1.0.6) 2021-09-09

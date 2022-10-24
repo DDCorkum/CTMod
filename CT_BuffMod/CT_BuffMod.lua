@@ -4437,6 +4437,20 @@ function frameClass:createAuraFrame()
 		oldAuraFrameTable.serial = oldAuraFrameTable.serial + 1;
 
 		auraFrame = CreateFrame("Frame", frameName .. oldAuraFrameTable.serial, UIParent, template);
+		
+		-- WoW 10.x temporary bugfix for https://github.com/Stanzilla/WoWUIBugs/issues/307
+		if module:getGameVersion() >= 10 and not self.useUnsecure then
+			auraFrame.nextButtonToRegisterForClickUp = 1
+			local function bugFix()
+				local btn = _G[auraFrame:GetName() .. "AuraButton" .. auraFrame.nextButtonToRegisterForClickUp]
+				if btn then
+					btn:RegisterForClicks("RightButtonUp")
+					auraFrame.nextButtonToRegisterForClickUp = auraFrame.nextButtonToRegisterForClickUp + 1
+				end
+			end
+			auraFrame:HookScript("OnEvent", bugFix)
+			C_Timer.After(0, bugFix)
+		end
 
 		local level = auraFrame:GetFrameLevel() + 1;  -- +1 to get it above the alt frame
 		if (self.isConsolidated) then

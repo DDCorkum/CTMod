@@ -10,6 +10,10 @@
 -- the CTMod Team. Thank you.                 --
 ------------------------------------------------
 
+if CT_BottomBar:getGameVersion() >= 10 then
+	return
+end
+
 --------------------------------------------
 -- Initialization
 
@@ -64,7 +68,9 @@ local function addon_Init(self)
 	module.CT_BottomBar_StatusBar_SetWidth = addon_Update;
 
 	CT_BottomBar_StatusBar_Frame = self.frame;
-	CT_BottomBar_StatusBar_Frame:SetFrameLevel(MainMenuBarArtFrame:GetFrameLevel() + 1);
+	if MainMenuBarArtFrame then
+		CT_BottomBar_StatusBar_Frame:SetFrameLevel(MainMenuBarArtFrame:GetFrameLevel() + 1)
+	end
 	CT_BottomBar_StatusBar_Frame.OnStatusBarsUpdated = CT_BottomBar_StatusBar_OnStatusBarsUpdated;
 	
 	CT_BottomBar_StatusBar_HelperFrame = CreateFrame("Frame", "CT_BottomBar_" .. self.frameName .. "_GuideFrame");

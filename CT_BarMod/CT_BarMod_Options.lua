@@ -19,6 +19,32 @@ local module = select(2, ...);
 -- End Initialization
 --------------------------------------------
 
+if module:getGameVersion() >= 10 then
+	function module.frame ()
+		local optionsFrameList = module:framesInit()
+
+		-- helper funcs
+		local function optionsAddFrame (offset, size, details, data) module:framesAddFrame(optionsFrameList, offset, size, details, data) end
+		local function optionsAddObject (offset, size, details) module:framesAddObject(optionsFrameList, offset, size, details) end
+		local function optionsAddScript (name, func) module:framesAddScript(optionsFrameList, name, func) end
+		local function optionsAddTooltip (text) module:framesAddScript(optionsFrameList, "onenter", function(obj) module:displayTooltip(obj, text, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL) end) end
+		local function optionsBeginFrame (offset, size, details, data) module:framesBeginFrame(optionsFrameList, offset, size, details, data) end
+		local function optionsEndFrame () module:framesEndFrame(optionsFrameList) end
+		local function optionsAddFromTemplate (offset, size, details, template) module:framesAddFromTemplate(optionsFrameList, offset, size, details, template) end
+
+		local textColor0 = "#1.0:1.0:1.0";
+		local textColor1 = "#0.9:0.9:0.9";
+		local textColor2 = "#0.7:0.7:0.7";
+		local textColor3 = "#0.9:0.72:0.0";
+		local xoffset, yoffset;
+
+		optionsAddObject( -2, 3*14, "font#t:0:%y#s:0:%s#l:13:0#r#CT_BarMod is currently disabled." .. textColor2 .. ":l")
+		
+		return "frame#all", module:framesGetData(optionsFrameList);
+	end
+	return
+end
+
 --------------------------------------------
 -- Local Copies
 

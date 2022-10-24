@@ -25,6 +25,10 @@ local module = select(2, ...);
 -- End Initialization
 --------------------------------------------
 
+if module:getGameVersion() >= 10 then
+	return
+end
+
 --------------------------------------------
 -- Local Copies
 

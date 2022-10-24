@@ -13,7 +13,7 @@ local module = select(2, ...);
 
 -- before/after WoW 10.x
 local healthBar = TargetFrameHealthBar or TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar
-local manaBar = TargetFrameHealthBar or TargetFrame.TargetFrameContent.TargetFrameContentMain.ManaBar
+local manaBar = TargetFrameManaBar or TargetFrame.TargetFrameContent.TargetFrameContentMain.ManaBar
 
 local inworld;
 function CT_TargetFrameOnEvent(self, event, arg1, ...)

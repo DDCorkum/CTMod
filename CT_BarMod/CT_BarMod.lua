@@ -28,6 +28,10 @@ CT_Library:registerModule(module);
 -- End Initialization
 --------------------------------------------
 
+if module:getGameVersion() >= 10 then
+	return
+end
+
 --------------------------------------------
 -- Local Copies
 

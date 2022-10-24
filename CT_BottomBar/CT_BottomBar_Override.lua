@@ -10,7 +10,9 @@
 -- the CTMod Team. Thank you.                 --
 ------------------------------------------------
 
-
+if CT_BottomBar:getGameVersion() >= 10 then
+	return
+end
 
 --------------------------------------------
 -- Initialization

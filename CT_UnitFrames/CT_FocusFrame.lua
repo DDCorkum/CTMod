@@ -947,9 +947,9 @@ local function CT_FocusFrame_HealthFlash(self)
 		self.statusCounter = counter;
 
 		if ( sign == 1 ) then
-			alpha = (153  + (counter * 256)) / 255;
+			alpha = (153  + (counter * 255)) / 255;
 		else
-			alpha = (255 - (counter * 256)) / 255;
+			alpha = (255 - (counter * 255)) / 255;
 		end
 
 		if ( self.portrait ) then

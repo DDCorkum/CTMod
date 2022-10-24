@@ -215,6 +215,10 @@ L["CT_MapMod/User/Red Cross"] = "Red Cross"
 L["CT_MapMod/User/Red Dot"] = "Red Dot"
 L["CT_MapMod/User/Waypoint"] = "Waypoint"
 L["CT_MapMod/User/White Circle"] = "White Circle"
+L["CT_MapMod/Herb/Hochenblume"] = "Hochenblume"
+L["CT_MapMod/Herb/Saxifrage"] = "Saxifrage"
+L["CT_MapMod/Herb/Bubble Poppy"] = "Bubble Poppy"
+L["CT_MapMod/Herb/Writhebark"] = "Writhebark"
 
 
 -----------------------------------------------

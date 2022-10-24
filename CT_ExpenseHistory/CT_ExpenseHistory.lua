@@ -405,22 +405,24 @@ end
 
 -- Data collection
 function CT_EH_UpdateRepair(arg1, arg2)
-	if ( InRepairMode() ) then
-		local repairCost;
-		if ( arg2 ) then
-			_, repairCost = CT_EHTooltip:SetBagItem(arg1, arg2);
-		else
-			_, _, repairCost = CT_EHTooltip:SetInventoryItem("player", arg1);
-		end
-		if ( repairCost and repairCost > 0 and repairCost <= GetMoney() and MerchantFrame.repairCost ) then
-			MerchantFrame.repairCost = MerchantFrame.repairCost + repairCost;
-		end
+	if InRepairMode() and GameTooltip:IsShown() and GameTooltipMoneyFrame1 and GameTooltipMoneyFrame1:IsShown() then
+		local gold, silver, copper = 
+			tonumber(GameTooltipMoneyFrame1GoldButtonText:GetText()) or 0,
+			tonumber(GameTooltipMoneyFrame1SilverButtonText:GetText()) or 0,
+			tonumber(GameTooltipMoneyFrame1CopperButtonText:GetText()) or 0
+		MerchantFrame.repairCost = MerchantFrame.repairCost + gold*10000 + silver*100 + copper
 	end
 end
 
-hooksecurefunc("PickupInventoryItem", function(id) CT_EH_UpdateRepair(id); end);
-hooksecurefunc("UseContainerItem", CT_EH_UpdateRepair);
-hooksecurefunc("PickupContainerItem", CT_EH_UpdateRepair);
+hooksecurefunc("PickupInventoryItem", CT_EH_UpdateRepair)
+if C_Container and C_Container.UseContainerItem then
+	hooksecurefunc(C_Container, "UseContainerItem", CT_EH_UpdateRepair)
+	hooksecurefunc(C_Container, "PickupContainerItem", CT_EH_UpdateRepair)
+else
+	hooksecurefunc("UseContainerItem", CT_EH_UpdateRepair)
+	hooksecurefunc("PickupContainerItem", CT_EH_UpdateRepair)
+end
+
 
 CT_EH_oldRepairAllItems = RepairAllItems;
 function CT_EH_newRepairAllItems(...)
