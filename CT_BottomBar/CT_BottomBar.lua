@@ -700,6 +700,11 @@ module.update = function(self, optName, value)
 		module:mainmenuInit();
 	end
 
+	if module:getOption("disableDefaultActionBar") ~= false and module:getGameVersion() >= 10 then
+		print(module:getOption("disableDefaultActionBar"))
+		RegisterStateDriver(MainMenuBar, "visibility", "hide");
+	end
+
 	module:optionsInit();
 	module:addonsInit();
 

@@ -26,6 +26,7 @@ local module = select(2, ...);
 --------------------------------------------
 
 if module:getGameVersion() >= 10 then
+	CT_BarMod_Shift_Init = nop
 	return
 end
 

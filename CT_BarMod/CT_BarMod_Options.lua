@@ -42,7 +42,7 @@ if module:getGameVersion() >= 10 then
 		
 		return "frame#all", module:framesGetData(optionsFrameList);
 	end
-	return
+	--return
 end
 
 --------------------------------------------
@@ -1104,18 +1104,16 @@ module.frame = function()
 		--optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:clickDirection:true#Activate on key down only");
 		--optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:clickIncluded#Activate button on key or mouse down");
 		
-		optionsAddObject(-40, 26, "font#tl:20:%y#v:ChatFontNormal#n:CT_BarMod_ToggleKeyFontString#Toggle mouse/key press down or release up");
-		
 		local SetCVar = SetCVar or C_CVar.SetCVar;	--retail vs classic
 		local GetCVar = GetCVar or C_CVar.GetCVar;
-		optionsBeginFrame( 55,   30,  "button#t:0:%y#s:200:%s#v:GameMenuButtonTemplate#Toggle Action Key Up/Down")
+		optionsBeginFrame( -20,   30,  "button#t:0:%y#s:200:%s#v:GameMenuButtonTemplate#Toggle Action Key Up/Down")
 			optionsAddScript("onclick", function()
 				if (GetCVar("ActionButtonUseKeyDown") == "1") then
 					SetCVar("ActionButtonUseKeyDown", "0");
 					CT_BarMod_OnMouseDownCheckButton:Hide();
 				else
 					SetCVar("ActionButtonUseKeyDown", "1");
-					CT_BarMod_OnMouseDownCheckButton:Show();
+					CT_BarMod_OnMouseDownCheckButton:Show()
 				end
 				updateClickDirection();
 			end);
@@ -1125,7 +1123,9 @@ module.frame = function()
 				if (timeElapsed < 0.25) then return; end
 				timeElapsed = 0;
 				if (GetCVar("ActionButtonUseKeyDown") == "1") then
-					if (module:getOption("onMouseDown")) then
+					if module:getGameVersion() >= 10 then
+						CT_BarMod_ToggleKeyFontString:SetText("Currently responds to |cFFFFFF99mouse down|r & |cFFFFFF99 key down|r|cFFFF9999\n\nStarting in Dragonflight,\n keyboard-down implies mouse-down");
+					elseif module:getOption("onMouseDown") then
 						CT_BarMod_ToggleKeyFontString:SetText("Currently responds to |cFFFFFF99mouse down|r & |cFFFFFF99 key down");
 					else
 						CT_BarMod_ToggleKeyFontString:SetText("Currently responds to |cFFFFFF99mouse up|r & |cFFFFFF99 key down");
@@ -1154,7 +1154,7 @@ module.frame = function()
 			end);
 		optionsEndFrame();
 		
-		optionsBeginFrame( -40, 26, "checkbutton#tl:50:%y#o:onMouseDown:false#n:CT_BarMod_OnMouseDownCheckButton#Also respond to mouse-down");
+		optionsBeginFrame( -10, 26, "checkbutton#tl:50:%y#o:onMouseDown:false#n:CT_BarMod_OnMouseDownCheckButton#Also respond to mouse-down");
 			optionsAddScript("onenter", function(checkbutton)
 				module:displayTooltip(checkbutton, {
 					"Also respond to mouse-down",
@@ -1165,9 +1165,15 @@ module.frame = function()
 			optionsAddScript("onshow", function(checkbutton)
 				if (GetCVar("ActionButtonUseKeyDown") == "0") then
 					checkbutton:Hide();
+				elseif module:getGameVersion() >= 10 then
+					checkbutton:Disable()
+					checkbutton:SetChecked(true)
+					checkbutton.Text:SetTextColor(0.5, 0.5, 0.5)
 				end
 			end);
 		optionsEndFrame();
+		
+		optionsAddObject(-20, 5*13, "font#tl:20:%y#r#v:ChatFontNormal#n:CT_BarMod_ToggleKeyFontString#Toggle mouse/key press down or release up");
 		
 	optionsEndFrame();
 

@@ -17,7 +17,7 @@
 local module = select(2, ...);
 
 if module:getGameVersion() >= 10 then
-	return
+	--return
 end
 
 -- Options
@@ -946,7 +946,8 @@ end
 
 function useButton:updateFlyout()
 	-- Call Blizzard's function to update the flyout bar.
-	ActionButton_UpdateFlyout(self.button);
+	local func = ActionButton_UpdateFlyout or ActionBarActionButtonMixin.UpdateFlyout
+	func(self.button)
 end
 
 -- Check button lock state to disable shift-click

@@ -1,3 +1,7 @@
+CT_BottomBar (10.0.0.2) 2022-10-25
+- The WoW Dragonflight action bar can be disabled
+- Alignment fix to the bag bar for backwards compatibility with Classic
+
 CT_BottomBar (9.2.0.4) 2022-10-23
 - Updates to the bag, micro-menu and fps bars for WoW Dragonflight
 - All other modules/features disabled in WoW Dragonflight 
