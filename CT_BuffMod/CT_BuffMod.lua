@@ -2992,7 +2992,9 @@ end
 function CT_BuffMod_AuraButton_OnShow(self)
 	if (not self.ctinit) then
 		self.ctinit = true;
-		self:RegisterForClicks("RightButtonDown", "LeftButtonDown");
+		self:RegisterForClicks("RightButtonDown", "LeftButtonDown", "RightButtonUp");
+			-- alt-LeftButtonDown will always insecurely select a window
+			-- either RightButtonDown or RightButtonUp may trigger based on ActionButtonUseKeyDown (from WoW 10.0 onwards)
 		auraButton_Update(self);
 	end
 end
@@ -3105,6 +3107,15 @@ function CT_BuffMod_AuraButton_OnMouseDown(self, button)
 				-- The :startMoving method tests for combat, locked window, etc.
 				frameObject:startMoving();
 			end
+		elseif (button == "RightButton" and frameObject.useUnsecure and InCombatLockdown() == false and C_CVar.GetCVar("ActionButtonUseKeyDown") == "1") then
+			local auraObject = self.auraObject;
+			if (not auraObject) then
+				return;
+			end
+			local auraType = auraObject.auraType;
+			if auraType == constants.AURATYPE_BUFF or auraType == constants.AURATYPE_AURA then
+				CancelUnitBuff(frameObject:getUnitId(), self.index, self.filter);
+			end
 		end
 	end
 end
@@ -3121,7 +3132,7 @@ function CT_BuffMod_AuraButton_OnMouseUp(self, button)
 					return;
 				end
 				local auraType = auraObject.auraType;
-				if ( auraType == constants.AURATYPE_BUFF or auraType == constants.AURATYPE_AURA ) then
+				if self:IsMouseOver() and C_CVar.GetCVar("ActionButtonUseKeyDown") ~= "1" and (auraType == constants.AURATYPE_BUFF or auraType == constants.AURATYPE_AURA) then
 					-- CancelUnitBuff() can now be called from unsecure code when not in combat.
 					if (not InCombatLockdown()) then
 						CancelUnitBuff(frameObject:getUnitId(), self.index, self.filter);
@@ -4438,20 +4449,6 @@ function frameClass:createAuraFrame()
 
 		auraFrame = CreateFrame("Frame", frameName .. oldAuraFrameTable.serial, UIParent, template);
 		
-		-- WoW 10.x temporary bugfix for https://github.com/Stanzilla/WoWUIBugs/issues/307
-		if module:getGameVersion() >= 10 and not self.useUnsecure then
-			auraFrame.nextButtonToRegisterForClickUp = 1
-			local function bugFix()
-				local btn = _G[auraFrame:GetName() .. "AuraButton" .. auraFrame.nextButtonToRegisterForClickUp]
-				if btn then
-					btn:RegisterForClicks("RightButtonUp")
-					auraFrame.nextButtonToRegisterForClickUp = auraFrame.nextButtonToRegisterForClickUp + 1
-				end
-			end
-			auraFrame:HookScript("OnEvent", bugFix)
-			C_Timer.After(0, bugFix)
-		end
-
 		local level = auraFrame:GetFrameLevel() + 1;  -- +1 to get it above the alt frame
 		if (self.isConsolidated) then
 			level = level + 10;  -- +10 to make consolidated frame higher than primary
