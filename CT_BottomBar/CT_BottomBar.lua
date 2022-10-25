@@ -698,13 +698,21 @@ module.update = function(self, optName, value)
 			module:overrideInit();
 		end
 		module:mainmenuInit();
+	
+	else -- module:getGameVersion() >= 10
+		if CT_BarMod and CT_BarMod.updateOptionFromOutside then
+			local t1, t2 = module:getOption("disableDragonflightActionBarChangedDate"), CT_BarMod:getOption("disableDragonflightActionBarChangedDate")
+			preventLoop = true
+			if (t1 and t2 and t1 > t2) or (t1 and not t2) then
+				CT_BarMod:setOption("disableDragonflightActionBar", module:getOption("disableDragonflightActionBar"))
+			elseif (t1 and t2 and t2 < t1) or (t2 and not t1) then
+				module:setOption("disableDragonflightActionBar", CT_BarMod:getOption("disableDragonflightActionBar"))
+			end
+			preventLoop = nil
+		end
+		RegisterAttributeDriver(MainMenuBar, "state-visibility", module:getOption("disableDragonflightActionBar") and "hide" or "show")
 	end
-
-	if module:getOption("disableDefaultActionBar") ~= false and module:getGameVersion() >= 10 then
-		print(module:getOption("disableDefaultActionBar"))
-		RegisterStateDriver(MainMenuBar, "visibility", "hide");
-	end
-
+	
 	module:optionsInit();
 	module:addonsInit();
 

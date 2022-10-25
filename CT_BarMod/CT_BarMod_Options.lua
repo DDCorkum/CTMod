@@ -80,9 +80,11 @@ module.updateOptionFromOutside = function(optName, value)
 		return;
 	end
 
-	if (optName == "disableDefaultActionBar") then
-		-- Update our option
-		module:setOption(optName, value);
+	if optName == "disableDefaultActionBar"
+		or optName == "disableDragonflightActionBarChangedDate"
+		or optName == "disableDragonflightActionBar"
+	then
+		module:setOption(optName, value)
 	end
 end
 
@@ -1197,103 +1199,105 @@ module.frame = function()
 		optionsAddObject(-10,   26, "checkbutton#tl:20:%y#o:shiftFocus:true#Shift default focus frame to the right");
 		optionsAddFrame( -10,   17, "slider#tl:50:%y#s:220:%s#o:shiftFocusOffset:37#Position = <value>#0:200:1");
 
-		if (CT_BottomBar) then optionsAddObject(-15, 3*14, "font#t:0:%y#s:0:%s#l:20:0#r#These options can be overridden by CT_BottomBar#" .. textColor2 .. ":l"); end
-		optionsBeginFrame( -5,   26, "checkbutton#tl:20:%y#i:ctbar_shiftShapeshift#o:shiftShapeshift:true#Shift default class bar up");
-			optionsAddScript("onshow",
-				function(self)
-					if ((CT_BottomBar and CT_BottomBar.ctClassBar and not CT_BottomBar.ctClassBar.isDisabled) or (CT_BottomBar and not CT_BottomBar.ctClassBar)) then
-						-- The custom CT_BB class bar is present in this version
-						self:SetAlpha(.5);
-					else
-						-- Either CT_BB is not installed, or the custom CT_BB class bar has been disabled
-						self:SetAlpha(1);
+		if module:getGameVersion() <= 9 then
+			if (CT_BottomBar) then optionsAddObject(-15, 3*14, "font#t:0:%y#s:0:%s#l:20:0#r#These options can be overridden by CT_BottomBar#" .. textColor2 .. ":l"); end
+			optionsBeginFrame( -5,   26, "checkbutton#tl:20:%y#i:ctbar_shiftShapeshift#o:shiftShapeshift:true#Shift default class bar up");
+				optionsAddScript("onshow",
+					function(self)
+						if ((CT_BottomBar and CT_BottomBar.ctClassBar and not CT_BottomBar.ctClassBar.isDisabled) or (CT_BottomBar and not CT_BottomBar.ctClassBar)) then
+							-- The custom CT_BB class bar is present in this version
+							self:SetAlpha(.5);
+						else
+							-- Either CT_BB is not installed, or the custom CT_BB class bar has been disabled
+							self:SetAlpha(1);
+						end
 					end
-				end
-			);
-			optionsAddScript("onenter",
-				function(self)
-					GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 120, -5);
-					GameTooltip:SetText("|cFFCCCCCCMoves the class/stance bar further from the bottom of screen.");
-					if ((CT_BottomBar and CT_BottomBar.ctClassBar and not CT_BottomBar.ctClassBar.isDisabled) or (CT_BottomBar and not CT_BottomBar.ctClassBar)) then
-						GameTooltip:AddLine("|cFFFF9999Currently overriden by CT_BottomBar.");
+				);
+				optionsAddScript("onenter",
+					function(self)
+						GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 120, -5);
+						GameTooltip:SetText("|cFFCCCCCCMoves the class/stance bar further from the bottom of screen.");
+						if ((CT_BottomBar and CT_BottomBar.ctClassBar and not CT_BottomBar.ctClassBar.isDisabled) or (CT_BottomBar and not CT_BottomBar.ctClassBar)) then
+							GameTooltip:AddLine("|cFFFF9999Currently overriden by CT_BottomBar.");
+						end
+						GameTooltip:Show();
 					end
-					GameTooltip:Show();
-				end
-			);
-			optionsAddScript("onleave",
-				function(self)
-					GameTooltip:Hide();
-				end
-			);
-		optionsEndFrame();
-		optionsBeginFrame(  6,   26, "checkbutton#tl:20:%y#i:ctbar_shiftPet#o:shiftPet:true#Shift default pet bar up");
-			optionsAddScript("onshow",
-				function(self)
-					if (CT_BottomBar and CT_BottomBar.ctPetBar) then
-						-- This version of CT_BottomBar supports deactivation of this bar.
-						if (not CT_BottomBar.ctPetBar.isDisabled) then
-							-- The bar is activated, 
+				);
+				optionsAddScript("onleave",
+					function(self)
+						GameTooltip:Hide();
+					end
+				);
+			optionsEndFrame();
+			optionsBeginFrame(  6,   26, "checkbutton#tl:20:%y#i:ctbar_shiftPet#o:shiftPet:true#Shift default pet bar up");
+				optionsAddScript("onshow",
+					function(self)
+						if (CT_BottomBar and CT_BottomBar.ctPetBar) then
+							-- This version of CT_BottomBar supports deactivation of this bar.
+							if (not CT_BottomBar.ctPetBar.isDisabled) then
+								-- The bar is activated, 
+								-- Let CT_BottomBar handle it.
+								self:SetAlpha(.5);
+							else
+								self:SetAlpha(1);
+							end
+						elseif (CT_BottomBar) then
+							-- This version of CT_BottomBar does not support deactivation of this bar.
 							-- Let CT_BottomBar handle it.
 							self:SetAlpha(.5);
 						else
+							-- CT_BottomBar isn't even installed
 							self:SetAlpha(1);
 						end
-					elseif (CT_BottomBar) then
-						-- This version of CT_BottomBar does not support deactivation of this bar.
-						-- Let CT_BottomBar handle it.
-						self:SetAlpha(.5);
-					else
-						-- CT_BottomBar isn't even installed
-						self:SetAlpha(1);
 					end
-				end
-			);
-			optionsAddScript("onenter",
-				function(self)
-					GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 120, -5);
-					GameTooltip:SetText("|cFFCCCCCCMoves the pet bar further from the bottom of screen.");
-					if ((CT_BottomBar and CT_BottomBar.ctPetBar and not CT_BottomBar.ctPetBar.isDisabled) or (CT_BottomBar and not CT_BottomBar.ctPetBar)) then
-						GameTooltip:AddLine("|cFFFF9999Currently overriden by CT_BottomBar.");
+				);
+				optionsAddScript("onenter",
+					function(self)
+						GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 120, -5);
+						GameTooltip:SetText("|cFFCCCCCCMoves the pet bar further from the bottom of screen.");
+						if ((CT_BottomBar and CT_BottomBar.ctPetBar and not CT_BottomBar.ctPetBar.isDisabled) or (CT_BottomBar and not CT_BottomBar.ctPetBar)) then
+							GameTooltip:AddLine("|cFFFF9999Currently overriden by CT_BottomBar.");
+						end
+						GameTooltip:Show();
 					end
-					GameTooltip:Show();
-				end
-			);
-			optionsAddScript("onleave",
-				function(self)
-					GameTooltip:Hide();
-				end
-			);
-		optionsEndFrame();
-		optionsAddFrame( -10,   17, "slider#tl:50:%y#s:220:%s#o:shiftPetOffset:113#Position = <value>#0:200:1");
-		optionsBeginFrame( -5,   26, "checkbutton#tl:20:%y#i:ctbar_shiftPossess#o:shiftPossess:true#Shift default possess bar up");
-					optionsAddScript("onshow",
-						function(self)
-							if ((CT_BottomBar and CT_BottomBar.ctPossess and not CT_BottomBar.ctPossess.isDisabled) or (CT_BottomBar and not CT_BottomBar.ctPossess)) then
-								-- The custom CT_BB class bar is present in this version
-								self:SetAlpha(.5);
-							else
-								-- Either CT_BB is not installed, or the custom CT_BB class bar has been disabled
-								self:SetAlpha(1);
+				);
+				optionsAddScript("onleave",
+					function(self)
+						GameTooltip:Hide();
+					end
+				);
+			optionsEndFrame();
+			optionsAddFrame( -10,   17, "slider#tl:50:%y#s:220:%s#o:shiftPetOffset:113#Position = <value>#0:200:1");
+			optionsBeginFrame( -5,   26, "checkbutton#tl:20:%y#i:ctbar_shiftPossess#o:shiftPossess:true#Shift default possess bar up");
+						optionsAddScript("onshow",
+							function(self)
+								if ((CT_BottomBar and CT_BottomBar.ctPossess and not CT_BottomBar.ctPossess.isDisabled) or (CT_BottomBar and not CT_BottomBar.ctPossess)) then
+									-- The custom CT_BB class bar is present in this version
+									self:SetAlpha(.5);
+								else
+									-- Either CT_BB is not installed, or the custom CT_BB class bar has been disabled
+									self:SetAlpha(1);
+								end
 							end
-						end
-					);
-					optionsAddScript("onenter",
-						function(self)
-							GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 120, -5);
-							GameTooltip:SetText("|cFFCCCCCCMoves the default possess bar further from the bottom of screen.");
-							if ((CT_BottomBar and CT_BottomBar.ctPossess and not CT_BottomBar.ctPossess.isDisabled) or (CT_BottomBar and not CT_BottomBar.ctPossess)) then
-								GameTooltip:AddLine("|cFFFF9999Currently overriden by CT_BottomBar.");
+						);
+						optionsAddScript("onenter",
+							function(self)
+								GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 120, -5);
+								GameTooltip:SetText("|cFFCCCCCCMoves the default possess bar further from the bottom of screen.");
+								if ((CT_BottomBar and CT_BottomBar.ctPossess and not CT_BottomBar.ctPossess.isDisabled) or (CT_BottomBar and not CT_BottomBar.ctPossess)) then
+									GameTooltip:AddLine("|cFFFF9999Currently overriden by CT_BottomBar.");
+								end
+								GameTooltip:Show();
 							end
-							GameTooltip:Show();
-						end
-					);
-					optionsAddScript("onleave",
-						function(self)
-							GameTooltip:Hide();
-						end
-					);
-		optionsEndFrame();
-		-- removed from game in 2012 -- optionsAddObject(  6,   26, "checkbutton#tl:20:%y#i:ctbar_shiftMultiCast#o:shiftMultiCast:true#Shift default multicast bar up");
+						);
+						optionsAddScript("onleave",
+							function(self)
+								GameTooltip:Hide();
+							end
+						);
+			optionsEndFrame();
+			-- removed from game in 2012 -- optionsAddObject(  6,   26, "checkbutton#tl:20:%y#i:ctbar_shiftMultiCast#o:shiftMultiCast:true#Shift default multicast bar up");
+		end
 	optionsEndFrame();
 
 	----------
@@ -1494,14 +1498,16 @@ module.frame = function()
 		optionsAddObject(-15, 5*14, "font#t:0:%y#s:0:%s#l:20:0#r#Bar 12 can show one of six different pages of buttons. The buttons on each page are a copy of the buttons found on one of the other bars. Refer to the 'Enable bar 12' option's tooltip for more details.#" .. textColor2 .. ":l");
 		optionsAddObject(  0,   26, "checkbutton#tl:25:%y#i:showGroup12#o:showGroup12:true#Enable bar 12 (Action bar)");
 
-		if (CT_BottomBar) then
+		if module:getGameVersion() >= 10 then
+			optionsAddObject( -5,   26, "checkbutton#tl:25:%y#i:disableDragonflightActionBar#o:disableDragonflightActionBar:false#Disable the default main action bar.")
+		elseif (CT_BottomBar) then
 			-- Don't show this option if CT_BottomBar is not loaded.
 			-- This option only works if CT_BottomBar 4.008 or greater is loaded.
 
 			optionsAddObject( -5,   26, "checkbutton#tl:25:%y#i:disableDefaultActionBar#o:disableDefaultActionBar#Disable the default main action bar.");
 
-			optionsAddObject(  3, 2*14, "font#t:0:%y#s:0:%s#l:55:0#r#This option requires CT_BottomBar version 4.008 or greater.#" .. textColor2 .. ":l");
-			optionsAddObject(  0, 4*14, "font#t:0:%y#s:0:%s#l:55:0#r#Disabling or enabling the default main action bar will have no effect until addons are reloaded.#" .. textColor3 .. ":l");
+			optionsAddObject(  3, 2*14, "font#t:0:%y#s:0:%s#l:55:0#r#This option requires CT_BottomBar.#" .. textColor2 .. ":l");
+			optionsAddObject(  0, 4*14, "font#t:0:%y#s:0:%s#l:55:0#r#Disabling or enabling the default main action bar requires reloading addons.#" .. textColor3 .. ":l");
 
 			optionsBeginFrame(  -5,   30, "button#tl:55:%y#s:150:%s#n:CT_BarMod_DisableActionBar_Button#v:GameMenuButtonTemplate#Reload addons");
 				optionsAddScript("onclick",
@@ -2507,6 +2513,7 @@ module.optionUpdate = function(self, optName, value)
 		end
 
 	elseif (optName == "disableDefaultActionBar") then
+	
 		-- CT_BarMod's default for this option is irrelevant. The checkbox
 		-- is only visible when CT_BottomBar is loaded.
 		--
@@ -2531,8 +2538,18 @@ module.optionUpdate = function(self, optName, value)
 			-- disabling of the default main action bar.
 			preventLoop = true;
 			CT_BottomBar.updateOptionFromOutside(optName, value);
-			preventLoop = nil;
+			preventLoop = nil;			
 		end
+	
+	elseif optName == "disableDragonflightActionBar" then
+		local time = GetServerTime()
+		module:setOption("disableDragonflightActionBarChangedDate", time)
+		if CT_BottomBar and CT_BottomBar.updateOptionFromOutside and not preventLoop then
+			preventLoop = true
+			CT_BottomBar.updateOptionFromOutside("disableDragonflightActionBar", value)
+			preventLoop = nil
+		end
+		RegisterAttributeDriver(MainMenuBar, "state-visibility", value and "hide" or "show")
 
 	elseif (
 		optName == "hideExtraBar3" or
@@ -2713,6 +2730,20 @@ module.optionUpdate = function(self, optName, value)
 		frame:Show();
 
 		CT_BarMod_Shift_Init();
+		
+		-- hiding the main bar
+		if CT_BottomBar and CT_BottomBar.updateOptionFromOutside then
+			local t1, t2 = module:getOption("disableDragonflightActionBarChangedDate"), CT_BottomBar:getOption("disableDragonflightActionBarChangedDate")
+			preventLoop = true
+			if (t1 and t2 and t1 > t2) or (t1 and not t2) then
+				CT_BottomBar:setOption("disableDragonflightActionBar", module:getOption("disableDragonflightActionBar"))
+			elseif (t1 and t2 and t2 < t1) or (t2 and not t1) then
+				module:setOption("disableDragonflightActionBar", CT_BottomBar:getOption("disableDragonflightActionBar"))
+			end
+			preventLoop = nil
+		end
+		RegisterAttributeDriver(MainMenuBar, "state-visibility", module:getOption("disableDragonflightActionBar") and "hide" or "show")
+		
 	end
 
 	-- Clear edit box focus and highlight.

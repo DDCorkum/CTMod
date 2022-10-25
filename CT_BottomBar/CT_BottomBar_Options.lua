@@ -90,10 +90,12 @@ module.updateOptionFromOutside = function(optName, value)
 		return;
 	end
 
-	if (optName == "disableDefaultActionBar") then
-		-- Update our option
-		module:setOption(optName, value);
+	if optName == "disableDefaultActionBar"
+		or optName == "disableDragonflightActionBar"
+	then
+		module:setOption(optName, value)
 	end
+	
 end
 
 local addonTitles = { }
@@ -496,7 +498,17 @@ function module:updateOption(optName, value)
 			CT_BarMod.updateOptionFromOutside(optName, value);
 			preventLoop = nil;
 		end
-
+	
+	elseif optName == "disableDragonflightActionBar" then
+		local time = GetServerTime()
+		module:setOption("disableDragonflightActionBarChangedDate", time)
+		if CT_BarMod and CT_BarMod.updateOptionFromOutside and not preventLoop then
+			preventLoop = true
+			CT_BarMod.updateOptionFromOutside("disableDragonflightActionBar", value)		
+			preventLoop = nil
+		end
+		RegisterAttributeDriver(MainMenuBar, "state-visibility", value and "hide" or "show")
+		
 	else
 		local found;
 		for key, obj in ipairs(module.addons) do
@@ -745,7 +757,11 @@ module.frame = function()
 		optionsAddObject( -5, 3*14, "font#t:0:%y#s:0:%s#l:20:0#r#If you disable the bar, you may want to use CT_BarMod version 4.004 (or greater) which includes an alternate main action bar.#" .. textColor2 .. ":l");
 		optionsAddObject( -2, 3*14, "font#t:0:%y#s:0:%s#l:20:0#r#NOTE: Disabling or enabling the default main action bar will have no effect until addons are reloaded.#" .. textColor3 .. ":l");
 
-		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#i:disableDefaultActionBar#o:disableDefaultActionBar:true#Disable the default main action bar.");
+		if module:getGameVersion() >= 10 then
+			optionsAddObject( -5,   26, "checkbutton#tl:20:%y#i:disableDragonflightActionBar#o:disableDragonflightActionBar:false#Disable the default main action bar.")
+		else
+			optionsAddObject( -5,   26, "checkbutton#tl:20:%y#i:disableDefaultActionBar#o:disableDefaultActionBar:true#Disable the default main action bar.")
+		end
 
 		optionsBeginFrame(  -8,   30, "button#t:0:%y#s:180:%s#n:CT_BottomBar_DisableActionBar_Button#v:GameMenuButtonTemplate#Reload addons");
 			optionsAddScript("onclick",
@@ -1082,6 +1098,7 @@ function module:optionsInitApplied()
 	end
 
 	appliedOptions.disableDefaultActionBar = module:getOption("disableDefaultActionBar") ~= false;
+	appliedOptions.disableDragonflightActionBar = not not module:getOption("disableDragonflightActionBar")
 
 	appliedOptions.bagsBarHideBags = not not module:getOption("bagsBarHideBags");
 	appliedOptions.bagsBarSpacing = module:getOption("bagsBarSpacing");	-- if nil, the addon knows what to do for each version of the game
