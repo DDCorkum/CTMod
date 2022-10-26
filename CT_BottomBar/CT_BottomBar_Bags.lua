@@ -55,7 +55,7 @@ local function addon_UpdateOrientation(self, orientation)
 		backpack:SetPoint("BOTTOMLEFT", self.frame, 0, 0);
 		backpack:Show();
 	else
-		frames[#frames]:SetPoint("TOPRIGHT", self.frame, width + spacing*(#frames-2), 0)
+		frames[#frames]:SetPoint("BOTTOMRIGHT", self.frame, width + spacing*(#frames-2), 0)
 		for i=#frames-1, 2, -1 do
 			obj = frames[i];
 			if ( orientation == "ACROSS" ) then

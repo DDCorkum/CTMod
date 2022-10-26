@@ -11,6 +11,7 @@
 ------------------------------------------------
 
 if CT_BottomBar:getGameVersion() >= 10 then
+	-- see module.init() that disables the action bar during game load.
 	return
 end
 

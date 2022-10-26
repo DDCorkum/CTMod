@@ -29,7 +29,7 @@ CT_Library:registerModule(module);
 --------------------------------------------
 
 if module:getGameVersion() >= 10 then
-	return
+	--return
 end
 
 --------------------------------------------

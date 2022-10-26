@@ -20,7 +20,7 @@ local module = select(2, ...);
 --------------------------------------------
 
 if module:getGameVersion() >= 10 then
-	return
+	--return
 end
 
 --------------------------------------------
@@ -242,20 +242,30 @@ local function getActionButton(buttonId)
 		bling.a2:SetStartDelay(0.5)
 		bling.a2:SetFromAlpha(0.6)
 		bling.a2:SetToAlpha(0.0)
+		
+		-- scale
 		bling.s1 = bling.ag:CreateAnimation("Scale")
-		bling.s1:SetFromScale(1.0, 1.0)
-		bling.s1:SetToScale(1.8, 1.8)
 		bling.s1:SetDuration(0.4)
 		bling.s2 = bling.ag:CreateAnimation("Scale")
-		bling.s2:SetFromScale(1.0, 1.0)
-		bling.s2:SetToScale(0.75, 0.75)
 		bling.s2:SetDuration(0.4)
 		bling.s2:SetStartDelay(0.4)
 		bling.s3 = bling.ag:CreateAnimation("Scale")
-		bling.s3:SetFromScale(1.0, 1.0)
-		bling.s3:SetToScale(1.2, 1.2)
 		bling.s3:SetDuration(0.2)
 		bling.s3:SetStartDelay(0.8)
+		
+		do
+			local toFunc = bling.s1.SetFromScale or bling.s1.SetScaleFrom
+			local fromFunc = bling.s1.SetToScale or bling.s1.SetScaleTo
+			
+			fromFunc(bling.s1, 1.0, 1.0)
+			toFunc (bling.s1, 1.8, 1.8)
+			
+			fromFunc(bling.s2, 1.0, 1.0)
+			toFunc(bling.s2, 0.75, 0.75)
+			
+			fromFunc(bling.s3, 1.0, 1.0)
+			toFunc(bling.s3, 1.2, 1.2)
+		end
 		
 		module:regEvent("PLAYER_LOGIN", function()
 			-- Delay these hooks for compatibility with OmniCC.
@@ -275,18 +285,25 @@ local function getActionButton(buttonId)
 		button.recharge:SetDrawBling(false);
 		button.recharge:SetHideCountdownNumbers(true);
 		
-		button.FlyoutArrow = parent:CreateTexture(nil, "ARTWORK", "ActionBarFlyoutButton-ArrowUp");
-		button.FlyoutArrow:SetDrawLayer("ARTWORK", 2);
+		button.FlyoutArrow = parent:CreateTexture()
+		button.FlyoutArrow:SetSize(23, 11)
+		button.FlyoutArrow:SetDrawLayer("ARTWORK", 2)
+		button.FlyoutArrow:SetTexture("Interface\\Buttons\ActionBarFlyoutButton")
+		button.FlyoutArrow:SetTexCoord("0.62500000", "0.98437500", "0.74218750", "0.82812500")
+		
+		button.FlyoutBorder = parent:CreateTexture()
+		button.FlyoutBorder:SetSize(42,42)
+		button.FlyoutBorder:SetPoint("CENTER")
+		button.FlyoutBorder:SetDrawLayer("ARTWORK", 2)
+		button.FlyoutBorder:SetTexture("Interface\\Buttons\ActionBarFlyoutButton")
+		button.FlyoutBorder:SetTexCoord("0.01562500", "0.67187500", "0.39843750", "0.72656250")
 
-		button.FlyoutBorder = parent:CreateTexture(nil, "ARTWORK", "ActionBarFlyoutButton-IconFrame");
-		button.FlyoutBorder:ClearAllPoints();
-		button.FlyoutBorder:SetPoint("CENTER", button);
-		button.FlyoutBorder:SetDrawLayer("ARTWORK", 1);
-
-		button.FlyoutBorderShadow = parent:CreateTexture(nil, "ARTWORK", "ActionBarFlyoutButton-IconShadow");
-		button.FlyoutBorderShadow:ClearAllPoints();
-		button.FlyoutBorderShadow:SetPoint("CENTER", button);
-		button.FlyoutBorderShadow:SetDrawLayer("ARTWORK", 1);
+		button.FlyoutBorderShadow = parent:CreateTexture()
+		button.FlyoutBorderShadow:SetSize(48,48)
+		button.FlyoutBorderShadow:SetPoint("CENTER")
+		button.FlyoutBorderShadow:SetDrawLayer("ARTWORK", 2)
+		button.FlyoutBorderShadow:SetTexture("Interface\\Buttons\ActionBarFlyoutButton")
+		button.FlyoutBorderShadow:SetTexCoord("0.01562500", "0.76562500", "0.00781250", "0.38281250")
 
 		button:SetNormalTexture(button.normalTexture);
 		button:SetPushedTexture(button.pushedTexture);
@@ -460,6 +477,11 @@ end
 --
 -- Update: Keybinds trigger Button31, but are now converted to LeftButton during execution so the macro conditional [button:1] will trigger.
 function actionButton:setClickDirection(onKeyDown, alsoOnMouseDown)
+
+	if module:getGameVersion() >= 10 then
+		alsoOnMouseDown = true
+	end
+	
 	self.button:SetAttribute("type31", "")
 	if (self.onClickDirectionPreviouslySet) then
 		self.button:UnwrapScript(self.button, "OnClick")
