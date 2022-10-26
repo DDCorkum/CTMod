@@ -507,8 +507,15 @@ function module:updateOption(optName, value)
 			CT_BarMod.updateOptionFromOutside("disableDragonflightActionBar", value)		
 			preventLoop = nil
 		end
-		RegisterAttributeDriver(MainMenuBar, "state-visibility", value and "hide" or "show")
-		
+		if value then
+			MainMenuBar.ctBBHidden = true
+			module:afterCombat(RegisterAttributeDriver, MainMenuBar, "state-visibility", "hide")
+			MainMenuBar:SetAlpha(0)
+		elseif MainMenuBar.ctBBHidden then
+			MainMenuBar.ctBBHidden = nil
+			module:afterCombat(RegisterAttributeDriver, MainMenuBar, "state-visibility", "show")
+			MainMenuBar:SetAlpha(1)
+		end
 	else
 		local found;
 		for key, obj in ipairs(module.addons) do
@@ -758,7 +765,16 @@ module.frame = function()
 		optionsAddObject( -2, 3*14, "font#t:0:%y#s:0:%s#l:20:0#r#NOTE: Disabling or enabling the default main action bar will have no effect until addons are reloaded.#" .. textColor3 .. ":l");
 
 		if module:getGameVersion() >= 10 then
-			optionsAddObject( -5,   26, "checkbutton#tl:20:%y#i:disableDragonflightActionBar#o:disableDragonflightActionBar:false#Disable the default main action bar.")
+			optionsBeginFrame( -5,   26, "checkbutton#tl:20:%y#i:disableDragonflightActionBar#o:disableDragonflightActionBar:true#Disable the default main action bar.")
+				optionsAddScript("onshow", function(self)
+					local opt = module:getOption("disableDragonflightActionBar")
+					if opt == nil and CT_BottomBar then
+						self:SetChecked(CT_BottomBar:getOption("disableDragonflightActionBar") ~= false)
+					else
+						self:SetChecked(opt)
+					end
+				end)
+			optionsEndFrame()
 		else
 			optionsAddObject( -5,   26, "checkbutton#tl:20:%y#i:disableDefaultActionBar#o:disableDefaultActionBar:true#Disable the default main action bar.")
 		end
@@ -1097,8 +1113,8 @@ function module:optionsInitApplied()
 		obj.isDisabled = not appliedOptions["enable" .. obj.optionName];
 	end
 
-	appliedOptions.disableDefaultActionBar = module:getOption("disableDefaultActionBar") ~= false;
-	appliedOptions.disableDragonflightActionBar = not not module:getOption("disableDragonflightActionBar")
+	appliedOptions.disableDefaultActionBar = module:getOption("disableDefaultActionBar") ~= false
+	appliedOptions.disableDragonflightActionBar = module:getOption("disableDragonflightActionBar") ~= false
 
 	appliedOptions.bagsBarHideBags = not not module:getOption("bagsBarHideBags");
 	appliedOptions.bagsBarSpacing = module:getOption("bagsBarSpacing");	-- if nil, the addon knows what to do for each version of the game

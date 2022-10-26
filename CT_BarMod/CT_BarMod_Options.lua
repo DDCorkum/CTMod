@@ -1499,7 +1499,16 @@ module.frame = function()
 		optionsAddObject(  0,   26, "checkbutton#tl:25:%y#i:showGroup12#o:showGroup12:true#Enable bar 12 (Action bar)");
 
 		if module:getGameVersion() >= 10 then
-			optionsAddObject( -5,   26, "checkbutton#tl:25:%y#i:disableDragonflightActionBar#o:disableDragonflightActionBar:false#Disable the default main action bar.")
+			optionsBeginFrame( -5,   26, "checkbutton#tl:25:%y#i:disableDragonflightActionBar#o:disableDragonflightActionBar:false#Disable the default main action bar.")
+				optionsAddScript("onshow", function(self)
+					local opt = module:getOption("disableDragonflightActionBar")
+					if opt == nil and CT_BottomBar then
+						self:SetChecked(CT_BottomBar:getOption("disableDragonflightActionBar") ~= false)
+					else
+						self:SetChecked(opt)
+					end
+				end)
+			optionsEndFrame()
 		elseif (CT_BottomBar) then
 			-- Don't show this option if CT_BottomBar is not loaded.
 			-- This option only works if CT_BottomBar 4.008 or greater is loaded.
@@ -2549,7 +2558,13 @@ module.optionUpdate = function(self, optName, value)
 			CT_BottomBar.updateOptionFromOutside("disableDragonflightActionBar", value)
 			preventLoop = nil
 		end
-		RegisterAttributeDriver(MainMenuBar, "state-visibility", value and "hide" or "show")
+		if value then
+			MainMenuBar.ctBarHidden = true
+			module:afterCombat(RegisterAttributeDriver, MainMenuBar, "state-visibility", "hide")
+		elseif MainMenuBar.ctBarHidden then
+			MainMenuBar.ctBarHidden = nil
+			module:afterCombat(RegisterAttributeDriver, MainMenuBar, "state-visibility", "show")
+		end
 
 	elseif (
 		optName == "hideExtraBar3" or
@@ -2731,19 +2746,24 @@ module.optionUpdate = function(self, optName, value)
 
 		CT_BarMod_Shift_Init();
 		
-		-- hiding the main bar
-		if CT_BottomBar and CT_BottomBar.updateOptionFromOutside then
-			local t1, t2 = module:getOption("disableDragonflightActionBarChangedDate"), CT_BottomBar:getOption("disableDragonflightActionBarChangedDate")
-			preventLoop = true
-			if (t1 and t2 and t1 > t2) or (t1 and not t2) then
-				CT_BottomBar:setOption("disableDragonflightActionBar", module:getOption("disableDragonflightActionBar"))
-			elseif (t1 and t2 and t2 < t1) or (t2 and not t1) then
-				module:setOption("disableDragonflightActionBar", CT_BottomBar:getOption("disableDragonflightActionBar"))
+		-- hiding the main bar from WoW 10.0 onwards
+		if module:getGameVersion() >= 10 then
+			if CT_BottomBar and CT_BottomBar.updateOptionFromOutside then
+				local t1, t2 = module:getOption("disableDragonflightActionBarChangedDate"), CT_BottomBar:getOption("disableDragonflightActionBarChangedDate")
+				preventLoop = true
+				if (t1 and t2 and t1 > t2) or (t1 and not t2) then
+					CT_BottomBar:setOption("disableDragonflightActionBar", module:getOption("disableDragonflightActionBar"))
+				elseif (t1 and t2 and t2 < t1) or (t2 and not t1) then
+					module:setOption("disableDragonflightActionBar", CT_BottomBar:getOption("disableDragonflightActionBar"))
+				end
+				preventLoop = nil
 			end
-			preventLoop = nil
+			if module:getOption("disableDragonflightActionBar") then
+				MainMenuBar.ctBarHidden = true
+				RegisterAttributeDriver(MainMenuBar, "state-visibility", "hide")
+				MainMenuBar:SetAlpha(0)
+			end
 		end
-		RegisterAttributeDriver(MainMenuBar, "state-visibility", module:getOption("disableDragonflightActionBar") and "hide" or "show")
-		
 	end
 
 	-- Clear edit box focus and highlight.

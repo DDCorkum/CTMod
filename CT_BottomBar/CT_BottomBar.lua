@@ -706,11 +706,15 @@ module.update = function(self, optName, value)
 			if (t1 and t2 and t1 > t2) or (t1 and not t2) then
 				CT_BarMod:setOption("disableDragonflightActionBar", module:getOption("disableDragonflightActionBar"))
 			elseif (t1 and t2 and t2 < t1) or (t2 and not t1) then
-				module:setOption("disableDragonflightActionBar", CT_BarMod:getOption("disableDragonflightActionBar"))
+				module:setOption("disableDragonflightActionBar", CT_BarMod:getOption("disableDragonflightActionBar"))			
 			end
 			preventLoop = nil
 		end
-		RegisterAttributeDriver(MainMenuBar, "state-visibility", module:getOption("disableDragonflightActionBar") and "hide" or "show")
+		if module:getOption("disableDragonflightActionBar") ~= false then
+			MainMenuBar.ctBBHidden = true
+			RegisterAttributeDriver(MainMenuBar, "state-visibility", "hide")
+			MainMenuBar:SetAlpha(0)
+		end
 	end
 	
 	module:optionsInit();

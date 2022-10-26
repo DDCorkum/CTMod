@@ -1,5 +1,5 @@
-CT_BarMod (10.0.0.2) 2022-10-25
-- Blizzard restored limited key-up/down functionality to secure buttons in Dragonflight -- CT_BarMod is once again functional
+CT_BarMod (10.0.0.2) 2022-10-26
+- Restored in WoW Dragonflight
 
 CT_BarMod (9.2.0.4) 2022-10-23
 - Disabled in WoW Dragonflight
