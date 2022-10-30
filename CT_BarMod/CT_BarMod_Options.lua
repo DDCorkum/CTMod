@@ -1097,7 +1097,14 @@ module.frame = function()
 		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:hideTooltip#Hide action button tooltips");
 		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:hideGlow#Disable spell alert animations");
 
-		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:hideGrid#Hide empty button slots");
+		optionsBeginFrame( -5,   26, "checkbutton#tl:20:%y#o:hideGrid#Hide empty button slots")
+			if module:getGameVersion() >= 10 then
+				optionsAddTooltip("This option is only available in Classic.")
+				optionsAddScript("onload", function(btn)
+					btn.text:SetTextColor(0.5, 0.5, 0.5)
+				end)
+			end
+		optionsEndFrame()
 	
 		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:buttonLock#Button lock (require a key to move buttons)");
 		optionsAddObject(  0,   14, "font#tl:50:%y#v:ChatFontNormal#Move buttons key:");

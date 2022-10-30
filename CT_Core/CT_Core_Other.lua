@@ -1830,15 +1830,14 @@ do
 	local function onEvent(event)
 		local data = events[event];
 
-		if (not data) then
-			-- This is not a recognized event.
+		if (
+			module:getOption("disableBagAutomation")
+			or C_CVar.GetCVarBool("combinedBags")
+			or not data
+		) then
 			return;
 		end
 		
-		if (module:getOption("disableBagAutomation")) then
-			-- Bag automation is completely disabled, so go no further
-			return;
-		end
 		
 		if (data.open) then
 			-- This is an open event.
@@ -2016,6 +2015,40 @@ local function setBagOption(value, optName)
 	end
 end
 
+if ContainerFrameMixin then
+	-- To prevent taint in WoW 10.0.0
+	
+	-- Remove ContainerFrameItemButtonMixin:SetBagID() before it ever gets called, but only when the user is not combining bags
+	module:regEvent("PLAYER_LOGIN", function()
+		if not (module:getOption("disableBagAutomation") or C_CVar.GetCVarBool("combinedBags")) then
+			for i=1, NUM_CONTAINER_FRAMES do
+				for j=1, 36 do
+					local frame = _G["ContainerFrame"..i.."Item"..j]
+					if frame then
+						frame.SetBagID = nop
+					end
+				end
+			end
+		end
+	end)
+	
+	-- Encouraging the user to reload the UI after turning combined bags on and off.
+	local needButton = true
+	EventRegistry:RegisterFrameEventAndCallback("USE_COMBINED_BAGS_CHANGED", function()
+		if needButton then
+			needButton = false
+			local btn = CreateFrame("Button", nil, SettingsPanel, "SecureActionButtonTemplate, UIPanelButtonTemplate")
+			btn:RegisterForClicks("AnyDown", "AnyUp")
+			btn:SetAttribute("type", "macro")
+			btn:SetAttribute("macrotext", "/reload")
+			btn:SetSize(SettingsPanel.CloseButton:GetSize())
+			btn:SetPoint("RIGHT", SettingsPanel.CloseButton, "LEFT", -5, 0)
+			btn:SetText(RELOADUI)
+			btn.tooltipText = "CT_Core: Reload required for addon compatibility"
+		end
+	end)
+end
+	
 --------------------------------------------
 -- Block duel requests
 

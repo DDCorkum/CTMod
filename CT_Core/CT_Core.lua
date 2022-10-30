@@ -408,9 +408,23 @@ module.frame = function()
 		optionsAddObject(-15,   17, "font#tl:5:%y#v:GameFontNormalLarge#Bag Automation#i:BagsAndMicroMenuHeading");
 	end
 	optionsAddObject( -8, 2*13, "font#t:0:%y#s:0:%s#l:13:0#r#Disable bag automation if you have other bag management addons#" .. textColor2 .. ":l");	
-	optionsBeginFrame( -3, 15, "checkbutton#tl:60:%y#o:disableBagAutomation#i:disableBagAutomation#|cFFFF6666Disable bag automation");
-		optionsAddTooltip({"Disable bag automation#1:0.5:0.5","Prevents conflicts with other bag management addons#0.9:0.9:0.9"})
+	optionsBeginFrame( -3, 15, "checkbutton#tl:60:%y#o:disableBagAutomation#i:disableBagAutomation#Disable bag automation");
+		optionsAddTooltip({"Disable bag automation#1:0.5:0.5","Prevents conflicts with other bag management addons#0.9:0.9:0.9",module:getGameVersion() >= 10 and "May require a /reload to fully take effect#0.8:0.8:0.5" or nil})
 	optionsEndFrame();
+	optionsBeginFrame(0, 0, "collapsible#tl:0:%y#br:tr:0:%b#i:showWhenBagsCombined")
+		optionsAddObject( -10, 4*13, "font#t:0:%y#s:0:%s#l:13:0#r#Regardless of this setting, bag automation is disabled because the bags are combined.#0.8:0.8:0.5:l");
+	optionsEndFrame()
+	optionsAddScript("onshow", function(frame)
+		if C_CVar.GetCVarBool("combinedBags") then
+			frame.showWhenBagsCombined:Expand()
+			frame.disableBagAutomation.text:SetTextColor(0.5, 0.5, 0.5)
+			frame.bagAutomationCollapsible:SetAlpha(0.5)
+		else
+			frame.showWhenBagsCombined:Collapse()
+			frame.disableBagAutomation.text:SetTextColor(1, 0.5, 0.5)
+			frame.bagAutomationCollapsible:SetAlpha(1)
+		end
+	end)
 	optionsBeginFrame(0, 0, "collapsible#tl:0:%y#br:tr:0:%b#i:bagAutomationCollapsible#o:~disableBagAutomation")
 		-- refer to local variable bagAutomationEvents
 		for i, bagevent in ipairs(bagAutomationEvents) do
@@ -495,7 +509,7 @@ module.frame = function()
 				end
 			end
 		end
-	optionsEndFrame()
+	optionsEndFrame()	--disableBagAutomation
 	optionsAddObject( -18, 1*13, "font#tl:25:%y#s:0:%s#l:13:0#r#Also see CT_MailMod for bag settings#" .. textColor2 .. ":l");	
 
 -- Camera Max Distance

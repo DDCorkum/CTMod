@@ -128,12 +128,26 @@ do
 	--   Clicking the mail frame's upper right close button does not close the backpack.
 	--   Pressing ESC to close the mail frame does close the backpack.
 
+	-- To prevent taint in WoW 10.0.0, remove ContainerFrameItemButtonMixin:SetBagID() before it ever gets called but only if CT_Core isn't already doing this and the user is not combining bags
+	module:regEvent("PLAYER_LOGIN", function()
+		if ContainerFrameMixin and not (CT_Core and not CT_Core:getOption("disableBagAutomation") or C_CVar.GetCVarBool("combinedBags")) and (module.opt.openAllBags or module.opt.openBackpack or module.opt.openNoBags or module.opt.closeAllBags) then
+			for i=1, NUM_CONTAINER_FRAMES do
+				for j=1, 36 do
+					local frame = _G["ContainerFrame"..i.."Item"..j]
+					if frame then
+						frame.SetBagID = nop
+					end
+				end
+			end
+		end
+	end)
+
 	local function mailboxOpened()
 		local openAllBags = module.opt.openAllBags;
 		local openBackpack = module.opt.openBackpack;
 		local openNoBags = module.opt.openNoBags;
 		
-		if (openAllBags or openBackpack or openNoBags) then
+		if (openAllBags or openBackpack or openNoBags) and not C_CVar.GetCVarBool("combinedBags") then
 			-- First, close all bags.
 			-- This also ensures that no bags are open when we call OpenAllBags()
 			-- since that function will do nothing if at least one bag is already open.
