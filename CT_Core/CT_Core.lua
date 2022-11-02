@@ -570,10 +570,12 @@ module.frame = function()
 	optionsAddBookmark("Casting Bar", "CastingBarHeading");
 	optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Casting Bar#i:CastingBarHeading")
 	optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:castingTimers#Display casting bar timers")
-	optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:castingbarEnabled#Use custom casting bar position")
-	optionsBeginFrame(   0,    0, "collapsible#tl:0:%y#br:tr:0:%b#o:castingbarEnabled")
-		optionsAddObject(  6,   26, "checkbutton#tl:40:%y#o:castingbarMovable#Unlock the casting bar")
-	optionsEndFrame()
+	if not CastingBarMixin then
+		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:castingbarEnabled#Use custom casting bar position")
+		optionsBeginFrame(   0,    0, "collapsible#tl:0:%y#br:tr:0:%b#o:castingbarEnabled")
+			optionsAddObject(  6,   26, "checkbutton#tl:40:%y#o:castingbarMovable#Unlock the casting bar")
+		optionsEndFrame()
+	end
 
 -- Chat options
 	optionsAddBookmark("Chat Features", "ChatHeading");

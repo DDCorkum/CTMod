@@ -1,5 +1,6 @@
-CT_Core (10.0.0.3) 2022-10-30
+CT_Core (10.0.0.3) 2022-11-02
 - Preventing bag frame taint
+- Adjusting casting bar text position
 
 CT_Core (9.2.0.4) 2022-10-22
 - Further updates in anticipation of WoW Dragonflight
