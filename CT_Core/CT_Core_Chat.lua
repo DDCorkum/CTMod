@@ -642,22 +642,10 @@ local function setChatFrameResizeMouseover(chatFrame, showOnMouseover)
 		else
 			btn = chatFrame.ctResizeButtons[buttonNum];
 		end
-		if (btn) then
-			if (showOnMouseover) then
-				-- Show textures on mouseover only
-				btn:SetNormalTexture(nil);
-
-				btn:SetHighlightTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight");
-				tx = btn:GetHighlightTexture();
-				RotateTexture(tx, 90 * buttonNum);
-
-				btn:SetPushedTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down");
-				tx = btn:GetPushedTexture();
-				RotateTexture(tx, 90 * buttonNum);
-			else
-				-- Always show textures
-				assignChatFrameResizeDefaultTexture(btn, buttonNum);
-			end
+		if btn then
+			assignChatFrameResizeDefaultTexture(btn, buttonNum)
+			local tex = btn:GetNormalTexture()
+			tex:SetAlpha(showOnMouseover and not btn:IsMouseOver() and 0 or 1)
 		end
 	end
 end
