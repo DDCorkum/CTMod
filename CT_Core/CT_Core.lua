@@ -701,13 +701,16 @@ module.frame = function()
 	end
 
 	-- Chat frame resizing
-	optionsAddObject(-20, 1*13, "font#tl:15:%y#Chat frame resizing");
-	optionsAddObject( -7,   26, "checkbutton#tl:35:%y#o:chatResizeEnabled2#Enable top left resize button");
-	optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:chatResizeEnabled1#Enable top right resize button");
-	optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:chatResizeEnabled3#Enable bottom left resize button");
-	optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:chatResizeEnabled4:true#Enable bottom right resize button");
-	optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:chatResizeMouseover#Show resize buttons on mouseover only");
-	optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:chatMinMaxSize#Override default resize limits");
+	optionsAddObject(-20, 1*13, "font#tl:15:%y#Chat frame resizing")
+	if EditModeManagerFrame then
+		optionsAddObject( -4, 3*13, "font#tl:35:%y#s:0:%s#r#These options only apply to secondary chat windows detached from the main one.#" .. textColor2 .. ":l")
+	end
+	optionsAddObject( -7,   26, "checkbutton#tl:35:%y#o:chatResizeEnabled2#Enable top left resize button")
+	optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:chatResizeEnabled1#Enable top right resize button")
+	optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:chatResizeEnabled3#Enable bottom left resize button")
+	optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:chatResizeEnabled4:true#Enable bottom right resize button")
+	optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:chatResizeMouseover#Show resize buttons on mouseover only")
+	optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:chatMinMaxSize#Override default resize limits")
 
 	-- Chat frame sticky chat types
 	do
