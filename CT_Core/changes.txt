@@ -1,7 +1,7 @@
 CT_Core (10.0.0.3) 2022-11-03
 - Preventing bag frame taint
 - Adjusting casting bar text position
-- Bugfix for chat frame corner textures
+- Chat resizing options updated for secondary chat windows
 
 CT_Core (9.2.0.4) 2022-10-22
 - Further updates in anticipation of WoW Dragonflight

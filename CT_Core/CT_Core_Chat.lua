@@ -541,7 +541,7 @@ end
 local function setChatResizeButton(buttonNum, enableButton)
 	for _, chatFrameName in pairs(CHAT_FRAMES) do
 		local chatFrame = _G[chatFrameName];
-		if (chatFrame) then
+		if chatFrame and not chatFrame.OnEditModeEnter then
 			setChatFrameResizeButton(chatFrame, buttonNum, enableButton);
 		end
 	end
@@ -653,7 +653,7 @@ end
 local function setChatResizeMouseover(showOnMouseover)
 	for _, chatFrameName in pairs(CHAT_FRAMES) do
 		local chatFrame = _G[chatFrameName];
-		if (chatFrame) then
+		if chatFrame and not chatFrame.OnEditModeEnter then
 			setChatFrameResizeMouseover(chatFrame, showOnMouseover);
 		end
 	end
@@ -746,12 +746,12 @@ end
 local function createChatResizeButtons()
 	local updated;
 	for _, chatFrameName in pairs(CHAT_FRAMES) do
-		local chatFrame = _G[chatFrameName];
-		if (chatFrame) then
-			updated = createChatFrameResizeButtons(chatFrame);
+		local chatFrame = _G[chatFrameName]
+		if chatFrame and not chatFrame.OnEditModeEnter then
+			updated = createChatFrameResizeButtons(chatFrame)
 		end
 	end
-	return updated;
+	return updated
 end
 
 if (createChatResizeButtons()) then
