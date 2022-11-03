@@ -1,5 +1,6 @@
-CT_MailMod (10.0.0.3) 2022-10-30
+CT_MailMod (10.0.0.3) 2022-11-03
 - Preventing bag frame taint
+- Inbox size appears over title bar
 
 CT_MailMod (9.2.0.4) 2022-10-21
 - Multi-item tooltips in Dragonflight
