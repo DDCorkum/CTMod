@@ -2317,7 +2317,7 @@ module.useUpdate = function(self, optName, value)
 		actionButtonList:updateLock();
 
 	elseif ( optName == "hideGrid" ) then
-		hideGrid = value;
+		hideGrid = module:getGameVersion() <= 9 and value
 		if (hideGrid) then
 			actionButtonList:hideGrid();
 		else
@@ -2392,7 +2392,7 @@ module.useUpdate = function(self, optName, value)
 		hideGlow = self:getOption("hideGlow");
 		buttonLock = self:getOption("buttonLock");
 		buttonLockKey = self:getOption("buttonLockKey") or 3;
-		hideGrid = self:getOption("hideGrid");
+		hideGrid = module:getGameVersion() <= 9 and value
 		hideTooltip = self:getOption("hideTooltip");
 		useNonEmptyNormal = self:getOption("useNonEmptyNormal");
 		backdropShow = self:getOption("backdropShow");

@@ -541,7 +541,7 @@ end
 local function setChatResizeButton(buttonNum, enableButton)
 	for _, chatFrameName in pairs(CHAT_FRAMES) do
 		local chatFrame = _G[chatFrameName];
-		if (chatFrame) then
+		if chatFrame and not chatFrame.OnEditModeEnter then
 			setChatFrameResizeButton(chatFrame, buttonNum, enableButton);
 		end
 	end
@@ -642,22 +642,10 @@ local function setChatFrameResizeMouseover(chatFrame, showOnMouseover)
 		else
 			btn = chatFrame.ctResizeButtons[buttonNum];
 		end
-		if (btn) then
-			if (showOnMouseover) then
-				-- Show textures on mouseover only
-				btn:SetNormalTexture(nil);
-
-				btn:SetHighlightTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight");
-				tx = btn:GetHighlightTexture();
-				RotateTexture(tx, 90 * buttonNum);
-
-				btn:SetPushedTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down");
-				tx = btn:GetPushedTexture();
-				RotateTexture(tx, 90 * buttonNum);
-			else
-				-- Always show textures
-				assignChatFrameResizeDefaultTexture(btn, buttonNum);
-			end
+		if btn then
+			assignChatFrameResizeDefaultTexture(btn, buttonNum)
+			local tex = btn:GetNormalTexture()
+			tex:SetAlpha(showOnMouseover and not btn:IsMouseOver() and 0 or 1)
 		end
 	end
 end
@@ -665,7 +653,7 @@ end
 local function setChatResizeMouseover(showOnMouseover)
 	for _, chatFrameName in pairs(CHAT_FRAMES) do
 		local chatFrame = _G[chatFrameName];
-		if (chatFrame) then
+		if chatFrame and not chatFrame.OnEditModeEnter then
 			setChatFrameResizeMouseover(chatFrame, showOnMouseover);
 		end
 	end
@@ -758,12 +746,12 @@ end
 local function createChatResizeButtons()
 	local updated;
 	for _, chatFrameName in pairs(CHAT_FRAMES) do
-		local chatFrame = _G[chatFrameName];
-		if (chatFrame) then
-			updated = createChatFrameResizeButtons(chatFrame);
+		local chatFrame = _G[chatFrameName]
+		if chatFrame and not chatFrame.OnEditModeEnter then
+			updated = createChatFrameResizeButtons(chatFrame)
 		end
 	end
-	return updated;
+	return updated
 end
 
 if (createChatResizeButtons()) then

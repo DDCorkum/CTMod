@@ -408,9 +408,23 @@ module.frame = function()
 		optionsAddObject(-15,   17, "font#tl:5:%y#v:GameFontNormalLarge#Bag Automation#i:BagsAndMicroMenuHeading");
 	end
 	optionsAddObject( -8, 2*13, "font#t:0:%y#s:0:%s#l:13:0#r#Disable bag automation if you have other bag management addons#" .. textColor2 .. ":l");	
-	optionsBeginFrame( -3, 15, "checkbutton#tl:60:%y#o:disableBagAutomation#i:disableBagAutomation#|cFFFF6666Disable bag automation");
-		optionsAddTooltip({"Disable bag automation#1:0.5:0.5","Prevents conflicts with other bag management addons#0.9:0.9:0.9"})
+	optionsBeginFrame( -3, 15, "checkbutton#tl:60:%y#o:disableBagAutomation#i:disableBagAutomation#Disable bag automation");
+		optionsAddTooltip({"Disable bag automation#1:0.5:0.5","Prevents conflicts with other bag management addons#0.9:0.9:0.9",module:getGameVersion() >= 10 and "May require a /reload to fully take effect#0.8:0.8:0.5" or nil})
 	optionsEndFrame();
+	optionsBeginFrame(0, 0, "collapsible#tl:0:%y#br:tr:0:%b#i:showWhenBagsCombined")
+		optionsAddObject( -10, 4*13, "font#t:0:%y#s:0:%s#l:13:0#r#Regardless of this setting, bag automation is disabled because the bags are combined.#0.8:0.8:0.5:l");
+	optionsEndFrame()
+	optionsAddScript("onshow", function(frame)
+		if C_CVar.GetCVarBool("combinedBags") then
+			frame.showWhenBagsCombined:Expand()
+			frame.disableBagAutomation.text:SetTextColor(0.5, 0.5, 0.5)
+			frame.bagAutomationCollapsible:SetAlpha(0.5)
+		else
+			frame.showWhenBagsCombined:Collapse()
+			frame.disableBagAutomation.text:SetTextColor(1, 0.5, 0.5)
+			frame.bagAutomationCollapsible:SetAlpha(1)
+		end
+	end)
 	optionsBeginFrame(0, 0, "collapsible#tl:0:%y#br:tr:0:%b#i:bagAutomationCollapsible#o:~disableBagAutomation")
 		-- refer to local variable bagAutomationEvents
 		for i, bagevent in ipairs(bagAutomationEvents) do
@@ -495,7 +509,7 @@ module.frame = function()
 				end
 			end
 		end
-	optionsEndFrame()
+	optionsEndFrame()	--disableBagAutomation
 	optionsAddObject( -18, 1*13, "font#tl:25:%y#s:0:%s#l:13:0#r#Also see CT_MailMod for bag settings#" .. textColor2 .. ":l");	
 
 -- Camera Max Distance
@@ -556,10 +570,12 @@ module.frame = function()
 	optionsAddBookmark("Casting Bar", "CastingBarHeading");
 	optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Casting Bar#i:CastingBarHeading")
 	optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:castingTimers#Display casting bar timers")
-	optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:castingbarEnabled#Use custom casting bar position")
-	optionsBeginFrame(   0,    0, "collapsible#tl:0:%y#br:tr:0:%b#o:castingbarEnabled")
-		optionsAddObject(  6,   26, "checkbutton#tl:40:%y#o:castingbarMovable#Unlock the casting bar")
-	optionsEndFrame()
+	if not CastingBarMixin then
+		optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:castingbarEnabled#Use custom casting bar position")
+		optionsBeginFrame(   0,    0, "collapsible#tl:0:%y#br:tr:0:%b#o:castingbarEnabled")
+			optionsAddObject(  6,   26, "checkbutton#tl:40:%y#o:castingbarMovable#Unlock the casting bar")
+		optionsEndFrame()
+	end
 
 -- Chat options
 	optionsAddBookmark("Chat Features", "ChatHeading");
@@ -685,13 +701,16 @@ module.frame = function()
 	end
 
 	-- Chat frame resizing
-	optionsAddObject(-20, 1*13, "font#tl:15:%y#Chat frame resizing");
-	optionsAddObject( -7,   26, "checkbutton#tl:35:%y#o:chatResizeEnabled2#Enable top left resize button");
-	optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:chatResizeEnabled1#Enable top right resize button");
-	optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:chatResizeEnabled3#Enable bottom left resize button");
-	optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:chatResizeEnabled4:true#Enable bottom right resize button");
-	optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:chatResizeMouseover#Show resize buttons on mouseover only");
-	optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:chatMinMaxSize#Override default resize limits");
+	optionsAddObject(-20, 1*13, "font#tl:15:%y#Chat frame resizing")
+	if EditModeManagerFrame then
+		optionsAddObject( -4, 3*13, "font#tl:35:%y#s:0:%s#r#These options only apply to secondary chat windows detached from the main one.#" .. textColor2 .. ":l")
+	end
+	optionsAddObject( -7,   26, "checkbutton#tl:35:%y#o:chatResizeEnabled2#Enable top left resize button")
+	optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:chatResizeEnabled1#Enable top right resize button")
+	optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:chatResizeEnabled3#Enable bottom left resize button")
+	optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:chatResizeEnabled4:true#Enable bottom right resize button")
+	optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:chatResizeMouseover#Show resize buttons on mouseover only")
+	optionsAddObject(  6,   26, "checkbutton#tl:35:%y#o:chatMinMaxSize#Override default resize limits")
 
 	-- Chat frame sticky chat types
 	do

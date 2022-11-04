@@ -47,6 +47,9 @@ do
 	fsInboxCount = InboxFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall");
 	fsInboxCount:SetText("");
 	fsInboxCount:SetPoint("TOPLEFT", InboxFrame, "TOPLEFT", 63, -8);
+	if MailFrame.TitleContainer then
+		fsInboxCount:SetParent(MailFrame.TitleContainer)
+	end
 end
 
 

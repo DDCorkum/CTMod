@@ -1,3 +1,6 @@
+CT_BarMod (10.0.0.3) 2022-10-29
+- The option to hide unused button slots is no longer available in Retail
+
 CT_BarMod (10.0.0.2) 2022-10-26
 - Restored in WoW Dragonflight
 

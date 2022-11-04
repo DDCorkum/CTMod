@@ -1219,60 +1219,50 @@ end
 
 local function castingtimer_configure(castBarFrame)
 	
-	local castingBarText = castBarFrame.Text;
-	local countDownText = castBarFrame.countDownText;
+	local castingBarText = castBarFrame.Text
+	local countDownText = castBarFrame.countDownText
 
 	if (not countDownText) then
-		castingtimer_createFS(castBarFrame);
-		countDownText = castBarFrame.countDownText;
+		castingtimer_createFS(castBarFrame)
+		countDownText = castBarFrame.countDownText
 	end
 
 	if ( displayTimers ) then
 
-		countDownText:ClearAllPoints();
-		castingBarText:ClearAllPoints();
+		countDownText:ClearAllPoints()
+		castingBarText:ClearAllPoints()
+		countDownText:SetFontObject(castingBarText:GetFontObject())
 
 		if ((castBarFrame:GetWidth() or 0) > 190) then
 			-- CLASSIC look
-			countDownText:SetPoint("TOPRIGHT", 0, 5);
-			countDownText:SetPoint("BOTTOMLEFT", castBarFrame, "BOTTOMRIGHT", -50, 0);
-			countDownText:SetFontObject("GameFontHighlight");
-
-			castingBarText:SetPoint("TOPLEFT", 3, 5);
-			castingBarText:SetPoint("BOTTOMRIGHT", countDownText, "BOTTOMLEFT", 10, 0);
+			countDownText:SetPoint("TOPRIGHT", 0, CastingBarMixin and -12 or 3)
+			castingBarText:SetPoint("TOPLEFT", 3, CastingBarMixin and -10 or 5)
+			castingBarText:SetPoint("RIGHT", countDownText, "LEFT", 10, 0)
 		else
 			-- UNITFRAME look
-			countDownText:ClearAllPoints();
-			castingBarText:ClearAllPoints();
-
-			countDownText:SetPoint("TOPRIGHT", 0, 1);
-			countDownText:SetPoint("BOTTOMLEFT", castBarFrame, "BOTTOMRIGHT", -45, 0);
-			countDownText:SetFontObject("SystemFont_Shadow_Small");
-
-			castingBarText:SetPoint("TOPLEFT", 5, 1);
-			castingBarText:SetPoint("BOTTOMRIGHT", countDownText, "BOTTOMLEFT", 10, 0);
+			countDownText:SetPoint("TOPRIGHT", 0, CastingBarMixin and 1 or 2)
+			castingBarText:SetPoint("TOPLEFT", 5, CastingBarMixin and 3 or 4)
+			castingBarText:SetPoint("RIGHT", countDownText, "LEFT", 10, 0)
 		end
 
-		countDownText:Show();
+		countDownText:Show()
 	else
-		countDownText:Hide();
+		countDownText:Hide()
 
 		-- See CastingBarFrame_SetLook() in CastingBarFrame.lua.
 		if ((castBarFrame:GetWidth() or 0) > 190) then
 			-- CLASSIC look
-			castingBarText:ClearAllPoints();
-			castingBarText:SetWidth(185);
-			castingBarText:SetHeight(16);
-			castingBarText:SetPoint("TOP", 0, 5);
-			castingBarText:SetFontObject("GameFontHighlight");
+			castingBarText:ClearAllPoints()
+			castingBarText:SetWidth(185)
+			castingBarText:SetHeight(16)
+			castingBarText:SetPoint("TOP", 0, CastingBarMixin and -10 or 5)	 -- WoW 10.0 vs Classic
 		else
 			-- UNITFRAME look
-			castingBarText:ClearAllPoints();
-			castingBarText:SetWidth(0);
-			castingBarText:SetHeight(16);
-			castingBarText:SetPoint("TOPLEFT", 0, 4);
-			castingBarText:SetPoint("TOPRIGHT", 0, 4);
-			castingBarText:SetFontObject("SystemFont_Shadow_Small");
+			castingBarText:ClearAllPoints()
+			castingBarText:SetWidth(0)
+			castingBarText:SetHeight(16)
+			castingBarText:SetPoint("TOPLEFT", 0, CastingBarMixin and 3 or 4)
+			castingBarText:SetPoint("TOPRIGHT", 0, CastingBarMixin and 3 or 4)
 		end
 	end
 end
@@ -1538,103 +1528,107 @@ end
 --------------------------------------------
 -- Movable casting bar
 
-local movableCastingBar, movableCastingBarHelper, enableMovableCastingBar, unlockMovableCastingBar
+local castingbar_ToggleHelper, castingbar_Update	-- defined within the code block below
 
--- start by creating a helper that can be moved around
- movableCastingBarHelper = CreateFrame("StatusBar", nil, UIParent, "CastingBarFrameTemplate");
-movableCastingBarHelper:SetWidth(195);
-movableCastingBarHelper:SetHeight(13);
-movableCastingBarHelper:SetPoint("CENTER", UIParent, "CENTER", 0, 0);
-movableCastingBarHelper:SetFrameStrata("BACKGROUND");
-movableCastingBarHelper:SetScript("OnEvent", nil);
-movableCastingBarHelper:SetScript("OnUpdate", nil);
-movableCastingBarHelper:SetScript("OnShow", nil);
+if not CastingBarMixin then
 
-local function castingbar_ToggleHelper(showHelper)
-	unlockMovableCastingBar = showHelper
-	movableCastingBarHelper:SetShown(enableMovableCastingBar and unlockMovableCastingBar)
-end
+	local movableCastingBar, movableCastingBarHelper, enableMovableCastingBar, unlockMovableCastingBar
 
-castingbar_ToggleHelper(module:getOption("castingbarMovable"));
--- deferred until ADDON_LOADED -- module:registerMovable("CASTINGBARHELPER",movableCastingBarHelper,true);
-movableCastingBarHelper:SetScript("OnMouseDown",
-	function(self, button)
-		module:moveMovable("CASTINGBARANCHOR2")
+	-- start by creating a helper that can be moved around
+	movableCastingBarHelper = CreateFrame("StatusBar", nil, UIParent, "CastingBarFrameTemplate");
+	movableCastingBarHelper:SetWidth(195);
+	movableCastingBarHelper:SetHeight(13);
+	movableCastingBarHelper:SetPoint("CENTER", UIParent, "CENTER", 0, 0);
+	movableCastingBarHelper:SetFrameStrata("BACKGROUND");
+	movableCastingBarHelper:SetScript("OnEvent", nil);
+	movableCastingBarHelper:SetScript("OnUpdate", nil);
+	movableCastingBarHelper:SetScript("OnShow", nil);
+
+	function castingbar_ToggleHelper(showHelper) -- local
+		unlockMovableCastingBar = showHelper
+		movableCastingBarHelper:SetShown(enableMovableCastingBar and unlockMovableCastingBar)
 	end
-);
-movableCastingBarHelper:SetScript("OnMouseUp",
-	function(self, button)
-		module:stopMovable("CASTINGBARANCHOR2")
-	end
-);
+
+	castingbar_ToggleHelper(module:getOption("castingbarMovable"));
+	-- deferred until ADDON_LOADED -- module:registerMovable("CASTINGBARHELPER",movableCastingBarHelper,true);
+	movableCastingBarHelper:SetScript("OnMouseDown",
+		function(self, button)
+			module:moveMovable("CASTINGBARANCHOR2")
+		end
+	);
+	movableCastingBarHelper:SetScript("OnMouseUp",
+		function(self, button)
+			module:stopMovable("CASTINGBARANCHOR2")
+		end
+	);
 
 
--- create the actual bar and attach it to the helper's current position
-local movableCastingBar = CreateFrame("StatusBar", "CT_CastingBarFrame", UIParent, "CastingBarFrameTemplate");
-movableCastingBar:SetPoint("CENTER", movableCastingBarHelper);
-movableCastingBar:SetWidth(195);
-movableCastingBar:SetHeight(13);
-movableCastingBar:Hide();
-movableCastingBar:SetFrameStrata("HIGH");
+	-- create the actual bar and attach it to the helper's current position
+	local movableCastingBar = CreateFrame("StatusBar", "CT_CastingBarFrame", UIParent, "CastingBarFrameTemplate");
+	movableCastingBar:SetPoint("CENTER", movableCastingBarHelper);
+	movableCastingBar:SetWidth(195);
+	movableCastingBar:SetHeight(13);
+	movableCastingBar:Hide();
+	movableCastingBar:SetFrameStrata("HIGH");
 
-local movableCastingBarIsLoaded = nil;
+	local movableCastingBarIsLoaded = nil;
 
-local frameIsAttached = nil;
-local function castingbar_Update(enable)
-	if (not movableCastingBarIsLoaded) then
-		return;
-	end
-	if (enable and not frameIsAttached) then
-		if CastingBarFrame_OnLoad then
-			-- prior to WoW 10.x
-			CastingBarFrame_OnLoad(movableCastingBar, "player", true, false)
-			CastingBarFrame_OnLoad(CastingBarFrame, nil, true, false)
+	local frameIsAttached = nil;
+	function castingbar_Update(enable)
+		if (not movableCastingBarIsLoaded) then
+			return;
+		end
+		if (enable and not frameIsAttached) then
+			if CastingBarFrame_OnLoad then
+				-- prior to WoW 10.x
+				CastingBarFrame_OnLoad(movableCastingBar, "player", true, false)
+				CastingBarFrame_OnLoad(CastingBarFrame, nil, true, false)
+			else
+				-- WoW 10.x
+				PlayerCastingBarFrame.OnLoad(movableCastingBar, "player", true, false)
+				PlayerCastingBarFrame.showCastbar = false --:OnLoad(nil, true, false)
+			end
 		else
-			-- WoW 10.x
-			PlayerCastingBarFrame.OnLoad(movableCastingBar, "player", true, false)
-			PlayerCastingBarFrame.showCastbar = false --:OnLoad(nil, true, false)
+			if CastingBarFrame_OnLoad then
+				-- prior to WoW 10.x
+				CastingBarFrame_OnLoad(movableCastingBar, nil, true, false)
+				CastingBarFrame_OnLoad(CastingBarFrame, "player", true, false)
+			else
+				-- WoW 10.x
+				movableCastingBar.showCastbar = false
+				PlayerCastingBarFrame.showCastbar = true   --:OnLoad("player", true, false)
+			end
 		end
-	else
-		if CastingBarFrame_OnLoad then
-			-- prior to WoW 10.x
-			CastingBarFrame_OnLoad(movableCastingBar, nil, true, false)
-			CastingBarFrame_OnLoad(CastingBarFrame, "player", true, false)
-		else
-			-- WoW 10.x
-			movableCastingBar.showCastbar = false
-			PlayerCastingBarFrame.showCastbar = true   --:OnLoad("player", true, false)
-		end
+		enableMovableCastingBar = enable
+		movableCastingBarHelper:SetShown(enableMovableCastingBar and unlockMovableCastingBar)
 	end
-	enableMovableCastingBar = enable
-	movableCastingBarHelper:SetShown(enableMovableCastingBar and unlockMovableCastingBar)
+
+	movableCastingBar:RegisterEvent("ADDON_LOADED")
+	movableCastingBar:HookScript("OnEvent",
+		function(self, event, ...)
+			if (event == "ADDON_LOADED" and not movableCastingBarIsLoaded) then
+				module:registerMovable("CASTINGBARANCHOR2",movableCastingBarHelper,true);
+				movableCastingBar.Icon:Hide();
+				movableCastingBarIsLoaded = true;
+				castingbar_Update(module:getOption("castingbarEnabled"))
+			end
+		end	
+	);
+
+	local function castingbar_PlayerFrame_DetachCastBar()
+		frameIsAttached = nil;
+		castingbar_Update(module:getOption("castingbarEnabled"))  -- use our bar IF APPROPRIATE
+	end
+
+	local function castingbar_PlayerFrame_AttachCastBar()
+		frameIsAttached = true;
+		castingbar_Update(false); -- no matter what, stop using our bar
+	end
+
+	hooksecurefunc("PlayerFrame_DetachCastBar", castingbar_PlayerFrame_DetachCastBar);
+	hooksecurefunc("PlayerFrame_AttachCastBar", castingbar_PlayerFrame_AttachCastBar);
+
 end
-
-movableCastingBar:RegisterEvent("ADDON_LOADED")
-movableCastingBar:HookScript("OnEvent",
-	function(self, event, ...)
-		if (event == "ADDON_LOADED" and not movableCastingBarIsLoaded) then
-			module:registerMovable("CASTINGBARANCHOR2",movableCastingBarHelper,true);
-			movableCastingBar.Icon:Hide();
-			movableCastingBarIsLoaded = true;
-			castingbar_Update(module:getOption("castingbarEnabled"))
-		end
-	end	
-);
-
-
-
-local function castingbar_PlayerFrame_DetachCastBar()
-	frameIsAttached = nil;
-	castingbar_Update(module:getOption("castingbarEnabled"))  -- use our bar IF APPROPRIATE
-end
-
-local function castingbar_PlayerFrame_AttachCastBar()
-	frameIsAttached = true;
-	castingbar_Update(false); -- no matter what, stop using our bar
-end
-
-hooksecurefunc("PlayerFrame_DetachCastBar", castingbar_PlayerFrame_DetachCastBar);
-hooksecurefunc("PlayerFrame_AttachCastBar", castingbar_PlayerFrame_AttachCastBar);
 
 --------------------------------------------
 -- Movable LossOfControlFrame
@@ -1830,15 +1824,14 @@ do
 	local function onEvent(event)
 		local data = events[event];
 
-		if (not data) then
-			-- This is not a recognized event.
+		if (
+			module:getOption("disableBagAutomation")
+			or C_CVar.GetCVarBool("combinedBags")
+			or not data
+		) then
 			return;
 		end
 		
-		if (module:getOption("disableBagAutomation")) then
-			-- Bag automation is completely disabled, so go no further
-			return;
-		end
 		
 		if (data.open) then
 			-- This is an open event.
@@ -2016,6 +2009,40 @@ local function setBagOption(value, optName)
 	end
 end
 
+if ContainerFrameMixin then
+	-- To prevent taint in WoW 10.0.0
+	
+	-- Remove ContainerFrameItemButtonMixin:SetBagID() before it ever gets called, but only when the user is not combining bags
+	module:regEvent("PLAYER_LOGIN", function()
+		if not (module:getOption("disableBagAutomation") or C_CVar.GetCVarBool("combinedBags")) then
+			for i=1, NUM_CONTAINER_FRAMES do
+				for j=1, 36 do
+					local frame = _G["ContainerFrame"..i.."Item"..j]
+					if frame then
+						frame.SetBagID = nop
+					end
+				end
+			end
+		end
+	end)
+	
+	-- Encouraging the user to reload the UI after turning combined bags on and off.
+	local needButton = true
+	EventRegistry:RegisterFrameEventAndCallback("USE_COMBINED_BAGS_CHANGED", function()
+		if needButton then
+			needButton = false
+			local btn = CreateFrame("Button", nil, SettingsPanel, "SecureActionButtonTemplate, UIPanelButtonTemplate")
+			btn:RegisterForClicks("AnyDown", "AnyUp")
+			btn:SetAttribute("type", "macro")
+			btn:SetAttribute("macrotext", "/reload")
+			btn:SetSize(SettingsPanel.CloseButton:GetSize())
+			btn:SetPoint("RIGHT", SettingsPanel.CloseButton, "LEFT", -5, 0)
+			btn:SetText(RELOADUI)
+			btn.tooltipText = "CT_Core: Reload required for addon compatibility"
+		end
+	end)
+end
+	
 --------------------------------------------
 -- Block duel requests
 
