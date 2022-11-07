@@ -1,3 +1,6 @@
+CT_BuffMod (10.0.0.4) 2022-11-07
+- Now also hides the debuff frame in Dragonflight
+
 CT_BuffMod (10.0.0.2) 2022-10-25
 - Removing workaround; updating secure frames to rely on cvar ActionButtonUseKeyDown
 - Non-secure frames will also respect ActionButtonUseKeyDown for consistency

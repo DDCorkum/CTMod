@@ -8229,17 +8229,23 @@ local buffsOption;
 
 function globalClass:hideBlizzardBuffsFrame(value)
 	-- Configure the option.
-	local frame = BuffFrame;
-	buffsOption = value;  -- save option's value for use in the OnShow hook.
-	if (value) then
-		frame_Hide(frame);
-		hidBuffs = true;
+	local frame1, frame2 = BuffFrame, DebuffFrame;
+	buffsOption = value  -- save option's value for use in the OnShow hook.
+	if value then
+		frame_Hide(frame1)
+		if frame2 then
+			frame_Hide(frame2)
+		end
+		hidBuffs = true
 	else
 		-- Only show the frame if we have previously hidden it,
 		-- that way we don't affect anything if the user leaves the option disabled.
-		if (hidBuffs) then
-			frame:Show();
-			hidBuffs = nil;
+		if hidBuffs then
+			frame1:Show()
+			if frame2 then
+				frame2:Show()
+			end
+			hidBuffs = nil
 		end
 	end
 end
@@ -8247,12 +8253,24 @@ end
 BuffFrame:HookScript("OnShow",
 	function(self)
 		-- If player has chosen to hide the frame.
-		if (buffsOption) then
+		if buffsOption then
 			-- Override Show() by hiding the frame.
-			frame_Hide(self);
+			frame_Hide(self)
 		end
 	end
-);
+)
+
+if DebuffFrame then
+	DebuffFrame:HookScript("OnShow",
+		function(self)
+			-- If player has chosen to hide the frame.
+			if buffsOption then
+				-- Override Show() by hiding the frame.
+				frame_Hide(self)
+			end
+		end
+	)
+end
 
 -- Blizzard shows/hides the ConsolidatedBuffs frame as needed.
 --[[local hidConsolidated;
