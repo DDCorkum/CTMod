@@ -2392,7 +2392,7 @@ module.useUpdate = function(self, optName, value)
 		hideGlow = self:getOption("hideGlow");
 		buttonLock = self:getOption("buttonLock");
 		buttonLockKey = self:getOption("buttonLockKey") or 3;
-		hideGrid = module:getGameVersion() <= 9 and value
+		hideGrid = module:getGameVersion() <= 9 and self:getOption("hideGrid")	-- classic only
 		hideTooltip = self:getOption("hideTooltip");
 		useNonEmptyNormal = self:getOption("useNonEmptyNormal");
 		backdropShow = self:getOption("backdropShow");
