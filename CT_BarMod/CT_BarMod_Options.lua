@@ -858,6 +858,7 @@ do
 		end)
 	end
 	
+	--[[
 	if (NPE_LoadUI) then
 		local firstTime = true
 		hooksecurefunc("NPE_LoadUI", function()
@@ -871,6 +872,7 @@ do
 			end
 		end)
 	end
+	--]]
 
 end
 
@@ -1098,12 +1100,12 @@ module.frame = function()
 		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:hideGlow#Disable spell alert animations");
 
 		optionsBeginFrame( -5,   26, "checkbutton#tl:20:%y#o:hideGrid#Hide empty button slots")
-			if module:getGameVersion() >= 10 then
-				optionsAddTooltip("This option is only available in Classic.")
-				optionsAddScript("onload", function(btn)
-					btn.text:SetTextColor(0.5, 0.5, 0.5)
-				end)
-			end
+		--	if module:getGameVersion() >= 10 then
+		--		optionsAddTooltip("This option is only available in Classic.")
+		--		optionsAddScript("onload", function(btn)
+		--			btn.text:SetTextColor(0.5, 0.5, 0.5)
+		--		end)
+		--	end
 		optionsEndFrame()
 	
 		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:buttonLock#Button lock (require a key to move buttons)");

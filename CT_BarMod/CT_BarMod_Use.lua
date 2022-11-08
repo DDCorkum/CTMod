@@ -2317,13 +2317,23 @@ module.useUpdate = function(self, optName, value)
 		actionButtonList:updateLock();
 
 	elseif ( optName == "hideGrid" ) then
-		hideGrid = module:getGameVersion() <= 9 and value
-		if (hideGrid) then
-			actionButtonList:hideGrid();
+		hideGrid = value
+		if hideGrid then
+			actionButtonList:hideGrid()
+			if MultiBar7 then
+				module:afterCombat(function()
+					MultiBar7Button12:SetAttribute("ctForceHideGrid", 1)
+					MultiBar7Button12:SetAttribute("showgrid", 0)
+				end)
+			end
 		else
-			actionButtonList:showGrid();
+			actionButtonList:showGrid()
+			module:afterCombat(function()
+				MultiBar7Button12:SetAttribute("ctForceHideGrid", 0)
+				MultiBar7Button12:SetAttribute("showgrid", MultiBar7Button11:GetAttribute("showgrid"))
+			end)
 		end
-		actionButtonList:update();
+		actionButtonList:update()
 
 	elseif ( optName == "useNonEmptyNormal" ) then
 		useNonEmptyNormal = value;
@@ -2392,7 +2402,7 @@ module.useUpdate = function(self, optName, value)
 		hideGlow = self:getOption("hideGlow");
 		buttonLock = self:getOption("buttonLock");
 		buttonLockKey = self:getOption("buttonLockKey") or 3;
-		hideGrid = module:getGameVersion() <= 9 and self:getOption("hideGrid")	-- classic only
+		hideGrid = self:getOption("hideGrid")
 		hideTooltip = self:getOption("hideTooltip");
 		useNonEmptyNormal = self:getOption("useNonEmptyNormal");
 		backdropShow = self:getOption("backdropShow");
@@ -2416,8 +2426,14 @@ module.useUpdate = function(self, optName, value)
 
 		if (hideGrid) then
 			actionButtonList:hideGrid();
+			if MultiBar7 then
+				MultiBar7Button12:SetAttribute("ctForceHideGrid", 1)
+			end
 		else
 			actionButtonList:showGrid();
+			if MultiBar7 then
+				MultiBar7Button12:SetAttribute("ctForceHideGrid", 0)
+			end
 		end
 		actionButtonList:updateVisibility();
 

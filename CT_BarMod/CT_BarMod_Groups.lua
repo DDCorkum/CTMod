@@ -1846,6 +1846,8 @@ local actionButton_OnAttributeChanged_Pre_Secure = [=[
 		self:CallMethod("grideventFunc", showgrid);
 	end
 
+	
+	
 	return nil;  -- return a non-false value to allow wrapped script to execute
 ]=];
 
@@ -1859,6 +1861,32 @@ actButton:Hide();
 SecureHandlerWrapScript(actButton, "OnAttributeChanged", actButton, actionButton_OnAttributeChanged_Pre_Secure, nil);
 
 actButton.grideventFunc = actionButton_gridevent_Unsecure;
+
+if MultiBar7 then
+	SecureHandlerSetFrameRef(MultiBar7Button12, "ctActButton", actButton)
+	SecureHandlerWrapScript(
+		MultiBar7Button12,
+		"OnAttributeChanged",
+		MultiBar7Button12,
+		[=[
+			-- name, value
+			if name == "showgrid" and value == 1 then
+				if self:GetAttribute("ctForceHideGrid") == 1 then
+					return true, true
+				end
+			else
+				self:GetFrameRef("ctActButton"):SetAttribute(name,value)
+				return true;
+			end
+		]=],
+		[=[
+			self:SetAttribute("showgrid", 0)
+		]=]
+	)
+	MultiBar7Button12:SetAttribute("showgrid", 0)
+end
+
+
 
 --------------------------------------------
 -- Interface
