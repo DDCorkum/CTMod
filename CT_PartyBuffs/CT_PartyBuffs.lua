@@ -132,7 +132,7 @@ local function createAndAnchorButtons()
 end
 
 local function setBuffSize(size)
-	size = size + (UIParent:GetScale() < 0.7 and 17 or 15)
+	size = size + 17 - 2 * ClampedPercentageBetween(UIParent:GetScale(), 0.7, 0.9)
 	for btn in buffPool:EnumerateActive() do
 		btn:SetSize(size, size)
 	end
@@ -142,7 +142,7 @@ local function setBuffSize(size)
 end
 
 local function setDebuffSize(size)
-	size = size + (UIParent:GetScale() < 0.7 and 17 or 15)
+	size = size + 17 - 2 * ClampedPercentageBetween(UIParent:GetScale(), 0.7, 0.9)
 	for btn in debuffPool:EnumerateActive() do
 		btn:SetSize(size, size)
 		btn.Border:SetSize(size+2, size+2)
@@ -294,12 +294,14 @@ do
 		frame:SetScript("OnShow", partyMemberFrame_OnShow)
 		frame:SetScript("OnHide", partyMemberFrame_OnHide)		
 		RegisterAttributeDriver(frame, "state-visibility", "[group:raid]hide;[@party1,exists]show;hide")	-- useful starting in WoW 10.x because it is now parented by PartyFrame that never disappears
-		CompactPartyFrame:HookScript("OnShow", function()
-			module:afterCombat(RegisterAttributeDriver, frame, "state-visibility", "hide")
-		end)
-		CompactPartyFrame:HookScript("OnHide", function()
-			module:afterCombat(RegisterAttributeDriver, frame, "state-visibility", "[group:raid]hide;[@party1,exists]show;hide")
-		end)
+		if CompactPartyFrame then
+			CompactPartyFrame:HookScript("OnShow", function()
+				module:afterCombat(RegisterAttributeDriver, frame, "state-visibility", "hide")
+			end)
+			CompactPartyFrame:HookScript("OnHide", function()
+				module:afterCombat(RegisterAttributeDriver, frame, "state-visibility", "[group:raid]hide;[@party1,exists]show;hide")
+			end)
+		end
 	end
 
 	createPartyMemberFrame(1)
