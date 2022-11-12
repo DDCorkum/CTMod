@@ -266,10 +266,7 @@ do
 		local frame = CreateFrame("Frame", "CT_PartyBuffFrame"..id, _G["PartyMemberFrame"..id] or PartyFrame, nil, id)
 		frame:SetPoint("TOPLEFT", 48, PartyMemberFrame1 and -32 or -53*(id-1)-32)
 		frame:SetSize(70, 50)
-		frame:SetScript("OnShow", partyMemberFrame_OnShow)
-		frame:SetScript("OnHide", partyMemberFrame_OnHide)
-		frame:SetScript("OnEvent", triggerNextUpdate)
-		
+	
 		frame.buffs = {}
 		frame.debuffs = {}
 		
@@ -277,9 +274,16 @@ do
 		
 		frame.unit = "party" .. id
 		frame:SetAttribute("unit", "party" .. id)
+
+
+		frame:SetScript("OnEvent", triggerNextUpdate)
 		frame:RegisterUnitEvent("UNIT_AURA", frame.unit)
+		frame:RegisterEvent("PLAYER_LOGIN")
 		
-		RegisterUnitWatch(frame, false)	-- useful starting in WoW 10.x because it is now parented by PartyFrame that never disappears
+		frame:Hide()
+		frame:SetScript("OnShow", partyMemberFrame_OnShow)
+		frame:SetScript("OnHide", partyMemberFrame_OnHide)		
+		RegisterAttributeDriver(frame, "state-visibility", "[group:raid]hide;[@party1,exists]show;hide")	-- useful starting in WoW 10.x because it is now parented by PartyFrame that never disappears
 	end
 
 	createPartyMemberFrame(1)
@@ -291,23 +295,26 @@ do
 	local frame = CreateFrame("Frame", "CT_PetBuffFrame", PetFrame)
 	frame:SetPoint("TOPLEFT", 48, -42)
 	frame:SetSize(70,50)
-	frame:SetScript("OnShow", partyMemberFrame_OnShow)
-	frame:SetScript("OnHide", partyMemberFrame_OnHide)
-	frame:SetScript("OnEvent", triggerNextUpdate)
 
 	frame.buffs = {}
 	frame.debuffs = {}
 
 	petFrame = frame
-
 	frame.unit = "pet"
-	frame:RegisterUnitEvent("UNIT_AURA", frame.unit)
 	frame.isPet = true
+
+	frame:SetScript("OnEvent", triggerNextUpdate)
+	frame:RegisterUnitEvent("UNIT_AURA", frame.unit)	
 	
-	RegisterUnitWatch(frame)	-- not strictly necessary; included to match the party frame
+	frame:Hide()
+	frame:SetScript("OnShow", partyMemberFrame_OnShow)
+	frame:SetScript("OnHide", partyMemberFrame_OnHide)
+	RegisterAttributeDriver(frame, "state-visibility", "[@pet,exists]show;hide")	-- not strictly necessary; included to match the party frame
 end
+
 --------------------------------------------
 -- Hide the default buff tooltip when icons are already present
+
 PartyMemberBuffTooltip:HookScript("OnShow", function(self)
 	if ( ( self.unit == "pet" and numPetBuffs > 0 ) or ( self.unit ~= "pet" and numBuffs > 0 ) ) then
 		PartyMemberBuffTooltip:Hide();
