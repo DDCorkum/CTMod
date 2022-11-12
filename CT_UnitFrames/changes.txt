@@ -1,3 +1,6 @@
+CT_UnitFrames (10.0.0.4) 2022-11-12
+- Update for Dragonflight 10.0.2 (build 46619 on the beta)
+
 CT_UnitFrames (9.2.0.4) 2022-10-21
 - Further updates for Dragonflight
 - Bugfix for target health bar text in live servers

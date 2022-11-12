@@ -11,6 +11,9 @@
 
 local module = select(2, ...)
 
+local healthBar = PlayerFrameHealthBar or PlayerFrame.PlayerFrameContent.PlayerFrameContentMain.HealthBarArea.HealthBar
+local manaBar = PlayerFrameManaBar or PlayerFrame.PlayerFrameContent.PlayerFrameContentMain.ManaBarArea.ManaBar
+
 local function CT_PlayerFrame_HealthTextStatusBar_UpdateTextString(bar)
 	if (CT_UnitFramesOptions) then
 		module:UpdateStatusBarTextString(bar, CT_UnitFramesOptions.styles[1][1])
@@ -27,12 +30,12 @@ local function CT_PlayerFrame_ManaTextStatusBar_UpdateTextString(bar)
 end
 
 module:regEvent("PLAYER_LOGIN", function()
-	PlayerFrameHealthBar:HookScript("OnEnter", CT_PlayerFrame_HealthTextStatusBar_UpdateTextString)
-	PlayerFrameHealthBar:HookScript("OnLeave", CT_PlayerFrame_HealthTextStatusBar_UpdateTextString)
-	PlayerFrameHealthBar:HookScript("OnValueChanged", CT_PlayerFrame_HealthTextStatusBar_UpdateTextString)
-	PlayerFrameManaBar:HookScript("OnEnter", CT_PlayerFrame_ManaTextStatusBar_UpdateTextString)
-	PlayerFrameManaBar:HookScript("OnLeave", CT_PlayerFrame_ManaTextStatusBar_UpdateTextString)
-	PlayerFrameManaBar:HookScript("OnValueChanged", CT_PlayerFrame_ManaTextStatusBar_UpdateTextString)
+	healthBar:HookScript("OnEnter", CT_PlayerFrame_HealthTextStatusBar_UpdateTextString)
+	healthBar:HookScript("OnLeave", CT_PlayerFrame_HealthTextStatusBar_UpdateTextString)
+	healthBar:HookScript("OnValueChanged", CT_PlayerFrame_HealthTextStatusBar_UpdateTextString)
+	manaBar:HookScript("OnEnter", CT_PlayerFrame_ManaTextStatusBar_UpdateTextString)
+	manaBar:HookScript("OnLeave", CT_PlayerFrame_ManaTextStatusBar_UpdateTextString)
+	manaBar:HookScript("OnValueChanged", CT_PlayerFrame_ManaTextStatusBar_UpdateTextString)
 	
 	-- incoming heals on classic
 	if (UnitGetTotalAbsorbs == nil) then
@@ -41,8 +44,8 @@ module:regEvent("PLAYER_LOGIN", function()
 end)
 
 function module:ShowPlayerFrameBarText()
-	CT_PlayerFrame_HealthTextStatusBar_UpdateTextString(PlayerFrameHealthBar)
-	CT_PlayerFrame_ManaTextStatusBar_UpdateTextString(PlayerFrameManaBar)
+	CT_PlayerFrame_HealthTextStatusBar_UpdateTextString(healthBar)
+	CT_PlayerFrame_ManaTextStatusBar_UpdateTextString(manaBar)
 end
 
 function module:AnchorPlayerFrameSideText()
