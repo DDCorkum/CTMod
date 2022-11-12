@@ -41,20 +41,18 @@ local numBuffs, numDebuffs, numPetBuffs, layout		-- options used in createAndAnc
 
 -- Helper intended only for use in createAndAnchorButtons(); accepts nil if there are no buttons of a given kind
 local function anchorFirstBuffAndDebuff(buff, debuff)
-	if (buff) then
-		if (layout == 1 or layout == 3) then
-			buff:SetPoint("TOPLEFT", 0, 0)
-		else
+	if buff then
+		if layout == 2 then
 			buff:SetPoint("TOPLEFT", 75, 38)
+		else
+			buff:SetPoint("TOPLEFT", 0, 0)
 		end
 	end
 	if (debuff) then
 		if (layout == 1) then
 			debuff:SetPoint("TOPLEFT", 75, 38)
-		elseif (layout == 2 or layout == 3 and not buff) then
-			debuff:SetPoint("TOPLEFT", 0, 0)
 		else
-			debuff:SetPoint("TOPLEFT", 0, -18)
+			debuff:SetPoint("TOPLEFT", 0, 0)
 		end
 	end
 end
@@ -81,7 +79,7 @@ local function createAndAnchorButtons()
 			buffPool:Release(tremove(frame.buffs))
 			count = count - 1
 		end
-		
+
 		-- Acquire debuff buttons, and anchor all but the first
 		count = #frame.debuffs
 		while (count < numDebuffs and count < CT_MAX_PARTY_DEBUFFS) do
@@ -99,7 +97,7 @@ local function createAndAnchorButtons()
 			debuffPool:Release(tremove(frame.debuffs))
 			count = count - 1
 		end
-		
+				
 		-- Anchor the first buff and debuff buttons
 		anchorFirstBuffAndDebuff(frame.buffs[1], frame.debuffs[1])
 	end
@@ -134,7 +132,7 @@ local function createAndAnchorButtons()
 end
 
 local function setBuffSize(size)
-	size = size + 15
+	size = size + (UIParent:GetScale() < 0.7 and 17 or 15)
 	for btn in buffPool:EnumerateActive() do
 		btn:SetSize(size, size)
 	end
@@ -144,12 +142,14 @@ local function setBuffSize(size)
 end
 
 local function setDebuffSize(size)
-	size = size + 15
+	size = size + (UIParent:GetScale() < 0.7 and 17 or 15)
 	for btn in debuffPool:EnumerateActive() do
 		btn:SetSize(size, size)
+		btn.Border:SetSize(size+2, size+2)
 	end
 	for __, btn in debuffPool:EnumerateInactive() do
 		btn:SetSize(size, size)
+		btn.Border:SetSize(size+2, size+2)
 	end
 	
 	if (PetFrameDebuff1 and PetFrameDebuff2 and PetFrameDebuff3 and PetFrameDebuff4) then
@@ -180,16 +180,8 @@ local triggers = {}			-- list of party frames requiring an update since the last
 
 local function refreshBuffs()
 	for frame in pairs(triggers) do
-		for i, button in ipairs(frame.buffs) do
-			local name, icon = UnitAura(frame.unit, i, buffFilter)
-			if (name) then
-				button.Icon:SetTexture(icon)
-				button:Show()
-			else
-				button:Hide()
-			end
-		end
-
+		
+		local debuffsShown = 0
 		for i, button in ipairs(frame.debuffs) do
 			local name, icon, count, debuffType = UnitAura(frame.unit, i, debuffFilter)
 			if (name) then
@@ -197,6 +189,24 @@ local function refreshBuffs()
 				button.Count:SetText(count > 1 and count or "")
 				local color = DebuffTypeColor[debuffType or "none"]
 				button.Border:SetVertexColor(color.r, color.g, color.b)
+				button:Show()
+				debuffsShown = i
+			else
+				button:Hide()
+			end
+		end
+		
+		for i, button in ipairs(frame.buffs) do
+			if i == 1 and layout == 3 then
+				if debuffsShown > 0 then
+					button:SetPoint("TOPLEFT", frame.debuffs[debuffsShown], "TOPRIGHT", 2, 0)
+				else
+					button:SetPoint("TOPLEFT", 0, 0)
+				end
+			end
+			local name, icon = UnitAura(frame.unit, i, buffFilter)
+			if (name) then
+				button.Icon:SetTexture(icon)
 				button:Show()
 			else
 				button:Hide()
@@ -264,7 +274,7 @@ do
 
 	local function createPartyMemberFrame(id)
 		local frame = CreateFrame("Frame", "CT_PartyBuffFrame"..id, _G["PartyMemberFrame"..id] or PartyFrame, nil, id)
-		frame:SetPoint("TOPLEFT", 48, PartyMemberFrame1 and -32 or -53*(id-1)-32)
+		frame:SetPoint("TOPLEFT", 48, PartyMemberFrame1 and -32 or -63*(id-1)-40)
 		frame:SetSize(70, 50)
 	
 		frame.buffs = {}
@@ -284,6 +294,12 @@ do
 		frame:SetScript("OnShow", partyMemberFrame_OnShow)
 		frame:SetScript("OnHide", partyMemberFrame_OnHide)		
 		RegisterAttributeDriver(frame, "state-visibility", "[group:raid]hide;[@party1,exists]show;hide")	-- useful starting in WoW 10.x because it is now parented by PartyFrame that never disappears
+		CompactPartyFrame:HookScript("OnShow", function()
+			module:afterCombat(RegisterAttributeDriver, frame, "state-visibility", "hide")
+		end)
+		CompactPartyFrame:HookScript("OnHide", function()
+			module:afterCombat(RegisterAttributeDriver, frame, "state-visibility", "[group:raid]hide;[@party1,exists]show;hide")
+		end)
 	end
 
 	createPartyMemberFrame(1)
@@ -381,8 +397,8 @@ function module:frame()
 	ysize = 80;
 	options["frame#tl:0:-" .. yoffset .. "#br:tr:0:-".. (yoffset + ysize)] = {
 		"font#tl:5:0#v:GameFontNormalLarge#Size",
-		"slider#tr:t:-20:-45#s:120:17#o:buffSize:0#Buffs:" .. SMALL .. ":" .. LARGE .. "#-1:1:1",
-		"slider#tl:t:20:-45#s:120:17#o:debuffSize:0#Debuffs:" .. SMALL .. ":" .. LARGE .. "#-1:1:1",
+		"slider#tr:t:-20:-45#s:120:17#o:buffSize:0#Buffs = <value>:" .. SMALL .. ":" .. LARGE .. "#-2:2:1",
+		"slider#tl:t:20:-45#s:120:17#o:debuffSize:0#Debuffs = <value>:" .. SMALL .. ":" .. LARGE .. "#-2:2:1",
 	};
 	yoffset = yoffset + ysize;
 
@@ -407,6 +423,11 @@ function module:update(type, value)
 		setBuffSize(module:getOption("buffSize") or 0)
 		setDebuffSize(module:getOption("debuffSize") or 0)
 		
+		module:regEvent("UI_SCALE_CHANGED", function()
+			setBuffSize(module:getOption("buffSize") or 0)
+			setDebuffSize(module:getOption("debuffSize") or 0)
+		end)
+
 		-- Hide the filter if the user has turned it off
 		setDebuffBorder(module:getOption("debuffBorder") ~= false)
 		
@@ -429,6 +450,7 @@ function module:update(type, value)
 	elseif ( type == "layout" ) then
 		layout = value
 		createAndAnchorButtons()
+		refreshAllBuffs()
 	elseif ( type == "buffSize" ) then
 		setBuffSize(value)
 	elseif (type == "debuffSize" ) then

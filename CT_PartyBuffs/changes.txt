@@ -1,5 +1,6 @@
 CT_PartyBuffs (10.0.0.4) 2022-11-12
-- Buffs hidden during raids
+- Buffs hidden during raids and compact party frames
+- Adjusted buff frame size and positions
 
 CT_PartyBuffs (9.2.0.3) 2022-10-14
 - Updates for Dragonflight and compatibility with older editions
