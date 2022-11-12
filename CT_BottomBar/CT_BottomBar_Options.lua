@@ -325,9 +325,15 @@ function module:updateOption(optName, value)
 				end
 			end
 		end
+		
+	elseif optName == "microButtonSpacing" then
+		value = value or module:getGameVersion() >= 10 and 0 or -3
+		if applyUnprotectedOption(optName, value) then
+			module.ctMenuBar:updateFunc()
+		end
 
 	elseif (optName == "customStatusBarWidth") then				-- used in retail
-		value = value or EXP_DEFAULT_WIDTH or 1024;
+		value = value or 768;
 		if (applyUnprotectedOption(optName, value)) then
 			module:CT_BottomBar_StatusBar_SetWidth();
 		end
@@ -509,12 +515,16 @@ function module:updateOption(optName, value)
 		end
 		if value then
 			MainMenuBar.ctBBHidden = true
-			module:afterCombat(RegisterAttributeDriver, MainMenuBar, "state-visibility", "hide")
-			MainMenuBar:SetAlpha(0)
+			module:afterCombat(RegisterAttributeDriver, MainMenuBar, "state-visibility", MainMenuBar.ctBBHiddenInVehicle and "hide" or "[overridebar] show; [vehicleui] show; hide")
 		elseif MainMenuBar.ctBBHidden then
 			MainMenuBar.ctBBHidden = nil
-			module:afterCombat(RegisterAttributeDriver, MainMenuBar, "state-visibility", "show")
-			MainMenuBar:SetAlpha(1)
+			module:afterCombat(RegisterAttributeDriver, MainMenuBar, "state-visibility", "[overridebar] hide; [vehicleui] hide; show")
+		end
+		
+	elseif optName == "disableDragonflightActionBarInVehicle" then
+		MainMenuBar.ctBBHiddenInVehicle = value
+		if MainMenuBar.ctBBHidden then
+			module:afterCombat(RegisterAttributeDriver, MainMenuBar, "state-visibility", value and "hide" or "[overridebar] show; [vehicleui] show; hide")
 		end
 	else
 		local found;
@@ -629,6 +639,7 @@ end
 local function optionsBeginFrame(offset, size, details, data)
 	module:framesBeginFrame(optionsFrameList, offset, size, details, data);
 end
+local function optionsAddTooltip (text) module:framesAddScript(optionsFrameList, "onenter", function(obj) module:displayTooltip(obj, text, "CT_ABOVEBELOW", 0, 0, CTCONTROLPANEL) end) end
 local function optionsEndFrame()
 	module:framesEndFrame(optionsFrameList);
 end
@@ -714,7 +725,7 @@ module.frame = function()
 	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
 		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Important General Options");
 
-		if module:getGameVersion() <= 9 then
+		if module:getGameVersion() <= 9 then	
 			optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormal#" .. L["CT_BottomBar/Options/General/BackgroundTextures/Heading"]);
 			optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#" .. L["CT_BottomBar/Options/General/BackgroundTextures/Line1"] .. "#" .. textColor2 .. ":l");
 			optionsAddObject( -5,   26, "checkbutton#tl:20:%y#i:showLions#o:showLions#" .. L["CT_BottomBar/Options/General/BackgroundTextures/ShowLionsCheckButton"]);
@@ -722,70 +733,80 @@ module.frame = function()
 			optionsAddObject(  6,   26, "checkbutton#tl:20:%y#i:hideTexturesBackground#o:hideTexturesBackground:true#" .. L["CT_BottomBar/Options/General/BackgroundTextures/HideActionBarCheckButton"]);
 			--optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#Warning: don't hide the bag/menu background if you unchecked 'Activate' up above#" .. textColor2 .. ":l");
 			optionsAddObject(  6,   26, "checkbutton#tl:20:%y#i:hideMenuAndBagsBackground#o:hideMenuAndBagsBackground:true#" .. L["CT_BottomBar/Options/General/BackgroundTextures/HideMenuAndBagsCheckButton"]);
-			optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormal#How to move bars");
-			optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#You can move a bar off the screen if you want... but consider just hiding it instead#" .. textColor2 .. ":l");
-			optionsAddObject(  -5,   26, "checkbutton#tl:20:%y#o:clampFrames:true#Cannot drag bars completely off screen");
-			if (CT_BarMod) then
-				optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#The numbered bars are part of CT_BarMod.\nCheck this to move them at the same time.#" .. textColor2 .. ":l");
-				optionsAddObject( -5,   26, "checkbutton#tl:20:%y#i:showCTBarMod#o:showCTBarMod#Move CT_BarMod bars at the same time");
-			end
 			optionsAddObject(  -15,    1, "texture#tl:5:%y#br:tr:0:%b#1:1:1");
+		end
+
+		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormal#How to move bars");
+		optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#You can move a bar off the screen if you want... but consider just hiding it instead#" .. textColor2 .. ":l");
+		optionsAddObject(  -5,   26, "checkbutton#tl:20:%y#o:clampFrames:true#Cannot drag bars completely off screen");
+		if (CT_BarMod) then
+			optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#The numbered bars are part of CT_BarMod.\nCheck this to move them at the same time.#" .. textColor2 .. ":l");
+			optionsAddObject( -5,   26, "checkbutton#tl:20:%y#i:showCTBarMod#o:showCTBarMod#Move CT_BarMod bars at the same time");
 		end
 	optionsEndFrame();
 
-	if module:getGameVersion() <= 9 then
-		-- Bar-Specific Options
-		optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
-			optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Bar-Specific Options");
-		optionsEndFrame();
-
-		-- Override Frame
-		optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
-			optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormal#Override/Vehicle Frame");
-			optionsAddObject( -5, 4*14, "font#t:0:%y#s:0:%s#l:20:0#r#This is a large frame used for vehicle and override bars. If you hide the frame you will need to use an alternate bar that can show vehicle and override buttons.#" .. textColor2 .. ":l");
-			optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:vehicleHideFrame#Hide the override/vehicle frame.");
-			optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:vehicleHideEnabledBars:true#Hide the activated CT_BottomBar bars.");
-		optionsEndFrame();
-
-		-- Pet Battle Frame
-		optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
-			optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormal#Pet Battle Frame");
-			optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:petbattleHideEnabledBars:true#Hide the activated CT_BottomBar bars.");
-		optionsEndFrame();
-		
-	end
+	-- Bar-Specific Options
+	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
+		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormalLarge#Bar-Specific Options");
+	optionsEndFrame();
 
 	-- Action bar options
 	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b#i:actionbar");
-		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormal#Action Bar");
-
-		optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:20:0#r#CT_BottomBar does not include support for manipulating the default main action bar.#" .. textColor2 .. ":l");
-		optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:20:0#r#The main action bar can either be used in its default state or it can be disabled.#" .. textColor2 .. ":l");
-		optionsAddObject( -5, 3*14, "font#t:0:%y#s:0:%s#l:20:0#r#If you disable the bar, you may want to use CT_BarMod version 4.004 (or greater) which includes an alternate main action bar.#" .. textColor2 .. ":l");
-		optionsAddObject( -2, 3*14, "font#t:0:%y#s:0:%s#l:20:0#r#NOTE: Disabling or enabling the default main action bar will have no effect until addons are reloaded.#" .. textColor3 .. ":l");
-
+		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormal#Action Bar")		
+		optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:20:0#r#This is the main action bar.  It is normally visible except when you are in a vehicle.#" .. textColor2 .. ":l");
 		if module:getGameVersion() >= 10 then
-			optionsBeginFrame( -5,   26, "checkbutton#tl:20:%y#i:disableDragonflightActionBar#o:disableDragonflightActionBar:true#Disable the default main action bar.")
-				optionsAddScript("onshow", function(self)
-					local opt = module:getOption("disableDragonflightActionBar")
-					if opt == nil and CT_BottomBar then
-						self:SetChecked(CT_BottomBar:getOption("disableDragonflightActionBar") ~= false)
-					else
-						self:SetChecked(opt)
-					end
+			optionsBeginFrame( -5,   26, "checkbutton#tl:20:%y#i:disableDragonflightActionBar#o:disableDragonflightActionBar:true#Hide the default action bar")
+				optionsAddScript("onshow", function(btn)
+					btn:SetChecked(module:getOption("disableDragonflightActionBar") ~= false)
 				end)
 			optionsEndFrame()
+			optionsBeginFrame( 6,   26, "checkbutton#tl:50:%y#i:disableDragonflightActionBarInVehicle#o:disableDragonflightActionBarInVehicle:true#Also hide it when entering a vehicle")
+				optionsAddTooltip({"Also hide the default action bar when entering a vehicle#"..textColor3, "Deselect this if you are hiding the override/vehicle frame and don't have another addon to show the buttons.#"..textColor1})
+				optionsAddScript("onshow", function(btn1)
+					local btn2 = btn1:GetParent().disableDragonflightActionBar
+					if not btn2.hookedByBtn1 then
+						btn2.hookedByBtn1 = true
+						btn2:HookScript("OnClick", function()
+							btn1:SetAlpha(btn2:GetChecked() and 1 or 0.5)
+						end)
+					end
+					btn1:SetAlpha(btn2:GetChecked() and 1 or 0.5)
+				end)
+			optionsEndFrame()
+			
 		else
-			optionsAddObject( -5,   26, "checkbutton#tl:20:%y#i:disableDefaultActionBar#o:disableDefaultActionBar:true#Disable the default main action bar.")
-		end
+			-- Classic
+			optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:20:0#r#CT_BottomBar does not include support for manipulating the default main action bar.#" .. textColor2 .. ":l");
+			optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:20:0#r#The main action bar can either be used in its default state or it can be disabled.#" .. textColor2 .. ":l");
+			optionsAddObject( -5, 3*14, "font#t:0:%y#s:0:%s#l:20:0#r#If you disable the bar, you may want to use CT_BarMod version 4.004 (or greater) which includes an alternate main action bar.#" .. textColor2 .. ":l");
+			optionsAddObject( -2, 3*14, "font#t:0:%y#s:0:%s#l:20:0#r#NOTE: Disabling or enabling the default main action bar will have no effect until addons are reloaded.#" .. textColor3 .. ":l");
 
-		optionsBeginFrame(  -8,   30, "button#t:0:%y#s:180:%s#n:CT_BottomBar_DisableActionBar_Button#v:GameMenuButtonTemplate#Reload addons");
-			optionsAddScript("onclick",
-				function(self)
-					ConsoleExec("RELOADUI");
-				end
-			);
-		optionsEndFrame();
+			optionsAddObject( -5,   26, "checkbutton#tl:20:%y#i:disableDefaultActionBar#o:disableDefaultActionBar:true#Disable the default main action bar.")
+			optionsBeginFrame(  -8,   30, "button#t:0:%y#s:180:%s#n:CT_BottomBar_DisableActionBar_Button#v:GameMenuButtonTemplate#Reload addons")
+				optionsAddScript("onclick",
+					function(self)
+						ConsoleExec("RELOADUI")
+					end
+				)
+			optionsEndFrame()
+		end
+		
+	optionsEndFrame();
+
+	-- Override Frame
+	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
+		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormal#Override/Vehicle Frame");
+		optionsAddObject( -5, 4*14, "font#t:0:%y#s:0:%s#l:20:0#r#This is a large frame used for vehicle and override bars. If you hide the frame you will need to use an alternate bar that can show vehicle and override buttons.#" .. textColor2 .. ":l");
+		optionsBeginFrame( -5,   26, "checkbutton#tl:20:%y#o:vehicleHideFrame#Hide the override/vehicle frame")
+			optionsAddTooltip({"Hide the override/vehicle frame#"..textColor3, "Make sure you have an alternative!  One option is to show the action bar while in vehicles.#"..textColor1})
+		optionsEndFrame()
+		optionsAddObject(  6,   26, "checkbutton#tl:20:%y#o:vehicleHideEnabledBars:true#Hide the activated CT_BottomBar bars");
+	optionsEndFrame();
+
+	-- Pet Battle Frame
+	optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
+		optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormal#Pet Battle Frame");
+		optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:petbattleHideEnabledBars:true#Hide the activated CT_BottomBar bars.");
 	optionsEndFrame();
 
 	-- Bags Bar
@@ -801,6 +822,14 @@ module.frame = function()
 
 			optionsAddFrame( -25,   17, "slider#tl:30:%y#s:250:%s#i:spacing#n:bagsBarSpacing#o:bagsBarSpacing:2#Button Spacing = <value>#0:25:1");
 		optionsEndFrame();
+	end
+	
+	-- Micro menu buttons
+	if module.ctMenuBar then
+		optionsBeginFrame(-25, 0, "frame#tl:0:%y#br:tr:0:%b#i:menu#r")
+			optionsAddObject(  0,   17, "font#tl:5:%y#v:GameFontNormal#Menu Buttons")
+			optionsAddFrame( -15,   17, "slider#tl:55:%y#s:210:%s#i:microButtonSpacing#o:microButtonSpacing:" .. (module:getGameVersion() >= 10 and 0 or -3) .. "#Menu Button Spacing = <value>#-3:3:1")
+		optionsEndFrame()
 	end
 
 	-- Classic Experience & Reputation Bars
@@ -963,32 +992,20 @@ module.frame = function()
 
 			optionsAddObject( -5, 4*14, "font#t:0:%y#s:0:%s#l:20:0#r#If you are using the game's default status bars, the game will shift the action bars up or down in response to the showing or hiding of the exp and rep bars.#" .. textColor2 .. ":l");
 
-			optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:20:0#r#The default width of the experience and reputation frames is 1024.#" .. textColor2 .. ":l");
+			optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:20:0#r#The default width of the experience and reputation frames is 571.#" .. textColor2 .. ":l");
 	
-			optionsAddFrame( -25,   17, "slider#tl:55:%y#s:210:%s#i:customStatusBarWidth#o:customStatusBarWidth:1024#Status Frame width = <value>#1:2048:1");
-			do
-				local function updateStatusBarSize(size)
-					local minSize, maxSize = statusOptionsFrame.customStatusBarWidth:GetMinMaxValues();
-					if (size < minSize) then
-						size = minSize;
-					end
-					if (size > maxSize) then
-						size = maxSize;
-					end
-					statusOptionsFrame.customStatusBarWidth:SetValue(size);
-				end
-			end
-			optionsAddObject(  0,   35, "font#tl:20:-206:%y#v:GameFontNormal#Make bars hidden");
-			optionsAddObject( -5, 3*14, "font#t:0:%y#s:0:%s#l:20:0#r#The game automatically hides bars that are not needed.  Use these options to hide them always.#" .. textColor2 .. ":l");
+			optionsAddFrame( -25,   17, "slider#tl:55:%y#s:210:%s#i:customStatusBarWidth#o:customStatusBarWidth:768#Status Frame width = <value>#1:1024:1");
+			optionsAddObject(  0,   35, "font#tl:20:-206:%y#v:GameFontNormal#Hide bars");
+			optionsAddObject( -5, 3*14, "font#t:0:%y#s:0:%s#l:20:0#r#The game shows the two highest-priority bars.  Use these options to hide them always.#" .. textColor2 .. ":l");
 			optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:customStatusBarHideExp#Never display experience bar");
-			optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:customStatusBarHideReputation#Never display reputation bar");
-			optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:customStatusBarHideHonor#Never display honor bar");
-			optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:customStatusBarHideArtifact#Never display Legion artifact bar");
-			optionsAddObject( -5,   26, "checkbutton#tl:20:%y#o:customStatusBarHideAzerite#Never display BFA Azerite bar");
+			optionsAddObject(  0,   26, "checkbutton#tl:20:%y#o:customStatusBarHideReputation#Never display reputation bar");
+			optionsAddObject(  0,   26, "checkbutton#tl:20:%y#o:customStatusBarHideHonor#Never display honor bar");
+			optionsAddObject(  0,   26, "checkbutton#tl:20:%y#o:customStatusBarHideArtifact#Never display Legion artifact bar");
+			optionsAddObject(  0,   26, "checkbutton#tl:20:%y#o:customStatusBarHideAzerite#Never display BFA Azerite bar");
 
 		optionsEndFrame();
 	end
-
+	
 	-- Extra Bar
 	if (module.ctExtraBar) then
 		optionsBeginFrame(-20, 0, "frame#tl:0:%y#br:tr:0:%b");
@@ -1114,7 +1131,12 @@ function module:optionsInitApplied()
 	end
 
 	appliedOptions.disableDefaultActionBar = module:getOption("disableDefaultActionBar") ~= false
-	appliedOptions.disableDragonflightActionBar = module:getOption("disableDragonflightActionBar") ~= false
+	if CT_BarMod then
+		appliedOptions.disableDragonflightActionBar = module:getOption("disableDragonflightActionBar") ~= false
+	else
+		appliedOptions.disableDragonflightActionBar = module:getOption("disableDragonflightActionBar")
+	end
+	appliedOptions.disableDragonflightActionBarInVehicle = module:getOption("disableDragonflightActionBarInVehicle") ~= false
 
 	appliedOptions.bagsBarHideBags = not not module:getOption("bagsBarHideBags");
 	appliedOptions.bagsBarSpacing = module:getOption("bagsBarSpacing");	-- if nil, the addon knows what to do for each version of the game
@@ -1125,8 +1147,10 @@ function module:optionsInitApplied()
 		appliedOptions["enable" .. "Reputation Bar"] = appliedOptions["enable" .. "Experience Bar"];
 		module.ctRepBar.isDisabled = module.ctExpBar.isDisabled;
 	end
+	
+	appliedOptions.microButtonSpacing = module:getOption("microButtonSpacing") or module:getGameVersion() >= 10 and 0 or -3
 
-	appliedOptions.customStatusBarWidth = module:getOption("customStatusBarWidth");
+	appliedOptions.customStatusBarWidth = min(1024, module:getOption("customStatusBarWidth") or 768) -- before CT_BarMod 10.0.0.4, values up to 2048 were permitted.
 	appliedOptions.repBarHideNoRep = not not module:getOption("repBarHideNoRep");
 	appliedOptions.repBarCoverExpBar = not not module:getOption("repBarCoverExpBar");
 	appliedOptions.expBarShowMaxLevelBar = not not module:getOption("expBarShowMaxLevelBar");

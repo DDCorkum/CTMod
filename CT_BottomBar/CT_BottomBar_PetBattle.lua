@@ -10,21 +10,15 @@
 -- the CTMod Team. Thank you.                 --
 ------------------------------------------------
 
-if CT_BottomBar:getGameVersion() >= 10 then
-	return
-end
 
 --------------------------------------------
 -- Initialization
 
-local _G = getfenv(0);
 local module = _G.CT_BottomBar;
 
 --------------------------------------------
 -- Miscellaneous
 
 function module:hasPetBattleUI()
-	local hasPetBattleUI;
-	hasPetBattleUI = CT_BottomBar_SecureFrame:GetAttribute("has-petbattle");
-	return hasPetBattleUI;
+	return CT_BottomBar_SecureFrame:GetAttribute("has-petbattle")
 end

@@ -1508,21 +1508,24 @@ module.frame = function()
 		optionsAddObject(  0,   26, "checkbutton#tl:25:%y#i:showGroup12#o:showGroup12:true#Enable bar 12 (Action bar)");
 
 		if module:getGameVersion() >= 10 then
-			optionsBeginFrame( -5,   26, "checkbutton#tl:25:%y#i:disableDragonflightActionBar#o:disableDragonflightActionBar:false#Disable the default main action bar.")
+			optionsBeginFrame( -5,   26, "checkbutton#tl:25:%y#i:disableDragonflightActionBar#o:disableDragonflightActionBar:false#Disable the default main action bar")
 				optionsAddScript("onshow", function(self)
 					local opt = module:getOption("disableDragonflightActionBar")
-					if opt == nil and CT_BottomBar then
-						self:SetChecked(CT_BottomBar:getOption("disableDragonflightActionBar") ~= false)
+					if CT_BottomBar then
+						self:SetChecked(opt ~= false)
 					else
 						self:SetChecked(opt)
 					end
 				end)
+				if CT_BottomBar then
+					optionsAddTooltip({"Disable the default main action bar#"..textColor3, "CT_BottomBar has additional options affecting the action bar.#"..textColor1})
+				end
 			optionsEndFrame()
 		elseif (CT_BottomBar) then
 			-- Don't show this option if CT_BottomBar is not loaded.
 			-- This option only works if CT_BottomBar 4.008 or greater is loaded.
 
-			optionsAddObject( -5,   26, "checkbutton#tl:25:%y#i:disableDefaultActionBar#o:disableDefaultActionBar#Disable the default main action bar.");
+			optionsAddObject( -5,   26, "checkbutton#tl:25:%y#i:disableDefaultActionBar#o:disableDefaultActionBar#Disable the default main action bar");
 
 			optionsAddObject(  3, 2*14, "font#t:0:%y#s:0:%s#l:55:0#r#This option requires CT_BottomBar.#" .. textColor2 .. ":l");
 			optionsAddObject(  0, 4*14, "font#t:0:%y#s:0:%s#l:55:0#r#Disabling or enabling the default main action bar requires reloading addons.#" .. textColor3 .. ":l");
@@ -2569,10 +2572,10 @@ module.optionUpdate = function(self, optName, value)
 		end
 		if value then
 			MainMenuBar.ctBarHidden = true
-			module:afterCombat(RegisterAttributeDriver, MainMenuBar, "state-visibility", "hide")
+			module:afterCombat(RegisterAttributeDriver, MainMenuBar, "state-visibility", MainMenuBar.ctBBHiddenInVehicle and "hide" or "[overridebar] show; [vehicleui] show; hide")
 		elseif MainMenuBar.ctBarHidden then
 			MainMenuBar.ctBarHidden = nil
-			module:afterCombat(RegisterAttributeDriver, MainMenuBar, "state-visibility", "show")
+			module:afterCombat(RegisterAttributeDriver, MainMenuBar, "state-visibility", "[overridebar] hide; [vehicleui] hide; show")
 		end
 
 	elseif (
@@ -2769,8 +2772,7 @@ module.optionUpdate = function(self, optName, value)
 			end
 			if module:getOption("disableDragonflightActionBar") then
 				MainMenuBar.ctBarHidden = true
-				RegisterAttributeDriver(MainMenuBar, "state-visibility", "hide")
-				MainMenuBar:SetAlpha(0)
+				RegisterAttributeDriver(MainMenuBar, "state-visibility", MainMenuBar.ctBBHiddenInVehicle and "hide" or "[overridebar] show; [vehicleui] show; hide")
 			end
 		end
 	end

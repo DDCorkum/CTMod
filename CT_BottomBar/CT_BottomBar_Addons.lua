@@ -577,9 +577,7 @@ function addon:updateDragVisibility(show)
 			local hasSpecialUI;
 			local usedOnSpecialUI;
 			local hideSpecialUI;
-			if module:getGameVersion() >= 10 then
-				hasSpecialUI, show = false, true
-			elseif (module:hasPetBattleUI()) then
+			if (module:hasPetBattleUI()) then
 				hasSpecialUI = true;
 				usedOnSpecialUI = self.settings.usedOnPetBattleUI;
 				hideSpecialUI = appliedOptions.petbattleHideFrame;
@@ -712,23 +710,21 @@ function addon:updateVisibility()
 		local hideEnabledBars;
 		local hideSpecialUI;
 		local showOnSpecialUI;
-		if module:getGameVersion() <= 9 then
-			if (module:hasPetBattleUI()) then
-				hasSpecialUI = true;
-				hideEnabledBars = appliedOptions.petbattleHideEnabledBars;
-				hideSpecialUI = appliedOptions.petbattleHideFrame;
-				showOnSpecialUI = self.settings.showOnPetBattleUI;
-			elseif (module:hasVehicleUI()) then
-				hasSpecialUI = true;
-				hideEnabledBars = appliedOptions.vehicleHideEnabledBars;
-				hideSpecialUI = appliedOptions.vehicleHideFrame;
-				showOnSpecialUI = self.settings.showOnVehicleUI;
-			elseif (module:hasOverrideUI()) then
-				hasSpecialUI = true;
-				hideEnabledBars = appliedOptions.overrideHideEnabledBars;
-				hideSpecialUI = appliedOptions.overrideHideFrame;
+		if module:hasPetBattleUI() then
+			hasSpecialUI = true;
+			hideEnabledBars = appliedOptions.petbattleHideEnabledBars;
+			hideSpecialUI = appliedOptions.petbattleHideFrame;
+			showOnSpecialUI = self.settings.showOnPetBattleUI;
+		elseif (module:hasVehicleUI()) then
+			hasSpecialUI = true;
+			hideEnabledBars = appliedOptions.vehicleHideEnabledBars;
+			hideSpecialUI = appliedOptions.vehicleHideFrame;
+			showOnSpecialUI = self.settings.showOnVehicleUI;
+		elseif (module:hasOverrideUI()) then
+			hasSpecialUI = true;
+			hideEnabledBars = appliedOptions.overrideHideEnabledBars;
+			hideSpecialUI = appliedOptions.overrideHideFrame;
 			showOnSpecialUI = self.settings.showOnOverrideUI;
-			end
 		end
 		if (not hasSpecialUI or (hasSpecialUI and not hideEnabledBars)) then
 			-- -----
