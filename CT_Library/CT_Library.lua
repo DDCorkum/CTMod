@@ -1002,7 +1002,7 @@ do
 	-- Reads an option, or the 'default' value for display on a frame (NOT INTENDED FOR USE BY ANY MODULES)
 	function lib:getDisplayValue(option)
 		local value = self:getOption(option)
-		return value ~= nil and value or defaultDisplayValues[self][option]
+		return value == nil and defaultDisplayValues[self][option] or value
 	end
 
 	local function nextOption(t, key)

@@ -10,9 +10,6 @@
 -- the CTMod Team. Thank you.                 --
 ------------------------------------------------
 
-if CT_BottomBar:getGameVersion() >= 10 then
-	return
-end
 
 --------------------------------------------
 -- Vehicle tools bar
@@ -357,7 +354,8 @@ local function addon_Hooked_OverrideActionBar_CalcSize()
 		return;
 	end
 --	setDelayedUpdate(1);
-	if (not MainMenuBar.slideOut:IsPlaying() or OverrideActionBar.slideOut:IsPlaying()) then
+	
+	if (MainMenuBar.slideOut and not MainMenuBar.slideOut:IsPlaying() or OverrideActionBar.slideOut and OverrideActionBar.slideOut:IsPlaying()) then
 		-- Get items back on default UI frames before they start to be animated.
 		addon_Update_OverrideUI();
 	end
@@ -471,10 +469,16 @@ local function addon_Init(self)
 	-- (from MainMenuBar.lua)
 	-- This is the routine where Blizzard shows or hides a vehicle leave button
 	-- when the player does not have a vehicle ui.
-	hooksecurefunc("MainMenuBarVehicleLeaveButton_Update", addon_Hooked_MainMenuBarVehicleLeaveButton_Update);
+	if MainMenuBarVehicleLeaveButton_Update then
+		hooksecurefunc("MainMenuBarVehicleLeaveButton_Update", addon_Hooked_MainMenuBarVehicleLeaveButton_Update)
+		hooksecurefunc("OverrideActionBar_CalcSize", addon_Hooked_OverrideActionBar_CalcSize);
+	else
+		hooksecurefunc(MainMenuBarVehicleLeaveButton, "Update", addon_Hooked_MainMenuBarVehicleLeaveButton_Update)
+		hooksecurefunc(OverrideActionBar, "CalcSize", addon_Hooked_OverrideActionBar_CalcSize);
+	end
 
 	-- (from OverrideActionBar.lua)
-	hooksecurefunc("OverrideActionBar_CalcSize", addon_Hooked_OverrideActionBar_CalcSize);
+	
 --	hooksecurefunc("OverrideActionBar_Setup", addon_Hooked_OverrideActionBar_Setup);
 
 	-- Hook the OnShow script of the MainMenuBarVehicleLeaveButton.

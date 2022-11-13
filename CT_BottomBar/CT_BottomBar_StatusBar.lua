@@ -10,22 +10,16 @@
 -- the CTMod Team. Thank you.                 --
 ------------------------------------------------
 
-if CT_BottomBar:getGameVersion() >= 10 then
-	return
-end
 
 --------------------------------------------
 -- Initialization
 
-local _G = getfenv(0);
-local module = _G.CT_BottomBar;
+local module = _G.CT_BottomBar
 
-local ctRelativeFrame = module.ctRelativeFrame;
-local appliedOptions;
+local ctRelativeFrame = module.ctRelativeFrame
+local appliedOptions
 
-local CT_BottomBar_StatusBar_Frame = nil;
-local CT_BottomBar_StatusBar_HelperFrame = nil;
-local CT_BottomBar_StatusBar_CustomManager = nil;
+local customStatusBarManager
 
 --------------------------------------------
 -- Status Tracking Bar Manager
@@ -34,29 +28,25 @@ local function addon_Update(self)
 	-- Update the frame
 	-- self == status tracking bar manager object
 
-	CT_BottomBar_StatusBar_Frame:SetWidth(appliedOptions.customStatusBarWidth or 1024);
-		
-	CT_BottomBar_StatusBar_CustomManager:ClearAllPoints();
-	CT_BottomBar_StatusBar_CustomManager:SetPoint("TOPLEFT", self.frame, 0, 0);
-	CT_BottomBar_StatusBar_CustomManager:UpdateBarsShown();
+	self.frame:SetWidth(appliedOptions.customStatusBarWidth or 768)
 	
-	CT_BottomBar_StatusBar_HelperFrame:ClearAllPoints();
-	CT_BottomBar_StatusBar_HelperFrame:SetPoint("TOPLEFT", CT_BottomBar_StatusBar_Frame, "TOPLEFT", -5, 5);
-	CT_BottomBar_StatusBar_HelperFrame:SetPoint("BOTTOMRIGHT", CT_BottomBar_StatusBar_Frame, "BOTTOMRIGHT", 5, -5);
-
-
-
+	customStatusBarManager:UpdateBarsShown()
+	
+	self.helperFrame:ClearAllPoints()
+	self.helperFrame:SetPoint("TOPLEFT", self.frame, "TOPLEFT", -5, 5)
+	self.helperFrame:SetPoint("BOTTOMRIGHT", self.frame, "BOTTOMRIGHT", 5, -8)
+	
 end
 
 
 local function addon_Enable(self)
 	StatusTrackingBarManager:Hide();
-	CT_BottomBar_StatusBar_CustomManager:Show();
+	customStatusBarManager:Show();
 end
 
 local function addon_Disable(self)
 	StatusTrackingBarManager:Show();
-	CT_BottomBar_StatusBar_CustomManager:Hide();
+	customStatusBarManager:Hide();
 end
 
 local function addon_Init(self)
@@ -65,31 +55,53 @@ local function addon_Init(self)
 
 	appliedOptions = module.appliedOptions;
 	module.ctStatusBar = self;
-	module.CT_BottomBar_StatusBar_SetWidth = addon_Update;
+	module.CT_BottomBar_StatusBar_SetWidth = function() addon_Update(self) end
 
-	CT_BottomBar_StatusBar_Frame = self.frame;
 	if MainMenuBarArtFrame then
-		CT_BottomBar_StatusBar_Frame:SetFrameLevel(MainMenuBarArtFrame:GetFrameLevel() + 1)
+		self.frame:SetFrameLevel(MainMenuBarArtFrame:GetFrameLevel() + 1)
 	end
-	CT_BottomBar_StatusBar_Frame.OnStatusBarsUpdated = CT_BottomBar_StatusBar_OnStatusBarsUpdated;
+	self.frame.OnStatusBarsUpdated = CT_BottomBar_StatusBar_OnStatusBarsUpdated;
 	
-	CT_BottomBar_StatusBar_HelperFrame = CreateFrame("Frame", "CT_BottomBar_" .. self.frameName .. "_GuideFrame");
-	self.helperFrame = CT_BottomBar_StatusBar_HelperFrame;
+	self.helperFrame = CreateFrame("Frame", "CT_BottomBar_" .. self.frameName .. "_GuideFrame")
 	
+	customStatusBarManager = CreateFrame("Frame", "CT_StatusTrackingBarManager", self.frame)
 	
-	CT_BottomBar_StatusBar_CustomManager = CreateFrame("FRAME", "CT_StatusTrackingBarManager", CT_BottomBar_StatusBar_Frame, "StatusTrackingBarManagerTemplate");
-	CT_BottomBar_StatusBar_CustomManager:AddBarFromTemplate("FRAME", "ReputationStatusBarTemplate");
-	CT_BottomBar_StatusBar_CustomManager:AddBarFromTemplate("FRAME", "HonorStatusBarTemplate");
-	CT_BottomBar_StatusBar_CustomManager:AddBarFromTemplate("FRAME", "ArtifactStatusBarTemplate");
-	CT_BottomBar_StatusBar_CustomManager:AddBarFromTemplate("FRAME", "ExpStatusBarTemplate");
-        CT_BottomBar_StatusBar_CustomManager:AddBarFromTemplate("FRAME", "AzeriteBarTemplate"); 
-	CT_BottomBar_StatusBar_CustomManager.UpdateBarsShown = CT_BottomBar_StatusBar_UpdateBarsShown;
-	for i, bar in ipairs(CT_BottomBar_StatusBar_CustomManager.bars) do
+	-- duplicating StatusTrackingBarManager, now that in WoW 10.0 one cannot simply inherit StatusTrackingBarManagerTemplate
+	Mixin(customStatusBarManager, StatusTrackingManagerMixin)
+	customStatusBarManager:SetSize(571, 34)
+	-- customStatusBarManager:SetPoint("BOTTOM")		-- superceded by the addon
+	customStatusBarManager.BottomBarFrameTexture = customStatusBarManager:CreateTexture()
+	customStatusBarManager.BottomBarFrameTexture:SetPoint("BOTTOMLEFT")
+	customStatusBarManager.BottomBarFrameTexture:SetAtlas("UI-HUD-ExperienceBar-Frame", true)
+	customStatusBarManager.BottomBarFrameTexture:Hide()
+	customStatusBarManager.TopBarFrameTexture = customStatusBarManager:CreateTexture()
+	customStatusBarManager.TopBarFrameTexture:SetPoint("BOTTOMLEFT", customStatusBarManager.BottomBarFrameTexture, "TOPLEFT", 0, -3)
+	customStatusBarManager.TopBarFrameTexture:SetAtlas("UI-HUD-ExperienceBar-Frame", true)
+	customStatusBarManager.TopBarFrameTexture:Hide()
+	customStatusBarManager:SetScript("OnEvent", customStatusBarManager.OnEvent)
+	customStatusBarManager:OnLoad()
+	
+	-- additional rules unique to CT_BottomBar
+	customStatusBarManager:SetPoint("TOPLEFT", self.frame, 0, 10)
+	customStatusBarManager:SetPoint("RIGHT", self.frame)
+	customStatusBarManager.BottomBarFrameTexture:SetPoint("RIGHT")
+	customStatusBarManager.TopBarFrameTexture:SetPoint("RIGHT", customStatusBarManager.BottomBarFrameTexture)
+	
+	-- Adding the bars
+	customStatusBarManager:AddBarFromTemplate("Frame", "ReputationStatusBarTemplate")
+	customStatusBarManager:AddBarFromTemplate("Frame", "HonorStatusBarTemplate")
+	customStatusBarManager:AddBarFromTemplate("Frame", "ArtifactStatusBarTemplate")
+	customStatusBarManager:AddBarFromTemplate("Frame", "ExpStatusBarTemplate")
+    customStatusBarManager:AddBarFromTemplate("Frame", "AzeriteBarTemplate")
+    
+	customStatusBarManager.UpdateBarsShown = CT_BottomBar_StatusBar_UpdateBarsShown;
+	for i, bar in ipairs(customStatusBarManager.bars) do
 		-- prevents mouseover text (such as how much xp or rep you have) from appearing overtop the world map frame
 		bar.OverlayFrame:SetFrameStrata("MEDIUM");	
 	end
 
 	addon_Update(self);
+	
 	return true;
 end
 
@@ -101,13 +113,13 @@ end
 
 function CT_BottomBar_StatusBar_UpdateBarsShown(self)
  	local visibleBars = {};
- 	if ( CT_BottomBar_StatusBar_CustomManager.bars[1].ShouldBeVisible() and not module:getOption("customStatusBarHideReputation")) then	table.insert(visibleBars, CT_BottomBar_StatusBar_CustomManager.bars[1]); end
-  	if ( CT_BottomBar_StatusBar_CustomManager.bars[2].ShouldBeVisible() and not module:getOption("customStatusBarHideHonor")) then table.insert(visibleBars, CT_BottomBar_StatusBar_CustomManager.bars[2]); end
-  	if ( CT_BottomBar_StatusBar_CustomManager.bars[3].ShouldBeVisible() and not module:getOption("customStatusBarHideArtifact")) then table.insert(visibleBars, CT_BottomBar_StatusBar_CustomManager.bars[3]); end
-  	if ( CT_BottomBar_StatusBar_CustomManager.bars[4].ShouldBeVisible() and not module:getOption("customStatusBarHideExp")) then	table.insert(visibleBars, CT_BottomBar_StatusBar_CustomManager.bars[4]); end
-  	if ( CT_BottomBar_StatusBar_CustomManager.bars[5].ShouldBeVisible() and not module:getOption("customStatusBarHideAzerite")) then table.insert(visibleBars, CT_BottomBar_StatusBar_CustomManager.bars[5]); end
+ 	if ( customStatusBarManager.bars[1].ShouldBeVisible() and not module:getOption("customStatusBarHideReputation")) then	table.insert(visibleBars, customStatusBarManager.bars[1]); end
+  	if ( customStatusBarManager.bars[2].ShouldBeVisible() and not module:getOption("customStatusBarHideHonor")) then table.insert(visibleBars, customStatusBarManager.bars[2]); end
+  	if ( customStatusBarManager.bars[3].ShouldBeVisible() and not module:getOption("customStatusBarHideArtifact")) then table.insert(visibleBars, customStatusBarManager.bars[3]); end
+  	if ( customStatusBarManager.bars[4].ShouldBeVisible() and not module:getOption("customStatusBarHideExp")) then	table.insert(visibleBars, customStatusBarManager.bars[4]); end
+  	if ( customStatusBarManager.bars[5].ShouldBeVisible() and not module:getOption("customStatusBarHideAzerite")) then table.insert(visibleBars, customStatusBarManager.bars[5]); end
    	table.sort(visibleBars, function(left, right) return left:GetPriority() < right:GetPriority() end);
-	CT_BottomBar_StatusBar_CustomManager:LayoutBars(visibleBars); 	
+	customStatusBarManager:LayoutBars(visibleBars); 	
 end
 
 function CT_BottomBar_StatusBar_OnStatusBarsUpdated(self)
@@ -121,7 +133,7 @@ local function addon_Register()
 		module.text["CT_BottomBar/Options/StatusBar"],  -- shown in options window & tooltips
 		module.text["CT_BottomBar/Options/StatusBar"],  -- title for horizontal orientation
 		nil,  -- title for vertical orientation
-		{ "BOTTOMLEFT", ctRelativeFrame, "BOTTOM", -512, 18 },
+		{ "BOTTOM", ctRelativeFrame, "BOTTOM", 0, 18 },
 		{ -- settings
 			orientation = "ACROSS",
 		},

@@ -10,9 +10,6 @@
 -- the CTMod Team. Thank you.                 --
 ------------------------------------------------
 
-if CT_BottomBar:getGameVersion() >= 10 then
-	return
-end
 
 --------------------------------------------
 -- Initialization
@@ -21,9 +18,6 @@ local _G = getfenv(0);
 local module = _G.CT_BottomBar;
 
 local appliedOptions;
-local frame_SetAlpha;
-local frame_EnableMouse;
-
 
 --------------------------------------------
 -- Miscellaneous
@@ -121,7 +115,7 @@ local function override_Hooked_SetAlpha(self, alpha)
 				-- Set the value to 0 to "hide" the frame.
 				alpha = 0;
 			end
-			frame_SetAlpha(self, alpha);
+			module.frame_SetAlpha(self, alpha);
 	--	else
 	--		-- We have shown the override bar, or we haven't done anything with it yet.
 	--		-- Allow the change to stick. Don't override it.
@@ -147,7 +141,7 @@ local function override_Hooked_EnableMouse(self, enable)
 				enable = false;
 			end
 			if (not (self:IsProtected() and InCombatLockdown())) then
-				frame_EnableMouse(self, enable);
+				module.frame_EnableMouse(self, enable);
 			end
 	--	else
 	--		-- We have shown the override bar, or we haven't done anything with it yet.
@@ -174,9 +168,9 @@ local function override_HideFrames()
 				alpha = 0;
 				mouse = false;
 			end
-			frame_SetAlpha(frame, alpha);
+			module.frame_SetAlpha(frame, alpha);
 			if (not (frame:IsProtected() and inCombatLockdown)) then
-				frame_EnableMouse(frame, mouse);
+				module.frame_EnableMouse(frame, mouse);
 			end
 		end
 	end
@@ -201,9 +195,9 @@ local function override_ShowFrames()
 					alpha = frame.ctSaveAlpha;
 					mouse = frame.ctSaveMouse;
 				end
-				frame_SetAlpha(frame, alpha);
+				module.frame_SetAlpha(frame, alpha);
 				if (not (frame:IsProtected() and inCombatLockdown)) then
-					frame_EnableMouse(frame, mouse);
+					module.frame_EnableMouse(frame, mouse);
 				end
 			end
 		end
@@ -282,8 +276,6 @@ end
 function module:initOverrideActionBar()
 	if (OverrideActionBar) then
 		-- Initialize the override action bar
-		frame_SetAlpha = module.frame_SetAlpha;
-		frame_EnableMouse = module.frame_EnableMouse;
 
 		local frame;
 		for i, name in ipairs(overrideFrames) do

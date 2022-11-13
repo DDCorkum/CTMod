@@ -39,9 +39,6 @@ module.loadedAddons = {};
 local appliedOptions;
 local pendingOptions;
 
-local frame_SetAlpha;
-local frame_EnableMouse;
-
 --------------------------------------------
 -- Secure frame
 
@@ -659,10 +656,8 @@ module.update = function(self, optName, value)
 
 	-- Create a frame for the addon (used for events, etc).
 	local frame = CreateFrame("Frame", "CT_BottomBar_Frame");
-	frame_SetAlpha = frame.SetAlpha;
-	frame_EnableMouse = frame.EnableMouse;
-	module.frame_SetAlpha = frame_SetAlpha;
-	module.frame_EnableMouse = frame_EnableMouse;
+	module.frame_SetAlpha = frame.SetAlpha;
+	module.frame_EnableMouse = frame.EnableMouse;
 
 	-- Create the options tables.
 	module.appliedOptions = {};
@@ -676,30 +671,36 @@ module.update = function(self, optName, value)
 	local secureFrame = CreateFrame("Frame", "CT_BottomBar_SecureFrame", nil, "SecureFrameTemplate,SecureHandlerAttributeTemplate");
 	initSecureFrame();
 
-	if module:getGameVersion() <= 9 then
-	
-		-- Fix CT_BarMod bar positioning issue when CT_BarMod loads before CT_BottomBar.
-		fix_CT_BarMod_BarPositions()
-	
-		-- Configure/disable the default main action bar.
-		configureActionBar();
-	
-		-- Initialize some bars bar
-		if (module:getGameVersion() >= 3) then
-			module:initOverrideActionBar();
-		end
-		module:initMainMenuBar();
-		
-		-- Make sure Blizzard managed frames are in position.
-		UIParent_ManageFramePositions();
+	-- Fix CT_BarMod bar positioning issue when CT_BarMod loads before CT_BottomBar.
+	fix_CT_BarMod_BarPositions()
 
-		-- Initialize some other lua files.
-		if (module:getGameVersion()  >= 3) then	
-			module:overrideInit();
-		end
-		module:mainmenuInit();
+
 	
-	else -- module:getGameVersion() >= 10
+	-- Initialize some bars bar
+	if (module:getGameVersion() >= 3) then
+		module:initOverrideActionBar();
+	end
+	
+	-- Make sure Blizzard managed frames are in position.
+	UIParent_ManageFramePositions();
+		
+	-- Initialize some other lua files.
+	if (module:getGameVersion()  >= 3) then	
+		module:overrideInit();
+	end
+	
+	-- Configure/disable the default main action bar
+	if module:getGameVersion() <= 9 then
+		-- prior to WoW 10.x
+		configureActionBar();
+		module:initMainMenuBar();
+		module:mainmenuInit();	
+	else 
+		-- WoW 10.x
+		if module:getOption("disableDragonflightActionBarInVehicle") ~= false then
+			MainMenuBar.ctBBHiddenInVehicle = true
+		end
+		
 		if CT_BarMod and CT_BarMod.updateOptionFromOutside then
 			local t1, t2 = module:getOption("disableDragonflightActionBarChangedDate"), CT_BarMod:getOption("disableDragonflightActionBarChangedDate")
 			preventLoop = true
@@ -709,11 +710,11 @@ module.update = function(self, optName, value)
 				module:setOption("disableDragonflightActionBar", CT_BarMod:getOption("disableDragonflightActionBar"))			
 			end
 			preventLoop = nil
-		end
+		end  
+
 		if module:getOption("disableDragonflightActionBar") ~= false then
 			MainMenuBar.ctBBHidden = true
-			RegisterAttributeDriver(MainMenuBar, "state-visibility", "hide")
-			MainMenuBar:SetAlpha(0)
+			RegisterAttributeDriver(MainMenuBar, "state-visibility", MainMenuBar.ctBBHiddenInVehicle and "hide" or "[overridebar] show; [vehicleui] show; hide")
 		end
 	end
 	

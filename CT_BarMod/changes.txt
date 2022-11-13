@@ -1,3 +1,8 @@
+CT_BarMod (10.0.0.4) 2022-11-12
+- Restoring the option to hide empty button slots
+- Removing code for the New-Player Experience that is no longer applicable in Dragonflight
+- Updates to align with CT_BottomBar
+
 CT_BarMod (10.0.0.3) 2022-10-29
 - The option to hide unused button slots is no longer available in Retail
 

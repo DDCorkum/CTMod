@@ -32,9 +32,6 @@
 			</Layer>
 			<Layer level="OVERLAY">
 				<Texture parentKey="Border" file="Interface\Buttons\UI-Debuff-Overlays">
-					<Size>
-						<AbsDimension x="19" y="19"/>
-					</Size>
 					<Anchors>
 						<Anchor point="CENTER">
 							<Offset>

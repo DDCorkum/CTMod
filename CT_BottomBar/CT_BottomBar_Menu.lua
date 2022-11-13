@@ -88,9 +88,9 @@ local function addon_UpdateOrientation_OurUI(self, orientation)
 	for i = 3, #frames do
 		obj = frames[i];
 		if (orientation == "ACROSS") then
-			setpoint(obj, "LEFT", frames[i-1], "RIGHT", -3, 0);
+			setpoint(obj, "LEFT", frames[i-1], "RIGHT", -1 + (appliedOptions.microButtonSpacing or module:getGameVersion() >= 10 and 0 or -3), 0)
 		else
-			setpoint(obj, "TOP", frames[i-1], "BOTTOM", 0, 1);
+			setpoint(obj, "TOP", frames[i-1], "BOTTOM", 0, 1 - (appliedOptions.microButtonSpacing or 0));  	-- was 0, 1 before CTMod 10.0.0.x
 		end
 	end
 
@@ -135,7 +135,7 @@ local function addon_Update_OverrideUI(self)
 
 	for i = 3, #frames do
 		obj = frames[i];
-		setpoint(obj, "LEFT", frames[i-1], "RIGHT", -3, 0);
+		setpoint(obj, "LEFT", frames[i-1], "RIGHT", -1, 0);	-- was -3, 0 before CTMod 10.0.0.x
 	end
 
 	local anchorX, anchorY = addon_OverrideActionBar_GetMicroButtonAnchor();
@@ -180,7 +180,7 @@ local function addon_Update_PetBattleUI(self)
 
 	for i = 3, #frames do
 		obj = frames[i];
-		setpoint(obj, "LEFT", frames[i-1], "RIGHT", -3, 0);
+		setpoint(obj, "LEFT", frames[i-1], "RIGHT", -1, 0)	-- was -3, 0 before CTMod 10.0.0.x
 	end
 
 	local anchorX, anchorY = -9, 25;
@@ -451,6 +451,18 @@ local function addon_PostInit(self)
 		hooksecurefunc(frames[i], "SetPoint", addon_Hooked_MicroButton_SetPoint);
 		hooksecurefunc(frames[i], "SetParent", addon_Hooked_MicroButton_SetParent);
 	end
+	
+	-- Apply scaling
+	function module.rescaleMicroButtons(scale)
+		scale = Clamp(scale or 1, 0.8, 1.2)
+		for i= 2, #frames do
+			frames[i]:SetScale(scale)
+		end
+		addon_Update_OurUI(self)
+	end
+	
+	module.rescaleMicroButtons(module:getOption("rescaleMicroButtons"))
+	
 end
 
 local function addon_Register()
