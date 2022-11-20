@@ -158,20 +158,39 @@ function public:InsertHerb(mapID, x, y, herb, descript, name)
 	
 	-- convert special node names to the standard variant (localization dependent)
 	if GetLocale() == "enUS" or GetLocale() == "enGB" then
-		-- Drangonflight prefixes
-		if herb:sub(1, 8) == "Decayed " then
+	
+		-- Drangonflight overloads
+		if herb:sub(1, 8) == "Decayed " and herb:len() > 8 then
 			herb = herb:sub(9)
-		elseif herb:sub(1, 11) == "Self-Grown " then
+		elseif herb:sub(1, 11) == "Self-Grown " and herb:len() > 11 then
 			herb = herb:sub(12)
-		elseif herb:sub(1, 10) == "Windswept " then
+		elseif herb:sub(1, 10) == "Windswept " and herb:len() > 10 then
 			herb = herb:sub(11)
-		elseif herb:sub(1, 7) == "Frigid " then
+		elseif herb:sub(1, 7) == "Frigid " and herb:len() > 7 then
 			herb = herb:sub(8)
-		elseif herb:sub(1, 5) == "Lush " then
+		elseif herb:sub(1, 5) == "Lush " and herb:len() > 5 then
 			herb = herb:sub(6)
-		elseif herb:sub(1, 14) == "Titan-Touched " then
+		elseif herb:sub(1, 14) == "Titan-Touched " and herb:len() > 14 then
 			herb = herb:sub(15)
 		end
+	
+	elseif GetLocale() == "frFR" then
+	
+		-- Drangonflight overloads
+		if herb:sub(-10, -1) == " sanglante" and herb:len() > 10 then
+			herb = herb:sub(1, -11)
+		--elseif herb:sub(1, 11) == "Self-Grown " and herb:len() > 11 then
+		--	herb = herb:sub(12)
+		elseif herb:sub(-21, -1) == " balayée par le vent" and herb:len() > 21 then
+			herb = herb:sub(1, -22)
+		elseif herb:sub(-7, -1) == " algide" and herb:len() > 7 then
+			herb = herb:sub(1, -8)
+		elseif herb:sub(-11, -1) == " luxuriante" and herb:len() > 11 then
+			herb = herb:sub(1, -12)
+		elseif herb:sub(-24, -1) == " touchée par les Titans" and herb:len() > 24 then
+			herb = herb:sub(1, -25)
+		end
+		
 	end
 	
 	-- now process the standardized names
@@ -248,13 +267,26 @@ function public:InsertOre(mapID, x, y, ore, descript, name)
 	end
 	-- Convert from the name of a node to a type of ore (using rules for each localization)
 	if (GetLocale() == "enUS" or GetLocale() == "enGB") then
-		--adjectives
+	
+		-- adjectives
 		if (ore:sub(1,5) == "Rich " and ore:len() > 5) then
 			ore = ore:sub(6); 				-- "Rich Thorium Vein" to "Thorium Vein"
 		elseif (ore:sub(1,5) == "Small " and ore:len() > 6) then 
 			ore = ore:sub(7); 				-- "Small Thorium Vein" to "Thorium Vein"
 		end
-		--nouns
+		
+		-- Dragonflight overloading
+		if ore:sub(1,14) == "Titan-Touched " and ore:len() > 14 then
+			ore = ore:sub(15)
+		elseif ore:sub(1,7) == "Primal " and ore:len() > 7 then
+			ore = ore:sub(8)
+		elseif ore:sub(1,7) == "Molten " and ore:len() > 7 then
+			ore = ore:sub(8)
+		elseif ore:sub(1,9) == "Hardened " and ore:len() > 9 then
+			ore = ore:sub(10)
+		end
+		
+		-- nouns
 		if (ore:sub(-5) == " Vein" and ore:len() > 5) then 
 			ore = ore:sub(1,-6);				-- "Copper Vein" to "Copper"
 		elseif (ore:sub(-8) == " Deposit" and ore:len() > 8) then
@@ -262,14 +294,17 @@ function public:InsertOre(mapID, x, y, ore, descript, name)
 		elseif (ore:sub(-5) == " Seam" and ore:len() > 5) then 
 			ore = ore:sub(1,-6);				-- "Monelite Seam" to "Monelite"
 		end
+		
 	elseif (GetLocale() == "frFR") then
-		--adjectifs
+	
+		-- adjectifs
 		if (ore:sub(1,6) == "Riche " and ore:len() > 7) then 
 			ore = ore:sub(7,7):upper() .. ore:sub(8);	-- "Riche filon de thorium" to "Filon de Thorium"
 		elseif (ore:sub(1,6) == "Petit " and ore:len() > 7) then 
 			ore = ore:sub(7,7):upper() .. ore:sub(8);	-- "Petit filon de thorium" to "Filon de Thorium"
 		end
-		--noms
+		
+		-- noms
 		if (ore:sub(1,9) == "Filon de " and ore:len() > 10) then 
 			ore = ore:sub(10,10):upper() .. ore:sub(11);	-- "Filon de cuivre" to "Cuivre"
 		elseif (ore:sub(1,12) == "Gisement de " and ore:len() > 13) then 
@@ -277,7 +312,9 @@ function public:InsertOre(mapID, x, y, ore, descript, name)
 		elseif (ore:sub(1,9) == "Veine de " and ore:len() > 10) then 
 			ore = ore:sub(10,10):upper() .. ore:sub(11);	-- "Veine de gangreschiste" to "Gangreschiste"
 		end
+		
 	elseif (GetLocale() == "deDE") then		-- credit: Dynaletik
+	
 		-- adjectives
 		if (ore:sub(1,8) == "Reiches " and ore:len() > 8) then
 			ore = ore:sub(9); 				-- "Reiches Thoriumvorkommen" to "Thoriumvorkommen"
@@ -286,6 +323,7 @@ function public:InsertOre(mapID, x, y, ore, descript, name)
 		elseif (ore:sub(1,7) == "Reiche " and ore:len() > 7) then
 			ore = ore:sub(8); 				-- "Reiche Adamantitablagerung" to "Adamantitablagerung"
 		end
+		
 		-- composite nouns
 		if (ore:sub(-9) == "vorkommen" and ore:len() > 9) then
 			ore = ore:sub(1, -10); 				-- "Kupfervorkommen" to "Kupfer"
@@ -296,11 +334,14 @@ function public:InsertOre(mapID, x, y, ore, descript, name)
 		elseif (ore:sub(-10) == "ablagerung" and ore:len() > 10) then
 			ore = ore:sub(1, -11); 				-- "Mithrilablagerung" to "Mithril"
 		end
+		
 	elseif (GetLocale() == "esES" or GetLocale() == "esMX") then
+	
 		-- following adjective
 		if (ore:sub(-9) == " enriquecido" and ore:len() > 12) then
 			ore = ore:sub(1, -13); 				-- "Filón de torio enriquecido" to "Filón de torio"
 		end
+		
 		-- preceeding nouns and adjectives
 		if (ore:sub(1,10) == "Filón de " and ore:len() > 11) then
 			ore = ore:sub(11,11):upper() .. ore:sub(12);	-- "Filón de cobre" to "Cobre"	NOTE: the ó counts as TWO bytes
@@ -313,13 +354,16 @@ function public:InsertOre(mapID, x, y, ore, descript, name)
 		elseif (ore:sub(1,8) == "Veta de " and ore:len() > 9) then
 			ore = ore:sub(9,9):upper() .. ore:sub(10);	-- "Veta de monalita" to "Monalita"
 		end
+		
 	elseif (GetLocale() == "ptBR") then
+	
 		-- following adjectives
 		if (ore:sub(-10) == " Abundante" and ore:len() > 10) then
 			ore = ore:sub(1,-11);				-- changes "Veio de Tório Abundante" to "Veio de Tório"
 		elseif (ore:sub(-8) == " Escasso" and ore:len() > 8) then
 			ore = ore:sub(1,-9);				-- changes "Veio de Tório Escasso" to "Veio de Tório"
 		end
+		
 		-- preceeding nouns
 		if (ore:sub(1,8) == "Veio de " and ore:len() > 8) then
 			ore = ore:sub(9);				-- changes "Veio de Cobre" to "Cobre"
@@ -328,7 +372,9 @@ function public:InsertOre(mapID, x, y, ore, descript, name)
 		elseif (ore:sub(1,10) == "Jazida de " and ore:len() > 10) then
 			ore = ore:sub(11);				-- changes "Jazida de Monelita" to "Monelita"
 		end
+		
 	elseif (GetLocale() == "ruRU") then
+	
 		-- preceeding
 		if (ore:sub(1,15) == "Богатая " and ore:len() > 16) then
 			ore = ore:sub(16,16):upper() .. ore:sub(17);	-- changes "Богатая ториевая жила" to "Ториевая жила"
@@ -339,11 +385,13 @@ function public:InsertOre(mapID, x, y, ore, descript, name)
 		if (ore:sub(1,13) == "Залежи " and ore:len() > 14) then
 			ore = ore:sub(14,14):upper() .. ore:sub(15);	-- changes "Залежи истинного серебра" to "Истинного серебра"
 		end
+		
 		-- following
 		if (ore:sub(-9) == " жила" and ore:len() > 9) then
 			ore = ore:sub(1,-10);				-- changes "Медная жила" to "Медная"
 		end
 	elseif (GetLocale() == "zhCH") then
+	
 		-- exceptions first, then normal rules for everything else
 		if (ore == "活性魔石") then
 			ore = "魔石矿石"					-- Living Leystone

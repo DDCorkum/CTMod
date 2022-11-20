@@ -85,11 +85,12 @@ module.pinTypes =
 		},
 		["Recent Expansions"] = 
 		{
-			-- WoD, Legion, BFA, SL
+			-- WoD, Legion, BFA, SL, DF
 			"Blackrock", "True Iron",
 			"Leystone", "Felslate",
 			"Monelite", "Storm Silver", "Platinum", "Osmenite",
-			"Laestrite", "Oxxein", "Phaedrum", "Sinvyr", "Solenium", "Elethium"
+			"Laestrite", "Oxxein", "Phaedrum", "Sinvyr", "Solenium", "Elethium",
+			"Serevite", "Draconium",
 		},
 	},
 };
@@ -152,10 +153,6 @@ module.pinIcons =
 	["Wild Steelbloom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_WildSteelbloom",
 	["Wintersbite"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Wintersbite",
 	["Dreaming Glory"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_DreamingGlory",
-	["Hochenblume"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Hochenblume",
-	["Saxifrage"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",
-	["Bubble Poppy"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",
-	["Writhebark"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",
 	
 	-- Burning Crusade
 	["Felweed"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Felweed",
@@ -228,6 +225,11 @@ module.pinIcons =
 	["Widowbloom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Widowbloom",	
 	["Nightshade"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Nightshade",
 	
+	["Hochenblume"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Hochenblume",
+	["Saxifrage"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Saxifrage",
+	["Bubble Poppy"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_BubblePoppy",
+	["Writhebark"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Writhebark",
+	
 	-- Ore --
 	
 	-- Classic
@@ -281,6 +283,10 @@ module.pinIcons =
 	["Sinvyr"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Sinvyr",
 	["Solenium"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Solenium",
 	["Elethium"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Elethium",
+	
+	-- Dragonflight
+	["Serevite"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Tyrivite",
+	["Draconium"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Draconium",
 }
 setmetatable(module.pinIcons, {__index = function() return "Interface\\RaidFrame\\UI-RaidFrame-Threat" end})
 
