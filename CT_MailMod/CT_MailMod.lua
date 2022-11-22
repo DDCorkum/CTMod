@@ -143,6 +143,7 @@ do
 	end
 
 	local function mailboxClosed()
+		
 		if (not mailboxOpen) then
 			-- Game may send two MAIL_CLOSED events.
 			-- We only need to deal with one of them.
@@ -163,9 +164,16 @@ do
 		mailboxOpen = nil;
 	end
 
-	module:regEvent("MAIL_SHOW", mailboxOpened);
-	module:regEvent("MAIL_CLOSED", mailboxClosed);  -- Game may send 2 of these when mailbox closes
-	module:regEvent("PLAYER_LOGOUT", mailboxClosed);  -- when player logs out or reloads ui
+	module:regEvent("MAIL_SHOW", mailboxOpened)
+	
+	module:regEvent("PLAYER_LOGOUT", mailboxClosed)  -- when player logs out or reloads ui
+	
+	if module:getGameVersion() >= 10 then
+		--module:regEvent("PLAYER_INTERACTION_MANAGER_FRAME_SHOW", function(__, type) if type == 17 then mailboxOpened() end end)
+		module:regEvent("PLAYER_INTERACTION_MANAGER_FRAME_HIDE", function(__, type) if type == 17 then mailboxClosed() end end)
+	else
+		module:regEvent("MAIL_CLOSED", mailboxClosed)  -- Game may send 2 of these when mailbox closes
+	end
 end
 
 --------------------------------------------
