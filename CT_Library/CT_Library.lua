@@ -1705,11 +1705,8 @@ end
 objectHandlers.button = function(self, parent, name, virtual, option, text)
 	local button = CreateFrame("Button", name, parent, virtual);
 	if ( text ) then
-		local str = self:getText(text) or _G[text];
-		if ( type(str) ~= "string" ) then
-			str = text;
-		end
-		button:SetText(str);
+		local str = self:getText(text)
+		button:SetText(type(str) == "string" and str or text)
 	end
 	return button;
 end
@@ -1782,11 +1779,7 @@ objectHandlers.checkbutton = function(self, parent, name, virtual, option, text,
 
 	-- Text
 	if ( text ) then
-		local str = _G[text];
-		if ( type(str) ~= "string" ) then
-			str = text;
-		end
-		textObj:SetText(str);
+		textObj:SetText(text)
 	end
 
 	if ( not virtual or not checkbutton:GetScript("OnClick") ) then
@@ -1886,7 +1879,7 @@ objectHandlers.font = function(self, parent, name, virtual, option, text, data, 
 	end
 
 	-- Text
-	fontString:SetText(self:getText(text) or _G[text] or text);
+	fontString:SetText(self:getText(text) or text)
 
 	return fontString;
 end
