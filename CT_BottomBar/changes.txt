@@ -1,3 +1,6 @@
+CT_BottomBar (10.0.2.2) 2022-12-02
+- The main bar re-appears during dragonriding (with a new option to keep it hidden)
+
 CT_BottomBar (10.0.0.2) 2022-10-26
 - Restoring some functions that were disabled in Dragonflight
 - Fixing bag bar alignment in Classic
