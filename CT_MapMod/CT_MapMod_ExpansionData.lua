@@ -431,6 +431,7 @@ module.gatheringSkills =
 	[265834] = "Herb",
 	[265835] = "Herb",
 	[309780] = "Herb",	-- Shadowlands
+	[366252] = "Herb",	-- Dragonflight
 
 	-- Mining
 	   [186] = "Ore",
@@ -454,6 +455,7 @@ module.gatheringSkills =
 	[265851] = "Ore",	-- Kul Tiran
 	[265854] = "Ore",	-- Zandalari
 	[309835] = "Ore",	-- Shadowlands
+	[366260] = "Ore",	-- Dragonflight
 }
 
 
