@@ -16,10 +16,6 @@
 
 local module = select(2, ...);
 
-if module:getGameVersion() >= 10 then
-	--return
-end
-
 -- Options
 local displayBindings = true;
 local displayRangeDot = true;
@@ -944,10 +940,37 @@ function useButton:hideOverlayGlow(arg1)
 	end
 end
 
-function useButton:updateFlyout()
-	-- Call Blizzard's function to update the flyout bar.
-	local func = ActionButton_UpdateFlyout or ActionBarActionButtonMixin.UpdateFlyout
-	func(self.button)
+if ActionButton_UpdateFlyout then
+	-- prior to WoW 10.x
+	function useButton:updateFlyout()
+		-- Call Blizzard's function to update the flyout bar.
+		ActionButton_UpdateFlyout(self.button)
+	end
+else
+	-- WoW 10.x
+	function useButton:updateFlyout()
+		if InCombatLockdown() then
+			module:afterCombat(useButton.updateFlyout, self)	-- to do this inside combat, it would be necessary to trigger the restricted environment whenever GetActionInfo() changes, and also having flyout info available beforehand
+			return
+		end
+		module.updateFlyout(self.button)	-- congfigures the arrow textures
+		local type, id = GetActionInfo(self.button.action)
+		if type == "flyout" then
+			local numSlots = select(3,GetFlyoutInfo(id))
+			local numKnownSlots = 0
+			for i=1, numSlots do
+				local spellID, overrideSpellID, isKnown = GetFlyoutSlotInfo(id, i)
+				if isKnown then
+					numKnownSlots = numKnownSlots + 1
+					self.button:SetAttribute("spell"..numKnownSlots, spellID)
+				end
+			end
+			self.button:SetAttribute("numKnownSlots", numKnownSlots)
+			module.createSpellFlyoutButtons(numKnownSlots)
+		else
+			self.button:SetAttribute("numKnownSlots", 0)
+		end
+	end
 end
 
 -- Check button lock state to disable shift-click

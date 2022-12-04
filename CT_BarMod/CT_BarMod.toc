@@ -16,4 +16,5 @@ CT_BarMod_Masque.lua
 CT_BarMod_Skins.lua
 CT_BarMod_Use.lua
 CT_BarMod_Shift.lua
+CT_BarMod_SpellFlyout.lua
 CT_BarMod_Options.lua
