@@ -235,7 +235,7 @@ function public:InsertHerb(mapID, x, y, herb, descript, name)
 		elseif herb:sub(1, 15) == "Wutentbranntes " and herb:len() > 15 then
 			herb = herb:sub(16)
 		elseif herb:sub(1,2) == "Ur" and herb:len() > 4 then
-			herb = herb:sub(3,4):upper() .. herb:sub(4)
+			herb = herb:sub(3,3):upper() .. herb:sub(4)
 		end
 	end
 
