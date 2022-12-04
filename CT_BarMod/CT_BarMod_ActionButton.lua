@@ -304,6 +304,42 @@ local function getActionButton(buttonId)
 		button.FlyoutBorderShadow:SetDrawLayer("ARTWORK", 2)
 		button.FlyoutBorderShadow:SetTexture("Interface\\Buttons\ActionBarFlyoutButton")
 		button.FlyoutBorderShadow:SetTexCoord("0.01562500", "0.76562500", "0.00781250", "0.38281250")
+		
+		if CT_BarMod_SpellFlyout then
+			-- WoW 10.x
+			button.FlyoutArrowContainer = CreateFrame("Frame", nil, button)
+			button.FlyoutArrowContainer:SetAllPoints()
+			
+			button.FlyoutArrowContainer.FlyoutArrowNormal = button.FlyoutArrowContainer:CreateTexture(nil, "ARTWORK", nil, 2)
+			button.FlyoutArrowContainer.FlyoutArrowNormal:SetAtlas("UI-HUD-ActionBar-Flyout")
+			button.FlyoutArrowContainer.FlyoutArrowNormal:Hide()
+			button.FlyoutArrowContainer.FlyoutArrowNormal:SetSize(18,7)
+			button.FlyoutArrowContainer.FlyoutArrowNormal:SetPoint("TOP")
+
+			button.FlyoutArrowContainer.FlyoutArrowPushed = button.FlyoutArrowContainer:CreateTexture(nil, "ARTWORK", nil, 2)
+			button.FlyoutArrowContainer.FlyoutArrowPushed:SetAtlas("UI-HUD-ActionBar-Flyout-Down")
+			button.FlyoutArrowContainer.FlyoutArrowPushed:Hide()
+			button.FlyoutArrowContainer.FlyoutArrowPushed:SetSize(18,8)	--sic? (WoW 10.0.2)
+			button.FlyoutArrowContainer.FlyoutArrowPushed:SetPoint("TOP")
+
+			button.FlyoutArrowContainer.FlyoutArrowHighlight = button.FlyoutArrowContainer:CreateTexture(nil, "ARTWORK", nil, 2)
+			button.FlyoutArrowContainer.FlyoutArrowHighlight:SetAtlas("UI-HUD-ActionBar-Flyout-Mouseover")
+			button.FlyoutArrowContainer.FlyoutArrowHighlight:Hide()
+			button.FlyoutArrowContainer.FlyoutArrowHighlight:SetSize(18,7)
+			button.FlyoutArrowContainer.FlyoutArrowHighlight:SetPoint("TOP")
+			
+			SecureHandlerSetFrameRef(button, "ctSpellFlyout", CT_BarMod_SpellFlyout)
+			SecureHandlerWrapScript(button, "OnClick", button, [=[
+				local type, action = GetActionInfo(self:GetAttribute("action"))
+				if type == "flyout" then
+					local spellFlyout = owner:GetFrameRef("ctSpellFlyout")
+					spellFlyout:SetAttribute("newParent", self)
+					spellFlyout:SetAttribute("newFlyoutID", action)
+					spellFlyout:RunAttribute("toggleFlyout")
+					return false
+				end
+			]=], nil)
+		end
 
 		button:SetNormalTexture(button.normalTexture);
 		button:SetPushedTexture(button.pushedTexture);

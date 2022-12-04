@@ -2572,7 +2572,11 @@ module.optionUpdate = function(self, optName, value)
 		end
 		if value then
 			MainMenuBar.ctBarHidden = true
-			module:afterCombat(RegisterAttributeDriver, MainMenuBar, "state-visibility", MainMenuBar.ctBBHiddenInVehicle and "hide" or "[overridebar] show; [vehicleui] show; hide")
+			if MainMenuBar.ctBBHiddenInDragonriding then
+				module:afterCombat(RegisterAttributeDriver, MainMenuBar, "state-visibility", MainMenuBar.ctBBHiddenInVehicle and "hide" or "[overridebar] show; [vehicleui] show; hide")
+			else
+				module:afterCombat(RegisterAttributeDriver, MainMenuBar, "state-visibility", MainMenuBar.ctBBHiddenInVehicle and "[bonusbar:5] show; hide" or "[bonusbar:5] show; [overridebar] show; [vehicleui] show; hide")
+			end
 		elseif MainMenuBar.ctBarHidden then
 			MainMenuBar.ctBarHidden = nil
 			module:afterCombat(RegisterAttributeDriver, MainMenuBar, "state-visibility", "[overridebar] hide; [vehicleui] hide; show")
@@ -2772,7 +2776,11 @@ module.optionUpdate = function(self, optName, value)
 			end
 			if module:getOption("disableDragonflightActionBar") then
 				MainMenuBar.ctBarHidden = true
-				RegisterAttributeDriver(MainMenuBar, "state-visibility", MainMenuBar.ctBBHiddenInVehicle and "hide" or "[overridebar] show; [vehicleui] show; hide")
+				if MainMenuBar.ctBBHiddenInDragonriding then
+					RegisterAttributeDriver(MainMenuBar, "state-visibility", MainMenuBar.ctBBHiddenInVehicle and "hide" or "[overridebar] show; [vehicleui] show; hide")
+				else
+					RegisterAttributeDriver(MainMenuBar, "state-visibility", MainMenuBar.ctBBHiddenInVehicle and "[bonusbar:5] show; hide" or "[bonusbar:5] show; [overridebar] show; [vehicleui] show; hide")
+				end
 			end
 		end
 	end

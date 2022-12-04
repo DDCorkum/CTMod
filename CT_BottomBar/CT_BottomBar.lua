@@ -701,6 +701,10 @@ module.update = function(self, optName, value)
 			MainMenuBar.ctBBHiddenInVehicle = true
 		end
 		
+		if module:getOption("disableDragonflightActionBarWhileDragonriding") then
+			MainMenuBar.ctBBHiddenInDragonriding = true
+		end
+		
 		if CT_BarMod and CT_BarMod.updateOptionFromOutside then
 			local t1, t2 = module:getOption("disableDragonflightActionBarChangedDate"), CT_BarMod:getOption("disableDragonflightActionBarChangedDate")
 			preventLoop = true
@@ -714,7 +718,11 @@ module.update = function(self, optName, value)
 
 		if module:getOption("disableDragonflightActionBar") ~= false then
 			MainMenuBar.ctBBHidden = true
-			RegisterAttributeDriver(MainMenuBar, "state-visibility", MainMenuBar.ctBBHiddenInVehicle and "hide" or "[overridebar] show; [vehicleui] show; hide")
+			if MainMenuBar.ctBBHiddenInDragonriding then
+				RegisterAttributeDriver(MainMenuBar, "state-visibility", MainMenuBar.ctBBHiddenInVehicle and "hide" or "[overridebar] show; [vehicleui] show; hide")
+			else
+				RegisterAttributeDriver(MainMenuBar, "state-visibility", MainMenuBar.ctBBHiddenInVehicle and "[bonusbar:5] show; hide" or "[bonusbar:5] show; [overridebar] show; [vehicleui] show; hide")
+			end
 		end
 	end
 	
