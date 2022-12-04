@@ -234,8 +234,6 @@ function public:InsertHerb(mapID, x, y, herb, descript, name)
 			herb = herb:sub(16)
 		elseif herb:sub(1, 15) == "Wutentbranntes " and herb:len() > 15 then
 			herb = herb:sub(16)
-		elseif herb:sub(1,2) == "Ur" and herb:len() > 4 then
-			herb = herb:sub(3,3):upper() .. herb:sub(4)
 		end
 	end
 
@@ -377,8 +375,8 @@ function public:InsertOre(mapID, x, y, ore, descript, name)
 			ore = ore:sub(19)
 		elseif ore:sub(1,16) == "Titanversetztes " and ore:len() > 16 then
 			ore = ore:sub(17)
-		elseif ore:sub(1,2) == "Ur" and ore:len() > 2 then
-			ore = ore:sub(3)
+		elseif ore:sub(1,2) == "Ur" and ore:len() > 3 then
+			ore = ore:sub(3,3):upper() .. ore:sub(4)
 		elseif ore:sub(1,14) == "Geschmolzenes " and ore:len() > 14 then
 			ore = ore:sub(15)
 		elseif ore:sub(1,12) == "Gehärtetes " and ore:len() > 12 then
