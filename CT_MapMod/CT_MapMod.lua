@@ -172,6 +172,8 @@ function public:InsertHerb(mapID, x, y, herb, descript, name)
 			herb = herb:sub(6)
 		elseif herb:sub(1, 14) == "Titan-Touched " and herb:len() > 14 then
 			herb = herb:sub(15)
+		elseif herb:sub(1, 10) == "Infurious " and herb:len() > 10 then
+			herb = herb:sub(11)
 		end
 	
 	elseif GetLocale() == "frFR" then
@@ -189,10 +191,52 @@ function public:InsertHerb(mapID, x, y, herb, descript, name)
 			herb = herb:sub(1, -12)
 		elseif herb:sub(-24, -1) == " touchée par les Titans" and herb:len() > 24 then
 			herb = herb:sub(1, -25)
+		elseif herb:sub(-8, -1) == " ardente" and herb:len() > 8 then
+			herb = herb:sub(1, -9)
 		end
-		
+
+	elseif GetLocale() == "deDE" then
+
+		-- Drangonflight overloads
+		if herb:sub(1, 11) == "Verrottete " and herb:len() > 11 then
+			herb = herb:sub(12)
+		elseif herb:sub(1, 12) == "Verrotteter " and herb:len() > 12 then
+			herb = herb:sub(13)
+		elseif herb:sub(1, 12) == "Verrottetes " and herb:len() > 12 then
+			herb = herb:sub(13)
+		elseif herb:sub(1, 16) == "Windgepeitschte " and herb:len() > 16 then
+			herb = herb:sub(17)
+		elseif herb:sub(1, 17) == "Windgepeitschter " and herb:len() > 17 then
+			herb = herb:sub(18)
+		elseif herb:sub(1, 17) == "Windgepeitschtes " and herb:len() > 17 then
+			herb = herb:sub(18)
+		elseif herb:sub(1, 7) == "Eisige " and herb:len() > 7 then
+			herb = herb:sub(8)
+		elseif herb:sub(1, 8) == "Eisiger " and herb:len() > 8 then
+			herb = herb:sub(9)
+		elseif herb:sub(1, 8) == "Eisiges " and herb:len() > 8 then
+			herb = herb:sub(9)
+		elseif herb:sub(1, 8) == "Üppige " and herb:len() > 8 then
+			herb = herb:sub(9)
+		elseif herb:sub(1, 9) == "Üppiger " and herb:len() > 9 then
+			herb = herb:sub(10)
+		elseif herb:sub(1, 9) == "Üppiges " and herb:len() > 9 then
+			herb = herb:sub(10)
+		elseif herb:sub(1, 17) == "Titanenberührte " and herb:len() > 17 then
+			herb = herb:sub(18)
+		elseif herb:sub(1, 18) == "Titanenberührter " and herb:len() > 18 then
+			herb = herb:sub(19)
+		elseif herb:sub(1, 18) == "Titanenberührtes " and herb:len() > 18 then
+			herb = herb:sub(19)
+		elseif herb:sub(1, 14) == "Wutentbrannte " and herb:len() > 14 then
+			herb = herb:sub(15)
+		elseif herb:sub(1, 15) == "Wutentbrannter " and herb:len() > 15 then
+			herb = herb:sub(16)
+		elseif herb:sub(1, 15) == "Wutentbranntes " and herb:len() > 15 then
+			herb = herb:sub(16)
+		end
 	end
-	
+
 	-- now process the standardized names
 	for __, expansion in pairs(module.pinTypes["Herb"]) do
 		for __, kind in ipairs(expansion) do
@@ -284,6 +328,8 @@ function public:InsertOre(mapID, x, y, ore, descript, name)
 			ore = ore:sub(8)
 		elseif ore:sub(1,9) == "Hardened " and ore:len() > 9 then
 			ore = ore:sub(10)
+		elseif ore:sub(1,10) == "Infurious " and ore:len() > 10 then
+			ore = ore:sub(11)
 		end
 		
 		-- nouns
@@ -324,7 +370,22 @@ function public:InsertOre(mapID, x, y, ore, descript, name)
 			ore = ore:sub(8); 				-- "Reiche Adamantitablagerung" to "Adamantitablagerung"
 		end
 		
-		-- composite nouns
+		-- Dragonflight overloading
+		if ore:sub(1,18) == "Titanenberührtes " and ore:len() > 18 then
+			ore = ore:sub(19)
+		elseif ore:sub(1,16) == "Titanversetztes " and ore:len() > 16 then
+			ore = ore:sub(17)
+		elseif ore:sub(1,2) == "Ur" and ore:len() > 2 then
+			ore = ore:sub(3)
+		elseif ore:sub(1,14) == "Geschmolzenes " and ore:len() > 14 then
+			ore = ore:sub(15)
+		elseif ore:sub(1,12) == "Gehärtetes " and ore:len() > 12 then
+			ore = ore:sub(13)
+		elseif ore:sub(1,15) == "Wutentbranntes " and ore:len() > 15 then
+			ore = ore:sub(16)
+		end
+		
+		-- nouns
 		if (ore:sub(-9) == "vorkommen" and ore:len() > 9) then
 			ore = ore:sub(1, -10); 				-- "Kupfervorkommen" to "Kupfer"
 		elseif (ore:sub(-5) == "flöz" and ore:len() > 5) then
