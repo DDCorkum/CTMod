@@ -1,3 +1,6 @@
+CT_BarMod (10.0.2.3) 2022-12-10
+- Securely closing spell flyout to avoid errors in Dragonflight
+
 CT_BarMod (10.0.2.2) 2022-12-04
 - Custom spell flyout button to mitigate taint in Dragonflight
 - Updates to align with CT_BottomBar
