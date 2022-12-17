@@ -27,7 +27,7 @@
 		<Frames>
 			<Frame name="$parentClassFrame" hidden="true">
 				<Size>
-					<AbsDimension x="100" y="25"/>
+					<AbsDimension x="96" y="24"/>
 				</Size>
 
 				<Anchors>
@@ -51,23 +51,24 @@
 				</Layers>
 				<Scripts>
 					<OnLoad>
-						Mixin(self, BackdropTemplateMixin or {});
+						Mixin(self, BackdropTemplateMixin or {})
 						self:SetBackdrop({
 							bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
 							edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
 							tile = true,
 							tileSize = 16,
-							edgeSize = 16,
-							insets = { left = 5, right = 5, top = 5, bottom = 5 },
-						});
-						self:SetBackdropColor(0, 0, 1, 0.5);
-						self:RegisterUnitEvent("UNIT_FACTION", "target");
-						<!-- (Removed since WoW 5.3.0) self:RegisterEvent("UNIT_DYNAMIC_FLAGS"); -->
-						self:RegisterEvent("PLAYER_TARGET_CHANGED");
-						self:RegisterEvent("GROUP_ROSTER_UPDATE");
+							edgeSize = 12,
+							insets = { left = 3, right = 3, top = 3, bottom = 3 },
+						})
+						self:SetBackdropColor(0, 0, 1, 0.5)
+						self:SetBackdropBorderColor(0.8, 0.8, 0.8, 0.8)
+						self:RegisterUnitEvent("UNIT_FACTION", "target")
+						<!-- (Removed since WoW 5.3.0) self:RegisterEvent("UNIT_DYNAMIC_FLAGS") -->
+						self:RegisterEvent("PLAYER_TARGET_CHANGED")
+						self:RegisterEvent("GROUP_ROSTER_UPDATE")
 					</OnLoad>
 					<OnEvent>
-						CT_SetTargetClass();
+						CT_SetTargetClass()
 					</OnEvent>
 				</Scripts>
 			</Frame>
@@ -75,7 +76,7 @@
 		<Scripts>
 			<OnLoad>
 				self:SetParent(TargetFrameTextureFrame or TargetFrame.TargetFrameContent.TargetFrameContentMain)	-- prior/after WoW 10.x
-				self:RegisterEvent("PLAYER_ENTERING_WORLD");
+				self:RegisterEvent("PLAYER_LOGIN");
 			</OnLoad>
 			<OnEvent>
 				CT_TargetFrameOnEvent(self, event, ...);
