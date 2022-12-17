@@ -293,13 +293,13 @@ do
 		frame:Hide()
 		frame:SetScript("OnShow", partyMemberFrame_OnShow)
 		frame:SetScript("OnHide", partyMemberFrame_OnHide)		
-		RegisterAttributeDriver(frame, "state-visibility", "[group:raid]hide;[@party"..id..",exists]show;hide")	-- useful starting in WoW 10.x because it is now parented by PartyFrame that never disappears
+		RegisterAttributeDriver(frame, "state-visibility", "[group:raid]hide;[@arena1,exists]hide;[@party"..id..",exists]show;hide")	-- useful starting in WoW 10.x because it is now parented by PartyFrame that never disappears
 		if CompactPartyFrame then
 			CompactPartyFrame:HookScript("OnShow", function()
 				module:afterCombat(RegisterAttributeDriver, frame, "state-visibility", "hide")
 			end)
 			CompactPartyFrame:HookScript("OnHide", function()
-				module:afterCombat(RegisterAttributeDriver, frame, "state-visibility", "[group:raid]hide;[@party"..id..",exists]show;hide")
+				module:afterCombat(RegisterAttributeDriver, frame, "state-visibility", "[group:raid]hide;[@arena1,exists]hide;[@party"..id..",exists]show;hide")
 			end)
 		end
 	end
