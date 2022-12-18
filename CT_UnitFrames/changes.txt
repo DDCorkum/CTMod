@@ -1,3 +1,6 @@
+CT_UnitFrames (10.0.2.3) 2022-12-17
+- Updating the target class frame for Dragonflight
+
 CT_UnitFrames (10.0.0.4) 2022-11-12
 - Update for Dragonflight 10.0.2 (build 46619 on the beta)
 

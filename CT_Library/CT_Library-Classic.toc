@@ -1,5 +1,5 @@
 ## Interface: 11403
-## Version: 10.0.2.2
+## Version: 10.0.2.3
 ## Title: CT_Library |cFFCC6600CTMod|r
 ## Notes: Library features for CTMod. 
 ## DefaultState: Enabled

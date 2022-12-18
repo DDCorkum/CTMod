@@ -91,10 +91,10 @@ spellFlyout:SetScript("OnEvent", function(self, event, ...)
 			i = i+1;
 			button = _G["CT_BarMod_SpellFlyoutButton"..i];
 		end
-	elseif (event == "PET_STABLE_UPDATE" or event == "PET_STABLE_SHOW") then
-		self:Hide();
-	elseif (event == "ACTIONBAR_PAGE_CHANGED") then
-		self:Hide();
+	elseif (event == "PET_STABLE_UPDATE" or event == "PET_STABLE_SHOW") and not InCombatLockdown() then		-- InCombatLockdown() required because this is insecure
+		self:Hide();  -- TODO: Find a way to securely do this during combat
+	--elseif (event == "ACTIONBAR_PAGE_CHANGED") then
+		--self:Hide();  -- Replaced with OnShow SecureHandler that creates a SecureStateDriver with "[nobar:##] hide;"
 	end
 end)
 
@@ -296,3 +296,7 @@ function module.updateFlyout(self, isButtonDownOverride)
 		flyoutArrowTexture:SetPoint("TOP", self, "TOP", 0, arrowDistance);
 	end
 end
+
+-- Hide the spell flyout when the action bar changes; secure alternative to SpellFlyout's event handler
+SecureHandlerWrapScript(spellFlyout, "OnShow", spellFlyout, [=[	RegisterAttributeDriver(self, "state-visibility", "[nobar:" .. GetActionBarPage() .."]hide") ]=], nil)
+SecureHandlerWrapScript(spellFlyout, "OnHide", spellFlyout, [=[ RegisterAttributeDriver(self, "state-visibility", "") ]=], nil)

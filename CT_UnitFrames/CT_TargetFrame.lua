@@ -15,22 +15,17 @@ local module = select(2, ...);
 local healthBar = TargetFrameHealthBar or TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar
 local manaBar = TargetFrameManaBar or TargetFrame.TargetFrameContent.TargetFrameContentMain.ManaBar
 
-local inworld;
 function CT_TargetFrameOnEvent(self, event, arg1, ...)
 
-	if ( event == "PLAYER_ENTERING_WORLD" ) then
-		if (inworld == nil) then
-			inworld = 1;
-			if (UnitFrame_UpdateThreatIndicator) then
-				hooksecurefunc("UnitFrame_UpdateThreatIndicator", CT_TargetFrame_UpdateThreatIndicator);
-			end
-			CT_TargetFrame_SetClassPosition(true);
-
-			if ( GetCVarBool("predictedPower") ) then
-				local statusbar = TargetFrameManaBar;
-				statusbar:SetScript("OnUpdate", UnitFrameManaBar_OnUpdate);
-				UnitFrameManaBar_UnregisterDefaultEvents(statusbar);
-			end
+	if ( event == "PLAYER_LOGIN" ) then
+		if (UnitFrame_UpdateThreatIndicator) then
+			hooksecurefunc("UnitFrame_UpdateThreatIndicator", CT_TargetFrame_UpdateThreatIndicator)
+		end
+		CT_TargetFrame_SetClassPosition(true)
+		if ( GetCVarBool("predictedPower") ) then
+			local statusbar = TargetFrameManaBar
+			statusbar:SetScript("OnUpdate", UnitFrameManaBar_OnUpdate)
+			UnitFrameManaBar_UnregisterDefaultEvents(statusbar)
 		end
 	end
 end
@@ -140,29 +135,34 @@ function CT_TargetFrame_UpdateThreatIndicator(indicator, numericIndicator, unit)
 end
 
 function CT_TargetFrame_SetClassPosition(center)
-	local frame = CT_TargetFrameClassFrame;
-	frame:ClearAllPoints();
+	local frame = CT_TargetFrameClassFrame
+	frame:ClearAllPoints()
 
-	local buffsOnTop = TARGET_FRAME_BUFFS_ON_TOP;
+	local buffsOnTop = TargetFrame.buffsOnTop
 	if (center or buffsOnTop) then
 		-- Center the class over the unit name.
 		if (buffsOnTop) then
 			-- Center class below the unit frame
-			local xoff;
+			local xoff
 			if (TargetFrameToT and TargetFrameToT:IsShown()) then
-				xoff = -13;
+				xoff = -13
 			else
-				xoff = 0;
+				xoff = 0
 			end
-			frame:SetPoint("TOP", TargetFrameTextureFrameName, "BOTTOM", xoff, -31);
+			frame:SetPoint("TOP", TargetFrameTextureFrameName or TargetFrame.TargetFrameContent.TargetFrameContentMain.Name, "BOTTOM", xoff, TargetFrame.TargetFrameContent and -35 or -31);
 		else
-			frame:SetPoint("BOTTOM", TargetFrameTextureFrameName, "TOP", 0, 5);
+			if TargetFrame.TargetFrameContent then
+				frame:SetPoint("BOTTOM", TargetFrame.TargetFrameContent.TargetFrameContentMain.Name, "TOP", 0, 2)
+				frame:SetPoint("RIGHT", TargetFrame.TargetFrameContent.TargetFrameContentContextual.LeaderIcon, "LEFT")
+			else
+				frame:SetPoint("BOTTOM", TargetFrameTextureFrameName, "TOP", 0, 4)
+			end
 		end
 		frame:SetWidth(100);
 		CT_TargetFrameClassFrameText:SetWidth(96);
 	else
 		-- Leave room on the left to display threat indicator.
-		frame:SetPoint("BOTTOMLEFT", TargetFrameTextureFrameName, "TOPLEFT", 35, 5);
+		frame:SetPoint("BOTTOMLEFT", TargetFrameTextureFrameName or TargetFrame.TargetFrameContent.TargetFrameContentMain.Name, "TOPLEFT", 35, 5);
 		frame:SetWidth(86);
 		CT_TargetFrameClassFrameText:SetWidth(82);
 	end
