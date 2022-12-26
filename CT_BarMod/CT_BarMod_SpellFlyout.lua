@@ -103,6 +103,11 @@ spellFlyout:SetBorderColor(0.5, 0.5, 0.5)
 spellFlyout:SetBorderSize(47)
 spellFlyout.Toggle = nop	-- replaced with a secure snippet
 
+-- Workaround; pushing the buttons forward one frame level
+spellFlyout.buttonsFrame = CreateFrame("Frame", nil, spellFlyout)
+spellFlyout.buttonsFrame:SetAllPoints()
+
+
 --------------------------------------------
 -- Insecure Code
 
@@ -141,7 +146,7 @@ spellFlyout:SetAttribute("createdButtons", 0)
 
 function module.createSpellFlyoutButtons(numSlots)	-- must not be called during combat lockdown
 	for i=spellFlyout:GetAttribute("createdButtons")+1, numSlots do
-		local button = CreateFrame("CheckButton", "CT_BarMod_SpellFlyoutButton" .. i, spellFlyout, "SecureActionButtonTemplate,SmallActionButtonTemplate")
+		local button = CreateFrame("CheckButton", "CT_BarMod_SpellFlyoutButton" .. i, spellFlyout.buttonsFrame, "SecureActionButtonTemplate,SmallActionButtonTemplate")
 		
 		button:SetScript("OnEnter", SpellFlyoutButton_SetTooltip)
 		button:SetScript("OnDragStart", SpellFlyoutButton_OnDrag)
@@ -190,6 +195,7 @@ spellFlyout:SetAttribute("toggleFlyout", [=[
 					prevButton = button
 				end
 				self:SetParent(newParent)
+				self:SetFrameStrata("DIALOG")
 				self:ClearAllPoints()
 				if direction == "UP" then
 					self:SetPoint("BOTTOM", newParent, "TOP", 0, 3)
