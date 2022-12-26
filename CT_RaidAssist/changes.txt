@@ -1,3 +1,6 @@
+CT_RaidAssist (10.0.2.4) 2022-12-26
+- Updates for Dragonflight
+
 CT_RaidAssist (9.2.0.3) 2022-10-14
 - Removing cooldown text when action bar numbers are shown
 
