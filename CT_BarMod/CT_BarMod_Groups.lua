@@ -1874,6 +1874,9 @@ if MultiBar7 then
 				if self:GetAttribute("ctForceHideGrid") == 1 then
 					return true, true
 				end
+			elseif name == "showgrid" and value == 4 and self:GetFrameRef("ctActButton"):GetAttribute(name) == 4 then
+				-- after releasing a spell dragged directly from the spellbook
+				return true, true
 			else
 				self:GetFrameRef("ctActButton"):SetAttribute(name,value)
 				return true;

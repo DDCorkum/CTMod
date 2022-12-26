@@ -1,5 +1,6 @@
 CT_BarMod (10.0.2.4) 2022-12-26
 - Pushing spell flyout buttons in front of background texture
+- Maintain control over hidden button slots after dragging from spellbook
 
 CT_BarMod (10.0.2.3) 2022-12-10
 - Securely closing spell flyout to avoid errors in Dragonflight
