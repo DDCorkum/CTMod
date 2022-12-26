@@ -1570,9 +1570,9 @@ function module.configureFlightMapFrame()
 	end
 
 	local currentNodeID = 0;
-	local underseaNodes = {[521] = true, [522] = true, [523] = true, [524] = true, [525] = true, [526] = true, [607] = true, [609] = true, [611] = true, [612] = true}
+	
 	local function CT_MapMod_FlightPointPinTemplate_SetShown(pin, value)
-		return pin.ctSetShown(pin, value or underseaNodes[currentNodeID] == underseaNodes[pin.taxiNodeData.nodeID])
+		return pin.ctSetShown(pin, value or module.specialTransportNodes[currentNodeID] == module.specialTransportNodes[pin.taxiNodeData.nodeID])
 	end
 	
 	local function CT_MapMod_FlightPointPinTemplate_OnClick(pin, button)

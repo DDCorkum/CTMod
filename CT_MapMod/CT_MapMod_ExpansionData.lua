@@ -399,8 +399,34 @@ module.ignoreClassicTaxiNodes =
 	[405] = true,	-- Durotar - ET - CC Prologue Spy Frog End
 	[438] = true,	-- Durotar - ET - CC Prologue Troll Taxi Bat Start
 	[439] = true,	-- Durotar - ET - CC Prologue Troll Recruit End
+}
+
+-- Special forms of travel which appear on the flight map.
+module.specialTransportNodes = 
+{
+	-- Underwater, Cataclysm
+	[521] = 1,
+	[522] = 1,
+	[523] = 1,
+	[524] = 1,
+	[525] = 1,
+	[526] = 1,
+	[607] = 1,
+	[609] = 1,
+	[611] = 1,
+	[612] = 1,
 	
-};
+	-- Teleportation, Dragon Isles
+	[2834] = 2,		-- Eon's Fringe
+	[2836] = 2,		-- Algeth'era
+	[2837] = 2,		-- Vakthros
+	[2838] = 2,		-- Cobalt Assembly
+	[2839] = 2,		-- Rusza'thar
+	[2840] = 2,		-- Shady Sanctuary
+	[2841] = 2,		-- Skytop Observatory
+	[2842] = 2,		-- Rubyscale Outpost
+	
+}
 
 
 ------------------------------------------------
