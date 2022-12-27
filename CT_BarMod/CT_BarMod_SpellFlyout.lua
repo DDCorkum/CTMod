@@ -151,6 +151,7 @@ function module.createSpellFlyoutButtons(numSlots)	-- must not be called during 
 		button:SetScript("OnEnter", SpellFlyoutButton_SetTooltip)
 		button:SetScript("OnDragStart", SpellFlyoutButton_OnDrag)
 		button:SetScript("OnLeave", function() GameTooltip:Hide() end)
+		button:RegisterForClicks("AnyUp", "AnyDown")
 		
 		SecureHandlerSetFrameRef(spellFlyout, "button"..i, button)
 		button:SetAttribute("slot", i)
