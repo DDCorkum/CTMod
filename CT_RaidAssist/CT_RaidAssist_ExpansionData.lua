@@ -541,9 +541,21 @@ module.CTRA_Configuration_Consumables =
 local playerLoginHappened = false;
 module:regEvent("PLAYER_LOGIN", function() playerLoginHappened = true; end);
 
-local insecureAsyncSpellCallback = Mixin(CreateFrame("Frame"), AsyncCallbackSystemMixin)	-- insecure alternative to ContinueOnSpellLoad() convenience wrapper
-insecureAsyncSpellCallback:Init(AsyncCallbackAPIType.ASYNC_SPELL)
-
+local onSpellLoad
+if AsyncCallbackSystemMixin then
+	-- Avoiding taint in WoW 10.x (WoWUIBugs #373)
+	local insecureAsyncSpellCallback = Mixin(CreateFrame("Frame"), AsyncCallbackSystemMixin)
+	insecureAsyncSpellCallback:Init(AsyncCallbackAPIType.ASYNC_SPELL)
+	function onSpellLoad(spellID, func)
+		insecureAsyncSpellCallback:AddCallback(spellID, func)
+	end
+else
+	-- Classic; unusable on Retail because it causes taint
+	function onSpellLoad(spellID, func)
+		Spell:CreateFromSpellID(spellID):ContinueOnSpellLoad(func)
+	end
+end
+	
 local function filterAndLocalize(table)
 	local entries = table[select(2, UnitClass("player"))];
 	if (entries) then
@@ -552,9 +564,7 @@ local function filterAndLocalize(table)
 		while (entries[i]) do
 			local entry = entries[i];	-- This local reference is important! The async queries below could come back after entries[i] points to something else.
 			if (C_Spell.DoesSpellExist(entry.id)) then
-				--local spell = Spell:CreateFromSpellID(entry.id)
-				--spell:ContinueOnSpellLoad(function()	-- taint!  WoWUIBugs #373
-				insecureAsyncSpellCallback:AddCallback(entry.id, function()		-- insecure alternative to ContinueOnSpellLoad() to avoid tainting the player's spellbook during fresh login (WoWUIBugs #373)
+				onSpellLoad(entry.id, function()
 					entry.name = GetSpellInfo(entry.id)
 					if (playerLoginHappened and module.ClickCastBroker) then
 						module.ClickCastBroker:Refresh();
