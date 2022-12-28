@@ -449,7 +449,7 @@ function StaticCTRAFrames()
 		UnregisterStateDriver(CompactRaidFrameContainer, "visibility");
 		
 		-- STEP 2:
-		CompactRaidFrameManager_SetSetting("IsShown",CompactUnitFrameProfiles_GetAutoActivationState());    --    (IsInRaid() and true) or (IsInGroup() and CompactRaidFrameManagerDisplayFrameHiddenModeToggle.shownMode) or false);
+		--CompactRaidFrameManager_SetSetting("IsShown",CompactUnitFrameProfiles_GetAutoActivationState());    --    (IsInRaid() and true) or (IsInGroup() and CompactRaidFrameManagerDisplayFrameHiddenModeToggle.shownMode) or false);
 		--CompactRaidFrameContainer_TryUpdate(CompactRaidFrameContainer);
 	end
 	

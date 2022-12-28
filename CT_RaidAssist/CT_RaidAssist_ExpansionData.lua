@@ -324,6 +324,12 @@ module.CTRA_Configuration_BossAuras =
 	[329875] = 3,		-- Castle Nathria - Sire Denathrius: Carnage
 	[329181] = 1,		-- Castle Nathria - Sire Denathrius: Wracking Pain
 	[332585] = 5,		-- Castle Nathria - Sire Denathrius: Scorn
+	
+	-- Dragonflight
+	[371836] = 5,		-- Vault of the Incarnates - Primal Council: Primal Blizzard
+	[372027] = 1,		-- Vault of the Incarnates - Primal Council: Slashing Blaze
+	[372044] = 0,		-- Vault of the Incarnates - Sennarth: Wrapped in Webs
+	[381615] = 0,		-- Vault of the Incarnates - Raszageth: Static Charge
 }
 
 
@@ -524,7 +530,7 @@ module.CTRA_Configuration_Consumables =
 	[327705] = true,	-- Surprisingly Palatable Feast (18 Agi)
 	[327706] = true,	-- Feast of Gluttonous Hedonism (20 Str)
 	[327708] = true,	-- Feast of Gluttonous Hedonism (20 Int)
-	[327709] = true,	-- Feast of Gluttonous Hedonism (20 Agi)	
+	[327709] = true,	-- Feast of Gluttonous Hedonism (20 Agi)
 } 
 
 
@@ -535,6 +541,21 @@ module.CTRA_Configuration_Consumables =
 local playerLoginHappened = false;
 module:regEvent("PLAYER_LOGIN", function() playerLoginHappened = true; end);
 
+local onSpellLoad
+if AsyncCallbackSystemMixin then
+	-- Avoiding taint in WoW 10.x (WoWUIBugs #373)
+	local insecureAsyncSpellCallback = Mixin(CreateFrame("Frame"), AsyncCallbackSystemMixin)
+	insecureAsyncSpellCallback:Init(AsyncCallbackAPIType.ASYNC_SPELL)
+	function onSpellLoad(spellID, func)
+		insecureAsyncSpellCallback:AddCallback(spellID, func)
+	end
+else
+	-- Classic; unusable on Retail because it causes taint
+	function onSpellLoad(spellID, func)
+		Spell:CreateFromSpellID(spellID):ContinueOnSpellLoad(func)
+	end
+end
+	
 local function filterAndLocalize(table)
 	local entries = table[select(2, UnitClass("player"))];
 	if (entries) then
@@ -543,13 +564,12 @@ local function filterAndLocalize(table)
 		while (entries[i]) do
 			local entry = entries[i];	-- This local reference is important! The async queries below could come back after entries[i] points to something else.
 			if (C_Spell.DoesSpellExist(entry.id)) then
-				local spell = Spell:CreateFromSpellID(entry.id)
-				spell:ContinueOnSpellLoad(function()
+				onSpellLoad(entry.id, function()
 					entry.name = GetSpellInfo(entry.id)
 					if (playerLoginHappened and module.ClickCastBroker) then
 						module.ClickCastBroker:Refresh();
 					end
-				end);
+				end)
 				i = i + 1;			-- moves to the next spell
 			else
 				tremove(entries, i);		-- shifts the remaining spells forward to the current position
