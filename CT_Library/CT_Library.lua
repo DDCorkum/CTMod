@@ -103,6 +103,26 @@ local getSpellName = GetSpellBookItemName;
 -----------------------------------------------
 
 -----------------------------------------------
+-- Protected; these should be overloaded
+
+function lib:init()
+	-- fires after ADDON_LOADED; defaults to the older CTMod behaviour of self:update("init", nil)
+	return self:update("init")
+end
+
+function lib:update(option, value)
+	-- fires after self:setOption() unless supressed using the third arg of setOption()
+	-- if self:init() is undefined, then self:update("init", nil) fires after ADDON_LOADED
+end
+
+function lib.frame()
+	-- constructs them module's panel; defaults to an empty window
+	-- once called, replaced with a reference to the actual frame itself
+	local optionsFrameList = self:framesInit()
+	return "frame#all", self:framesGetData(optionsFrameList)
+end
+
+-----------------------------------------------
 -- Generic Functions
 
 -- Return's the library's version, as a number with the main version before the decimal and subversions as fractions (usually tenths and thousandths, but not guaranteed)
@@ -620,24 +640,6 @@ do
 end
 
 -----------------------------------------------
--- Initializing
-
-local function loadAddon(event, addon)
-	if ( modules ) then
-		local module = modules[addon];
-		if (module) then
-			-- Initialize options
-			module.options = _G[addon.."Options"];
-			
-			-- Run any update function we might have
-			if ( module.update ) then
-				module:update("init");
-			end
-		end
-	end
-end
-
------------------------------------------------
 -- Actions requiring frames
 
 -- Register events
@@ -701,7 +703,6 @@ local function eventHandler(self, event, ...)
 	end
 end
 
-lib:regEvent("ADDON_LOADED", loadAddon);
 frame:SetScript("OnEvent", eventHandler);
 
 -- Schedule timers
@@ -750,7 +751,7 @@ end
 -- Check if an encounter is in progress, and return its ID (might not work after a /reload until the next encounter begins)
 do
 	local inEncounter = nil
-	lib:regEvent("ENCOUNTER_START", function(id)
+	lib:regEvent("ENCOUNTER_START", function(__, id)
 		inEncounter = id
 	end);
 	lib:regEvent("ENCOUNTER_END", function()
@@ -925,11 +926,19 @@ end
 
 -- Integrates the module into the CT Control Panel, and makes the module an extension of CTMod's public interface and protected content by configuring its metatable __index property
 -- Furthermore, creates sub-table module.publicInterface that may be used by modules to limit their public exposure
--- 
 function libPublic:registerModule(module)
 	assert(type(module) == "table", "An AddOn attempted to register itself with CTMod without passing its table");
 	assert(type(module.name) == "string", "An unnamed addon attempted to register with CTMod.");
 	registerModule(module);
+end
+
+-- Creates a pretend module that lacks its own saved variables, but can pretend to use setOption() and getOption()
+local function registerPseudoModule(module, position)
+	local charKey = lib.getCharKey()
+	registerModule(module, position)
+	module.options = {}
+	module.options[charKey] = {}
+	module.charOptions = module.options[charKey]
 end
 
 -- End Module Handling
@@ -939,47 +948,57 @@ end
 -- Option Handling
 
 do
-	local charKey;
+	local charKey = "CHAR-"..(UnitName("player") or "Unknown").."-"..(GetRealmName() or "Unknown")
 	local function getCharKey()
-		if ( not charKey ) then
-			charKey = "CHAR-"..(UnitName("player") or "Unknown").."-"..(GetRealmName() or "Unknown");
-		end
-		return charKey;
+		return charKey
 	end
-	lib.getCharKey = getCharKey;
+	lib.getCharKey = getCharKey
+
+	-- Initialize the options once saved variables available
+	local function loadAddon(event, addon)
+	
+		local module = modules[addon]
+		if (module) then
+
+			-- Initialize options table
+			local optionsKey = addon.."Options"
+			_G[optionsKey] = _G[optionsKey] or {}
+			module.options = _G[optionsKey]
+			
+			-- Initialize options subtable
+			module.options[charKey] = module.options[charKey] or {}
+			module.charOptions = module.options[charKey]
+
+			-- Run any update function we might have
+			module:init()
+			
+		end
+	end
+
+	lib:regEvent("ADDON_LOADED", loadAddon);
 
 	CT_SKIP_UPDATE_FUNC = false	-- convenience constant so the impact of callUpdate is clearer in other modules
 
+	local debug, debugCount = 0, 0
+	
 	-- Set an option's value on the current profile
 	function lib:setOption(option, value, callUpdate)
 		-- callUpdate
 		--	false: Do not call the update and callback functions.
 		--	true, nil: Call the update and callback functions.
 
-		if (type(option) == "function") then
+		if type(option) == "function" then
 			-- some addons overload option so the same object can manipulate different tasks simultaneously
 			option = option()
 		end
-		if (not option) then
-			-- either option was nil, or option() returned nil
-			return
-		end
-		if ( self.options == nil ) then
-			local optionKey = self.name.."Options"
-			self.options = _G[optionKey] or {}
-			_G[optionKey] = self.options
-		end
-		local key = getCharKey();
-		self.options[key] = self.options[key] or {}
-		self.options[key][option] = value;
-		if (callUpdate ~= false) then
-			local updateFunc = self.update;
-			if ( updateFunc ) then
-				updateFunc(self, option, value);
-			end
-			if (self.setOptionCallbacks and self.setOptionCallbacks[option]) then
-				for func, owner in pairs(self.setOptionCallbacks[option]) do
-					func(owner, option, value)
+		if option and self.options then
+			self.charOptions[option] = value;
+			if (callUpdate ~= false) then
+				self:update(option, value)
+				if (self.setOptionCallbacks and self.setOptionCallbacks[option]) then
+					for __, func in ipairs(self.setOptionCallbacks[option]) do
+						func(value)
+					end
 				end
 			end
 		end
@@ -987,15 +1006,12 @@ do
 
 	-- Reads an option.
 	function lib:getOption(option)
-		if (type(option) == "function") then
+		if type(option) == "function" then
 			-- some addons overload a frame to have a function
-			option = option();
+			option = option()
 		end
-		if (option and self.options) then
-			local key = getCharKey();
-			if ( self.options[key] ) then
-				return self.options[key][option];
-			end
+		if option and self.options then
+			return self.charOptions[option]
 		end
 	end
 
@@ -1016,21 +1032,15 @@ do
 	-- function lib:enumerateOptions()
 	-- Iterates through each option except movables; see lib:nextMovable()
 	function lib:enumerateOptions()
-		local key = getCharKey()
-		local options = self.options
-		if (options and options[key]) then
-			return nextOption, options[key]
-		else
-			return next, {}
-		end
+		return nextOption, self.charOptions or {}
 	end
 
-	-- function lib:registerSetOptionCallback(option, func [, owner])
-	-- Registers a callback, func(owner, option, value), to fire during lib:setOption() unless supressed args to setOption()
-	function lib:registerSetOptionCallback(option, func, owner)
+	-- function lib:registerSetOptionCallback(option, func)
+	-- Cause func(value) to fire after calls to lib:setOption() unless callbacks are supressed using optional args to setOption()
+	function lib:registerSetOptionCallback(option, func)
 		self.setOptionCallbacks = self.setOptionCallbacks or {}
 		self.setOptionCallbacks[option] = self.setOptionCallbacks[option] or {}
-		self.setOptionCallbacks[option][func] = owner or self
+		tinsert(self.setOptionCallbacks[option], func)
 	end
 
 
@@ -1191,16 +1201,10 @@ local function nextMovable(t, key)	-- see nextOption() above
 	return key, val
 end
 
--- function lib:enumerateOptions()
+-- function lib:enumerateMovables()
 -- Iterates through the saved settings for each movable; see lib:enumerateOptions()
 function lib:enumerateMovables()
-	local key = getCharKey()
-	local options = self.options
-	if (options and options[key]) then
-		return nextMovable, options[key]
-	else
-		return pairs({})
-	end
+	return nextMovable, self.charOptions or {}
 end
 
 -- End Movable Handling
@@ -1652,7 +1656,7 @@ do
 		end
 	end
 	
-	local function autoCollapse(frame, __, value)	-- frame, option, value
+	local function autoCollapse(frame, value)	-- frame, option, value
 		if (frame.invertAutoCollapse ~= not not value) then
 			frame:Expand()
 		else
@@ -1684,17 +1688,25 @@ do
 			button.text:Hide()
 		end
 		
-		-- Collapse immediately after loading when the option is false; or when its true if prefixed with "~"
+		-- Automate based on the value of another setting
 		if (option) then
 			if (option:sub(1,1) == "~") then
+				-- Show when the option is FALSE
 				frame.invertAutoCollapse = true
 				option = option:sub(2)
 			else
+				-- Show when the option is TRUE
 				frame.invertAutoCollapse = false
 			end
-			self:registerSetOptionCallback(option, autoCollapse, frame)
+			
+			-- Change when the option changes
+			self:registerSetOptionCallback(option, function(value)
+				autoCollapse(frame, value)
+			end)
+			
+			-- Set the initial state
 			C_Timer.After(0, function()
-				autoCollapse(frame, option, self:getDisplayValue(option))
+				autoCollapse(frame, self:getDisplayValue(option))
 			end)
 		end
 		return frame
@@ -3365,7 +3377,7 @@ module.version = ""
 -- Register as module 1 only, since this will code will get executed once per different
 -- version of CT_Library. We don't want multiple copies showing up in the
 -- control panel.
-registerModule(module, 1)
+registerPseudoModule(module, 1)
 
 module:regEvent("PLAYER_LOGIN", function() module.displayName = "|cFFFFFFCC" .. L["CT_Library/SettingsImport/Heading"]; end)
 
@@ -3378,30 +3390,27 @@ local importRealm2
 local importPlayerCount
 
 local function populateAddonsList(char)
-	local importButton, num, obj, options;
-	local deleteButton;
-	local numAddons;
-	importButton = optionsFrame.importButton;
-	deleteButton = optionsFrame.deleteButton;
-	num = 0;
+	local importButton = optionsFrame.importButton
+	local deleteButton = optionsFrame.deleteButton
+	local num = 0
 	for key, value in ipairs(modules) do
 		if ( value ~= module ) then
-			options = value.options;
-			if ( options and options[char] ) then
-				num = num + 1;
-				obj = addonsFrame[tostring(num)];
-				obj:Show();
-				obj:SetChecked(false);
-				obj.text:SetText(value.name);
+			local options = value.options;
+			if ( options and options[char] and next(options[char]) ~= nil) then
+				num = num + 1
+				local obj = addonsFrame[tostring(num)]
+				obj:Show()
+				obj:SetChecked(false)
+				obj.text:SetText(value.name)
 			end
 		end
 	end
 
-	numAddons = num;
-	num = num + 1;
+	local numAddons = num
+	num = num + 1
 
 	-- Position action frame
-	obj = optionsFrame.actions;
+	local obj = optionsFrame.actions;
 	obj:ClearAllPoints();
 	obj:SetPoint("TOPLEFT", optionsFrame, "TOPLEFT", 0, -180 + (-20 * num));
 	obj:SetWidth(300)
@@ -3998,7 +4007,7 @@ function module:update(type, value)		-- also see the general-purpose ADDON_LOADE
 	end
 end
 
-module.frame = function()
+function module.frame()
 	local addonsTable = { };
 	local optionsTable = {
 		"font#tl:5:-5#v:GameFontNormalLarge#" .. L["CT_Library/SettingsImport/Profiles/Heading"],
@@ -4118,12 +4127,12 @@ module.version = LIBRARY_VERSION;
 -- Register as module 2 only, since this will code will get executed once per different
 -- version of CT_Library. We don't want multiple copies showing up in the
 -- control panel.
-registerModule(module, 2);
+registerPseudoModule(module, 2);
 
 module:regEvent("PLAYER_LOGIN", function() module.displayName = "|cFFFFFFCC" .. L["CT_Library/Help/Heading"]; end);
 
 
-module.frame = function()
+function module.frame()
 
 	local optionsFrameList = module:framesInit()
 	

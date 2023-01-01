@@ -1,3 +1,8 @@
+CT_Core (10.0.2.5) 2023-01-04
+- Refactoring to improve performance, prevent taint
+- Removing the custom /hail
+- Quest levels setting also applies to the objectives tracker in Dragonflight
+
 CT_Core (10.0.0.3) 2022-11-03
 - Preventing bag frame taint
 - Adjusting casting bar text position

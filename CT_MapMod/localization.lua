@@ -24,7 +24,6 @@ local L = module.text
 -----------------------------------------------
 -- enUS (Default) Unlocalized Strings 
 
-L["CT_MapMod/Herb/Adders Tongue"] = "Adders Tongue"
 L["CT_MapMod/Herb/Adder's Tongue"] = "Adder's Tongue"
 L["CT_MapMod/Herb/Aethril"] = "Aethril"
 L["CT_MapMod/Herb/Akunda's Bite"] = "Akunda's Bite"
@@ -229,7 +228,6 @@ L["CT_MapMod/User/White Circle"] = "White Circle"
 
 if (GetLocale() == "frFR") then
 
-L["CT_MapMod/Herb/Adders Tongue"] = "Langues de serpent"
 L["CT_MapMod/Herb/Adder's Tongue"] = "Langue de serpent"
 L["CT_MapMod/Herb/Aethril"] = "Aethril"
 L["CT_MapMod/Herb/Akunda's Bite"] = "Mâche d’Akunda"
@@ -432,7 +430,6 @@ L["CT_MapMod/User/White Circle"] = "Cercle blanc"
 	
 elseif (GetLocale() == "deDE") then
 
-L["CT_MapMod/Herb/Adders Tongue"] = "Schlangenzunge"
 L["CT_MapMod/Herb/Adder's Tongue"] = "Schlangenzunge"
 L["CT_MapMod/Herb/Aethril"] = "Aethril"
 L["CT_MapMod/Herb/Akunda's Bite"] = "Akundas Biss"
