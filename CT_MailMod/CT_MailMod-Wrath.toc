@@ -1,4 +1,4 @@
-## Interface: 30400
+## Interface: 30401
 ## Version: 10.0.2.5
 ## Title: CT_MailMod
 ## Notes: Heavily improves the in-game mail functionality.
