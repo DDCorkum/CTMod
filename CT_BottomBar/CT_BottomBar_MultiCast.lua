@@ -36,7 +36,7 @@ local function moveBar()
 		local x3,y3 = MultiCastSummonSpellButton:GetScaledRect()
 		MultiCastSummonSpellButton:AdjustPointsOffset((x-30-x3)/scale, (y-y3)/scale)
 		
-		MultiCastRecallSpellButton:ClearPointByName("BOTTOMLEFT")
+		MultiCastRecallSpellButton:ClearPoint("BOTTOMLEFT")
 		
 		--local x4,y4 = MultiCastRecallSpellButton:GetScaledRect()
 		--MultiCastRecallSpellButton:AdjustPointsOffset((x+30-x4)/scale, (y-y4)/scale)
