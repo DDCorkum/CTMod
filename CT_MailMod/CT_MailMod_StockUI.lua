@@ -1015,7 +1015,7 @@ do
 							petSpecies, petQuality, petLevel, petName = data.battlePetSpeciesID, data.battlePetBreedQuality, data.battlePetLevel, data.battlePetName
 						end
 					else
-						battlePetTooltip = battlePetTooltip or CreateFrame("GameTooltip")	-- deliberately does not inherit any templates, prior to WoW 10.x
+						battlePetTooltip = battlePetTooltip or CreateFrame("GameTooltip", "CT_MailMod_BattlePetScanningTooltip")	-- deliberately does not inherit any templates, prior to WoW 10.x
 						__, petSpecies, petLevel, petQuality, __, __, __, petName = battlePetTooltip:SetInboxItem(mailIndex, i)
 					end
 					if petSpecies then
