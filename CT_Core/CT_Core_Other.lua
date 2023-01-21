@@ -672,32 +672,40 @@ elseif module:getGameVersion() == 3 then
 else -- if module:getGameVersion() >= 9 then
 	
 	local dummySetText = CreateFrame("Frame"):CreateFontString(nil, "ARTWORK").SetText;	-- prevents an infinite loop by the hook below
-	QuestScrollFrame.titleFramePool.creationFunc = function(self)
-		local frame = CreateFrame(self.frameType, nil, self.parent, self.frameTemplate);
-		hooksecurefunc(frame.Text, "SetText", function(fontString, text)
-			local info = C_QuestLog.GetInfo(frame.questLogIndex);
-			if (displayLevels and info and info.level and info.level > 0) then
-				dummySetText(fontString, "[" .. info.level .. (info.suggestedGroup > 0 and "+] " or "] ") .. text);
-			end
-		end)
-		return frame;
-	end
+
+	-- we want to hook each font string as they are created
+	hooksecurefunc(QuestScrollFrame.titleFramePool, "resetterFunc", function(__, obj)
+		if obj.ct == nil then
+			obj.ct = 1
+			hooksecurefunc(obj.Text, "SetText", function(fontString, text)
+				local info = C_QuestLog.GetInfo(obj.questLogIndex)
+				if (displayLevels and info and info.level and info.level > 0) then
+					dummySetText(fontString, "[" .. info.level .. (info.suggestedGroup > 0 and "+] " or "] ") .. text)
+				end
+			end)
+		end
+	end)
+	
+	local info
+	hooksecurefunc(QUEST_TRACKER_MODULE, "GetBlock", function(__, id)
+		local questLogIndex = C_QuestLog.GetLogIndexForQuestID(id)
+		if questLogIndex then
+			info = C_QuestLog.GetInfo(questLogIndex)
+		end
+	end)
+	
+	hooksecurefunc("QuestObjective_SetupHeader", function(block)
+		if block.HeaderText and block.ct == nil then
+			block.ct = 1
+			hooksecurefunc(block.HeaderText, "SetText", function(fontString, text)
+				if (displayLevels and info and info.level and info.level > 0) then
+					dummySetText(fontString, "[" .. info.level .. (info.suggestedGroup > 0 and "+] " or "] ") .. text)
+				end
+				info = nil
+			end)
+		end
+	end)
 end
-
---------------------------------------------
--- Hail Mod
-
-local function hail()
-	local targetName = UnitName("target");
-	if ( targetName ) then
-		SendChatMessage("Hail, " .. targetName .. (((UnitIsDead("target") or UnitIsCorpse("target")) and "'s Corpse") or ""));
-	else
-		SendChatMessage("Hail");
-	end
-end
-
-module.hail = hail;
-module:setSlashCmd(hail, "/hail");
 
 --------------------------------------------
 -- Block trades when bank or guild bank is open
@@ -1222,12 +1230,12 @@ local function castingtimer_configure(castBarFrame)
 	local castingBarText = castBarFrame.Text
 	local countDownText = castBarFrame.countDownText
 
-	if (not countDownText) then
-		castingtimer_createFS(castBarFrame)
-		countDownText = castBarFrame.countDownText
-	end
+	if displayTimers then
 
-	if ( displayTimers ) then
+		if (not countDownText) then
+			castingtimer_createFS(castBarFrame)
+			countDownText = castBarFrame.countDownText
+		end
 
 		countDownText:ClearAllPoints()
 		castingBarText:ClearAllPoints()
@@ -1246,7 +1254,9 @@ local function castingtimer_configure(castBarFrame)
 		end
 
 		countDownText:Show()
-	else
+	
+	elseif countDownText then
+	
 		countDownText:Hide()
 
 		-- See CastingBarFrame_SetLook() in CastingBarFrame.lua.
@@ -1264,6 +1274,7 @@ local function castingtimer_configure(castBarFrame)
 			castingBarText:SetPoint("TOPLEFT", 0, CastingBarMixin and 3 or 4)
 			castingBarText:SetPoint("TOPRIGHT", 0, CastingBarMixin and 3 or 4)
 		end
+		
 	end
 end
 
@@ -1283,10 +1294,12 @@ hooksecurefunc("PlayerFrame_AttachCastBar", castingtimer_PlayerFrame_AttachCastB
 local function toggleCastingTimers(enable)
 	displayTimers = enable;
 
-	for i, frameName in ipairs(castingBarFrames) do
-		local frame = _G[frameName];
-		if (frame) then
-			castingtimer_configure(frame);
+	if enable then
+		for i, frameName in ipairs(castingBarFrames) do
+			local frame = _G[frameName];
+			if (frame) then
+				castingtimer_configure(frame);
+			end
 		end
 	end
 end
@@ -1294,8 +1307,10 @@ end
 local function addCastingBarFrame(name)
 	local frame = _G[name];
 	if (frame) then
-		castingtimer_configure(frame);
-		tinsert(castingBarFrames,name);
+		tinsert(castingBarFrames,name)
+		if displayTimers then
+			castingtimer_configure(frame)
+		end
 	end
 end
 
@@ -1449,12 +1464,12 @@ end
 
 local cfibomcTable = {};
 
-function CT_Core_ContainerFrameItemButton_OnModifiedClick_Register(func)
-	cfibomcTable[func] = true;
+function CT_Core.ContainerFrameItemButton_OnModifiedClick_Register(func)
+	cfibomcTable[func] = true
 end
 
-function CT_Core_ContainerFrameItemButton_OnModifiedClick_Unregister(func)
-	cfibomcTable[func] = nil;
+function CT_Core.ContainerFrameItemButton_OnModifiedClick_Unregister(func)
+	cfibomcTable[func] = nil
 end
 
 local function CT_Core_ContainerFrameItemButton_OnModifiedClick(self, button)
@@ -1482,7 +1497,7 @@ else
 	end)
 end
 
-CT_Core_ContainerFrameItemButton_OnModifiedClick_Register(CT_Core_AddToAuctions);
+CT_Core.ContainerFrameItemButton_OnModifiedClick_Register(CT_Core_AddToAuctions)
 
 --------------------------------------------
 -- Hides the gryphons if the user does not have CT_BottomBar installed
@@ -1795,29 +1810,29 @@ do
 	--	Does not open or close any bags.
 
 	local events = {
-		["BANKFRAME_OPENED"]      = {option = "bankOpenBags", open = true, backpack = "bankOpenBackpack", nobags = "bankOpenNoBags", bank = "bankOpenBankBags"},
-		["BANKFRAME_CLOSED"]      = {option = "bankCloseBags"},
+		["BANKFRAME_OPENED"]      = {openAll = "bankOpenBags", backpack = "bankOpenBackpack", nobags = "bankOpenNoBags", bank = "bankOpenBankBags"},
+		["BANKFRAME_CLOSED"]      = {close = "bankCloseBags"},
 
-		["GUILDBANKFRAME_OPENED"] = GuildBankFrame_LoadUI and {option = "gbankOpenBags", open = true, backpack = "gbankOpenBackpack", nobags = "gbankOpenNoBags"},
-		["GUILDBANKFRAME_CLOSED"] = GuildBankFrame_LoadUI and {option = "gbankCloseBags"},
+		["GUILDBANKFRAME_OPENED"] = GuildBankFrame_LoadUI and {openAll = "gbankOpenBags", backpack = "gbankOpenBackpack", nobags = "gbankOpenNoBags"},
+		["GUILDBANKFRAME_CLOSED"] = GuildBankFrame_LoadUI and {close = "gbankCloseBags"},
 
-		["MERCHANT_SHOW"]         = {option = "merchantOpenBags", open = true, backpack = "merchantOpenBackpack", nobags = "merchantOpenNoBags"},
-		["MERCHANT_CLOSED"]       = {option = "merchantCloseBags"},
+		["MERCHANT_SHOW"]         = {openAll = "merchantOpenBags", backpack = "merchantOpenBackpack", nobags = "merchantOpenNoBags"},
+		["MERCHANT_CLOSED"]       = {close = "merchantCloseBags"},
 
-		["AUCTION_HOUSE_SHOW"]    = {option = "auctionOpenBags", open = true, backpack = "auctionOpenBackpack", nobags = "auctionOpenNoBags"},
-		["AUCTION_HOUSE_CLOSED"]  = {option = "auctionCloseBags"},
+		["AUCTION_HOUSE_SHOW"]    = {openAll = "auctionOpenBags", backpack = "auctionOpenBackpack", nobags = "auctionOpenNoBags"},
+		["AUCTION_HOUSE_CLOSED"]  = {close = "auctionCloseBags"},
 
-		["TRADE_SHOW"]            = {option = "tradeOpenBags", open = true, backpack = "tradeOpenBackpack", nobags = "tradeOpenNoBags"},
-		["TRADE_CLOSED"]          = {option = "tradeCloseBags"},
+		["TRADE_SHOW"]            = {openAll = "tradeOpenBags", backpack = "tradeOpenBackpack", nobags = "tradeOpenNoBags"},
+		["TRADE_CLOSED"]          = {close = "tradeCloseBags"},
 
-		["VOID_STORAGE_OPEN"]     = VoidStorageFrame_LoadUI and {option = "voidOpenBags", open = true, backpack = "voidOpenBackpack", nobags = "voidOpenNoBags"},
-		["VOID_STORAGE_CLOSE"]    = VoidStorageFrame_LoadUI and {option = "voidCloseBags"},
+		["VOID_STORAGE_OPEN"]     = VoidStorageFrame_LoadUI and {openAll = "voidOpenBags", backpack = "voidOpenBackpack", nobags = "voidOpenNoBags"},
+		["VOID_STORAGE_CLOSE"]    = VoidStorageFrame_LoadUI and {close = "voidCloseBags"},
 
-		--["OBLITERUM_FORGE_SHOW"]     = ObliterumForgeFrame_LoadUI and {option = "obliterumOpenBags", open = true, backpack = "obliterumOpenBackpack", nobags = "obliterumOpenNoBags"},
-		--["OBLITERUM_FORGE_CLOSE"]    = ObliterumForgeFrame_LoadUI and {option = "obliterumCloseBags"},
+		--["OBLITERUM_FORGE_SHOW"]     = ObliterumForgeFrame_LoadUI and {openAll = "obliterumOpenBags", backpack = "obliterumOpenBackpack", nobags = "obliterumOpenNoBags"},
+		--["OBLITERUM_FORGE_CLOSE"]    = ObliterumForgeFrame_LoadUI and {close = "obliterumCloseBags"},
 		
-		--["SCRAPPING_MACHINE_SHOW"]     = ScrappingMachineFrame_LoadUI and {option = "scrappingOpenBags", open = true, backpack = "scrappingOpenBackpack", nobags = "scrappingOpenNoBags"},
-		--["SCRAPPING_MACHINE_CLOSE"]    = ScrappingMachineFrame_LoadUI and {option = "scrappingCloseBags"},
+		--["SCRAPPING_MACHINE_SHOW"]     = ScrappingMachineFrame_LoadUI and {openAll = "scrappingOpenBags", backpack = "scrappingOpenBackpack", nobags = "scrappingOpenNoBags"},
+		--["SCRAPPING_MACHINE_CLOSE"]    = ScrappingMachineFrame_LoadUI and {close = "scrappingCloseBags"},
 
 	};
 
@@ -1833,23 +1848,12 @@ do
 		end
 		
 		
-		if (data.open) then
+		if (data.openAll) then
 			-- This is an open event.
-			local openAllBags;
-			local openBackpack;
-			local openNoBags;
-			local openBankBags;
-
-			openAllBags = module:getOption(data.option);
-			if (data.backpack) then
-				openBackpack = module:getOption(data.backpack);
-			end
-			if (data.nobags) then
-				openNoBags = module:getOption(data.nobags);
-			end
-			if (data.bank) then
-				openBankBags = module:getOption(data.bank);
-			end
+			local openAllBags = module:getOption(data.openAll) ~= false
+			local openBackpack = data.backpack and module:getOption(data.backpack)
+			local openNoBags = data.nobags and module:getOption(data.nobags)
+			local openBankBags = data.bank and module:getOption(data.bank) ~= false
 
 			if (openAllBags or openBackpack or openNoBags) then
 				-- First, close all bags.
@@ -1874,9 +1878,7 @@ do
 			end
 		else
 			-- This is a close event.
-			local closeAll;
-			closeAll = module:getOption(data.option);
-			if (closeAll) then
+			if (data.close and module:getOption(data.close) ~= false) then
 				-- Close all bags.
 				CloseAllBags();
 			end
@@ -2854,7 +2856,10 @@ local powerbaralt__createAnchorFrame;
 
 local powerbaralt_toggleStatus, powerbaralt_toggleMovable, powerbaralt_toggleAnchor;	-- defined within the conditional chunk below
 
-if (PlayerPowerBarAlt) then
+if PlayerPowerBarAlt and not EncounterBar then
+	
+	-- this is now essentially permanently disabled; PlayerPowerBarAlt was introduced in WoW 4.0 and then became part of the movable EncounterBar in WoW 10.0
+	
 	local function powerbaralt_reanchor()
 		PlayerPowerBarAlt:ClearAllPoints();
 		PlayerPowerBarAlt:SetPoint("CENTER", powerbaraltAnchorFrame, "CENTER", 0, 0);
@@ -3184,7 +3189,8 @@ end
 --------------------------------------------
 -- General Initializer
 
-local modFunctions = {
+local modInitAndUpdateFuncs =
+{
 	["castingTimers"] = toggleCastingTimers,
 	["questLevels"] = toggleDisplayLevels,
 	["blockBankTrades"] = module.configureBlockTradesBank,
@@ -3203,6 +3209,21 @@ local modFunctions = {
 	["watchframeChangeWidth"] = module.watchframeChangeWidth,
 	["watchframeAddMinimizeButton"] = module.watchframeAddMinimizeButton,
 	["CTCore_WatchFrameScale"] = module.watchframeChangeScale,
+	["powerbaraltEnabled"] = powerbaralt_toggleStatus,
+	["powerbaraltMovable"] = powerbaralt_toggleMovable,
+	["powerbaraltShowAnchor"] = powerbaralt_toggleAnchor,
+	["hideGryphons"] = hide_gryphons,
+	["castingbarEnabled"] = castingbar_Update,
+	["castingbarMovable"] = castingbar_ToggleHelper,
+	["showLossOfControlFrame"] = movableLoC_UpdateVisibility,
+	["moveLossOfControlFrame"] = movableLoC_UpdatePosition,
+	["dragLossOfControlFrame"] = movableLoC_UpdateDragging,
+	["enableCustomBagMenuBars"] = enableCustomBagMenuBars,
+	["showCustomBagMenuAnchors"] = showCustomBagMenuAnchors,
+}
+
+local modUpdateFuncs =
+{
 	["auctionOpenNoBags"] = setBagOption,
 	["auctionOpenBackpack"] = setBagOption,
 	["auctionOpenBags"] = setBagOption,
@@ -3227,30 +3248,20 @@ local modFunctions = {
 	["scrappingOpenNoBags"] = setBagOption,
 	["scrappingOpenBackpack"] = setBagOption,
 	["scrappingOpenBags"] = setBagOption,
-	["powerbaraltEnabled"] = powerbaralt_toggleStatus,
-	["powerbaraltMovable"] = powerbaralt_toggleMovable,
-	["powerbaraltShowAnchor"] = powerbaralt_toggleAnchor,
-	["hideGryphons"] = hide_gryphons,
-	["castingbarEnabled"] = castingbar_Update,
-	["castingbarMovable"] = castingbar_ToggleHelper,
-	["showLossOfControlFrame"] = movableLoC_UpdateVisibility,
-	["moveLossOfControlFrame"] = movableLoC_UpdatePosition,
-	["dragLossOfControlFrame"] = movableLoC_UpdateDragging,
-	["enableCustomBagMenuBars"] = enableCustomBagMenuBars,
-	["showCustomBagMenuAnchors"] = showCustomBagMenuAnchors,
-};
+}
 
+setmetatable(modUpdateFuncs, {__index = modInitAndUpdateFuncs})
 
-module.modupdate = function(self, type, value)
-	if ( type == "init" ) then
-		-- load all the various settings
-		for key, value in pairs(modFunctions) do
-			value(self:getOption(key), key);
-		end
-	else
-		local func = modFunctions[type];
-		if ( func ) then
-			func(value, type);
-		end
+function module:modinit()
+	-- load all the various settings
+	for key, value in pairs(modInitAndUpdateFuncs) do
+		value(self:getOption(key), key);
+	end
+end
+
+function module:modupdate(opt, value)
+	local func = modUpdateFuncs[opt];
+	if ( func ) then
+		func(value, opt);
 	end
 end

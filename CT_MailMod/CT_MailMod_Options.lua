@@ -210,159 +210,160 @@ end
 
 module.opt = {};
 
-module.update = function(self, optName, value)
-	local opt = module.opt;
-	if (optName == "init") then
+function module:init()
 	
-		-- Temporary
-		local charLog = module:getOption("mailLog")
-		if (CT_MailModOptions) then
-			CT_MailModOptions.mailLog = CT_MailModOptions.mailLog or {}	
-			if (charLog) then
-				for __, v in ipairs(charLog) do
-					tinsert(CT_MailModOptions.mailLog, v)
-				end
-				module:setOption("mailLog", nil)
+	local opt = module.opt;	
+	
+	-- Temporary
+	local charLog = module:getOption("mailLog")
+	if (CT_MailModOptions) then
+		CT_MailModOptions.mailLog = CT_MailModOptions.mailLog or {}	
+		if (charLog) then
+			for __, v in ipairs(charLog) do
+				tinsert(CT_MailModOptions.mailLog, v)
 			end
+			module:setOption("mailLog", nil)
 		end
-		
-		-- General
-		opt.openBackpack = getoption("openBackpack", false);
-		opt.openAllBags = getoption("openAllBags", false);
-		opt.closeAllBags = getoption("closeAllBags", false);
-		opt.blockTrades = getoption("blockTrades", false);
-		opt.showMoneyChange = getoption("showMoneyChange", false);
+	end
 
-		-- Inbox
-		opt.inboxShowNumbers = getoption("inboxShowNumbers", true);
-		opt.inboxShowLong = getoption("inboxShowLong", true);
-		opt.inboxShowExpiry = getoption("inboxShowExpiry", true);
-		opt.inboxShowInbox = getoption("inboxShowInbox", true);
-		opt.inboxShowMailbox = getoption("inboxShowMailbox", true);
-		opt.toolMultipleItems = getoption("toolMultipleItems", true);
-		opt.toolSelectMsg = getoption("toolSelectMsg", true);
+	-- General
+	opt.openBackpack = getoption("openBackpack", false);
+	opt.openAllBags = getoption("openAllBags", false);
+	opt.closeAllBags = getoption("closeAllBags", false);
+	opt.blockTrades = getoption("blockTrades", false);
+	opt.showMoneyChange = getoption("showMoneyChange", false);
 
-		-- Message selection
-		opt.inboxSenderNew = getoption("inboxSenderNew", true);
-		opt.inboxRangeNew = getoption("inboxRangeNew", true);
+	-- Inbox
+	opt.inboxShowNumbers = getoption("inboxShowNumbers", true);
+	opt.inboxShowLong = getoption("inboxShowLong", true);
+	opt.inboxShowExpiry = getoption("inboxShowExpiry", true);
+	opt.inboxShowInbox = getoption("inboxShowInbox", true);
+	opt.inboxShowMailbox = getoption("inboxShowMailbox", true);
+	opt.toolMultipleItems = getoption("toolMultipleItems", true);
+	opt.toolSelectMsg = getoption("toolSelectMsg", true);
 
-		-- Mail Log
-		opt.printLog = getoption("printLog", false);
-		opt.saveLog = getoption("saveLog", true);
-		opt.logOpenedMail = getoption("logOpenedMail", true);
-		opt.logReturnedMail = getoption("logReturnedMail", true);
-		opt.logDeletedMail = getoption("logDeletedMail", true);
-		opt.logSentMail = getoption("logSentMail", true);
-		opt.logWindowScale = getoption("logWindowScale", 1);
-		opt.logColor = getoption("logColor", defaultLogColor);
-		opt.hideLogButton = getoption("hideLogButton", false);
+	-- Message selection
+	opt.inboxSenderNew = getoption("inboxSenderNew", true);
+	opt.inboxRangeNew = getoption("inboxRangeNew", true);
+
+	-- Mail Log
+	opt.printLog = getoption("printLog", false);
+	opt.saveLog = getoption("saveLog", true);
+	opt.logOpenedMail = getoption("logOpenedMail", true);
+	opt.logReturnedMail = getoption("logReturnedMail", true);
+	opt.logDeletedMail = getoption("logDeletedMail", true);
+	opt.logSentMail = getoption("logSentMail", true);
+	opt.logWindowScale = getoption("logWindowScale", 1);
+	opt.logColor = getoption("logColor", defaultLogColor);
+	opt.hideLogButton = getoption("hideLogButton", false);
+	module:updateMailLogButton();
+	opt.showCheckboxes = getoption("showCheckboxes", true);
+	module:updateOpenCloseButtons();
+	module:updateSelectAllCheckbox();
+
+	-- Send Mail
+	opt.sendmailAltClickItem = getoption("sendmailAltClickItem", true);
+	opt.sendmailMoneySubject = getoption("sendmailMoneySubject", true);
+	module.configureSendToNameAutoComplete();
+	local temp = getoption("sendmailAutoCompleteUse", 5);  -- 5 is a non-sensical value, demonstrating the var was never set
+	if (temp == 5) then
+		module:setOption("sendmailAutoCompleteUse", true, CT_SKIP_UPDATE_FUNC);
+		module:setOption("sendmailAutoCompleteFriends", true, CT_SKIP_UPDATE_FUNC);
+		module:setOption("sendmailAutoCompleteGuild", true, CT_SKIP_UPDATE_FUNC);
+		module:setOption("sendmailAutoCompleteInteracted", true, CT_SKIP_UPDATE_FUNC);
+		module:setOption("sendmailAutoCompleteGroup", true, CT_SKIP_UPDATE_FUNC);
+		module:setOption("sendmailAutoCompleteOnline", true, CT_SKIP_UPDATE_FUNC);
+		module:setOption("sendmailAutoCompleteAccount", true, CT_SKIP_UPDATE_FUNC);
+	end
+	if (module:getGameVersion() >= 8) then
+		module.protectFocus(module:getOption("sendmailProtectFocus") ~= false);
+	end
+
+end
+
+function module:update(optName, value)
+	local opt = module.opt;
+	opt[optName] = value;
+
+	if (
+		optName == "inboxShowNumbers" or
+		optName == "inboxShowLong" or
+		optName == "inboxShowExpiry" or
+		optName == "inboxShowInbox" or
+		optName == "inboxShowMailbox"
+	) then
+		module:raiseCustomEvent("INCOMING_UPDATE");
+
+	elseif (optName == "logWindowScale") then
+		module:scaleMailLog();
+
+	elseif (optName == "logColor") then
+		module:updateMailLogColor();
+
+	elseif (optName == "hideLogButton") then
 		module:updateMailLogButton();
-		opt.showCheckboxes = getoption("showCheckboxes", true);
-		module:updateOpenCloseButtons();
-		module:updateSelectAllCheckbox();
 
-		-- Send Mail
-		opt.sendmailAltClickItem = getoption("sendmailAltClickItem", true);
-		opt.sendmailMoneySubject = getoption("sendmailMoneySubject", true);
+	elseif (optName == "showCheckboxes") then
+		module:updateOpenCloseButtons();  -- hide the open/close buttons
+		module:updateSelectAllCheckbox(); -- hide the select all checkbox
+		module:inboxUpdateSelection();    -- hide any currently open checkboxes
+
+	elseif (optName == "blockTrades") then
+		module.configureBlockTradesMail(value);
+
+	elseif (
+		optName == "sendmailAutoCompleteUse" or
+		optName == "sendmailAutoCompleteFriends" or
+		optName == "sendmailAutoCompleteGuild" or
+		optName == "sendmailAutoCompleteInteracted" or
+		optName == "sendmailAutoCompleteGroup" or
+		optName == "sendmailAutoCompleteOnline" or
+		optName == "sendmailAutoCompleteAccount"
+	) then
 		module.configureSendToNameAutoComplete();
-		local temp = getoption("sendmailAutoCompleteUse", 5);  -- 5 is a non-sensical value, demonstrating the var was never set
-		if (temp == 5) then
-			module:setOption("sendmailAutoCompleteUse", true, CT_SKIP_UPDATE_FUNC);
-			module:setOption("sendmailAutoCompleteFriends", true, CT_SKIP_UPDATE_FUNC);
-			module:setOption("sendmailAutoCompleteGuild", true, CT_SKIP_UPDATE_FUNC);
-			module:setOption("sendmailAutoCompleteInteracted", true, CT_SKIP_UPDATE_FUNC);
-			module:setOption("sendmailAutoCompleteGroup", true, CT_SKIP_UPDATE_FUNC);
-			module:setOption("sendmailAutoCompleteOnline", true, CT_SKIP_UPDATE_FUNC);
-			module:setOption("sendmailAutoCompleteAccount", true, CT_SKIP_UPDATE_FUNC);
-		end
-		if (module:getGameVersion() >= 8) then
-			module.protectFocus(module:getOption("sendmailProtectFocus") ~= false);
-		end
 
-	-- General options
-	else
-		opt[optName] = value;
+	elseif (optName == "sendmailProtectFocus") then
+		module.protectFocus(value)
 
-		if (
-			optName == "inboxShowNumbers" or
-			optName == "inboxShowLong" or
-			optName == "inboxShowExpiry" or
-			optName == "inboxShowInbox" or
-			optName == "inboxShowMailbox"
-		) then
-			module:raiseCustomEvent("INCOMING_UPDATE");
-
-		elseif (optName == "logWindowScale") then
-			module:scaleMailLog();
-
-		elseif (optName == "logColor") then
-			module:updateMailLogColor();
-
-		elseif (optName == "hideLogButton") then
-			module:updateMailLogButton();
-			
-		elseif (optName == "showCheckboxes") then
-			module:updateOpenCloseButtons();  -- hide the open/close buttons
-			module:updateSelectAllCheckbox(); -- hide the select all checkbox
-			module:inboxUpdateSelection();    -- hide any currently open checkboxes
-			
-		elseif (optName == "blockTrades") then
-			module.configureBlockTradesMail(value);
-
-		elseif (
-			optName == "sendmailAutoCompleteUse" or
-			optName == "sendmailAutoCompleteFriends" or
-			optName == "sendmailAutoCompleteGuild" or
-			optName == "sendmailAutoCompleteInteracted" or
-			optName == "sendmailAutoCompleteGroup" or
-			optName == "sendmailAutoCompleteOnline" or
-			optName == "sendmailAutoCompleteAccount"
-		) then
-			module.configureSendToNameAutoComplete();
-		
-		elseif (optName == "sendmailProtectFocus") then
-			module.protectFocus(value)
-		
-		elseif (optName == "openAllBags") then
-			if (value) then
-				local value = false;
-				opt.openBackpack = value;
-				opt.openNoBags = value;
-				module:setOption("openBackpack", value, CT_SKIP_UPDATE_FUNC);
-				module:setOption("openNoBags", value, CT_SKIP_UPDATE_FUNC);
-				if (optionsFrame) then
-					optionsFrame.openBackpack:SetChecked(value);
-					optionsFrame.openNoBags:SetChecked(value);
-				end
+	elseif (optName == "openAllBags") then
+		if (value) then
+			local value = false;
+			opt.openBackpack = value;
+			opt.openNoBags = value;
+			module:setOption("openBackpack", value, CT_SKIP_UPDATE_FUNC);
+			module:setOption("openNoBags", value, CT_SKIP_UPDATE_FUNC);
+			if (optionsFrame) then
+				optionsFrame.openBackpack:SetChecked(value);
+				optionsFrame.openNoBags:SetChecked(value);
 			end
-
-		elseif (optName == "openBackpack") then
-			if (value) then
-				local value = false;
-				opt.openAllBags = value;
-				opt.openNoBags = value;
-				module:setOption("openAllBags", value, CT_SKIP_UPDATE_FUNC);
-				module:setOption("openNoBags", value, CT_SKIP_UPDATE_FUNC);
-				if (optionsFrame) then
-					optionsFrame.openAllBags:SetChecked(value);
-					optionsFrame.openNoBags:SetChecked(value);
-				end
-			end
-
-		elseif (optName == "openNoBags") then
-			if (value) then
-				local value = false;
-				opt.openAllBags = value;
-				opt.openBackpack = value;
-				module:setOption("openAllBags", value, CT_SKIP_UPDATE_FUNC);
-				module:setOption("openBackpack", value, CT_SKIP_UPDATE_FUNC);
-				if (optionsFrame) then
-					optionsFrame.openAllBags:SetChecked(value);
-					optionsFrame.openBackpack:SetChecked(value);
-				end
-			end
-
 		end
+
+	elseif (optName == "openBackpack") then
+		if (value) then
+			local value = false;
+			opt.openAllBags = value;
+			opt.openNoBags = value;
+			module:setOption("openAllBags", value, CT_SKIP_UPDATE_FUNC);
+			module:setOption("openNoBags", value, CT_SKIP_UPDATE_FUNC);
+			if (optionsFrame) then
+				optionsFrame.openAllBags:SetChecked(value);
+				optionsFrame.openNoBags:SetChecked(value);
+			end
+		end
+
+	elseif (optName == "openNoBags") then
+		if (value) then
+			local value = false;
+			opt.openAllBags = value;
+			opt.openBackpack = value;
+			module:setOption("openAllBags", value, CT_SKIP_UPDATE_FUNC);
+			module:setOption("openBackpack", value, CT_SKIP_UPDATE_FUNC);
+			if (optionsFrame) then
+				optionsFrame.openAllBags:SetChecked(value);
+				optionsFrame.openBackpack:SetChecked(value);
+			end
+		end
+
 	end
 end
 

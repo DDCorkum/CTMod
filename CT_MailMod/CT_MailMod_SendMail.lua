@@ -46,10 +46,10 @@ do
 		end
 	end
 
-	if (not CT_Core_ContainerFrameItemButton_OnModifiedClick) then
-		hooksecurefunc("ContainerFrameItemButton_OnClick", CT_MailMod_ContainerFrameItemButton_OnModifiedClick);
+	if CT_Core then
+		CT_Core.ContainerFrameItemButton_OnModifiedClick_Register(CT_MailMod_AddToSendMail)
 	else
-		CT_Core_ContainerFrameItemButton_OnModifiedClick_Register(CT_MailMod_AddToSendMail);
+		hooksecurefunc("ContainerFrameItemButton_OnClick", CT_MailMod_ContainerFrameItemButton_OnModifiedClick);
 	end
 end
 

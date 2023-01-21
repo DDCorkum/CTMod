@@ -1119,16 +1119,40 @@ local function updateChat()
 	updateEditBorderHide();
 end
 
--- Hook function Blizzard uses to open a temporary window.
-local oldFCF_OpenTemporaryWindow = FCF_OpenTemporaryWindow;
-FCF_OpenTemporaryWindow = function(...)
-	local chatFrame = oldFCF_OpenTemporaryWindow(...);
-	if (chatFrame) then
-		createChatFrameResizeButtons(chatFrame);
-		updateChat();
+
+
+
+do
+
+	-- Hook function Blizzard uses to open a temporary window.
+	
+	--[[ replaced using the code underneath to avoid taint
+	local oldFCF_OpenTemporaryWindow = FCF_OpenTemporaryWindow;
+	FCF_OpenTemporaryWindow = function(...)
+		local chatFrame = oldFCF_OpenTemporaryWindow(...);
+		if (chatFrame) then
+			createChatFrameResizeButtons(chatFrame);
+			updateChat();
+		end
+		return chatFrame;
 	end
-	return chatFrame;
+	--]]
+
+	local tempChatFrame
+
+	hooksecurefunc("FCF_SetTemporaryWindowType", function(chatFrame)
+		tempChatFrame = chatFrame
+	end)
+
+	hooksecurefunc("FCF_OpenTemporaryWindow", function()
+		if tempChatFrame then
+			createChatFrameResizeButtons(tempChatFrame)
+			updateChat()
+		end
+	end)
 end
+
+
 
 --[[
 -- /pri

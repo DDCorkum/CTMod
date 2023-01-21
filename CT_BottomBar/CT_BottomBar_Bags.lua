@@ -138,8 +138,8 @@ local function addon_Init(self)
 end
 
 local addon_Disable = BagBarExpandToggle and function(self)
-	BagBarExpandToggle:Click()
-	BagBarExpandToggle:Click()
+	--BagBarExpandToggle:Click()
+	--BagBarExpandToggle:Click()		-- is this necessary?
 end
 
 local addon_Enable = addon_Disable

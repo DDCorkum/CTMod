@@ -642,15 +642,11 @@ end
 --------------------------------------------
 -- CT_BottomBar initialization
 
-module.update = function(self, optName, value)
-	-- optName -- "init == Perform initialization.
-	-- optName -- name of option to be changed.
+function module:update(optName, value)
+	self:updateOption(optName, value)	-- CT_BottomBar_Options.lua
+end
 
-	if (optName ~= "init") then
-		-- Update an option.
-		return module:updateOption(optName, value);
-	end
-
+function module:init()
 	-- Initialize CT_BottomBar.
 	-- This will be the first code run by CT_Library once the game has loaded CT_BottomBar.
 

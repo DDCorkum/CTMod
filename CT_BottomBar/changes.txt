@@ -1,3 +1,6 @@
+CT_BottomBar (10.0.2.5) 2023-01-04
+- Minor refactoring; nothing substantive
+
 CT_BottomBar (10.0.2.2) 2022-12-02
 - The main bar re-appears during dragonriding (with a new option to keep it hidden)
 

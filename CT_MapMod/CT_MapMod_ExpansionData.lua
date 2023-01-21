@@ -54,7 +54,7 @@ module.pinTypes =
 		{
 			-- BC, Wrath, Cata, MoP
 			"Felweed", "Flame Cap", "Mana Thistle", "Netherbloom", "Netherdust Bush", "Nightmare Vine", "Ragveil", "Terocone",
-			"Adders Tongue", "Frost Lotus", "Goldclover", "Icethorn", "Lichbloom", "Talandra's Rose", "Tiger Lily",	"Frozen Herb",
+			"Adder's Tongue", "Frost Lotus", "Goldclover", "Icethorn", "Lichbloom", "Talandra's Rose", "Tiger Lily",	"Frozen Herb",
 			"Cinderbloom", "Azshara's Veil", "Stormvein", "Heartblossom", "Whiptail", "Twilight Jasmine",
 			"Green Tea Leaf", "Rain Poppy", "Silkweed", "Snow Lily", "Fool's Cap", "Sha-Touched Herb", "Golden Lotus",
 		},
@@ -165,7 +165,7 @@ module.pinIcons =
 	["Terocone"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Terocone",
 	
 	-- Wrath of the Lich King
-	["Adders Tongue"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_AddersTongue",
+	["Adder's Tongue"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_AddersTongue",
 	["Frost Lotus"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_FrostLotus",
 	["Goldclover"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Goldclover",
 	["Icethorn"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Icethorn",

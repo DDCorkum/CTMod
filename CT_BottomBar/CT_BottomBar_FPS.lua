@@ -36,14 +36,14 @@ local function addon_Enable(self)
 	if (FramerateLabel:IsShown()) then
 		FramerateLabel:Hide();
 		FramerateText:Hide();
-		self.fontstring:Show();
+		self.textFrame:Show();
 	end
 	function ToggleFramerate(benchmark)
 		FramerateText.benchmark = benchmark;
-		if self.fontstring:IsShown() then
-			self.fontstring:Hide();
+		if self.textFrame:IsShown() then
+			self.textFrame:Hide();
 		else
-			self.fontstring:Show();
+			self.textFrame:Show();
 		end
 		(FramerateFrame or WorldFrame).fpsTime = 0
 	end
@@ -52,10 +52,10 @@ end
 
 local oldToggleFramerate = ToggleFramerate
 local function addon_Disable(self)
-	if (self.fontstring:IsShown()) then
+	if (self.textFrame:IsShown()) then
 		FramerateLabel:Show();
 		FramerateText:Show();
-		self.fontstring:Hide();
+		self.textFrame:Hide();
 	end	
 	-- the original code from WorldFrame.lua
 	ToggleFramerate = oldToggleFramerate
@@ -77,23 +77,28 @@ local function addon_Init(self)
 	local frame = CreateFrame("Frame", "CT_BottomBar_" .. self.frameName .. "_GuideFrame");
 	self.helperFrame = frame;
 	
-	self.fontstring = self.frame:CreateFontString(nil, "ARTWORK", "ChatFontNormal");
-	self.fontstring:SetPoint("CENTER");
-	self.fontstring:Hide();
+	self.textFrame = CreateFrame("Frame", nil, self.frame)
+	self.textFrame:SetAllPoints()
+	self.textFrame:Hide()
+
+	local fontstring = self.textFrame:CreateFontString(nil, "ARTWORK", "ChatFontNormal");
+	fontstring:SetPoint("CENTER");
 	
-	local timeElapsed = 0;
-	self.frame:SetScript("OnUpdate",
-		function(__, elapsed)
-			timeElapsed = timeElapsed + elapsed;
-			if (timeElapsed < 0.25) then return; end
-			timeElapsed = 0;
-			self.fontstring:SetText("FPS: " .. floor(GetFramerate()*10)/10);
-			if (self.fontstring:GetText():sub(-2,-2) ~= ".") then
-				self.fontstring:SetText(self.fontstring:GetText() .. ".0");
-			end
+	local function func()
+		fontstring:SetText(("FPS: %.1f"):format(GetFramerate()))
+	end
+	
+	local ticker
+	self.textFrame:SetScript("OnShow", function()
+		ticker = ticker or C_Timer.NewTicker(0.25, func)
+	end)
+	self.textFrame:SetScript("OnHide", function()
+		if ticker then
+			ticker:Cancel()
+			ticker = nil
 		end
-	);
-		
+	end)
+	
 	return true;
 end
 

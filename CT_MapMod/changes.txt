@@ -1,3 +1,6 @@
+CT_MapMod (10.0.2.5) 2023-01-01
+- Correcting the spelling of WotLK Adder's Tongue
+
 CT_MapMod (10.0.2.4) 2022-12-26
 - Hide flypoints when using Dragonflight special teleports
 

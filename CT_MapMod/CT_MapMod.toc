@@ -1,5 +1,5 @@
 ## Interface: 100002
-## Version: 10.0.2.4
+## Version: 10.0.2.5
 ## Title: CT_MapMod
 ## Notes: Pins the World Map with points of interest and herb/ore nodes
 ## DefaultState: Enabled

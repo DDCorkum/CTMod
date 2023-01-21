@@ -1769,36 +1769,46 @@ end
 --------------------------------------------
 -- Options handling
 
-module.update = function(self, optName, value)
-	if (optName == "init") then
+function module:init()
+	-- initialize the overall UI
+	module:Initialize();
+
+	-- convert an older note name for compatibility
+	if CT_MapMod_Notes[119] then
+		for __, pin in pairs(CT_MapMod_Notes[119]) do
+			if pin.subset == "Adders Tongue" then
+				pin.subset = "Adder's Tongue"
+			end
+		end
+	end
 	
-		-- initialize the overall UI
-		module:Initialize();
-		
-		-- handle options
-		module.pxy:ClearAllPoints();
-		module.cxy:ClearAllPoints();
-		local position = module:getOption("CT_MapMod_ShowPlayerCoordsOnMap") or 2;
-		if (position == 1) then
-			module.pxy:Show();
-			module.pxy:SetPoint("TOP",WorldMapFrame.BorderFrame,"TOP",-105,-3);
-		elseif (position == 2) then
-			module.pxy:Show();
-			module.pxy:SetPoint("BOTTOM",WorldMapFrame.ScrollContainer,"BOTTOM",-100,3);
-		else
-			module.pxy:Hide();
-		end
-		position = module:getOption("CT_MapMod_ShowCursorCoordsOnMap") or 2;
-		if (position == 1) then
-			module.cxy:Show();
-			module.cxy:SetPoint("TOP",WorldMapFrame.BorderFrame,"TOP",95,-3);
-		elseif (position == 2) then
-			module.cxy:Show();
-			module.cxy:SetPoint("BOTTOM",WorldMapFrame.ScrollContainer,"BOTTOM",100,3);
-		else
-			module.cxy:Hide();
-		end
-	elseif (optName == "CT_MapMod_ShowPlayerCoordsOnMap") then
+	-- handle options
+	module.pxy:ClearAllPoints();
+	module.cxy:ClearAllPoints();
+	local position = module:getOption("CT_MapMod_ShowPlayerCoordsOnMap") or 2;
+	if (position == 1) then
+		module.pxy:Show();
+		module.pxy:SetPoint("TOP",WorldMapFrame.BorderFrame,"TOP",-105,-3);
+	elseif (position == 2) then
+		module.pxy:Show();
+		module.pxy:SetPoint("BOTTOM",WorldMapFrame.ScrollContainer,"BOTTOM",-100,3);
+	else
+		module.pxy:Hide();
+	end
+	position = module:getOption("CT_MapMod_ShowCursorCoordsOnMap") or 2;
+	if (position == 1) then
+		module.cxy:Show();
+		module.cxy:SetPoint("TOP",WorldMapFrame.BorderFrame,"TOP",95,-3);
+	elseif (position == 2) then
+		module.cxy:Show();
+		module.cxy:SetPoint("BOTTOM",WorldMapFrame.ScrollContainer,"BOTTOM",100,3);
+	else
+		module.cxy:Hide();
+	end
+end
+
+function module:update(optName, value)
+	if (optName == "CT_MapMod_ShowPlayerCoordsOnMap") then
 		if (not module.pxy) then return; end
 		module.pxy:ClearAllPoints();
 		if (value == 1) then
