@@ -677,6 +677,9 @@ module.frame = function()
 	optionsBeginFrame(-5, 0, "frame#tl:0:%y#r");
 		optionsAddObject( -5, 3*14, "font#t:0:%y#s:0:%s#l:13:0#r#You can use /ctbb, /ctbottom, or /ctbottombar to open this options window directly.#" .. textColor2 .. ":l");
 		optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#Remember to scroll down!  There are lots of customizations down below.#" .. textColor2 .. ":l");
+		if module:getGameVersion() >= 10 then
+			optionsAddObject( -5, 2*14, "font#t:0:%y#s:0:%s#l:13:0#r#Starting in Dragonflight (10.0.2), several functions migrated to \"Edit Mode\"#1:0.5:0:l")
+		end
 	optionsEndFrame();
 
 	-- Bars

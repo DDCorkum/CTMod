@@ -1,3 +1,6 @@
+CT_Core (10.0.5.1) 2023-01-23
+- Disabling the backpack and micro-menu in Dragonflight (now covered by EditMode)
+
 CT_Core (10.0.2.5) 2023-01-04
 - Refactoring to improve performance, prevent taint
 - Removing the custom /hail

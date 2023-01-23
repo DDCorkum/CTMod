@@ -172,7 +172,7 @@ end
 
 
 local function CT_BarMod_Shift_MultiCast_areWeShifting()
-	if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+	if (module:getGameVersion() == 1) then
 		return false;
 	end
 	if (CT_BottomBar and CT_BottomBar.ctMultiCast) then

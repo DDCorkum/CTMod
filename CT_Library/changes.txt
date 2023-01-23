@@ -1,3 +1,6 @@
+CT_Library (10.0.5.1) 2023-01-23
+- Added getGameVersionAndPatch() to complement getGameVersion()
+
 CT_Library (10.0.2.5) 2023-01-04
 - Minor refactoring to improve performance
 

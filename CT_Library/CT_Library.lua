@@ -164,27 +164,19 @@ function lib:clearTable(tbl, clearMeta)
 	end
 end
 
--- Returns the game version as a number.  If the arguments are true, appends the major patch in the hundredths and minor patch in ten-thousandths.
+-- Returns the game version as a number suitable for binary comparison operators, such as (module:getGameVersion() <= 10) or (module:getGameVersionAndPatch() == 2.01)
 do
-	-- constants
-	CT_GAME_VERSION_CLASSIC = 1;	-- These globals are being phased out, but remain for backwards compatibility.
-	CT_GAME_VERSION_RETAIL  = 9;
+	local version, major, minor = strsplit(".", GetBuildInfo())
+	version = tonumber(version) or 0
+	major = version + (tonumber(major) or 0)/10
+	minor = major + (tonumber(minor) or 0)/100
 	
-	local version, major, minor = strsplit(".", GetBuildInfo());
-	version, major, minor = tonumber(version) or 0, tonumber(major) or 0, tonumber(minor) or 0
-	major = version + major/100
-	minor = major + minor/10000
+	function libPublic:getGameVersion()
+		return version
+	end
 	
-	function libPublic:getGameVersion(includeMajor, alsoIncludeMinor)
-		if (includeMajor) then
-			if (includeMinor) then
-				return minor;
-			else
-				return major;
-			end
-		else
-			return version;
-		end
+	function libPublic:getGameVersionAndPatch()
+		return minor
 	end
 end
 

@@ -732,8 +732,10 @@ function module:init()
 		-- Common Button Bars
 		module:insertAddonTitle(L["CT_BottomBar/Options/AddonList/CommonBarsSubheading"])
 		module:loadAddon("Action Bar Arrows");
-		module:loadAddon("Bags Bar");
-		module:loadAddon("Menu Bar");
+		if module:getGameVersionAndPatch() < 10.05 then
+			module:loadAddon("Bags Bar");
+			module:loadAddon("Menu Bar")
+		end
 		if (KeyRingButton) then
 			module:loadAddon("Classic Key Ring Button");
 		end
@@ -770,7 +772,9 @@ function module:init()
 		module:insertAddonTitle(L["CT_BottomBar/Options/AddonList/StatusTrackingBarsSubheading"])
 		if (StatusTrackingBarMixin) then
 			-- Retail
-			module:loadAddon("Status Bar");
+			if module:getGameVersionAndPatch() < 10.05 then
+				module:loadAddon("Status Bar");
+			end
 		else
 			-- Classic
 			module:loadAddon("Experience Bar");

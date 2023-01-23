@@ -392,7 +392,7 @@ module.frame = function()
 	optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:auctionAltClickItem#Alt left-click to add an item to the Auctions tab");
 
 -- Bags and Menu Bar
-	if module:getGameVersion() >= 10 and not CT_BottomBar then
+	if module:getGameVersionAndPatch() == 10.02 and not CT_BottomBar then
 		optionsAddBookmark("Bags and Menu Bars", "BagsAndMicroMenuHeading")	
 		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Bag and Menu Bars#i:BagsAndMicroMenuHeading");
 		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:enableCustomBagMenuBars#Move bag and menu bars");
@@ -787,7 +787,7 @@ module.frame = function()
 		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#i:watchframeEnabled#o:watchframeEnabled#Enable these options");
 		optionsAddObject(  4,   26, "checkbutton#tl:40:%y#i:watchframeLocked#o:watchframeLocked:true#Lock the game's Objectives window");
 		optionsAddObject(  6,   26, "checkbutton#tl:40:%y#i:watchframeShowTooltip#o:watchframeShowTooltip:true#Show drag and resize tooltips");
-		if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+		if (module:getGameVersion() == 1) then
 			optionsAddObject(  6,   26, "checkbutton#tl:40:%y#i:watchframeAddMinimizeButton#o:watchframeAddMinimizeButton:true#Add a minimize button (like retail)");
 		end
 		optionsAddObject(  6,   26, "checkbutton#tl:40:%y#i:watchframeClamped#o:watchframeClamped:true#Keep the window on screen");
