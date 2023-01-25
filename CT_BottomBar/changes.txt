@@ -1,4 +1,4 @@
-CT_BottomBar (10.0.5.1) 2023-01-23
+CT_BottomBar (10.0.5.1) 2023-01-25
 - Disabling the backpack and micro-menu in Dragonflight (now covered by EditMode)
 
 CT_BottomBar (10.0.2.5) 2023-01-04
