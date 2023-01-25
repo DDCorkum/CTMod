@@ -19,38 +19,39 @@ local module = _G["CT_MailMod"];
 
 do
 	local function CT_MailMod_AddToSendMail(self, button)
-		if (button == "LeftButton" and IsAltKeyDown()) then
-			if (MailFrame and SendMailFrame and MailFrame:IsShown()) then
-				if (
-					module.opt.sendmailAltClickItem and
-					not CursorHasItem()
-				) then
-					if (not SendMailFrame:IsVisible()) then
-						-- Switch to the send mail frame.
-						MailFrameTab_OnClick(nil, 2);
-					end
-					-- Pickup and add an item to the send mail window.
-					local bag, item = self:GetParent():GetID(), self:GetID();
-					PickupContainerItem(bag, item);
-					ClickSendMailItemButton();
-					return true;
-				end
+		if button == "LeftButton" and IsAltKeyDown() and MailFrame:IsShown() and module.opt.sendmailAltClickItem and not CursorHasItem() then
+			if (not SendMailFrame:IsVisible()) then
+				-- Switch to the send mail frame.
+				MailFrameTab_OnClick(nil, 2)
 			end
+			-- Pickup and add an item to the send mail window.
+			local bag, item = self:GetParent():GetID(), self:GetID()
+			local func = PickupContainerItem or C_Container.PickupContainerItem
+			func(bag, item)
+			ClickSendMailItemButton()
+			return true
 		end
-		return false;
-	end
-
-	local function CT_MailMod_ContainerFrameItemButton_OnModifiedClick(self, button)
-		if IsModifierKeyDown() then
-			CT_MailMod_AddToSendMail(self, button)
-		end
+		return false
 	end
 
 	if CT_Core then
+		-- marginally more efficient when the two addons are side-by-side
 		CT_Core.ContainerFrameItemButton_OnModifiedClick_Register(CT_MailMod_AddToSendMail)
 	else
-		hooksecurefunc("ContainerFrameItemButton_OnClick", CT_MailMod_ContainerFrameItemButton_OnModifiedClick);
+		for i=1, NUM_CONTAINER_FRAMES do
+			for j=1, 36 do
+				local button = _G["ContainerFrame" .. i .. "Item" .. j]
+				if button then
+					if ContainerFrameItemButtonMixin then
+						hooksecurefunc(button, "OnModifiedClick", CT_MailMod_AddToSendMail)
+					else
+						button:HookScript("OnClick", CT_MailMod_AddToSendMail)
+					end
+				end
+			end
+		end
 	end
+	
 end
 
 

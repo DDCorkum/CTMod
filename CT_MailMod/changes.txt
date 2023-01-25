@@ -1,3 +1,6 @@
+CT_MailMod (10.0.5.1) 2023-01-25
+- Fixed adding items to mail with alt-click
+
 CT_MailMod (10.0.2.5) 2023-01-21
 - Minor refactoring to align with CT_Core and CT_Library
 - Multiple-item tooltip update for WotLK Classic 3.4.1

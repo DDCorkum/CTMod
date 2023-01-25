@@ -1358,7 +1358,7 @@ hooksecurefunc("MerchantItemButton_OnModifiedClick", CT_Core_MerchantItemButton_
 
 local function CT_Core_AddToAuctions(self, button)
 	if (button == "LeftButton" and IsAltKeyDown()) then
-		if (AuctionFrame and AuctionFrame:IsShown()) then
+		if (AuctionFrame:IsShown()) then
 			local auctionAltClickItem = module:getOption("auctionAltClickItem");
 			if (auctionAltClickItem and
 				not CursorHasItem()
@@ -1475,29 +1475,33 @@ end
 local function CT_Core_ContainerFrameItemButton_OnModifiedClick(self, button)
 	-- Test registered functions
 	for func, value in pairs(cfibomcTable) do
-		if (func(self, button)) then
-			return;
+		if func(self, button) then
+			return
 		end
 	end
 	-- Test for the Add To Trade function last, since this one
 	-- doesn't require a particular frame to be open (unless you're
 	-- adding to an open trade frame).
-	CT_Core_AddToTrade(self, button);
+	CT_Core_AddToTrade(self, button)
 end
 
-if ContainerFrameItemButton_OnModifiedClick then
-	-- prior to WoW 10.x
-	hooksecurefunc("ContainerFrameItemButton_OnModifiedClick", CT_Core_ContainerFrameItemButton_OnModifiedClick)
-else
-	-- WoW 10.x
-	hooksecurefunc("ContainerFrameItemButton_OnClick", function(...)
-		if IsModifierKeyDown() then
-			CT_Core_ContainerFrameItemButton_OnModifiedClick()
+for i=1, NUM_CONTAINER_FRAMES do
+	for j=1, 36 do
+		local button = _G["ContainerFrame" .. i .. "Item" .. j]
+		if button then
+			if ContainerFrameItemButtonMixin then
+				hooksecurefunc(button, "OnModifiedClick", CT_Core_ContainerFrameItemButton_OnModifiedClick)
+			else
+				button:HookScript("OnClick", CT_Core_ContainerFrameItemButton_OnModifiedClick)
+			end
 		end
-	end)
+	end
 end
 
-CT_Core.ContainerFrameItemButton_OnModifiedClick_Register(CT_Core_AddToAuctions)
+if AuctionFrame then
+	-- before WoW 10.x
+	CT_Core.ContainerFrameItemButton_OnModifiedClick_Register(CT_Core_AddToAuctions)
+end
 
 --------------------------------------------
 -- Hides the gryphons if the user does not have CT_BottomBar installed
