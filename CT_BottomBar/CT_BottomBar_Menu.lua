@@ -376,29 +376,31 @@ end
 
 -- Prevents help tips from being off screen (ie, the "you need to select a talent" message)
 
-if (HelpTip) then  -- not in Classic
-	local lastParent, lastInfo, lastRelativeRegion
+local function configureHelpTips()
+	if (HelpTip) then  -- not in Classic
+		local lastParent, lastInfo, lastRelativeRegion
 
-	local function addon_Hooked_HelpTip_Show(__, parent, info, relativeRegion)
-		lastParent, lastInfo, lastRelativeRegion = parent, info, relativeRegion
-	end
+		local function addon_Hooked_HelpTip_Show(__, parent, info, relativeRegion)
+			lastParent, lastInfo, lastRelativeRegion = parent, info, relativeRegion
+		end
 
-	local function addon_Hooked_MicroButton_ShowAlert(microButton)
-		if (lastRelativeRegion == microButton and ctAddon.isDisabled == false) then
-			if (ctAddon.orientation == "DOWN") then
-				HelpTip:HideAllSystem("MicroButtons")
-				lastInfo.targetPoint = microButton:GetLeft() > UIParent:GetRight()/2 and HelpTip.Point.LeftEdgeCenter or HelpTip.Point.RightEdgeCenter
-				HelpTip:Show(lastParent, lastInfo, lastRelativeRegion)
-			elseif (microButton:GetBottom() > UIParent:GetTop()/2) then
-				HelpTip:HideAllSystem("MicroButtons")
-				lastInfo.targetPoint = HelpTip.Point.BottomEdgeCenter
-				HelpTip:Show(lastParent, lastInfo, lastRelativeRegion)
+		local function addon_Hooked_MicroButton_ShowAlert(microButton)
+			if (lastRelativeRegion == microButton and ctAddon.isDisabled == false) then
+				if (ctAddon.orientation == "DOWN") then
+					HelpTip:HideAllSystem("MicroButtons")
+					lastInfo.targetPoint = microButton:GetLeft() > UIParent:GetRight()/2 and HelpTip.Point.LeftEdgeCenter or HelpTip.Point.RightEdgeCenter
+					HelpTip:Show(lastParent, lastInfo, lastRelativeRegion)
+				elseif (microButton:GetBottom() > UIParent:GetTop()/2) then
+					HelpTip:HideAllSystem("MicroButtons")
+					lastInfo.targetPoint = HelpTip.Point.BottomEdgeCenter
+					HelpTip:Show(lastParent, lastInfo, lastRelativeRegion)
+				end
 			end
 		end
-	end
 
-	hooksecurefunc(HelpTip, "Show", addon_Hooked_HelpTip_Show)
-	hooksecurefunc("MainMenuMicroButton_ShowAlert", addon_Hooked_MicroButton_ShowAlert)
+		hooksecurefunc(HelpTip, "Show", addon_Hooked_HelpTip_Show)
+		hooksecurefunc("MainMenuMicroButton_ShowAlert", addon_Hooked_MicroButton_ShowAlert)
+	end
 end
 
 --------------------------------------------
@@ -437,6 +439,8 @@ local function addon_Init(self)
 	hooksecurefunc("UpdateMicroButtons", addon_Hooked_UpdateMicroButtons);
 	hooksecurefunc("UpdateMicroButtonsParent", addon_Hooked_UpdateMicroButtonsParent);
 	hooksecurefunc("MoveMicroButtons", addon_Hooked_MoveMicroButtons);
+
+	configureHelpTips()
 
 	return true;
 end

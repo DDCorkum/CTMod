@@ -1358,7 +1358,7 @@ hooksecurefunc("MerchantItemButton_OnModifiedClick", CT_Core_MerchantItemButton_
 
 local function CT_Core_AddToAuctions(self, button)
 	if (button == "LeftButton" and IsAltKeyDown()) then
-		if (AuctionFrame and AuctionFrame:IsShown()) then
+		if (AuctionFrame:IsShown()) then
 			local auctionAltClickItem = module:getOption("auctionAltClickItem");
 			if (auctionAltClickItem and
 				not CursorHasItem()
@@ -1475,29 +1475,33 @@ end
 local function CT_Core_ContainerFrameItemButton_OnModifiedClick(self, button)
 	-- Test registered functions
 	for func, value in pairs(cfibomcTable) do
-		if (func(self, button)) then
-			return;
+		if func(self, button) then
+			return
 		end
 	end
 	-- Test for the Add To Trade function last, since this one
 	-- doesn't require a particular frame to be open (unless you're
 	-- adding to an open trade frame).
-	CT_Core_AddToTrade(self, button);
+	CT_Core_AddToTrade(self, button)
 end
 
-if ContainerFrameItemButton_OnModifiedClick then
-	-- prior to WoW 10.x
-	hooksecurefunc("ContainerFrameItemButton_OnModifiedClick", CT_Core_ContainerFrameItemButton_OnModifiedClick)
-else
-	-- WoW 10.x
-	hooksecurefunc("ContainerFrameItemButton_OnClick", function(...)
-		if IsModifierKeyDown() then
-			CT_Core_ContainerFrameItemButton_OnModifiedClick()
+for i=1, NUM_CONTAINER_FRAMES do
+	for j=1, 36 do
+		local button = _G["ContainerFrame" .. i .. "Item" .. j]
+		if button then
+			if ContainerFrameItemButtonMixin then
+				hooksecurefunc(button, "OnModifiedClick", CT_Core_ContainerFrameItemButton_OnModifiedClick)
+			else
+				button:HookScript("OnClick", CT_Core_ContainerFrameItemButton_OnModifiedClick)
+			end
 		end
-	end)
+	end
 end
 
-CT_Core.ContainerFrameItemButton_OnModifiedClick_Register(CT_Core_AddToAuctions)
+if AuctionFrame then
+	-- before WoW 10.x
+	CT_Core.ContainerFrameItemButton_OnModifiedClick_Register(CT_Core_AddToAuctions)
+end
 
 --------------------------------------------
 -- Hides the gryphons if the user does not have CT_BottomBar installed
@@ -3110,79 +3114,80 @@ end
 --------------------------------------------
 -- WoW 10.x menu and bags bar
 
-local ctBagBar = CreateFrame("Frame", nil, MicroButtonAndBagsBar)
-ctBagBar:SetSize(10, 10)
-ctBagBar:SetPoint("TOPRIGHT")
-ctBagBar:SetFrameLevel(54)	-- in front of the bag
-ctBagBar:Hide()
-local tex = ctBagBar:CreateTexture(nil, "ARTWORK")
-tex:SetColorTexture(1,1,0,0.5)
-tex:SetAllPoints()
+local enableCustomBagMenuBars, showCustomBagMenuAnchors
 
-ctBagBar:EnableMouse(true)
-ctBagBar:RegisterForDrag("LeftButton", "RightButton")
-
-module:regEvent("PLAYER_LOGIN", function()
-	module:registerMovable("ctBagBar", ctBagBar, true)
-end)
-
-ctBagBar:SetScript("OnDragStart", function()
-	module:moveMovable("ctBagBar")
-end)
-
-ctBagBar:SetScript("OnDragStop", function()
-	module:stopMovable("ctBagBar")
-end)
-
-
-local ctMicroMenuBar = CreateFrame("Frame", nil, MicroButtonAndBagsBar)
-ctMicroMenuBar:SetSize(10, 10)
-ctMicroMenuBar:SetPoint("BOTTOMLEFT")
-ctMicroMenuBar:SetFrameLevel(54)	-- in front of the bag
-ctMicroMenuBar:Hide()
-local tex = ctMicroMenuBar:CreateTexture(nil, "ARTWORK")
-tex:SetColorTexture(1,1,0,0.5)
-tex:SetAllPoints()
-
-ctMicroMenuBar:EnableMouse(true)
-ctMicroMenuBar:RegisterForDrag("LeftButton", "RightButton")
-
-module:regEvent("PLAYER_LOGIN", function()
-	module:registerMovable("ctMicroMenuBar", ctMicroMenuBar, true)
-end)
-
-ctMicroMenuBar:SetScript("OnDragStart", function()
-	module:moveMovable("ctMicroMenuBar")
-end)
-
-ctMicroMenuBar:SetScript("OnDragStop", function()
-	module:stopMovable("ctMicroMenuBar")
-end)
-
-local function enableCustomBagMenuBars(enable)
-	if ctBagBar.enabled and not enable then
-		-- take no action if it was never enabled
-		ctBagBar.enabled = false
-		MainMenuBarBackpackButton:SetPoint("TOPRIGHT", MicroButtonAndBagsBar, -4, 2)
-		CharacterMicroButton:SetPoint("BOTTOMLEFT", MicroButtonAndBagsBar, 7, 2)
-	elseif enable then
-		ctBagBar.enabled = true
-		ctBagBar:SetShown(ctBagBar.shown)
-		ctMicroMenuBar:SetShown(ctBagBar.shown)
-		MainMenuBarBackpackButton:SetPoint("TOPRIGHT", ctBagBar, -4, 2)
-		CharacterMicroButton:SetPoint("BOTTOMLEFT", ctMicroMenuBar, 7, 2)
+if module:getGameVersionAndPatch() == 10.02 and not CT_BottomBar then
+	-- temporary code that was only used in 10.02; replaced by edit mode in 10.05
+	
+	local ctBagBar = CreateFrame("Frame", nil, MicroButtonAndBagsBar)
+	ctBagBar:SetSize(10, 10)
+	ctBagBar:SetPoint("TOPRIGHT")
+	ctBagBar:SetFrameLevel(54)	-- in front of the bag
+	ctBagBar:Hide()
+	local tex = ctBagBar:CreateTexture(nil, "ARTWORK")
+	tex:SetColorTexture(1,1,0,0.5)
+	tex:SetAllPoints()
+	
+	ctBagBar:EnableMouse(true)
+	ctBagBar:RegisterForDrag("LeftButton", "RightButton")
+	
+	module:regEvent("PLAYER_LOGIN", function()
+		module:registerMovable("ctBagBar", ctBagBar, true)
+	end)
+	
+	ctBagBar:SetScript("OnDragStart", function()
+		module:moveMovable("ctBagBar")
+	end)
+	
+	ctBagBar:SetScript("OnDragStop", function()
+		module:stopMovable("ctBagBar")
+	end)
+	
+	local ctMicroMenuBar = CreateFrame("Frame", nil, MicroButtonAndBagsBar)
+	ctMicroMenuBar:SetSize(10, 10)
+	ctMicroMenuBar:SetPoint("BOTTOMLEFT")
+	ctMicroMenuBar:SetFrameLevel(54)	-- in front of the bag
+	ctMicroMenuBar:Hide()
+	local tex = ctMicroMenuBar:CreateTexture(nil, "ARTWORK")
+	tex:SetColorTexture(1,1,0,0.5)
+	tex:SetAllPoints()
+	
+	ctMicroMenuBar:EnableMouse(true)
+	ctMicroMenuBar:RegisterForDrag("LeftButton", "RightButton")
+	
+	module:regEvent("PLAYER_LOGIN", function()
+		module:registerMovable("ctMicroMenuBar", ctMicroMenuBar, true)
+	end)
+	
+	ctMicroMenuBar:SetScript("OnDragStart", function()
+		module:moveMovable("ctMicroMenuBar")
+	end)
+	
+	ctMicroMenuBar:SetScript("OnDragStop", function()
+		module:stopMovable("ctMicroMenuBar")
+	end)
+	
+	function enableCustomBagMenuBars(enable)
+		if ctBagBar.enabled and not enable then
+			-- take no action if it was never enabled
+			ctBagBar.enabled = false
+			MainMenuBarBackpackButton:SetPoint("TOPRIGHT", MicroButtonAndBagsBar, -4, 2)
+			CharacterMicroButton:SetPoint("BOTTOMLEFT", MicroButtonAndBagsBar, 7, 2)
+		elseif enable then
+			ctBagBar.enabled = true
+			ctBagBar:SetShown(ctBagBar.shown)
+			ctMicroMenuBar:SetShown(ctBagBar.shown)
+			MainMenuBarBackpackButton:SetPoint("TOPRIGHT", ctBagBar, -4, 2)
+			CharacterMicroButton:SetPoint("BOTTOMLEFT", ctMicroMenuBar, 7, 2)
+		end
 	end
-end
-
-local function showCustomBagMenuAnchors(show)
-	ctBagBar.shown = show
-	ctBagBar:SetShown(show and ctBagBar.enabled)
-	ctMicroMenuBar:SetShown(show and ctBagBar.enabled)
-end	
-
-if module:getGameVersion() < 10 or CT_BottomBar then
-	enableCustomBagMenuBars = nil
-	showCustomBagMenuAnchors = nil
+	
+	function showCustomBagMenuAnchors(show)
+		ctBagBar.shown = show
+		ctBagBar:SetShown(show and ctBagBar.enabled)
+		ctMicroMenuBar:SetShown(show and ctBagBar.enabled)
+	end
+	
 end
 
 

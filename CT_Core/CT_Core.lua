@@ -387,20 +387,22 @@ module.frame = function()
 	end
 
 -- Auction house options
-	optionsAddBookmark("Auction House", "AuctionHouseHeading");
-	optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Auction House#i:AuctionHouseHeading");
-	optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:auctionAltClickItem#Alt left-click to add an item to the Auctions tab");
+	if AuctionFrame then
+		optionsAddBookmark("Auction House", "AuctionHouseHeading")
+		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Auction House#i:AuctionHouseHeading")
+		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:auctionAltClickItem#Alt left-click to add an item to the Auctions tab")
+	end
 
 -- Bags and Menu Bar
-	if module:getGameVersion() >= 10 and not CT_BottomBar then
+	if module:getGameVersionAndPatch() == 10.02 and not CT_BottomBar then
 		optionsAddBookmark("Bags and Menu Bars", "BagsAndMicroMenuHeading")	
-		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Bag and Menu Bars#i:BagsAndMicroMenuHeading");
-		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:enableCustomBagMenuBars#Move bag and menu bars");
-		optionsAddObject( -5,   26, "checkbutton#tl:30:%y#o:showCustomBagMenuAnchors#Show dragging anchors");
-		optionsAddObject(-15,   17, "font#tl:5:%y#v:GameFontNormal#Auction House#i:Bag Automation");
+		optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Bag and Menu Bars#i:BagsAndMicroMenuHeading")
+		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:enableCustomBagMenuBars#Move bag and menu bars")
+		optionsAddObject( -5,   26, "checkbutton#tl:30:%y#o:showCustomBagMenuAnchors#Show dragging anchors")
+		optionsAddObject(-15,   17, "font#tl:5:%y#v:GameFontNormal#Auction House#i:Bag Automation")
 	else
 		optionsAddBookmark("Bag Automation", "BagsAndMicroMenuHeading")
-		optionsAddObject(-15,   17, "font#tl:5:%y#v:GameFontNormalLarge#Bag Automation#i:BagsAndMicroMenuHeading");
+		optionsAddObject(-15,   17, "font#tl:5:%y#v:GameFontNormalLarge#Bag Automation#i:BagsAndMicroMenuHeading")
 	end
 	optionsAddObject( -8, 2*13, "font#t:0:%y#s:0:%s#l:13:0#r#Disable bag automation if you have other bag management addons#" .. textColor2 .. ":l");	
 	optionsBeginFrame( -3, 15, "checkbutton#tl:60:%y#o:disableBagAutomation#i:disableBagAutomation#Disable bag automation");
@@ -787,7 +789,7 @@ module.frame = function()
 		optionsAddObject( -5,   26, "checkbutton#tl:10:%y#i:watchframeEnabled#o:watchframeEnabled#Enable these options");
 		optionsAddObject(  4,   26, "checkbutton#tl:40:%y#i:watchframeLocked#o:watchframeLocked:true#Lock the game's Objectives window");
 		optionsAddObject(  6,   26, "checkbutton#tl:40:%y#i:watchframeShowTooltip#o:watchframeShowTooltip:true#Show drag and resize tooltips");
-		if (module:getGameVersion() == CT_GAME_VERSION_CLASSIC) then
+		if (module:getGameVersion() == 1) then
 			optionsAddObject(  6,   26, "checkbutton#tl:40:%y#i:watchframeAddMinimizeButton#o:watchframeAddMinimizeButton:true#Add a minimize button (like retail)");
 		end
 		optionsAddObject(  6,   26, "checkbutton#tl:40:%y#i:watchframeClamped#o:watchframeClamped:true#Keep the window on screen");
