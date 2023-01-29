@@ -1684,7 +1684,9 @@ function module.configureClassicTaxiFrame()
 		if (showUnreachable) then
 			local knownDestinations = {}
 			for i=1, NumTaxiNodes() do
-				knownDestinations[TaxiNodeName(i)] = true
+				if TaxiNodeGetType(i) == "REACHABLE" or TaxiNodeGetType(i) == "CURRENT" then
+					knownDestinations[TaxiNodeName(i)] = true
+				end
 			end
 			local taxiMap = GetTaxiMapID()
 			if (taxiMap) then
