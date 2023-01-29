@@ -1,3 +1,6 @@
+CT_MapMod (10.0.5.2) 2023-01-29
+- Preventing an error in Classic
+
 CT_MapMod (10.0.2.5) 2023-01-01
 - Correcting the spelling of WotLK Adder's Tongue
 
