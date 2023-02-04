@@ -1,3 +1,6 @@
+CT_BarMod (10.0.5.2) 2022-02-04
+- Updated bar 12 (custom action bar) for Dragonflight
+
 CT_BarMod (10.0.2.4) 2022-12-26
 - Pushing spell flyout buttons in front of background texture
 - Maintain control over hidden button slots after dragging from spellbook

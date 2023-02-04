@@ -761,7 +761,7 @@ function module:init()
 		if (ExtraActionBarFrame) then
 			module:loadAddon("Extra Bar");
 		end
-		if (VehicleSeatIndicator) then
+		if module:getGameVersionAndPatch() < 10.05 and VehicleSeatIndicator then
 			module:loadAddon("Vehicle Bar");
 		end
 		if (ZoneAbilityFrame) then
