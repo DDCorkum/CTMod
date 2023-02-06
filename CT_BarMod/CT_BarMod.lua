@@ -531,17 +531,19 @@ local secureFrame_OnAttributeChanged = [=[
 	-- name == name of attribute
 	-- value == value of attribute
 
-	if (name == "state-vehicleui") then
-		self:SetAttribute("hasVehicleUI", value);
-	elseif (name == "state-overridebar") then
-		self:SetAttribute("hasOverrideBar", value);
-	elseif (name == "state-possessbar") then
-		self:SetAttribute("hasPossessBar", value);
-	elseif (name == "state-petbattle") then
-		self:SetAttribute("hasPetBattle", value);
+	if name == "state-vehicleui" then
+		self:SetAttribute("hasVehicleUI", value)
+	elseif name == "state-overridebar" then
+		self:SetAttribute("hasOverrideBar", value)
+	elseif name == "state-possessbar" then
+		self:SetAttribute("hasPossessBar", value)
+	elseif name == "state-petbattle" then
+		self:SetAttribute("hasPetBattle", value)
+	elseif name == "state-dragonriding" then
+		self:SetAttribute("hasDragonRiding", value)
 	end
 
-	if (name == "state-overridebar" or name == "state-vehicleui" or name == "state-possessbar") then
+	if (name == "state-overridebar" or name == "state-vehicleui" or name == "state-possessbar" or name == "state-dragonriding") then
 		-- Override bar, vehicle bar, or possess bar state has changed.
 		--
 		-- Update visibility of buttons with related action ids.
@@ -580,7 +582,7 @@ local secureFrame_OnAttributeChanged = [=[
 			while (button) do
 				actionId = button:GetAttribute("action");
 				actionMode = button:GetAttribute("actionMode");
-
+				
 				-- Ensure that buttons with the following action ids get assigned
 				-- the correct "type" attribute.
 				--
@@ -675,8 +677,8 @@ local secureFrame_OnAttributeChanged = [=[
 local function initSecureFrame()
 	local frame = CT_BarMod_SecureFrame;
 
-	frame:SetAttribute("maxPage", 14);
-	frame:SetAttribute("maxAction", 168);
+	frame:SetAttribute("maxPage", module:getGameVersion() >= 10 and 16 or 14);
+	frame:SetAttribute("maxAction", module:getGameVersion() >= 10 and 192 or 168);
 
 	-- Set the attribute that will tell the game which secure snippet to use when an attribute changes.
 	frame:SetAttribute("_onattributechanged", secureFrame_OnAttributeChanged);
@@ -711,16 +713,19 @@ local function initSecureFrame()
 	-- Also, I'm not sure why they are calling UnitCanAssist in the first place.
 	--
 	
-	RegisterStateDriver(frame, "vehicleui", "[vehicleui]1;nil");
+	RegisterStateDriver(frame, "vehicleui", "[vehicleui]1;nil")
 	
 	-- Detect when the overridebar state changes.
-	RegisterStateDriver(frame, "overridebar", "[overridebar]1;nil");
+	RegisterStateDriver(frame, "overridebar", "[overridebar]1;nil")
 
 	-- Detect when the possessbar state changes.
-	RegisterStateDriver(frame, "possessbar", "[possessbar]1;nil");
+	RegisterStateDriver(frame, "possessbar", "[possessbar]1;nil")
 
 	-- Detect when the petbattle state changes.
-	RegisterStateDriver(frame, "petbattle", "[petbattle]1;nil");
+	RegisterStateDriver(frame, "petbattle", "[petbattle]1;nil")
+	
+	-- Detect when the petbattle state changes.
+	RegisterStateDriver(frame, "dragonriding", "[bonusbar:5]1;nil")
 end
 
 --------------------------------------------

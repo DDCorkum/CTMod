@@ -356,6 +356,7 @@ local setActionPage_secure = [=[
 	local hasVehicleUI = secureFrame:GetAttribute("hasVehicleUI");
 	local hasOverrideBar = secureFrame:GetAttribute("hasOverrideBar");
 	local hasPossessBar = secureFrame:GetAttribute("hasPossessBar");
+	local hasDragonRiding = secureFrame:GetAttribute("hasDragonRiding");
 	local showCancel = secureFrame:GetAttribute("showcancel");
 	local maxPage = secureFrame:GetAttribute("maxPage");
 	
@@ -393,8 +394,11 @@ local setActionPage_secure = [=[
 		-- Page 12 == vehicle [vehicleui] and possess [possessbar] (GetVehicleBarIndex() == 12)
 		-- Page 13 == temporary shapeshift (when does game use this?) (GetTempShapeshiftBarIndex() == 13)
 		-- Page 14 == override [overridebar] (GetOverrideBarIndex() == 14)
+		
+		-- DRAGONFLIGHT
+		-- Page 13 == Dragonriding
 		--
-		if (usePage == 12) then  -- vehicle or possess buttons
+		if (usePage >= 12) then  -- vehicle or possess buttons
 			if (hasVehicleUI) then
 				if (count == 12) then  -- last button on bar
 					actionMode = "leave";
@@ -408,17 +412,15 @@ local setActionPage_secure = [=[
 				else
 					actionMode = "possess";
 				end
-			else  -- unexpected set of buttons
-				actionMode = "action";
-			end
-		elseif (usePage == 14) then  -- override buttons
-			if (hasOverrideBar) then
+			elseif (hasOverrideBar) then
 				if (count == 11) then  -- second to last button on bar
 --					actionMode = "cancel";
 					actionMode = "override";
 				else
 					actionMode = "override";
 				end
+			elseif hasDragonRiding then
+				actionMode = "action";
 			else  -- unexpected set of buttons
 				actionMode = "action";
 			end
@@ -1250,7 +1252,6 @@ function group:addObject(object)
 		object:updateVisibility();
 	end
 	button:SetScale(self.scale or 1);
-	hooksecurefunc(button, "SetParent", print);
 	
 	self:updateDragframePosition();
 	self:updateOverlayPosition();
@@ -1966,7 +1967,7 @@ function module:buildPageBasicCondition(groupId)
 		for count = 2, 6 do
 			condition = condition .. "[bar:" .. count .. "]" .. count .. "; ";
 		end
-		for count = 1, 4 do
+		for count = 1, 5 do
 			condition = condition .. "[bonusbar:" .. count .. "]" .. (count + 6) .. "; ";
 		end
 		condition = condition .. "1";

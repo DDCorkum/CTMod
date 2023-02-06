@@ -1666,7 +1666,7 @@ function module.configureClassicTaxiFrame()
 	local function creationFunc(self)
 		local frame = CreateFrame("Frame", nil, TaxiFrame)
 		frame:SetSize(8, 8)
-		frame.tex = frame:CreateTexture(nil, "BACKGROUND", -8)
+		frame.tex = frame:CreateTexture(nil, "BACKGROUND", nil, -8)
 		frame.tex:SetTexture("Interface\\TaxiFrame\\UI-Taxi-Icon-Nub")
 		frame.tex:SetAllPoints()
 		frame:SetScript("OnEnter", function()
@@ -1684,7 +1684,9 @@ function module.configureClassicTaxiFrame()
 		if (showUnreachable) then
 			local knownDestinations = {}
 			for i=1, NumTaxiNodes() do
-				knownDestinations[TaxiNodeName(i)] = true
+				if TaxiNodeGetType(i) == "REACHABLE" or TaxiNodeGetType(i) == "CURRENT" then
+					knownDestinations[TaxiNodeName(i)] = true
+				end
 			end
 			local taxiMap = GetTaxiMapID()
 			if (taxiMap) then
