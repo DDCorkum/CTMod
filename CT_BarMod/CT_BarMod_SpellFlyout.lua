@@ -87,7 +87,7 @@ spellFlyout:SetScript("OnEvent", function(self, event, ...)
 			SpellFlyoutButton_UpdateState(button);
 			SpellFlyoutButton_UpdateUsable(button);
 			SpellFlyoutButton_UpdateCount(button);
-			SpellFlyoutButton_UpdateGlyphState(button);
+			--SpellFlyoutButton_UpdateGlyphState(button);
 			i = i+1;
 			button = _G["CT_BarMod_SpellFlyoutButton"..i];
 		end
@@ -152,6 +152,8 @@ function module.createSpellFlyoutButtons(numSlots)	-- must not be called during 
 		button:SetScript("OnDragStart", SpellFlyoutButton_OnDrag)
 		button:SetScript("OnLeave", function() GameTooltip:Hide() end)
 		button:RegisterForClicks("AnyUp", "AnyDown")
+		
+		SecureHandlerWrapScript(button, "PostClick", button, [=[ if down == false then self:GetParent():GetParent():Hide() end ]=], nil)
 		
 		SecureHandlerSetFrameRef(spellFlyout, "button"..i, button)
 		button:SetAttribute("slot", i)
