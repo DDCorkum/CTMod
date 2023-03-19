@@ -1,4 +1,4 @@
-## Interface: 100005
+## Interface: 100007
 ## Version: 10.0.5.1
 ## Title: CT_Library |cFFCC6600CTMod|r
 ## Notes: Library features for CTMod. 
