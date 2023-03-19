@@ -307,7 +307,7 @@ function module:printLogMessage(success, mail, message)
 		if (mail) then
 			message = ("%s: %s"):format(mail:getName(), message);
 		end
-		(success and module.printformat or module.errorformat)(module, "<MailMod> %s", message);
+		(success and module.printformat or module.errorformat)(module, "<CT_MailMod> %s", message);
 	end
 end
 
