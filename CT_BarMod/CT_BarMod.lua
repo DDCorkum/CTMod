@@ -677,8 +677,8 @@ local secureFrame_OnAttributeChanged = [=[
 local function initSecureFrame()
 	local frame = CT_BarMod_SecureFrame;
 
-	frame:SetAttribute("maxPage", module:getGameVersion() >= 10 and 16 or 14);
-	frame:SetAttribute("maxAction", module:getGameVersion() >= 10 and 192 or 168);
+	frame:SetAttribute("maxPage", GetOverrideBarIndex());				-- used to be 14; in Dragonflight and WotLK Classic it is 18
+	frame:SetAttribute("maxAction", GetOverrideBarIndex() * 12);
 
 	-- Set the attribute that will tell the game which secure snippet to use when an attribute changes.
 	frame:SetAttribute("_onattributechanged", secureFrame_OnAttributeChanged);

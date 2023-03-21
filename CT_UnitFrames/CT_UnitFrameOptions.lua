@@ -235,7 +235,7 @@ function CT_UnitFramesOptions_Radio_Update()
 		CT_TargetFrameClassFrame:Hide();
 	end
 
-	if (FocusFrame) then
+	if (CT_FocusFrame) then
 		CT_FocusFrame_ToggleStandardFocus();
 	end
 
@@ -252,7 +252,7 @@ function CT_UnitFramesOptions_Radio_Update()
 	module:ShowAssistFrameBarText();
 	module:AnchorAssistFrameSideText();
 
-	if (FocusFrame) then	
+	if (CT_FocusFrame) then	
 		module:ShowFocusFrameBarText();
 		module:AnchorFocusFrameSideText();
 	end
@@ -455,7 +455,7 @@ local lockTable =
 	--[1] = { drag = "CT_PlayerFrame_Drag", cb = "CT_UnitFramesOptionsFrameBox1LockCB" },
 	--[2] = { drag = "CT_TargetFrame_Drag", cb = "CT_UnitFramesOptionsFrameBox3LockCB" },
 	[3] = { drag = "CT_AssistFrame_Drag", cb = "CT_UnitFramesOptionsFrameBox4LockCB" },
-	[4] = FocusFrame and { drag = "CT_FocusFrame_Drag",  cb = "CT_UnitFramesOptionsFrameBox5LockCB" },	-- nil in Classic Era
+	[4] = CT_FocusFrame and { drag = "CT_FocusFrame_Drag",  cb = "CT_UnitFramesOptionsFrameBox5LockCB" },	-- nil in Classic Era
 }
 
 function CT_UnitFramesOptions_Lock_CB_OnClick(obj, checked, id)
@@ -479,7 +479,7 @@ module.currBoxFrame = nil;
 
 function CT_UnitFrameOptionsBoxSelectionButton_OnShow(self)
 	local id = self:GetID()
-	if (FocusFrame) then
+	if (CT_FocusFrame) then
 		self:SetPoint("TOPLEFT", (79*id)-64, -45)
 		self:SetSize(75, 21)
 	elseif (id < 5) then
@@ -516,7 +516,7 @@ function CT_UnitFramesOptions_OneColorHealth_CB_OnClick(self, checked)
 	module:ShowPartyFrameBarText();
 	module:ShowTargetFrameBarText();
 	module:ShowAssistFrameBarText();
-	if (FocusFrame) then
+	if (CT_FocusFrame) then
 		module:ShowFocusFrameBarText();
 	end
 end
@@ -527,7 +527,7 @@ function CT_UnitFramesOptions_LargeBreakUp_CB_OnClick(self, checked)
 	module:ShowPartyFrameBarText();
 	module:ShowTargetFrameBarText();
 	module:ShowAssistFrameBarText();
-	if (FocusFrame) then
+	if (CT_FocusFrame) then
 		module:ShowFocusFrameBarText();
 	end
 end
@@ -538,7 +538,7 @@ function CT_UnitFramesOptions_LargeAbbreviate_CB_OnClick(self, checked)
 	module:ShowPartyFrameBarText();
 	module:ShowTargetFrameBarText();
 	module:ShowAssistFrameBarText();
-	if (FocusFrame) then	
+	if (CT_FocusFrame) then	
 		module:ShowFocusFrameBarText();
 	end
 end
@@ -582,7 +582,7 @@ module.update = function(self, option, value)
 			CT_TargetofAssistFrame:Hide();
 		end		
 		
-		if (FocusFrame) then
+		if (CT_FocusFrame) then
 			CT_FocusFrame.buffsOnTop = CT_UnitFramesOptions.focusBuffsOnTop;
 			if ( CT_UnitFramesOptions.shallDisplayFocus ) then
 				RegisterUnitWatch(CT_FocusFrame);

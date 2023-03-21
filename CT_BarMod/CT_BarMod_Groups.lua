@@ -371,11 +371,18 @@ local setActionPage_secure = [=[
 	end
 	local usePage = page;
 	local base = (usePage - 1) * 12;
-	
+		
 	local count = 1;
 	local actionId;
 	local actionMode;
 	local button = self:GetFrameRef("child1");
+	
+	-- see CT_BarMod_SpellFlyout.lua
+	local flyout = button:GetFrameRef("ctSpellFlyout")
+	if flyout then
+		flyout:Hide()
+	end
+	
 	while (button) do
 		-- Determine the action number for this button.
 		actionId = base + count;
@@ -397,6 +404,7 @@ local setActionPage_secure = [=[
 		
 		-- DRAGONFLIGHT
 		-- Page 13 == Dragonriding
+		-- Page 18 == override [overridebar]  (GetOverrideBarIndex() == 18)
 		--
 		if (usePage >= 12) then  -- vehicle or possess buttons
 			if (hasVehicleUI) then
