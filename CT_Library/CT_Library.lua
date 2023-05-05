@@ -3264,10 +3264,6 @@ local function displayControlPanel()
 		controlPanelFrame.height = maxHeight;	-- tracking variables used by resizer()
 		controlPanelFrame.width = minWidth;
 		controlPanelFrame.alpha = 0;
-		
-		if lib:getGameVersion() >= 10 then
-			print("Warning: it may be necessary to /reload after using the CTMod control panel, due to bugs in the new Dragonflight user interface.")
-		end
 	end
 	maximizeControlPanel();
 	controlPanelFrame:Show();
@@ -3285,6 +3281,59 @@ function libPublic:showControlPanel(show)
 	elseif ( controlPanelFrame) then 
 		controlPanelFrame:Hide();
 	end
+end
+
+function CTMod_OnAddonCompartmentClick(__, button)
+	if button == "RightButton" and AddonCompartmentFrame then
+		if not CT_AddonCompartmentDropdown then
+			CreateFrame("Frame", "CT_AddonCompartmentDropdown", AddonCompartmentFrame, "UIDropDownMenuTemplate")
+			UIDropDownMenu_Initialize(
+				CT_AddonCompartmentDropdown,
+				function()
+					if (UIDROPDOWNMENU_MENU_LEVEL == 1) then
+						for i, mod in lib:iterateModules() do
+							if (i>2) then
+								local info = {}
+								info.text = mod.name
+
+
+								info.notCheckable = 1
+								if (mod.externalDropDown_Initialize) then
+									-- shows a custom dropdown provided by the module
+									info.hasArrow = 1
+									info.value = mod.name
+								else
+									-- opens the customOpenFunction() if it exists, or just opens the standard module options
+									info.func = mod.customOpenFunction or function()
+										mod:showModuleOptions()
+									end
+								end
+								UIDropDownMenu_AddButton(info)
+							end
+						end
+					elseif (_G[UIDROPDOWNMENU_MENU_VALUE] and _G[UIDROPDOWNMENU_MENU_VALUE].externalDropDown_Initialize) then
+						_G[UIDROPDOWNMENU_MENU_VALUE]:externalDropDown_Initialize(UIDROPDOWNMENU_MENU_LEVEL)
+					end
+				end,
+				"MENU"  --causes it to be like a context menu
+			)
+		end
+		ToggleDropDownMenu(1, nil, CT_AddonCompartmentDropdown, AddonCompartmentFrame, -300, 0)
+	else
+		lib:showControlPanel("toggle")
+	end
+end
+
+function CTMod_OnAddonCompartmentEnter(__, frame)
+	GameTooltip:SetOwner(frame,"ANCHOR_LEFT")
+	GameTooltip:AddDoubleLine("CTMod", lib:getLibVersion())
+	GameTooltip:AddLine("Left-click: full options", .8, .8, .8);
+	GameTooltip:AddLine("Right-click: quick menu", .8, .8, .8);
+	GameTooltip:Show();
+end
+
+function CTMod_OnAddonCompartmentLeave()
+	GameTooltip:Hide()
 end
 
 function libPublic:toggleMinimizeControlPanel()

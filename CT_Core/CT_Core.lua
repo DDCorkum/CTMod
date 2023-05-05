@@ -240,7 +240,13 @@ end
 function module:init()
 	self:modinit()
 	self:chatupdate("init")
-	showMinimap(self:getOption("minimapIcon") ~= false)
+	if self:getGameVersion() < 10 then
+		-- Classic
+		showMinimap(self:getOption("minimapIcon") ~= false)
+	else
+		-- Default to the new addon compartment instead
+		showMinimap(self:getOption("minimapIcon"))
+	end
 end
 
 
@@ -766,7 +772,7 @@ module.frame = function()
 	optionsAddBookmark("Minimap", "MinimapHeading");
 	optionsAddObject(-20,   17, "font#tl:5:%y#v:GameFontNormalLarge#Minimap #i:MinimapHeading"); -- Need the blank after "Minimap" otherwise the word won't appear on screen.
 	optionsAddObject( -5,   26, "checkbutton#tl:10:%y#o:hideWorldMap#Hide the World Map minimap button");
-	optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:minimapIcon:true#Show the CTMod minimap button");
+	optionsAddObject(  6,   26, "checkbutton#tl:10:%y#o:minimapIcon:" .. (module:getGameVersion() < 10 and "true" or "false") .. "#Show the CTMod minimap button");
 	optionsBeginFrame(   0,   30, "button#t:0:%y#s:180:%s#n:CT_Core_ResetCTModPosition_Button#v:GameMenuButtonTemplate#Reset CTMod position");
 		optionsAddScript("onclick",
 			function(self)
