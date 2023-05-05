@@ -14,7 +14,6 @@
 
 -- This file gives users the option to open the CTMod options directly from the TitanPanel bar if it exists
 
-
 -- ******************************** Constants *******************************
 -- Setup the name we want in the global namespace
 CTModTitanPlugin = {}
@@ -31,7 +30,7 @@ TS.tooltip_header = TS.id.." Options"
 
 --  Get data from the TOC file.
 TS.version = tostring(GetAddOnMetadata("CT_Library", "Version")) or "Unknown" 
-TS.author = GetAddOnMetadata(TS.addon, "Author") or "Unknown"
+TS.author = GetAddOnMetadata("CT_Library", "Author") or "Unknown"
 -- ******************************** Variables *******************************
 -- ******************************** Functions *******************************
 
