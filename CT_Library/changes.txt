@@ -1,3 +1,7 @@
+CT_Library (10.1.0.1) 2023-05-05
+- Bugfix to Titan Panel integration
+- Migrating the minimap button to the new addon list
+
 CT_Library (10.0.5.1) 2023-01-23
 - Added getGameVersionAndPatch() to complement getGameVersion()
 

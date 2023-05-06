@@ -1,10 +1,13 @@
 ## Interface: 11403
-## Version: 10.0.2.5
+## Version: 10.1.0.1
 ## Title: CT_Library |cFFCC6600CTMod|r
-## Notes: Library features for CTMod. 
+## Notes: Required for all CTMod modules
 ## DefaultState: Enabled
 ## Author: Cide, TS, Resike, Dahk
-
+## AddonCompartmentFunc: CTMod_OnAddonCompartmentClick
+## AddonCompartmentFuncOnEnter: CTMod_OnAddonCompartmentEnter
+## AddonCompartmentFuncOnLeave: CTMod_OnAddonCompartmentLeave
+## IconTexture: Interface\Addons\CT_Library\Images\minimapIcon
 
 Libs\LibStub\LibStub.lua
 Libs\TaintLess.xml
