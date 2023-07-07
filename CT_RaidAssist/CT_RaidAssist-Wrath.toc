@@ -1,4 +1,4 @@
-## Interface: 30401
+## Interface: 30402
 ## Version: 10.0.2.4
 ## Title: CT_RaidAssist
 ## Author: TS & Cide (Original), Dargen (MT Addon), DDC (Redesign)
