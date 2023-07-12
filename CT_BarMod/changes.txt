@@ -1,3 +1,6 @@
+CT_BarMod (10.1.5.1) 2023-07-12
+- Disabling the overlay glow on retail to stop combat errors
+
 CT_BarMod (10.0.7.2) 2023-03-22
 - Compatibility fix to the previous update in Classic Era
 

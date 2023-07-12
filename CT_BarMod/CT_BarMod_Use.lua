@@ -902,41 +902,45 @@ local function CT_BarMod__ActionButton_UpdateOverlayGlow(self)
 end
 
 function useButton:updateOverlayGlow()
-	if (module:getGameVersion() >= 4) then
+	if (module:getGameVersion() >= 4 and module:getGameVersion() < 10) then
 		CT_BarMod__ActionButton_UpdateOverlayGlow(self.button);
 	end
 end
 
 function useButton:showOverlayGlow(arg1)
-	-- Based on the code that handles the "SPELL_ACTIVATION_OVERLAY_GLOW_SHOW" event in ActionButton.lua
-	local actionType, id, subType = GetActionInfo(self.actionId);
-	if ( actionType == "spell" and id == arg1 ) then
-		CT_BarMod__ActionButton_ShowOverlayGlow(self.button);
-	elseif ( actionType == "macro" ) then
-		-- id == macro number
-		local spellId = GetMacroSpell(id);
-		if (spellId and spellId == arg1 ) then
+	if module:getGameVersion() < 10 then
+		-- Based on the code that handles the "SPELL_ACTIVATION_OVERLAY_GLOW_SHOW" event in ActionButton.lua
+		local actionType, id, subType = GetActionInfo(self.actionId);
+		if ( actionType == "spell" and id == arg1 ) then
+			CT_BarMod__ActionButton_ShowOverlayGlow(self.button);
+		elseif ( actionType == "macro" ) then
+			-- id == macro number
+			local spellId = GetMacroSpell(id);
+			if (spellId and spellId == arg1 ) then
+				CT_BarMod__ActionButton_ShowOverlayGlow(self.button);
+			end
+		elseif (actionType == "flyout" and FlyoutHasSpell(id, arg1)) then
 			CT_BarMod__ActionButton_ShowOverlayGlow(self.button);
 		end
-	elseif (actionType == "flyout" and FlyoutHasSpell(id, arg1)) then
-		CT_BarMod__ActionButton_ShowOverlayGlow(self.button);
 	end
 end
 
 function useButton:hideOverlayGlow(arg1)
-	-- Based on the code that handles the "SPELL_ACTIVATION_OVERLAY_GLOW_HIDE" event in ActionButton.lua
-	local actionType, id, subType = GetActionInfo(self.actionId);
-	if ( actionType == "spell" and id == arg1 ) then
-		-- id == spell number
-		CT_BarMod__ActionButton_HideOverlayGlow(self.button);
-	elseif ( actionType == "macro" ) then
-		-- id == macro number
-		local spellId = GetMacroSpell(id);
-		if (spellId and spellId == arg1 ) then
+	if module:getGameVersion() < 10 then
+		-- Based on the code that handles the "SPELL_ACTIVATION_OVERLAY_GLOW_HIDE" event in ActionButton.lua
+		local actionType, id, subType = GetActionInfo(self.actionId);
+		if ( actionType == "spell" and id == arg1 ) then
+			-- id == spell number
+			CT_BarMod__ActionButton_HideOverlayGlow(self.button);
+		elseif ( actionType == "macro" ) then
+			-- id == macro number
+			local spellId = GetMacroSpell(id);
+			if (spellId and spellId == arg1 ) then
+				CT_BarMod__ActionButton_HideOverlayGlow(self.button);
+			end
+		elseif (actionType == "flyout" and FlyoutHasSpell(id, arg1)) then
 			CT_BarMod__ActionButton_HideOverlayGlow(self.button);
 		end
-	elseif (actionType == "flyout" and FlyoutHasSpell(id, arg1)) then
-		CT_BarMod__ActionButton_HideOverlayGlow(self.button);
 	end
 end
 
