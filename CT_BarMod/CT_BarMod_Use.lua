@@ -803,9 +803,8 @@ end
 local unusedOverlayGlows = {};
 local numOverlays = 0;
 
-local function CT_BarMod__ActionButton_OverlayGlowAnimOutFinished(animGroup)
+local function CT_BarMod__ActionButton_OverlayGlowAnimOutFinished(overlay)
 	-- This is a modified version of ActionButton_OverlayGlowAnimOutFinished from ActionButton.lua
-	local overlay = animGroup:GetParent();
 	local actionButton = overlay:GetParent();
 	overlay:Hide();
 	tinsert(unusedOverlayGlows, overlay);
@@ -818,20 +817,6 @@ local function CT_BarMod__ActionButton_GetOverlayGlow()
 	if ( not overlay ) then
 		numOverlays = numOverlays + 1;
 		overlay = CreateFrame("Frame", "CT_BarMod__ActionButtonOverlay" .. numOverlays, UIParent, "ActionBarButtonSpellActivationAlert");
-		-- Override some scripts in the template because they call Blizzard's ActionButton_OverlayGlowAnimOutFinished function.
-		overlay:SetScript("OnHide",
-			function(self)
-				if ( self.animOut:IsPlaying() ) then
-					self.animOut:Stop();
-					CT_BarMod__ActionButton_OverlayGlowAnimOutFinished(self.animOut);
-				end
-			end
-		);
-		overlay.animOut:SetScript("OnFinished",
-			function (self)
-				CT_BarMod__ActionButton_OverlayGlowAnimOutFinished(self);
-			end
-		);
 	end
 	return overlay;
 end
@@ -839,13 +824,13 @@ end
 local function CT_BarMod__ActionButton_HideOverlayGlow(self)
 	-- This is a modified version of ActionButton_HideOverlayGlow from ActionButton.lua
 	if ( self.overlay ) then
-		if ( self.overlay.animIn:IsPlaying() ) then
-			self.overlay.animIn:Stop();
+		if ( self.overlay.ProcStartAnim:IsPlaying() ) then
+			self.overlay.ProcStartAnim:Stop();
 		end
 		if ( self:IsVisible() ) then
-			self.overlay.animOut:Play();
+			self.overlay:Hide()
 		else
-			CT_BarMod__ActionButton_OverlayGlowAnimOutFinished(self.overlay.animOut);
+			CT_BarMod__ActionButton_OverlayGlowAnimOutFinished(self.overlay);
 		end
 	end
 end
@@ -857,9 +842,9 @@ local function CT_BarMod__ActionButton_ShowOverlayGlow(self)
 		return;
 	end
 	if ( self.overlay ) then
-		if ( self.overlay.animOut:IsPlaying() ) then
-			self.overlay.animOut:Stop();
-			self.overlay.animIn:Play();
+		if ( not self.overlay:IsShown() ) then
+			self.overlay:Show()
+			self.overlay.ProcStartAnim:Play()
 		end
 	else
 		self.overlay = CT_BarMod__ActionButton_GetOverlayGlow();
@@ -880,7 +865,7 @@ local function CT_BarMod__ActionButton_ShowOverlayGlow(self)
 		self.overlay:SetSize(frameWidth * 1.4, frameHeight * 1.4);
 		self.overlay:SetPoint("TOPLEFT", self, "TOPLEFT", -frameWidth * 0.2, frameHeight * 0.2);
 		self.overlay:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", frameWidth * 0.2, -frameHeight * 0.2);
-		self.overlay.animIn:Play();
+		self.overlay.ProcStartAnim:Play();
 	end
 end
 
@@ -902,45 +887,41 @@ local function CT_BarMod__ActionButton_UpdateOverlayGlow(self)
 end
 
 function useButton:updateOverlayGlow()
-	if (module:getGameVersion() >= 4 and module:getGameVersion() < 10) then
+	if (module:getGameVersion() >= 4) then
 		CT_BarMod__ActionButton_UpdateOverlayGlow(self.button);
 	end
 end
 
 function useButton:showOverlayGlow(arg1)
-	if module:getGameVersion() < 10 then
-		-- Based on the code that handles the "SPELL_ACTIVATION_OVERLAY_GLOW_SHOW" event in ActionButton.lua
-		local actionType, id, subType = GetActionInfo(self.actionId);
-		if ( actionType == "spell" and id == arg1 ) then
-			CT_BarMod__ActionButton_ShowOverlayGlow(self.button);
-		elseif ( actionType == "macro" ) then
-			-- id == macro number
-			local spellId = GetMacroSpell(id);
-			if (spellId and spellId == arg1 ) then
-				CT_BarMod__ActionButton_ShowOverlayGlow(self.button);
-			end
-		elseif (actionType == "flyout" and FlyoutHasSpell(id, arg1)) then
+	-- Based on the code that handles the "SPELL_ACTIVATION_OVERLAY_GLOW_SHOW" event in ActionButton.lua
+	local actionType, id, subType = GetActionInfo(self.actionId);
+	if ( actionType == "spell" and id == arg1 ) then
+		CT_BarMod__ActionButton_ShowOverlayGlow(self.button);
+	elseif ( actionType == "macro" ) then
+		-- id == macro number
+		local spellId = GetMacroSpell(id);
+		if (spellId and spellId == arg1 ) then
 			CT_BarMod__ActionButton_ShowOverlayGlow(self.button);
 		end
+	elseif (actionType == "flyout" and FlyoutHasSpell(id, arg1)) then
+		CT_BarMod__ActionButton_ShowOverlayGlow(self.button);
 	end
 end
 
 function useButton:hideOverlayGlow(arg1)
-	if module:getGameVersion() < 10 then
-		-- Based on the code that handles the "SPELL_ACTIVATION_OVERLAY_GLOW_HIDE" event in ActionButton.lua
-		local actionType, id, subType = GetActionInfo(self.actionId);
-		if ( actionType == "spell" and id == arg1 ) then
-			-- id == spell number
-			CT_BarMod__ActionButton_HideOverlayGlow(self.button);
-		elseif ( actionType == "macro" ) then
-			-- id == macro number
-			local spellId = GetMacroSpell(id);
-			if (spellId and spellId == arg1 ) then
-				CT_BarMod__ActionButton_HideOverlayGlow(self.button);
-			end
-		elseif (actionType == "flyout" and FlyoutHasSpell(id, arg1)) then
+	-- Based on the code that handles the "SPELL_ACTIVATION_OVERLAY_GLOW_HIDE" event in ActionButton.lua
+	local actionType, id, subType = GetActionInfo(self.actionId);
+	if ( actionType == "spell" and id == arg1 ) then
+		-- id == spell number
+		CT_BarMod__ActionButton_HideOverlayGlow(self.button);
+	elseif ( actionType == "macro" ) then
+		-- id == macro number
+		local spellId = GetMacroSpell(id);
+		if (spellId and spellId == arg1 ) then
 			CT_BarMod__ActionButton_HideOverlayGlow(self.button);
 		end
+	elseif (actionType == "flyout" and FlyoutHasSpell(id, arg1)) then
+		CT_BarMod__ActionButton_HideOverlayGlow(self.button);
 	end
 end
 
