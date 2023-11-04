@@ -140,7 +140,7 @@ function module:UpdateStatusBarTextString(textStatusBar, settings, lockShow)
 			style = 4;
 			prefix = 1;
 		end
-		textStatusBar:Show();
+		--textStatusBar:Show();		-- causing errors in 10.1.7 along with similar calls at lines 159 and 210
 		if ( value == 0 and textStatusBar.zeroText ) then
 			textString:SetText(textStatusBar.zeroText);
 			textStatusBar.isZero = 1;			
@@ -156,7 +156,7 @@ function module:UpdateStatusBarTextString(textStatusBar, settings, lockShow)
 			-- None
 			textString:SetText("");
 			textStatusBar.isZero = nil;
-			textStatusBar:Show();
+			--textStatusBar:Show();
 		elseif (style == 3) then
 			-- Deficit
 			textStatusBar.isZero = nil;
@@ -207,7 +207,7 @@ function module:UpdateStatusBarTextString(textStatusBar, settings, lockShow)
 		textString:Show();
 	else
 		textString:Hide();
-		textStatusBar:Hide();
+		--textStatusBar:Hide();
 	end
 	textString:SetTextColor(settings[2], settings[3], settings[4], settings[5]);
 end
