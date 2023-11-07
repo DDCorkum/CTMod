@@ -1,5 +1,5 @@
-## Interface: 100100
-## Version: 10.0.7.1
+## Interface: 100200
+## Version: 10.1.7.1
 ## Title: CT_UnitFrames
 ## Notes: Changes display of hp/mana values and adds a percentage.
 ## DefaultState: Enabled

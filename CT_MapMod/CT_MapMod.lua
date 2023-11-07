@@ -174,6 +174,8 @@ function public:InsertHerb(mapID, x, y, herb, descript, name)
 			herb = herb:sub(15)
 		elseif herb:sub(1, 10) == "Infurious " and herb:len() > 10 then
 			herb = herb:sub(11)
+		elseif herb:sub(1, 8) == "Lambent " and herb:len() > 8 then
+			herb = herb:sub(9)
 		end
 	
 	elseif GetLocale() == "frFR" then
@@ -234,6 +236,12 @@ function public:InsertHerb(mapID, x, y, herb, descript, name)
 			herb = herb:sub(16)
 		elseif herb:sub(1, 15) == "Wutentbranntes " and herb:len() > 15 then
 			herb = herb:sub(16)
+		elseif herb:sub(1, 11) == "Flackernde " and herb:len() > 11 then
+			herb = herb:sub(12)
+		elseif herb:sub(1, 12) == "Flackernder " and herb:len() > 12 then
+			herb = herb:sub(13)
+		elseif herb:sub(1, 12) == "Flackerndes " and herb:len() > 12 then
+			herb = herb:sub(13)
 		end
 	end
 
@@ -330,6 +338,8 @@ function public:InsertOre(mapID, x, y, ore, descript, name)
 			ore = ore:sub(10)
 		elseif ore:sub(1,10) == "Infurious " and ore:len() > 10 then
 			ore = ore:sub(11)
+		elseif ore:sub(1,12) == "Metamorphic " and ore:len() > 12 then
+			ore = ore:sub(13)
 		end
 		
 		-- nouns
@@ -383,6 +393,8 @@ function public:InsertOre(mapID, x, y, ore, descript, name)
 			ore = ore:sub(13)
 		elseif ore:sub(1,15) == "Wutentbranntes " and ore:len() > 15 then
 			ore = ore:sub(16)
+		elseif ore:sub(1,12) == "Metamorphes " and ore:len() > 12 then
+			ore = ore:sub(13)
 		end
 		
 		-- nouns
