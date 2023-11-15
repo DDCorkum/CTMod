@@ -1,3 +1,6 @@
+CT_MapMod (10.2.0.2) 2023-11-15
+- Updates for Emerald Dream herbs/ore (Dynaletik)
+
 CT_MapMod (10.1.7.1) 2023-11-04
 - Updates for Zaralek cavern herbs/ore (danke schön, Dynaletik)
 

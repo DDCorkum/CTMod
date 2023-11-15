@@ -1,4 +1,4 @@
-## Interface: 11404
+## Interface: 11500
 ## Version: 10.1.7.1
 ## Title: CT_UnitFrames
 ## Notes: Changes display of hp/mana values and adds a percentage.
