@@ -1970,7 +1970,7 @@ do
 			end
 		end
 	end
-	if (ActionBarActionButtonMixin) then
+	if (ActionBarActionButtonMixin and ActionBarActionButtonMixin.UpdateHotkeys) then
 		-- Shadowlands 9.0
 		hooksecurefunc(ActionBarActionButtonMixin, "UpdateHotkeys", CT_BarMod_ActionButton_UpdateHotkeys);
 	else
@@ -2111,7 +2111,7 @@ do
 			GameTooltip:Hide();
 		end
 	end
-	if (ActionBarActionButtonMixin) then
+	if (ActionBarActionButtonMixin and ActionBarActionButtonMixin.SetTooltip) then
 		-- Shadowlands 9.0
 		hooksecurefunc(ActionBarActionButtonMixin, "SetTooltip", CT_BarMod_ActionButton_SetTooltip);
 	else
