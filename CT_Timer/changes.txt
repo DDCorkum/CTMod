@@ -1,3 +1,6 @@
+CT_Timer (10.2.0.3) 2023-11-17
+- SetAlpha() now strictly requires value in the range 0 to 1
+
 CT_Timer (9.1.0.3) 2021-09-03
 - Control panel improvements
 

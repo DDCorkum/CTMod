@@ -1,3 +1,6 @@
+CT_Core (10.2.0.3) 2023-11-17
+- Fixing error when quests automatically appear in the quest log.  (courtesy: DaGrump)
+
 CT_Core (10.0.5.1) 2023-01-25
 - Disabling the backpack and micro-menu in Dragonflight (now covered by EditMode)
 - Removing alt-click at the auction house in Dragonflight (now handled by default UI as right click)
