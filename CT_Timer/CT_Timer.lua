@@ -77,37 +77,37 @@ local bgFadeIn, bgFadeOut;	-- these functions are called to make the background 
 
 do
 	local function updateAlpha()
-		CT_TimerFrameHeaderTexture:SetAlpha(CT_Timer.alpha);
-		CT_TimerFrameScrollDownHour:SetAlpha(CT_Timer.alpha);
-		CT_TimerFrameScrollDownMin:SetAlpha(CT_Timer.alpha);
-		CT_TimerFrameScrollUpHour:SetAlpha(CT_Timer.alpha);
-		CT_TimerFrameScrollUpMin:SetAlpha(CT_Timer.alpha);
+		CT_TimerFrameHeaderTexture:SetAlpha(CT_Timer.alpha)
+		CT_TimerFrameScrollDownHour:SetAlpha(CT_Timer.alpha)
+		CT_TimerFrameScrollDownMin:SetAlpha(CT_Timer.alpha)
+		CT_TimerFrameScrollUpHour:SetAlpha(CT_Timer.alpha)
+		CT_TimerFrameScrollUpMin:SetAlpha(CT_Timer.alpha)
 	end
 
 	bgFadeIn = function()
 		if ( opts.hideBG ) then
-			CT_Timer.alpha = CT_Timer.alpha or 0;
+			CT_Timer.alpha = CT_Timer.alpha or 0
 			if ( CT_Timer.isMouseOver and CT_Timer.alpha < 1) then
-				CT_Timer.alpha = CT_Timer.alpha + 0.05;
-				C_Timer.After(0.05, bgFadeIn);
-			end
-		else
-			CT_Timer.alpha = 1;	
-		end
-		updateAlpha();
-	end
-
-	bgFadeOut = function()
-		if ( opts.hideBG ) then
-			CT_Timer.alpha = CT_Timer.alpha or 0;
-			if ( (not CT_Timer.isMouseOver) and CT_Timer.alpha > 0) then
-				CT_Timer.alpha = CT_Timer.alpha - 0.05;
-				C_Timer.After(0.05, bgFadeOut);
+				CT_Timer.alpha = min(CT_Timer.alpha + 0.05, 1)
+				C_Timer.After(0.05, bgFadeIn)
 			end
 		else
 			CT_Timer.alpha = 1;
 		end
-		updateAlpha();
+		updateAlpha()
+	end
+
+	bgFadeOut = function()
+		if ( opts.hideBG ) then
+			CT_Timer.alpha = CT_Timer.alpha or 0
+			if ( (not CT_Timer.isMouseOver) and CT_Timer.alpha > 0) then
+				CT_Timer.alpha = max(0, CT_Timer.alpha - 0.05)
+				C_Timer.After(0.05, bgFadeOut)
+			end
+		else
+			CT_Timer.alpha = 1
+		end
+		updateAlpha()
 	end
 end
 
