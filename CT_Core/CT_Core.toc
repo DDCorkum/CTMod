@@ -1,5 +1,5 @@
 ## Interface: 100200
-## Version: 10.2.0.3
+## Version: 10.2.0.4
 ## Title: CT_Core
 ## Notes: General nifty features for CTMod.
 ## DefaultState: Enabled

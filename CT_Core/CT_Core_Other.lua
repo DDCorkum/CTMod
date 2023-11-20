@@ -689,7 +689,8 @@ else -- if module:getGameVersion() >= 9 then
 	local info
 	hooksecurefunc(QUEST_TRACKER_MODULE, "GetBlock", function(__, id)
 		if type(id) == "string" then
-			id = tonumber(string.gsub(id, "%D+","")) -- Sometimes the function is passed a string like "12345OFFER"
+			id = string.gsub(id, "%D+","") -- Sometimes the function is passed a string like "12345OFFER"
+			id = tonumber(id)
 		end
 		if id then
 			local questLogIndex = C_QuestLog.GetLogIndexForQuestID(id)

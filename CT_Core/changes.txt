@@ -1,3 +1,6 @@
+CT_Core (10.2.0.4) 2023-11-20
+- Second part of the fix to the previous quest log issue.
+
 CT_Core (10.2.0.3) 2023-11-17
 - Fixing error when quests automatically appear in the quest log.  (courtesy: DaGrump)
 
