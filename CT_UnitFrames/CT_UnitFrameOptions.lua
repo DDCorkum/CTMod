@@ -249,8 +249,10 @@ function CT_UnitFramesOptions_Radio_Update()
 	module:ShowPartyFrameBarText();
 	module:AnchorPartyFrameSideText();
 	
-	module:ShowAssistFrameBarText();
-	module:AnchorAssistFrameSideText();
+	if (CT_AssistFrame) then
+		module:ShowAssistFrameBarText();
+		module:AnchorAssistFrameSideText();
+	end
 
 	if (CT_FocusFrame) then	
 		module:ShowFocusFrameBarText();
@@ -454,7 +456,7 @@ local lockTable =
 { 
 	--[1] = { drag = "CT_PlayerFrame_Drag", cb = "CT_UnitFramesOptionsFrameBox1LockCB" },
 	--[2] = { drag = "CT_TargetFrame_Drag", cb = "CT_UnitFramesOptionsFrameBox3LockCB" },
-	[3] = { drag = "CT_AssistFrame_Drag", cb = "CT_UnitFramesOptionsFrameBox4LockCB" },
+	[3] = CT_AssistFrame and { drag = "CT_AssistFrame_Drag", cb = "CT_UnitFramesOptionsFrameBox4LockCB" },
 	[4] = CT_FocusFrame and { drag = "CT_FocusFrame_Drag",  cb = "CT_UnitFramesOptionsFrameBox5LockCB" },	-- nil in Classic Era
 }
 
@@ -479,16 +481,28 @@ module.currBoxFrame = nil;
 
 function CT_UnitFrameOptionsBoxSelectionButton_OnShow(self)
 	local id = self:GetID()
-	if (CT_FocusFrame) then
-		self:SetPoint("TOPLEFT", (79*id)-64, -45)
-		self:SetSize(75, 21)
-	elseif (id < 5) then
-		self:SetPoint("TOPLEFT", (93*id)-79, -45)
-		self:SetSize(89, 21)
-	elseif (id == 6) then
-		self:SetPoint("TOPLEFT", 386, -45)
-		self:SetSize(89, 21)
+	local total, padding = 6, 4
+	if not CT_FocusFrame then
+		total = total - 1
+		padding = padding + 3
+		if id == 5 then
+			return
+		elseif id > 5 then
+			id = id - 1
+		end
 	end
+	if not CT_AssistFrame then
+		total = total - 1
+		padding = padding + 3
+		if id == 4 then
+			return
+		elseif id > 4 then
+			id = id - 1
+		end
+	end	
+	local width = (500 - 3*padding) / total
+	self:SetPoint("TOPLEFT", (width*(id-1))+2*padding, -45)
+	self:SetSize(width-padding, 21)
 	self:SetScript("OnShow", nil)
 end
 
@@ -515,7 +529,9 @@ function CT_UnitFramesOptions_OneColorHealth_CB_OnClick(self, checked)
 	module:ShowPlayerFrameBarText();
 	module:ShowPartyFrameBarText();
 	module:ShowTargetFrameBarText();
-	module:ShowAssistFrameBarText();
+	if (CT_AssistFrame) then
+		module:ShowAssistFrameBarText();
+	end
 	if (CT_FocusFrame) then
 		module:ShowFocusFrameBarText();
 	end
@@ -526,7 +542,9 @@ function CT_UnitFramesOptions_LargeBreakUp_CB_OnClick(self, checked)
 	module:ShowPlayerFrameBarText();
 	module:ShowPartyFrameBarText();
 	module:ShowTargetFrameBarText();
-	module:ShowAssistFrameBarText();
+	if (CT_AssistFrame) then
+		module:ShowAssistFrameBarText();
+	end
 	if (CT_FocusFrame) then
 		module:ShowFocusFrameBarText();
 	end
@@ -537,7 +555,9 @@ function CT_UnitFramesOptions_LargeAbbreviate_CB_OnClick(self, checked)
 	module:ShowPlayerFrameBarText();
 	module:ShowPartyFrameBarText();
 	module:ShowTargetFrameBarText();
-	module:ShowAssistFrameBarText();
+	if (CT_AssistFrame) then
+		module:ShowAssistFrameBarText();
+	end
 	if (CT_FocusFrame) then	
 		module:ShowFocusFrameBarText();
 	end
@@ -566,21 +586,23 @@ module:setSlashCmd(module.customOpenFunction, "/uf", "/ctuf", "/unitframes");
 -- Mod Initialization
 module.update = function(self, option, value)
 	if ( option == "init" ) then
-		CT_AssistFrame.buffsOnTop = CT_UnitFramesOptions.assistBuffsOnTop;
-		if ( CT_UnitFramesOptions.shallDisplayAssist ) then
-			RegisterUnitWatch(CT_AssistFrame);
-			CT_AssistFrame_Update(CT_AssistFrame);
-		else
-			UnregisterUnitWatch(CT_AssistFrame);
-			CT_AssistFrame:Hide();
+		if (CT_AssistFrame) then
+			CT_AssistFrame.buffsOnTop = CT_UnitFramesOptions.assistBuffsOnTop;
+			if ( CT_UnitFramesOptions.shallDisplayAssist ) then
+				RegisterUnitWatch(CT_AssistFrame);
+				CT_AssistFrame_Update(CT_AssistFrame);
+			else
+				UnregisterUnitWatch(CT_AssistFrame);
+				CT_AssistFrame:Hide();
+			end
+			if ( CT_UnitFramesOptions.shallDisplayTargetofAssist ) then
+				RegisterUnitWatch(CT_TargetofAssistFrame);
+				CT_TargetofAssist_Update(CT_TargetofAssistFrame);
+			else
+				UnregisterUnitWatch(CT_TargetofAssistFrame);
+				CT_TargetofAssistFrame:Hide();
+			end		
 		end
-		if ( CT_UnitFramesOptions.shallDisplayTargetofAssist ) then
-			RegisterUnitWatch(CT_TargetofAssistFrame);
-			CT_TargetofAssist_Update(CT_TargetofAssistFrame);
-		else
-			UnregisterUnitWatch(CT_TargetofAssistFrame);
-			CT_TargetofAssistFrame:Hide();
-		end		
 		
 		if (CT_FocusFrame) then
 			CT_FocusFrame.buffsOnTop = CT_UnitFramesOptions.focusBuffsOnTop;
