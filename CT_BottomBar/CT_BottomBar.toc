@@ -1,4 +1,4 @@
-## Interface: 100200
+## Interface: 100205
 ## Version: 10.1.5.1
 ## Title: CT_BottomBar |cFF333333(Disabled in retail)
 ## Notes: Breaks up the main menu bar into movable pieces.
