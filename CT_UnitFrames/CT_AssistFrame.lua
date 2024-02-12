@@ -103,12 +103,9 @@ function CT_AssistFrame_OnLoad(self)
 			_G[thisName.."MyHealPredictionBar"],
 			_G[thisName.."OtherHealPredictionBar"],
 			_G[thisName.."TotalAbsorbBar"],
-			_G[thisName.."TotalAbsorbBarOverlay"],
 			_G[thisName.."TextureFrameOverAbsorbGlow"],
 			_G[thisName.."TextureFrameOverHealAbsorbGlow"],
-			_G[thisName.."HealAbsorbBar"],
-			_G[thisName.."HealAbsorbBarLeftShadow"],
-			_G[thisName.."HealAbsorbBarRightShadow"]	
+			_G[thisName.."HealAbsorbBar"]
 		)
 	else
 		UnitFrame_Initialize(self,
