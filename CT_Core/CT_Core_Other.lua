@@ -73,7 +73,7 @@ if (module:getGameVersion() == 1) then
 			questHighlight = _G["QuestLogTitle"..i.."Highlight"];
 			if ( questIndex <= numEntries ) then
 -- CT_CORE CLASSIC ERA QUEST LOG MODIFICATION STARTS HERE
-				local questLogTitleText, level, questTag, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isBounty, isStory, isHidden, isScaling = GetQuestLogTitle(questIndex);
+				questLogTitleText, level, questTag, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isBounty, isStory, isHidden, isScaling = GetQuestLogTitle(questIndex);
 				if (displayLevels and questLogTitleText and level and level > 0) then
 					if (questTag) then
 						questLogTitleText = "[" .. level .. "+] " .. questLogTitleText;
@@ -102,7 +102,7 @@ if (module:getGameVersion() == 1) then
 					--Set Dummy text to get text width *SUPER HACK*
 					QuestLogDummyText:SetText("  "..questLogTitleText);
 
-					questLogTitle:SetNormalTexture("");
+					questLogTitle:ClearNormalTexture();
 					questHighlight:SetTexture("");
 
 					-- If not a header see if any nearby group mates are on this quest

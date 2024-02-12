@@ -2531,7 +2531,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 		visualFrame.backdropInfo = {edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border"};
 		
 		-- frequent range check that affects the border only
-		C_Timer.NewTicker(1, updateBackdropBorder);
+		C_Timer.NewTicker(0.5, updateBackdropBorder);
 		
 		-- initial configuration
 		configureBackdrop()
@@ -2680,12 +2680,13 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 			incomingBarZeroCombat:Hide();
 			incomingBarFullNoCombat:Hide();
 			incomingBarFullNoCombat:Hide();
+			incomingSetting = nil
 		else
 			incomingBarFullCombat:Show();
 			incomingBarZeroCombat:Show();
 			incomingBarFullNoCombat:Show();
 			incomingBarFullNoCombat:Show();
-			incomingSetting = owner:GetProperty("ShowIncomingHeals") == 2;
+			incomingSetting = owner:GetProperty("ShowIncomingHeals") == 2 and player or nil;
 		end
 		
 		healthBarText:SetShown(owner:GetProperty("ShowHealthText"));
@@ -3928,7 +3929,7 @@ function NewCTRATargetFrame(parentInterface, parentFrame)
 			incomingBarZeroCombat:Show();
 			incomingBarFullNoCombat:Show();
 			incomingBarFullNoCombat:Show();	
-			incomingSetting = owner:GetProperty("ShowIncomingHeals") == 2
+			incomingSetting = owner:GetProperty("ShowIncomingHeals") == 2 and "player" or nil
 		end
 		
 		healthBarText:SetShown(owner:GetProperty("ShowHealthText"));

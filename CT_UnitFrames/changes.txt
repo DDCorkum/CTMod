@@ -1,3 +1,6 @@
+CT_UnitFrames (10.2.5.1) 2024-02-10
+- Disabling the assist frame on retail to prevent errors
+
 CT_UnitFrames (10.1.7.1) 2023-11-04
 - Preventing error during combat
 
