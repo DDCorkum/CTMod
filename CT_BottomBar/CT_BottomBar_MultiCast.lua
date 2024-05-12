@@ -138,6 +138,6 @@ local function addon_Register()
 	);
 end
 
-if module:getGameVersion() == 3 and UnitClassBase("player") == "SHAMAN" then
+if (module:getGameVersion() == 3 or module:getGameVersion() == 4) and UnitClassBase("player") == "SHAMAN" then
 	module.loadedAddons["MultiCastBar"] = addon_Register;
 end

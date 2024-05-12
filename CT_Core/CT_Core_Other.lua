@@ -653,7 +653,7 @@ elseif (module:getGameVersion() == 2) then
 		UIParent_ManageFramePositions();
 	end); -- end post-hook of QuestWatch_Update()
 	
-elseif module:getGameVersion() == 3 then
+elseif (module:getGameVersion() == 3 or module:getGameVersion() == 4) then
 
 	local dummySetText = CreateFrame("Button").SetText
 	for __, btn in pairs(QuestLogListScrollFrame.buttons) do
