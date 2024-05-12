@@ -1,0 +1,13 @@
+## Interface: 40400
+## Version: 10.3.0.0
+## Title: CT_Core
+## Notes: General nifty features for CTMod.
+## DefaultState: Enabled
+## SavedVariables: CT_CoreOptions
+## Dependencies: CT_Library
+## X-Part-Of: CT-Library
+
+CT_Core.lua
+CT_Core_Chat.lua
+CT_Core_Other.lua
+localization.lua

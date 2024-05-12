@@ -1,3 +1,6 @@
+CT_BuffMod (10.3.0.0) 2024-05-10
+- Update for Cata Classic 4.4.0
+
 CT_BuffMod (10.0.0.4) 2022-11-07
 - Now also hides the debuff frame in Dragonflight
 

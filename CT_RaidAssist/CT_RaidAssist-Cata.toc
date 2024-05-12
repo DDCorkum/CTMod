@@ -1,0 +1,18 @@
+## Interface: 40400
+## Version: 10.3.0.0
+## Title: CT_RaidAssist
+## Author: TS & Cide (Original), Dargen (MT Addon), DDC (Redesign)
+## Notes: Monitor raid HP and click cast buffs, debuff removals, resurrections
+## DefaultState: Enabled
+## LoadOnDemand: 0
+## Dependencies: CT_Library
+## SavedVariables: CT_RaidAssistOptions
+## X-Part-Of: CT-Library
+
+# Durability tracking on both retail and classic
+Libs/LibDurability.lua
+
+# CTRA (for both retail and classic)
+CT_RaidAssist.lua
+CT_RaidAssist_ExpansionData.lua
+localization.lua

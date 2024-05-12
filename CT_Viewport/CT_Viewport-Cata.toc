@@ -1,0 +1,12 @@
+## Interface: 40400
+## Version: 10.3.0.0
+## Title: CT_Viewport
+## Notes: Allows you to change the rendered world's size.
+## DefaultState: Enabled
+## SavedVariablesPerCharacter: CT_Viewport_Saved
+## SavedVariables: CT_ViewportOptions, CT_ViewportBackup
+## Dependencies: CT_Library
+## X-Part-Of: CT-Library
+
+CT_Viewport.lua
+localization.lua

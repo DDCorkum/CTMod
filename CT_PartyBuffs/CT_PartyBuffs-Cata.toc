@@ -1,0 +1,10 @@
+## Interface: 40400
+## Version: 10.3.0.0
+## Title: CT_PartyBuffs
+## Notes: Shows buffs at party member frames.
+## DefaultState: Enabled
+## SavedVariables: CT_PartyBuffsOptions
+## Dependencies: CT_Library
+## X-Part-Of: CT-Library
+
+CT_PartyBuffs.xml

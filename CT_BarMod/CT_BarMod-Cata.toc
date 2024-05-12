@@ -1,0 +1,20 @@
+## Interface: 40400
+## Version: 10.3.0.0
+## Title: CT_BarMod
+## Notes: Intuitive yet powerful action bar addon.
+## DefaultState: Enabled
+## SavedVariables: CT_BarModOptions
+## Dependencies: CT_Library
+## OptionalDeps: Masque
+## X-Part-Of: CT-Library
+
+CT_BarMod.lua
+CT_BarMod_ActionButton.lua
+CT_BarMod_Groups.lua
+CT_BarMod_KeyBindings.lua
+CT_BarMod_Masque.lua
+CT_BarMod_Skins.lua
+CT_BarMod_Use.lua
+CT_BarMod_Shift.lua
+#CT_BarMod_SpellFlyout.lua
+CT_BarMod_Options.lua

@@ -1,3 +1,6 @@
+CT_PartyBuffs (10.3.0.0) 2024-05-10
+- Update for Cata Classic 4.4.0
+
 CT_PartyBuffs (10.0.2.3) 2022-12-17
 - Buffs hidden during arena matches
 

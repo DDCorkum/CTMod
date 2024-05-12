@@ -1,3 +1,6 @@
+CT_MailMod (10.3.0.0) 2024-05-10
+- Update for Cata Classic 4.4.0
+
 CT_MailMod (10.0.7.1) 2023-03-19
 - Fixed a logging error
 

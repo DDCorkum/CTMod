@@ -1,3 +1,6 @@
+CT_Viewport (10.3.0.0) 2024-05-10
+- Update for Cata Classic 4.4.0
+
 CT_Viewport (9.2.0.3) 2022-10-14
 - Fix to bug introduced in 9.2.0.2 affecting non-default resolutions
 

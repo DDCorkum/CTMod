@@ -1,0 +1,20 @@
+## Interface: 40400
+## Version: 10.3.0.0
+## Title: CT_Library |cFFCC6600CTMod|r
+## Notes: Required for all CTMod modules
+## DefaultState: Enabled
+## Author: Cide, TS, Resike, Dahk
+## AddonCompartmentFunc: CTMod_OnAddonCompartmentClick
+## AddonCompartmentFuncOnEnter: CTMod_OnAddonCompartmentEnter
+## AddonCompartmentFuncOnLeave: CTMod_OnAddonCompartmentLeave
+## IconTexture: Interface\Addons\CT_Library\Images\minimapIcon
+
+Libs\LibStub\LibStub.lua
+Libs\TaintLess.xml
+Libs\LibDeflate.lua
+Libs\Ace3\AceSerializer-3.0.lua
+
+CT_Library.lua
+localization.lua
+CT_Library_TitanPlugin.lua
+
