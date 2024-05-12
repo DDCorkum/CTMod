@@ -1023,10 +1023,10 @@ local function addon_OnDelayedUpdate(self, value)
 	-- Returns: true if delayed update was completed.
 	--          false, nil == the delayed update was not completed.
 	
-	-- Call Blizzard's ReputationWatchBar_UpdateMaxLevel() function.
+	-- Call Blizzard's ReputationWatchBar_Update() function.
 	-- Since we have this hooked (in CT_BottomBar_Rep.lua),
 	-- our exp and rep bars will also get updated.
-	ReputationWatchBar_UpdateMaxLevel();
+	ReputationWatchBar_Update();
 
 	return true;
 end
@@ -1034,7 +1034,7 @@ end
 local function addon_updateVisibility()
 	-- This will get called at the end of addon:updateVisibility().
 	-- Call Blizzard's function that updates the reputation and exp bars.
-	ReputationWatchBar_UpdateMaxLevel();
+	ReputationWatchBar_Update();
 end
 
 local function addon_Hooked_SpecialUI_OnShow(self)
