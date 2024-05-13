@@ -1,3 +1,6 @@
+CT_BarMod (10.3.0.1) 2024-05-13
+- Fix overlay glow (not sure if this breaks retail)
+
 CT_BarMod (10.3.0.0) 2024-05-10
 - Update for Cata Classic 4.4.0
 

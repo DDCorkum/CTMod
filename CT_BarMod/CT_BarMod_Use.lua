@@ -824,11 +824,11 @@ end
 local function CT_BarMod__ActionButton_HideOverlayGlow(self)
 	-- This is a modified version of ActionButton_HideOverlayGlow from ActionButton.lua
 	if ( self.overlay ) then
-		if ( self.overlay.ProcStartAnim:IsPlaying() ) then
-			self.overlay.ProcStartAnim:Stop();
+		if ( self.overlay.animIn:IsPlaying() ) then
+			self.overlay.animIn:Stop();
 		end
 		if ( self:IsVisible() ) then
-			self.overlay:Hide()
+			self.overlay.animOut:Play();
 		else
 			CT_BarMod__ActionButton_OverlayGlowAnimOutFinished(self.overlay);
 		end
@@ -842,9 +842,9 @@ local function CT_BarMod__ActionButton_ShowOverlayGlow(self)
 		return;
 	end
 	if ( self.overlay ) then
-		if ( not self.overlay:IsShown() ) then
-			self.overlay:Show()
-			self.overlay.ProcStartAnim:Play()
+		if ( self.overlay.animOut:IsPlaying() ) then
+			self.overlay.animOut:Stop();
+			self.overlay.animIn:Play();
 		end
 	else
 		self.overlay = CT_BarMod__ActionButton_GetOverlayGlow();
@@ -865,7 +865,7 @@ local function CT_BarMod__ActionButton_ShowOverlayGlow(self)
 		self.overlay:SetSize(frameWidth * 1.4, frameHeight * 1.4);
 		self.overlay:SetPoint("TOPLEFT", self, "TOPLEFT", -frameWidth * 0.2, frameHeight * 0.2);
 		self.overlay:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", frameWidth * 0.2, -frameHeight * 0.2);
-		self.overlay.ProcStartAnim:Play();
+		self.overlay.animIn:Play();
 	end
 end
 
