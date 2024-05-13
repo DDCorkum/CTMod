@@ -129,9 +129,12 @@ local function CT_BottomBar_ExhaustionToolTipText()
 	exhaustionStateMultiplier = exhaustionStateMultiplier * 100;
 
 	local exhaustionCountdown;
-	if (GetTimeToWellRested()) then
-		exhaustionCountdown = GetTimeToWellRested() / 60;
-	end
+	-- GetTimeToWellRested was deprecated in 10.2.5 and seems to have been removed in 4.4.0 for cata classic. I'm not sure of a replacement function. 
+	-- From what I can tell the function just always returned nil anyways, so this block would not actually execute anyways
+	-- For now I'm commenting this out
+	-- if (GetTimeToWellRested()) then
+	-- 	exhaustionCountdown = GetTimeToWellRested() / 60;
+	-- end
 	
 	local currXP = UnitXP("player");
 	local nextXP = UnitXPMax("player");
