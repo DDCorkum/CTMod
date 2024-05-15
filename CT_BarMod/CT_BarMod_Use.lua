@@ -823,9 +823,9 @@ end
 
 local function CT_BarMod__ActionButton_HideOverlayGlow(self)
 	-- This is a modified version of ActionButton_HideOverlayGlow from ActionButton.lua
-	if ( self.overlay ) then
-		if ( self.overlay.ProcStartAnim:IsPlaying() ) then
-			self.overlay.ProcStartAnim:Stop();
+	if self.overlay then
+		if (self.overlay.ProcStartAnim or self.overlay.animIn):IsPlaying() then  -- Retail vs Cata Classic
+			(self.overlay.ProcStartAnim or self.overlay.animIn):Stop();
 		end
 		if ( self:IsVisible() ) then
 			self.overlay:Hide()
@@ -841,11 +841,15 @@ local function CT_BarMod__ActionButton_ShowOverlayGlow(self)
 		CT_BarMod__ActionButton_HideOverlayGlow(self);
 		return;
 	end
-	if ( self.overlay ) then
-		if ( not self.overlay:IsShown() ) then
+	if self.overlay then
+		if self.overlay:IsShown() then
+			if self.overlay.animOut and self.overlay.animOut:IsPlaying() then
+				self.overlay.animOut:Stop()
+			end
+		else
 			self.overlay:Show()
-			self.overlay.ProcStartAnim:Play()
 		end
+		(self.overlay.ProcStartAnim or self.overlay.animIn):Play()
 	else
 		self.overlay = CT_BarMod__ActionButton_GetOverlayGlow();
 
@@ -865,7 +869,7 @@ local function CT_BarMod__ActionButton_ShowOverlayGlow(self)
 		self.overlay:SetSize(frameWidth * 1.4, frameHeight * 1.4);
 		self.overlay:SetPoint("TOPLEFT", self, "TOPLEFT", -frameWidth * 0.2, frameHeight * 0.2);
 		self.overlay:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", frameWidth * 0.2, -frameHeight * 0.2);
-		self.overlay.ProcStartAnim:Play();
+		(self.overlay.ProcStartAnim or self.overlay.animIn):Play();
 	end
 end
 
