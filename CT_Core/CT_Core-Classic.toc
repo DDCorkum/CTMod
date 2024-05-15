@@ -1,5 +1,5 @@
-## Interface: 11501
-## Version: 10.2.5.1
+## Interface: 11502
+## Version: 10.2.7.1
 ## Title: CT_Core
 ## Notes: General nifty features for CTMod.
 ## DefaultState: Enabled

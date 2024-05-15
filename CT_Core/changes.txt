@@ -1,3 +1,6 @@
+CT_Core (10.2.7.1) 2024-05-15
+- Update for Cataclysm Classic (courtesy: Rob Zak)
+
 CT_Core (10.2.5.1) 2024-02-10
 - Clearing extra collapse icons from the classic quest log
 
