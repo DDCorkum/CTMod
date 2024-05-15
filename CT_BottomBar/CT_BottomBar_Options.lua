@@ -365,7 +365,7 @@ function module:updateOption(optName, value)
 			end
 			if (update) then
 				-- Call Blizzard's function that updates the reputation and exp bars.
-				ReputationWatchBar_Update();
+				(ReputationWatchBar_UpdateMaxLevel or ReputationWatchBar_Update)(); -- classic vs cata
 			end
 		end
 
@@ -436,7 +436,7 @@ function module:updateOption(optName, value)
 	elseif (optName == "expBarHideAtMaxLevel") then			-- used in classic
 		value = not not value;
 		if (applyUnprotectedOption(optName, value)) then
-			ReputationWatchBar_Update();
+			(ReputationWatchBar_UpdateMaxLevel or ReputationWatchBar_Update)();  -- classic vs cata
 		end
 
 	elseif (optName == "hideGryphons") then

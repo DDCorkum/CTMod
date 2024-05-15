@@ -333,9 +333,9 @@ local function CT_BottomBar_ReputationWatchBar_CreateFrames()
 		function(self, event, ...)
 			local arg1, arg2 = ...;
 			if( event == "UPDATE_FACTION" ) then
-				ReputationWatchBar_Update();
+				(ReputationWatchBar_UpdateMaxLevel or ReputationWatchBar_Update)();  -- classic vs cata
 			elseif( event == "PLAYER_LEVEL_UP" or event == "ENABLE_XP_GAIN" or event == "DISABLE_XP_GAIN" ) then
-				ReputationWatchBar_Update(arg1);
+				(ReputationWatchBar_UpdateMaxLevel or ReputationWatchBar_Update)(arg1);  -- classic vs cata
 				UIParent_ManageFramePositions()
 			elseif( event == "CVAR_UPDATE" and arg1 == "XP_BAR_TEXT" ) then
 				if( arg2 == "1" ) then
@@ -729,7 +729,7 @@ end
 local function addon_updateVisibility()
 	-- This will get called at the end of addon:updateVisibility().
 	-- Call Blizzard's function that updates the reputation and exp bars.
-	ReputationWatchBar_Update();
+	(ReputationWatchBar_UpdateMaxLevel or ReputationWatchBar_Update)();
 end
 
 local function addon_OnAnimFinished(self)
@@ -743,7 +743,7 @@ end
 -- Hooks
 
 local function addon_Hooked_ReputationWatchBar_Update(newLevel)
-	-- (hooksecurefunc of ReputationWatchBar_Update) --  in ReputationFrame.lua)
+	-- hooksecurefunc of ReputationWatchBar_UpdateMaxLevel() in ReputationFrame.lua; or ReputationWatchBar_Update() in Cataclysm Clasic
 	-- We don't need the newLevel parameter.
 	if (addon_isDisabled()) then
 		return;
@@ -794,7 +794,11 @@ local function addon_Init(self)
 	frame:SetParent(self.frame);
 
 	-- (from ReputationFrame.lua)
-	hooksecurefunc("ReputationWatchBar_Update", addon_Hooked_ReputationWatchBar_Update);
+	if ReputationWatchBar_UpdateMaxLevel then
+		hooksecurefunc("ReputationWatchBar_UpdateMaxLevel", addon_Hooked_ReputationWatchBar_Update);
+	else
+		hooksecurefunc("ReputationWatchBar_Update", addon_Hooked_ReputationWatchBar_Update);
+	end
 	
 --	hooksecurefunc("VehicleMenuBar_MoveMicroButtons", addon_Hooked_VehicleMenuBar_MoveMicroButtons);
 --	hooksecurefunc("ActionBar_AnimTransitionFinished", addon_Hooked_AnimTransitionFinished);
