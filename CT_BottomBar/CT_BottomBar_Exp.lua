@@ -127,11 +127,6 @@ local function CT_BottomBar_ExhaustionToolTipText()
 	local exhaustionThreshold = GetXPExhaustion();
 
 	exhaustionStateMultiplier = exhaustionStateMultiplier * 100;
-
-	local exhaustionCountdown;
-	if (GetTimeToWellRested()) then
-		exhaustionCountdown = GetTimeToWellRested() / 60;
-	end
 	
 	local currXP = UnitXP("player");
 	local nextXP = UnitXPMax("player");
@@ -140,17 +135,10 @@ local function CT_BottomBar_ExhaustionToolTipText()
 	--local XPText = format(XP_TEXT, currXP, nextXP, percentXP);
 	local XPText = format(XP_TEXT, module:breakUpLargeNumbers(currXP), module:breakUpLargeNumbers(nextXP), percentXP);
 	local tooltipText = XPText .. format(EXHAUST_TOOLTIP1, exhaustionStateName, exhaustionStateMultiplier);
-	local append;
-	if (IsResting()) then
-		if (exhaustionThreshold and exhaustionCountdown) then
-			append = format(EXHAUST_TOOLTIP4, exhaustionCountdown);
-		end
-	elseif (exhaustionStateID == 4 or exhaustionStateID == 5) then
-		append = EXHAUST_TOOLTIP2;
-	end
 
-	if (append) then
-		tooltipText = tooltipText .. append;
+	-- simplified in CTMod 10.2.7.1 with the earlier depreciation of GetTimeToWellRested() in WoW 10.2.5 and subsequent removal from Classic
+	if exhaustionStateID == 4 or exhaustionStateID == 5 then
+		tooltipText = tooltipText .. EXHAUST_TOOLTIP2
 	end
 
 	if (SHOW_NEWBIE_TIPS ~= "1") then
