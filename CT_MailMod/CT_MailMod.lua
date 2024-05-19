@@ -168,12 +168,8 @@ do
 	
 	module:regEvent("PLAYER_LOGOUT", mailboxClosed)  -- when player logs out or reloads ui
 	
-	if module:getGameVersion() >= 10 then
-		--module:regEvent("PLAYER_INTERACTION_MANAGER_FRAME_SHOW", function(__, type) if type == 17 then mailboxOpened() end end)
-		module:regEvent("PLAYER_INTERACTION_MANAGER_FRAME_HIDE", function(__, type) if type == 17 then mailboxClosed() end end)
-	else
-		module:regEvent("MAIL_CLOSED", mailboxClosed)  -- Game may send 2 of these when mailbox closes
-	end
+	--module:regEvent("PLAYER_INTERACTION_MANAGER_FRAME_SHOW", function(__, type) if type == Enum.PlayerInteractionType.MailInfo then mailboxOpened() end end)
+	module:regEvent("PLAYER_INTERACTION_MANAGER_FRAME_HIDE", function(__, type) if type == Enum.PlayerInteractionType.MailInfo then mailboxClosed() end end)  -- formerly MAIL_CLOSED
 end
 
 --------------------------------------------

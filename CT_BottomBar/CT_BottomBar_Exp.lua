@@ -127,11 +127,6 @@ local function CT_BottomBar_ExhaustionToolTipText()
 	local exhaustionThreshold = GetXPExhaustion();
 
 	exhaustionStateMultiplier = exhaustionStateMultiplier * 100;
-
-	local exhaustionCountdown;
-	if (GetTimeToWellRested()) then
-		exhaustionCountdown = GetTimeToWellRested() / 60;
-	end
 	
 	local currXP = UnitXP("player");
 	local nextXP = UnitXPMax("player");
@@ -140,17 +135,10 @@ local function CT_BottomBar_ExhaustionToolTipText()
 	--local XPText = format(XP_TEXT, currXP, nextXP, percentXP);
 	local XPText = format(XP_TEXT, module:breakUpLargeNumbers(currXP), module:breakUpLargeNumbers(nextXP), percentXP);
 	local tooltipText = XPText .. format(EXHAUST_TOOLTIP1, exhaustionStateName, exhaustionStateMultiplier);
-	local append;
-	if (IsResting()) then
-		if (exhaustionThreshold and exhaustionCountdown) then
-			append = format(EXHAUST_TOOLTIP4, exhaustionCountdown);
-		end
-	elseif (exhaustionStateID == 4 or exhaustionStateID == 5) then
-		append = EXHAUST_TOOLTIP2;
-	end
 
-	if (append) then
-		tooltipText = tooltipText .. append;
+	-- simplified in CTMod 10.2.7.1 with the earlier depreciation of GetTimeToWellRested() in WoW 10.2.5 and subsequent removal from Classic
+	if exhaustionStateID == 4 or exhaustionStateID == 5 then
+		tooltipText = tooltipText .. EXHAUST_TOOLTIP2
 	end
 
 	if (SHOW_NEWBIE_TIPS ~= "1") then
@@ -1026,7 +1014,7 @@ local function addon_OnDelayedUpdate(self, value)
 	-- Call Blizzard's ReputationWatchBar_UpdateMaxLevel() function.
 	-- Since we have this hooked (in CT_BottomBar_Rep.lua),
 	-- our exp and rep bars will also get updated.
-	ReputationWatchBar_UpdateMaxLevel();
+	(ReputationWatchBar_UpdateMaxLevel or ReputationWatchBar_Update)();  -- classic era vs cata
 
 	return true;
 end
@@ -1034,7 +1022,7 @@ end
 local function addon_updateVisibility()
 	-- This will get called at the end of addon:updateVisibility().
 	-- Call Blizzard's function that updates the reputation and exp bars.
-	ReputationWatchBar_UpdateMaxLevel();
+	(ReputationWatchBar_UpdateMaxLevel or ReputationWatchBar_Update)();
 end
 
 local function addon_Hooked_SpecialUI_OnShow(self)

@@ -1,3 +1,6 @@
+CT_BarMod (10.2.7.1) 2024-05-15
+- Update for Cata Classic (courtesy: Rob Zak)
+
 CT_BarMod (10.2.0.2) 2023-11-15
 - Update for Classic 1.15.0
 

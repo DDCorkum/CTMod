@@ -1,4 +1,4 @@
-## Interface: 11501
+## Interface: 11502
 ## Version: 10.0.2.3
 ## Title: CT_PartyBuffs
 ## Notes: Shows buffs at party member frames.
