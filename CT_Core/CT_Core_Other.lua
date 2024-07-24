@@ -669,7 +669,7 @@ elseif (module:getGameVersion() == 3 or module:getGameVersion() == 4) then
 		end)
 	end
 
-else -- if module:getGameVersion() >= 9 then
+elseif module:getGameVersion() == 9 then
 	
 	local dummySetText = CreateFrame("Frame"):CreateFontString(nil, "ARTWORK").SetText;	-- prevents an infinite loop by the hook below
 

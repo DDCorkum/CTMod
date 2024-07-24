@@ -1,3 +1,6 @@
+CT_Core (11.0.2.1) 2024-07-24
+- Showing levels in the quest log now classic only
+
 CT_Core (10.2.7.1) 2024-05-15
 - Update for Cataclysm Classic (courtesy: Rob Zak)
 
