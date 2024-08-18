@@ -19,7 +19,7 @@
 -----------------------------------------------
 -- Initialization
 local LIBRARY_NAME, lib = ...;
-local LIBRARY_VERSION = strmatch(GetAddOnMetadata(LIBRARY_NAME, "version"), "^([%d.]+)");
+local LIBRARY_VERSION = strmatch(C_AddOns.GetAddOnMetadata(LIBRARY_NAME, "version"), "^([%d.]+)");
 
 -- Create tables for all the PROTECTED contents and PUBLIC interface of CTMod
 
@@ -781,70 +781,6 @@ end)
 -- End Generic Functions
 -----------------------------------------------
 
------------------------------------------------
--- Spell Database
-
--- Local variables used
-local spellRanks, spellIds;
-
--- Update a tab
-local function updateSpellTab(tabIndex)
-	local spellName, rankName, rank, oldRank, spellId;
-	local _, _, offset, numSpells = getSpellTabInfo(tabIndex);
-	for spellIndex = 1, numSpells, 1 do
-
-		spellId = offset + spellIndex;
-		spellName, rankName = getSpellName(spellId, "spell");
-
-		_, _, rank = string.find(rankName or "", "(%d+)$");
-		oldRank = spellRanks[spellName];
-		rank = tonumber(rank);
-
-		-- print("tab=", tabIndex, "off=", offset, "idx=", spellIndex, "name=", spellName, "rname=", rankName, "rold=", oldRank, "rnk=", rank, "sid=", spellId)
-
-		if ( ( not oldRank or ( rank and rank > oldRank ) ) and spellName ) then
-			-- Need to update our listing
-			spellRanks[spellName] = rank;
-			spellIds[spellName] = spellId;
-		end
-
-	end
-end
-
--- Update the database
-local function updateSpellDatabase(event, arg1, arg2)
-	-- print(event, arg1, arg2)
-	if ( (not spellRanks) or (event == "PLAYER_TALENT_UPDATE") ) then
-		spellRanks = {};
-		spellIds = {};
-	end
-	if ( (event == "LEARNED_SPELL_IN_TAB") and arg2 ) then
-		-- arg1 == spell number
-		-- arg2 == tab number that spell was added to
-		updateSpellTab(arg2);
-	else
-		for tabIndex = 1, getNumSpellTabs(), 1 do
-			updateSpellTab(tabIndex);
-		end
-	end
-end
-
--- Returns spell id and spell rank (if applicable)
-function lib:getSpell(name)
-	if ( not spellRanks ) then
-		updateSpellDatabase();
-	end
-
-	return spellIds[name], spellRanks[name];
-end
-
-lib:regEvent("LEARNED_SPELL_IN_TAB", updateSpellDatabase);
-if (lib:getGameVersion() >= 8) then
-	lib:regEvent("PLAYER_TALENT_UPDATE", updateSpellDatabase);
-end
-
--- End Spell Database
------------------------------------------------
 
 -----------------------------------------------
 -- Module Handling

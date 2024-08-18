@@ -15,7 +15,7 @@ local module = select(2, ...);
 local _G = getfenv(0);
 
 local MODULE_NAME = "CT_PartyBuffs";
-local MODULE_VERSION = strmatch(GetAddOnMetadata(MODULE_NAME, "version"), "^([%d.]+)");
+local MODULE_VERSION = strmatch(C_AddOns.GetAddOnMetadata(MODULE_NAME, "version"), "^([%d.]+)");
 
 module.name = MODULE_NAME;
 module.version = MODULE_VERSION;
@@ -180,11 +180,11 @@ local function refreshBuffs()
 		
 		local debuffsShown = 0
 		for i, button in ipairs(frame.debuffs) do
-			local name, icon, count, debuffType = UnitAura(frame.unit, i, debuffFilter)
-			if (name) then
-				button.Icon:SetTexture(icon)
-				button.Count:SetText(count > 1 and count or "")
-				local color = DebuffTypeColor[debuffType or "none"]
+			local aura = C_UnitAuras.GetAuraDataByIndex(frame.unit, i, debuffFilter)
+			if (aura) then
+				button.Icon:SetTexture(aura.icon)
+				button.Count:SetText(aura.charges > 1 and aura.charges or "")
+				local color = DebuffTypeColor[aura.dispelName or "none"]
 				button.Border:SetVertexColor(color.r, color.g, color.b)
 				button:Show()
 				debuffsShown = i
@@ -201,9 +201,9 @@ local function refreshBuffs()
 					button:SetPoint("TOPLEFT", 0, 0)
 				end
 			end
-			local name, icon = UnitAura(frame.unit, i, buffFilter)
-			if (name) then
-				button.Icon:SetTexture(icon)
+			local aura = C_UnitAuras.GetAuraDataByIndex(frame.unit, i, buffFilter)
+			if (aura) then
+				button.Icon:SetTexture(aura.icon)
 				button:Show()
 			else
 				button:Hide()

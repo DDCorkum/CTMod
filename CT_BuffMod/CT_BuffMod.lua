@@ -26,7 +26,7 @@ local module = { };
 local _G = getfenv(0);
 
 local MODULE_NAME = "CT_BuffMod";
-local MODULE_VERSION = strmatch(GetAddOnMetadata(MODULE_NAME, "version"), "^([%d.]+)");
+local MODULE_VERSION = strmatch(C_AddOns.GetAddOnMetadata(MODULE_NAME, "version"), "^([%d.]+)");
 
 module.name = MODULE_NAME;
 module.version = MODULE_VERSION;
@@ -483,20 +483,6 @@ local function stripRAID(filter)
 	return filter and tostring(filter):upper():gsub("RAID", ""):gsub("|+", "|"):match("^|?(.+[^|])|?$");
 end
 
-local freshTable;
-local releaseTable;
-do
-	local tableReserve = {};
-	freshTable = function ()
-		local t = next(tableReserve) or {};
-		tableReserve[t] = nil;
-		return t;
-	end
-	releaseTable = function (t)
-		tableReserve[t] = wipe(t);
-	end
-end
-
 local sorterBuilders =
 {
 	["filter"] = function()
@@ -729,27 +715,15 @@ function CT_BuffMod_UnsecureAuraHeader_Update(self)
 		end
 
 		local i = 1;
-		repeat
-			local aura, _, duration = freshTable();
-			aura.name, _, _, _, duration, aura.expires, aura.caster, _, aura.shouldConsolidate, _ = UnitAura(unit, i, fullFilter);
-			if ( aura.name ) then
-				aura.filter = fullFilter;
-				aura.index = i;
-				local targetList = sortingTable;
-				if ( consolidateTable and aura.shouldConsolidate ) then
-					if ( not aura.expires or duration > consolidateDuration or (aura.expires - time >= max(consolidateThreshold, duration * consolidateFraction)) ) then
-						targetList = consolidateTable;
-					end
-				end
-				tinsert(targetList, aura);
-				-- BeginMod
-				aura.duration = duration;
-				-- EndMod
-			else
-				releaseTable(aura);
-			end
+		local aura = C_UnitAuras.GetAuraDataByIndex(unit, i, fullFilter)
+		while aura do
+			aura.filter = fullFilter;
+			aura.index = i;
+			local targetList = sortingTable;
+			tinsert(targetList, aura);
 			i = i + 1;
-		until ( not aura.name );
+			aura = C_UnitAuras.GetAuraDataByIndex(unit, i, fullFilter)
+		end
 	end
 	if ( includeWeapons and not weaponPosition ) then
 		weaponPosition = 0;
@@ -1300,7 +1274,8 @@ function auraClass:checkExpiration()
 
 			if (name) then
 				-- If you don't know how to cast this buff...
-			     	if (not module:getSpell(name)) then
+			     	local isUsable, insufficientPower = C_Spell.IsSpellUsable(name)
+			     	if not isUsable and not insufficientPower then
 					-- If ignoring buffs you cannot cast...
 			     		if (globalObject.expirationCastOnly) then
 			     			return;
@@ -1501,15 +1476,12 @@ function unitClass:findSpell(spellId)
 end
 
 function unitClass:updateSpellsForFilter(filter, buffFlag)
-	local name, texture, count, debuffType, duration, expirationTime, casterUnit, canStealOrPurge, shouldConsolidate, spellId;
 	local unit, index, auraObject, auraType;
 	unit = self.unitId;
 	index = 1;
-	name, texture, count, debuffType, duration, expirationTime, casterUnit, canStealOrPurge, shouldConsolidate, spellId = UnitAura(unit, index, filter);
-	while (name) do
-		duration = duration or 0;
-		expirationTime = expirationTime or 0;
-		auraObject = self:findSpell(spellId);
+	local aura = C_UnitAuras.GetAuraDataByIndex(unit, index, filter)
+	while aura do
+		auraObject = self:findSpell(aura.spellId);
 		if (not auraObject) then
 			-- New aura
 			if (buffFlag) then
@@ -1522,25 +1494,24 @@ function unitClass:updateSpellsForFilter(filter, buffFlag)
 				auraType = constants.AURATYPE_DEBUFF;
 			end
 
-			auraObject = self:addSpell(spellId, auraType);
+			auraObject = self:addSpell(aura.spellId, auraType);
 
-			auraObject.name = name;
-			auraObject.texture = texture;
-			auraObject.debuffType = debuffType;
-			auraObject.duration = duration;
-			auraObject.expirationTime = expirationTime;
-			auraObject.casterUnit = casterUnit;
-			auraObject.canStealOrPurge = canStealOrPurge;
-			auraObject.shouldConsolidate = shouldConsolidate;
-			auraObject:setCasterUnit(casterUnit);
+			auraObject.name = aura.name;
+			auraObject.texture = aura.icon;
+			auraObject.debuffType = aura.dispelName;
+			auraObject.duration = aura.duration;
+			auraObject.expirationTime = aura.expirationTime;
+			auraObject.casterUnit = aura.sourceUnit;
+			auraObject.canStealOrPurge = aura.isStealable;
+			auraObject:setCasterUnit(aura.sourceUnit);
 
-			auraObject.updateInterval = getAuraUpdateInterval(duration);
+			auraObject.updateInterval = getAuraUpdateInterval(aura.duration);
 
 			auraObject.isFlashing = false;
 			auraObject.showedWarning = false;
 
 			-- Remove this from buff recasting
-			removeBuffRecast(name);
+			removeBuffRecast(aura.name);
 		else
 			-- Existing aura
 
@@ -1554,15 +1525,15 @@ function unitClass:updateSpellsForFilter(filter, buffFlag)
 				-- We also want to re-evaluate the aura type, which may originally have
 				-- been constants.AURATYPE_AURA since the duration was zero at the time.
 
-				auraObject.duration = duration;
-				auraObject.expirationTime = expirationTime;
-				auraObject.updateInterval = getAuraUpdateInterval(duration);
+				auraObject.duration = aura.duration;
+				auraObject.expirationTime = aura.expirationTime;
+				auraObject.updateInterval = getAuraUpdateInterval(aura.duration);
 				auraObject.isFlashing = false;
 				auraObject.showedWarning = false;
 
 				-- Determine if the aura type is different now that we know the correct duration.
 				if (buffFlag) then
-					if (duration == 0) then
+					if (aura.duration == 0) then
 						auraType = constants.AURATYPE_AURA;
 					else
 						auraType = constants.AURATYPE_BUFF;
@@ -1577,7 +1548,7 @@ function unitClass:updateSpellsForFilter(filter, buffFlag)
 					end
 				end
 
-			elseif (auraObject.duration ~= 0 and duration == 0) then
+			elseif (auraObject.duration ~= 0 and aura.duration == 0) then
 				-- If we had a duration, and now the duration is 0, then we've probably
 				-- gone out of range of the unit.
 				-- When you go out of range the game returns 0 for the duration and
@@ -1599,13 +1570,13 @@ function unitClass:updateSpellsForFilter(filter, buffFlag)
 				-- will stop counting down. Once the player gets back into range of the
 				-- unit it will correct the time and continue to countdown.
 
-				auraObject.duration = duration;
-				auraObject.expirationTime = expirationTime;
-				auraObject.updateInterval = getAuraUpdateInterval(duration);
+				auraObject.duration = aura.duration;
+				auraObject.expirationTime = aura.expirationTime;
+				auraObject.updateInterval = getAuraUpdateInterval(aura.duration);
 				auraObject.isFlashing = false;
 				auraObject.showedWarning = false;
 
-			elseif (auraObject.expirationTime ~= expirationTime) then
+			elseif (auraObject.expirationTime ~= aura.expirationTime) then
 				-- If the expiration time has changed, then this buff has been renewed
 				-- since we last saw it.
 				-- Or we're now out of range of the unit and the expiration time has
@@ -1629,15 +1600,15 @@ function unitClass:updateSpellsForFilter(filter, buffFlag)
 				-- Same goes for the isFlashing flag, and whether we remove the buff from
 				-- recasting.
 
-				auraObject.duration = duration;
-				auraObject.expirationTime = expirationTime;
-				auraObject.updateInterval = getAuraUpdateInterval(duration);
+				auraObject.duration = aura.duration;
+				auraObject.expirationTime = aura.expirationTime;
+				auraObject.updateInterval = getAuraUpdateInterval(aura.duration);
 
 				local renew;
-				if (expirationTime ~= 0) then
-					if (duration > 0) then
-						local remain = expirationTime - GetTime();
-						if (remain > duration - 60) then
+				if (aura.expirationTime ~= 0) then
+					if (aura.duration > 0) then
+						local remain = aura.expirationTime - GetTime();
+						if (remain > aura.duration - 60) then
 							renew = true;
 						end
 					else
@@ -1650,15 +1621,15 @@ function unitClass:updateSpellsForFilter(filter, buffFlag)
 					auraObject.isFlashing = false;
 					auraObject.showedWarning = false;
 					-- Remove this from buff recasting
-					removeBuffRecast(name);
+					removeBuffRecast(aura.name);
 				end
 			end
 		end
 		auraObject.updated = true;
-		auraObject.count = count;
+		auraObject.count = aura.charges;
 
 		index = index + 1;
-		name, texture, count, debuffType, duration, expirationTime, casterUnit, canStealOrPurge, shouldConsolidate, spellId = UnitAura(unit, index, filter);
+		aura = C_UnitAuras.GetAuraDataByIndex(unit, index, filter)
 	end
 end
 
@@ -2418,7 +2389,6 @@ local function auraButton_updateAppearance(button)
 	-- This is the first auraButton_ routine to get called for each button
 	-- after Blizzard configures the buttons.
 	-- ---------
-	local spellId;
 	local frameObject = button.frameObject;
 
 	button.timeleftFlag = nil;
@@ -2438,8 +2408,8 @@ local function auraButton_updateAppearance(button)
 		if (not index or not filter) then
 			return;
 		end
-		spellId = select(10, UnitAura(frameObject:getUnitId(), index, filter));
-		auraObject = unitObject:findSpell(spellId);
+		local aura = C_UnitAuras.GetAuraDataByIndex(frameObject:getUnitId(), index, filter)
+		auraObject = unitObject:findSpell(aura.spellId);
 
 	elseif (button.mode == constants.BUTTONMODE_ENCHANT) then
 		-- Temporary weapon enchant

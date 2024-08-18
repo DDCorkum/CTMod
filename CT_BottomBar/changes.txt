@@ -1,3 +1,6 @@
+CT_BottomBar (11.0.2.2) 2024-08-18
+- Updates for Classic versions with code baselined to WoW: The War Within
+
 CT_BottomBar (10.2.7.1) 2024-05-15
 - Updates for Cataclsym Classic (courtesy of Rob Zak)
 - Fix to XP Bar mouseover in all classic editions

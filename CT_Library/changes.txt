@@ -1,3 +1,6 @@
+CT_Library (11.0.2.2) 2024-08-18
+- Updates for WoW: The War Within
+
 CT_Library (10.1.0.2) 2023-07-07
 - Library update
 

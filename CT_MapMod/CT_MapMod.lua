@@ -18,7 +18,7 @@ local module = select(2, ...);
 local _G = getfenv(0);
 
 local MODULE_NAME = "CT_MapMod";
-local MODULE_VERSION = strmatch(GetAddOnMetadata(MODULE_NAME, "version"), "^([%d.]+)");
+local MODULE_VERSION = strmatch(C_AddOns.GetAddOnMetadata(MODULE_NAME, "version"), "^([%d.]+)");
 
 module.name = MODULE_NAME;
 module.version = MODULE_VERSION;
@@ -1403,7 +1403,7 @@ function module.configureWorldMapFrame()
 			["onload"] = function(self)
 				local anchorFrom = WorldMapFrame.ScrollContainer;
 				local leftMinOffset = 140;
-				local rightMaxOffset = WaypointLocationDataProviderMixin and -84 or WorldMapFrame.BorderFrame.MaximizeMinimizeFrame and -52 or -20;
+				local rightMaxOffset = MapLegendScrollFrame and-116 or WaypointLocationDataProviderMixin and -84 or WorldMapFrame.BorderFrame.MaximizeMinimizeFrame and -52 or -20;
 				local yOff = -18.5;
 				self.updateClamps = function()
 					local scale = WorldFrame:GetEffectiveScale() / self:GetEffectiveScale();

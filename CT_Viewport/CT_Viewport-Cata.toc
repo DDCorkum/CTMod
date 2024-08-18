@@ -1,5 +1,5 @@
 ## Interface: 40400
-## Version: 9.2.0.3
+## Version: 11.0.2.2
 ## Title: CT_Viewport
 ## Notes: Allows you to change the rendered world's size.
 ## DefaultState: Enabled

@@ -1,3 +1,6 @@
+CT_PartyBuffs (11.0.2.2) 2024-08-18
+- Updates for WoW: The War Within
+
 CT_PartyBuffs (11.0.2.1) 2024-07-24
 - Updates for WoW The War Within
 

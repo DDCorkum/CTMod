@@ -1,3 +1,6 @@
+CT_MapMod (11.0.2.2) 2024-08-18
+- Updates for WoW: The War Within
+
 CT_MapMod (10.2.0.2) 2023-11-15
 - Updates for Emerald Dream herbs/ore (Dynaletik)
 

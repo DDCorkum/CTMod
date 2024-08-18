@@ -1,3 +1,6 @@
+CT_ExpenseHistory (11.0.2.2) 2024-08-18
+- Updates for WoW: The War Within
+
 CT_ExpenseHistory (9.2.0.3) 2022-10-19
 - Repair cost tracking in Dragonflight
 
