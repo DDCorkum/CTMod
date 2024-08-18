@@ -1,3 +1,9 @@
+CT_UnitFrames (11.0.2.2) 2024-08-18
+- Updates for WoW: The War Within
+
+CT_UnitFrames (11.0.2.1) 2024-07-28
+- Updates for WoW: The War Within
+
 CT_UnitFrames (10.2.5.1) 2024-02-10
 - Disabling the assist frame on retail to prevent errors
 

@@ -1,3 +1,6 @@
+CT_RaidAssist (11.0.2.2) 2024-08-18
+- Updates for WoW: The War Within
+
 CT_BuffMod (10.0.0.4) 2022-11-07
 - Now also hides the debuff frame in Dragonflight
 

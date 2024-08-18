@@ -1,3 +1,6 @@
+CT_MapMod (11.0.2.2) 2024-08-18
+- Updates for WoW: The War Within
+
 CT_Viewport (9.2.0.3) 2022-10-14
 - Fix to bug introduced in 9.2.0.2 affecting non-default resolutions
 

@@ -58,15 +58,22 @@ module.pinTypes =
 			"Cinderbloom", "Azshara's Veil", "Stormvein", "Heartblossom", "Whiptail", "Twilight Jasmine",
 			"Green Tea Leaf", "Rain Poppy", "Silkweed", "Snow Lily", "Fool's Cap", "Sha-Touched Herb", "Golden Lotus",
 		},
-		["Recent Expansions"] =
+		["Later Expansions"] =
 		{
-			-- WoD, Legion, BFA, SL, DF
+			-- WoD, Legion, BFA, SL, DF,
 			"Fireweed", "Gorgrond Flytrap", "Frostweed", "Nagrand Arrowbloom", "Starflower", "Talador Orchid", "Withered Herb",
 			"Aethril", "Astral Glory", "Dreamleaf", "Fel-Encrusted Herb", "Fjarnskaggl", "Foxflower", "Starlight Rose",
 			"Akunda's Bite", "Anchor Weed", "Riverbud", "Sea Stalks", "Siren's Sting", "Star Moss", "Winter's Kiss", "Zin'anthid",
 			"Death Blossom", "Marrowroot", "Rising Glory", "Vigil's Torch", "Widowbloom", "Nightshade",
 			"Hochenblume", "Saxifrage", "Bubble Poppy", "Writhebark",
 		},
+		["Worldsoul Saga"] = 
+		{
+			-- WW, Mid, LT
+			"Arathor's Spear", "Blessing Blossom", "Luredrop", "Orbinid",
+			-- insert Midnight herbs here (WoW 11.x)
+			-- insert Last Titan herbs here (WoW 12.x)
+		}
 	},
 	["Ore"] =
 	{ 
@@ -83,7 +90,7 @@ module.pinTypes =
 			"Elementium", "Obsidian", "Pyrite",
 			"Ghost Iron", "Kyparite", "Trillium",
 		},
-		["Recent Expansions"] = 
+		["Later Expansions"] = 
 		{
 			-- WoD, Legion, BFA, SL, DF
 			"Blackrock", "True Iron",
@@ -92,6 +99,13 @@ module.pinTypes =
 			"Laestrite", "Oxxein", "Phaedrum", "Sinvyr", "Solenium", "Elethium",
 			"Serevite", "Draconium",
 		},
+		["Worldsoul Saga"] = 
+		{
+			-- WW, Mid, LT
+			"Aqirite", "Ironclaw Ore",
+			-- insert Midnight ores here (WoW 11.x)
+			-- insert Last Titan ores here (WoW 12.x)
+		}
 	},
 };
 
@@ -190,6 +204,8 @@ module.pinIcons =
 	["Fool's Cap"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",
 	["Sha-Touched Herb"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",
 	["Golden Lotus"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",	
+	
+	-- WoD
 	["Fireweed"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Fireweed",
 	["Gorgrond Flytrap"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_GorgrondFlytrap",
 	["Frostweed"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Frostweed",
@@ -225,10 +241,17 @@ module.pinIcons =
 	["Widowbloom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Widowbloom",	
 	["Nightshade"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Nightshade",
 	
+	-- Dragonflight
 	["Hochenblume"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Hochenblume",
 	["Saxifrage"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Saxifrage",
 	["Bubble Poppy"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_BubblePoppy",
 	["Writhebark"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Writhebark",
+	
+	-- The War Within
+	["Arathor's Spear"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_ArathorsSpear", 
+	["Blessing Blossom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_BlessingBlossom",
+	["Luredrop"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Luredrop",
+	["Orbinid"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Orbinid",
 	
 	-- Ore --
 	
@@ -287,6 +310,11 @@ module.pinIcons =
 	-- Dragonflight
 	["Serevite"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Tyrivite",
 	["Draconium"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Draconium",
+	
+	-- The War Within
+	["Aqirite"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein",
+	["Ironclaw Ore"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Elementium",
+	
 }
 setmetatable(module.pinIcons, {__index = function() return "Interface\\RaidFrame\\UI-RaidFrame-Threat" end})
 

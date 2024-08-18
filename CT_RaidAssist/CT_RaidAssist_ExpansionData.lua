@@ -565,7 +565,7 @@ local function filterAndLocalize(table)
 			local entry = entries[i];	-- This local reference is important! The async queries below could come back after entries[i] points to something else.
 			if (C_Spell.DoesSpellExist(entry.id)) then
 				onSpellLoad(entry.id, function()
-					entry.name = GetSpellInfo(entry.id)
+					entry.name = (GetSpellInfo or C_Spell.GetSpellName)(entry.id)	-- WoW 11.0.2 vs classic
 					if (playerLoginHappened and module.ClickCastBroker) then
 						module.ClickCastBroker:Refresh();
 					end

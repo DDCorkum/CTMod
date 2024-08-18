@@ -67,14 +67,15 @@ local function CT_PartyFrame_OnAddonLoaded()
 		for frame in PartyFrame.PartyMemberFramePool:EnumerateActive() do		-- this will break if Blizzard ever decides to defer or shuffle the four party subframes
 			local id = frame.layoutIndex
 			local newFrame = CreateFrame("Button", "CT_PartyFrame"..id, frame, "CT_PartyFrameTemplate", id)
-			newFrame:SetPoint("CENTER", frame.HealthBar)
+			local oldHealthBar = frame.HealthBar or frame.HealthBarContainer.HealthBar
+			newFrame:SetPoint("CENTER", oldHealthBar)
 		
-			frame.HealthBar.textRight = _G["CT_PartyFrame"..id.."HealthRight"]
-			frame.HealthBar.ctFont = CT_UnitFrames_PartyStatusBarText
-			frame.HealthBar:HookScript("OnEnter", CT_PartyFrame_TextStatusBar_UpdateTextString)
-			frame.HealthBar:HookScript("OnLeave", CT_PartyFrame_TextStatusBar_UpdateTextString)
-			frame.HealthBar:HookScript("OnValueChanged", CT_PartyFrame_TextStatusBar_UpdateTextString)
-			frame.HealthBar.type = "health"
+			oldHealthBar.textRight = _G["CT_PartyFrame"..id.."HealthRight"]
+			oldHealthBar.ctFont = CT_UnitFrames_PartyStatusBarText
+			oldHealthBar:HookScript("OnEnter", CT_PartyFrame_TextStatusBar_UpdateTextString)
+			oldHealthBar:HookScript("OnLeave", CT_PartyFrame_TextStatusBar_UpdateTextString)
+			oldHealthBar:HookScript("OnValueChanged", CT_PartyFrame_TextStatusBar_UpdateTextString)
+			oldHealthBar.type = "health"
 			
 			frame.ManaBar.textRight = _G["CT_PartyFrame"..id.."ManaRight"]
 			frame.ManaBar.ctFont = CT_UnitFrames_PartyStatusBarText
@@ -129,7 +130,7 @@ function module:ShowPartyFrameBarText()
 	if PartyFrameMixin then
 		-- WoW 10.x
 		for frame in PartyFrame.PartyMemberFramePool:EnumerateActive() do
-			CT_PartyFrame_TextStatusBar_UpdateTextString(frame.HealthBar)
+			CT_PartyFrame_TextStatusBar_UpdateTextString(frame.HealthBar or frame.HealthBarContainer.HealthBar)
 			CT_PartyFrame_TextStatusBar_UpdateTextString(frame.ManaBar)
 		end
 	else

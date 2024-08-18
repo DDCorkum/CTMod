@@ -15,7 +15,7 @@ local module = { };
 local _G = getfenv(0);
 
 local MODULE_NAME = "CT_Core";
-local MODULE_VERSION = strmatch(GetAddOnMetadata(MODULE_NAME, "version"), "^([%d.]+)");
+local MODULE_VERSION = strmatch(C_AddOns.GetAddOnMetadata(MODULE_NAME, "version"), "^([%d.]+)");
 
 module.name = MODULE_NAME;
 module.version = MODULE_VERSION;
@@ -815,15 +815,19 @@ module.frame = function()
 		optionsAddObject(  5, 5*13, "font#t:0:%y#s:0:%s#l:70:0#r#Note: To use a wider objectives window without enabling this option, you can enable the 'Wider objectives tracker' option in the game's Interface options.#" .. textColor2 .. ":l");
 	end
 	
-	--Quest Log
 	optionsAddObject(-20, 1*13, "font#tl:15:%y#Quest Log");
-	optionsBeginFrame(-5,   26, "checkbutton#tl:10:%y#o:questLevels:" .. (module:getGameVersion() < 7 and "true" or "false") .. "#Display quest levels in the Quest Log#i:QuestLogHeading");
-		optionsAddScript("onenter",
-			function(button)
-				module:displayTooltip(button, {"|cFFCCCCCCAdds |r[1] |cFFCCCCCCor |r[60+] |cFFCCCCCCin front of the quest title","|cFF999999May not take effect until you close and open the quest log"}, "ANCHOR_RIGHT",30,0);
-			end
-		);
-	optionsEndFrame();
+	if module:getGameVersion() < 10 then
+		--Quest Log	
+		optionsBeginFrame(-5,   26, "checkbutton#tl:10:%y#o:questLevels:" .. (module:getGameVersion() < 7 and "true" or "false") .. "#Display quest levels in the Quest Log#i:QuestLogHeading");
+			optionsAddScript("onenter",
+				function(button)
+					module:displayTooltip(button, {"|cFFCCCCCCAdds |r[1] |cFFCCCCCCor |r[60+] |cFFCCCCCCin front of the quest title","|cFF999999May not take effect until you close and open the quest log"}, "ANCHOR_RIGHT",30,0);
+				end
+			);
+		optionsEndFrame();
+	else
+		optionsAddObject( -10, 13, "font#t:0:%y#Quest levels only shown in classic#0.6:0.6:0.6")
+	end
 
 -- Regen Rates
 	do

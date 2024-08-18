@@ -29,8 +29,8 @@ TS.menu_text = TS.id
 TS.tooltip_header = TS.id.." Options"
 
 --  Get data from the TOC file.
-TS.version = tostring(GetAddOnMetadata("CT_Library", "Version")) or "Unknown" 
-TS.author = GetAddOnMetadata("CT_Library", "Author") or "Unknown"
+TS.version = tostring(C_AddOns.GetAddOnMetadata("CT_Library", "Version")) or "Unknown" 
+TS.author = C_AddOns.GetAddOnMetadata("CT_Library", "Author") or "Unknown"
 -- ******************************** Variables *******************************
 -- ******************************** Functions *******************************
 

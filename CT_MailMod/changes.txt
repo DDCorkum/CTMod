@@ -1,3 +1,6 @@
+CT_MailMod (11.0.2.2) 2024-08-18
+- Updates for WoW: The War Within
+
 CT_MailMod (10.2.7.1) 2024-05-15
 - Update to closing mailbox in Classic with CT_MailMod
 

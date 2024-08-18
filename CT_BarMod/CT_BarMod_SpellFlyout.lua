@@ -248,7 +248,7 @@ function module.updateFlyout(self, isButtonDownOverride)
 		return;
 	end
 	-- Update border
-	local isMouseOverButton =  GetMouseFocus() == self;
+	local isMouseOverButton =  self:IsMouseMotionFocus();
 	local isFlyoutShown = SpellFlyout and SpellFlyout:IsShown() and SpellFlyout:GetParent() == self;
 	if (isFlyoutShown or isMouseOverButton) then
 		self.FlyoutBorderShadow:Show();

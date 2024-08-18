@@ -84,7 +84,7 @@ local NewCTRATargetFrame		-- A single, interactive target frame that is containe
 local MODULE_TOC_NAME, module = ...
 local _G = getfenv(0)
 
-local MODULE_TOC_VERSION = strmatch(GetAddOnMetadata(MODULE_TOC_NAME, "version"), "^([%d.]+)")
+local MODULE_TOC_VERSION = strmatch(C_AddOns.GetAddOnMetadata(MODULE_TOC_NAME, "version"), "^([%d.]+)")
 
 module.name = "CT_RaidAssist"
 module.version = MODULE_TOC_VERSION
@@ -2218,7 +2218,7 @@ function StaticClickCastBroker()
 		-- STEP 2:
 		-- canBuff
 		for __, details in ipairs(allBuff) do
-			if (details.enabled and GetSpellInfo(details.name)) then
+			if (details.enabled and (GetSpellInfo or C_Spell.GetSpellInfo)(details.name)) then
 				local key = details.button .. ", " .. details.modifier;
 				if (not canBuff[key]) then
 					canBuff[key] = details.name;
@@ -2231,7 +2231,7 @@ function StaticClickCastBroker()
 		
 		-- canRemoveDebuff
 		for __, details in ipairs(allRemoveDebuff) do
-			if (details.enabled and GetSpellInfo(details.name) and (details.spec == nil or spec == nil or details.spec == spec)) then
+			if (details.enabled and (GetSpellInfo or C_Spell.GetSpellInfo)(details.name) and (details.spec == nil or spec == nil or details.spec == spec)) then
 				local key = details.button .. ", " .. details.modifier;
 				if (not canRemoveDebuff[key]) then
 					canRemoveDebuff[key] = details.name;
@@ -2244,7 +2244,7 @@ function StaticClickCastBroker()
 		
 		-- canRezCombat
 		for __, details in ipairs(allRezCombat) do
-			if (details.enabled and GetSpellInfo(details.name)) then
+			if (details.enabled and (GetSpellInfo or C_Spell.GetSpellInfo)(details.name)) then
 				local key = details.button .. ", " .. details.modifier;
 				if (not canRezCombat[key]) then
 					canRezCombat[key] = details.name;
@@ -2257,7 +2257,7 @@ function StaticClickCastBroker()
 		
 		-- canRezNoCombat
 		for __, details in ipairs(allRezNoCombat) do
-			if (details.enabled and GetSpellInfo(details.name)) then
+			if (details.enabled and (GetSpellInfo or C_Spell.GetSpellInfo)(details.name)) then
 				local key = details.button .. ", " .. details.modifier;
 				if (not canRezNoCombat[key]) then
 					canRezNoCombat[key] = details.name;
@@ -2435,9 +2435,9 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 					visualFrame:SetBackdropBorderColor(colorBorderBeyondRangeRed, colorBorderBeyondRangeGreen, colorBorderBeyondRangeBlue, colorBorderBeyondRangeAlpha);
 				end
 			else
-				local removableDebuff = select(4, UnitAura(shownUnit, 1, "RAID HARMFUL"));
+				local removableDebuff = C_UnitAuras.GetAuraDataByIndex(shownUnit, 1, "RAID HARMFUL")
 				if (removableDebuff and owner:GetProperty("RemovableDebuffColor")) then
-					local color = DebuffTypeColor[removableDebuff] or DEFAULT_DEBUFF_COLOR;
+					local color = DebuffTypeColor[removableDebuff.dispelName] or DEFAULT_DEBUFF_COLOR;
 					local unit = (isPet and shownUnit:sub(1,-4)) or shownUnit;
 					if (UnitInRange(unit) or UnitIsUnit(unit, "player")) then
 						visualFrame:SetBackdropBorderColor(color.r, color.g, color.b, colorBorderAlpha*0.8 + 0.2);
@@ -2474,9 +2474,9 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 					visualFrame:SetBackdropBorderColor(colorBorderBeyondRangeRed, colorBorderBeyondRangeGreen, colorBorderBeyondRangeBlue, colorBorderBeyondRangeAlpha);
 				end
 			else
-				local removableDebuff = select(4, UnitAura(shownUnit, 1, "RAID HARMFUL"));
+				local removableDebuff = C_UnitAuras.GetAuraDataByIndex(shownUnit, 1, "RAID HARMFUL")
 				if (removableDebuff and owner:GetProperty("RemovableDebuffColor")) then
-					local color = DebuffTypeColor[removableDebuff] or DEFAULT_DEBUFF_COLOR;
+					local color = DebuffTypeColor[removableDebuff.dispelName] or DEFAULT_DEBUFF_COLOR;
 					background:SetColorTexture(colorBackgroundRed/2 + color.r/2, colorBackgroundGreen/2 + color.g/2, colorBackgroundBlue/2 + color.b/2, colorBackgroundAlpha*0.8 + 0.2);
 					local unit = (isPet and shownUnit:sub(1,-4)) or shownUnit;
 					if (UnitInRange(unit) or UnitIsUnit(unit, "player")) then
@@ -3137,15 +3137,15 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 				filterText = "HELPFUL";		-- further filtered by conditional statements during for loop below
 			end
 			for auraIndex = 1, 40 do
-				local name, icon, count, debuffType, duration, expirationTime, source, __, __, spellId = UnitAura(shownUnit, auraIndex, filterText);
-				if (name and spellId and frame) then
+				local aura = C_UnitAuras.GetAuraDataByIndex(shownUnit, auraIndex, filterText)
+				if (aura and frame) then
 					if(
-						auraBossShown[spellId] ~= true
-						and (filterType == 2 or filterType == 4 or not SpellIsSelfBuff(spellId))			-- excludes self-only buffs
-						and (filterType ~= 5 or source == "player" or source == "vehicle" or source == "pet")		-- complements filterType == 5  (buffs cast by the player only)
+						auraBossShown[aura.spellId] ~= true
+						and (filterType == 2 or filterType == 4 or not SpellIsSelfBuff(aura.spellId))				-- excludes self-only buffs
+						and (filterType ~= 5 or aura.isFromPlayerOrPlayerPet or aura.sourceUnit == "vehicle")		-- complements filterType == 5  (buffs cast by the player only)
 					) then
 						numShown = numShown + 1;
-						updateAuraButton(frame, name, icon, count, debuffType, duration, expirationTime);
+						updateAuraButton(frame, aura.name, aura.icon, aura.charges, aura.dispelName, aura.duration, aura.expirationTime);
 						frame = frame.next;
 					end
 				else
@@ -3337,21 +3337,21 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 			--]]
 				-- Consumables
 				for i=1, 40 do
-					local name, icon, __, __, __, __, __, __, __, spellId = UnitAura(shownUnit, i, "HELPFUL CANCELABLE");
-					if (not name or not spellId) then
-						break;
+					local aura = C_UnitAuras.GetAuraDataByIndex(shownUnit, i, "HELPFUL CANCELABLE")
+					if not aura then
+						break
 					end
-					local isConsumable = module.CTRA_Configuration_Consumables[spellId];
+					local isConsumable = module.CTRA_Configuration_Consumables[aura.spellId];
 					if (isConsumable) then
 						if (type(isConsumable) == "number") then
 							local itemName, __, __, __, __, __, __, __, __, itemIcon = GetItemInfo(isConsumable);
 							if (itemName and itemIcon) then
-								tinsert(tooltipTable, strings[8]:format(icon, name, itemIcon, itemName));
+								tinsert(tooltipTable, strings[8]:format(aura.icon, aura.name, itemIcon, itemName));
 							else
-								tinsert(tooltipTable, strings[9]:format(icon, name));
+								tinsert(tooltipTable, strings[9]:format(aura.icon, aura.name));
 							end
 						else
-							tinsert(tooltipTable, strings[9]:format(icon, name));
+							tinsert(tooltipTable, strings[9]:format(aura.icon, aura.name));
 						end
 					end
 				end
@@ -3606,7 +3606,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 							updateAuras();
 							updateBackdrop();
 							if (not InCombatLockdown()) then
-								if (UnitAura(shownUnit,1,"HARMFUL RAID")) then
+								if C_UnitAuras.GetAuraDataByIndex(shownUnit, 1, "HARMFUL RAID") then
 									secureButtonDebuffFirst:Show();
 								else
 									secureButtonDebuffFirst:Hide();
@@ -3619,7 +3619,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 							C_Timer.After(0.001, updateHealthBar);
 							C_Timer.After(0.001, updateAuras);
 						elseif (event == "PLAYER_REGEN_ENABLED") then
-							if (UnitAura(shownUnit,1,"HARMFUL RAID")) then
+							if C_UnitAuras.GetAuraDataByIndex(shownUnit, 1, "HARMFUL RAID") then
 								secureButtonDebuffFirst:Show();
 							else
 								secureButtonDebuffFirst:Hide();
@@ -3696,7 +3696,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 			secureButton:SetAttribute("unit", shownUnit);
 			secureButtonDebuffFirst:SetAttribute("unit", shownUnit);
 			secureButtonCliqueFirst:SetAttribute("unit", shownUnit);
-			if (UnitAura(shownUnit, 1, "RAID HARMFUL")) then
+			if C_UnitAuras.GetAuraDataByIndex(shownUnit, 1, "HARMFUL RAID") then
 				secureButtonDebuffFirst:Show();
 			else
 				secureButtonDebuffFirst:Hide();
