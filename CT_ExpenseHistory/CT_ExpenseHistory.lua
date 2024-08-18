@@ -20,7 +20,7 @@ local MODULE_TOC_NAME, module = ...;
 
 local _G = getfenv(0);
 
-local MODULE_TOC_VERSION = strmatch(GetAddOnMetadata(MODULE_TOC_NAME, "version"), "^([%d.]+)");
+local MODULE_TOC_VERSION = strmatch(C_AddOns.GetAddOnMetadata(MODULE_TOC_NAME, "version"), "^([%d.]+)");
 
 module.name = "CT_ExpenseHistory";
 module.version = MODULE_TOC_VERSION;

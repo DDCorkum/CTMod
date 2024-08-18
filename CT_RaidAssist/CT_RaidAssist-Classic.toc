@@ -1,5 +1,5 @@
-## Interface: 11502
-## Version: 10.2.5.1
+## Interface: 11503
+## Version: 11.0.2.2
 ## Title: CT_RaidAssist
 ## Author: TS & Cide (Original), Dargen (MT Addon), DDC (Redesign)
 ## Notes: Monitor raid HP and click cast buffs, debuff removals, resurrections

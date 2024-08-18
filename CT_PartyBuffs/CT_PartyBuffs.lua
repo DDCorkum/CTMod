@@ -15,7 +15,7 @@ local module = select(2, ...);
 local _G = getfenv(0);
 
 local MODULE_NAME = "CT_PartyBuffs";
-local MODULE_VERSION = strmatch(GetAddOnMetadata(MODULE_NAME, "version"), "^([%d.]+)");
+local MODULE_VERSION = strmatch(C_AddOns.GetAddOnMetadata(MODULE_NAME, "version"), "^([%d.]+)");
 
 module.name = MODULE_NAME;
 module.version = MODULE_VERSION;
@@ -38,6 +38,8 @@ local partyFrames = {}	-- populated by OnLoad() funcs below
 local petFrame
 
 local numBuffs, numDebuffs, numPetBuffs, layout		-- options used in createAndAnchorButtons() and its helper, anchorFirstBuffAndDebuff()
+
+local buffSize, debuffSize, debuffBorderShown = 0, 0, false
 
 -- Helper intended only for use in createAndAnchorButtons(); accepts nil if there are no buttons of a given kind
 local function anchorFirstBuffAndDebuff(buff, debuff)
@@ -67,6 +69,7 @@ local function createAndAnchorButtons()
 		while (count < numBuffs and count < CT_MAX_PARTY_BUFFS) do
 			local btn = buffPool:Acquire()
 			btn:SetParent(frame)
+			btn:SetSize(buffSize, buffSize)
 			if (count > 0) then
 				btn:SetPoint("LEFT", frame.buffs[count], "RIGHT", 2, 0)
 			end
@@ -85,6 +88,9 @@ local function createAndAnchorButtons()
 		while (count < numDebuffs and count < CT_MAX_PARTY_DEBUFFS) do
 			local btn = debuffPool:Acquire()
 			btn:SetParent(frame)
+			btn:SetSize(debuffSize, debuffSize)
+			btn.Border:SetSize(debuffSize+2, debuffSize+2)
+			btn.Border:SetShown(debuffBorderShown)
 			if (count > 0) then
 				btn:SetPoint("LEFT", frame.debuffs[count], "RIGHT", 2, 0)
 			end
@@ -132,39 +138,30 @@ local function createAndAnchorButtons()
 end
 
 local function setBuffSize(size)
-	size = size + 17 - 2 * ClampedPercentageBetween(UIParent:GetScale(), 0.7, 0.9)
+	buffSize = size + 17 - 2 * ClampedPercentageBetween(UIParent:GetScale(), 0.7, 0.9)
 	for btn in buffPool:EnumerateActive() do
-		btn:SetSize(size, size)
+		btn:SetSize(buffSize, buffSize)
 	end
-	for __, btn in buffPool:EnumerateInactive() do
-		btn:SetSize(size, size)
-	end	
 end
 
 local function setDebuffSize(size)
-	size = size + 17 - 2 * ClampedPercentageBetween(UIParent:GetScale(), 0.7, 0.9)
+	debuffSize = size + 17 - 2 * ClampedPercentageBetween(UIParent:GetScale(), 0.7, 0.9)
 	for btn in debuffPool:EnumerateActive() do
-		btn:SetSize(size, size)
-		btn.Border:SetSize(size+2, size+2)
-	end
-	for __, btn in debuffPool:EnumerateInactive() do
-		btn:SetSize(size, size)
-		btn.Border:SetSize(size+2, size+2)
+		btn:SetSize(debuffSize, debuffSize)
+		btn.Border:SetSize(debuffSize+2, debuffSize+2)
 	end
 	
 	if (PetFrameDebuff1 and PetFrameDebuff2 and PetFrameDebuff3 and PetFrameDebuff4) then
-		PetFrameDebuff1:SetSize(size, size)
-		PetFrameDebuff2:SetSize(size, size)
-		PetFrameDebuff3:SetSize(size, size)
-		PetFrameDebuff4:SetSize(size, size)
+		PetFrameDebuff1:SetSize(debuffSize, debuffSize)
+		PetFrameDebuff2:SetSize(debuffSize, debuffSize)
+		PetFrameDebuff3:SetSize(debuffSize, debuffSize)
+		PetFrameDebuff4:SetSize(debuffSize, debuffSize)
 	end
 end
 
 local function setDebuffBorder(show)
+	debuffBorderShown = show
 	for btn in debuffPool:EnumerateActive() do
-		btn.Border:SetShown(show)
-	end
-	for __, btn in debuffPool:EnumerateInactive() do
 		btn.Border:SetShown(show)
 	end
 end
@@ -183,11 +180,11 @@ local function refreshBuffs()
 		
 		local debuffsShown = 0
 		for i, button in ipairs(frame.debuffs) do
-			local name, icon, count, debuffType = UnitAura(frame.unit, i, debuffFilter)
-			if (name) then
-				button.Icon:SetTexture(icon)
-				button.Count:SetText(count > 1 and count or "")
-				local color = DebuffTypeColor[debuffType or "none"]
+			local aura = C_UnitAuras.GetAuraDataByIndex(frame.unit, i, debuffFilter)
+			if (aura) then
+				button.Icon:SetTexture(aura.icon)
+				button.Count:SetText(aura.charges > 1 and aura.charges or "")
+				local color = DebuffTypeColor[aura.dispelName or "none"]
 				button.Border:SetVertexColor(color.r, color.g, color.b)
 				button:Show()
 				debuffsShown = i
@@ -204,9 +201,9 @@ local function refreshBuffs()
 					button:SetPoint("TOPLEFT", 0, 0)
 				end
 			end
-			local name, icon = UnitAura(frame.unit, i, buffFilter)
-			if (name) then
-				button.Icon:SetTexture(icon)
+			local aura = C_UnitAuras.GetAuraDataByIndex(frame.unit, i, buffFilter)
+			if (aura) then
+				button.Icon:SetTexture(aura.icon)
 				button:Show()
 			else
 				button:Hide()
