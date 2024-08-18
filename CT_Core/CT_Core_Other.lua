@@ -1882,7 +1882,8 @@ do
 			if (openBankBags) then
 				-- Open all bank bags.
 				-- The game closes these when the bank closes.
-				for i = NUM_BAG_FRAMES + 1, NUM_CONTAINER_FRAMES, 1 do
+				for i = BACKPACK_CONTAINER+ITEM_INVENTORY_BANK_BAG_OFFSET+1, BACKPACK_CONTAINER+ITEM_INVENTORY_BANK_BAG_OFFSET+NUM_BANKBAGSLOTS, 1 do
+				--for i = NUM_BAG_FRAMES + 1, NUM_CONTAINER_FRAMES, 1 do
 					OpenBag(i);
 				end
 			end
