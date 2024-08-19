@@ -1274,7 +1274,7 @@ function auraClass:checkExpiration()
 
 			if (name) then
 				-- If you don't know how to cast this buff...
-			     	local isUsable, insufficientPower = C_Spell.IsSpellUsable(name)
+			     	local isUsable, insufficientPower = (IsUsableSpell or C_Spell.IsSpellUsable)(name)	-- classic vs WoW 11.0.2
 			     	if not isUsable and not insufficientPower then
 					-- If ignoring buffs you cannot cast...
 			     		if (globalObject.expirationCastOnly) then

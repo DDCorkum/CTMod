@@ -1,4 +1,7 @@
-CT_RaidAssist (11.0.2.2) 2024-08-18
+CT_BuffMod (11.0.2.3) 2024-08-18
+- Classic compatibility for 11.0.2.2
+
+CT_BuffMod (11.0.2.2) 2024-08-18
 - Updates for WoW: The War Within
 
 CT_BuffMod (10.0.0.4) 2022-11-07

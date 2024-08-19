@@ -159,7 +159,7 @@ function public:InsertHerb(mapID, x, y, herb, descript, name)
 	-- convert special node names to the standard variant (localization dependent)
 	if GetLocale() == "enUS" or GetLocale() == "enGB" then
 	
-		-- Drangonflight overloads
+		-- Drangonflight, The War Within
 		if herb:sub(1, 8) == "Decayed " and herb:len() > 8 then
 			herb = herb:sub(9)
 		elseif herb:sub(1, 11) == "Self-Grown " and herb:len() > 11 then
@@ -178,6 +178,16 @@ function public:InsertHerb(mapID, x, y, herb, descript, name)
 			herb = herb:sub(9)
 		elseif herb:sub(1, 10) == "Overgrown " and herb:len() > 10 then
 			herb = herb:sub(11)
+		elseif herb:sub(1,11) == "Irradiated " and herb:len() > 11 then
+			herb = herb:sub(12)
+		elseif herb:sub(1,13) == "Crystallized " and herb:len() > 13 then
+			herb = herb:sub(14)
+		elseif herb:sub(1,11) == "Sporefused " and herb:len() > 11 then
+			herb = herb:sub(12)
+		elseif herb:sub(1,13) == "Sporelusive " and herb:len() > 13 then
+			herb = herb:sub(14)
+		elseif herb:sub(1,13) == "Camouflaged " and herb:len() > 13 then
+			herb = herb:sub(14)
 		end
 	
 	elseif GetLocale() == "frFR" then
@@ -335,7 +345,7 @@ function public:InsertOre(mapID, x, y, ore, descript, name)
 			ore = ore:sub(7); 				-- "Small Thorium Vein" to "Thorium Vein"
 		end
 		
-		-- Dragonflight overloading
+		-- Dragonflight, The War Within
 		if ore:sub(1,14) == "Titan-Touched " and ore:len() > 14 then
 			ore = ore:sub(15)
 		elseif ore:sub(1,7) == "Primal " and ore:len() > 7 then
@@ -350,6 +360,8 @@ function public:InsertOre(mapID, x, y, ore, descript, name)
 			ore = ore:sub(13)
 		elseif ore:sub(1,7) == "Living " and ore:len() > 7 then
 			ore = ore:sub(8)
+		elseif ore:sub(1,13) == "Crystallized " and ore:len() > 13 then
+			ore = ore:sub(14)
 		end
 		
 		-- nouns
@@ -1800,10 +1812,10 @@ function module:init()
 	module:Initialize();
 
 	-- convert an older note name for compatibility
-	if CT_MapMod_Notes[119] then
-		for __, pin in pairs(CT_MapMod_Notes[119]) do
-			if pin.subset == "Adders Tongue" then
-				pin.subset = "Adder's Tongue"
+	for __, zone in pairs(CT_MapMod_Notes) do
+		for __, pin in pairs(zone) do
+			if pin.subset == "Stormvein" then
+				pin.subset = "Stormvine"
 			end
 		end
 	end

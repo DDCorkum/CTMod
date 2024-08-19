@@ -3074,14 +3074,14 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 		wipe(auraBossShown);
 		local frame = auraBoss1;
 		local encounter = module:isInEncounter() or select(3, GetInstanceInfo()) == 8;	-- raid fights, or mythic plus dungeons
-		if(encounter and shownUnit and UnitExists(shownUnit) and owner:GetProperty("ShowBossAuras")) then		
+		if (encounter and shownUnit and UnitExists(shownUnit) and owner:GetProperty("ShowBossAuras")) then		
 			for auraIndex = 1, 40 do
-				local name, icon, count, debuffType, duration, expirationTime, __, __, __, spellId = UnitBuff(shownUnit, auraIndex);
-				if (name and spellId and frame) then
-					if (module.CTRA_Configuration_BossAuras[spellId] and (count or 0) >= module.CTRA_Configuration_BossAuras[spellId]) then
-						auraBossShown[spellId] = true;
+				local aura = C_UnitAuras.GetBuffDataByIndex(shownUnit, auraIndex)
+				if aura and frame then
+					if  (module.CTRA_Configuration_BossAuras[aura.spellId] and (aura.applications or 0) >= module.CTRA_Configuration_BossAuras[aura.spellId]) then
+						auraBossShown[aura.spellId] = true;
 						numShown = numShown + 1;
-						updateAuraButton(frame, name, icon, count, debuffType, duration, expirationTime);
+						updateAuraButton(frame, aura.name, aura.icon, aura.applications, aura.dispelName, aura.duration, aura.expirationTime);
 						frame = frame.next
 					end
 				else
@@ -3090,12 +3090,12 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 				end
 			end
 			for auraIndex = 1, 40 do
-				local name, icon, count, debuffType, duration, expirationTime, __, __, __, spellId = UnitDebuff(shownUnit, auraIndex);
-				if (name and spellId and frame) then
-					if (module.CTRA_Configuration_BossAuras[spellId] and (count or 0) >= module.CTRA_Configuration_BossAuras[spellId]) then
-						auraBossShown[spellId] = true;
+				local aura = C_UnitAuras.GetDebuffDataByIndex(shownUnit, auraIndex)
+				if aura and frame then
+					if (module.CTRA_Configuration_BossAuras[aura.spellId] and (aura.applications or 0) >= module.CTRA_Configuration_BossAuras[aura.spellId]) then
+						auraBossShown[aura.spellId] = true;
 						numShown = numShown + 1;
-						updateAuraButton(frame, name, icon, count, debuffType, duration, expirationTime);
+						updateAuraButton(frame, aura.name, aura.icon, aura.applications, aura.dispelName, aura.duration, aura.expirationTime);
 						frame = frame.next
 					end
 				else
@@ -3145,7 +3145,7 @@ function NewCTRAPlayerFrame(parentInterface, parentFrame, isDummy)
 						and (filterType ~= 5 or aura.isFromPlayerOrPlayerPet or aura.sourceUnit == "vehicle")		-- complements filterType == 5  (buffs cast by the player only)
 					) then
 						numShown = numShown + 1;
-						updateAuraButton(frame, aura.name, aura.icon, aura.charges, aura.dispelName, aura.duration, aura.expirationTime);
+						updateAuraButton(frame, aura.name, aura.icon, aura.applications, aura.dispelName, aura.duration, aura.expirationTime);
 						frame = frame.next;
 					end
 				else

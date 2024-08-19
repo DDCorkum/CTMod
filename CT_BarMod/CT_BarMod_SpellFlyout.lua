@@ -164,7 +164,7 @@ function module.createSpellFlyoutButtons(numSlots)	-- must not be called during 
 		
 		function button:updateSpellID(spellID)
 			button.spellID = spellID
-			button.Icon:SetTexture(GetSpellTexture(spellID))
+			button.Icon:SetTexture((GetSpellTexture or C_Spell.GetSpellTexture)(spellID))
 		end
 	end
 end

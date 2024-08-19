@@ -55,7 +55,7 @@ module.pinTypes =
 			-- BC, Wrath, Cata, MoP
 			"Felweed", "Flame Cap", "Mana Thistle", "Netherbloom", "Netherdust Bush", "Nightmare Vine", "Ragveil", "Terocone",
 			"Adder's Tongue", "Frost Lotus", "Goldclover", "Icethorn", "Lichbloom", "Talandra's Rose", "Tiger Lily",	"Frozen Herb",
-			"Cinderbloom", "Azshara's Veil", "Stormvein", "Heartblossom", "Whiptail", "Twilight Jasmine",
+			"Cinderbloom", "Azshara's Veil", "Stormvine", "Heartblossom", "Whiptail", "Twilight Jasmine",
 			"Green Tea Leaf", "Rain Poppy", "Silkweed", "Snow Lily", "Fool's Cap", "Sha-Touched Herb", "Golden Lotus",
 		},
 		["Later Expansions"] =
@@ -189,21 +189,21 @@ module.pinIcons =
 	["Frozen Herb"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_FrozenHerb",
 	
 	-- Cataclysm
-	["Cinderbloom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",
-	["Azshara's Veil"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",
-	["Stormvein"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",
-	["Heartblossom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",
-	["Whiptail"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",
-	["Twilight Jasmine"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",
+	["Cinderbloom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Cinderbloom",
+	["Azshara's Veil"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_AzsharasVeil",
+	["Stormvine"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Stormvine",
+	["Heartblossom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Heartblossom",
+	["Whiptail"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Whiptail",
+	["Twilight Jasmine"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_TwilightJasmine",
 	
 	-- Mists of Pandaria
-	["Green Tea Leaf"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",
-	["Rain Poppy"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",
-	["Silkweed"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",
-	["Snow Lily"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",
-	["Fool's Cap"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",
-	["Sha-Touched Herb"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",
-	["Golden Lotus"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",	
+	["Green Tea Leaf"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_GreenTeaLeaf",
+	["Rain Poppy"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_RainPoppy",
+	["Silkweed"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Silkweed",
+	["Snow Lily"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_SnowLily",
+	["Fool's Cap"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_FoolsCap",
+	["Sha-Touched Herb"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_ShaHerb",
+	["Golden Lotus"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_GoldenLotus",	
 	
 	-- WoD
 	["Fireweed"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Fireweed",
