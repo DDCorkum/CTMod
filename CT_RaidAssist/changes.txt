@@ -1,3 +1,6 @@
+CT_RaidAssist (11.0.2.3) 2024-08-19
+- Updates for WoW: The War Within
+
 CT_RaidAssist (11.0.2.2) 2024-08-18
 - Updates for WoW: The War Within
 
