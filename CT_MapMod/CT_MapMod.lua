@@ -184,8 +184,8 @@ function public:InsertHerb(mapID, x, y, herb, descript, name)
 			herb = herb:sub(14)
 		elseif herb:sub(1,11) == "Sporefused " and herb:len() > 11 then
 			herb = herb:sub(12)
-		elseif herb:sub(1,13) == "Sporelusive " and herb:len() > 13 then
-			herb = herb:sub(14)
+		elseif herb:sub(1,8) == "Altered " and herb:len() > 8 then
+			herb = herb:sub(9)
 		elseif herb:sub(1,13) == "Camouflaged " and herb:len() > 13 then
 			herb = herb:sub(14)
 		end
@@ -211,7 +211,7 @@ function public:InsertHerb(mapID, x, y, herb, descript, name)
 
 	elseif GetLocale() == "deDE" then
 
-		-- Drangonflight overloads
+		-- Drangonflight, The War Within
 		if herb:sub(1, 11) == "Verrottete " and herb:len() > 11 then
 			herb = herb:sub(12)
 		elseif herb:sub(1, 12) == "Verrotteter " and herb:len() > 12 then
@@ -260,6 +260,36 @@ function public:InsertHerb(mapID, x, y, herb, descript, name)
 			herb = herb:sub(14)
 		elseif herb:sub(1, 13) == "Verwuchertes " and herb:len() > 13 then
 			herb = herb:sub(14)
+		elseif herb:sub(1,12) == "Verstrahlte " and herb:len() > 12 then
+			herb = herb:sub(13)
+		elseif herb:sub(1,13) == "Verstrahlter " and herb:len() > 13 then
+			herb = herb:sub(14)			
+		elseif herb:sub(1,13) == "Verstrahltes " and herb:len() > 13 then
+			herb = herb:sub(14)
+		elseif herb:sub(1,16) == "Kristallisierte " and herb:len() > 16 then
+			herb = herb:sub(17)
+		elseif herb:sub(1,17) == "Kristallisierter " and herb:len() > 17 then
+			herb = herb:sub(18)
+		elseif herb:sub(1,17) == "Kristallisiertes " and herb:len() > 17 then
+			herb = herb:sub(18)
+		elseif herb:sub(1,20) == "Sporenverschmolzene " and herb:len() > 20 then
+			herb = herb:sub(21)
+		elseif herb:sub(1,21) == "Sporenverschmolzener " and herb:len() > 21 then
+			herb = herb:sub(22)
+		elseif herb:sub(1,21) == "Sporenverschmolzenes " and herb:len() > 21 then
+			herb = herb:sub(22)
+		elseif herb:sub(1,13) == "Modifizierte " and herb:len() > 13 then
+			herb = herb:sub(14)
+		elseif herb:sub(1,14) == "Modifizierter " and herb:len() > 14 then
+			herb = herb:sub(15)
+		elseif herb:sub(1,14) == "Modifiziertes " and herb:len() > 14 then
+			herb = herb:sub(15)
+		elseif herb:sub(1,9) == "Getarnte " and herb:len() > 9 then
+			herb = herb:sub(10)
+		elseif herb:sub(1,10) == "Getarnter " and herb:len() > 10 then
+			herb = herb:sub(11)
+		elseif herb:sub(1,10) == "Getarntes " and herb:len() > 10 then
+			herb = herb:sub(11)
 		end
 	end
 
@@ -362,6 +392,14 @@ function public:InsertOre(mapID, x, y, ore, descript, name)
 			ore = ore:sub(8)
 		elseif ore:sub(1,13) == "Crystallized " and ore:len() > 13 then
 			ore = ore:sub(14)
+		elseif ore:sub(1,12) == "Camouflaged " and ore:len() > 12 then
+			ore = ore:sub(13)
+		elseif ore:sub(1,7) == "Webbed " and ore:len() > 7 then
+			ore = ore:sub(8)
+		elseif ore:sub(1,8) == "Weeping " and ore:len() > 8 then
+			ore = ore:sub(9)
+		elseif ore:sub(1,8) == "EZ-Mine-" and ore:len() > 8 then
+			ore = ore:sub(9)
 		end
 		
 		-- nouns
@@ -402,7 +440,7 @@ function public:InsertOre(mapID, x, y, ore, descript, name)
 			ore = ore:sub(8); 				-- "Reiche Adamantitablagerung" to "Adamantitablagerung"
 		end
 		
-		-- Dragonflight overloading
+		-- Dragonflight, The War Within
 		if ore:sub(1,18) == "Titanenberührtes " and ore:len() > 18 then
 			ore = ore:sub(19)
 		elseif ore:sub(1,16) == "Titanversetztes " and ore:len() > 16 then
@@ -419,6 +457,28 @@ function public:InsertOre(mapID, x, y, ore, descript, name)
 			ore = ore:sub(13)
 		elseif ore:sub(1,9) == "Lebendes " and ore:len() > 9 then
 			ore = ore:sub(10)
+		elseif ore:sub(1,16) == "Kristallisierte " and ore:len() > 16 then
+			ore = ore:sub(17)
+		elseif ore:sub(1,17) == "Kristallisiertes " and ore:len() > 17 then
+			ore = ore:sub(18)
+		elseif ore:sub(1,9) == "Getarnte " and ore:len() > 9 then
+			ore = ore:sub(10)
+		elseif ore:sub(1,10) == "Getarntes " and ore:len() > 10 then
+			ore = ore:sub(11)
+		elseif ore:sub(1,11) == "Eingewebte " and ore:len() > 11 then
+			ore = ore:sub(12)
+		elseif ore:sub(1,12) == "Eingewebtes " and ore:len() > 12 then
+			ore = ore:sub(13)
+		elseif ore:sub(1,9) == "Heulende " and ore:len() > 9 then
+			ore = ore:sub(10)
+		elseif ore:sub(1,10) == "Heulendes " and ore:len() > 10 then
+			ore = ore:sub(11)
+		elseif ore:sub(1,13) == "Schnellabbau-" and ore:len() > 13 then
+			ore = ore:sub(14)
+		elseif ore:sub(1,13) == "Reichhaltige " and ore:len() > 13 then
+			ore = ore:sub(14)
+		elseif ore:sub(1,14) == "Reichhaltiges " and ore:len() > 14 then
+			ore = ore:sub(15)
 		end
 		
 		-- nouns
