@@ -734,12 +734,6 @@ function CT_BuffMod_UnsecureAuraHeader_Update(self)
 	end
 
 	configureAuras(self, sortingTable, consolidateTable, weaponPosition);
-	while ( sortingTable[1] ) do
-		releaseTable(tremove(sortingTable));
-	end
-	while ( consolidateTable and consolidateTable[1] ) do
-		releaseTable(tremove(consolidateTable));
-	end
 end
 
 end
@@ -1626,7 +1620,7 @@ function unitClass:updateSpellsForFilter(filter, buffFlag)
 			end
 		end
 		auraObject.updated = true;
-		auraObject.count = aura.charges;
+		auraObject.count = aura.applications;
 
 		index = index + 1;
 		aura = C_UnitAuras.GetAuraDataByIndex(unit, index, filter)
@@ -2944,8 +2938,8 @@ local function auraButton_updateAppearance(button)
 		if (not fsCount) then
 			fsCount = button:CreateFontString(nil, "OVERLAY", "NumberFontNormalSmall");
 			fsCount:SetWordWrap(false)
-			fsCount:SetPoint("BOTTOMRIGHT", button, 5, 0);
-			fsCount:SetFont("ARIALN.TTF", 12, ""); -- "MONOCHROME");
+			fsCount:SetPoint("BOTTOMRIGHT", button, module:getGameVersion() >= 10 and 2 or 5, 0);
+			--fsCount:SetFont("ARIALN.TTF", 12, ""); -- "MONOCHROME");
 		end
 		fsCount:SetText(auraObject.count);
 		button.fsCount = fsCount;
