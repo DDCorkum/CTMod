@@ -1,3 +1,6 @@
+CT_MapMod (11.0.2.4) 2024-08-23
+- Herb and ore updates
+
 CT_MapMod (11.0.2.3) 2024-08-18
 - Herb and ore updates
 

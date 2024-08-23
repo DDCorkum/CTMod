@@ -1,5 +1,5 @@
 ## Interface: 40400
-## Version: 11.0.2.3
+## Version: 11.0.2.4
 ## Title: CT_BuffMod
 ## Notes: Customizable buff display.
 ## DefaultState: Enabled

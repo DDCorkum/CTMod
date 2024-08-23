@@ -70,7 +70,7 @@ module.pinTypes =
 		["Worldsoul Saga"] = 
 		{
 			-- WW, Mid, LT
-			"Arathor's Spear", "Blessing Blossom", "Luredrop", "Orbinid",
+			"Arathor's Spear", "Blessing Blossom", "Luredrop", "Orbinid", "Mycobloom"
 			-- insert Midnight herbs here (WoW 11.x)
 			-- insert Last Titan herbs here (WoW 12.x)
 		}
@@ -102,7 +102,7 @@ module.pinTypes =
 		["Worldsoul Saga"] = 
 		{
 			-- WW, Mid, LT
-			"Aqirite", "Ironclaw Ore",
+			"Aqirite", "Ironclaw", "Bismuth"
 			-- insert Midnight ores here (WoW 11.x)
 			-- insert Last Titan ores here (WoW 12.x)
 		}
@@ -252,6 +252,7 @@ module.pinIcons =
 	["Blessing Blossom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_BlessingBlossom",
 	["Luredrop"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Luredrop",
 	["Orbinid"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Orbinid",
+	["Mycobloom"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Herb_Bruiseweed",
 	
 	-- Ore --
 	
@@ -313,7 +314,8 @@ module.pinIcons =
 	
 	-- The War Within
 	["Aqirite"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_CopperVein",
-	["Ironclaw Ore"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Elementium",
+	["Ironclaw"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Elementium",
+	["Bismuth"] = "Interface\\AddOns\\CT_MapMod\\Resource\\Ore_Platinum",
 	
 }
 setmetatable(module.pinIcons, {__index = function() return "Interface\\RaidFrame\\UI-RaidFrame-Threat" end})
@@ -486,6 +488,7 @@ module.gatheringSkills =
 	[265835] = "Herb",
 	[309780] = "Herb",	-- Shadowlands
 	[366252] = "Herb",	-- Dragonflight
+	[441327] = "Herb",  -- The War Within
 
 	-- Mining
 	   [186] = "Ore",
@@ -510,6 +513,7 @@ module.gatheringSkills =
 	[265854] = "Ore",	-- Zandalari
 	[309835] = "Ore",	-- Shadowlands
 	[366260] = "Ore",	-- Dragonflight
+	[423341] = "Ore",  -- The War Within
 }
 
 
