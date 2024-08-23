@@ -488,7 +488,8 @@ module.gatheringSkills =
 	[265835] = "Herb",
 	[309780] = "Herb",	-- Shadowlands
 	[366252] = "Herb",	-- Dragonflight
-
+	[441327] = "Herb",	-- The War Within
+	
 	-- Mining
 	   [186] = "Ore",
 	  [2575] = "Ore",	-- Classic Apprentice
@@ -512,6 +513,7 @@ module.gatheringSkills =
 	[265854] = "Ore",	-- Zandalari
 	[309835] = "Ore",	-- Shadowlands
 	[366260] = "Ore",	-- Dragonflight
+	[423353] = "Ore",	-- The War Within
 }
 
 
