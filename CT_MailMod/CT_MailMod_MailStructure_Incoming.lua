@@ -129,6 +129,10 @@ function incMail:canMassReturn()
 	if (self.numItems == 0 and self.money == 0 and self.codAmount == 0) then
 		return false;
 	end
+	-- Dont' return consortium crafting orders
+	if select(6, GetInboxText(self.id)) then
+		return false
+	end
 	-- Don't return messages that cannot be replied to.
 	if (not self.canReply) then
 		return false;
@@ -324,6 +328,7 @@ function incMail:retrieveSelectedMail(cancelProcessing)
 				module:inboxUnselectSingle(self.id);
 				module:inboxUpdateSelection();
 			end
+			
 			return 1;
 		end
 		-- We've already taken the money.
@@ -359,6 +364,14 @@ function incMail:retrieveSelectedMail(cancelProcessing)
 				if (self.numItems == 1) then
 					module:inboxUnselectSingle(self.id);
 					module:inboxUpdateSelection();
+					
+					if select(6, GetInboxText(self.id)) then
+						-- This is a special case for crafting orders that do not self-delete
+						-- after taking the last item, so we should just move on.
+						module:logPending(self)
+						return 3
+					end
+					
 				end
 				return 1;
 			end
