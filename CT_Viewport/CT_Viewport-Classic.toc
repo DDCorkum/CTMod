@@ -1,4 +1,4 @@
-## Interface: 11503
+## Interface: 11506
 ## Version: 11.0.2.2
 ## Title: CT_Viewport
 ## Notes: Allows you to change the rendered world's size.
@@ -6,6 +6,7 @@
 ## SavedVariablesPerCharacter: CT_Viewport_Saved
 ## SavedVariables: CT_ViewportOptions, CT_ViewportBackup
 ## Dependencies: CT_Library
+## Group: CT_Library
 ## X-Part-Of: CT-Library
 
 CT_Viewport.lua

@@ -25,32 +25,9 @@ end
 
 
 --------------------------------------------
--- Local Copies and Retail/Classic API differences
+-- Retail/Classic API differences
 
-local format = format;
-local ipairs = ipairs;
-local pairs = pairs;
-local tinsert = tinsert;
-local tonumber = tonumber;
-local tostring = tostring;
-local ClearOverrideBindings = ClearOverrideBindings;
-local GetActionInfo = GetActionInfo;
-local GetActionText = GetActionText;
-local GetBindingAction = GetBindingAction;
-local GetBindingKey = GetBindingKey;
-local GetBindingText = GetBindingText;
-local GetCurrentBindingSet = GetCurrentBindingSet;
-local GetMacroInfo = GetMacroInfo;
-local GetMouseFocus = GetMouseFocus;
-local GetSpellInfo = GetSpellInfo;
-local HasAction = HasAction;
-local InCombatLockdown = InCombatLockdown;
-local IsAltKeyDown = IsAltKeyDown;
-local IsControlKeyDown = IsControlKeyDown;
-local IsShiftKeyDown = IsShiftKeyDown;
 local SaveBindings = SaveBindings or AttemptToSaveBindings;   -- Retail vs Classic
-local SetOverrideBinding = SetOverrideBinding;
-local SetOverrideBindingClick = SetOverrideBindingClick;
 
 -- End Local Copies
 --------------------------------------------
@@ -902,7 +879,7 @@ local function flyoutModeStart()
 					module.needSetAttributes = true;
 				end
 				obj:updateFlyout();
-				if ((SpellFlyout and SpellFlyout:IsShown() and SpellFlyout:GetParent() == obj.button) or GetMouseFocus() == obj.button) then
+				if ((SpellFlyout and SpellFlyout:IsShown() and SpellFlyout:GetParent() == obj.button) or GetMouseFoci()[1] == obj.button) then
 					if (not InCombatLockdown()) then
 						SpellFlyout:Hide();
 					end

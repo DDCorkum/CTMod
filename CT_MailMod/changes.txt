@@ -1,3 +1,6 @@
+CT_MailMod (11.1.0.1) 2025-02-27
+- Further avoiding crafting orders to avoid getting hung
+
 CT_MailMod (11.0.2.5) 2024-09-19
 - Fix for tooltip with mail having multiple attachments
 - Fix for mail opening getting hung on crafting orders
