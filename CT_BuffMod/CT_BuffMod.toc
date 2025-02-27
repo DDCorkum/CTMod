@@ -1,10 +1,11 @@
-## Interface: 110002
+## Interface: 110100
 ## Version: 11.0.2.4
 ## Title: CT_BuffMod
 ## Notes: Customizable buff display.
 ## DefaultState: Enabled
 ## SavedVariables: CT_BuffModOptions
 ## Dependencies: CT_Library
+## Group: CT_Library
 ## X-Part-Of: CT-Library
 
 CT_BuffMod.xml
