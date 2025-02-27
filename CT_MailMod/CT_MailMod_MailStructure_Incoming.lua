@@ -109,6 +109,10 @@ function incMail:canMassOpen()
 	if (self.numItems == 0 and self.money == 0) then
 		return false;
 	end
+	-- Dont' open consortium crafting orders (because its acting buggy)
+	if select(6, GetInboxText(self.id)) then
+		return false
+	end
 	return true;
 end
 
